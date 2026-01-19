@@ -42,7 +42,7 @@ CREATE TABLE CA (
     NAME VARCHAR(45) NOT NULL COMMENT 'duplication is not permitted',
     SUBJECT VARCHAR(350) NOT NULL,
     REV_INFO VARCHAR(200) NULL COMMENT 'CA revocation information',
-    CERT VARCHAR(6000) NOT NULL,
+    CERT LONGTEXT NOT NULL,
     CONSTRAINT PK_CA PRIMARY KEY (ID)
 );
 
@@ -84,8 +84,8 @@ CREATE TABLE CERT (ID BIGINT NOT NULL,
     CRL_SCOPE SMALLINT NOT NULL COMMENT 'CRL scope, reserved for future use',
     SHA1 CHAR(28) NOT NULL COMMENT 'base64 encoded SHA1 fingerprint of the certificate',
     REQ_SUBJECT VARCHAR(350) NULL,
-    CERT VARCHAR(6000) NOT NULL COMMENT 'Base64 encoded certificate',
-    PRIVATE_KEY VARCHAR(6000) NULL COMMENT 'Base64-encoded encrypted PKCS#8 private key',
+    CERT LONGTEXT NOT NULL COMMENT 'Base64 encoded certificate',
+    PRIVATE_KEY LONGTEXT NULL COMMENT 'Base64-encoded encrypted PKCS#8 private key',
     CONSTRAINT PK_CERT PRIMARY KEY (ID)
 );
 

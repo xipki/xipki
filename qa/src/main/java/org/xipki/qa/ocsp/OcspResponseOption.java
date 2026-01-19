@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ocsp;
@@ -6,7 +6,7 @@ package org.xipki.qa.ocsp;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.TripleState;
+import org.xipki.util.extra.type.TripleState;
 
 /**
  * OCSP response option.

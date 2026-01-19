@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
@@ -14,14 +14,14 @@
   <properties>
     <app.name>QA</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <patchkaraf.repos>mvn:org.xipki.feature/qa/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client,xipki-ca-mgmt,xipki-qa</patchkaraf.features>
+    <patchkaraf.repos>mvn:org.xipki/karaf-features/${project.version}/xml/features</patchkaraf.repos>
+    <patchkaraf.features>(-jaas,-ssh,-config,aries-blueprint),xipki-pki-client,xipki-ca-mgmt,xipki-qa</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
-      <groupId>org.xipki.feature</groupId>
-      <artifactId>qa</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>karaf-features</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -45,7 +45,7 @@
         <directory>../xipki-cli/src/main/unfiltered</directory>
         <filtering>false</filtering>
         <includes>
-          <include>xipki/etc/curl.json</include>
+          <include>xipki/etc/*.json</include>
           <include>etc/**</include>
         </includes>
       </resource>
@@ -59,6 +59,8 @@
         <includes>
           <include>etc/**</include>
           <include>xipki/sql/**</include>
+          <include>xipki/ca-setup/c14n-keyspec.script</include>
+          <include>xipki/ca-setup/print-keyspecs.script</include>
         </includes>
       </resource>
       <resource>
@@ -101,13 +103,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-ctlog-servlet</artifactId>
-                  <version>${project.version}</version>
-                  <type>war</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
-                  <artifactId>dummy-crl-servlet</artifactId>
+                  <artifactId>dummy-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
@@ -163,25 +159,6 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Patch Karaf -->
-            <id>patch-karaf</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/jars/system/org/osgi/org.osgi.service.metatype/1.4.1</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.osgi</groupId>
-                  <artifactId>org.osgi.service.metatype</artifactId>
-                  <version>1.4.1</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-prepare-jar</id>
             <phase>generate-resources</phase>
             <goals>
@@ -220,7 +197,7 @@
             <configuration>
               <repository>${project.build.directory}/jars/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.feature/qa/${project.version}/xml/features</descriptor>
+                <descriptor>mvn:org.xipki/karaf-features/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
               </descriptors>
@@ -228,9 +205,7 @@
                 <feature>framework</feature>
                 <feature>aries-blueprint</feature>
                 <!-- project-core features -->
-                <feature>xipki-cmp-client</feature>
-                <feature>xipki-ocsp-client</feature>
-                <feature>xipki-scep-client</feature>
+                <feature>xipki-pki-client</feature>
                 <feature>xipki-ca-mgmt</feature>
                 <feature>xipki-qa</feature>
               </features>
@@ -251,19 +226,7 @@
                    dest="${project.build.directory}"/>
                 <unzip src="../xipki-gateway/target/xipki-gateway-${project.version}.zip"
                        dest="${project.build.directory}"/>
-                <unzip src="../xipki-hsmproxy/target/xipki-hsmproxy-${project.version}.zip"
-                       dest="${project.build.directory}"/>
 
-                <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception
-                     presented in the log file-->
-                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
-                  <arg value="--backup"/>
-                  <arg value="no"/>
-                  <arg value="--file"/>
-                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"/>
-                  <arg value="--value"/>
-                  <arg value="mvn\:org.osgi/org.osgi.service.metatype/1.4.1 = 9"/>
-                </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--file"/>
                   <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"/>
@@ -299,15 +262,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcutil-jdk15on/${karaf.bc.version}"
-                  value="bcutil-lts8on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcprov-jdk15on/${karaf.bc.version}"
-                  value="bcprov-lts8on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk15on/${karaf.bc.version}"
-                  value="bcpkix-lts8on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
               </target>
             </configuration>
             <goals>

@@ -1,19 +1,20 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.shell;
 
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
+import org.xipki.security.KeySpec;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11Slot.P11KeyUsage;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,20 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 public class SecurityCompleters {
+
+  @Service
+  public static class KeySpecCompleter extends EnumCompleter {
+
+    public KeySpecCompleter() {
+      KeySpec[] keySpecs = KeySpec.values();
+      String[] names = new String[keySpecs.length];
+      int i = 0;
+      for (KeySpec keySpec : keySpecs) {
+        names[i++] = keySpec.name();
+      }
+      setTokens(names);
+    }
+  } // class KeystoreTypeCompleter
 
   @Service
   public static class KeystoreTypeCompleter extends EnumCompleter {
@@ -45,16 +60,19 @@ public class SecurityCompleters {
 
     public P11KeyUsageCompleter() {
       Set<String> names = new HashSet<>();
-      for (P11KeyUsage usage : P11KeyUsage.values()) {
+      for (NewKeyControl.P11KeyUsage usage
+          : NewKeyControl.P11KeyUsage.values()) {
         names.add(usage.name());
       }
       setTokens(names);
     }
 
-    public static Set<P11KeyUsage> parseUsages(List<String> usageTexts) {
-      Set<P11KeyUsage> usages = new HashSet<>();
+    public static Set<NewKeyControl.P11KeyUsage> parseUsages(
+        List<String> usageTexts) {
+      Set<NewKeyControl.P11KeyUsage> usages = new HashSet<>();
       for (String usageText : usageTexts) {
-        P11KeyUsage usage = P11KeyUsage.valueOf(usageText.toUpperCase());
+        NewKeyControl.P11KeyUsage usage =
+            NewKeyControl.P11KeyUsage.valueOf(usageText.toUpperCase());
         usages.add(usage);
       }
       return usages;
@@ -83,7 +101,7 @@ public class SecurityCompleters {
   public static class SecretKeyTypeCompleter extends EnumCompleter {
 
     public SecretKeyTypeCompleter() {
-      setTokens("DES3", "AES", "GENERIC");
+      setTokens("DES3", "AES", "SM4", "GENERIC");
     }
 
   } // class SecretKeyTypeCompleter
@@ -103,5 +121,27 @@ public class SecurityCompleters {
       setTokens(algos);
     }
   }
+
+  @Service
+  public static class AllSigAlgCompleter extends EnumCompleter {
+
+    public AllSigAlgCompleter() {
+      List<String> algos = new LinkedList<>();
+      for (SignAlgo a : SignAlgo.values()) {
+        algos.add(a.getJceName());
+      }
+      setTokens(algos);
+    }
+
+  } // class SigAlgCompleter
+
+  @Service
+  public static class SignerTypeCompleter extends EnumCompleter {
+
+    public SignerTypeCompleter() {
+      setTokens("JCEKS", "PKCS11", "PKCS12");
+    }
+
+  } // class SignerTypeCompleter
 
 }

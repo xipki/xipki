@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.assembly</groupId>
   <artifactId>assemblies</artifactId>
@@ -21,7 +21,6 @@
     <module>xipki-ocsp</module>
     <module>xipki-ca</module>
     <module>xipki-gateway</module>
-    <module>xipki-hsmproxy</module>
     <module>xipki-qa</module>
     <module>xipki-setup</module>
   </modules>

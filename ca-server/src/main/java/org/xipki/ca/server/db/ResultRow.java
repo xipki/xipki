@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.db;
@@ -58,7 +58,8 @@ class ResultRow {
         case Types.CLOB:
         case Types.NCLOB:
           Clob clob = rs.getClob(index);
-          value = clob == null ? null : clob.getSubString(1, (int) clob.length());
+          value = (clob == null) ? null
+              : clob.getSubString(1, (int) clob.length());
           break;
         case Types.TIMESTAMP:
         case Types.TIMESTAMP_WITH_TIMEZONE:
@@ -111,7 +112,8 @@ class ResultRow {
     } else if (obj instanceof Boolean) {
       return ((boolean) obj) ? 1 : 0;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to int");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to int");
     }
   }
 
@@ -128,7 +130,8 @@ class ResultRow {
     } else if (obj instanceof Long) {
       return ((long) obj) != 0;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to boolean");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to boolean");
     }
   }
 
@@ -145,7 +148,8 @@ class ResultRow {
     } else if (obj instanceof Boolean) {
       return ((boolean) obj) ? 1 : 0;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to long");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to long");
     }
   }
 
@@ -173,7 +177,8 @@ class ResultRow {
     if (obj instanceof Timestamp) {
       return (Timestamp) obj;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to Timestamp");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to Timestamp");
     }
   }
 
@@ -186,7 +191,8 @@ class ResultRow {
     if (obj instanceof byte[]) {
       return (byte[]) obj;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to byte[]");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to byte[]");
     }
   }
 
@@ -199,7 +205,8 @@ class ResultRow {
     if (obj instanceof Time) {
       return (Time) obj;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to Time");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to Time");
     }
   }
 
@@ -212,7 +219,8 @@ class ResultRow {
     if (obj instanceof Date) {
       return (Date) obj;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to Date");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to Date");
     }
   }
 
@@ -227,7 +235,8 @@ class ResultRow {
     } else if (obj instanceof Double) {
       return (float) ((double) obj);
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to float");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to float");
     }
   }
 
@@ -242,7 +251,8 @@ class ResultRow {
     } else if (obj instanceof Float) {
       return (double) ((float) obj);
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to double");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to double");
     }
   }
 
@@ -255,7 +265,8 @@ class ResultRow {
     if (obj instanceof BigDecimal) {
       return (BigDecimal) obj;
     } else {
-      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to BigDecimal");
+      throw new IllegalArgumentException(
+          "cannot convert " + obj.getClass().getName() + " to BigDecimal");
     }
   }
 

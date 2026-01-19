@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.shell;
@@ -10,18 +10,17 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.apache.karaf.shell.support.completers.StringsCompleter;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.Permissions;
+import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -41,29 +40,28 @@ import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CaEnrollBenchEntry;
 import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry;
-import org.xipki.qa.ca.CaEnrollBenchKeyEntry.DSAKeyEntry;
-import org.xipki.qa.ca.CaEnrollBenchKeyEntry.ECKeyEntry;
-import org.xipki.qa.ca.CaEnrollBenchKeyEntry.RSAKeyEntry;
 import org.xipki.qa.ca.CaEnrollBenchmark;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
-import org.xipki.security.EdECConstants;
+import org.xipki.security.KeySpec;
+import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
-import org.xipki.security.util.AlgorithmUtil;
+import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
-import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,7 +78,8 @@ import java.util.Set;
 
 public class QaCaActions {
 
-  @Command(scope = "caqa", name = "init", description = "initialize the CA QA manager")
+  @Command(scope = "caqa", name = "init", description =
+      "initialize the CA QA manager")
   @Service
   public static class Init extends XiAction {
 
@@ -99,15 +98,18 @@ public class QaCaActions {
 
   } // class Init
 
-  @Command(scope = "caqa", name = "check-cert", description = "check the certificate")
+  @Command(scope = "caqa", name = "check-cert", description =
+      "check the certificate")
   @Service
   public static class CheckCert extends XiAction {
 
-    @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
+    @Option(name = "--cert", aliases = "-c", required = true, description =
+        "certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--issuer", description = "issuer name\n(required if multiple issuers are configured)")
+    @Option(name = "--issuer", description =
+        "issuer name\n(required if multiple issuers are configured)")
     @Completion(QaCompleters.IssuerNameCompleter.class)
     private String issuerName;
 
@@ -115,11 +117,13 @@ public class QaCaActions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--profile", aliases = "-p", required = true, description = "certificate profile")
+    @Option(name = "--profile", aliases = "-p", required = true, description =
+        "certificate profile")
     @Completion(QaCompleters.CertprofileNameCompleter.class)
     private String profileName;
 
-    @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
+    @Option(name = "--verbose", aliases = "-v", description =
+        "show status verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Reference
@@ -147,8 +151,10 @@ public class QaCaActions {
 
       IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-      CertprofileQa qa = Optional.ofNullable(qaSystemManager.getCertprofile(profileName)).orElseThrow(() ->
-          new IllegalCmdParamException("found no certificate profile named '" + profileName + "'"));
+      CertprofileQa qa = Optional.ofNullable(
+          qaSystemManager.getCertprofile(profileName)).orElseThrow(() ->
+          new IllegalCmdParamException(
+              "found no certificate profile named '" + profileName + "'"));
 
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
       Extensions extensions = null;
@@ -156,17 +162,18 @@ public class QaCaActions {
       ASN1Set attrs = reqInfo.getAttributes();
       for (int i = 0; i < attrs.size(); i++) {
         Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-        if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+        if (OIDs.PKCS9.pkcs9_at_extensionRequest.equals(attr.getAttrType())) {
           extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
         }
       }
 
       byte[] certBytes = IoUtil.read(certFile);
-      ValidationResult result = qa.checkCert(certBytes, issuerInfo, reqInfo.getSubject(),
-          reqInfo.getSubjectPublicKeyInfo(), extensions);
+      ValidationResult result = qa.checkCert(certBytes, issuerInfo,
+          reqInfo.getSubject(), reqInfo.getSubjectPublicKeyInfo(), extensions);
       StringBuilder sb = new StringBuilder();
 
-      sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
+      sb.append(certFile).append(" (certprofile ").append(profileName)
+          .append(")\n");
       sb.append("\tcertificate is ");
       sb.append(result.isAllSuccessful() ? "valid" : "invalid");
 
@@ -191,7 +198,8 @@ public class QaCaActions {
       return null;
     } // method execute0
 
-    private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
+    private static void format(
+        ValidationIssue issue, String prefix, StringBuilder sb) {
       sb.append(prefix).append(issue.getCode());
       sb.append(", ").append(issue.getDescription());
       sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
@@ -202,7 +210,8 @@ public class QaCaActions {
 
   } // class CheckCert
 
-  @Command(scope = "caqa", name = "caalias-check", description = "check CA aliases (QA)")
+  @Command(scope = "caqa", name = "caalias-check", description =
+      "check CA aliases (QA)")
   @Service
   public static class CaAliasCheck extends CaAction {
 
@@ -216,8 +225,9 @@ public class QaCaActions {
     @Override
     protected Object execute0() throws Exception {
       println("checking CA alias='" + aliasName + "', CA='" + caName + "'");
-      String tmpCaName = Optional.ofNullable(caManager.getCaNameForAlias(aliasName)).orElseThrow(() ->
-        new CmdFailure("alias '" + aliasName + "' is not configured"));
+      String tmpCaName = Optional.ofNullable(
+          caManager.getCaNameForAlias(aliasName)).orElseThrow(() ->
+            new CmdFailure("alias '" + aliasName + "' is not configured"));
 
       assertEquals("CA name", caName, tmpCaName);
       println(" checked CA alias='" + aliasName + "', CA='" + caName + "'");
@@ -232,16 +242,17 @@ public class QaCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--profile", aliases = "-p", required = true,
-            description = "certificate profile that allows duplication of public key")
+    @Option(name = "--profile", aliases = "-p", required = true, description =
+        "certificate profile that allows duplication of public key")
     protected String certprofile;
 
-    @Option(name = "--subject", aliases = "-s", required = true, description = "subject template")
+    @Option(name = "--subject", aliases = "-s", required = true, description =
+        "subject template")
     protected String subjectTemplate;
 
     @Option(name = "--random-dn", description = "DN name to be incremented")
-    @Completion(value = StringsCompleter.class,
-        values = {"GIVENNAME", "SURNAME", "STREET", "POSTALCODE", "O", "OU", "CN"})
+    @Completion(value = StringsCompleter.class, values =
+        {"GIVENNAME", "SURNAME", "STREET", "POSTALCODE", "O", "OU", "CN"})
     protected String randomDnStr = "O";
 
     @Option(name = "--duration", description = "duration")
@@ -250,34 +261,42 @@ public class QaCaActions {
     @Option(name = "--thread", description = "number of threads")
     protected Integer numThreads = 5;
 
-    @Option(name = "-n", description = "number of certificates to be requested in one request")
+    @Option(name = "-n", description =
+        "number of certificates to be requested in one request")
     protected Integer num = 1;
 
-    @Option(name = "--max-num", description = "maximal number of requests\n0 for unlimited")
+    @Option(name = "--max-num", description =
+        "maximal number of requests\n0 for unlimited")
     protected Integer maxRequests = 0;
   }
 
-  @Command(scope = "xiqa", name = "benchmark-enroll-serverkeygen",
-      description = "Enroll certificate (CA generates keypairs, benchmark)")
+  @Command(scope = "xiqa", name = "benchmark-enroll-serverkeygen", description =
+      "Enroll certificate (CA generates keypairs, benchmark)")
   @Service
   public static class BenchmarkCaGenEnroll extends AbstractBenchmarkEnroll {
     @Override
     protected Object execute0() throws Exception {
       if (numThreads < 1) {
-        throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+        throw new IllegalCmdParamException(
+            "invalid number of threads " + numThreads);
       }
 
-      String description = StringUtil.concatObjectsCap(200, "subjectTemplate: ", subjectTemplate,
-              "\nprofile: ", certprofile, "\nmaxRequests: ", maxRequests);
+      String description = StringUtil.concatObjectsCap(200,
+          "subjectTemplate: ", subjectTemplate,
+          "\nprofile: ", certprofile, "\nmaxRequests: ", maxRequests);
 
       RandomDn randomDn = null;
       if (randomDnStr != null) {
-        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr)).orElseThrow(() ->
-          new IllegalCmdParamException("invalid randomDn " + randomDnStr));
+        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr))
+            .orElseThrow(() -> new IllegalCmdParamException(
+                "invalid randomDn " + randomDnStr));
       }
 
-      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, null, subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
+      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(
+          certprofile, null, subjectTemplate, randomDn);
+
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(
+          caName, benchmarkEntry, maxRequests, num, description);
 
       benchmark.setDuration(duration).setThreads(numThreads).execute();
 
@@ -285,60 +304,48 @@ public class QaCaActions {
     } // method execute0
   }
 
-  @Command(scope = "xiqa", name = "benchmark-enroll", description = "Enroll certificate (benchmark)")
+  @Command(scope = "xiqa", name = "benchmark-enroll", description =
+      "Enroll certificate (benchmark)")
   @Service
   public static class BenchmarkEnroll extends AbstractBenchmarkEnroll {
 
-    @Completion(value = StringsCompleter.class, values = {"RSA", "EC", "DSA"})
-    @Option(name = "--key-type", description = "key type to be requested")
-    private String keyType = "RSA";
+    @Option(name = "--keyspec", description = "key spec")
+    @Completion(SecurityCompleters.KeySpecCompleter.class)
+    private String keyspec;
 
-    @Option(name = "--key-size", description = "modulus length of RSA key or p length of DSA key")
-    private Integer keysize = 2048;
-
-    @Option(name = "--curve", description = "EC curve name or OID of EC key")
-    @Completion(Completers.ECCurveNameCompleter.class)
-    private String curveName;
-
-    @Option(name = "--new-key", description = "Generate different keypair for each certificate")
+    @Option(name = "--new-key", description =
+        "Generate different keypair for each certificate")
     private boolean newKey = false;
 
     @Override
     protected Object execute0() throws Exception {
       if (numThreads < 1) {
-        throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+        throw new IllegalCmdParamException(
+            "invalid number of threads " + numThreads);
       }
 
-      if ("EC".equalsIgnoreCase(keyType) && StringUtil.isBlank(curveName)) {
-        throw new IllegalCmdParamException("curveName is not specified");
-      }
-
-      String description = StringUtil.concatObjectsCap(200, "subjectTemplate: ", subjectTemplate,
-          "\nprofile: ", certprofile, "\nkeyType: ", keyType, "\nmaxRequests: ", maxRequests);
+      String description = StringUtil.concatObjectsCap(200,
+          "subjectTemplate: ", subjectTemplate,
+          "\nprofile: ", certprofile,
+          "\nkeySpec: ", keyspec,
+          "\nmaxRequests: ", maxRequests);
 
       RandomDn randomDn = null;
       if (randomDnStr != null) {
-        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr)).orElseThrow(() ->
-          new IllegalCmdParamException("invalid randomDn " + randomDnStr));
+        randomDn = Optional.ofNullable(RandomDn.getInstance(randomDnStr))
+            .orElseThrow(() -> new IllegalCmdParamException(
+                "invalid randomDn " + randomDnStr));
       }
 
-      CaEnrollBenchKeyEntry keyEntry;
-      if ("EC".equalsIgnoreCase(keyType)) {
-        ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
-        if (curveOid == null) {
-          curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
-        }
-        keyEntry = new ECKeyEntry(curveOid, !newKey);
-      } else if ("RSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new RSAKeyEntry(keysize, !newKey);
-      } else if ("DSA".equalsIgnoreCase(keyType)) {
-        keyEntry = new DSAKeyEntry(keysize, !newKey);
-      } else {
-        throw new IllegalCmdParamException("invalid keyType " + keyType);
-      }
+      KeySpec ks = KeySpec.ofKeySpec(keyspec);
 
-      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(certprofile, keyEntry, subjectTemplate, randomDn);
-      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName, benchmarkEntry, maxRequests, num, description);
+      CaEnrollBenchKeyEntry keyEntry = new CaEnrollBenchKeyEntry(
+          ks, !newKey, new SecureRandom());
+      CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(
+          certprofile, keyEntry, subjectTemplate, randomDn);
+
+      CaEnrollBenchmark benchmark = new CaEnrollBenchmark(caName,
+          benchmarkEntry, maxRequests, num, description);
 
       benchmark.setDuration(duration).setThreads(numThreads).execute();
 
@@ -347,7 +354,8 @@ public class QaCaActions {
 
   } // class CmpBenchmarkEnroll
 
-  @Command(scope = "caqa", name = "ca-check", description = "check information of CAs (QA)")
+  @Command(scope = "caqa", name = "ca-check", description =
+      "check information of CAs (QA)")
   @Service
   public static class CaCheck extends CaActions.CaUp {
 
@@ -357,13 +365,15 @@ public class QaCaActions {
       String caName = ey.getIdent().getName();
       println("checking CA " + caName);
 
-      CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(() ->
-        new CmdFailure("could not find CA '" + caName + "'"));
+      CaEntry ca = Optional.ofNullable(caManager.getCa(caName))
+          .orElseThrow(() -> new CmdFailure(
+              "could not find CA '" + caName + "'"));
 
       CaUris eyUris = ey.getCaUris();
       // CA cert uris
       if (eyUris != null) {
-        assertObjEquals("CA URIs", ey.getCaUris(), ca.getCaUris());
+        assertObjEquals("CA URIs", ey.getCaUris(),
+            ca.getBase().getCaUris());
       }
 
       // CA certificate
@@ -382,65 +392,77 @@ public class QaCaActions {
 
         if (eySize != isSize) {
           if (CollectionUtil.isNotEmpty(ca.getCertchain())) {
-            throw new CmdFailure("Length of CA certchain " + isSize + " is not as expected " + eySize);
+            throw new CmdFailure("Length of CA certchain " + isSize
+                + " is not as expected " + eySize);
           }
         } else if (eySize != 0) {
           for (int i = 0; i < eySize; i++) {
             if (!certEquals(eyList.get(i), isList.get(i).getEncoded())) {
-              throw new CmdFailure("CA cert chain[" + i + "] is not as expected");
+              throw new CmdFailure(
+                  "CA cert chain[" + i + "] is not as expected");
             }
           }
         }
       }
 
+      BaseCaInfo caBase = ca.getBase();
       // SN size
       if (ey.getSerialNoLen() != null) {
-        assertObjEquals("serial number length", ey.getSerialNoLen(), ca.getSnSize());
+        assertObjEquals("serial number length",
+            ey.getSerialNoLen(), caBase.getSnSize());
       }
 
       // CRL control name
       if (ey.getCrlControl() != null) {
-        assertObjEquals("CRL control", new CrlControl(ey.getCrlControl()), ca.getCrlControl());
+        assertObjEquals("CRL control",
+            new CrlControl(ey.getCrlControl()), caBase.getCrlControl());
       }
 
       // CRL signer name
       if (ey.getCrlSignerName() != null) {
-        assertEquals("CRL signer name", ey.getCrlSignerName(), ca.getCrlSignerName());
+        assertEquals("CRL signer name", ey.getCrlSignerName(),
+            caBase.getCrlSignerName());
       }
 
       // Expiration period
       if (ey.getExpirationPeriod() != null) {
-        assertObjEquals("Expiration period", ey.getExpirationPeriod(), ca.getExpirationPeriod());
+        assertObjEquals("Expiration period", ey.getExpirationPeriod(),
+            caBase.getExpirationPeriod());
       }
 
       // Extra control
       if (ey.getExtraControl() != null) {
-        assertObjEquals("Extra control", ey.getExtraControl(), ca.getExtraControl());
+        assertObjEquals("Extra control", ey.getExtraControl(),
+            caBase.getExtraControl());
       }
 
       // Max validity
       if (ey.getMaxValidity() != null) {
-        assertObjEquals("Max validity", ey.getMaxValidity(), ca.getMaxValidity());
+        assertObjEquals("Max validity", ey.getMaxValidity(),
+            caBase.getMaxValidity());
       }
 
       // Keep expired certificate
       if (ey.getKeepExpiredCertDays() != null) {
-        assertObjEquals("keepExpiredCertDays", ey.getKeepExpiredCertDays(), ca.getKeepExpiredCertDays());
+        assertObjEquals("keepExpiredCertDays",
+            ey.getKeepExpiredCertDays(), caBase.getKeepExpiredCertDays());
       }
 
       // Num CRLs
       if (ey.getNumCrls() != null) {
-        assertObjEquals("num CRLs", ey.getNumCrls(), ca.getNumCrls());
+        assertObjEquals("num CRLs", ey.getNumCrls(), caBase.getNumCrls());
       }
 
       // Permissions
-      if (ey.getPermission() != null) {
-        assertObjEquals("permission", new Permissions(ey.getPermission()), ca.getPermissions());
+      if (ey.getPermissions() != null) {
+        assertObjEquals("permissions", new Permissions(ey.getPermissions()),
+            caBase.getPermissions());
       }
 
       // Signer Type
       if (ey.getSignerType() != null) {
-        assertTypeEquals("signer type", ey.getSignerType(), ca.getSignerType());
+        assertTypeEquals("signer type", ey.getSignerType(),
+            caBase.getSignerType());
       }
 
       if (ey.getSignerConf() != null) {
@@ -453,12 +475,13 @@ public class QaCaActions {
 
       // Status
       if (ey.getStatus() != null) {
-        assertObjEquals("status", ey.getStatus(), ca.getStatus());
+        assertObjEquals("status", ey.getStatus(), caBase.getStatus());
       }
 
       // validity mode
       if (ey.getValidityMode() != null) {
-        assertObjEquals("validity mode", ey.getValidityMode(), ca.getValidityMode());
+        assertObjEquals("validity mode", ey.getValidityMode(),
+            caBase.getValidityMode());
       }
 
       println(" checked CA" + caName);
@@ -467,8 +490,8 @@ public class QaCaActions {
 
   } // class CaCheck
 
-  @Command(scope = "caqa", name = "caprofile-check",
-      description = "check information of certificate profiles in given CA (QA)")
+  @Command(scope = "caqa", name = "caprofile-check", description =
+      "check information of certificate profiles in given CA (QA)")
   @Service
   public static class CaprofileCheck extends CaAction {
 
@@ -476,14 +499,15 @@ public class QaCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--profile", required = true,
-        description = "profile name and aliases, <name>[:<\",\"-separated aliases>]")
+    @Option(name = "--profile", required = true, description =
+        "profile name and aliases, <name>[:<\",\"-separated aliases>]")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String profileNameAliases;
 
     @Override
     protected Object execute0() throws Exception {
-      println("checking CA profile CA='" + caName + "', profile='" + profileNameAliases + "'");
+      println("checking CA profile CA='" + caName +
+          "', profile='" + profileNameAliases + "'");
 
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
@@ -502,13 +526,16 @@ public class QaCaActions {
       }
 
       if (receivedEntry == null) {
-        throw new CmdFailure("CA is not associated with profile '" + expectedEntry.getProfileName() + "'");
+        throw new CmdFailure("CA is not associated with profile '"
+            + expectedEntry.getProfileName() + "'");
       }
 
       if (expectedEntry.equals(receivedEntry)) {
-        println(" checked CA profile CA='" + caName + "', profile='" + profileNameAliases + "'");
+        println(" checked CA profile CA='" + caName + "', profile='" +
+            profileNameAliases + "'");
       } else {
-        throw new CmdFailure("CA-Profile unmatch, expected=" + expectedEntry + ", but received=" + receivedEntry);
+        throw new CmdFailure("CA-Profile unmatch, expected=" + expectedEntry
+            + ", but received=" + receivedEntry);
       }
 
       return null;
@@ -516,7 +543,8 @@ public class QaCaActions {
 
   } // class CaprofileCheck
 
-  @Command(scope = "caqa", name = "capub-check", description = "check information of publishers in given CA (QA)")
+  @Command(scope = "caqa", name = "capub-check", description =
+      "check information of publishers in given CA (QA)")
   @Service
   public static class CapubCheck extends CaAction {
 
@@ -524,13 +552,15 @@ public class QaCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher", required = true, description = "publisher name")
+    @Option(name = "--publisher", required = true, description =
+        "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private String publisherName;
 
     @Override
     protected Object execute0() throws Exception {
-      println("checking CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
+      println("checking CA publisher CA='" + caName + "', publisher='" +
+          publisherName + "'");
 
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");
@@ -540,17 +570,20 @@ public class QaCaActions {
       String upPublisherName = publisherName.toLowerCase();
       for (String m : entries) {
         if (m.equals(upPublisherName)) {
-          println(" checked CA publisher CA='" + caName + "', publisher='" + publisherName + "'");
+          println(" checked CA publisher CA='" + caName + "', publisher='" +
+              publisherName + "'");
           return null;
         }
       }
 
-      throw new CmdFailure("CA is not associated with publisher '" + publisherName + "'");
+      throw new CmdFailure("CA is not associated with publisher '" +
+          publisherName + "'");
     }
 
   } // class CapubCheck
 
-  @Command(scope = "caqa", name = "careq-check", description = "check information of requestors in CA (QA)")
+  @Command(scope = "caqa", name = "careq-check", description =
+      "check information of requestors in CA (QA)")
   @Service
   public static class CaReqCheck extends CaAction {
 
@@ -558,22 +591,25 @@ public class QaCaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--requestor", required = true, description = "requestor name")
+    @Option(name = "--requestor", required = true, description =
+        "requestor name")
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String requestorName;
 
-    @Option(name = "--permission", multiValued = true, description = "permission")
+    @Option(name = "--permission", multiValued = true, description =
+        "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
 
-    @Option(name = "--profile", multiValued = true,
-        description = "profile name or 'all' for all profiles, and 'null' for no profiles")
+    @Option(name = "--profile", multiValued = true, description =
+        "profile name or 'all' for all profiles, and 'null' for no profiles")
     @Completion(CaCompleters.ProfileNameAndAllCompleter.class)
     private Set<String> profiles;
 
     @Override
     protected Object execute0() throws Exception {
-      println("checking CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
+      println("checking CA requestor CA='" + caName +
+          "', requestor='" + requestorName + "'");
 
       if (caManager.getCa(caName) == null) {
         throw new UnexpectedException("could not find CA '" + caName + "'");
@@ -590,14 +626,16 @@ public class QaCaActions {
       }
 
       if (entry == null) {
-        throw new CmdFailure("CA is not associated with requestor '" + requestorName + "'");
+        throw new CmdFailure("CA is not associated with requestor '" +
+            requestorName + "'");
       }
 
       if (permissions != null) {
         Permissions objPermissions = new Permissions(permissions);
         if (objPermissions.getValue() != entry.getPermissions().getValue()) {
-          throw new CmdFailure("permissions: is '" + entry.getPermissions().getValue()
-              + "', but expected '" + objPermissions.getValue() + "'");
+          throw new CmdFailure("permissions: is '" +
+              entry.getPermissions().getValue() + "', but expected '" +
+              objPermissions.getValue() + "'");
         }
       }
 
@@ -608,18 +646,21 @@ public class QaCaActions {
           }
         }
 
-        if (!profiles.equals(entry.getProfiles())) {
-          throw new CmdFailure("profiles: is '" + entry.getProfiles() + "', but expected '" + profiles + "'");
+        if (!new ArrayList<>(profiles).equals(entry.getProfiles())) {
+          throw new CmdFailure("profiles: is '" + entry.getProfiles()
+              + "', but expected '" + profiles + "'");
         }
       }
 
-      println(" checked CA requestor CA='" + caName + "', requestor='" + requestorName + "'");
+      println(" checked CA requestor CA='" + caName + "', requestor='" +
+          requestorName + "'");
       return null;
     } // method execute0
 
   } // class CaReqCheck
 
-  @Command(scope = "caqa", name = "profile-check", description = "check information of profiles (QA)")
+  @Command(scope = "caqa", name = "profile-check", description =
+      "check information of profiles (QA)")
   @Service
   public static class ProfileCheck extends ProfileActions.ProfileUp {
 
@@ -636,10 +677,12 @@ public class QaCaActions {
         conf = StringUtil.toUtf8String(IoUtil.read(confFile));
       }
 
-      CertprofileEntry cp = Optional.ofNullable(caManager.getCertprofile(name)).orElseThrow(() ->
-        new CmdFailure("certificate profile named '" + name + "' is not configured"));
+      CertprofileEntry cp = Optional.ofNullable(caManager.getCertprofile(name))
+          .orElseThrow(() -> new CmdFailure(
+              "certificate profile named '" + name + "' is not configured"));
 
-      assertTypeEquals("type", type == null ? "xijson" : type, cp.getType());
+      assertTypeEquals("type", type == null ? "xijson" : type,
+          cp.getType());
       assertEquals("conf", conf, cp.getConf());
       println(" checked profile " + name);
       return null;
@@ -647,7 +690,8 @@ public class QaCaActions {
 
   } // class ProfileCheck
 
-  @Command(scope = "caqa", name = "publisher-check", description = "check information of publishers (QA)")
+  @Command(scope = "caqa", name = "publisher-check", description =
+      "check information of publishers (QA)")
   @Service
   public static class PublisherCheck extends PublisherActions.PublisherUp {
 
@@ -655,8 +699,9 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking publisher " + name);
 
-      PublisherEntry cp = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(() ->
-        new CmdFailure("publisher named '" + name + "' is not configured"));
+      PublisherEntry cp = Optional.ofNullable(caManager.getPublisher(name))
+          .orElseThrow(() -> new CmdFailure(
+              "publisher named '" + name + "' is not configured"));
 
       if (cp.getType() != null) {
         assertTypeEquals("type", type, cp.getType());
@@ -672,7 +717,8 @@ public class QaCaActions {
 
   } // class PublisherCheck
 
-  @Command(scope = "caqa", name = "requestor-check", description = "check information of requestors (QA)")
+  @Command(scope = "caqa", name = "requestor-check", description =
+      "check information of requestors (QA)")
   @Service
   public static class RequestorCheck extends RequestorActions.RequestorUp {
 
@@ -680,8 +726,9 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking requestor " + name);
 
-      RequestorEntry cr = Optional.ofNullable(caManager.getRequestor(name)).orElseThrow(() ->
-        new CmdFailure("requestor named '" + name + "' is not configured"));
+      RequestorEntry cr = Optional.ofNullable(caManager.getRequestor(name))
+          .orElseThrow(() -> new CmdFailure(
+              "requestor named '" + name + "' is not configured"));
 
       byte[] ex = IoUtil.read(certFile);
       String expType = RequestorEntry.TYPE_CERT;
@@ -693,7 +740,8 @@ public class QaCaActions {
         new CmdFailure("CaCert: is not configured explicitly as expected"));
 
       if (!certEquals(ex, Base64.decode(conf))) {
-        throw new CmdFailure("CaCert: the expected one and the actual one differ");
+        throw new CmdFailure(
+            "CaCert: the expected one and the actual one differ");
       }
 
       println(" checked requestor " + name);
@@ -702,7 +750,8 @@ public class QaCaActions {
 
   } // class RequestorCheck
 
-  @Command(scope = "caqa", name = "signer-check", description = "check information of signer (QA)")
+  @Command(scope = "caqa", name = "signer-check", description =
+      "check information of signer (QA)")
   @Service
   public static class SignerCheck extends SignerActions.SignerUp {
 
@@ -710,8 +759,9 @@ public class QaCaActions {
     protected Object execute0() throws Exception {
       println("checking signer " + name);
 
-      SignerEntry cr = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(() ->
-        new CmdFailure("signer named '" + name + "' is not configured"));
+      SignerEntry cr = Optional.ofNullable(caManager.getSigner(name))
+          .orElseThrow(() -> new CmdFailure(
+              "signer named '" + name + "' is not configured"));
 
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         if (cr.base64Cert() != null) {
@@ -720,10 +770,12 @@ public class QaCaActions {
       } else if (certFile != null) {
         byte[] ex = IoUtil.read(certFile);
         if (cr.base64Cert() == null) {
-          throw new CmdFailure("CaCert: is not configured explicitly as expected");
+          throw new CmdFailure(
+              "CaCert: is not configured explicitly as expected");
         }
         if (!certEquals(ex, Base64.decode(cr.base64Cert()))) {
-          throw new CmdFailure("CaCert: the expected one and the actual one differ");
+          throw new CmdFailure(
+              "CaCert: the expected one and the actual one differ");
         }
       }
 
@@ -746,7 +798,8 @@ public class QaCaActions {
 
   } // class SignerCheck
 
-  private static void assertTypeEquals(String desc, String ex, String is) throws CmdFailure {
+  private static void assertTypeEquals(String desc, String ex, String is)
+      throws CmdFailure {
     String tmpEx = ex;
     if (CaManager.NULL.equals(tmpEx)) {
       tmpEx = null;
@@ -754,20 +807,25 @@ public class QaCaActions {
 
     boolean bo = (tmpEx == null) ? (is == null) : tmpEx.equalsIgnoreCase(is);
     if (!bo) {
-      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
+      throw new CmdFailure(desc + ": is '" + is +
+          "', but expected '" + tmpEx + "'");
     }
   } // method assertTypeEquals
 
-  private static void assertEquals(String desc, String ex, String is) throws CmdFailure {
+  private static void assertEquals(String desc, String ex, String is)
+      throws CmdFailure {
     String tmpEx = CaManager.NULL.equals(ex) ? null : ex;
     if (!Objects.equals(tmpEx, is)) {
-      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + tmpEx + "'");
+      throw new CmdFailure(desc + ": is '" + is +
+          "', but expected '" + tmpEx + "'");
     }
   } // method assertEquals
 
-  private static void assertObjEquals(String desc, Object ex, Object is) throws CmdFailure {
+  private static void assertObjEquals(String desc, Object ex, Object is)
+      throws CmdFailure {
     if (!Objects.equals(ex, is)) {
-      throw new CmdFailure(desc + ": is '" + is + "', but expected '" + ex + "'");
+      throw new CmdFailure(desc + ": is '" + is +
+          "', but expected '" + ex + "'");
     }
   } // method assertObjEquals
 
@@ -776,7 +834,8 @@ public class QaCaActions {
       return true;
     } else if (certBytes1 != null && certBytes2 != null) {
       try {
-        return Arrays.equals(X509Util.parseCert(certBytes1).getEncoded(), X509Util.parseCert(certBytes2).getEncoded());
+        return Arrays.equals(X509Util.parseCert(certBytes1).getEncoded(),
+                X509Util.parseCert(certBytes2).getEncoded());
       } catch (Exception ex) {
         return false;
       }

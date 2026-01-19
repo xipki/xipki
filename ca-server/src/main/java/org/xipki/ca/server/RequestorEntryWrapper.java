@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.security.cert.CertificateException;
 
@@ -22,7 +22,8 @@ import java.security.cert.CertificateException;
  */
 
 public class RequestorEntryWrapper {
-  private static final Logger LOG = LoggerFactory.getLogger(RequestorEntryWrapper.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(RequestorEntryWrapper.class);
 
   private RequestorEntry dbEntry;
 
@@ -39,10 +40,12 @@ public class RequestorEntryWrapper {
     dbEntry.faulty(true);
     if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
       try {
-        this.cert = new CertWithDbId(X509Util.parseCert(StringUtil.toUtf8Bytes(conf)));
+        this.cert = new CertWithDbId(
+            X509Util.parseCert(StringUtil.toUtf8Bytes(conf)));
         dbEntry.faulty(false);
       } catch (CertificateException ex) {
-        LogUtil.error(LOG, ex, "error while parsing certificate of requestor" + dbEntry.getIdent());
+        LogUtil.error(LOG, ex, "error while parsing certificate of " +
+            "requestor" + dbEntry.getIdent());
       }
     }
   } // method setDbEntry

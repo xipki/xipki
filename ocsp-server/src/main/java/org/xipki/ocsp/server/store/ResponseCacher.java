@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
@@ -6,9 +6,6 @@ package org.xipki.ocsp.server.store;
 import org.bouncycastle.crypto.Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataAccessException.Reason;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo.ResponseCacheInfo;
@@ -16,12 +13,15 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.LogUtil;
-import org.xipki.util.SqlUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataAccessException.Reason;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.misc.SqlUtil;
+import org.xipki.util.extra.type.Validity;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -48,22 +48,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ResponseCacher implements Closeable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(ResponseCacher.class);
 
   private static final long SEC_DFLT_NEXT_UPDATE_DURATION = 7L * 24 * 60 * 60;
 
   private static final long SEC_NEXT_UPDATE_BUFFER = 600;
 
-  private static final String SQL_ADD_ISSUER = SqlUtil.buildInsertSql("ISSUER", "ID,S1C,CERT");
+  private static final String SQL_ADD_ISSUER =
+      SqlUtil.buildInsertSql("ISSUER", "ID,S1C,CERT");
 
   private static final String SQL_SELECT_ISSUER_ID = "SELECT ID FROM ISSUER";
 
-  private static final String SQL_DELETE_EXPIRED_RESP = "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
+  private static final String SQL_DELETE_EXPIRED_RESP =
+      "DELETE FROM OCSP WHERE GENERATED_AT<? OR NEXT_UPDATE<?";
 
   private static final String SQL_ADD_RESP = SqlUtil.buildInsertSql("OCSP",
       "ID,IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP");
 
-  private static final String SQL_UPDATE_RESP = "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
+  private static final String SQL_UPDATE_RESP =
+      "UPDATE OCSP SET GENERATED_AT=?,NEXT_UPDATE=?,RESP=? WHERE ID=?";
 
   private class IssuerUpdater implements Runnable {
 
@@ -99,7 +103,8 @@ public class ResponseCacher implements Closeable {
         try {
           int num1 = removeExpiredResponses(maxGeneratedAt, minNextUpdate);
           if (num1 > 0 && LOG.isInfoEnabled()) {
-            LOG.info("removed {} with thisUpdate < {} ({}) OR nextUpdate < {} ({})",
+            LOG.info("removed {} with thisUpdate < {} ({}) OR " +
+                "nextUpdate < {} ({})",
                 num1 == 1 ? "1 response" : num1 + " responses",
                 maxGeneratedAt, Instant.ofEpochSecond(maxGeneratedAt),
                 minNextUpdate, Instant.ofEpochSecond(minNextUpdate));
@@ -137,11 +142,14 @@ public class ResponseCacher implements Closeable {
 
   private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
-  public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
+  public ResponseCacher(DataSourceWrapper datasource, boolean master,
+                        Validity validity) {
     this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
-    this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
-    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
+    this.validity = (int) (Args.notNull(validity, "validity")
+                            .approxMinutes() * 60);
+    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1,
+        "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
     this.onService = new AtomicBoolean(false);
@@ -203,7 +211,8 @@ public class ResponseCacher implements Closeable {
   public synchronized IssuerEntry storeIssuer(X509Cert issuerCert)
       throws CertificateException, DataAccessException {
     if (!master) {
-      throw new IllegalStateException("storeIssuer is not permitted in slave mode");
+      throw new IllegalStateException(
+          "storeIssuer is not permitted in slave mode");
     }
 
     for (Integer id : issuerStore.getIds()) {
@@ -228,7 +237,7 @@ public class ResponseCacher implements Closeable {
         int idx = 1;
         ps.setInt(idx++, id);
         ps.setString(idx++, sha1FpCert);
-        ps.setString(idx, Base64.encodeToString(encodedCert));
+        ps.setString(idx, Base64.getEncoder().encodeToString(encodedCert));
 
         ps.execute();
 
@@ -248,7 +257,8 @@ public class ResponseCacher implements Closeable {
     }
   } // method storeIssuer
 
-  public OcspRespWithCacheInfo getOcspResponse(int issuerId, BigInteger serialNumber, SignAlgo sigAlgo)
+  public OcspRespWithCacheInfo getOcspResponse(
+      int issuerId, BigInteger serialNumber, SignAlgo sigAlgo)
       throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlgo);
@@ -268,7 +278,7 @@ public class ResponseCacher implements Closeable {
         return null;
       }
 
-      String ident = Base64.encodeToString(identBytes);
+      String ident = Base64.getEncoder().encodeToString(identBytes);
       String dbIdent = rs.getString("IDENT");
       if (!ident.equals(dbIdent)) {
         return null;
@@ -300,7 +310,8 @@ public class ResponseCacher implements Closeable {
   } // method getOcspResponse
 
   public void storeOcspResponse(
-      int issuerId, BigInteger serialNumber, long generatedAt, Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
+      int issuerId, BigInteger serialNumber, long generatedAt,
+      Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
     long nowInSec = Instant.now().getEpochSecond();
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
@@ -311,7 +322,7 @@ public class ResponseCacher implements Closeable {
     }
 
     byte[] identBytes = buildIdent(serialNumber, sigAlgo);
-    String ident = Base64.encodeToString(identBytes);
+    String ident = Base64.getEncoder().encodeToString(identBytes);
     try {
       long id = deriveId(issuerId, identBytes);
 
@@ -320,7 +331,7 @@ public class ResponseCacher implements Closeable {
         String sql = SQL_ADD_RESP;
         PreparedStatement ps = datasource.prepareStatement(conn, sql);
 
-        String b64Response = Base64.encodeToString(response);
+        String b64Response = Base64.getEncoder().encodeToString(response);
         Boolean dataIntegrityViolationException = null;
         try {
           int idx = 1;
@@ -333,7 +344,8 @@ public class ResponseCacher implements Closeable {
           ps.execute();
         } catch (SQLException ex) {
           DataAccessException dex = datasource.translate(sql, ex);
-          if (dex.getReason().isDescendantOrSelfOf(Reason.DataIntegrityViolation)) {
+          if (dex.getReason().isDescendantOrSelfOf(
+                Reason.DataIntegrityViolation)) {
             dataIntegrityViolationException = Boolean.TRUE;
           } else {
             throw dex;
@@ -343,7 +355,8 @@ public class ResponseCacher implements Closeable {
         }
 
         if (dataIntegrityViolationException == null) {
-          LOG.debug("added cached OCSP response iid={}, ident={}", issuerId, ident);
+          LOG.debug("added cached OCSP response iid={}, ident={}",
+              issuerId, ident);
           return;
         }
 
@@ -365,9 +378,11 @@ public class ResponseCacher implements Closeable {
         datasource.returnConnection(conn);
       }
     } catch (DataAccessException ex) {
-      LOG.info("could not cache OCSP response iid={}, ident={}", issuerId, ident);
+      LOG.info("could not cache OCSP response iid={}, ident={}",
+          issuerId, ident);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("could not cache OCSP response iid=" + issuerId + ", ident=" + ident, ex);
+        LOG.debug("could not cache OCSP response iid={}, ident={}",
+            issuerId, ident, ex);
       }
     }
   } // method storeOcspResponse
@@ -417,7 +432,8 @@ public class ResponseCacher implements Closeable {
           ids.add(rs.getInt("ID"));
         }
       } catch (SQLException ex) {
-        LogUtil.error(LOG, datasource.translate(SQL_SELECT_ISSUER_ID, ex), "could not executing updateCacheStore()");
+        LogUtil.error(LOG, datasource.translate(SQL_SELECT_ISSUER_ID, ex),
+            "could not executing updateCacheStore()");
         return false;
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not executing updateCacheStore()");
@@ -442,7 +458,8 @@ public class ResponseCacher implements Closeable {
             ps.setInt(1, id);
             rs = ps.executeQuery();
             rs.next();
-            X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
+            X509Cert cert = X509Util.parseCert(
+                StringUtil.toUtf8Bytes(rs.getString("CERT")));
             IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
             issuerStore.addIssuer(caInfoEntry);
             LOG.info("added issuer {}", id);
@@ -486,15 +503,18 @@ public class ResponseCacher implements Closeable {
     digest.doFinal(hash, 0);
 
     return (0x7FL & hash[0]) << 56 // ignore the first bit
-        | (0xFFL & hash[1]) << 48 | (0xFFL & hash[2]) << 40 | (0xFFL & hash[3]) << 32
-        | (0xFFL & hash[4]) << 24 | (0xFFL & hash[5]) << 16 | (0xFFL & hash[6]) << 8 | (0xFFL & hash[7]);
+        | (0xFFL & hash[1]) << 48 | (0xFFL & hash[2]) << 40
+        | (0xFFL & hash[3]) << 32 | (0xFFL & hash[4]) << 24
+        | (0xFFL & hash[5]) << 16 | (0xFFL & hash[6]) << 8
+        | (0xFFL & hash[7]);
   } // method deriveId
 
   private static byte[] int2Bytes(int value) {
     if (value > -1 && value < 65535) {
       return new byte[]{(byte) (value >> 8), (byte) value};
     } else {
-      throw new IllegalArgumentException("value is out of the range [0, 65535]: " + value);
+      throw new IllegalArgumentException(
+          "value is out of the range [0, 65535]: " + value);
     }
   }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa;
@@ -19,7 +19,8 @@ public class BigIntegerRange {
 
   public BigIntegerRange(BigInteger from, BigInteger to) {
     if (from.compareTo(to) > 0) {
-      throw new IllegalArgumentException("from (" + from + ") may not be larger than to (" + to + ")");
+      throw new IllegalArgumentException(
+          "from (" + from + ") may not be larger than to (" + to + ")");
     }
     this.from = from;
     this.to = to;

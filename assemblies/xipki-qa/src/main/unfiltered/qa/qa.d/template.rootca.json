@@ -15,13 +15,13 @@
 		"name":"pkcs11",
 		"type":"pkcs11",
 		"conf":{
-			"value":"slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+			"value":"slot=0,keyspecs=SM2:ED25519:X25519:RSA2048:RSA3072:RSA4096:SECP256R1:SECP384R1:SECP521R1:BRAINPOOLP256R1:BRAINPOOLP384R1:BRAINPOOLP521R1"
 		}
 	},{
 		"name":"keypool",
 		"type":"keypool",
 		"conf":{
-			"value":"datasource=keypool,password=CHANGEIT,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448"
+			"value":"datasource=keypool,password=CHANGEIT,keyspecs=SM2:ED25519:ED448:X25519:X448:RSA2048:RSA3072:RSA4096:SECP256R1:SECP384R1:SECP521R1:BRAINPOOLP256R1:BRAINPOOLP384R1:BRAINPOOLP521R1"
 		}
 	}],
 	"requestors":[{
@@ -81,12 +81,6 @@
 			"file":"${profiles.dir}/certprofile-multiple-ous.json"
 		}
 	},{
-		"name":"multi-valued-rdn",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-multi-valued-rdn.json"
-		}
-	},{
 		"name":"qc",
 		"type":"xijson",
 		"conf":{
@@ -129,10 +123,10 @@
 			"file":"${profiles.dir}/certprofile-tls-enc.json"
 		}
 	},{
-		"name":"tls-dsa",
+		"name":"tls-rsa",
 		"type":"xijson",
 		"conf":{
-			"file":"${profiles.dir}/certprofile-tls-dsa.json"
+			"file":"${profiles.dir}/certprofile-tls-rsa.json"
 		}
 	},{
 		"name":"tls-ec",
@@ -141,16 +135,28 @@
 			"file":"${profiles.dir}/certprofile-tls-ec.json"
 		}
 	},{
-		"name":"tls-ed25519",
+		"name":"tls-edwards",
 		"type":"xijson",
 		"conf":{
-			"file":"${profiles.dir}/certprofile-tls-ed25519.json"
+			"file":"${profiles.dir}/certprofile-tls-edwards.json"
 		}
 	},{
-		"name":"tls-rsa",
+		"name":"tls-montgomery",
 		"type":"xijson",
 		"conf":{
-			"file":"${profiles.dir}/certprofile-tls-rsa.json"
+			"file":"${profiles.dir}/certprofile-tls-montgomery.json"
+		}
+	},{
+		"name":"tls-mldsa",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-mldsa.json"
+		}
+	},{
+		"name":"tls-mlkem",
+		"type":"xijson",
+		"conf":{
+			"file":"${profiles.dir}/certprofile-tls-mlkem.json"
 		}
 	},{
 		"name":"tls-sm2",
@@ -169,12 +175,6 @@
 		"type":"xijson",
 		"conf":{
 			"file":"${profiles.dir}/certprofile-tls-c.json"
-		}
-	},{
-		"name":"gmt0015",
-		"type":"xijson",
-		"conf":{
-			"file":"${profiles.dir}/certprofile-gmt0015.json"
 		}
 	},{
 		"name":"max-time",
@@ -200,7 +200,7 @@
 					"http://myorg.org/rootca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8081/crl/?type=crl&name=rootca1"
+					"http://localhost:8081/dummy/crl/?type=crl&name=rootca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

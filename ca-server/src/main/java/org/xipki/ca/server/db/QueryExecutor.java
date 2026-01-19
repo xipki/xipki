@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.db;
 
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceWrapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,7 +43,8 @@ class QueryExecutor {
       this(type, name, value, false, false);
     }
 
-    public SqlColumn(ColumnType type, String name, Object value, boolean sensitive, boolean signerConf) {
+    public SqlColumn(ColumnType type, String name, Object value,
+                     boolean sensitive, boolean signerConf) {
       this.type = Args.notNull(type, "type");
       this.name = Args.notNull(name, "name");
       this.value = value;
@@ -123,7 +124,8 @@ class QueryExecutor {
     return new SqlColumn(ColumnType.STRING, name, value);
   }
 
-  protected static SqlColumn colStr(String name, String value, boolean sensitive, boolean signerConf) {
+  protected static SqlColumn colStr(String name, String value,
+                                    boolean sensitive, boolean signerConf) {
     return new SqlColumn(ColumnType.STRING, name, value, sensitive, signerConf);
   }
 
@@ -158,7 +160,8 @@ class QueryExecutor {
     }
   }
 
-  protected int execUpdatePrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
+  protected int execUpdatePrepStmt(String sql, SqlColumn2... params)
+      throws DataAccessException {
     PreparedStatement ps = buildPrepStmt(sql, params);
     try {
       return ps.executeUpdate();
@@ -169,11 +172,13 @@ class QueryExecutor {
     }
   }
 
-  protected List<ResultRow> execQueryStmt(String sql) throws DataAccessException {
+  protected List<ResultRow> execQueryStmt(String sql)
+      throws DataAccessException {
     return execQueryStmt(false, sql);
   }
 
-  private List<ResultRow> execQueryStmt(boolean single, String sql) throws DataAccessException {
+  private List<ResultRow> execQueryStmt(boolean single, String sql)
+      throws DataAccessException {
     PreparedStatement stmt = datasource.prepareStatement(sql);
     ResultSet rs = null;
 
@@ -194,16 +199,19 @@ class QueryExecutor {
     }
   }
 
-  protected ResultRow execQuery1PrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
+  protected ResultRow execQuery1PrepStmt(String sql, SqlColumn2... params)
+      throws DataAccessException {
     List<ResultRow> rows = execQueryPrepStmt(true, sql, params);
     return rows.isEmpty() ? null : rows.get(0);
   }
 
-  protected List<ResultRow> execQueryPrepStmt(String sql, SqlColumn2... params) throws DataAccessException {
+  protected List<ResultRow> execQueryPrepStmt(String sql, SqlColumn2... params)
+      throws DataAccessException {
     return execQueryPrepStmt(false, sql, params);
   }
 
-  private List<ResultRow> execQueryPrepStmt(boolean single, String sql, SqlColumn2... params)
+  private List<ResultRow> execQueryPrepStmt(
+      boolean single, String sql, SqlColumn2... params)
       throws DataAccessException {
     PreparedStatement ps = buildPrepStmt(sql, params);
     ResultSet rs = null;
@@ -224,7 +232,8 @@ class QueryExecutor {
     }
   }
 
-  protected PreparedStatement buildPrepStmt(String sql,  SqlColumn2... columns) throws DataAccessException {
+  protected PreparedStatement buildPrepStmt(String sql,  SqlColumn2... columns)
+      throws DataAccessException {
     PreparedStatement ps = null;
     boolean succ = false;
     try {
@@ -265,7 +274,8 @@ class QueryExecutor {
               ps.setTimestamp(index, (Timestamp) value);
             }
           } else {
-            throw new IllegalStateException("should not reach here, unknown type " + type);
+            throw new IllegalStateException(
+                "should not reach here, unknown type " + type);
           }
         } catch (SQLException ex) {
           throw datasource.translate(sql, ex);
@@ -281,19 +291,24 @@ class QueryExecutor {
     }
   }
 
-  protected void notNulls(Object param1, String name1, Object param2, String name2) {
+  protected void notNulls(Object param1, String name1,
+                          Object param2, String name2) {
     Args.notNull(param1, name1);
     Args.notNull(param2, name2);
   }
 
-  protected void notNulls(Object param1, String name1, Object param2, String name2, Object param3, String name3) {
+  protected void notNulls(Object param1, String name1,
+                          Object param2, String name2,
+                          Object param3, String name3) {
     Args.notNull(param1, name1);
     Args.notNull(param2, name2);
     Args.notNull(param3, name3);
   }
 
-  protected void notNulls(Object param1, String name1, Object param2, String name2,
-      Object param3, String name3, Object param4, String name4) {
+  protected void notNulls(Object param1, String name1,
+                          Object param2, String name2,
+                          Object param3, String name3,
+                          Object param4, String name4) {
     Args.notNull(param1, name1);
     Args.notNull(param2, name2);
     Args.notNull(param3, name3);

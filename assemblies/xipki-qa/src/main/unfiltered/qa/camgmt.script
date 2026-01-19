@@ -1,3 +1,6 @@
+## DER or PEM
+OUTFORM = DER
+
 printUsage = "false"
 argsValid = "false"
 errMsg = ""
@@ -7,50 +10,51 @@ if { "$1" equals "" | "$1" equals "help" } then {
   argsValid = "true"
 } else {
   if { "$1" equals "-l" } then {
-    OUTFORM = $2
-    HASH = $3
-    TOKEN_TYPE = $4
-    SIG_TYPE = $5
-    KEYSPEC =$6
+    TOKEN_TYPE = $2
+    CA_KEYSPEC = $3
+    KEYSPEC = $4
   } else {
-    OUTFORM = $1
-    HASH = $2
-    TOKEN_TYPE = $3
-    SIG_TYPE = $4
-    KEYSPEC =$5
+    TOKEN_TYPE = $1
+    CA_KEYSPEC = $2
+    KEYSPEC = $3
   }
 
-  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
+  TOKEN_TYPE = $(xi:uppercase "$TOKEN_TYPE")
+  CA_KEYSPEC = $(xi:uppercase "$CA_KEYSPEC")
+  KEYSPEC    = $(xi:uppercase "$KEYSPEC")
+
+  if { "$KEYSPEC" equals "" } then {
+    KEYSPEC = $CA_KEYSPEC
+  }
+
+  argsValid = $([PKCS11 PKCS12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
   } else {
-    argsValid = $([rsa rsapss ec plainec dsa sm2] contains $SIG_TYPE)
-    if { "$argsValid" equals "false" } then {
-      errMsg = "invalid SIG_TYPE $SIG_TYPE"
+    keyspec = $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
+    if { "$sigalg" equals "" } then {
+      argsValid = "false"
     }
-  }
 
-  if { "$argsValid" equals "true" } then {
-    if { "$SIG_TYPE" equals "plainec" } then {
-      argsValid = $([sha1 sha256 sha384 sha512] contains $HASH)
-    } elif { "$SIG_TYPE" equals "sm2" } then {
-      argsValid = $([sm3] contains $HASH)
-    } elif { "$SIG_TYPE" equals "rsa" } then {
-      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
-    } elif { "$SIG_TYPE" equals "dsa" } then {
-      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512] contains $HASH)
+    CA_KEYSPEC = $keyspec
+    CA_SIGALG  = $sigalg
+    CA_RSAPSS  = $rsapss
+
+    if { "$KEYSPEC" equals "" } then {
+      keyspec = $CA_KEYSPEC
     } else {
-      # ec and rsapss
-      argsValid = $([sha1 sha256 sha384 sha512 sha3-224 sha3-256 sha3-384 sha3-512 shake128 shake256] contains $HASH)
+      keyspec = $KEYSPEC
     }
 
-    if { "$argsValid" equals "false" } then {
-      if { "$errMsg" equals ""} then {
-        errMsg = "invalid HASH $HASH"
-      }
-    }
+    source xipki/ca-setup/c14n-keyspec.script
 
+    if { "$keyspec" equals "" } then {
+      argsValid = "false"
+    }
+    KEYSPEC = $keyspec
+    RSAPSS  = $rsapss
   }
 }
 
@@ -63,21 +67,20 @@ if { "$argsValid" equals "false" } then {
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/camgmt-qa.script [option] <outform> <hash algo> <token type> <signature type> [<keyspec>]"
-  echo "    outform:         Output format of the certificates, CRLs and CSRs"
-  echo "    hash algo:       sha1, sha224, sha256, sha384, sha512"
-  echo "                     sha3-224, sha3-256, sha3-384, sha3-512"
-  echo "                     shake128, shake256 (for signature types rsapss and ec)"
-  echo "                     sm3 (for signature type sm2)"
-  echo "                     The sha3 algorithms are not for plainec."
-  echo "    token type:      pkcs11, pkcs12"
-  echo "    signature type:  rsa, rsapss, ec, plainec, dsa, sm2"
-  echo "    keyspec:         keysize for signature types rsa, rsapss and dsa,"
-  echo "                     curve name for signature types ec and plainec"
+  echo "source file:./qa/camgmt-qa.script [option] <token type> <CA keyspec> [<EE keyspec>]"
+  echo "    token type:      PKCS11, PKCS12"
+  source xipki/ca-setup/print-keyspecs.script
   echo "options"
   echo "    -l               configure CAs using command 'load-conf'"
 } else {
   xi:rm --recursive --force output
+
+  echo "========================================================"
+  echo "TOKEN_TYPE: $TOKEN_TYPE"
+  echo "CA_KEYSPEC: $CA_KEYSPEC"
+  echo "CA_SIGALG:  $CA_SIGALG"
+  echo "KEYSPEC:    $KEYSPEC"
+  echo "========================================================"
 
   source file:./qa/qa.d/prepare-keys.script
 
@@ -87,22 +90,7 @@ if { "$printUsage" equals "true" } then {
   xi:copy-file -f qa/qa.d/template.ca.script \
     qa/qa.d/ca.script
 
-  dsaPlain = ""
-
-  if { "$SIG_TYPE" equals "plainec" } then {
-    dsaPlain = "--dsa-plain"
-  }
-
-  xi:replace --old "REPLACEME-DSAPLAIN" --new "${dsaPlain}" \
-    qa/qa.d/ca-load.script \
-    qa/qa.d/ca.script
-
-  rsaPss = ""
-  if { "$SIG_TYPE" equals "rsapss" } then {
-    rsaPss = "--rsa-pss"
-  }
-
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" \
     qa/qa.d/ca-load.script \
     qa/qa.d/ca.script
 
@@ -222,7 +210,7 @@ if { "$printUsage" equals "true" } then {
     --sn-len 20  \
     --signer-type $TOKEN_TYPE \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
+    --crl-uri "http://localhost:8081/dummy/crl/?type=crl&name=subca1" \
     --ca-cert-uri http://myorg.org/subca1.der \
     --certchain output/rootca1.crt
 
@@ -234,7 +222,7 @@ if { "$printUsage" equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
     --ca-cert-uri http://myorg.org/rootca1.der \
-    --crl-uri 'http://localhost:8081/crl/?type=crl&name=rootca1' \
+    --crl-uri 'http://localhost:8081/dummy/crl/?type=crl&name=rootca1' \
     --validity-mode cutoff \
     --certchain NULL
 
@@ -250,7 +238,7 @@ if { "$printUsage" equals "true" } then {
     --signer-type $TOKEN_TYPE \
     --cert output/subca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder1 \
-    --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
+    --crl-uri "http://localhost:8081/dummy/crl/?type=crl&name=subca1" \
     --ca-cert-uri http://myorg.org/subca1.der \
     --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
     --certchain output/rootca1.crt \
@@ -273,7 +261,7 @@ if { "$printUsage" equals "true" } then {
     --cert output/rootca1.crt \
     --ocsp-uri http://localhost:8080/ocsp/responder2 \
     --ca-cert-uri http://myorg.org/rootca1-2.der \
-    --crl-uri 'http://localhost:8081/crl/?type=crl&name=rootca1' \
+    --crl-uri 'http://localhost:8081/dummy/crl/?type=crl&name=rootca1' \
     --validity-mode strict
 
   # for commands neg-gen-rootca
@@ -281,7 +269,7 @@ if { "$printUsage" equals "true" } then {
 
   # The CA named rootca2 exists. No new CA with the same name is allowed
 
-  if { $TOKEN_TYPE equals "pkcs11" } then {
+  if { $TOKEN_TYPE equals "PKCS11" } then {
     CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=rootca1"
   } else {
     CA_SIGNER_CONF_RCA = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"

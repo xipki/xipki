@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -21,8 +19,9 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
 
   private final BigInteger[] entries;
 
-  public UnsuspendOrRemoveCertsRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
-                                       byte[] authorityKeyIdentifier, BigInteger[] entries) {
+  public UnsuspendOrRemoveCertsRequest(
+      byte[] issuerCertSha1Fp, X500NameType issuer,
+      byte[] authorityKeyIdentifier, BigInteger[] entries) {
     super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.entries = entries;
   }
@@ -32,21 +31,22 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     super.encode0(encoder, 1);
     encoder.writeBigInts(entries);
   }
 
-  public static UnsuspendOrRemoveCertsRequest decode(byte[] encoded) throws DecodeException {
+  public static UnsuspendOrRemoveCertsRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
-      assertArrayStart("UnsuspendOrRemoveRequest", decoder, 3 + 1); // 3 fields defined in the pararent class.
-      return new UnsuspendOrRemoveCertsRequest(
-          decoder.readByteString(),
-          X500NameType.decode(decoder),
-          decoder.readByteString(),
+      // 3 fields defined in the pararent class.
+      assertArrayStart("UnsuspendOrRemoveRequest", decoder, 3 + 1);
+      return new UnsuspendOrRemoveCertsRequest(decoder.readByteString(),
+          X500NameType.decode(decoder), decoder.readByteString(),
           decoder.readBigInts());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, UnsuspendOrRemoveCertsRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, UnsuspendOrRemoveCertsRequest.class), ex);
     }
   }
 

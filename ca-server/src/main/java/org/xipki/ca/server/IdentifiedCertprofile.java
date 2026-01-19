@@ -1,90 +1,53 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.PolicyInformation;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.Certprofile.CertDomain;
-import org.xipki.ca.api.profile.Certprofile.CertLevel;
-import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
-import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
-import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.SubjectInfo;
-import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.ExtensionSpec;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.api.profile.NotAfterMode;
-import org.xipki.ca.api.profile.SubjectDnSpec;
-import org.xipki.pki.BadCertTemplateException;
+import org.xipki.ca.api.profile.ctrl.*;
+import org.xipki.security.KeySpec;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.BaseRequirements;
-import org.xipki.security.ObjectIdentifiers.DN;
-import org.xipki.security.ObjectIdentifiers.Extn;
+import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Validity;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.type.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
-import static org.xipki.ca.server.CertprofileUtil.addExtension;
-import static org.xipki.ca.server.CertprofileUtil.addRequestedExtKeyusage;
-import static org.xipki.ca.server.CertprofileUtil.addRequestedKeyusage;
-import static org.xipki.ca.server.CertprofileUtil.createSubjectInfoAccess;
-
 /**
- * CertProfiel with identifier.
+ * CertProfile with identifier.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public class IdentifiedCertprofile implements Closeable {
@@ -92,14 +55,17 @@ public class IdentifiedCertprofile implements Closeable {
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  public IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
+  public IdentifiedCertprofile(
+      CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     this.certprofile = Args.notNull(certprofile, "certprofile");
 
     this.certprofile.initialize(dbEntry.getConf());
-    if (this.certprofile.getCertLevel() != CertLevel.EndEntity && this.certprofile.hasNoWellDefinedExpirationDate()) {
-      throw new CertprofileException("CA certificate is not allowed to have notAfter 99991231235959Z");
+    if (this.certprofile.getCertLevel() != CertLevel.EndEntity
+        && this.certprofile.hasNoWellDefinedExpirationDate()) {
+      throw new CertprofileException(
+          "CA certificate is not allowed to have notAfter 99991231235959Z");
     }
   } // constructor
 
@@ -113,10 +79,6 @@ public class IdentifiedCertprofile implements Closeable {
 
   public CertprofileEntry getDbEntry() {
     return dbEntry;
-  }
-
-  public X509CertVersion getVersion() {
-    return certprofile.getVersion();
   }
 
   public List<SignAlgo> getSignatureAlgorithms() {
@@ -135,568 +97,8 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.hasNoWellDefinedExpirationDate();
   }
 
-  public NotAfterMode getNotAfterMode() {
+  public ValidityMode getNotAfterMode() {
     return certprofile.getNotAfterMode();
-  }
-
-  public SubjectInfo getSubject(X500Name requestedSubject, SubjectPublicKeyInfo publicKeyInfo)
-      throws CertprofileException, BadCertTemplateException {
-    SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject, publicKeyInfo);
-
-    if (certprofile.getCertDomain() == CertDomain.CABForumBR) {
-      X500Name subject = subjectInfo.getGrantedSubject();
-
-      if (getCertLevel() == CertLevel.EndEntity) {
-        // extract the policyIdentifier
-        CertificatePolicies policies = certprofile.getCertificatePolicies();
-        ASN1ObjectIdentifier policyId = null;
-        if (policies != null) {
-          for (PolicyInformation m : policies.getPolicyInformation()) {
-            ASN1ObjectIdentifier pid = m.getPolicyIdentifier();
-            if (BaseRequirements.id_domain_validated.equals(pid)
-                || BaseRequirements.id_organization_validated.equals(pid)
-                || BaseRequirements.id_individual_validated.equals(pid)) {
-              policyId = pid;
-              break;
-            }
-          }
-        }
-
-        // subject:street
-        if (containsRdn(subject, DN.street)) {
-          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
-            throw new BadCertTemplateException("subject:street is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
-          }
-        }
-
-        // subject:localityName
-        if (containsRdn(subject, DN.localityName)) {
-          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
-            throw new BadCertTemplateException("subject:localityName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
-          }
-        } else {
-          if (!containsRdn(subject, DN.ST) &&
-              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
-            throw new BadCertTemplateException("subject:localityName is required if the "
-                + "subject:organizationName field, subject:givenName field, or subject:surname "
-                + "field are present and the subject:stateOrProvinceName field is absent.");
-          }
-        }
-
-        // subject:stateOrProvinceName
-        if (containsRdn(subject, DN.ST)) {
-          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
-            throw new BadCertTemplateException("subject:stateOrProvinceName is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
-          }
-        } else {
-          if (!containsRdn(subject, DN.localityName) &&
-              (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname))) {
-            throw new BadCertTemplateException("subject:stateOrProvinceName is required if the "
-                + "subject:organizationName field, subject:givenName field, or subject:surname "
-                +  "field are present and the subject:localityName field is absent.");
-          }
-        }
-
-        // subject:postalCode
-        if (containsRdn(subject, DN.postalCode)) {
-          if (!containsRdn(subject, DN.O) && !containsRdn(subject, DN.givenName) && !containsRdn(subject, DN.surname)) {
-            throw new BadCertTemplateException("subject:postalCode is prohibited if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field are absent.");
-          }
-        }
-
-        // subject:countryCode
-        if (!containsRdn(subject, DN.C)) {
-          if (containsRdn(subject, DN.O) || containsRdn(subject, DN.givenName) || containsRdn(subject, DN.surname)) {
-            throw new BadCertTemplateException("subject:countryCode is required if the "
-                + "subject:organizationName field, subject:givenName, and subject:surname field are present");
-          }
-        }
-
-        if (BaseRequirements.id_domain_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] excludeSubjectFields = new ASN1ObjectIdentifier[] {
-              DN.O, DN.givenName, DN.surname, DN.street, DN.localityName, DN.ST, DN.postalCode};
-          for (ASN1ObjectIdentifier m : excludeSubjectFields) {
-            if (containsRdn(subject, m)) {
-              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
-                + " is prohibited in domain validated certificate");
-            }
-          }
-        } else if (BaseRequirements.id_organization_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.O, DN.C};
-          for (ASN1ObjectIdentifier m : includeSubjectFields) {
-            if (!containsRdn(subject, m)) {
-              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
-                + " is required in organization validated certificate");
-            }
-          }
-
-          if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
-            throw new BadCertTemplateException("at least one of subject:localityName and "
-                + "subject:stateOrProvinceName is required in organization validated certificate");
-          }
-        } else if (BaseRequirements.id_individual_validated.equals(policyId)) {
-          ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {DN.C};
-          for (ASN1ObjectIdentifier m : includeSubjectFields) {
-            if (!containsRdn(subject, m)) {
-              throw new BadCertTemplateException("subject " + ObjectIdentifiers.getName(m)
-                + " is required in individual validated certificate");
-            }
-          }
-
-          if (!(containsRdn(subject, DN.O)
-              || (containsRdn(subject, DN.givenName) && containsRdn(subject, DN.surname)))) {
-            throw new BadCertTemplateException("at least one of subject:organizationName and "
-                + "(subject:givenName, subject:surName) is required in individual validated certificate");
-          }
-
-          if (!(containsRdn(subject, DN.localityName) || containsRdn(subject, DN.ST))) {
-            throw new BadCertTemplateException("at least one of subject:localityName and "
-                + "subject:stateOrProvinceName is required in individual validated certificate");
-          }
-        }
-      } else {
-        ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {DN.CN, DN.O, DN.C};
-        for (ASN1ObjectIdentifier m : requiredTypes) {
-          if (!containsRdn(subject, DN.CN)) {
-            throw new BadCertTemplateException("missing " + ObjectIdentifiers.getName(m) + " in subject");
-          }
-        }
-      }
-    }
-
-    // check the country
-    ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
-        ObjectIdentifiers.DN.C,  ObjectIdentifiers.DN.countryOfCitizenship,
-        ObjectIdentifiers.DN.countryOfResidence, ObjectIdentifiers.DN.jurisdictionOfIncorporationCountryName};
-
-    for (ASN1ObjectIdentifier oid : countryOids) {
-      RDN[] countryRdns = subjectInfo.getGrantedSubject().getRDNs(oid);
-      if (countryRdns != null) {
-        for (RDN rdn : countryRdns) {
-          String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
-          if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
-            String name = ObjectIdentifiers.getName(oid);
-            if (name == null) {
-              name = oid.getId();
-            }
-
-            throw new BadCertTemplateException("invalid country/area code '" + textValue
-                + "' in subject attribute " + name);
-          }
-        }
-      }
-    }
-    return subjectInfo;
-  } // method getSubject
-
-  private boolean containsRdn(X500Name subject, ASN1ObjectIdentifier o) {
-    RDN[] rdns = subject.getRDNs(o);
-    return rdns != null && rdns.length != 0;
-  }
-
-  /**
-   * Get the extensions.
-   *
-   * @param requestedSubject
-   *          Subject requested subject. Must not be {@code null}.
-   * @param grantedSubject
-   *          Granted subject. Must not be {@code null}.
-   * @param requestedExtensions
-   *          Extensions requested by the requestor. Could be {@code null}.
-   * @param publicKeyInfo
-   *          Subject public key. Must not be {@code null}.
-   * @param publicCaInfo
-   *          CA information. Must not be {@code null}.
-   * @param crlSignerCert
-   *          CRL signer certificate. Could be {@code null}.
-   * @param notBefore
-   *          NotBefore. Must not be {@code null}.
-   * @param notAfter
-   *          NotAfter. Must not be {@code null}.
-   * @return the extensions of the certificate to be issued.
-   * @throws BadCertTemplateException if the requestedSubject, requestedExtensions and publicKeyInfo
-   *         does not match the requested certificate profile.
-   * @throws CertprofileException if any error occurs.
-   */
-  public ExtensionValues getExtensions(
-      X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
-      SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
-      Instant notBefore, Instant notAfter)
-      throws CertprofileException, BadCertTemplateException {
-    Args.notNull(publicKeyInfo, "publicKeyInfo");
-    ExtensionValues values = new ExtensionValues();
-
-    Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certprofile.getExtensionControls());
-
-    // CTLog extension will be processed by the CA
-    controls.remove(Extn.id_SCTs);
-
-    Map<ASN1ObjectIdentifier, Extension> requestedExtns = new HashMap<>();
-    // remove the request extensions which are not permitted in the request
-    if (requestedExtensions != null) {
-      ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
-      for (ASN1ObjectIdentifier m : oids) {
-        ExtensionControl control = controls.get(m);
-        if (control == null || control.isPermittedInRequest()) {
-          requestedExtns.put(m, requestedExtensions.getExtension(m));
-        }
-      }
-    }
-
-    // SubjectKeyIdentifier
-    ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
-    ExtensionControl extControl = controls.remove(extType);
-    if (extControl != null) {
-      // If specified by the request, use it
-      Extension reqExtn = requestedExtns.get(extType);
-      SubjectKeyIdentifier value;
-      if (reqExtn == null) {
-        value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
-      } else {
-        value = new SubjectKeyIdentifier(SubjectKeyIdentifier.getInstance(reqExtn.getParsedValue()).getKeyIdentifier());
-      }
-      addExtension(values, extType, value, extControl);
-    }
-
-    // Authority key identifier
-    byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
-
-    if (ikiValue != null) {
-      extType = Extension.authorityKeyIdentifier;
-      extControl = controls.remove(extType);
-
-      if (extControl != null) {
-        AuthorityKeyIdentifier value;
-        if (certprofile.useIssuerAndSerialInAki()) {
-          GeneralNames x509CaIssuer = new GeneralNames(new GeneralName(publicCaInfo.getIssuer()));
-          value = new AuthorityKeyIdentifier(ikiValue, x509CaIssuer, publicCaInfo.getSerialNumber());
-        } else {
-          value = new AuthorityKeyIdentifier(ikiValue);
-        }
-
-        addExtension(values, extType, value, extControl);
-      }
-    }
-
-    // IssuerAltName
-    extType = Extension.issuerAlternativeName;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      GeneralNames value = publicCaInfo.getSubjectAltName();
-      addExtension(values, extType, value, extControl);
-    }
-
-    // AuthorityInfoAccess
-    extType = Extension.authorityInfoAccess;
-    extControl = controls.remove(extType);
-    CaUris caUris = publicCaInfo.getCaUris();
-
-    if (extControl != null) {
-      AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
-
-      List<String> caIssuers = null;
-      if (aiaControl != null && aiaControl.isIncludesCaIssuers()) {
-        caIssuers = caUris.getCacertUris();
-        assertAllUrisHasProtocol(caIssuers, aiaControl.getCaIssuersProtocols());
-      }
-
-      List<String> ocspUris = null;
-      if (aiaControl != null && aiaControl.isIncludesOcsp()) {
-        ocspUris = caUris.getOcspUris();
-        assertAllUrisHasProtocol(ocspUris, aiaControl.getOcspProtocols());
-      }
-
-      AuthorityInformationAccess value = null;
-      if (CollectionUtil.isNotEmpty(caIssuers) || CollectionUtil.isNotEmpty(ocspUris)) {
-        value = CaUtil.createAuthorityInformationAccess(caIssuers, ocspUris);
-      }
-      addExtension(values, extType, value, extControl);
-    }
-
-    if (controls.containsKey(Extension.cRLDistributionPoints)
-        || controls.containsKey(Extension.freshestCRL)) {
-      X500Name crlSignerSubject = (crlSignerCert == null) ? null : crlSignerCert.getSubject();
-      X500Name x500CaPrincipal = publicCaInfo.getSubject();
-
-      // CRLDistributionPoints
-      extType = Extension.cRLDistributionPoints;
-      extControl = controls.remove(extType);
-      if (extControl != null) {
-        CRLDistPoint value = null;
-        List<String> uris = caUris.getCrlUris();
-        if (CollectionUtil.isNotEmpty(uris)) {
-          CrlDistributionPointsControl control = certprofile.getCrlDpControl();
-          Set<String> protocols = control == null ? null : control.getProtocols();
-          assertAllUrisHasProtocol(uris, protocols);
-          value = CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
-        }
-        addExtension(values, extType, value, extControl);
-      }
-
-      // FreshestCRL
-      extType = Extension.freshestCRL;
-      extControl = controls.remove(extType);
-      if (extControl != null) {
-        CRLDistPoint value = null;
-        List<String> uris = caUris.getDeltaCrlUris();
-        if (CollectionUtil.isNotEmpty(uris)) {
-          CrlDistributionPointsControl control = certprofile.getFreshestCrlControl();
-          Set<String> protocols = control == null ? null : control.getProtocols();
-          assertAllUrisHasProtocol(uris, protocols);
-          value = CaUtil.createCrlDistributionPoints(caUris.getDeltaCrlUris(), x500CaPrincipal, crlSignerSubject);
-        }
-        addExtension(values, extType, value, extControl);
-      }
-    }
-
-    // BasicConstraints
-    extType = Extension.basicConstraints;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      CertLevel certLevel = certprofile.getCertLevel();
-      BasicConstraints value;
-      if (certLevel == CertLevel.EndEntity) {
-        value = CaUtil.createBasicConstraints(CertLevel.EndEntity, null);
-      } else {
-        Integer pathLen = certprofile.getPathLenBasicConstraint();
-        Extension requestedExtn = requestedExtns.get(extType);
-        if (requestedExtn != null) {
-          BasicConstraints bc = BasicConstraints.getInstance(requestedExtn.getParsedValue());
-          if (!bc.isCA()) {
-            throw new CertprofileException("could not enroll a CA certificate for an EndEntity request");
-          }
-
-          if (bc.getPathLenConstraint() != null) {
-            int reqPathLen = bc.getPathLenConstraint().intValue();
-            if (reqPathLen >= 0 && (pathLen == null || reqPathLen < pathLen)) {
-              pathLen = reqPathLen;
-            }
-          }
-        }
-
-        value = CaUtil.createBasicConstraints(certLevel, pathLen);
-      }
-
-      addExtension(values, extType, value, extControl);
-    }
-
-    // KeyUsage
-    extType = Extension.keyUsage;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      Set<KeyUsage> usages = new HashSet<>();
-      Set<KeyUsageControl> usageOccs = certprofile.getKeyUsage();
-      for (KeyUsageControl k : usageOccs) {
-        if (k.isRequired()) {
-          usages.add(k.getKeyUsage());
-        }
-      }
-
-      // the optional KeyUsage will only be set if requested explicitly
-      addRequestedKeyusage(usages, requestedExtns, usageOccs);
-
-      org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
-      addExtension(values, extType, value, extControl);
-    }
-
-    // ExtendedKeyUsage
-    extType = Extension.extendedKeyUsage;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      List<ASN1ObjectIdentifier> usages = new LinkedList<>();
-      Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
-      for (ExtKeyUsageControl k : usageOccs) {
-        if (k.isRequired()) {
-          usages.add(k.getExtKeyUsage());
-        }
-      }
-
-      // the optional ExtKeyUsage will only be set if requested explicitly
-      addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
-
-      if (extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_anyExtendedKeyUsage)) {
-        extControl = new ExtensionControl(false, extControl.isRequired(), extControl.getInRequest());
-      }
-
-      if (!extControl.isCritical() && usages.contains(ObjectIdentifiers.XKU.id_kp_timeStamping)) {
-        extControl = new ExtensionControl(true, extControl.isRequired(), extControl.getInRequest());
-      }
-
-      ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
-      addExtension(values, extType, value, extControl);
-    }
-
-    // ocsp-nocheck
-    extType = ObjectIdentifiers.Extn.id_extension_pkix_ocsp_nocheck;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      // the extension ocsp-nocheck will only be set if requested explicitly
-      addExtension(values, extType, DERNull.INSTANCE, extControl);
-    }
-
-    // SubjectInfoAccess
-    extType = Extension.subjectInfoAccess;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      ASN1Sequence value = createSubjectInfoAccess(requestedExtns, certprofile.getSubjectInfoAccessModes());
-      addExtension(values, extType, value, extControl);
-    }
-
-    // CertificatePolicies
-    extType = Extension.certificatePolicies;
-    extControl = controls.remove(extType);
-    if (extControl != null) {
-      ASN1Encodable value = certprofile.getCertificatePolicies();
-      addExtension(values, extType, value, extControl);
-    }
-
-    ExtensionValues subvalues = certprofile.getExtensions(Collections.unmodifiableMap(controls),
-        requestedSubject, grantedSubject, requestedExtns, notBefore, notAfter, publicCaInfo);
-
-    Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
-    for (ASN1ObjectIdentifier type : extTypes) {
-      extControl = controls.get(type);
-      ExtensionValue value = subvalues.getExtensionValue(type);
-      if (value == null && extControl.isPermittedInRequest()) {
-        Extension reqExt = requestedExtns.get(type);
-        if (reqExt != null) {
-          value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
-        }
-      }
-
-      if (value != null) {
-        addExtension(values, type, value, extControl);
-        controls.remove(type);
-      }
-    }
-
-    Set<ASN1ObjectIdentifier> unprocessedExtTypes = new HashSet<>();
-    for (Entry<ASN1ObjectIdentifier, ExtensionControl> entry : controls.entrySet()) {
-      if (entry.getValue().isRequired()) {
-        unprocessedExtTypes.add(entry.getKey());
-      }
-    }
-
-    if (CollectionUtil.isNotEmpty(unprocessedExtTypes)) {
-      throw new CertprofileException(
-          "could not add required extensions " + CertprofileUtil.toString(unprocessedExtTypes));
-    }
-
-    // Check the SubjectAltNames
-    if (certprofile.getCertDomain() == CertDomain.CABForumBR && getCertLevel() == CertLevel.EndEntity) {
-      // Make sure that the commonName included in SubjectAltName
-      String commonName = X509Util.getCommonName(grantedSubject);
-      boolean commonNameInSan = commonName == null;
-
-      // No private IP address is permitted
-      GeneralName[] genNames = GeneralNames.getInstance(
-              values.getExtensionValue(Extension.subjectAlternativeName).getValue()).getNames();
-      for (GeneralName m : genNames) {
-        if (GeneralName.dNSName == m.getTagNo()) {
-          String domain = ASN1IA5String.getInstance(m.getName()).getString();
-          if (!commonNameInSan && domain.equals(commonName)) {
-            commonNameInSan = true;
-          }
-
-          if (domain.indexOf('_') != -1) {
-            throw new BadCertTemplateException("invalid DNSName " + domain);
-          }
-
-          if (!ExtensionSpec.isValidPublicDomain(domain)) {
-            throw new BadCertTemplateException("invalid DNSName " + domain);
-          }
-        } else if (GeneralName.iPAddress == m.getTagNo()) {
-          byte[] octets = DEROctetString.getInstance(m.getName()).getOctets();
-          if (octets.length == 4) { // IPv4 address
-            if (!commonNameInSan) {
-              String ipAddressText = (0xFF & octets[0]) + "." + (0xFF & octets[1]) + "."
-                  + (0xFF & octets[2]) + "." + (0xFF & octets[3]);
-              if (ipAddressText.equals(commonName)) {
-                commonNameInSan = true;
-              }
-            }
-
-            //if (!ExtensionSpec.isValidPublicIPv4Address(octets)) {
-            //  throw new BadCertTemplateException(
-            //      "invalid IPv4Address " + ipAddressText);
-            //}
-          } else if (octets.length == 8) { // IPv6 address
-            if (!commonNameInSan) {
-              // get the number of ":"
-              List<Integer> positions = new ArrayList<>(7);
-              int n = commonName.length();
-
-              for (int i = 0; i < n; i++) {
-                if (commonName.charAt(i) == ':') {
-                  positions.add(i);
-                }
-              }
-
-              if (positions.size() == 7) {
-                String[] blocks = new String[8];
-                blocks[0] = commonName.substring(0, positions.get(0));
-                for (int i = 0; i < 6; i++) {
-                  blocks[i + 1] = commonName.substring(positions.get(i) + 1, positions.get(i + 1));
-                }
-                blocks[7] = commonName.substring(positions.get(6) + 1);
-
-                byte[] commonNameBytes = new byte[16];
-                for (int i = 0; i < 8; i++) {
-                  String block = blocks[i];
-                  int blen = block.length();
-                  if (blen == 1 | blen == 2) {
-                    commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block, 16);
-                  } else if (blen == 3 | blen == 4) {
-                    commonNameBytes[i * 2] = (byte) Integer.parseInt(block.substring(0, blen - 2), 16);
-                    commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block.substring(blen - 2), 16);
-                  } else if(blen != 0) {
-                    throw new BadCertTemplateException("invalid IP address in commonName " + commonName);
-                  }
-                }
-
-                if (Arrays.equals(commonNameBytes, octets)) {
-                  commonNameInSan = true;
-                }
-              }
-            }
-          } else {
-            throw new BadCertTemplateException("invalid IP address " + Hex.toHexString(octets));
-          }
-        }
-      }
-
-      if (!commonNameInSan) {
-        throw new BadCertTemplateException(
-            "content of subject:commonName is not included in extension:SubjectAlternativeNames");
-      }
-    }
-
-    return values;
-  } // method getExtensions
-
-  private static void assertAllUrisHasProtocol(List<String> uris, Set<String> protocols)
-      throws CertprofileException {
-    if (protocols == null || uris == null) {
-      return;
-    }
-
-    for (String uri : uris) {
-      boolean validUri = false;
-      for (String protocol : protocols) {
-        if (uri.startsWith(protocol + ":")) {
-          validUri = true;
-          break;
-        }
-      }
-
-      if (!validUri) {
-        throw new CertprofileException("URL '" + uri + "' does not have any of protocols " + protocols);
-      }
-    }
   }
 
   public CertLevel getCertLevel() {
@@ -707,23 +109,12 @@ public class IdentifiedCertprofile implements Closeable {
     return certprofile.getKeypairGenControl();
   }
 
-  public String getSerialNumberMode() {
-    return certprofile.getSerialNumberMode();
-  }
-
-  public BigInteger generateSerialNumber(
-          X500Name caSubject, SubjectPublicKeyInfo caPublicKeyInfo, X500Name requestSubject,
-          SubjectPublicKeyInfo publicKeyInfo, ConfPairs caExtraControl)
-      throws CertprofileException {
-    return certprofile.generateSerialNumber(caSubject, caPublicKeyInfo, requestSubject, publicKeyInfo, caExtraControl);
-  }
-
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
       throws CertprofileException, BadCertTemplateException {
     return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
   }
 
-  public SubjectKeyIdentifier getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)
+  public byte[] getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)
       throws CertprofileException {
     return certprofile.getSubjectKeyIdentifier(publicKey);
   }
@@ -735,8 +126,8 @@ public class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
-    return certprofile.getExtensionControls();
+  public ExtensionsControl getExtensionControls() {
+    return certprofile.getExtensionsControl();
   }
 
   public Integer getPathLenBasicConstraint() {
@@ -745,6 +136,645 @@ public class IdentifiedCertprofile implements Closeable {
 
   public int getMaxCertSize() {
     return certprofile.getMaxCertSize();
+  }
+
+  public SubjectInfo getSubject(X500Name requestedSubject)
+      throws CertprofileException, BadCertTemplateException {
+    return CertprofileUtil.getSubject(certprofile, requestedSubject);
+  }
+
+  /**
+   * Get the extensions.
+   *
+   * @param requestedSubject
+   *        Subject requested subject. Must not be {@code null}.
+   * @param grantedSubject
+   *        Granted subject. Must not be {@code null}.
+   * @param requestedExtensions
+   *        Extensions requested by the requestor. Could be {@code null}.
+   * @param publicKeyInfo
+   *        Subject public key. Must not be {@code null}.
+   * @param publicCaInfo
+   *        CA information. Must not be {@code null}.
+   * @param crlSignerCert
+   *        CRL signer certificate. Could be {@code null}.
+   * @param notBefore
+   *        NotBefore. Must not be {@code null}.
+   * @param notAfter
+   *        NotAfter. Must not be {@code null}.
+   * @return the extensions of the certificate to be issued.
+   * @throws BadCertTemplateException
+   *         if the requestedSubject, requestedExtensions and publicKeyInfo
+   *         does not match the requested certificate profile.
+   * @throws CertprofileException
+   *         if any error occurs.
+   */
+  public ExtensionValues getExtensions(
+      X500Name requestedSubject, X500Name grantedSubject,
+      Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo,
+      PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
+      Instant notBefore, Instant notAfter)
+      throws CertprofileException, BadCertTemplateException {
+    Args.notNull(publicKeyInfo, "publicKeyInfo");
+    ExtensionValues values = new ExtensionValues();
+
+    ExtensionsControl controls = certprofile.getExtensionsControl();
+    List<ASN1ObjectIdentifier> types = new ArrayList<>(controls.getTypes());
+
+    // CTLog extension will be processed by the CA
+    types.remove(OIDs.Extn.id_SignedCertificateTimestampList);
+
+    Map<ASN1ObjectIdentifier, Extension> requestedExtns = new HashMap<>();
+    // remove the request extensions which are not permitted in the request
+    if (requestedExtensions != null) {
+      ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
+      for (ASN1ObjectIdentifier m : oids) {
+        ExtensionControl control = controls.getControl(m);
+        if (control == null || control.isPermittedInRequest()) {
+          requestedExtns.put(m, requestedExtensions.getExtension(m));
+        }
+      }
+    }
+
+    // SubjectKeyIdentifier
+    addExtnSubjectKeyIdentifier(values, types, controls, publicKeyInfo);
+
+    // Authority key identifier
+    addExtnAuthorityKeyIdentifier(values, types, controls, publicCaInfo);
+
+    // IssuerAltName
+    addExtnIssuerAltName(values, types, controls, publicCaInfo);
+
+    // AuthorityInfoAccess
+    addExtnAuthorityInfoAccess(values, types, controls, publicCaInfo);
+
+    // CRLDistributionPoints
+    addExtnCRLDistributionPoints(values, types, controls, publicCaInfo);
+
+    // FreshestCRL
+    addExtnFreshestCRL(values, types, controls, publicCaInfo);
+
+    // BasicConstraints
+    addExtnBasicConstraints(values, types, controls, requestedExtns);
+
+    // KeyUsage
+    KeySpec publicKeySpec = KeySpec.ofPublicKey(publicKeyInfo);
+    if (publicKeySpec == null) {
+      throw new BadCertTemplateException("Unknown public key spec");
+    }
+    addExtnKeyUsage(values, types, controls, requestedExtns, publicKeySpec);
+
+    // ExtendedKeyUsage
+    addExtnExtendedKeyUsage(values, types, controls, requestedExtns);
+
+    // ocsp-nocheck
+    addExtnPkixOcspNoCheck(values, types, controls);
+
+    // SubjectInfoAccess
+    addExtnSubjectInfoAccess(values, types, controls, requestedExtns);
+
+    // CertificatePolicies
+    addExtnCertificatePolicies(values, types, controls);
+
+    ExtensionValues subvalues = certprofile.getExtensions(types,
+        requestedSubject, grantedSubject, requestedExtns, notBefore,
+        notAfter, publicCaInfo);
+
+    for (ASN1ObjectIdentifier type : new ArrayList<>(types)) {
+      ExtensionControl extControl = controls.getControl(type);
+      ExtensionValue value = subvalues.getExtensionValue(type);
+      if (value == null && extControl.isPermittedInRequest()) {
+        Extension reqExt = requestedExtns.get(type);
+        if (reqExt != null) {
+          value = new ExtensionValue(extControl.isCritical(), reqExt);
+        }
+      }
+
+      if (value != null) {
+        CertprofileUtil.addExtension(values, type, extControl,
+            value.getValue());
+        types.remove(type);
+      }
+    }
+
+    Set<ASN1ObjectIdentifier> unprocessedExtTypes = new HashSet<>();
+    for (ASN1ObjectIdentifier type : types) {
+      if (controls.getControl(type).isRequired()) {
+        unprocessedExtTypes.add(type);
+      }
+    }
+
+    if (CollectionUtil.isNotEmpty(unprocessedExtTypes)) {
+      throw new CertprofileException("could not add required extensions " +
+          CertprofileUtil.toString(unprocessedExtTypes));
+    }
+
+    // Check the SubjectAltNames
+    if (certprofile.getCertDomain() == CertDomain.CABForumBR
+        && getCertLevel() == CertLevel.EndEntity) {
+      assertCommonNameInSAN(grantedSubject, values);
+    }
+
+    return values;
+  } // method getExtensions
+
+  private void addExtnSubjectKeyIdentifier(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, SubjectPublicKeyInfo publicKeyInfo)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.subjectKeyIdentifier;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    byte[] value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
+    CertprofileUtil.addExtension(values, extType, extControl,
+          new SubjectKeyIdentifier(value));
+  }
+
+  private void addExtnAuthorityKeyIdentifier(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, PublicCaInfo publicCaInfo)
+      throws CertprofileException {
+    byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifier();
+    if (ikiValue == null) {
+      return;
+    }
+
+    ASN1ObjectIdentifier extType = OIDs.Extn.authorityKeyIdentifier;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    CertprofileUtil.addExtension(values, extType, extControl,
+          new AuthorityKeyIdentifier(ikiValue));
+  }
+
+  private void addExtnIssuerAltName(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, PublicCaInfo publicCaInfo)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.issuerAlternativeName;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    GeneralNames value = publicCaInfo.getSubjectAltName();
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void addExtnAuthorityInfoAccess(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, PublicCaInfo publicCaInfo)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.authorityInfoAccess;
+    ExtensionControl extControl = controls.getControl(extType);
+    CaUris caUris = publicCaInfo.getCaUris();
+
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
+
+    List<String> caIssuers = null;
+    if (aiaControl != null && aiaControl.isIncludesCaIssuers()) {
+      caIssuers = caUris.getCacertUris();
+    }
+
+    List<String> ocspUris = null;
+    if (aiaControl != null && aiaControl.isIncludesOcsp()) {
+      ocspUris = caUris.getOcspUris();
+    }
+
+    boolean noUri = CollectionUtil.isEmpty(caIssuers)
+        && CollectionUtil.isEmpty(ocspUris);
+
+    AuthorityInformationAccess value = noUri ? null
+        : CaUtil.createAuthorityInformationAccess(caIssuers, ocspUris);
+
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void addExtnCRLDistributionPoints(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, PublicCaInfo publicCaInfo)
+      throws CertprofileException {
+    // CRLDistributionPoints
+    ASN1ObjectIdentifier extType = OIDs.Extn.cRLDistributionPoints;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    X509Cert crlSignerCert = publicCaInfo.getCrlSignerCert();
+    X500Name crlSignerSubject = (crlSignerCert == null) ? null
+        : crlSignerCert.getSubject();
+    X500Name x500CaPrincipal = publicCaInfo.getSubject();
+
+    List<String> uris = publicCaInfo.getCaUris().getCrlUris();
+    boolean noUri = CollectionUtil.isEmpty(uris);
+    CRLDistPoint value = noUri ? null
+        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
+            crlSignerSubject);
+
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void addExtnFreshestCRL(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls, PublicCaInfo publicCaInfo)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.freshestCRL;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    X509Cert crlSignerCert = publicCaInfo.getCrlSignerCert();
+    X500Name crlSignerSubject = (crlSignerCert == null) ? null
+        : crlSignerCert.getSubject();
+
+    X500Name x500CaPrincipal = publicCaInfo.getSubject();
+
+    List<String> uris = publicCaInfo.getCaUris().getDeltaCrlUris();
+    boolean noUri = CollectionUtil.isEmpty(uris);
+    CRLDistPoint value = noUri ? null
+        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
+            crlSignerSubject);
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void addExtnBasicConstraints(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.basicConstraints;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    CertLevel certLevel = certprofile.getCertLevel();
+
+    // Level EE
+    if (certLevel == CertLevel.EndEntity) {
+      CertprofileUtil.addExtension(values, extType, extControl,
+          CaUtil.createBasicConstraints(CertLevel.EndEntity, null));
+      return;
+    }
+
+    // Level CA+
+    Integer pathLen = certprofile.getPathLenBasicConstraint();
+    Extension requestedExtn = requestedExtns.get(extType);
+
+    if (requestedExtn != null) {
+      BasicConstraints requested =
+          BasicConstraints.getInstance(requestedExtn.getParsedValue());
+      boolean requestedIsCa = requested.isCA();
+      BigInteger bn = requested.getPathLenConstraint();
+      Integer requestedPathLen = (bn == null) ? null : bn.intValueExact();
+
+      if (!requestedIsCa) {
+        throw new CertprofileException(
+            "could not enroll a CA certificate for an EndEntity request");
+      }
+
+      if (requestedPathLen != null) {
+        if (pathLen == null) {
+          pathLen = requestedPathLen;
+        } else if (requestedPathLen >= 0 && requestedPathLen < pathLen) {
+          pathLen = requestedPathLen;
+        }
+      }
+    }
+
+    CertprofileUtil.addExtension(values, extType, extControl,
+        CaUtil.createBasicConstraints(certLevel, pathLen));
+  }
+
+  private void addExtnKeyUsage(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns, KeySpec keySpec)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.keyUsage;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    Set<KeyUsage> usages = new HashSet<>();
+    // have a copy
+    Set<KeySingleUsage> thisKeyUsage = certprofile.getKeyUsage(keySpec);
+    if (thisKeyUsage == null || thisKeyUsage.isEmpty()) {
+      throw new CertprofileException("KeyUsage does not allow empty usages.");
+    }
+
+    Set<KeySingleUsage> usageOccs = new HashSet<>(thisKeyUsage);
+
+    // Signature only key specs
+    if (keySpec.isMldsa() || keySpec.isEdwardsEC()) {
+      removeKeyUsage(keySpec, usageOccs, KeyUsage.keyAgreement,
+          KeyUsage.dataEncipherment, KeyUsage.keyEncipherment,
+          KeyUsage.decipherOnly,     KeyUsage.encipherOnly);
+    } else if (keySpec.isMlkem()) {
+      removeKeyUsage(keySpec, usageOccs, KeyUsage.keyCertSign, KeyUsage.cRLSign,
+          KeyUsage.digitalSignature, KeyUsage.contentCommitment);
+    } else if (keySpec.isMontgomeryEC()) {
+      removeKeyUsage(keySpec, usageOccs, KeyUsage.keyCertSign, KeyUsage.cRLSign,
+          KeyUsage.digitalSignature, KeyUsage.contentCommitment);
+    } else if (keySpec.isRSA()) {
+      removeKeyUsage(keySpec, usageOccs, KeyUsage.keyAgreement);
+    } else if (keySpec.isWeierstrassEC()) {
+      // all usages are allowed
+    }
+
+    CertLevel certLevel = certprofile.getCertLevel();
+    CertDomain certDomain = certprofile.getCertDomain();
+    if (certLevel == CertLevel.EndEntity) {
+      // make sure the EE certificate does not contain CA-only usages
+      if (containsKeyusage(usageOccs, KeyUsage.keyCertSign)) {
+        throw new CertprofileException(
+            "EndEntity profile must not contain CA-only keyUsage keyCertSign");
+      }
+    } else {
+      // make sure the CA certificate contains usage keyCertSign and cRLSign
+      boolean containsCaUsage =
+          containsKeyusage(usageOccs, KeyUsage.keyCertSign)
+              || containsKeyusage(usageOccs, KeyUsage.cRLSign);
+      if (!containsCaUsage) {
+        throw new CertprofileException(
+            "CA profile does not contain any of keyCertSign and cRLSign, ");
+      }
+    }
+
+    if (certDomain == CertDomain.CABForumBR) {
+      if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
+        if (!containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
+          throw new CertprofileException(
+              "CA profile does contain keyUsage cRLSign");
+        }
+      } else if (certLevel == CertLevel.EndEntity) {
+        if (containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
+          throw new CertprofileException(
+              "EndEntity profile must not contain keyUsage cRLSign");
+        }
+      }
+    }
+
+    for (KeySingleUsage k : usageOccs) {
+      if (k.isRequired()) {
+        usages.add(k.getKeyUsage());
+      }
+    }
+
+    // the optional KeyUsage will only be set if requested explicitly
+    CertprofileUtil.addRequestedKeyusage(usages, requestedExtns, usageOccs);
+
+    if (usages.isEmpty()) {
+      throw new CertprofileException("KeyUsage does not allow empty usages.");
+    }
+
+    CertprofileUtil.addExtension(values, extType, extControl,
+        X509Util.createKeyUsage(usages));
+  }
+
+  private static void removeKeyUsage(
+      KeySpec keySpec, Set<KeySingleUsage> usageControls, KeyUsage... usages)
+      throws CertprofileException {
+    for (KeyUsage usage : usages) {
+      KeySingleUsage singleUsage = null;
+      for (KeySingleUsage control : usageControls) {
+        if (usage == control.getKeyUsage()) {
+          if (!control.isRequired()) {
+            singleUsage = control;
+            break;
+          }
+
+          throw new CertprofileException("KeyUsage " + usage +
+              " is required but is not allowed for the key-spec " + keySpec);
+        }
+      }
+
+      if (singleUsage != null) {
+        usageControls.remove(singleUsage);
+      }
+    }
+  }
+
+  private static boolean containsKeyusage(
+      Set<KeySingleUsage> usageControls, KeyUsage usage) {
+    for (KeySingleUsage entry : usageControls) {
+      if (usage == entry.getKeyUsage()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void addExtnExtendedKeyUsage(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.extendedKeyUsage;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    List<ASN1ObjectIdentifier> usages = new LinkedList<>();
+    Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
+    for (ExtKeyUsageControl k : usageOccs) {
+      if (k.isRequired()) {
+        usages.add(k.getExtKeyUsage());
+      }
+    }
+
+    // the optional ExtKeyUsage will only be set if requested explicitly
+    CertprofileUtil.addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
+
+    if (extControl.isCritical()
+        && usages.contains(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
+      extControl = new ExtensionControl(extControl.getType(), false,
+          extControl.isRequired(), extControl.getInRequest());
+    }
+
+    if (!extControl.isCritical()
+        && usages.contains(OIDs.XKU.id_kp_timeStamping)) {
+      extControl = new ExtensionControl(extControl.getType(), true,
+          extControl.isRequired(), extControl.getInRequest());
+    }
+
+    CertprofileUtil.addExtension(values, extType, extControl,
+          X509Util.createExtendedUsage(usages));
+  }
+
+  private void addExtnPkixOcspNoCheck(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.id_pkix_ocsp_nocheck;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    // the extension ocsp-nocheck will only be set if requested explicitly
+    CertprofileUtil.addExtension(values, extType, extControl, DERNull.INSTANCE);
+  }
+
+  private void addExtnSubjectInfoAccess(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
+      throws BadCertTemplateException, CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.subjectInfoAccess;
+    types.remove(extType);
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    ASN1Sequence value = CertprofileUtil.createSubjectInfoAccess(
+        requestedExtns, certprofile.getSubjectInfoAccessModes());
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void addExtnCertificatePolicies(
+      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionsControl controls)
+      throws CertprofileException {
+    ASN1ObjectIdentifier extType = OIDs.Extn.certificatePolicies;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    CertificatePolicies value = certprofile.getCertificatePolicies();
+    CertprofileUtil.addExtension(values, extType, extControl, value);
+  }
+
+  private void assertCommonNameInSAN(X500Name subject, ExtensionValues values)
+      throws BadCertTemplateException {
+    // Make sure that the commonName is included in SubjectAltName
+    String commonName = X509Util.getCommonName(subject);
+    boolean commonNameInSan = commonName == null;
+
+    ExtensionValue extValue =
+        values.getExtensionValue(OIDs.Extn.subjectAlternativeName);
+
+    // No private IP address is permitted
+    GeneralName[] x509Names =
+        GeneralNames.getInstance(extValue.getValue()).getNames();
+
+    for (GeneralName m : x509Names) {
+      String domain = null;
+      byte[] ipAddress = null;
+      if (GeneralName.dNSName == m.getTagNo()) {
+        domain = ASN1IA5String.getInstance(m.getName()).getString();
+      } else if (GeneralName.iPAddress == m.getTagNo()) {
+        ipAddress = DEROctetString.getInstance(m.getName()).getOctets();
+      }
+
+      if (domain != null) {
+        if (!commonNameInSan && domain.equals(commonName)) {
+          commonNameInSan = true;
+        }
+
+        if (domain.indexOf('_') != -1) {
+          throw new BadCertTemplateException("invalid DNSName " + domain);
+        }
+
+        if (!ExtensionSpec.isValidPublicDomain(domain)) {
+          throw new BadCertTemplateException("invalid DNSName " + domain);
+        }
+      } else if (ipAddress != null) {
+        if (ipAddress.length == 4) { // IPv4 address
+          if (!commonNameInSan) {
+            String ipAddressText =
+                (0xFF & ipAddress[0]) + "." + (0xFF & ipAddress[1])
+                + "." + (0xFF & ipAddress[2]) + "." + (0xFF & ipAddress[3]);
+            if (ipAddressText.equals(commonName)) {
+              commonNameInSan = true;
+            }
+          }
+
+          //if (!ExtensionSpec.isValidPublicIPv4Address(octets)) {
+          //  throw new BadCertTemplateException(
+          //      "invalid IPv4Address " + ipAddressText);
+          //}
+        } else if (ipAddress.length == 8) { // IPv6 address
+          if (!commonNameInSan) {
+            // get the number of ":"
+            List<Integer> positions = new ArrayList<>(7);
+            int n = commonName.length();
+
+            for (int i = 0; i < n; i++) {
+              if (commonName.charAt(i) == ':') {
+                positions.add(i);
+              }
+            }
+
+            if (positions.size() == 7) {
+              String[] blocks = new String[8];
+              blocks[0] = commonName.substring(0, positions.get(0));
+              for (int i = 0; i < 6; i++) {
+                blocks[i + 1] = commonName.substring(
+                    positions.get(i) + 1, positions.get(i + 1));
+              }
+              blocks[7] = commonName.substring(positions.get(6) + 1);
+
+              byte[] commonNameBytes = new byte[16];
+              for (int i = 0; i < 8; i++) {
+                String block = blocks[i];
+                int blen = block.length();
+                if (blen == 1 | blen == 2) {
+                  commonNameBytes[i * 2 + 1] =
+                      (byte) Integer.parseInt(block, 16);
+                } else if (blen == 3 | blen == 4) {
+                  commonNameBytes[i * 2] = (byte)
+                      Integer.parseInt(block.substring(0, blen - 2), 16);
+                  commonNameBytes[i * 2 + 1] = (byte)
+                      Integer.parseInt(block.substring(blen - 2), 16);
+                } else if (blen != 0) {
+                  throw new BadCertTemplateException(
+                      "invalid IP address in commonName " + commonName);
+                }
+              }
+
+              if (Arrays.equals(commonNameBytes, ipAddress)) {
+                commonNameInSan = true;
+              }
+            }
+          }
+        } else {
+          throw new BadCertTemplateException(
+              "invalid IP address " + Hex.toHexString(ipAddress));
+        }
+      }
+    }
+
+    if (!commonNameInSan) {
+      throw new BadCertTemplateException("content of subject:commonName " +
+          "is not included in extension:SubjectAlternativeNames");
+    }
   }
 
 }

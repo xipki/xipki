@@ -1,46 +1,61 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ca;
 
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.FileOrValue;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Configuration the QA system.
  *
- * @author Lijun Liao (xipki)
+ * @author Lijun Liao
  */
-public class QaconfType extends ValidableConf {
+public class QaconfType {
 
   public static class Certprofile extends FileOrValue {
 
-    private String name;
+    private final String name;
 
     public String getName() {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
+    private Certprofile(String name, String file, String value) {
+      super(file, value);
+      this.name = Args.notBlank(name, "name");
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
-      super.validate();
-      notBlank(name, "name");
+    public static Certprofile ofFile(String name, String fileName) {
+      return new Certprofile(name, fileName, null);
     }
 
-  } // class class
+    public static Certprofile ofValue(String name, String value) {
+      return new Certprofile(name, null, value);
+    }
 
-  public static class Issuer extends ValidableConf {
+    public static Certprofile parse(JsonMap json) throws CodecException {
+      String name = json.getNnString("name");
+      String file = json.getString("file");
+      return (file != null) ? Certprofile.ofFile(name, file)
+          : Certprofile.ofValue(name, json.getNnString("value"));
+    }
 
-    private FileOrBinary cert;
+  }
+
+  public static class Issuer {
+
+    private final String name;
+
+    private final FileOrBinary cert;
 
     private String validityMode;
 
@@ -52,14 +67,13 @@ public class QaconfType extends ValidableConf {
 
     private List<String> deltaCrlUrls;
 
-    private String name;
+    public Issuer(String name, FileOrBinary cert) {
+      this.name = Args.notBlank(name, "name");
+      this.cert = Args.notNull(cert, "cert");
+    }
 
     public FileOrBinary getCert() {
       return cert;
-    }
-
-    public void setCert(FileOrBinary cert) {
-      this.cert = cert;
     }
 
     public String getValidityMode() {
@@ -118,48 +132,51 @@ public class QaconfType extends ValidableConf {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(cert, "cert");
-      validate(cert);
-      notBlank(name, "name");
+    public static Issuer parse(JsonMap json) throws CodecException {
+      Issuer ret = new Issuer(json.getNnString("name"),
+          FileOrBinary.parse(json.getNnMap("cert")));
+      ret.setValidityMode(json.getString("validityMode"));
+      ret.setCaIssuerUrls(json.getStringList("caIssuerUrls"));
+      ret.setOcspUrls(json.getStringList("ocspUrls"));
+      ret.setCrlUrls(json.getStringList("crlUrls"));
+      ret.setDeltaCrlUrls(json.getStringList("deltaCrlUrls"));
+      return ret;
     }
 
   } // class Issuer
 
-  private List<Issuer> issuers;
+  private final List<Issuer> issuers;
 
-  private List<Certprofile> certprofiles;
+  private final List<Certprofile> certprofiles;
+
+  public QaconfType(List<Issuer> issuers, List<Certprofile> certprofiles) {
+    this.issuers = (issuers == null) ? Collections.emptyList() : issuers;
+    this.certprofiles = (certprofiles == null) ? Collections.emptyList()
+        : certprofiles;
+  }
 
   public List<Issuer> getIssuers() {
-    if (issuers == null) {
-      issuers = new LinkedList<>();
-    }
     return issuers;
   }
 
-  public void setIssuers(List<Issuer> issuers) {
-    this.issuers = issuers;
-  }
-
   public List<Certprofile> getCertprofiles() {
-    if (certprofiles == null) {
-      certprofiles = new LinkedList<>();
-    }
     return certprofiles;
   }
 
-  public void setCertprofiles(List<Certprofile> certprofiles) {
-    this.certprofiles = certprofiles;
-  }
+  public static QaconfType parse(JsonMap json) throws CodecException {
+    JsonList list = json.getList("issuers");
+    List<Issuer> issuers = new LinkedList<>();
+    for (JsonMap v : list.toMapList()) {
+      issuers.add(Issuer.parse(v));
+    }
 
-  @Override
-  public void validate() throws InvalidConfException {
-    validate(issuers, certprofiles);
+    list = json.getList("certprofiles");
+    List<Certprofile> certprofiles = new LinkedList<>();
+    for (JsonMap v : list.toMapList()) {
+      certprofiles.add(Certprofile.parse(v));
+    }
+
+    return new QaconfType(issuers, certprofiles);
   }
 
 }

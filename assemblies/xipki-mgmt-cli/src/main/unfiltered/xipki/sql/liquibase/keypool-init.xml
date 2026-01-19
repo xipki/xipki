@@ -53,6 +53,9 @@
       <column name="DATA" type="VARCHAR(3300)" remarks="base64(encrypted PrivateKeyInfo)">
         <constraints nullable="false"/>
       </column>
+      <column name="PUKDATA" type="VARCHAR(3300)" remarks="base64(SubjectPublicKeyInfo)">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
   </changeSet>
 </databaseChangeLog>

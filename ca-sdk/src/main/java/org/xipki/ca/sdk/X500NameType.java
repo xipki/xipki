@@ -1,16 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.Args;
-import org.xipki.util.Hex;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.cbor.CborType;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.util.codec.cbor.CborType;
 
 import java.io.IOException;
 
@@ -22,9 +21,9 @@ import java.io.IOException;
 
 public class X500NameType extends SdkEncodable {
 
-  private static final long TAG_ENCODED = 1;
+  private static final int ALT_ENCODED = 1;
 
-  private static final long TAG_TEXT = 2;
+  private static final int ALT_TEXT = 2;
 
   private X500Name name;
 
@@ -71,36 +70,39 @@ public class X500NameType extends SdkEncodable {
     }
 
     try {
-      name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
+      name = (encoded != null) ? X500Name.getInstance(encoded)
+          : new X500Name(text);
       return name;
     } catch (Exception e) {
-      throw new IOException("error parsing X500Name " + (encoded == null ? text : "0x" + Hex.encode(encoded)));
+      throw new IOException("error parsing X500Name " + (encoded == null
+          ? text : "0x" + Hex.encode(encoded)));
     }
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     if (encoded != null) {
-      encoder.writeTag(TAG_ENCODED);
-      encoder.writeByteString(encoded);
+      encoder.writeAlternative(ALT_ENCODED).writeByteString(encoded);
     } else {
-      encoder.writeTag(TAG_TEXT);
-      encoder.writeTextString(text);
+      encoder.writeAlternative(ALT_TEXT).writeTextString(text);
     }
   }
 
-  public static X500NameType decode(CborDecoder decoder) throws DecodeException {
+  public static X500NameType decode(CborDecoder decoder)
+      throws CodecException {
     CborType type = decoder.peekType();
     if (CborDecoder.isNull(type)) {
       decoder.readNull();
       return null;
     }
 
-    long tag = decoder.readTag();
-    if (tag == TAG_ENCODED) {
+    long tag = decoder.readAlternative();
+    if (tag == ALT_ENCODED) {
       return new X500NameType(decoder.readByteString());
-    } else {
+    } else if (tag == ALT_TEXT) {
       return new X500NameType(decoder.readTextString());
+    } else {
+      throw new CodecException("invalid application tag " + tag);
     }
   }
 

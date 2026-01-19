@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.type;
@@ -28,8 +28,8 @@ public class SingleResponse extends ASN1Type {
 
   private final int encodedLength;
 
-  public SingleResponse(CertID certId, byte[] certStatus, Instant thisUpdate, Instant nextUpdate,
-                        Extensions extensions) {
+  public SingleResponse(CertID certId, byte[] certStatus, Instant thisUpdate,
+                        Instant nextUpdate, Extensions extensions) {
     this.certId = certId;
     this.certStatus = certStatus;
     this.thisUpdate = thisUpdate;

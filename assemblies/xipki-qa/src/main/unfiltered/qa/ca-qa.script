@@ -36,17 +36,8 @@ caqa:check-cert --issuer subcawithcrl --profile multiple-ous \
 caqa:check-cert --issuer subcawithcrl --profile multiple-ous \
   --csr output/multiple-ous2.csr --cert output/multiple-ous2.crt
 
-caqa:check-cert --issuer subcawithcrl --profile multi-valued-rdn \
-  --csr output/multi-valued-rdn1.csr --cert output/multi-valued-rdn1.crt
-
 caqa:check-cert --issuer subcawithcrl --profile max-time \
   --csr output/max-time1.csr --cert output/max-time1.crt
-
-caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
-  --csr output/gmt0015_1.csr --cert output/gmt0015_1.crt
-
-caqa:check-cert --issuer subcawithcrl --profile gmt0015 \
-  --csr output/gmt0015_2.csr --cert output/gmt0015_2.crt
 
 ## subca
 

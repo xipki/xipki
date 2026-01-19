@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.server.CertStore.SerialWithId;
-import org.xipki.pki.OperationException;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ProcessLog;
+import org.xipki.security.exception.OperationException;
+import org.xipki.util.benchmark.ProcessLog;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +74,8 @@ class CertRepublisher {
       try {
         List<SerialWithId> serials;
         do {
-          serials = certstore.getSerialNumbers(ca, startId, numEntries, onlyRevokedCerts);
+          serials = certstore.getSerialNumbers(ca, startId, numEntries,
+                      onlyRevokedCerts);
           long maxId = 1;
           for (SerialWithId sid : serials) {
             if (sid.getId() > maxId) {
@@ -137,7 +138,8 @@ class CertRepublisher {
         CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertForId(ca, caCert, sid.getId(), caIdNameMap);
+          certInfo = certstore.getCertForId(ca, caCert, sid.getId(),
+                      caIdNameMap);
         } catch (OperationException ex) {
           LogUtil.error(LOG, ex);
           failed = true;
@@ -167,7 +169,8 @@ class CertRepublisher {
 
   } // class CertRepublishConsumer
 
-  private static final Logger LOG = LoggerFactory.getLogger(CertRepublisher.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CertRepublisher.class);
 
   private final NameId ca;
 
@@ -183,14 +186,16 @@ class CertRepublisher {
 
   private final int numThreads;
 
-  private final BlockingQueue<QueueEntry> queue = new ArrayBlockingQueue<>(1000);
+  private final BlockingQueue<QueueEntry> queue =
+      new ArrayBlockingQueue<>(1000);
 
   private final AtomicBoolean stopMe = new AtomicBoolean(false);
 
   private ProcessLog processLog;
 
-  CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap, CertStore certstore,
-      List<IdentifiedCertPublisher> publishers, boolean onlyRevokedCerts, int numThreads) {
+  CertRepublisher(NameId ca, X509Cert caCert, CaIdNameMap caIdNameMap,
+                  CertStore certstore, List<IdentifiedCertPublisher> publishers,
+                  boolean onlyRevokedCerts, int numThreads) {
     this.ca = Args.notNull(ca, "ca");
     this.caCert = Args.notNull(caCert, "caCert");
     this.caIdNameMap = Args.notNull(caIdNameMap, "caIdNameMap");

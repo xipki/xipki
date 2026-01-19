@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+    <display-name>XiPKI CRL Dummy Download Server</display-name>
+    <session-config>
+        <session-timeout>120</session-timeout>
+    </session-config>
+    <filter>
+        <filter-name>crl-filter</filter-name>
+        <filter-class>org.xipki.dummyservlet.crl.CrlServletFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>ctlog-filter</filter-name>
+        <filter-class>org.xipki.dummyservlet.ctlog.CtLogServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>crl-filter</filter-name>
+        <url-pattern>/crl/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ctlog-filter</filter-name>
+        <url-pattern>/ctlog/*</url-pattern>
+    </filter-mapping>
+</web-app>

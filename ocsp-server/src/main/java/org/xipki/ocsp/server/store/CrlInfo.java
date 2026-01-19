@@ -1,14 +1,14 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.DateUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -74,7 +74,8 @@ public class CrlInfo {
     return str;
   }
 
-  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber, Instant thisUpdate, Instant nextUpdate, CrlID crlId) {
+  public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber,
+                 Instant thisUpdate, Instant nextUpdate, CrlID crlId) {
     this.crlNumber = Args.notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
     this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
@@ -98,7 +99,7 @@ public class CrlInfo {
     } catch (IOException ex) {
       throw new IllegalArgumentException("error encoding CrlID");
     }
-    pairs.putPair(CRL_ID, Base64.encodeToString(encodedCrlId));
+    pairs.putPair(CRL_ID, Base64.getEncoder().encodeToString(encodedCrlId));
     this.encoded = pairs.getEncoded();
   } // method initEncoded
 

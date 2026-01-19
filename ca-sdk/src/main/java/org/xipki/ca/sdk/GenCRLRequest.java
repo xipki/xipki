@@ -1,14 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  *
@@ -32,18 +29,17 @@ public class GenCRLRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(1);
-    encoder.writeTextString(crlDp);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(1).writeTextString(crlDp);
   }
 
-  public static GenCRLRequest decode(byte[] encoded) throws DecodeException {
+  public static GenCRLRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("GenCRLRequest", decoder, 1);
-      return new GenCRLRequest(
-          decoder.readTextString());
+      return new GenCRLRequest(decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, GenCRLRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, GenCRLRequest.class), ex);
     }
   }
 

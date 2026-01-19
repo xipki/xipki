@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.type;
@@ -21,12 +21,14 @@ public class ResponderID extends ASN1Type {
   private final int encodedLength;
 
   public ResponderID(byte[] key) throws IOException {
-    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(new DEROctetString(key)).getEncoded();
+    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(
+                    new DEROctetString(key)).getEncoded();
     this.encodedLength = encoded.length;
   }
 
   public ResponderID(X500Name name) throws IOException {
-    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(name).getEncoded();
+    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(name)
+                    .getEncoded();
     this.encodedLength = encoded.length;
   }
 

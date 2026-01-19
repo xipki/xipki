@@ -1,11 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.util.Args;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,13 +23,17 @@ public class XiWrappedContentSigner implements XiContentSigner {
   private byte[] encodedAlgorithmIdentifier;
   private final ContentSigner signer;
 
-  public XiWrappedContentSigner(ContentSigner signer, boolean fixedAlgorithmIdentifier) throws XiSecurityException {
+  public XiWrappedContentSigner(
+      ContentSigner signer, boolean fixedAlgorithmIdentifier)
+      throws XiSecurityException {
     this.signer = Args.notNull(signer, "signer");
     if (fixedAlgorithmIdentifier) {
       try {
-        this.encodedAlgorithmIdentifier = signer.getAlgorithmIdentifier().getEncoded();
+        this.encodedAlgorithmIdentifier =
+            signer.getAlgorithmIdentifier().getEncoded();
       } catch (IOException ex) {
-        throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
+        throw new XiSecurityException("could not encode AlgorithmIdentifier",
+            ex);
       }
     }
   }

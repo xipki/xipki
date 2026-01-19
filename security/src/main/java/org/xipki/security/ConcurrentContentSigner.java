@@ -1,11 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.bouncycastle.operator.ContentSigner;
+import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
 
-import java.io.Closeable;
 import java.security.Key;
 import java.security.PublicKey;
 import java.security.SignatureException;
@@ -17,7 +18,7 @@ import java.security.SignatureException;
  * @since 2.0.0
  */
 
-public interface ConcurrentContentSigner extends Closeable {
+public interface ConcurrentContentSigner {
 
   String getName();
 
@@ -112,4 +113,5 @@ public interface ConcurrentContentSigner extends Closeable {
 
   boolean isHealthy();
 
+  void close();
 }

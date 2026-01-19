@@ -1,11 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs11;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +12,13 @@ import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.GMUtil;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.EcCurveEnum;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.PKCS1Util;
-import org.xipki.security.util.SignerUtil;
-import org.xipki.util.Args;
-import org.xipki.util.LogUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.asn1.Asn1Util;
+import org.xipki.util.extra.misc.LogUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,113 +32,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_AES;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_DSA;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_EC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_EC_EDWARDS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_GENERIC_SECRET;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_RSA;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_VENDOR_SM2;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA1;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA3_224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA3_256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA3_384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA3_512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_DSA_SHA512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA1;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA3_224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA3_256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA3_384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA3_512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_ECDSA_SHA512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_EDDSA;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_RSA_X_509;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA1_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA1_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA224_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA224_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA224_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA256_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA256_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA256_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA384_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA384_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA384_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_224_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_224_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_224_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_256_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_256_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_256_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_384_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_384_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_384_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_512_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_512_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_512_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA512_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA512_RSA_PKCS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA512_RSA_PKCS_PSS;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA_1_HMAC;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_VENDOR_SM2;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_VENDOR_SM2_SM3;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.ckkCodeToName;
-import static org.xipki.security.SignAlgo.DSA_SHA1;
-import static org.xipki.security.SignAlgo.DSA_SHA224;
-import static org.xipki.security.SignAlgo.DSA_SHA256;
-import static org.xipki.security.SignAlgo.DSA_SHA384;
-import static org.xipki.security.SignAlgo.DSA_SHA3_224;
-import static org.xipki.security.SignAlgo.DSA_SHA3_256;
-import static org.xipki.security.SignAlgo.DSA_SHA3_384;
-import static org.xipki.security.SignAlgo.DSA_SHA3_512;
-import static org.xipki.security.SignAlgo.DSA_SHA512;
-import static org.xipki.security.SignAlgo.ECDSA_SHA1;
-import static org.xipki.security.SignAlgo.ECDSA_SHA224;
-import static org.xipki.security.SignAlgo.ECDSA_SHA256;
-import static org.xipki.security.SignAlgo.ECDSA_SHA384;
-import static org.xipki.security.SignAlgo.ECDSA_SHA3_224;
-import static org.xipki.security.SignAlgo.ECDSA_SHA3_256;
-import static org.xipki.security.SignAlgo.ECDSA_SHA3_384;
-import static org.xipki.security.SignAlgo.ECDSA_SHA3_512;
-import static org.xipki.security.SignAlgo.ECDSA_SHA512;
-import static org.xipki.security.SignAlgo.HMAC_SHA1;
-import static org.xipki.security.SignAlgo.HMAC_SHA224;
-import static org.xipki.security.SignAlgo.HMAC_SHA256;
-import static org.xipki.security.SignAlgo.HMAC_SHA384;
-import static org.xipki.security.SignAlgo.HMAC_SHA3_224;
-import static org.xipki.security.SignAlgo.HMAC_SHA3_256;
-import static org.xipki.security.SignAlgo.HMAC_SHA3_384;
-import static org.xipki.security.SignAlgo.HMAC_SHA3_512;
-import static org.xipki.security.SignAlgo.HMAC_SHA512;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA1;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA224;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA256;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA384;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA3_224;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA3_256;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA3_384;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA3_512;
-import static org.xipki.security.SignAlgo.RSAPSS_SHA512;
-import static org.xipki.security.SignAlgo.RSA_SHA1;
-import static org.xipki.security.SignAlgo.RSA_SHA224;
-import static org.xipki.security.SignAlgo.RSA_SHA256;
-import static org.xipki.security.SignAlgo.RSA_SHA384;
-import static org.xipki.security.SignAlgo.RSA_SHA3_224;
-import static org.xipki.security.SignAlgo.RSA_SHA3_256;
-import static org.xipki.security.SignAlgo.RSA_SHA3_384;
-import static org.xipki.security.SignAlgo.RSA_SHA3_512;
-import static org.xipki.security.SignAlgo.RSA_SHA512;
-import static org.xipki.security.SignAlgo.SM2_SM3;
+import static org.xipki.pkcs11.wrapper.PKCS11T.*;
+import static org.xipki.security.SignAlgo.*;
 
 /**
  * PKCS#11 {@link XiContentSigner}.
@@ -148,7 +43,8 @@ import static org.xipki.security.SignAlgo.SM2_SM3;
  */
 abstract class P11ContentSigner implements XiContentSigner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(P11ContentSigner.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(P11ContentSigner.class);
 
   protected final P11Key identity;
 
@@ -156,51 +52,71 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   protected final byte[] encodedAlgorithmIdentifier;
 
-  private P11ContentSigner(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
+  private P11ContentSigner(P11Key identity, SignAlgo signAlgo)
+      throws XiSecurityException {
     this.identity = Args.notNull(identity, "identity");
     this.signAlgo = Args.notNull(signAlgo, "signAlgo");
     try {
-      this.encodedAlgorithmIdentifier = signAlgo.getAlgorithmIdentifier().getEncoded();
+      this.encodedAlgorithmIdentifier =
+          signAlgo.getAlgorithmIdentifier().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
   }
 
-  static P11ContentSigner newInstance(P11Key identity, SignAlgo signAlgo,
-                                      SecureRandom random, PublicKey publicKey)
-      throws XiSecurityException {
-    long keyType = identity.getKeyType();
+  static P11ContentSigner newInstance(
+      P11Key identity, SignAlgo signAlgo, SecureRandom random,
+      PublicKey publicKey) throws XiSecurityException {
+    long keyType = identity.getKey().id().getKeyType();
     if (keyType == CKK_RSA) {
-      if (signAlgo.isRSAPSSSigAlgo()) {
-        return new RSAPSS(identity, signAlgo, random);
-      } else {
-        return new RSAPkcs1v1_5(identity, signAlgo);
-      }
+      return signAlgo.isRSAPSSSigAlgo() ? new RSAPSS(identity, signAlgo, random)
+          : new RSAPkcs1v1_5(identity, signAlgo);
     } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
-      boolean isSm2p256v1 = (keyType == CKK_VENDOR_SM2) || GMObjectIdentifiers.sm2p256v1.equals(identity.getEcParams());
+      boolean isSm2p256v1 = (keyType == CKK_VENDOR_SM2)
+          || EcCurveEnum.SM2P256V1 == identity.getEcParams();
 
      if (isSm2p256v1) {
        if (publicKey == null) {
-         publicKey = Optional.ofNullable(identity.getPublicKey()).orElseThrow(() ->
-             new XiSecurityException("SM2 signer needs public key, but could not get anyone."));
+         publicKey = Optional.ofNullable(identity.getPublicKey())
+             .orElseThrow(() -> new XiSecurityException(
+                 "SM2 signer needs public key, but could not get anyone."));
        }
 
        java.security.spec.ECPoint w = ((ECPublicKey) publicKey).getW();
-       BigInteger wx = w.getAffineX();
-       BigInteger wy = w.getAffineY();
-
-       return new SM2(identity, signAlgo, GMObjectIdentifiers.sm2p256v1, wx, wy);
+       return new SM2(identity, signAlgo, w.getAffineX(), w.getAffineY());
      } else {
        return new ECDSA(identity, signAlgo);
      }
-    } else if (keyType == CKK_DSA) {
-      return new DSA(identity, signAlgo);
     } else if (keyType == CKK_EC_EDWARDS) {
+      EcCurveEnum curve = identity.getEcParams();
+      boolean match = (curve == EcCurveEnum.ED25519) ? signAlgo == ED25519
+          : signAlgo == ED448;
+
+      if (!match) {
+        throw new XiSecurityException(
+            "key is not suitable for the sign algo " + signAlgo);
+      }
+
       return new EdDSA(identity, signAlgo);
+    } else if (keyType == CKK_ML_DSA) {
+      Long variant = identity.getKey().pqcVariant();
+      boolean match = false;
+      if (variant != null) {
+        match = (signAlgo == ML_DSA_44) ? variant == CKP_ML_DSA_44
+            : (signAlgo == ML_DSA_65) ? variant == CKP_ML_DSA_65
+            : signAlgo == ML_DSA_87 && variant == CKP_ML_DSA_87;
+      }
+      if (!match) {
+        throw new XiSecurityException(
+            "key is not suitable for the sign algo " + signAlgo);
+      }
+
+      return new MLDSA(identity, signAlgo);
     } else if (keyType == CKK_AES || keyType == CKK_GENERIC_SECRET) {
       return new Mac(identity, signAlgo);
     } else {
-      throw new XiSecurityException("unsupported key type " + ckkCodeToName(keyType));
+      throw new XiSecurityException(
+          "unsupported key type " + ckkCodeToName(keyType));
     }
   }
 
@@ -211,88 +127,9 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   @Override
   public final byte[] getEncodedAlgorithmIdentifier() {
-    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+    return Arrays.copyOf(encodedAlgorithmIdentifier,
+        encodedAlgorithmIdentifier.length);
   }
-
-  private static class DSA extends P11ContentSigner {
-
-    private static final Map<SignAlgo, Long> algoMechMap = new HashMap<>();
-
-    private final OutputStream outputStream;
-
-    private final long mechanism;
-
-    static {
-      algoMechMap.put(DSA_SHA1,     CKM_DSA_SHA1);
-      algoMechMap.put(DSA_SHA224,   CKM_DSA_SHA224);
-      algoMechMap.put(DSA_SHA256,   CKM_DSA_SHA256);
-      algoMechMap.put(DSA_SHA384,   CKM_DSA_SHA384);
-      algoMechMap.put(DSA_SHA512,   CKM_DSA_SHA512);
-      algoMechMap.put(DSA_SHA3_224, CKM_DSA_SHA3_224);
-      algoMechMap.put(DSA_SHA3_256, CKM_DSA_SHA3_256);
-      algoMechMap.put(DSA_SHA3_384, CKM_DSA_SHA3_384);
-      algoMechMap.put(DSA_SHA3_512, CKM_DSA_SHA3_512);
-    } // method static
-
-    DSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
-      super(identity, signAlgo);
-
-      if (!signAlgo.isDSASigAlgo()) {
-        throw new XiSecurityException("not a DSA algorithm: " + signAlgo);
-      }
-
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow( () ->
-        new XiSecurityException("unsupported signature algorithm " + signAlgo));
-
-      if (identity.supportsSign(CKM_DSA)) {
-        mechanism = CKM_DSA;
-        outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
-      } else if (identity.supportsSign(mech)) {
-        mechanism = mech;
-        outputStream = new ByteArrayOutputStream();
-      } else {
-        throw new XiSecurityException("signature algorithm " + signAlgo + " is not supported by the device");
-      }
-    } // constructor
-
-    @Override
-    public OutputStream getOutputStream() {
-      if (outputStream instanceof ByteArrayOutputStream) {
-        ((ByteArrayOutputStream) outputStream).reset();
-      } else {
-        ((DigestOutputStream) outputStream).reset();
-      }
-      return outputStream;
-    }
-
-    @Override
-    public byte[] getSignature() {
-      try {
-        byte[] plainSignature = getPlainSignature();
-        return SignerUtil.dsaSigPlainToX962(plainSignature);
-      } catch (XiSecurityException ex) {
-        LogUtil.warn(LOG, ex);
-        throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
-      } catch (Throwable th) {
-        LogUtil.warn(LOG, th);
-        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
-      }
-    }
-
-    private byte[] getPlainSignature() throws TokenException {
-      byte[] dataToSign;
-      if (outputStream instanceof ByteArrayOutputStream) {
-        dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
-        ((ByteArrayOutputStream) outputStream).reset();
-      } else {
-        dataToSign = ((DigestOutputStream) outputStream).digest();
-        ((DigestOutputStream) outputStream).reset();
-      }
-
-      return identity.sign(mechanism, null, dataToSign);
-    }
-
-  } // class DSA
 
   private static class ECDSA extends P11ContentSigner {
 
@@ -320,17 +157,20 @@ abstract class P11ContentSigner implements XiContentSigner {
         throw new XiSecurityException("not an ECDSA algorithm: " + signAlgo);
       }
 
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow(() ->
-        new XiSecurityException("unsupported signature algorithm " + signAlgo));
+      long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
+          .orElseThrow(() -> new XiSecurityException(
+              "unsupported signature algorithm " + signAlgo));
 
       if (identity.supportsSign(CKM_ECDSA)) {
         mechanism = CKM_ECDSA;
-        this.outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
+        this.outputStream = new DigestOutputStream(
+            signAlgo.getHashAlgo().createDigest());
       } else if (identity.supportsSign(mech)) {
         mechanism = mech;
         this.outputStream = new ByteArrayOutputStream();
       } else {
-        throw new XiSecurityException("signature algorithm " + signAlgo + " is not supported by the device");
+        throw new XiSecurityException("signature algorithm " + signAlgo
+            + " is not supported by the device");
       }
     } // method constructor
 
@@ -347,14 +187,15 @@ abstract class P11ContentSigner implements XiContentSigner {
     @Override
     public byte[] getSignature() {
       try {
-        byte[] plainSignature = getPlainSignature();
-        return signAlgo.isPlainECDSASigAlgo() ? plainSignature : SignerUtil.dsaSigPlainToX962(plainSignature);
+        return dsaSigPlainToX962(getPlainSignature());
       } catch (XiSecurityException ex) {
         LogUtil.warn(LOG, ex);
-        throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
+        throw new RuntimeCryptoException(
+            "XiSecurityException: " + ex.getMessage());
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
-        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+        throw new RuntimeCryptoException(
+            th.getClass().getName() + ": " + th.getMessage());
       }
     }
 
@@ -375,20 +216,85 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   private static class EdDSA extends P11ContentSigner {
 
+    private static final byte[] Ed448Params;
+
     private final ByteArrayOutputStream outputStream;
 
     private final long mechanism;
 
+    static {
+      /* construct CK_EDDSA_PARAMS with ulContextDataLen=0 and
+         pContextData = NULL_PTR
+        typedef struct CK_EDDSA_PARAMS {
+            CK_BBOOL     phFlag;
+            CK_ULONG     ulContextDataLen; // CK_ULONG := unsigned long int
+            CK_BYTE_PTR  pContextData;
+        }  CK_EDDSA_PARAMS;
+      */
+      boolean is64bit = System.getProperty("os.arch").contains("64");
+      int CK_ULONG_SIZE = 4;
+      int PTR_SIZE = is64bit ? 4 : 8;
+      byte[] bytes = new byte[1 + CK_ULONG_SIZE + PTR_SIZE];
+      bytes[0] = 0x00; // for phFlag = false
+      Ed448Params = bytes;
+    }
+
     EdDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
-      if (SignAlgo.ED25519 != signAlgo) {
-        throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
+      if (SignAlgo.ED25519 != signAlgo && ED448 != signAlgo) {
+        throw new XiSecurityException(
+            "unsupported signature algorithm " + signAlgo);
       }
 
       mechanism = CKM_EDDSA;
       if (!identity.supportsSign(mechanism)) {
-        throw new XiSecurityException("unsupported signature algorithm " + signAlgo);
+        throw new XiSecurityException(
+            "unsupported signature algorithm " + signAlgo);
+      }
+
+      this.outputStream = new ByteArrayOutputStream();
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+      outputStream.reset();
+      return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+      byte[] content = outputStream.toByteArray();
+      outputStream.reset();
+      try {
+        P11Params params = null;
+        if (signAlgo == ED448) {
+         params = new P11Params.P11ByteArrayParams(Ed448Params.clone());
+        }
+
+        return identity.sign(mechanism, params, content);
+      } catch (Throwable th) {
+        LogUtil.warn(LOG, th);
+        throw new RuntimeCryptoException(
+            th.getClass().getName() + ": " + th.getMessage());
+      }
+    }
+
+  } // class EdDSA
+
+  private static class MLDSA extends P11ContentSigner {
+
+    private final ByteArrayOutputStream outputStream;
+
+    private final long mechanism;
+
+    MLDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
+      super(identity, signAlgo);
+
+      this.mechanism = CKM_ML_DSA;
+      if (!identity.supportsSign(this.mechanism)) {
+        throw new XiSecurityException(
+            "unsupported signature algorithm " + signAlgo);
       }
 
       this.outputStream = new ByteArrayOutputStream();
@@ -408,11 +314,12 @@ abstract class P11ContentSigner implements XiContentSigner {
         return identity.sign(mechanism, null, content);
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
-        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+        throw new RuntimeCryptoException(
+            th.getClass().getName() + ": " + th.getMessage());
       }
     }
 
-  } // class EdDSA
+  } // class MLDSA
 
   private static class Mac extends P11ContentSigner {
 
@@ -437,10 +344,10 @@ abstract class P11ContentSigner implements XiContentSigner {
     Mac(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
 
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow(() ->
-          new XiSecurityException("Unsupported signature algorithm " + signAlgo));
+      this.mechanism = Optional.ofNullable(algoMechMap.get(signAlgo))
+          .orElseThrow(() -> new XiSecurityException(
+              "Unsupported MAC algorithm " + signAlgo));
 
-      this.mechanism = mech;
       if (identity.supportsSign(mechanism)) {
         throw new XiSecurityException("unsupported MAC algorithm " + signAlgo);
       }
@@ -465,7 +372,8 @@ abstract class P11ContentSigner implements XiContentSigner {
         throw new RuntimeCryptoException("TokenException: " + ex.getMessage());
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
-        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+        throw new RuntimeCryptoException(
+            th.getClass().getName() + ": " + th.getMessage());
       }
     }
 
@@ -495,15 +403,18 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(RSA_SHA3_512, CKM_SHA3_512_RSA_PKCS);
     } // method static
 
-    RSAPkcs1v1_5(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
+    RSAPkcs1v1_5(P11Key identity, SignAlgo signAlgo)
+        throws XiSecurityException {
       super(identity, signAlgo);
 
       if (!signAlgo.isRSAPkcs1SigAlgo()) {
-        throw new XiSecurityException("not an RSA PKCS#1 algorithm: " + signAlgo);
+        throw new XiSecurityException(
+            "not an RSA PKCS#1 algorithm: " + signAlgo);
       }
 
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow(() ->
-          new XiSecurityException("unsupported signature algorithm " + signAlgo));
+      long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
+          .orElseThrow(() -> new XiSecurityException(
+              "unsupported signature algorithm " + signAlgo));
 
       if (identity.supportsSign(CKM_RSA_PKCS)) {
         mechanism = CKM_RSA_PKCS;
@@ -512,18 +423,21 @@ abstract class P11ContentSigner implements XiContentSigner {
       } else if (identity.supportsSign(mech)) {
         mechanism = mech;
       } else {
-        throw new XiSecurityException("signature algorithm " + signAlgo + " is not supported by the device");
+        throw new XiSecurityException("signature algorithm " + signAlgo
+            + " is not supported by the device");
       }
 
       if (mechanism == CKM_RSA_PKCS || mechanism == CKM_RSA_X_509) {
-        this.digestPkcsPrefix = PKCS1Util.getDigestPkcsPrefix(signAlgo.getHashAlgo());
-        this.outputStream = new DigestOutputStream(signAlgo.getHashAlgo().createDigest());
+        this.digestPkcsPrefix = PKCS1Util.getDigestPkcsPrefix(
+            signAlgo.getHashAlgo());
+        this.outputStream = new DigestOutputStream(
+            signAlgo.getHashAlgo().createDigest());
       } else {
         this.digestPkcsPrefix = null;
         this.outputStream = new ByteArrayOutputStream();
       }
 
-      this.modulusBitLen = identity.getRsaModulus().bitLength();
+      this.modulusBitLen = identity.getKey().rsaModulus().bitLength();
     } // constructor
 
     @Override
@@ -546,13 +460,16 @@ abstract class P11ContentSigner implements XiContentSigner {
         byte[] hashValue = ((DigestOutputStream) outputStream).digest();
         ((DigestOutputStream) outputStream).reset();
         dataToSign = new byte[digestPkcsPrefix.length + hashValue.length];
-        System.arraycopy(digestPkcsPrefix, 0, dataToSign, 0, digestPkcsPrefix.length);
-        System.arraycopy(hashValue, 0, dataToSign, digestPkcsPrefix.length, hashValue.length);
+        System.arraycopy(digestPkcsPrefix, 0, dataToSign,
+            0, digestPkcsPrefix.length);
+        System.arraycopy(hashValue, 0, dataToSign,
+            digestPkcsPrefix.length, hashValue.length);
       }
 
       try {
         if (mechanism == CKM_RSA_X_509) {
-          dataToSign = PKCS1Util.EMSA_PKCS1_v1_5_encoding(dataToSign, modulusBitLen);
+          dataToSign = PKCS1Util.EMSA_PKCS1_V1_5_ENCODE(
+              dataToSign, modulusBitLen);
         }
 
         return identity.sign(mechanism, null, dataToSign);
@@ -588,7 +505,8 @@ abstract class P11ContentSigner implements XiContentSigner {
 
     private final SecureRandom random;
 
-    RSAPSS(P11Key identity, SignAlgo signAlgo, SecureRandom random) throws XiSecurityException {
+    RSAPSS(P11Key identity, SignAlgo signAlgo, SecureRandom random)
+        throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isRSAPSSSigAlgo()) {
         throw new XiSecurityException("not an RSA PSS algorithm: " + signAlgo);
@@ -597,12 +515,14 @@ abstract class P11ContentSigner implements XiContentSigner {
       this.random = Args.notNull(random, "random");
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
 
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow(() ->
-          new XiSecurityException("unsupported signature algorithm " + signAlgo));
+      long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
+          .orElseThrow(() -> new XiSecurityException(
+              "unsupported signature algorithm " + signAlgo));
 
-      boolean usePss = signAlgo.isRSAPSSMGF1SigAlgo() && identity.supportsSign(CKM_RSA_PKCS_PSS);
+      boolean usePss = signAlgo.isRSAPSSMGF1SigAlgo()
+          && identity.supportsSign(CKM_RSA_PKCS_PSS);
       if (usePss) {
-        switch (signAlgo.getHashAlgo()) {
+        switch (hashAlgo) {
           case SHA1:
           case SHA224:
           case SHA256:
@@ -611,7 +531,6 @@ abstract class P11ContentSigner implements XiContentSigner {
             break;
           default:
             usePss = false;
-            break;
         }
       }
 
@@ -628,7 +547,8 @@ abstract class P11ContentSigner implements XiContentSigner {
         this.parameters = new P11Params.P11RSAPkcsPssParams(hashAlgo);
         this.outputStream = new ByteArrayOutputStream();
       } else {
-        throw new XiSecurityException("signature algorithm " + signAlgo + " is not supported by the device");
+        throw new XiSecurityException("signature algorithm " + signAlgo
+            + " is not supported by the device");
       }
     } // constructor
 
@@ -652,9 +572,11 @@ abstract class P11ContentSigner implements XiContentSigner {
           byte[] encodedHashValue;
           try {
             encodedHashValue = PKCS1Util.EMSA_PSS_ENCODE(hash, hashValue, hash,
-                hash.getLength(), identity.getRsaModulus().bitLength(), random);
+                hash.getLength(), identity.getKey().rsaModulus().bitLength(),
+                random);
           } catch (XiSecurityException ex) {
-            throw new TokenException("XiSecurityException: " + ex.getMessage(), ex);
+            throw new TokenException("XiSecurityException: " + ex.getMessage(),
+                ex);
           }
           return identity.sign(mechanism, parameters, encodedHashValue);
         } else {
@@ -690,7 +612,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       algoMechMap.put(SM2_SM3, CKM_VENDOR_SM2_SM3);
     }
 
-    SM2(P11Key identity, SignAlgo signAlgo, ASN1ObjectIdentifier curveOid,
+    SM2(P11Key identity, SignAlgo signAlgo,
         BigInteger pubPointX, BigInteger pubPointY) throws XiSecurityException {
       super(identity, signAlgo);
       if (!signAlgo.isSM2SigAlgo()) {
@@ -698,19 +620,21 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       HashAlgo hashAlgo = signAlgo.getHashAlgo();
-      long mech = Optional.ofNullable(algoMechMap.get(signAlgo)).orElseThrow(() ->
-          new XiSecurityException("unsupported signature algorithm " + signAlgo));
+      long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
+          .orElseThrow(() -> new XiSecurityException(
+              "unsupported signature algorithm " + signAlgo));
 
       if (identity.supportsSign(CKM_VENDOR_SM2)) {
         this.mechanism = CKM_VENDOR_SM2;
-        this.z = GMUtil.getSM2Z(curveOid, pubPointX, pubPointY);
+        this.z = KeyUtil.getSM2Z(null, pubPointX, pubPointY);
         this.outputStream = new DigestOutputStream(hashAlgo.createDigest());
       } else if (identity.supportsSign(mech)) {
         this.mechanism = mech;
         this.z = null; // not required
         this.outputStream = new ByteArrayOutputStream();
       } else {
-        throw new XiSecurityException("signature algorithm " + signAlgo + " is not supported by the device");
+        throw new XiSecurityException("signature algorithm " + signAlgo
+            + " is not supported by the device");
       }
     }
 
@@ -736,33 +660,85 @@ abstract class P11ContentSigner implements XiContentSigner {
     @Override
     public byte[] getSignature() {
       try {
-        return SignerUtil.dsaSigPlainToX962(getPlainSignature());
+        return dsaSigPlainToX962(getPlainSignature());
       } catch (XiSecurityException ex) {
         LogUtil.warn(LOG, ex);
-        throw new RuntimeCryptoException("XiSecurityException: " + ex.getMessage());
+        throw new RuntimeCryptoException(
+            "XiSecurityException: " + ex.getMessage());
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
-        throw new RuntimeCryptoException(th.getClass().getName() + ": " + th.getMessage());
+        throw new RuntimeCryptoException(
+            th.getClass().getName() + ": " + th.getMessage());
       }
     }
 
     private byte[] getPlainSignature() throws TokenException {
       byte[] dataToSign;
-      P11Params.P11ByteArrayParams params;
       if (outputStream instanceof ByteArrayOutputStream) {
         // dataToSign is the real message
-        params = new P11Params.P11ByteArrayParams(GMUtil.getDefaultIDA());
         dataToSign = ((ByteArrayOutputStream) outputStream).toByteArray();
       } else {
         // dataToSign is Hash(Z||Real Message)
-        params = null;
         dataToSign = ((DigestOutputStream) outputStream).digest();
       }
 
       reset();
 
-      return identity.sign(mechanism, params, dataToSign);
+      return identity.sign(mechanism, null, dataToSign);
     }
   } // class SM2
 
+  private static byte[] dsaSigPlainToX962(byte[] signature)
+      throws XiSecurityException {
+    byte[] x962Sig = Asn1Util.dsaSigPlainToX962(
+        Args.notNull(signature, "signature"));
+
+    if (Arrays.equals(x962Sig, signature)) {
+      throw new XiSecurityException("signature is not correctly encoded.");
+    }
+    return x962Sig;
+  }
+
+  /**
+   * {@link OutputStream} with a {@link Digest} as the backend.
+   *
+   * @author Lijun Liao (xipki)
+   * @since 2.0.0
+   */
+
+  private static class DigestOutputStream extends OutputStream {
+
+    private final Digest digest;
+
+    public DigestOutputStream(Digest digest) {
+      this.digest = digest;
+    }
+
+    public void reset() {
+      digest.reset();
+    }
+
+    @Override
+    public void write(byte[] bytes, int off, int len) throws IOException {
+      digest.update(bytes, off, len);
+    }
+
+    @Override
+    public void write(byte[] bytes) throws IOException {
+      digest.update(bytes, 0, bytes.length);
+    }
+
+    @Override
+    public void write(int oneByte) throws IOException {
+      digest.update((byte) oneByte);
+    }
+
+    public byte[] digest() {
+      byte[] result = new byte[digest.getDigestSize()];
+      digest.doFinal(result, 0);
+      reset();
+      return result;
+    }
+
+  }
 }

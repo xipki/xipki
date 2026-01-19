@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.type;
@@ -7,8 +7,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.Hex;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.extra.misc.CompareUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -23,7 +23,8 @@ import java.util.Arrays;
 
 public class ExtendedExtension extends Extension {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ExtendedExtension.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(ExtendedExtension.class);
 
   private static final byte[] bytes_critical = Hex.decode("0101FF");
 
@@ -82,13 +83,15 @@ public class ExtendedExtension extends Extension {
       throws EncodingException {
     Header hdrExtn = OcspRequest.readHeader(encoded, from);
     Header hdrOid = OcspRequest.readHeader(encoded, hdrExtn.readerIndex);
-    Header hdrNext = OcspRequest.readHeader(encoded, hdrOid.readerIndex + hdrOid.len);
+    Header hdrNext = OcspRequest.readHeader(encoded,
+                    hdrOid.readerIndex + hdrOid.len);
     Header hdrExtValue;
 
     boolean critical;
     if (hdrNext.tag == 0x01) { // critical
       critical = encoded[hdrNext.readerIndex] == (byte) 0xFF;
-      hdrExtValue = OcspRequest.readHeader(encoded, hdrNext.readerIndex + hdrNext.len);
+      hdrExtValue = OcspRequest.readHeader(encoded,
+                    hdrNext.readerIndex + hdrNext.len);
     } else {
       critical = false;
       hdrExtValue = hdrNext;
@@ -96,12 +99,14 @@ public class ExtendedExtension extends Extension {
 
     OID extnType = OID.getInstanceForEncoded(encoded, hdrOid.tagIndex);
     if (extnType == null) {
-      byte[] bytes = new byte[hdrOid.readerIndex - hdrOid.tagIndex + hdrOid.len];
+      byte[] bytes =
+          new byte[hdrOid.readerIndex - hdrOid.tagIndex + hdrOid.len];
       System.arraycopy(encoded, hdrOid.tagIndex, bytes, 0, bytes.length);
       ASN1ObjectIdentifier oid = ASN1ObjectIdentifier.getInstance(bytes);
       LOG.warn("unknown extension {}", oid.getId());
       if (critical) {
-        throw new EncodingException("unkown critical extension: " + oid.getId());
+        throw new EncodingException(
+            "unkown critical extension: " + oid.getId());
       } else {
         return null;
       }
@@ -119,7 +124,8 @@ public class ExtendedExtension extends Extension {
     return encodedLength;
   }
 
-  public static int getEncodedLength(OID extnType, boolean critical, int extnValueLength) {
+  public static int getEncodedLength(
+      OID extnType, boolean critical, int extnValueLength) {
     int bodyLen = extnType.getEncodedLength();
     if (critical) {
       bodyLen += 3;
@@ -154,7 +160,8 @@ public class ExtendedExtension extends Extension {
     if (value.length != extnValueLength) {
       return false;
     }
-    return CompareUtil.areEqual(value, 0, encoded, extnValueFrom, extnValueLength);
+    return CompareUtil.areEqual(value, 0, encoded,
+        extnValueFrom, extnValueLength);
   }
 
   public int writeExtnValue(byte[] out, int offset) {
@@ -163,7 +170,8 @@ public class ExtendedExtension extends Extension {
   }
 
   public ExtendedExtension revertCritical() {
-    byte[] extnValue = Arrays.copyOfRange(encoded, extnValueFrom, extnValueFrom + extnValueLength);
+    byte[] extnValue = Arrays.copyOfRange(encoded, extnValueFrom,
+                        extnValueFrom + extnValueLength);
     return new ExtendedExtension(extnType, !critical, extnValue);
   }
 

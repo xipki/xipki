@@ -1,17 +1,19 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.id.AbstractID;
+import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.extra.misc.CollectionUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,50 +23,78 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 
-public class ExtendedKeyUsage extends ValidableConf {
+public class ExtendedKeyUsage implements JsonEncodable {
 
-  private List<Usage> usages;
+  private final List<ExtendedKeyUsageID> required;
 
-  public List<Usage> getUsages() {
-    if (usages == null) {
-      usages = new LinkedList<>();
+  private final List<ExtendedKeyUsageID> optional;
+
+  public ExtendedKeyUsage(List<ExtendedKeyUsageID> required,
+                          List<ExtendedKeyUsageID> optional) {
+    if (CollectionUtil.isEmpty(required) && CollectionUtil.isEmpty(optional)) {
+      throw new IllegalArgumentException(
+          "required and optional can not both be empty");
     }
-    return usages;
+
+    this.required = required;
+    this.optional = optional;
   }
 
-  public void setUsages(List<Usage> usages) {
-    this.usages = usages;
+  public List<ExtendedKeyUsageID> getRequired() {
+    return required;
   }
 
-  @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(usages, "usages");
-    validate(usages);
+  public List<ExtendedKeyUsageID> getOptional() {
+    return optional;
   }
 
   public Set<ExtKeyUsageControl> toXiExtKeyUsageOptions() {
-    List<Usage> usages = getUsages();
     Set<ExtKeyUsageControl> controls = new HashSet<>();
 
-    for (Usage m : usages) {
-      controls.add(new ExtKeyUsageControl(new ASN1ObjectIdentifier(m.getOid()), m.isRequired()));
+    if (required != null) {
+      for (ExtendedKeyUsageID usage : required) {
+        controls.add(new ExtKeyUsageControl(usage.getOid(), true));
+      }
+    }
+
+    if (optional != null) {
+      for (ExtendedKeyUsageID usage : optional) {
+        controls.add(new ExtKeyUsageControl(usage.getOid(), false));
+      }
     }
 
     return Collections.unmodifiableSet(controls);
   } // method buildExtKeyUsageOptions
 
-  public static class Usage extends DescribableOid {
-
-    private boolean required;
-
-    public boolean isRequired() {
-      return required;
+  @Override
+  public JsonMap toCodec() {
+    JsonMap ret = new JsonMap();
+    if (required != null) {
+      ret.putStrings("required", AbstractID.toJsonStringList(required));
     }
 
-    public void setRequired(boolean required) {
-      this.required = required;
+    if (optional != null) {
+      ret.putStrings("optional", AbstractID.toJsonStringList(optional));
+    }
+    return ret;
+  }
+
+  public static ExtendedKeyUsage parse(JsonMap json) throws CodecException {
+    return new ExtendedKeyUsage(
+        toUsageIDList(json.getStringList("required")),
+        toUsageIDList(json.getStringList("optional")));
+  }
+
+  private static List<ExtendedKeyUsageID> toUsageIDList(List<String> list) {
+    if (list == null) {
+      return null;
     }
 
-  } // class Usage
+    List<ExtendedKeyUsageID> usages = new ArrayList<>(list.size());
+    for (String v : list) {
+      usages.add(ExtendedKeyUsageID.ofOidOrName(v));
+    }
+    return usages;
+  }
 
 } // class ExtendedKeyUsage

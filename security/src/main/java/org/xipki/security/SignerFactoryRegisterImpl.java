@@ -1,12 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.Args;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -22,9 +22,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private final ConcurrentLinkedDeque<SignerFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<SignerFactory> factories =
+      new ConcurrentLinkedDeque<>();
 
   public SignerFactoryRegisterImpl() {
   }
@@ -68,8 +70,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   @Override
   public ConcurrentContentSigner newSigner(
-      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
-      throws ObjectCreationException {
+      SecurityFactory securityFactory, String type, SignerConf conf,
+      X509Cert[] certificateChain) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (SignerFactory service : factories) {
@@ -78,7 +80,8 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException("could not find Factory to create Signer of type " + type);
+    throw new ObjectCreationException(
+        "could not find Factory to create Signer of type " + type);
   }
 
 }

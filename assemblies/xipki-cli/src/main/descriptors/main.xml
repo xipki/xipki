@@ -24,7 +24,7 @@
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/jars</directory>
+      <directory>${project.build.directory}/karaf-jars</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>
         <exclude>system/org/apache/karaf/features/**</exclude>
@@ -33,6 +33,12 @@
         <exclude>system/org/bouncycastle/bcprov-jdk18on/${karaf.bc.version}/**</exclude>
         <exclude>system/org/bouncycastle/bcpkix-jdk18on/${karaf.bc.version}/**</exclude>
       </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/jars</directory>
+      <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -138,9 +144,8 @@
   </fileSets>
   <files>
     <file>
-      <source>${shared.dir}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
+      <source>${shared.dir}/tomcat/xipki/security/pkcs11.json</source>
       <outputDirectory>xipki/security</outputDirectory>
-      <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
   </files>

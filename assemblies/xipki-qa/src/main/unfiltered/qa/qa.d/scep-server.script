@@ -10,7 +10,7 @@ echo "#################################################################"
 
 echo "# Generate PKCS#12 key and certificate for SCEP Responder"
 
-xi:rsa-p12 --key-size 2048 --password CHANGEIT \
+xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT \
   --out ${KEYCERTS_DIR}/scep-subcawithcrl.p12
 
 xi:csr-p12 --password CHANGEIT \
@@ -32,5 +32,5 @@ xi:copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
 echo "restart gateway tomcat!"
 xi:exec $[tomcat.java.home] '~/test/xipki/gateway-tomcat/bin/shutdown.sh'
 xi:exec $[tomcat.java.home] '~/test/xipki/gateway-tomcat/bin/startup.sh'
-sleep 3
+sleep 1
 

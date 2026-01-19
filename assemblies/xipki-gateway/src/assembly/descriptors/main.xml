@@ -71,11 +71,5 @@
       <destName>gw.war</destName>
       <fileMode>0644</fileMode>
     </file>
-    <file>
-      <source>${project.build.directory}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>tomcat/xipki/security</outputDirectory>
-      <destName>pkcs11.json</destName>
-      <fileMode>0644</fileMode>
-    </file>
   </files>
 </assembly>

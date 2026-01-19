@@ -1,15 +1,26 @@
-WAIT_TOMCAT_START_TIME = 3
+WAIT_TOMCAT_START_TIME = 1
+
+date
+
+storetype = $(xi:lowercase "$storetype")
+tokentype = $(xi:uppercase "$tokentype")
 
 echo "+---------------------------------------------------------------+"
-echo "|  - key-type:          $keytype"
+echo "|  - CA key-spec:       $CA_KEYSPEC"
 echo "|  - caconf-store-type: $storetype"
 echo "|  - token-type:        $tokentype"
 echo "|  - CAcert-presence:   none"
 echo "+---------------------------------------------------------------+"
 
-CA_TOMCAT_DIR = ~/test/xipki/ca-tomcat
+if { "$tokentype" equals "PKCS11" } then {
+  tokenfile = "p11"
+} else {
+  tokenfile = "p12"
+}
+
+CA_TOMCAT_DIR   = ~/test/xipki/ca-tomcat
 OCSP_TOMCAT_DIR = ~/test/xipki/ocsp-tomcat
-GW_TOMCAT_DIR = ~/test/xipki/gateway-tomcat
+GW_TOMCAT_DIR   = ~/test/xipki/gateway-tomcat
 
 XIPKI_BASE = ${CA_TOMCAT_DIR}/xipki
 
@@ -29,34 +40,34 @@ xi:copy-file --force $CA_TOMCAT_DIR/xipki/etc/ca/database/ocsp-db.properties \
     $OCSP_TOMCAT_DIR/xipki/etc/ocsp/database/
 
 echo "Delete keys and certificates"
-if { "$tokentype" equals "p11" } then {
+if { "$tokentype" equals "PKCS11" } then {
   xi:delete-key-p11 --force --slot $SLOT --label $LABEL
 }
 
 xi:rm --force --recursive $CA_KEYCERTS_DIR
 
-if { "$storetype" equals "filebased" } then {
+if { "$storetype" equals "file" } then {
   xi:rm --force --recursive output/ca-setup/ca-conf
   xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
 }
 
-source xipki/ca-setup/cacert-none-${storetype}/setup-${tokentype}.script \
-    $keytype $CA_TOMCAT_DIR $XIPKI_BASE
+source xipki/ca-setup/cacert-none-${storetype}based/setup-${tokenfile}.script \
+    $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_BASE
 
 echo "+---------------------------------------------------------------+"
-echo "|  - key-type:          $keytype"
+echo "|  - CA key-spec:       $CA_KEYSPEC"
 echo "|  - caconf-store-type: $storetype"
 echo "|  - token-type:        $tokentype"
 echo "|  - CAcert-presence:   present"
 echo "+---------------------------------------------------------------+"
 
-if { "$storetype" equals "filebased" } then {
+if { "$storetype" equals "file" } then {
   xi:rm --force --recursive output/ca-setup/ca-conf
   xi:rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
 }
 
-source xipki/ca-setup/cacert-present-${storetype}/setup-${tokentype}.script \
-    $keytype $CA_TOMCAT_DIR $XIPKI_BASE
+source xipki/ca-setup/cacert-present-${storetype}based/setup-${tokenfile}.script \
+    $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_BASE
 
 ca:gen-crl --ca $[ca.name]
 
@@ -71,16 +82,16 @@ xi:exec "${GW_TOMCAT_DIR}/bin/startup.sh"
 xi:rm --force xipki/ocsp-setup/keycerts/ocsp1.crt \
   xipki/ocsp-setup/keycerts/ocsp1.p12
 
-if { "$tokentype" equals "p11" } then {
+if { "$tokentype" equals "PKCS11" } then {
   xi:delete-key-p11 --slot 0 --label ocsp1 --force
-  source xipki/ca-setup/setup-ocsp-p11.script $keytype
+  source xipki/ca-setup/setup-ocsp-p11.script $CA_KEYSPEC
   xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.crt ${OCSP_TOMCAT_DIR}/xipki/keycerts/
 } else {
-  source xipki/ca-setup/setup-ocsp-p12.script $keytype
+  source xipki/ca-setup/setup-ocsp-p12.script $CA_KEYSPEC
   xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.p12 ${OCSP_TOMCAT_DIR}/xipki/keycerts/
 }
 
-if { "$storetype" equals "filebased" } then {
+if { "$storetype" equals "file" } then {
   ocspdbtypes = [cadb]
 } else {
   ocspdbtypes = [cadb ocspdb]
@@ -94,23 +105,23 @@ each ($ocspdbtypes) {
         xipki/sql/ocsp-init.sql
 
     echo "Restart CA server due to change of ca.json"
-    xi:copy-file --force xipki/ca-setup/demo/${storetype}-ca.json \
+    xi:copy-file --force xipki/ca-setup/demo/${storetype}based-ca.json \
         ${CA_TOMCAT_DIR}/xipki/etc/ca/ca.json
     xi:exec "${CA_TOMCAT_DIR}/bin/shutdown.sh"
     xi:exec "${CA_TOMCAT_DIR}/bin/startup.sh"
     sleep $WAIT_TOMCAT_START_TIME
 
     echo "Add OCSP publisher to CA"
-    ca:publisher-add --name ocsp-publisher --type ocsp  --conf datasource=ocsp,publish.goodcerts=true
+    ca:publisher-add --name ocsp-publisher --type ocsp --conf datasource=ocsp,publish.goodcerts=true
     ca:capub-add --ca $[ca.name] --publisher ocsp-publisher
     ca:republish --ca $[ca.name] --publisher ocsp-publisher
   }
 
   echo "Copy the ocsp-responder configuration file"
-  if { "$tokentype" equals "p11" } then {
+  if { "$tokentype" equals "PKCS11" } then {
     OCSP_CONF_FILE = xipki/ca-setup/demo/ocsp-responder-p11-${ocspdbtype}.json
   } else {
-    if { "$ocspdbtype" equals "ocspdb" } then {
+    if { "$ocspdbtype" equals "OCSPDB" } then {
       OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-db-store/ocsp-responder.json
     } else {
       OCSP_CONF_FILE = ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json
@@ -128,5 +139,8 @@ each ($ocspdbtypes) {
   xi:rm --force --recursive $OUT_ROOT
 
   echo "Enroll certificate via Gateway over REST API"
-  source xipki/ca-setup/demo/rest-client.script ocsp
+  source xipki/ca-setup/demo/rest-client-demo.script
+
 }
+
+date

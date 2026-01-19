@@ -60,7 +60,7 @@ else
   wget --no-check-certificate https://dlcdn.apache.org/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_BINARY}
 fi
 
-rm -rf ca-tomcat ocsp-tomcat gateway-tomcat hsmproxy-tomcat
+rm -rf ca-tomcat ocsp-tomcat gateway-tomcat
 
 rm -rf $TOMCAT_DIR
 tar xf $TOMCAT_BINARY
@@ -70,7 +70,6 @@ rm -rf $TOMCAT_DIR/webapps/*
 cp -r $TOMCAT_DIR ca-tomcat
 cp -r $TOMCAT_DIR ocsp-tomcat
 cp -r $TOMCAT_DIR gateway-tomcat
-cp -r $TOMCAT_DIR hsmproxy-tomcat
 rm -rf $TOMCAT_DIR
 
 cd $WDIR
@@ -86,16 +85,14 @@ fi
 LIB_DIR=$WDIR/system
 XDIR=${WDIR}/xipki
 
-CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/password/${project.version}/*"
-CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-databind/${jackson.version}/*"
-CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-annotations/${jackson.version}/*"
-CP="$CP:$LIB_DIR/com/fasterxml/jackson/core/jackson-core/${jackson.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/xicodec/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/xiutil/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/util-extra/${project.version}/*"
 CP="$CP:$XDIR/lib/*"
 
 ## Configure XiPKI
 
-$JAVA_EXEC -cp "$CP" org.xipki.util.BatchReplace $XDIR/conf.json
+$JAVA_EXEC -cp "$CP" org.xipki.util.extra.misc.BatchReplace $XDIR/conf.json
 
 # Copy the keys and certificates
 KC_DIR=${XDIR}/setup/keycerts
@@ -106,9 +103,7 @@ TDIR=$WDIR/xipki-ca/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/*\
-   $KC_DIR/ca-server/* \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
+cp $KC_DIR/ca-server/* \
    $KC_DIR/ca-mgmt-client/ca-mgmt-client-cert.pem \
    $KS_DIR/ca-client-certstore.p12 \
    $TDIR
@@ -118,31 +113,16 @@ TDIR=$WDIR/xipki-ocsp/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/*\
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
-   $TDIR
-
 # Gateway
 TDIR=$WDIR/xipki-gateway/tomcat/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
-   $KC_DIR/gateway-server/* \
+cp $KC_DIR/gateway-server/* \
    $KC_DIR/ra-sdk-client/* \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \
    $KS_DIR/gateway-client-ca-certstore.p12 \
-   $TDIR
-
-# HSM proxy
-TDIR=$WDIR/xipki-hsmproxy/tomcat/xipki/keycerts
-
-mkdir -p $TDIR
-
-cp $KC_DIR/hsmproxy-server/* \
-   $KC_DIR/hsmproxy-client/*-cert.pem \
-   $KS_DIR/hsmproxy-client-certstore.p12 \
+   $KC_DIR/dh-pop/dh-pop.p12 \
    $TDIR
 
 # QA
@@ -150,16 +130,16 @@ TDIR=$WDIR/xipki/keycerts
 
 mkdir -p $TDIR
 
-cp $KC_DIR/hsmproxy-client/* \
-   $KC_DIR/ca-mgmt-client/* \
+cp $KC_DIR/ca-mgmt-client/* \
    $KC_DIR/cmp-client/* \
    $KC_DIR/est-client/* \
    $KC_DIR/rest-client/* \
    $KC_DIR/ocsp-client/* \
-   $KC_DIR/hsmproxy-server/hsmproxy-server-cert.pem \
    $KC_DIR/ca-server/* \
    $KC_DIR/gateway-server/*\
-   $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
+   $KC_DIR/dh-pop/dh-pop-certs.pem\
+   $KC_DIR/ra-sdk-client/ra-sdk-client.p12 \
+   $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem \
    $TDIR
 
 cp $WDIR/xipki/security/pkcs11.json $WDIR/xipki-ca/tomcat/xipki/security/
@@ -169,7 +149,6 @@ cp $WDIR/xipki/security/pkcs11.json $WDIR/xipki-gateway/tomcat/xipki/security/
 TOMCAT_CA_DIR=$TBDIR/ca-tomcat
 TOMCAT_OCSP_DIR=$TBDIR/ocsp-tomcat
 TOMCAT_GATEWAY_DIR=$TBDIR/gateway-tomcat
-TOMCAT_HSMPROXY_DIR=$TBDIR/hsmproxy-tomcat
 
 ## CA
 TOMCAT_DIR=${TOMCAT_CA_DIR}
@@ -181,7 +160,7 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
     ${TOMCAT_DIR}/lib/postgresql-*.jar \
     ${TOMCAT_DIR}/lib/h2-*.jar \
-    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
@@ -204,7 +183,7 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
     ${TOMCAT_DIR}/lib/postgresql-*.jar \
     ${TOMCAT_DIR}/lib/h2-*.jar \
-    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
@@ -229,7 +208,7 @@ rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
     ${TOMCAT_DIR}/lib/mariadb-java-client-*.jar \
     ${TOMCAT_DIR}/lib/postgresql-*.jar \
     ${TOMCAT_DIR}/lib/h2-*.jar \
-    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
+    ${TOMCAT_DIR}/lib/*pkcs11*.jar \
     ${TOMCAT_DIR}/lib/password-*.jar \
     ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
 
@@ -238,19 +217,3 @@ cp -r ${WDIR}/xipki-gateway/tomcat/*  ${TOMCAT_DIR}/
 cp -r ${WDIR}/xipki-gateway/${_DIR}/* ${TOMCAT_DIR}/
 cp -r ${XDIR}/tomcat-files/xipki-gateway/tomcat/* ${TOMCAT_DIR}/
 
-cp ${WDIR}/qa/keys/dhpop.p12 ${TOMCAT_DIR}/xipki/keycerts
-
-## HSM Proxy
-
-TOMCAT_DIR=${TOMCAT_HSMPROXY_DIR}
-echo "tomcat dir: ${TOMCAT_DIR}"
-
-rm -rf ${TOMCAT_DIR}/webapps ${TOMCAT_DIR}/logs/* ${TOMCAT_DIR}/xipki
-
-rm -rf ${TOMCAT_DIR}/lib/bc*.jar \
-    ${TOMCAT_DIR}/lib/*pkcs11wrapper-*.jar \
-    ${TOMCAT_DIR}/lib/password-*.jar \
-    ${TOMCAT_DIR}/lib/xipki-tomcat-password-*.jar
-
-cp -r ${WDIR}/xipki-hsmproxy/tomcat/*  ${TOMCAT_DIR}/
-cp -r ${WDIR}/xipki-hsmproxy/${_DIR}/* ${TOMCAT_DIR}/

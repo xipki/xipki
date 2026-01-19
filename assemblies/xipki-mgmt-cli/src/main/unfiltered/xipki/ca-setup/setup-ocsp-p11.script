@@ -10,33 +10,26 @@ OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
 if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
 } else {
-  keytype = $1
-  printUsage = "$([rsa ec dsa sm2 ed25519] contains $keytype)" equals "false"
+  keyspec = $1
+  source xipki/ca-setup/c14n-keyspec.script
+  if { "$sigalg" equals "" } then {
+    printUsage = true
+  }
 }
 
-echo "key type: $keytype"
+echo "key spec: $spec"
 
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/ocsp/setup-ocsp-p11.script <key type>"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519"
+  echo "source file:./xipki/ocsp/setup-ocsp-p11.script <key spec>"
+  source xipki/ca-setup/print-keyspecs.script
 } else {
   echo "#################################################################"
   echo "#                 Generate Key, CSR and Certificate             #"
   echo "#################################################################"
 
-  if { "$keytype" equals "dsa" } then {
-    xi:dsa-p11 --plen 2048 --slot ${SLOT} --label ${P11_LABEL}
-  } elif { "$keytype" equals "ec" } then {
-    xi:ec-p11 --curve secp256r1 --slot ${SLOT} --label ${P11_LABEL}
-  } elif { "$keytype" equals "rsa" } then {
-    xi:rsa-p11 --key-size 2048 --slot ${SLOT} --label ${P11_LABEL}
-  } elif { "$keytype" equals "sm2" } then {
-    xi:sm2-p11 --slot ${SLOT} --label ${P11_LABEL}
-  } elif { "$keytype" equals "ed25519" } then {
-    xi:ec-p11 --curve ed25519 --slot ${SLOT} --label ${P11_LABEL}
-  }
+  xi:keypair-p11 --keyspec ${keyspec} --slot ${SLOT} --label ${P11_LABEL}
 
   xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} --out ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.csr --subject "${SUBJECT}"
 
@@ -47,7 +40,7 @@ if { "$printUsage" equals "true" } then {
   echo "  1. Copy ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.crt to replace"
   echo "     the folder <OCSP\'s tomcat.dir>/xipki/keycerts/"
   echo "  2. Modify the signers field in <OCSP\'s tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
-  echo "     - Unncomment the pkcs11 part, and comment the pkcs12 part"
+  echo "     - Unncomment the PKCS11 part, and comment the PKCS12 part"
   echo "     - Change signer conf to \'slot=${SLOT},key-label=${P11_LABEL}\'"
   echo "  3. Restart OCSP\'s tomcat."
 }

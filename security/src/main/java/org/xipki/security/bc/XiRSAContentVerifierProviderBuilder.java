@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.bc;
@@ -12,20 +12,21 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.SignerUtil;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.KeyUtil;
 
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
- * RSAPSS.
+ * Extends {@link BcECContentVerifierProviderBuilder} to support the signature
+ * algorithms RSAPSS.
  *
  * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 
-public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierProviderBuilder {
+public class XiRSAContentVerifierProviderBuilder
+    extends BcRSAContentVerifierProviderBuilder {
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
       = new DefaultDigestAlgorithmIdentifierFinder();
 
@@ -34,7 +35,8 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
   }
 
   @Override
-  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+      throws OperatorCreationException {
     SignAlgo signAlgo;
     try {
       signAlgo = SignAlgo.getInstance(sigAlgId);
@@ -43,12 +45,13 @@ public class XiRSAContentVerifierProviderBuilder extends BcRSAContentVerifierPro
     }
 
     if (signAlgo == null) {
-      throw new OperatorCreationException("could not detect SignAlgo from sigAlgId");
+      throw new OperatorCreationException(
+          "could not detect SignAlgo from sigAlgId");
     }
 
     if (signAlgo.isRSAPSSSigAlgo()) {
       try {
-        return SignerUtil.createPSSRSASigner(signAlgo);
+        return KeyUtil.createPSSRSASigner(signAlgo);
       } catch (XiSecurityException ex) {
         throw new OperatorCreationException(ex.getMessage(), ex);
       }

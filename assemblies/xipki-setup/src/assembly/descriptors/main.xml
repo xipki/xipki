@@ -6,35 +6,23 @@
   <formats>
     <format>zip</format>
   </formats>
-  <dependencySets>
-    <dependencySet>
-      <useProjectArtifact>false</useProjectArtifact>
-      <outputDirectory>lib</outputDirectory>
-    </dependencySet>
-  </dependencySets>
   <fileSets>
     <fileSet>
-      <directory>src/assembly/unfiltered</directory>
-      <includes>
-        <include>*.sh</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-      <lineEnding>unix</lineEnding>
-    </fileSet>
+      <directory>${project.build.directory}/t</directory>
+       <includes>
+         <include>*.sh</include>
+       </includes>
+       <outputDirectory>.</outputDirectory>
+       <fileMode>0755</fileMode>
+       <directoryMode>0755</directoryMode>
+       <lineEnding>unix</lineEnding>
+     </fileSet>
     <fileSet>
-      <directory>src/assembly/unfiltered</directory>
-      <includes>
-        <include>INSTALL.md</include>
-      </includes>
+      <directory>${project.build.directory}/t</directory>
+      <excludes>
+        <exclude>*.sh</exclude>
+      </excludes>
       <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/t2</directory>
-      <outputDirectory>files</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>

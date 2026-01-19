@@ -44,11 +44,6 @@ fi
 echo "Tomcat: $tomcatDir"
 
 ## make sure the tomcat is only for CA
-if [ -f ${tomcatDir}/webapps/hp.war ]; then
-   echo "HSM proxy is running in $tomcatDir, please use other tomcat instance."
-   exit 1
-fi
-
 if [ -f ${tomcatDir}/webapps/ocsp.war ]; then
    echo "OCSP responder is running in $tomcatDir, please use other tomcat instance."
    exit 1
@@ -103,7 +98,7 @@ for X in $SRC; do [[ -e $X ]] && mv "$X" "${BDIR}/lib"; done
 SRC="${tomcatDir}/lib/xipki-tomcat-password-*.jar"
 for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 
-SRC="${tomcatDir}/lib/*pkcs11wrapper-*.jar"
+SRC="${tomcatDir}/lib/*pkcs11*.jar"
 for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
 
 SRC="${tomcatDir}/lib/bc*-jdk*.jar"

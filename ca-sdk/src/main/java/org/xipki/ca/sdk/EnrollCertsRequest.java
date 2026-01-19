@@ -1,14 +1,14 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.util.extra.type.EmbedCertsMode;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -25,7 +25,8 @@ public class EnrollCertsRequest extends SdkRequest {
   private String transactionId;
 
   /**
-   * For case to enroll more than 1 certificates in one request, default to false.
+   * For case to enroll more than 1 certificates in one request, default to
+   * false.
    * <ul>
    *   <li>true: either all certificates have been enrolled or failed.</li>
    *   <li>false: each certificate may have been enrolled or failed</li>
@@ -43,7 +44,7 @@ public class EnrollCertsRequest extends SdkRequest {
   /**
    * Specifies how to embed the CA certificate in the response:
    */
-  private CertsMode caCertMode;
+  private EmbedCertsMode caCertMode;
 
   private Entry[] entries;
 
@@ -79,11 +80,11 @@ public class EnrollCertsRequest extends SdkRequest {
     this.confirmWaitTimeMs = confirmWaitTimeMs;
   }
 
-  public CertsMode getCaCertMode() {
+  public EmbedCertsMode getCaCertMode() {
     return caCertMode;
   }
 
-  public void setCaCertMode(CertsMode caCertMode) {
+  public void setCaCertMode(EmbedCertsMode caCertMode) {
     this.caCertMode = caCertMode;
   }
 
@@ -96,17 +97,15 @@ public class EnrollCertsRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
-    encoder.writeArrayStart(6);
-    encoder.writeTextString(transactionId);
-    encoder.writeBooleanObj(groupEnroll);
-    encoder.writeBooleanObj(explicitConfirm);
-    encoder.writeIntObj(confirmWaitTimeMs);
-    encoder.writeEnumObj(caCertMode);
-    encoder.writeObjects(entries);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(6).writeTextString(transactionId)
+        .writeBooleanObj(groupEnroll).writeBooleanObj(explicitConfirm)
+        .writeIntObj(confirmWaitTimeMs).writeEnumObj(caCertMode)
+        .writeObjects(entries);
   }
 
-  public static EnrollCertsRequest decode(byte[] encoded) throws DecodeException {
+  public static EnrollCertsRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("EnrollCertsRequest", decoder, 6);
       EnrollCertsRequest ret = new EnrollCertsRequest();
@@ -116,12 +115,13 @@ public class EnrollCertsRequest extends SdkRequest {
       ret.setConfirmWaitTimeMs(decoder.readIntObj());
       String str = decoder.readTextString();
       if (str != null) {
-        ret.setCaCertMode(CertsMode.valueOf(str));
+        ret.setCaCertMode(EmbedCertsMode.valueOf(str));
       }
       ret.setEntries(Entry.decodeArray(decoder));
       return ret;
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
     }
   }
 
@@ -132,10 +132,10 @@ public class EnrollCertsRequest extends SdkRequest {
     private String certprofile;
 
     /**
-     * Specifies the PKCS#10 Request. Note that the CA does NOT verify the signature of
-     * this request. You may also put any dummy value in the signature field.
-     * The verification of CSR must be processed by the CA client calling
-     * the enrolment service.
+     * Specifies the PKCS#10 Request. Note that the CA does NOT verify the
+     * signature of this request. You may also put any dummy value in the
+     * signature field. The verification of CSR must be processed by the CA
+     * client calling the enrolment service.
      * <p>
      * If p10req is set, the {@link #subject}, {@link #subjectPublicKey} and
      * {@link #extensions} will be ignored.
@@ -143,8 +143,9 @@ public class EnrollCertsRequest extends SdkRequest {
     private byte[] p10req;
 
     /**
-     * Specifies the Subject. If not for re-enroll, subject must be set if p10req is not present,
-     * set it to empty string if empty subject is expected. Must be set if p10req is not present.
+     * Specifies the Subject. If not for re-enroll, subject must be set if
+     * p10req is not present, set it to empty string if empty subject is
+     * expected. Must be set if p10req is not present.
      */
     private X500NameType subject;
 
@@ -155,7 +156,8 @@ public class EnrollCertsRequest extends SdkRequest {
     private byte[] subjectPublicKey;
 
     /**
-     * Specifies the additional extensions. Will be considered only if p10req is not present.
+     * Specifies the additional extensions. Will be considered only if p10req
+     * is not present.
      */
     private byte[] extensions;
 
@@ -195,8 +197,10 @@ public class EnrollCertsRequest extends SdkRequest {
       this.subjectPublicKey = subjectPublicKey;
     }
 
-    public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey) throws IOException {
-      this.subjectPublicKey = subjectPublicKey == null ? null : subjectPublicKey.getEncoded();
+    public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey)
+        throws IOException {
+      this.subjectPublicKey = subjectPublicKey == null ? null
+          : subjectPublicKey.getEncoded();
     }
 
     public X500NameType getSubject() {
@@ -260,7 +264,7 @@ public class EnrollCertsRequest extends SdkRequest {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+    protected void encode0(CborEncoder encoder) throws CodecException {
       encoder.writeArrayStart(9);
       encoder.writeBigInt(certReqId);
       encoder.writeTextString(certprofile);
@@ -273,7 +277,7 @@ public class EnrollCertsRequest extends SdkRequest {
       encoder.writeObject(oldCertInfo);
     }
 
-    public static Entry decode(CborDecoder decoder) throws DecodeException {
+    public static Entry decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(9)) {
           return null;
@@ -291,11 +295,12 @@ public class EnrollCertsRequest extends SdkRequest {
         ret.setOldCertInfo(OldCertInfo.decode(decoder));
         return ret;
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    public static Entry[] decodeArray(CborDecoder decoder)
+        throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

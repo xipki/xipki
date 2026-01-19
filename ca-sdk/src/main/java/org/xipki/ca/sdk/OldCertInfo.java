@@ -1,15 +1,13 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.Args;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -20,11 +18,11 @@ import java.math.BigInteger;
 
 public class OldCertInfo extends SdkEncodable {
 
-  private static final long TAG_ISN = 1;
+  private static final int ALT_ISN = 1;
 
-  private static final long TAG_SUBJECT = 2;
+  private static final int ALT_SUBJECT = 2;
 
-  private static final long TAG_FSN = 3;
+  private static final int ALT_FSN = 3;
 
   /**
    * Whether to reu-use the public key in the old certificate for the new one.
@@ -69,33 +67,33 @@ public class OldCertInfo extends SdkEncodable {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2);
     encoder.writeBoolean(isReusePublicKey());
     if (isn != null) {
-      encoder.writeTag(TAG_ISN);
+      encoder.writeAlternative(ALT_ISN);
       encoder.writeObject(isn);
     } else if (subject != null) {
-      encoder.writeTag(TAG_SUBJECT);
+      encoder.writeAlternative(ALT_SUBJECT);
       encoder.writeObject(subject);
     } else {
-      encoder.writeTag(TAG_FSN);
+      encoder.writeAlternative(ALT_FSN);
       encoder.writeObject(fsn);
     }
   }
 
-  public static OldCertInfo decode(CborDecoder decoder) throws DecodeException {
+  public static OldCertInfo decode(CborDecoder decoder) throws CodecException {
     try {
       if (decoder.readNullOrArrayLength(2)) {
         return null;
       }
 
       boolean usePublicKey = decoder.readBoolean();
-      long tag = decoder.readTag();
-      if (tag == TAG_ISN) {
+      long tag = decoder.readAlternative();
+      if (tag == ALT_ISN) {
         ByIssuerAndSerial isn = ByIssuerAndSerial.decode(decoder);
         return new OldCertInfo(usePublicKey, isn);
-      } else if (tag == TAG_SUBJECT) {
+      } else if (tag == ALT_SUBJECT) {
         BySubject subject = BySubject.decode(decoder);
         return new OldCertInfo(usePublicKey, subject);
       } else { // if (tag == TAG_FSN) {
@@ -103,7 +101,8 @@ public class OldCertInfo extends SdkEncodable {
         return new OldCertInfo(usePublicKey, fsn);
       }
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
     }
   }
 
@@ -130,23 +129,23 @@ public class OldCertInfo extends SdkEncodable {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(2);
-      encoder.writeObject(issuer);
-      encoder.writeBigInt(serialNumber);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(2).writeObject(issuer)
+          .writeBigInt(serialNumber);
     }
 
-    public static ByIssuerAndSerial decode(CborDecoder decoder) throws DecodeException {
+    public static ByIssuerAndSerial decode(CborDecoder decoder)
+        throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
         return new ByIssuerAndSerial(
-            X500NameType.decode(decoder),
-            decoder.readBigInt());
+            X500NameType.decode(decoder), decoder.readBigInt());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+        throw new CodecException(
+            buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
   }
@@ -174,23 +173,23 @@ public class OldCertInfo extends SdkEncodable {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(2);
-      encoder.writeByteString(caCertSha1);
-      encoder.writeBigInt(serialNumber);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(2).writeByteString(caCertSha1)
+          .writeBigInt(serialNumber);
     }
 
-    public static BySha1FpAndSerial decode(CborDecoder decoder) throws DecodeException {
+    public static BySha1FpAndSerial decode(CborDecoder decoder)
+        throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
         return new BySha1FpAndSerial(
-            decoder.readByteString(),
-            decoder.readBigInt());
+            decoder.readByteString(), decoder.readBigInt());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+        throw new CodecException(
+            buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
   }
@@ -215,23 +214,22 @@ public class OldCertInfo extends SdkEncodable {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(2);
-      encoder.writeByteString(subject);
-      encoder.writeByteString(san);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(2).writeByteString(subject)
+          .writeByteString(san);
     }
 
-    public static BySubject decode(CborDecoder decoder) throws DecodeException {
+    public static BySubject decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
-        return new BySubject(
-            decoder.readByteString(),
+        return new BySubject(decoder.readByteString(),
             decoder.readByteString());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, BySubject.class), ex);
+        throw new CodecException(
+            buildDecodeErrMessage(ex, BySubject.class), ex);
       }
     }
 

@@ -1,0 +1,10 @@
+[
+  "vendor-cloudhsm.json",
+  "vendor-luna.json",
+  "vendor-ncipher.json",
+  "vendor-sansec.json",
+  "vendor-softhsm.json",
+  "vendor-tass.json",
+  "vendor-utimaco.json",
+  "vendor-xihsm.json"
+]

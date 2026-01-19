@@ -1,26 +1,26 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.publisher;
 
-import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.Audits;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
+import org.xipki.security.X509Crl;
+import org.xipki.util.codec.Args;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.audit.AuditEvent;
+import org.xipki.util.extra.audit.AuditLevel;
+import org.xipki.util.extra.audit.AuditStatus;
+import org.xipki.util.extra.audit.Audits;
+import org.xipki.util.extra.exception.CertPublisherException;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -33,7 +33,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class OcspCertPublisher extends CertPublisher {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspCertPublisher.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(OcspCertPublisher.class);
 
   private OcspStoreQueryExecutor queryExecutor;
 
@@ -43,7 +44,8 @@ public class OcspCertPublisher extends CertPublisher {
   }
 
   @Override
-  public void initialize(String conf, DataSourceMap datasourceConfs) throws CertPublisherException {
+  public void initialize(String conf, DataSourceMap datasourceConfs)
+      throws CertPublisherException {
     Args.notNull(conf, "conf");
 
     ConfPairs pairs = new ConfPairs(conf);
@@ -59,11 +61,13 @@ public class OcspCertPublisher extends CertPublisher {
     }
 
     if (datasource == null) {
-      throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
+      throw new CertPublisherException("no datasource named '"
+          + datasourceName + "' is specified");
     }
 
     try {
-      queryExecutor = new OcspStoreQueryExecutor(datasource, this.publishsGoodCert);
+      queryExecutor = new OcspStoreQueryExecutor(datasource,
+          this.publishsGoodCert);
     } catch (NoSuchAlgorithmException | DataAccessException ex) {
       throw new CertPublisherException(ex.getMessage(), ex);
     }
@@ -75,7 +79,8 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.addIssuer(issuer);
       return true;
     } catch (Exception ex) {
-      logAndAudit(issuer.getSubjectText(), issuer, null, ex, "could not publish issuer");
+      logAndAudit(issuer.getSubjectText(), issuer, null, ex,
+          "could not publish issuer");
       return false;
     }
   } // method caAdded
@@ -89,7 +94,8 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.addCert(caCert, cert, certInfo.getRevocationInfo());
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(), ex, "could not save certificate");
+      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+          ex, "could not save certificate");
       return false;
     }
   } // method certificateAdded
@@ -101,8 +107,8 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCert(caCert, cert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(), ex,
-          "could not publish revoked certificate");
+      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+          ex, "could not publish revoked certificate");
       return false;
     }
   } // method certificateRevoked
@@ -113,13 +119,14 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(), ex,
-          "could not publish unrevocation of certificate");
+      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+          ex, "could not publish unrevocation of certificate");
       return false;
     }
   } // method certificateUnrevoked
 
-  private void logAndAudit(String issuer, X509Cert cert, Long certId, Exception ex, String messagePrefix) {
+  private void logAndAudit(String issuer, X509Cert cert, Long certId,
+                           Exception ex, String messagePrefix) {
     String subjectText = cert.getSubjectText();
     String serialText = cert.getSerialNumberHex();
 
@@ -141,7 +148,7 @@ public class OcspCertPublisher extends CertPublisher {
   } // method logAndAudit
 
   @Override
-  public boolean crlAdded(X509Cert caCert, X509CRLHolder crl) {
+  public boolean crlAdded(X509Cert caCert, X509Crl crl) {
     return true;
   }
 
@@ -156,7 +163,8 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCa(caCert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex, "could not publish revocation of CA");
+      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
+          "could not publish revocation of CA");
       return false;
     }
   } // method caRevoked
@@ -167,7 +175,8 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCa(caCert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex, "could not publish unrevocation of CA");
+      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
+          "could not publish unrevocation of CA");
       return false;
     }
   } // method caUnrevoked

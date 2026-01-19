@@ -1,14 +1,14 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
 
 import org.xipki.security.SecurityFactory;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.util.Optional;
 
@@ -24,8 +24,9 @@ public class ShellUtil {
   private ShellUtil() {
   }
 
-  public static String canonicalizeSignerConf(String keystoreType, String signerConf, SecurityFactory securityFactory)
-          throws Exception {
+  public static String canonicalizeSignerConf(
+      String keystoreType, String signerConf, SecurityFactory securityFactory)
+      throws Exception {
     Args.notBlank(keystoreType, "keystoreType");
     Args.notBlank(signerConf, "signerConf");
     Args.notNull(securityFactory, "securityFactory");
@@ -38,7 +39,8 @@ public class ShellUtil {
     ConfPairs pairs = new ConfPairs(signerConf);
     String keystoreConf = pairs.value("keystore");
     Optional.ofNullable(pairs.value("password")).orElseThrow(
-        () -> new IllegalArgumentException("password is not set in " + signerConf));
+        () -> new IllegalArgumentException(
+            "password is not set in " + signerConf));
 
     byte[] keystoreBytes;
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {

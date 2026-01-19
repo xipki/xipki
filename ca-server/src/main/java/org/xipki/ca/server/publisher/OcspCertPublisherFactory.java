@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.publisher;
 
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -21,7 +21,8 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
 
   private static final String TYPE = "ocsp";
 
-  private static final Set<String> types = Set.copyOf(Collections.singletonList(TYPE));
+  private static final Set<String> types =
+      Set.copyOf(Collections.singletonList(TYPE));
 
   @Override
   public Set<String> getSupportedTypes() {
@@ -34,7 +35,8 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
   }
 
   @Override
-  public CertPublisher newPublisher(String type) throws ObjectCreationException {
+  public CertPublisher newPublisher(String type)
+      throws ObjectCreationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new OcspCertPublisher();
     } else {

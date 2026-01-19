@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.servlet;
@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkResponse;
 import org.xipki.ca.server.SdkResponder;
-import org.xipki.pki.ErrorCode;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.exception.EncodeException;
-import org.xipki.util.http.HttpResponse;
-import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.extra.http.HttpConstants;
+import org.xipki.util.extra.http.HttpResponse;
+import org.xipki.util.extra.http.HttpStatusCode;
+import org.xipki.util.extra.http.XiHttpRequest;
+import org.xipki.util.extra.http.XiHttpResponse;
+import org.xipki.util.io.IoUtil;
 
 import java.io.IOException;
 
@@ -30,7 +30,8 @@ import java.io.IOException;
 
 class HttpRaServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpRaServlet.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(HttpRaServlet.class);
 
   private final boolean logReqResp;
 
@@ -41,7 +42,8 @@ class HttpRaServlet {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp)
+      throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       service0(req, false).fillResponse(resp);
@@ -52,12 +54,14 @@ class HttpRaServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean post) throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean post)
+      throws IOException {
     byte[] reqBody  = null;
     byte[] respBody = null;
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-      reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
+      reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream())
+          : null;
 
       SdkResponse response = responder.service(path, reqBody, req);
       respBody = response == null ? null : response.encode();
@@ -93,7 +97,7 @@ class HttpRaServlet {
         }
       }
       return new HttpResponse(httpStatus, "application/cbor", null, respBody);
-    } catch (EncodeException ex) {
+    } catch (CodecException ex) {
       LOG.error("Error encoding SdkResponse", ex);
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } catch (RuntimeException ex) {
@@ -101,9 +105,12 @@ class HttpRaServlet {
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       if (logReqResp && LOG.isDebugEnabled()) {
-        String  reqBodyStr =  reqBody == null ? null : Base64.encodeToString( reqBody, true);
-        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
-        LOG.debug("HTTP RA path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(), reqBodyStr, respBodyStr);
+        String reqBodyStr = reqBody == null ? null
+            : Base64.encodeToString( reqBody, true);
+        String respBodyStr = respBody == null ? null
+            : Base64.encodeToString(respBody, true);
+        LOG.debug("HTTP RA path: {}\nRequest:\n{}\nResponse:\n{}",
+            req.getRequestURI(), reqBodyStr, respBodyStr);
       }
     }
   }

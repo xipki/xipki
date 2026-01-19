@@ -1,0 +1,9 @@
+{
+  "name": "AWS CloudHSM",
+  "filter": {
+    "manufacturerIDs": [
+      "cloudhsm"
+    ]
+  },
+  "vendor": "CLOUDHSM"
+}

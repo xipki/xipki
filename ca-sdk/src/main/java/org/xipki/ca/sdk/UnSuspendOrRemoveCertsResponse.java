@@ -1,17 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
- * Response for the operations unrevoking certificates and removing certificates.
+ * Response for the operations unsuspending certificates and removing
+ * certificates.
  *
  * @author Lijun Liao (xipki)
  * @since 6.0.0
@@ -30,18 +28,19 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(1);
-    encoder.writeObjects(entries);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(1).writeObjects(entries);
   }
 
-  public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) throws DecodeException {
+  public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("UnSuspendOrRemoveCertsResponse", decoder, 1);
       return new UnSuspendOrRemoveCertsResponse(
           SingleCertSerialEntry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
     }
   }
 

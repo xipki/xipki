@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -40,20 +38,19 @@ public class GetCertRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(2);
-    encoder.writeBigInt(serialNumber);
-    encoder.writeObject(issuer);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(2).writeBigInt(serialNumber)
+        .writeObject(issuer);
   }
 
-  public static GetCertRequest decode(byte[] encoded) throws DecodeException {
+  public static GetCertRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("GetCertRequest", decoder, 2);
-      return new GetCertRequest(
-          decoder.readBigInt(),
+      return new GetCertRequest(decoder.readBigInt(),
           X500NameType.decode(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, GetCertRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, GetCertRequest.class), ex);
     }
   }
 

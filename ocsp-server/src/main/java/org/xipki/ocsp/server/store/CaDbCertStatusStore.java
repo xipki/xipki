@@ -1,12 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
@@ -20,12 +18,14 @@ import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.JSON;
-import org.xipki.util.LogUtil;
-import org.xipki.util.RandomUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
@@ -63,9 +63,11 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private DataSourceWrapper datasource;
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaDbCertStatusStore.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CaDbCertStatusStore.class);
 
-  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
+  private final StoreUpdateService storeUpdateService =
+      new StoreUpdateService();
 
   private final Object lock = new Object();
 
@@ -123,10 +125,12 @@ public class CaDbCertStatusStore extends OcspStore {
               Instant revTime = null;
               String str = rs.getString("REV_INFO");
               if (str != null) {
-                CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
+                CertRevocationInfo revInfo =
+                    CertRevocationInfo.fromEncoded(str);
                 revTime = revInfo.getRevocationTime();
               }
-              SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTime);
+              SimpleIssuerEntry issuerEntry =
+                  new SimpleIssuerEntry(id, revTime);
               newIssuers.put(id, issuerEntry);
             }
 
@@ -172,11 +176,14 @@ public class CaDbCertStatusStore extends OcspStore {
 
             X509Cert cert = X509Util.parseCert(certBytes);
 
-            IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
-            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1, caInfoEntry.getEncodedHash(HashAlgo.SHA1));
+            IssuerEntry caInfoEntry = new IssuerEntry(
+                rs.getInt("ID"), cert);
+            RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
+                caInfoEntry.getEncodedHash(HashAlgo.SHA1));
             for (IssuerEntry existingIssuer : caInfos) {
               if (existingIssuer.matchHash(reqIssuer)) {
-                throw new Exception("found at least two issuers with the same subject and key");
+                throw new Exception("found at least two issuers with the " +
+                    "same subject and key");
               }
             }
 
@@ -222,7 +229,8 @@ public class CaDbCertStatusStore extends OcspStore {
     }
 
     if (!initialized) {
-      throw new OcspStoreException("initialization of CertStore is still in process");
+      throw new OcspStoreException(
+          "initialization of CertStore is still in process");
     }
 
     String sql;
@@ -299,18 +307,25 @@ public class CaDbCertStatusStore extends OcspStore {
 
       CertStatusInfo certStatusInfo;
       if (unknown) {
-        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
+        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(
+            thisUpdate, null);
       } else if (ignore) {
-        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
+        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(
+            thisUpdate, null);
       } else {
-        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
+        byte[] certHash = (b64CertHash == null) ? null
+            : Base64.decodeFast(b64CertHash);
+
         if (revoked) {
-          Instant invTime = (invalTime == 0 || invalTime == revTime) ? null : Instant.ofEpochSecond(invalTime);
-          CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.ofEpochSecond(revTime), invTime);
+          Instant invTime = (invalTime == 0 || invalTime == revTime)
+              ? null : Instant.ofEpochSecond(invalTime);
+          CertRevocationInfo revInfo = new CertRevocationInfo(reason,
+              Instant.ofEpochSecond(revTime), invTime);
           certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo,
               certHashAlgo, certHash, thisUpdate, null, null);
         } else {
-          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null, null);
+          certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
+              certHashAlgo, certHash, thisUpdate, null, null);
         }
       }
 
@@ -321,8 +336,11 @@ public class CaDbCertStatusStore extends OcspStore {
           if (retentionInterval < 0) {
             date = issuer.getNotBefore();
           } else {
-            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
-            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore() : t1;
+            Instant t1 = Instant.now().minus(retentionInterval,
+                ChronoUnit.DAYS);
+
+            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore()
+                : t1;
           }
 
           certStatusInfo.setArchiveCutOff(date);
@@ -338,12 +356,14 @@ public class CaDbCertStatusStore extends OcspStore {
       boolean replaced = false;
       if (certStatus == CertStatus.GOOD) {
         replaced = true;
-      } else if (certStatus == CertStatus.UNKNOWN || certStatus == CertStatus.IGNORE) {
+      } else if (certStatus == CertStatus.UNKNOWN
+          || certStatus == CertStatus.IGNORE) {
         if (unknownCertBehaviour == UnknownCertBehaviour.good) {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(
+            caRevInfo.getRevocationTime())) {
           replaced = true;
         }
       }
@@ -370,10 +390,11 @@ public class CaDbCertStatusStore extends OcspStore {
 
   /**
    * Borrow PreparedStatement.
-   * @return the next idle preparedStatement, {@code null} will be returned if no
-   *     PreparedStatement can be created within 5 seconds.
+   * @return the next idle preparedStatement, {@code null} will be returned if
+   *         no PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery)
+      throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 
@@ -417,19 +438,19 @@ public class CaDbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
+  public void init(JsonMap sourceConf, DataSourceWrapper datasource)
+      throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
-      Object objValue = sourceConf.get("caCerts");
-      if (objValue != null) {
-        caCerts = JSON.parseConf(JSON.toJSONBytes(objValue), OcspServerConf.CaCerts.class);
-      }
+      caCerts = OcspServerConf.CaCerts.parseSourceConf(sourceConf);
     }
 
     this.datasource = Args.notNull(datasource, "datasource");
 
-    sqlCs = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
-    sqlCsNoRit = datasource.buildSelectFirstSql(1, "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
+    sqlCs = datasource.buildSelectFirstSql(1,
+        "NBEFORE,NAFTER,REV,RR,RT,RIT FROM CERT WHERE CA_ID=? AND SN=?");
+    sqlCsNoRit = datasource.buildSelectFirstSql(1,
+        "NBEFORE,NAFTER,REV,RR,RT FROM CERT WHERE CA_ID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,RIT,SHA1 FROM CERT WHERE CA_ID=? AND SN=?");
@@ -463,11 +484,13 @@ public class CaDbCertStatusStore extends OcspStore {
       List<Runnable> scheduledServices = getScheduledServices();
       int size = scheduledServices.size();
       if (size > 0) {
-        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
+        this.scheduledThreadPoolExecutor =
+            new ScheduledThreadPoolExecutor(size);
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60),
+              intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }

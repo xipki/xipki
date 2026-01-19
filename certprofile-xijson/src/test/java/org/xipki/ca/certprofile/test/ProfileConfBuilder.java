@@ -1,59 +1,37 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.test;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.gm.GMObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
-import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.CertprofileValidator;
-import org.xipki.ca.api.profile.Certprofile.CertDomain;
-import org.xipki.ca.api.profile.Certprofile.CertLevel;
-import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
-import org.xipki.ca.api.profile.Certprofile.X509CertVersion;
+import org.xipki.ca.api.profile.ctrl.CertDomain;
+import org.xipki.ca.api.profile.ctrl.CertLevel;
+import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
+import org.xipki.ca.api.profile.id.AttributeType;
+import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
+import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
-import org.xipki.ca.certprofile.xijson.conf.AlgorithmType;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.DsaParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.EcParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeyParametersType.RsaParametersType;
-import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType;
-import org.xipki.ca.certprofile.xijson.conf.KeypairGenerationType.KeyType;
-import org.xipki.ca.certprofile.xijson.conf.Subject;
-import org.xipki.ca.certprofile.xijson.conf.Subject.RdnType;
-import org.xipki.ca.certprofile.xijson.conf.Subject.ValueType;
-import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
-import org.xipki.security.EdECConstants;
+import org.xipki.ca.certprofile.xijson.conf.RdnType;
+import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.DN;
-import org.xipki.security.ObjectIdentifiers.Extn;
-import org.xipki.security.util.AlgorithmUtil;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.IoUtil;
-import org.xipki.util.JSON;
-import org.xipki.util.StringUtil;
+import org.xipki.security.SignSpec;
+import org.xipki.util.codec.json.JsonBuilder;
+import org.xipki.util.io.IoUtil;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Builder to create xijson configuration.
+ * Builder to create json configuration.
  *
  * @author Lijun Liao (xipki)
  */
@@ -62,28 +40,25 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static final String REGEX_FQDN = ":FQDN";
 
-  protected static final Set<ASN1ObjectIdentifier> NOT_IN_SUBJECT_RDNS;
-
-  static {
-    NOT_IN_SUBJECT_RDNS = CollectionUtil.asUnmodifiableSet(
-        Extn.id_GMT_0015_ICRegistrationNumber, Extn.id_GMT_0015_IdentityCode,   Extn.id_GMT_0015_InsuranceNumber,
-        Extn.id_GMT_0015_OrganizationCode,     Extn.id_GMT_0015_TaxationNumber, Extn.id_extension_admission);
-  } // method static
-
-  protected static void marshall(X509ProfileType profile, String filename, boolean validate) {
+  protected static void marshall(XijsonCertprofileType profile,
+                                 String filename, boolean validate) {
+    // TODO: consider validate
+    //validate = false;
     try {
       Path path = Paths.get("tmp", filename);
       IoUtil.mkdirsParent(path);
       try (OutputStream out = Files.newOutputStream(path)) {
-        JSON.writeJSON(profile, out);
+        String json = JsonBuilder.toPrettyJson(profile.toCodec());
+        out.write(json.getBytes(StandardCharsets.UTF_8));
       }
 
       if (validate) {
-        X509ProfileType profileConf = X509ProfileType.parse(path.toFile());
+        XijsonCertprofileType profileConf =
+            XijsonCertprofileType.parse(path.toFile());
+
         XijsonCertprofile profileObj = new XijsonCertprofile();
         profileObj.initialize(profileConf);
         profileObj.close();
-
         CertprofileValidator.validate(profileObj);
         System.out.println("Generated certprofile in " + filename);
       }
@@ -94,426 +69,239 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   } // method marshal
 
-  protected static X509ProfileType getBaseCabSubscriberProfile(String desc) {
-    X509ProfileType profile = getBaseCabProfile(desc, CertLevel.EndEntity, "397d");
+  protected static XijsonCertprofileType getBaseCabSubscriberProfile(
+      String desc) {
+    XijsonCertprofileType profile =
+        getBaseCabProfile(desc, CertLevel.EndEntity, "397d");
 
     //profile.setNotAfterMode(NotAfterMode.BY_CA);
-
-    // SubjectToSubjectAltName
-    SubjectToSubjectAltNameType s2sType = new SubjectToSubjectAltNameType();
-    profile.getSubjectToSubjectAltNames().add(s2sType);
-    s2sType.setSource(createOidType(DN.CN));
-    s2sType.setTarget(GeneralNameTag.DNSName);
 
     // Extensions
     // Extensions - controls
     List<ExtensionType> list = profile.getExtensions();
-    list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
-    list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
-    last(list).setCrlDistributionPoints(createCrlDistibutoionPoints());
+    list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
+    list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
 
     // Extensions - SubjectAltNames
-    list.add(createExtension(Extension.subjectAlternativeName, true, false));
-    GeneralNameType san = new GeneralNameType();
+    list.add(createExtension(ExtensionID.subjectAltName, true, false));
+    GeneralNameType san = new GeneralNameType(
+        Arrays.asList(GeneralNameTag.DNSName, GeneralNameTag.IPAddress));
     last(list).setSubjectAltName(san);
-    san.addTags(GeneralNameTag.DNSName, GeneralNameTag.IPAddress);
 
     // Extensions - basicConstraints
-    list.add(createExtension(Extension.basicConstraints, true, true));
+    list.add(createExtension(ExtensionID.basicConstraints, true, true));
 
     // Extensions - AuthorityInfoAccess
-    list.add(createExtension(Extension.authorityInfoAccess, true, false));
+    list.add(createExtension(ExtensionID.authorityInfoAccess, true, false));
     last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
 
     // Extensions - AuthorityKeyIdentifier
-    list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+    list.add(createExtension(ExtensionID.authorityKeyIdentifier, true, false));
 
     // Extensions - keyUsage
-    list.add(createExtension(Extension.keyUsage, true, true));
+    list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment, KeyUsage.keyEncipherment},
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment},
         null));
 
     // Extensions - extenedKeyUsage
-    list.add(createExtension(Extension.extendedKeyUsage, true, false));
+    list.add(createExtension(ExtensionID.extKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_serverAuth},
-        new ASN1ObjectIdentifier[]{ObjectIdentifiers.XKU.id_kp_clientAuth}));
+        new ExtendedKeyUsageID[]{ExtendedKeyUsageID.serverAuth},
+        new ExtendedKeyUsageID[]{ExtendedKeyUsageID.clientAuth}));
 
     // Extensions - CTLog
-    list.add(createExtension(Extn.id_SCTs, true, false));
+    list.add(createExtension(ExtensionID.signedCertificateTimestampList,
+        true, false));
 
     return profile;
   } // method getBaseCabSubscriberProfile
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type) {
-    return rdn(type, 1, 1, null, null, null);
+  protected static RdnType rdn(AttributeType type) {
+    return rdn(type, 1, 1, null, null);
   }
 
-  protected static RdnType rdn01(ASN1ObjectIdentifier type) {
-    return rdn(type, 0, 1, null, null, null);
+  protected static RdnType rdn01(AttributeType type) {
+    return rdn(type, 0, 1, null, null);
   }
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max) {
-    return rdn(type, min, max, null, null, null);
+  protected static RdnType rdn(AttributeType type, int min, int max) {
+    return rdn(type, min, max, null, null);
   }
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
-                               String regex, String prefix, String suffix) {
-    return rdn(type, min, max, regex, prefix, suffix, null);
+  protected static RdnType rdn(
+      AttributeType type, int min, int max, String regex) {
+    return rdn(type, min, max, regex, null);
   }
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
-                               String regex, String prefix, String suffix, String group) {
-    return rdn(type, min, max, regex, prefix, suffix, group, null);
+  protected static RdnType rdn(
+      AttributeType type, int min, int max, String regex, String value) {
+    return rdn(type, min, max, regex, value, null);
   }
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type, int min, int max,
-                               String regex, String prefix, String suffix, String group, ValueType value) {
-    RdnType ret = new RdnType();
-    ret.setType(createOidType(type));
-    if (min != 1) {
-      ret.setMinOccurs(min);
-    }
-
-    if (max != 1) {
-      ret.setMaxOccurs(max);
-    }
-
-    if (regex != null) {
-      ret.setRegex(regex);
-    }
-
-    if (StringUtil.isNotBlank(prefix)) {
-      ret.setPrefix(prefix);
-    }
-
-    if (StringUtil.isNotBlank(suffix)) {
-      ret.setSuffix(suffix);
-    }
-
-    if (StringUtil.isNotBlank(group)) {
-      ret.setGroup(group);
-    }
-
-    if (value != null) {
-      ret.setValue(value);
-    }
-
-    if (NOT_IN_SUBJECT_RDNS.contains(type)) {
-      ret.setNotInSubject(Boolean.TRUE);
-    }
-
+  protected static RdnType rdn(
+      AttributeType type, int min, int max, String regex, String value,
+      GeneralNameTag toSAN) {
+    RdnType ret = new RdnType(type, value, min, max);
+    ret.setRegex(regex);
+    ret.setToSAN(toSAN);
     return ret;
   } // method createRdn
 
-  protected static RdnType rdn(ASN1ObjectIdentifier type, String regex, String group, ValueType value) {
-    RdnType ret = new RdnType();
-    ret.setType(createOidType(type));
-    ret.setValue(value);
-
-    if (regex != null) {
-      ret.setRegex(regex);
-    }
-
-    if (StringUtil.isNotBlank(group)) {
-      ret.setGroup(group);
-    }
-
+  protected static RdnType rdn(
+      AttributeType type, String regex, String value) {
+    RdnType ret = new RdnType(type, value, null, null);
+    ret.setRegex(regex);
     return ret;
   } // method createRdn
 
-  protected static X509ProfileType getBaseCabProfile(String description, CertLevel certLevel, String validity) {
-    return getBaseCabProfile(description, certLevel, validity, false);
-  }
-
-  protected static X509ProfileType getBaseCabProfile(
-      String description, CertLevel certLevel, String validity, boolean useMidnightNotBefore) {
-    X509ProfileType profile = new X509ProfileType();
+  protected static XijsonCertprofileType getBaseCabProfile(
+      String description, CertLevel certLevel, String validity) {
+    XijsonCertprofileType profile = new XijsonCertprofileType();
 
     profile.setMetadata(createDescription(description));
 
     profile.setCertDomain(CertDomain.CABForumBR);
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(6000 * 3 / 4);
-    profile.setVersion(X509CertVersion.v3);
+    profile.setMaxSize(7500);
     profile.setValidity(validity);
-    profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
+    profile.setNotBeforeTime("current");
 
     if (certLevel == CertLevel.EndEntity) {
-      profile.setKeypairGeneration(new KeypairGenerationType());
-      profile.getKeypairGeneration().setInheritCA(true);
+      profile.setKeypairGeneration(BuilderUtil.createKeypairGenControl(
+          KeypairGenMode.INHERITCA, null));
     }
 
     // SignatureAlgorithms
-    List<String> algos = new LinkedList<>();
+    List<SignSpec> algos = Arrays.asList(
+        SignSpec.RSA_SHA256,
+        SignSpec.RSA_SHA384,
+        SignSpec.RSA_SHA512,
+        SignSpec.ECDSA_SHA256,
+        SignSpec.ECDSA_SHA384,
+        SignSpec.ECDSA_SHA512,
+        SignSpec.RSAPSS_SHA256,
+        SignSpec.RSAPSS_SHA384,
+        SignSpec.RSAPSS_SHA512);
     profile.setSignatureAlgorithms(algos);
 
-    String[] sigHashAlgos = new String[]{"SHA512", "SHA384", "SHA256"};
-
-    String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withRSAandMGF1"};
-    for (String part2 : algoPart2s) {
-      for (String hashAlgo : sigHashAlgos) {
-        algos.add(hashAlgo + part2);
-      }
-    }
-
     // Subject
-    Subject subject = new Subject();
-    profile.setSubject(subject);
+    profile.setSubject(new ArrayList<>());
 
     // Key
-    profile.setKeyAlgorithms(createCabKeyAlgorithms());
+    profile.setKeyAlgorithms(BuilderUtil.createKeyAlgorithmTypes(
+        AllowKeyMode.RSA, AllowKeyMode.EC_SECP));
 
     return profile;
   } // method getBaseCabProfile
 
-  protected static X509ProfileType getBaseProfile(String description, CertLevel certLevel, String validity) {
-    return  getBaseProfile(description, certLevel, validity, true);
+  protected static XijsonCertprofileType getBaseProfile(
+      String description, CertLevel certLevel, String validity,
+      KeypairGenMode keypairGenMode, AllowKeyMode... allowedKeyMode) {
+    return getBaseProfile(description, certLevel, validity,
+        false, keypairGenMode, allowedKeyMode);
   }
 
-  protected static X509ProfileType getBaseProfile(
-      String description, CertLevel certLevel, String validity, boolean withEddsa) {
-    return getBaseProfile(description, certLevel, validity, false, withEddsa);
-  }
-
-  protected static X509ProfileType getBaseProfile(
-      String description, CertLevel certLevel, String validity, boolean useMidnightNotBefore, boolean withEddsa) {
-    X509ProfileType profile = new X509ProfileType();
+  protected static XijsonCertprofileType getBaseProfile(
+      String description, CertLevel certLevel, String validity,
+      boolean useMidnightNotBefore,
+      KeypairGenMode keypairGenMode,
+      AllowKeyMode... allowedKeyModes) {
+    XijsonCertprofileType profile = new XijsonCertprofileType();
 
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(4500);
-    profile.setVersion(X509CertVersion.v3);
+    profile.setMaxSize(7500);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
     if (certLevel == CertLevel.EndEntity) {
-      profile.setKeypairGeneration(new KeypairGenerationType());
-      profile.getKeypairGeneration().setInheritCA(true);
+      profile.setKeypairGeneration(BuilderUtil.createKeypairGenControl(
+          keypairGenMode,
+          allowedKeyModes == null || allowedKeyModes.length == 0
+              ? AllowKeyMode.RSA : allowedKeyModes[0]));
     }
 
     // SignatureAlgorithms
-    List<String> algos = new LinkedList<>();
+    List<SignSpec> algos = Arrays.asList(
+        SignSpec.RSA_SHA256,
+        SignSpec.RSA_SHA384,
+        SignSpec.RSA_SHA512,
+        SignSpec.ECDSA_SHA256,
+        SignSpec.ECDSA_SHA384,
+        SignSpec.ECDSA_SHA512,
+        SignSpec.RSAPSS_SHA256,
+        SignSpec.RSAPSS_SHA384,
+        SignSpec.RSAPSS_SHA512,
+        SignSpec.ECDSA_SHAKE128,
+        SignSpec.ECDSA_SHAKE256,
+        SignSpec.RSAPSS_SHAKE128,
+        SignSpec.RSAPSS_SHAKE256,
+        SignSpec.ED25519,
+        SignSpec.ED448,
+        SignSpec.SM2_SM3);
+
     profile.setSignatureAlgorithms(algos);
 
-    String[] sigHashAlgos = new String[]{"SHA3-512", "SHA3-384", "SHA3-256", "SHA3-224",
-      "SHA512", "SHA384", "SHA256", "SHA1"};
-
-    String[] algoPart2s = new String[]{"withRSA", "withDSA", "withECDSA", "withRSAandMGF1"};
-    for (String part2 : algoPart2s) {
-      for (String hashAlgo : sigHashAlgos) {
-        algos.add(hashAlgo + part2);
-      }
-    }
-
-    String part2 = "withPlainECDSA";
-    for (String hashAlgo : sigHashAlgos) {
-      if (!hashAlgo.startsWith("SHA3-")) {
-        algos.add(hashAlgo + part2);
-      }
-    }
-
-    algos.addAll(Arrays.asList("SM3withSM2", "Ed25519", "Ed448", "SHAKE128withRSAPSS",
-        "SHAKE256withRSAPSS", "SHAKE128withECDSA", "SHAKE256withECDSA"));
-
     // Subject
-    Subject subject = new Subject();
-    profile.setSubject(subject);
-
-    ASN1ObjectIdentifier[] curveIds = (CertLevel.EndEntity != certLevel) ? null :
-      new ASN1ObjectIdentifier[] {
-              SECObjectIdentifiers.secp256r1, SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1,
-              TeleTrusTObjectIdentifiers.brainpoolP256r1, TeleTrusTObjectIdentifiers.brainpoolP384r1,
-              TeleTrusTObjectIdentifiers.brainpoolP512r1, GMObjectIdentifiers.sm2p256v1};
+    profile.setSubject(new ArrayList<>());
 
     // Key
-    profile.setKeyAlgorithms(createKeyAlgorithms(curveIds, certLevel, withEddsa));
+    profile.setKeyAlgorithms(
+        BuilderUtil.createKeyAlgorithmTypes(allowedKeyModes));
 
     return profile;
   } // method getBaseProfile
 
-  protected static X509ProfileType getEeBaseProfileForEdwardsOrMontgomeryCurves(String description,
-      String validity, boolean edwards, boolean curve25519) {
-    X509ProfileType profile = new X509ProfileType();
+  protected static XijsonCertprofileType
+      getEeBaseProfileForEdwardsOrMontgomeryCurves(
+          String description, String validity,
+          boolean edwards, boolean curve25519) {
+    XijsonCertprofileType profile = new XijsonCertprofileType();
 
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(CertLevel.EndEntity);
-    profile.setMaxSize(4500);
-    profile.setVersion(X509CertVersion.v3);
+    profile.setMaxSize(7500);
     profile.setValidity(validity);
     profile.setNotBeforeTime("current");
 
-    KeypairGenerationType kpGen = new KeypairGenerationType();
-    profile.setKeypairGeneration(kpGen);
-    KeyType keyType;
-    ASN1ObjectIdentifier algorithm;
+    AllowKeyMode allowKeyMode;
     if (edwards) {
-      keyType = curve25519 ? KeyType.ED25519 : KeyType.ED448;
-      algorithm = curve25519 ? EdECConstants.id_ED25519 : EdECConstants.id_ED448;
+      allowKeyMode = curve25519 ? AllowKeyMode.ED25519 : AllowKeyMode.ED448;
     } else {
-      keyType = curve25519 ? KeyType.X25519 : KeyType.X448;
-      algorithm = curve25519 ? EdECConstants.id_X25519 : EdECConstants.id_X448;
+      allowKeyMode = curve25519 ? AllowKeyMode.X25519 : AllowKeyMode.X448;
     }
-    kpGen.setAlgorithm(createOidType(algorithm));
-    kpGen.setKeyType(keyType);
+
+    profile.setKeypairGeneration(BuilderUtil.createKeypairGenControl(
+        KeypairGenMode.FIRST_ALLOWED_KEY, allowKeyMode));
 
     // SignatureAlgorithm
-    List<String> algos = new LinkedList<>();
+    List<SignSpec> algos = Arrays.asList(
+        SignSpec.ED25519,
+        SignSpec.ED448);
+
     profile.setSignatureAlgorithms(algos);
-    algos.add("Ed25519");
-    algos.add("Ed448");
 
     // Subject
-    Subject subject = new Subject();
-    profile.setSubject(subject);
+    profile.setSubject(new ArrayList<>());
+
+    // public key
+    profile.setKeyAlgorithms(BuilderUtil.createKeyAlgorithmTypes(allowKeyMode));
 
     // KeyUsage
-
     KeyUsage[] usages = edwards
-      ? new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.contentCommitment}
-      : new KeyUsage[]{KeyUsage.keyAgreement};
+        ? new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.contentCommitment}
+        : new KeyUsage[]{KeyUsage.keyAgreement};
 
-    List<AlgorithmType> keyAlgorithms = createEdwardsOrMontgomeryKeyAlgorithms(edwards, curve25519, !curve25519);
-
-    profile.setKeyAlgorithms(keyAlgorithms);
     List<ExtensionType> extensions = profile.getExtensions();
-    extensions.add(createExtension(Extension.keyUsage, true, true));
+    extensions.add(createExtension(ExtensionID.keyUsage, true, true));
     last(extensions).setKeyUsage(createKeyUsage(usages, null));
 
     return profile;
   } // method getEeBaseProfileForEdwardsOrMontgomeryCurves
-
-  protected static List<AlgorithmType> createCabKeyAlgorithms() {
-    // RSA
-    List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
-
-    // DSA
-    list.add(new AlgorithmType());
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-    last(list).setParameters(new KeyParametersType());
-
-    DsaParametersType dsaParams = new DsaParametersType();
-    last(list).getParameters().setDsa(dsaParams);
-
-    dsaParams.setP(Arrays.asList(2048, 3072));
-    dsaParams.setQ(Arrays.asList(224, 256));
-
-    // EC
-    list.add(new AlgorithmType());
-
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
-    last(list).setParameters(new KeyParametersType());
-
-    EcParametersType ecParams = new EcParametersType();
-    last(list).getParameters().setEc(ecParams);
-
-    ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[] {
-            SECObjectIdentifiers.secp256r1, SECObjectIdentifiers.secp384r1, SECObjectIdentifiers.secp521r1};
-    List<DescribableOid> curves = new LinkedList<>();
-    ecParams.setCurves(curves);
-
-    for (ASN1ObjectIdentifier curveId : curveIds) {
-      String name = AlgorithmUtil.getCurveName(curveId);
-      curves.add(createOidType(curveId, name));
-    }
-
-    ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
-
-    return list;
-  } // method createCabKeyAlgorithms
-
-  protected static List<AlgorithmType> createKeyAlgorithms(
-      ASN1ObjectIdentifier[] curveIds, CertLevel certLevel, boolean withEddsa) {
-    // RSA
-    List<AlgorithmType> list = new LinkedList<>(createRSAKeyAlgorithms());
-
-    // DSA
-    list.add(new AlgorithmType());
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-    last(list).setParameters(new KeyParametersType());
-
-    DsaParametersType dsaParams = new DsaParametersType();
-    last(list).getParameters().setDsa(dsaParams);
-
-    dsaParams.setP(Arrays.asList(1024, 2048, 3072));
-    dsaParams.setQ(Arrays.asList(160, 224, 256));
-
-    // EC
-    list.add(new AlgorithmType());
-
-    last(list).getAlgorithms().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
-    last(list).setParameters(new KeyParametersType());
-
-    EcParametersType ecParams = new EcParametersType();
-    last(list).getParameters().setEc(ecParams);
-
-    if (curveIds != null && curveIds.length > 0) {
-      List<DescribableOid> curves = new LinkedList<>();
-      ecParams.setCurves(curves);
-
-      for (ASN1ObjectIdentifier curveId : curveIds) {
-        String name = AlgorithmUtil.getCurveName(curveId);
-        curves.add(createOidType(curveId, name));
-      }
-    }
-
-    ecParams.setPointEncodings(Collections.singletonList(((byte) 4)));
-
-    // EdDSA
-    if (withEddsa) {
-      list.addAll(createEdwardsOrMontgomeryKeyAlgorithms(true, true, true));
-    }
-
-    return list;
-  } // method createKeyAlgorithms
-
-  protected static List<AlgorithmType> createEdwardsOrMontgomeryKeyAlgorithms(
-      boolean edwards, boolean curve25519, boolean curve448) {
-    List<AlgorithmType> list = new LinkedList<>();
-
-    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-    if (edwards) {
-      if (curve25519) {
-        oids.add(EdECConstants.id_ED25519);
-      }
-
-      if (curve448) {
-        oids.add(EdECConstants.id_ED448);
-      }
-    } else {
-      if (curve25519) {
-        oids.add(EdECConstants.id_X25519);
-      }
-
-      if (curve448) {
-        oids.add(EdECConstants.id_X448);
-      }
-    }
-
-    for (ASN1ObjectIdentifier oid : oids) {
-      list.add(new AlgorithmType());
-      last(list).getAlgorithms().add(createOidType(oid));
-    }
-
-    return list;
-  } // method createEdwardsOrMontgomeryKeyAlgorithms
-
-  protected static List<AlgorithmType> createRSAKeyAlgorithms() {
-    List<AlgorithmType> list = new LinkedList<>();
-
-    list.add(new AlgorithmType());
-    last(list).getAlgorithms().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
-    last(list).setParameters(new KeyParametersType());
-
-    RsaParametersType rsaParams = new RsaParametersType();
-    rsaParams.setModulus(Arrays.asList(2048, 3072, 4096));
-    last(list).getParameters().setRsa(rsaParams);
-
-    return list;
-  } // method createRSAKeyAlgorithms
 
   protected static <T> T last(List<T> list) {
     if (list == null || list.isEmpty()) {
@@ -524,8 +312,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   } // method last
 
-  protected static void addRdns(X509ProfileType profile, RdnType... rdns) {
-    List<RdnType> list = profile.getSubject().getRdns();
+  protected static void addRdns(
+      XijsonCertprofileType profile, RdnType... rdns) {
+    List<RdnType> list = profile.getSubject();
     Collections.addAll(list, rdns);
   }
 

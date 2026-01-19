@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
@@ -9,8 +9,8 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.CompareUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CompareUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
@@ -40,7 +40,8 @@ public class IssuerEntry {
 
   private CertRevocationInfo revocationInfo;
 
-  public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
+  public IssuerEntry(int id, X509Cert cert)
+      throws CertificateEncodingException {
     this.id = id;
     this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.getNotBefore();
@@ -54,7 +55,8 @@ public class IssuerEntry {
     try {
       Certificate bcCert = Certificate.getInstance(encodedCert);
       encodedName = bcCert.getSubject().getEncoded("DER");
-      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData()
+                    .getBytes();
     } catch (IllegalArgumentException | IOException ex) {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
@@ -36,7 +36,8 @@ class IssuerStore {
     for (IssuerEntry issuer : issuers) {
       int id = issuer.getId();
       if (newIds.contains(id)) {
-        throw new IllegalArgumentException("issuer with the same id " + id + " duplicated");
+        throw new IllegalArgumentException(
+            "issuer with the same id " + id + " duplicated");
       }
       newIds.add(id);
     }
@@ -84,7 +85,8 @@ class IssuerStore {
   }
 
   public void setCrlInfos(Map<Integer, CrlInfo> crlInfos) {
-    this.crlInfos = crlInfos == null ? Collections.emptyMap() : new HashMap<>(crlInfos);
+    this.crlInfos = crlInfos == null ? Collections.emptyMap()
+                    : new HashMap<>(crlInfos);
   }
 
   public CrlInfo getCrlInfo(int crlInfoId) {

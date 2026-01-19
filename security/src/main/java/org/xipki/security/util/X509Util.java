@@ -1,75 +1,47 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.util;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Encoding;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.DERUniversalString;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.DSAParameter;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.BadInputException;
-import org.xipki.security.EdECConstants;
+import org.xipki.security.Asn1StreamParser;
 import org.xipki.security.FpIdCalculator;
+import org.xipki.security.KeySpec;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.asn1.Asn1StreamParser;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.PemEncoder;
-import org.xipki.util.PemEncoder.PemLabel;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.security.X509Crl;
+import org.xipki.security.exception.BadInputException;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.misc.PemEncoder;
+import org.xipki.util.extra.misc.PemEncoder.PemLabel;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -84,12 +56,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.NoSuchProviderException;
 import java.security.cert.CRLException;
-import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -100,7 +70,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static org.xipki.util.Args.notNull;
+import static org.xipki.util.codec.Args.notNull;
 
 /**
  * X.509 certificate utility class.
@@ -110,9 +80,11 @@ import static org.xipki.util.Args.notNull;
  */
 
 public class X509Util {
+
   private static final Logger LOG = LoggerFactory.getLogger(X509Util.class);
 
-  private static final byte[] BEGIN_PEM = StringUtil.toUtf8Bytes("-----BEGIN");
+  private static final byte[] BEGIN_PEM =
+      StringUtil.toUtf8Bytes("-----BEGIN");
 
   private static final byte[] END_PEM = StringUtil.toUtf8Bytes("-----END");
 
@@ -120,9 +92,7 @@ public class X509Util {
 
   private static final String BEGIN_CERTIFICATE = "-----BEGIN CERTIFICATE-----";
 
-  private static final String END_CERTIFICATE = "-----END CERTIFICATE-----";
-
-  private static final byte[] PEM_PREFIX = StringUtil.toUtf8Bytes("-----BEGIN");
+  private static final String END_CERTIFICATE   = "-----END CERTIFICATE-----";
 
   private static CertificateFactory certFact;
 
@@ -132,13 +102,13 @@ public class X509Util {
   }
 
   public static String getCommonName(X500Name name) {
-    RDN[] rdns = notNull(name, "name").getRDNs(ObjectIdentifiers.DN.CN);
+    RDN[] rdns = notNull(name, "name").getRDNs(OIDs.DN.commonName);
     if (rdns != null && rdns.length > 0) {
       RDN rdn = rdns[0];
       AttributeTypeAndValue atv = null;
       if (rdn.isMultiValued()) {
         for (AttributeTypeAndValue m : rdn.getTypesAndValues()) {
-          if (m.getType().equals(ObjectIdentifiers.DN.CN)) {
+          if (m.getType().equals(OIDs.DN.commonName)) {
             atv = m;
             break;
           }
@@ -161,33 +131,37 @@ public class X509Util {
     return new X500Name(newRdn);
   }
 
-  public static X509Cert parseCert(File file) throws IOException, CertificateException {
+  public static X509Cert parseCert(File file)
+      throws IOException, CertificateException {
     return parseCert(IoUtil.read(
         IoUtil.expandFilepath(notNull(file, "file"))));
   }
 
-  public static List<X509Cert> parseCerts(byte[] certsBytes) throws IOException, CertificateException {
+  public static List<X509Cert> parseCerts(byte[] certsBytes)
+      throws IOException, CertificateException {
     try (InputStream is = new ByteArrayInputStream(certsBytes)) {
       return parseCerts(is);
     }
   }
 
-  public static List<X509Cert> parseCerts(File certsFile) throws IOException, CertificateException {
+  public static List<X509Cert> parseCerts(File certsFile)
+      throws IOException, CertificateException {
     try (InputStream is = Files.newInputStream(certsFile.toPath())) {
       return parseCerts(is);
     }
   }
 
   /**
-   * Read a list of X.509 certificates from the input stream consisting of several
-   * PEM certificates.
+   * Read a list of X.509 certificates from the input stream consisting of
+   * several PEM certificates.
    * The specified stream remains open after this method returns.
    * @param certsStream the input stream of PEM certificates.
    * @return a list of X.509 certificates.
    * @throws IOException if IO error occurs while reading the input stream.
    * @throws CertificateException if error occurs parsing the certificates.
    */
-  private static List<X509Cert> parseCerts(InputStream certsStream) throws IOException, CertificateException {
+  private static List<X509Cert> parseCerts(InputStream certsStream)
+      throws IOException, CertificateException {
     List<X509Cert> certs = new LinkedList<>();
     try (PemReader pemReader = new PemReader(
         new InputStreamReader(certsStream, StandardCharsets.UTF_8))) {
@@ -201,11 +175,13 @@ public class X509Util {
     return certs;
   }
 
-  public static X509Cert parseCert(byte[] bytes) throws CertificateEncodingException {
+  public static X509Cert parseCert(byte[] bytes)
+      throws CertificateEncodingException {
     byte[] certBytes = null;
-    if (CompareUtil.areEqual(notNull(bytes, "bytes"), 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
-      try (PemReader r = new PemReader(
-          new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
+    if (CompareUtil.areEqual(notNull(bytes, "bytes"), 0,
+        BEGIN_PEM, 0, BEGIN_PEM.length)) {
+      try (PemReader r = new PemReader(new InputStreamReader(
+          new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
         PemObject obj;
         while (true) {
           obj = r.readPemObject();
@@ -233,17 +209,21 @@ public class X509Util {
       byte[] derBytes = toDerEncoded(certBytes);
       return new X509Cert(new X509CertificateHolder(derBytes), derBytes);
     } catch (IOException ex) {
-      throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage(), ex);
+      throw new CertificateEncodingException(
+          "error decoding certificate: " + ex.getMessage(), ex);
     }
   }
 
   public static CertificationRequest parseCsr(File file) throws IOException {
-    return parseCsr(IoUtil.read(IoUtil.expandFilepath(notNull(file, "file"))));
+    return parseCsr(IoUtil.read(
+        IoUtil.expandFilepath(notNull(file, "file"))));
   }
 
-  public static CertificationRequest parseCsr(byte[] csrBytes) throws IOException {
+  public static CertificationRequest parseCsr(byte[] csrBytes)
+      throws IOException {
     try {
-      return CertificationRequest.getInstance(toDerEncoded(notNull(csrBytes, "csrBytes")));
+      return CertificationRequest.getInstance(toDerEncoded(
+          notNull(csrBytes, "csrBytes")));
     } catch (IllegalArgumentException ex) {
       throw new IOException("invalid CSR bytes", ex);
     }
@@ -282,26 +262,29 @@ public class X509Util {
         }
 
         byte[] base64Bytes = new byte[base64End - base64Start + 1];
-        System.arraycopy(bytes, base64Start, base64Bytes, 0, base64Bytes.length);
+        System.arraycopy(bytes, base64Start, base64Bytes, 0,
+            base64Bytes.length);
         return Base64.decode(base64Bytes);
       }
     }
 
     // check whether base64 encoded
-    if (Base64.containsOnlyBase64Chars(bytes, 0, 10)) {
+    if (Base64.getEncoder().containsOnlyValidChars(bytes, 0, 10)) {
       return Base64.decode(bytes);
     }
 
     return bytes;
   } // method toDerEncoded
 
-  private static CertificateFactory getCertFactory() throws CertificateException {
+  private static CertificateFactory getCertFactory()
+      throws CertificateException {
     synchronized (certFactLock) {
       if (certFact == null) {
         try {
           certFact = CertificateFactory.getInstance("X.509", "BC");
         } catch (NoSuchProviderException ex) {
-          throw new CertificateException("NoSuchProviderException: " + ex.getMessage());
+          throw new CertificateException(
+              "NoSuchProviderException: " + ex.getMessage());
         }
       }
       return certFact;
@@ -309,10 +292,12 @@ public class X509Util {
   }
 
   public static String toPemCert(X509Cert cert) {
-    return StringUtil.toUtf8String(PemEncoder.encode(notNull(cert, "cert").getEncoded(), PemLabel.CERTIFICATE));
+    return StringUtil.toUtf8String(PemEncoder.encode(
+        notNull(cert, "cert").getEncoded(), PemLabel.CERTIFICATE));
   }
 
-  public static X509Certificate parseX509Certificate(byte[] bytes) throws CertificateException {
+  public static X509Certificate parseX509Certificate(byte[] bytes)
+      throws CertificateException {
     try (InputStream is = new ByteArrayInputStream(notNull(bytes, "bytes"))) {
       return (X509Certificate) getCertFactory().generateCertificate(is);
     } catch (IOException e) {
@@ -320,13 +305,16 @@ public class X509Util {
     }
   }
 
-  public static X509CRLHolder parseCrl(File file) throws IOException, CRLException {
-    return parseCrl(Files.readAllBytes(IoUtil.expandFilepath(notNull(file, "file")).toPath()));
+  public static X509Crl parseCrl(File file) throws IOException, CRLException {
+    return parseCrl(Files.readAllBytes(IoUtil.expandFilepath(
+        notNull(file, "file")).toPath()));
   }
 
-  public static X509CRLHolder parseCrl(byte[] encodedCrl) throws CRLException {
+  public static X509Crl parseCrl(byte[] encodedCrl) throws CRLException {
     try {
-      return new X509CRLHolder(toDerEncoded(notNull(encodedCrl, "encodedCrl")));
+      byte[] encoded = toDerEncoded(notNull(encodedCrl, "encodedCrl"));
+      X509CRLHolder bcCrl = new X509CRLHolder(encodedCrl);
+      return new X509Crl(bcCrl, encoded);
     } catch (IOException ex) {
       throw new CRLException("the given one is not a valid X.509 CRL");
     }
@@ -337,7 +325,8 @@ public class X509Util {
   }
 
   public static long fpCanonicalizedName(X500Name name) {
-    return FpIdCalculator.hash(StringUtil.toUtf8Bytes(canonicalizeName(notNull(name, "name"))));
+    return FpIdCalculator.hash(StringUtil.toUtf8Bytes(
+        canonicalizeName(notNull(name, "name"))));
   }
 
   @Deprecated
@@ -346,7 +335,8 @@ public class X509Util {
   }
 
   public static String canonicalizeName(X500Name name) {
-    ASN1ObjectIdentifier[] tmpTypes = notNull(name, "name").getAttributeTypes();
+    ASN1ObjectIdentifier[] tmpTypes =
+        notNull(name, "name").getAttributeTypes();
     int len = tmpTypes.length;
     List<String> types = new ArrayList<>(len);
     for (ASN1ObjectIdentifier type : tmpTypes) {
@@ -374,7 +364,8 @@ public class X509Util {
             }
           }
         } else {
-          values.add(IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase());
+          values.add(IETFUtils.valueToString(rdn.getFirst().getValue())
+              .toLowerCase());
         }
       } // end for(j)
 
@@ -397,17 +388,17 @@ public class X509Util {
       return ((ASN1String) value).getString();
     } else {
       try {
-        return "#" + Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
+        return "#" + Hex.encode(
+            value.toASN1Primitive().getEncoded(ASN1Encoding.DER));
       } catch (IOException ex) {
         throw new IllegalArgumentException("other value has no encoded form");
       }
     }
   }
 
-  public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> usages) {
-    if (CollectionUtil.isEmpty(usages)) {
-      return null;
-    }
+  public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(
+      Set<KeyUsage> usages) {
+    Args.notEmpty(usages, "usages");
 
     int usage = 0;
     for (KeyUsage keyUsage : usages) {
@@ -417,10 +408,9 @@ public class X509Util {
     return new org.bouncycastle.asn1.x509.KeyUsage(usage);
   }
 
-  public static ExtendedKeyUsage createExtendedUsage(Collection<ASN1ObjectIdentifier> usages) {
-    if (CollectionUtil.isEmpty(usages)) {
-      return null;
-    }
+  public static ExtendedKeyUsage createExtendedUsage(
+      Collection<ASN1ObjectIdentifier> usages) {
+    Args.notNull(usages, "usages");
 
     List<ASN1ObjectIdentifier> list = new ArrayList<>(usages);
     list.sort(Comparator.comparing(ASN1ObjectIdentifier::getId));
@@ -437,7 +427,8 @@ public class X509Util {
   }
 
   // sort the list and remove duplicated OID.
-  private static List<ASN1ObjectIdentifier> removeDuplication(List<ASN1ObjectIdentifier> oids) {
+  private static List<ASN1ObjectIdentifier> removeDuplication(
+      List<ASN1ObjectIdentifier> oids) {
     List<ASN1ObjectIdentifier> res = new ArrayList<>(oids.size());
     for (ASN1ObjectIdentifier n : oids) {
       if (!res.contains(n)) {
@@ -447,7 +438,8 @@ public class X509Util {
     return res;
   }
 
-  public static byte[] getCoreExtValue(Extensions extensions, ASN1ObjectIdentifier extnType) {
+  public static byte[] getCoreExtValue(
+      Extensions extensions, ASN1ObjectIdentifier extnType) {
     if (extensions == null) {
       return null;
     }
@@ -464,11 +456,9 @@ public class X509Util {
    * @param targetCert certificate for which the certificate path will be built
    * @param certs collection of certificates.
    * @return the certificate path
-   * @throws CertPathBuilderException
-   *           If a valid certificate path can not be built.
    */
-  public static X509Cert[] buildCertPath(X509Cert targetCert, Collection<X509Cert> certs)
-      throws CertPathBuilderException {
+  public static X509Cert[] buildCertPath(
+      X509Cert targetCert, Collection<X509Cert> certs) {
     return buildCertPath(targetCert, certs, true);
   }
 
@@ -476,15 +466,19 @@ public class X509Util {
    * Build the certificate path. Cross certificate will not be considered.
    * @param targetCert certificate for which the certificate path will be built
    * @param certs collection of certificates.
-   * @param includeTargetCert whether to include {@code targetCert} in the result.
+   * @param includeTargetCert whether to include {@code targetCert} in the
+   *        result.
    * @return the certificate path
    */
-  public static X509Cert[] buildCertPath(X509Cert targetCert, Collection<X509Cert> certs, boolean includeTargetCert) {
+  public static X509Cert[] buildCertPath(
+      X509Cert targetCert, Collection<X509Cert> certs,
+      boolean includeTargetCert) {
     return buildCertPath(targetCert, certs, null, includeTargetCert);
   }
 
   public static X509Cert[] buildCertPath(
-      X509Cert targetCert, Collection<X509Cert> certs, Collection<X509Cert> trustanchors, boolean includeTargetCert) {
+      X509Cert targetCert, Collection<X509Cert> certs,
+      Collection<X509Cert> trustanchors, boolean includeTargetCert) {
     Args.notNull(targetCert, "cert");
 
     if (trustanchors == null) {
@@ -492,29 +486,29 @@ public class X509Util {
     }
 
     if (!trustanchors.isEmpty()) {
-      Set<X509Cert> coll = certs == null ? new HashSet<>() : new HashSet<>(certs);
+      Set<X509Cert> coll = certs == null ? new HashSet<>()
+          : new HashSet<>(certs);
+
       coll.addAll(trustanchors);
       certs = coll;
     }
 
     List<X509Cert> certChain = new LinkedList<>();
     certChain.add(targetCert);
-    try {
-      if (certs != null && !targetCert.isSelfSigned()) {
-        while (true) {
-          X509Cert caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
-          if (caCert == null) {
-            break;
-          }
-          certChain.add(caCert);
-          if (caCert.isSelfSigned() || trustanchors.contains(caCert)) {
-            // reaches root self-signed certificate or trustanchor
-            break;
-          }
+    if (certs != null && !targetCert.isSelfSigned()) {
+      while (true) {
+        X509Cert caCert = getCaCertOf(
+            certChain.get(certChain.size() - 1), certs);
+
+        if (caCert == null) {
+          break;
+        }
+        certChain.add(caCert);
+        if (caCert.isSelfSigned() || trustanchors.contains(caCert)) {
+          // reaches root self-signed certificate or trustanchor
+          break;
         }
       }
-    } catch (CertificateEncodingException ex) {
-      LOG.warn("CertificateEncodingException: {}", ex.getMessage());
     }
 
     if (!trustanchors.isEmpty()) {
@@ -560,9 +554,11 @@ public class X509Util {
     return sb.toString();
   }
 
-  public static List<X509Cert> listCertificates(String encodedCerts) throws CertificateException, IOException {
+  public static List<X509Cert> listCertificates(String encodedCerts)
+      throws CertificateException, IOException {
     List<X509Cert> certs = new LinkedList<>();
-    try (BufferedReader reader = new BufferedReader(new StringReader(encodedCerts));
+    try (BufferedReader reader =
+             new BufferedReader(new StringReader(encodedCerts));
          ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
       String line;
       while ((line = reader.readLine()) != null) {
@@ -579,7 +575,8 @@ public class X509Util {
     return certs;
   }
 
-  private static X509Cert getCaCertOf(X509Cert cert, Collection<X509Cert> caCerts) throws CertificateEncodingException {
+  private static X509Cert getCaCertOf(
+      X509Cert cert, Collection<X509Cert> caCerts) {
     if (notNull(cert, "cert").isSelfSigned()) {
       return null;
     }
@@ -636,52 +633,16 @@ public class X509Util {
     return issues;
   } // method issues
 
-  public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
-      throws InvalidKeySpecException {
-    ASN1ObjectIdentifier algOid = notNull(publicKeyInfo, "publicKeyInfo").getAlgorithm().getAlgorithm();
-    ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
-
-    if (PKCSObjectIdentifiers.rsaEncryption.equals(algOid)) {
-      if (DERNull.INSTANCE.equals(keyParameters)) {
-        return publicKeyInfo;
-      } else {
-        AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-        return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-      }
-    } else if (X9ObjectIdentifiers.id_dsa.equals(algOid)) {
-      if (keyParameters == null) {
-        return publicKeyInfo;
-      } else if (DERNull.INSTANCE.equals(keyParameters)) {
-        AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid);
-        return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-      } else {
-        try {
-          DSAParameter.getInstance(keyParameters);
-        } catch (IllegalArgumentException ex) {
-          throw new InvalidKeySpecException("keyParameters is not null and Dss-Parms");
-        }
-        return publicKeyInfo;
-      }
-    } else if (X9ObjectIdentifiers.id_ecPublicKey.equals(algOid)
-        || algOid.getId().equals("1.3.132.1.12")) { // id-ECDH
-      if (keyParameters == null) {
-        throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
-      }
-      try {
-        ASN1ObjectIdentifier.getInstance(keyParameters);
-      } catch (IllegalArgumentException ex) {
-        throw new InvalidKeySpecException("keyParameters is not an OBJECT IDENTIFIER");
-      }
-      return publicKeyInfo;
-    } else if (EdECConstants.isEdwardsOrMontgomeryCurve(algOid)) {
-      if (keyParameters == null) {
-        return publicKeyInfo;
-      } else {
-        return new SubjectPublicKeyInfo(new AlgorithmIdentifier(algOid), publicKeyInfo.getPublicKeyData().getBytes());
-      }
-    } else {
+  public static SubjectPublicKeyInfo toRfc3279Style(
+      SubjectPublicKeyInfo publicKeyInfo) {
+    KeySpec keySpec = KeySpec.ofPublicKey(publicKeyInfo);
+    if (keySpec == null || publicKeyInfo.getAlgorithm().equals(
+                              keySpec.getAlgorithmIdentifier())) {
       return publicKeyInfo;
     }
+
+    return new SubjectPublicKeyInfo(keySpec.getAlgorithmIdentifier(),
+            publicKeyInfo.getPublicKeyData());
   } // method toRfc3279Style
 
   public static String cutText(String text, int maxLen) {
@@ -695,7 +656,8 @@ public class X509Util {
     return cutText(x500NameText(name), maxLen);
   }
 
-  public static Extension createExtnSubjectAltName(List<String> taggedValues, boolean critical)
+  public static Extension createExtnSubjectAltName(
+      List<String> taggedValues, boolean critical)
       throws BadInputException {
     GeneralNames names = createGeneralNames(taggedValues);
     if (names == null) {
@@ -703,13 +665,15 @@ public class X509Util {
     }
 
     try {
-      return new Extension(Extension.subjectAlternativeName, critical, names.getEncoded());
+      return new Extension(OIDs.Extn.subjectAlternativeName,
+          critical, names.getEncoded());
     } catch (IOException ex) {
       throw new IllegalStateException(ex.getMessage(), ex);
     }
   } // method createExtnSubjectAltName
 
-  public static Extension createExtnSubjectInfoAccess(List<String> accessMethodAndLocations, boolean critical)
+  public static Extension createExtnSubjectInfoAccess(
+      List<String> accessMethodAndLocations, boolean critical)
       throws BadInputException {
     if (CollectionUtil.isEmpty(accessMethodAndLocations)) {
       return null;
@@ -721,34 +685,41 @@ public class X509Util {
     }
     ASN1Sequence seq = new DERSequence(vector);
     try {
-      return new Extension(Extension.subjectInfoAccess, critical, seq.getEncoded());
+      return new Extension(OIDs.Extn.subjectInfoAccess,
+          critical, seq.getEncoded());
     } catch (IOException ex) {
       throw new IllegalStateException(ex.getMessage(), ex);
     }
   } // method createExtnSubjectInfoAccess
 
-  private static AccessDescription createAccessDescription(String accessMethodAndLocation) throws BadInputException {
+  private static AccessDescription createAccessDescription(
+      String accessMethodAndLocation) throws BadInputException {
     ConfPairs pairs;
     try {
-      pairs = new ConfPairs(notNull(accessMethodAndLocation, "accessMethodAndLocation"));
+      pairs = new ConfPairs(notNull(accessMethodAndLocation,
+          "accessMethodAndLocation"));
     } catch (IllegalArgumentException ex) {
-      throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
+      throw new BadInputException("invalid accessMethodAndLocation " +
+          accessMethodAndLocation);
     }
 
     Set<String> oids = pairs.names();
     if (oids == null || oids.size() != 1) {
-      throw new BadInputException("invalid accessMethodAndLocation " + accessMethodAndLocation);
+      throw new BadInputException("invalid accessMethodAndLocation " +
+          accessMethodAndLocation);
     }
 
     String accessMethodS = oids.iterator().next();
     String taggedValue = pairs.value(accessMethodS);
-    ASN1ObjectIdentifier accessMethod = new ASN1ObjectIdentifier(accessMethodS);
+    ASN1ObjectIdentifier accessMethod =
+        new ASN1ObjectIdentifier(accessMethodS);
 
     GeneralName location = createGeneralName(taggedValue);
     return new AccessDescription(accessMethod, location);
   } // method createAccessDescription
 
-  private static GeneralNames createGeneralNames(List<String> taggedValues) throws BadInputException {
+  private static GeneralNames createGeneralNames(List<String> taggedValues)
+      throws BadInputException {
     if (CollectionUtil.isEmpty(taggedValues)) {
       return null;
     }
@@ -763,13 +734,14 @@ public class X509Util {
 
   /**
   * Creates {@link GeneralName} from the tagged value.
-  * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is
-  *     type=value.
+  * @param taggedValue [tag]value, and the value for tags otherName and
+   *       ediPartyName is type=value.
   * @return the created {@link GeneralName}
   * @throws BadInputException
   *         if the {@code taggedValue} is invalid.
   */
-  private static GeneralName createGeneralName(String taggedValue) throws BadInputException {
+  private static GeneralName createGeneralName(String taggedValue)
+      throws BadInputException {
     String tagS = null;
     String value = null;
     if (Args.notBlank(taggedValue, "taggedValue").charAt(0) == '[') {
@@ -780,33 +752,14 @@ public class X509Util {
       }
     }
 
-    int tag;
-    try {
-      if ("0".equals(tagS) || "othername".equals(tagS)) {
-        tag = 0;
-      } else if ("1".equals(tagS) || "email".equals(tagS) || "rfc822".equals(tagS)) {
-        tag = 1;
-      } else if ("2".equals(tagS) || "dns".equals(tagS) || "dnsname".equals(tagS)) {
-        tag = 2;
-      } else if ("4".equals(tagS) || "dirname".equals(tagS)) {
-        tag = 4;
-      } else if ("5".equals(tagS) || "edi".equals(tagS)) {
-        tag = 5;
-      } else if ("6".equals(tagS) || "uri".equals(tagS)) {
-        tag = 6;
-      } else if ("7".equals(tagS) || "ip".equals(tagS) || "ipaddress".equals(tagS)) {
-        tag = 7;
-      } else if ("8".equals(tagS) || "rid".equals(tagS) || "registeredid".equals(tagS)) {
-        tag = 8;
-      } else {
-        throw new BadInputException("unknown tag " + tagS);
-      }
-    } catch (NumberFormatException ex) {
-      throw new BadInputException("invalid tag '" + tagS + "'");
-    }
+    int tag = getTag(tagS);
 
     switch (tag) {
       case GeneralName.otherName: {
+        if (value == null) {
+          throw new BadInputException("invalid otherName: null");
+        }
+
         int idxSep = value.indexOf("=");
         if (idxSep == -1 || idxSep == 0 || idxSep == value.length() - 1) {
           throw new BadInputException("invalid otherName " + value);
@@ -819,9 +772,11 @@ public class X509Util {
 
         ASN1Encodable asn1Value;
         if (StringUtil.startsWithIgnoreCase(otherValue, "printablestring:")) {
-          asn1Value = new DERPrintableString(otherValue.substring("printablestring:".length()));
+          // "printablestring:".length() = 16
+          asn1Value = new DERPrintableString(otherValue.substring(16));
         } else if (StringUtil.startsWithIgnoreCase(otherValue, "utf8string:")) {
-          asn1Value = new DERUTF8String(otherValue.substring("utf8string:".length()));
+          // "utf8string:".length() = 11
+          asn1Value = new DERUTF8String(otherValue.substring(11));
         } else {
           asn1Value = new DERUTF8String(otherValue);
         }
@@ -839,6 +794,10 @@ public class X509Util {
       case GeneralName.directoryName:
         return new GeneralName(tag, reverse(new X500Name(value)));
       case GeneralName.ediPartyName: {
+        if (value == null) {
+          throw new BadInputException("invalid ediPartyName: null");
+        }
+
         int idxSep = value.indexOf("=");
         if (idxSep == -1 || idxSep == value.length() - 1) {
           throw new BadInputException("invalid ediPartyName " + value);
@@ -847,9 +806,12 @@ public class X509Util {
         String partyName = value.substring(idxSep + 1);
         ASN1EncodableVector vector = new ASN1EncodableVector();
         if (nameAssigner != null) {
-          vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
+          vector.add(new DERTaggedObject(false, 0,
+              new DirectoryString(nameAssigner)));
         }
-        vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
+
+        vector.add(new DERTaggedObject(false, 1,
+            new DirectoryString(partyName)));
         return new GeneralName(tag, new DERSequence(vector));
       }
       default:
@@ -857,20 +819,56 @@ public class X509Util {
     } // end switch (tag)
   } // method createGeneralName
 
+  private static int getTag(String tagS) throws BadInputException {
+    try {
+      if ("0".equals(tagS) || "othername".equals(tagS)) {
+        return 0;
+      } else if ("1".equals(tagS) || "email".equals(tagS) ||
+          "rfc822".equals(tagS)) {
+        return 1;
+      } else if ("2".equals(tagS) || "dns".equals(tagS) ||
+          "dnsname".equals(tagS)) {
+        return 2;
+      } else if ("4".equals(tagS) || "dirname".equals(tagS)) {
+        return 4;
+      } else if ("5".equals(tagS) || "edi".equals(tagS)) {
+        return 5;
+      } else if ("6".equals(tagS) || "uri".equals(tagS)) {
+        return 6;
+      } else if ("7".equals(tagS) || "ip".equals(tagS) ||
+          "ipaddress".equals(tagS)) {
+        return 7;
+      } else if ("8".equals(tagS) || "rid".equals(tagS) ||
+          "registeredid".equals(tagS)) {
+        return 8;
+      } else {
+        throw new BadInputException("unknown tag " + tagS);
+      }
+    } catch (NumberFormatException ex) {
+      throw new BadInputException("invalid tag '" + tagS + "'");
+    }
+  }
+
   public static String formatCert(X509Cert cert, boolean verbose) {
     if (cert == null) {
       return "  null";
     }
 
-    StringBuilder sb = new StringBuilder(verbose ? 1000 : 100);
-    sb.append("  issuer:       ").append(x500NameText(cert.getIssuer())).append('\n');
-    sb.append("  serialNumber: ").append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
-    sb.append("  subject:      ").append(x500NameText(cert.getSubject())).append('\n');
-    sb.append("  notBefore:    ").append(cert.getNotBefore()).append("\n");
-    sb.append("  notAfter:     ").append(cert.getNotAfter());
-
-    if (verbose) {
-      sb.append("\n  encoded:      ").append(Base64.encodeToString(cert.getEncoded()));
+    StringBuilder sb = new StringBuilder(verbose ? 2000 : 100);
+    if (!verbose) {
+      sb.append("  issuer:       ")
+          .append(x500NameText(cert.getIssuer())).append('\n');
+      sb.append("  serialNumber: ")
+          .append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
+      sb.append("  subject:      ")
+          .append(x500NameText(cert.getSubject())).append('\n');
+      sb.append("  notBefore:    ").append(cert.getNotBefore()).append("\n");
+      sb.append("  notAfter:     ").append(cert.getNotAfter());
+    } else {
+      sb.append(cert.toString(1));
+      sb.append("\n  encoded:      ")
+          .append(Base64.getNoPaddingEncoder()
+              .encodeToString(cert.getEncoded()));
     }
 
     return sb.toString();
@@ -879,8 +877,9 @@ public class X509Util {
   public static Extensions getExtensions(CertificationRequestInfo csr) {
     ASN1Set attrs = notNull(csr, "csr").getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
-      org.bouncycastle.asn1.pkcs.Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType())) {
+      org.bouncycastle.asn1.pkcs.Attribute attr =
+          Attribute.getInstance(attrs.getObjectAt(i));
+      if (OIDs.PKCS9.pkcs9_at_extensionRequest.equals(attr.getAttrType())) {
         return Extensions.getInstance(attr.getAttributeValues()[0]);
       }
     }
@@ -888,11 +887,13 @@ public class X509Util {
   } // method getExtensions
 
   public static String getChallengePassword(CertificationRequestInfo csr) {
-    Attribute attr = getAttribute(csr, PKCSObjectIdentifiers.pkcs_9_at_challengePassword);
-    return attr == null ? null : ((ASN1String) attr.getAttributeValues()[0]).getString();
+    Attribute attr = getAttribute(csr, OIDs.PKCS9.pkcs9_at_challengePassword);
+    return attr == null ? null
+        : ((ASN1String) attr.getAttributeValues()[0]).getString();
   }
 
-  public static Attribute getAttribute(CertificationRequestInfo csr, ASN1ObjectIdentifier type) {
+  public static Attribute getAttribute(
+      CertificationRequestInfo csr, ASN1ObjectIdentifier type) {
     Args.notNull(type, "type");
     ASN1Set attrs = notNull(csr, "csr").getAttributes();
     for (int i = 0; i < attrs.size(); i++) {
@@ -904,7 +905,8 @@ public class X509Util {
     return null;
   } // method getChallengePassword
 
-  public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf) throws InvalidConfException {
+  public static List<X509Cert> parseCerts(List<FileOrBinary> certsConf)
+      throws InvalidConfException {
     if (CollectionUtil.isEmpty(certsConf)) {
       return Collections.emptyList();
     }
@@ -927,29 +929,36 @@ public class X509Util {
     return certs;
   }
 
-  public static void assertCsrAndCertMatch(CertificationRequest csr, Certificate targetCert, boolean caCertRequired)
+  public static void assertCsrAndCertMatch(
+      CertificationRequest csr, Certificate targetCert, boolean caCertRequired)
       throws XiSecurityException {
     CertificationRequestInfo cri = csr.getCertificationRequestInfo();
 
     try {
-      if (!Arrays.equals(cri.getSubject().getEncoded(), targetCert.getSubject().getEncoded())) {
-        throw new XiSecurityException("CSR and certificate do not have the same subject");
+      if (!Arrays.equals(cri.getSubject().getEncoded(),
+          targetCert.getSubject().getEncoded())) {
+        throw new XiSecurityException(
+            "CSR and certificate do not have the same subject");
       }
 
       if (!Arrays.equals(cri.getSubjectPublicKeyInfo().getEncoded(),
           targetCert.getSubjectPublicKeyInfo().getEncoded())) {
-        throw new XiSecurityException("CSR and certificate do not have the same SubjectPublicKeyInfo");
+        throw new XiSecurityException(
+            "CSR and certificate do not have the same SubjectPublicKeyInfo");
       }
 
       if (caCertRequired) {
-        Extension extn = targetCert.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
-        BasicConstraints bc = extn == null ? null : BasicConstraints.getInstance(extn.getParsedValue());
+        Extension extn = targetCert.getTBSCertificate().getExtensions()
+                          .getExtension(OIDs.Extn.basicConstraints);
+        BasicConstraints bc = extn == null ? null
+            : BasicConstraints.getInstance(extn.getParsedValue());
         if (bc == null || !bc.isCA()) {
           throw new XiSecurityException("targetCert is not a CA certificate");
         }
       }
     } catch (IOException | RuntimeException ex) {
-      throw new XiSecurityException("error while encoding Subject or SubjectPublicKeyInfo");
+      throw new XiSecurityException(
+          "error while encoding Subject or SubjectPublicKeyInfo");
     }
   }
 
@@ -972,14 +981,17 @@ public class X509Util {
   private static long extractTime(byte[] certBytes, String fieldName) {
     byte[] bytes = extractCertField(certBytes, fieldName);
     if (bytes[0] == BERTags.UTC_TIME) {
-      return Time.getInstance(ASN1UTCTime.getInstance(bytes)).getDate().getTime() / 1000;
+      return Time.getInstance(ASN1UTCTime.getInstance(bytes))
+              .getDate().getTime() / 1000;
     } else {
-      return Time.getInstance(ASN1GeneralizedTime.getInstance(bytes)).getDate().getTime() / 1000;
+      return Time.getInstance(ASN1GeneralizedTime.getInstance(bytes))
+              .getDate().getTime() / 1000;
     }
   }
 
   private static byte[] extractCertField(byte[] certBytes, String fieldName) {
-    try (BufferedInputStream instream = new BufferedInputStream(new ByteArrayInputStream(certBytes))) {
+    try (BufferedInputStream instream =
+             new BufferedInputStream(new ByteArrayInputStream(certBytes))) {
       // SEQUENCE of Certificate
       Asn1StreamParser.skipTagLen(instream);
 
@@ -994,13 +1006,16 @@ public class X509Util {
 
       // issuer
       if ("issuer".equalsIgnoreCase(fieldName)) {
-        return Asn1StreamParser.readBlock(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, instream, "issuer");
+        return Asn1StreamParser.readBlock(
+            Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE,
+            instream, "issuer");
       } else {
         Asn1StreamParser.skipField(instream);
       }
 
       // Validity
-      if ("notBefore".equalsIgnoreCase(fieldName) || "notAfter".equalsIgnoreCase(fieldName)) {
+      if ("notBefore".equalsIgnoreCase(fieldName) ||
+          "notAfter".equalsIgnoreCase(fieldName)) {
         Asn1StreamParser.skipTagLen(instream);
 
         // notBefore
@@ -1021,13 +1036,25 @@ public class X509Util {
       }
 
       if ("subject".equalsIgnoreCase(fieldName)) {
-        return Asn1StreamParser.readBlock(Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE, instream, "subject");
+        return Asn1StreamParser.readBlock(
+            Asn1StreamParser.TAG_CONSTRUCTED_SEQUENCE,
+            instream, "subject");
       }
     } catch (IOException e) {
       throw new RuntimeException("invalid certificate", e);
     }
 
     throw new IllegalArgumentException("unknown fieldName " + fieldName);
+  }
+
+  public static ASN1Object readAsn1Encodable(byte[] encoded)
+      throws IOException {
+    ASN1StreamParser parser = new ASN1StreamParser(encoded);
+    ASN1Object obj = parser.readObject().toASN1Primitive();
+    if (null != parser.readObject()) {
+      throw new IOException("could not read ASN.1 object");
+    }
+    return obj;
   }
 
 }

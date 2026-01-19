@@ -1,14 +1,13 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 import java.io.IOException;
 
@@ -28,7 +27,9 @@ public class CaIdentifierRequest extends SdkRequest{
 
   private final byte[] authorityKeyIdentifier;
 
-  protected CaIdentifierRequest(byte[] issuerCertSha1Fp, X500NameType issuer, byte[] authorityKeyIdentifier) {
+  protected CaIdentifierRequest(
+      byte[] issuerCertSha1Fp, X500NameType issuer,
+      byte[] authorityKeyIdentifier) {
     this.issuerCertSha1Fp = issuerCertSha1Fp;
     this.issuer = issuer;
     this.authorityKeyIdentifier = authorityKeyIdentifier;
@@ -61,11 +62,13 @@ public class CaIdentifierRequest extends SdkRequest{
     }
 
     if (issuerCertSha1Fp != null) {
-      sb.append("SHA1(cert)=").append(Hex.toHexString(issuerCertSha1Fp)).append(",");
+      sb.append("SHA1(cert)=").append(Hex.toHexString(issuerCertSha1Fp))
+          .append(",");
     }
 
     if (authorityKeyIdentifier != null) {
-      sb.append("AKI=").append(Hex.toHexString(authorityKeyIdentifier)).append(",");
+      sb.append("AKI=").append(Hex.toHexString(authorityKeyIdentifier))
+          .append(",");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append(")");
@@ -74,26 +77,27 @@ public class CaIdentifierRequest extends SdkRequest{
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     encode0(encoder, 0);
   }
 
-  protected void encode0(CborEncoder encoder, int subClassFieldSize) throws IOException, EncodeException {
-    encoder.writeArrayStart(3 + subClassFieldSize);
-    encoder.writeByteString(issuerCertSha1Fp);
-    encoder.writeObject(issuer);
-    encoder.writeByteString(authorityKeyIdentifier);
+  protected void encode0(CborEncoder encoder, int subClassFieldSize)
+      throws CodecException {
+    encoder.writeArrayStart(3 + subClassFieldSize)
+        .writeByteString(issuerCertSha1Fp)
+        .writeObject(issuer).writeByteString(authorityKeyIdentifier);
   }
 
-  public static CaIdentifierRequest decode(byte[] encoded) throws DecodeException {
+  public static CaIdentifierRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CaIdentifierRequest", decoder, 3);
       return new CaIdentifierRequest(
-          decoder.readByteString(),
-          X500NameType.decode(decoder),
+          decoder.readByteString(), X500NameType.decode(decoder),
           decoder.readByteString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
     }
   }
 

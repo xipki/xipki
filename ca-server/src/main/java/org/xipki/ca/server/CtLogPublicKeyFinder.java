@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -10,8 +10,8 @@ import org.xipki.ca.server.CaServerConf.CtLogConf;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.IoUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +28,8 @@ import java.util.List;
  */
 public class CtLogPublicKeyFinder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CtLogPublicKeyFinder.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CtLogPublicKeyFinder.class);
 
   private final byte[][] logIds;
 
@@ -44,7 +45,8 @@ public class CtLogPublicKeyFinder {
       keyFiles = new File(keydirName).listFiles(pathname -> {
         String name = pathname.getName();
         return pathname.isFile()
-            && (name.endsWith(".pem") || name.endsWith(".der") || name.endsWith(".key") || name.endsWith(".publickey"));
+            && (name.endsWith(".pem") || name.endsWith(".der")
+                || name.endsWith(".key") || name.endsWith(".publickey"));
       });
     }
 
@@ -65,13 +67,14 @@ public class CtLogPublicKeyFinder {
       try {
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);
         byte[] logId = HashAlgo.SHA256.hash(spki.getEncoded());
-        PublicKey key = KeyUtil.generatePublicKey(spki);
+        PublicKey key = KeyUtil.getPublicKey(spki);
 
         logIdList.add(logId);
         publicKeyList.add(key);
         LOG.info("loaded CtLog public key {}", m.getName());
       } catch (IOException | InvalidKeySpecException ex) {
-        LogUtil.error(LOG, ex, "could not load CtLog public key " + m.getName());
+        LogUtil.error(LOG, ex,
+            "could not load CtLog public key " + m.getName());
       }
     }
 

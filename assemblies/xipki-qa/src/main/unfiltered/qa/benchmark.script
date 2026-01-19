@@ -38,17 +38,20 @@ if { "$printUsage" equals "true" } then {
     }
   }
 
+  action = $(xi:lowercase "$action")
+
   if { "$action" equals "enroll" } then {
 
     echo "Sleeping 1 second"
     sleep 1
 
     # Loadtest RSA key
-    echo "Enroll benchmark"
+    echo "Benchmark Enroll"
     xiqa:benchmark-enroll  --ca subca --duration $duration --thread $threads \
-      --key-type RSA --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
+      --keyspec rsa2048 --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
       --profile TLS -n 5 --random-dn O
 
+    echo "Benchmark Enroll (server generate keypair)"
     xiqa:benchmark-enroll-serverkeygen --ca subca --duration $duration --thread $threads \
       --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
       --profile TLS -n 5 --random-dn O

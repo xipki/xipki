@@ -26,7 +26,7 @@
 	"signers":{
 		"default":{
 			"type":"pkcs12",
-			"conf":"password=$[gateway.https.keyPassword],keystore=file:keycerts/gateway-server.p12,algo=SHA256withECDSA"
+			"conf":"password=$[gateway.https.keyPassword],keystore=file:keycerts/gateway-server.p12"
 		}
 	}
 }

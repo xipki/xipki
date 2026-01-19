@@ -1,15 +1,13 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
 import org.xipki.security.CrlReason;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 
@@ -34,12 +32,13 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     super.encode0(encoder, 1);
     encoder.writeObjects(entries);
   }
 
-  public static RevokeCertsRequest decode(byte[] encoded) throws DecodeException {
+  public static RevokeCertsRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("RevokeCertsRequest", decoder, 4);
       return new RevokeCertsRequest(
@@ -48,7 +47,8 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
           decoder.readByteString(),
           Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
     }
   }
 
@@ -66,7 +66,8 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
      */
     private final Instant invalidityTime;
 
-    public Entry(BigInteger serialNumber, CrlReason reason, Instant invalidityTime) {
+    public Entry(BigInteger serialNumber, CrlReason reason,
+                 Instant invalidityTime) {
       this.serialNumber = serialNumber;
       this.reason = reason;
       this.invalidityTime = invalidityTime;
@@ -85,14 +86,12 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(3);
-      encoder.writeBigInt(serialNumber);
-      encoder.writeEnumObj(reason);
-      encoder.writeInstant(invalidityTime);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(3).writeBigInt(serialNumber)
+          .writeEnumObj(reason).writeInstant(invalidityTime);
     }
 
-    public static Entry decode(CborDecoder decoder) throws DecodeException {
+    public static Entry decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(3)) {
           return null;
@@ -103,15 +102,14 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
         String str = decoder.readTextString();
         CrlReason reason = (str == null) ? null : CrlReason.valueOf(str);
 
-        return new Entry(
-            serialNumber, reason,
-            decoder.readInstant());
+        return new Entry(serialNumber, reason, decoder.readInstant());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    public static Entry[] decodeArray(CborDecoder decoder)
+        throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

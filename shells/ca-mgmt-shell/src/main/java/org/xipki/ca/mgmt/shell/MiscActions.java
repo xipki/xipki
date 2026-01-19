@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -14,7 +14,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.shell.CmdFailure;
-import org.xipki.util.IoUtil;
+import org.xipki.util.io.IoUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,16 +30,18 @@ import java.util.List;
  */
 public class MiscActions {
 
-  @Command(scope = "ca", name = "export-conf", description = "export configuration to zip file")
+  @Command(scope = "ca", name = "export-conf", description =
+      "export configuration to zip file")
   @Service
   public static class ExportConf extends CaAction {
 
-    @Option(name = "--conf-file", required = true, description = "zip file that saves the exported configuration")
+    @Option(name = "--conf-file", required = true, description =
+        "zip file that saves the exported configuration")
     @Completion(FileCompleter.class)
     private String confFile;
 
-    @Option(name = "--ca", multiValued = true,
-        description = "CAs whose configuration should be exported. Empty list means all CAs")
+    @Option(name = "--ca", multiValued = true, description =
+        "CAs whose configuration should be exported. Empty list means all CAs")
     @Completion(CaCompleters.CaNameCompleter.class)
     private List<String> caNames;
 
@@ -47,11 +49,13 @@ public class MiscActions {
     protected Object execute0() throws Exception {
       String msg = "configuration to file " + confFile;
       try {
-        save(new File(confFile), IoUtil.readAllBytesAndClose(caManager.exportConf(caNames)));
+        save(new File(confFile),
+            IoUtil.readAllBytesAndClose(caManager.exportConf(caNames)));
         println("exported " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not export " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not export " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -61,7 +65,8 @@ public class MiscActions {
   @Service
   public static class LoadConf extends CaAction {
 
-    @Argument(name = "conf-file", required = true, description = "CA system configuration file (JSON or zip file)")
+    @Argument(name = "conf-file", required = true, description =
+        "CA system configuration file (JSON or zip file)")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -70,18 +75,21 @@ public class MiscActions {
       String msg = "configuration " + confFile;
       try {
         InputStream confStream = confFile.endsWith(".json")
-            ? CaConfs.convertFileConfToZip(confFile) : Files.newInputStream(Paths.get(confFile));
+            ? CaConfs.convertFileConfToZip(confFile)
+            : Files.newInputStream(Paths.get(confFile));
         caManager.loadConfAndClose(confStream);
         println("loaded " + msg);
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not load " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not load " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
       return null;
     }
 
   } // class LoadConf
 
-  @Command(scope = "ca", name = "notify-change", description = "notify the change of CA system")
+  @Command(scope = "ca", name = "notify-change", description =
+      "notify the change of CA system")
   @Service
   public static class NotifyChange extends CaAction {
 
@@ -93,13 +101,15 @@ public class MiscActions {
         println("notified " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not notify " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not notify " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class NotifyChange
 
-  @Command(scope = "ca", name = "republish", description = "republish certificates")
+  @Command(scope = "ca", name = "republish", description =
+      "republish certificates")
   @Service
   public static class Republish extends CaAction {
 
@@ -142,7 +152,8 @@ public class MiscActions {
         println("republished " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not republish " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not republish " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -152,7 +163,8 @@ public class MiscActions {
   @Service
   public static class RestartCa extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true, description = "CA name")
+    @Argument(index = 0, name = "name", required = true, description =
+        "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String name;
 
@@ -162,7 +174,8 @@ public class MiscActions {
         caManager.restartCa(name);
         System.out.println("restarted CA " + name);
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not restart CA " + name + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not restart CA " + name +
+            ", error: " + ex.getMessage(), ex);
       }
       return null;
     } // method execute0
@@ -178,7 +191,8 @@ public class MiscActions {
       try {
         caManager.restartCaSystem();
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not restart CA system, error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not restart CA system, error: "
+            + ex.getMessage(), ex);
       }
 
       StringBuilder sb = new StringBuilder("restarted CA system\n");
@@ -199,7 +213,8 @@ public class MiscActions {
 
   } // class Restart
 
-  @Command(scope = "ca", name = "system-status", description = "show CA system status")
+  @Command(scope = "ca", name = "system-status", description =
+      "show CA system status")
   @Service
   public static class SystemStatus extends CaAction {
 
@@ -227,17 +242,20 @@ public class MiscActions {
         println("unlocked CA system, calling ca:restart to restart CA system");
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not unlock CA system, error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not unlock CA system, error: "
+            + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class Unlock
 
-  @Command(scope = "ca", name = "ca-token-info-p11", description = "list objects in PKCS#11 device of the CA")
+  @Command(scope = "ca", name = "ca-token-info-p11", description =
+      "list objects in PKCS#11 device of the CA")
   @Service
   public static class CaTokenInfoP11 extends CaAction {
 
-    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description =
+        "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--module", description = "name of the PKCS#11 module.")
@@ -252,7 +270,8 @@ public class MiscActions {
         println(caManager.getTokenInfoP11(moduleName, slotIndex, verbose));
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not get token-info-p11, error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not get token-info-p11, error: "
+            + ex.getMessage(), ex);
       }
     } // method execute0
 

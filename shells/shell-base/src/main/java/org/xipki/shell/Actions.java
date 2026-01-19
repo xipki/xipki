@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.shell;
@@ -10,13 +10,13 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.Curl.CurlResult;
-import org.xipki.util.FileUtils;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.extra.http.Curl.CurlResult;
+import org.xipki.util.extra.http.HttpStatusCode;
+import org.xipki.util.io.FileUtils;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -40,16 +40,50 @@ import java.util.StringTokenizer;
  */
 public class Actions {
 
+  @Command(scope = "xi", name = "uppercase",
+      description = "convert to uppercase string")
+  @Service
+  public static class Uppercase extends XiAction {
+
+    @Argument(name = "text", required = true, description =
+        "text to be converted")
+    private String text;
+
+    @Override
+    protected Object execute0() throws Exception {
+      return text.toUpperCase();
+    }
+
+  } // class Uppercase
+
+  @Command(scope = "xi", name = "lowercase",
+      description = "convert to lowercase string")
+  @Service
+  public static class Lowercase extends XiAction {
+
+    @Argument(name = "text", required = true, description =
+        "text to be converted")
+    private String text;
+
+    @Override
+    protected Object execute0() throws Exception {
+      return text.toLowerCase();
+    }
+
+  } // class Lowercase
+
   @Command(scope = "xi", name = "confirm", description = "confirm an action")
   @Service
   public static class Confirm extends XiAction {
 
-    @Argument(index = 0, name = "message", required = true, description = "prompt message")
+    @Argument(name = "message", required = true, description =
+        "prompt message")
     private String prompt;
 
     @Override
     protected Object execute0() throws Exception {
-      boolean toContinue = confirm(prompt + "\nDo you want to continue", 3);
+      boolean toContinue = confirm(
+          prompt + "\nDo you want to continue", 3);
       if (!toContinue) {
         throw new CmdFailure("User cancelled");
       }
@@ -59,15 +93,18 @@ public class Actions {
 
   } // class Confirm
 
-  @Command(scope = "xi", name = "copy-dir", description = "copy content of the directory to destination")
+  @Command(scope = "xi", name = "copy-dir", description =
+      "copy content of the directory to destination")
   @Service
   public static class CopyDir extends XiAction {
 
-    @Argument(index = 0, name = "source", required = true, description = "content of this directory will be copied")
+    @Argument(name = "source", required = true, description =
+        "content of this directory will be copied")
     @Completion(Completers.DirCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true, description = "destination directory")
+    @Argument(index = 1, name = "destination", required = true, description =
+        "destination directory")
     @Completion(Completers.DirCompleter.class)
     private String dest;
 
@@ -99,13 +136,15 @@ public class Actions {
   @Service
   public static class CopyFile extends XiAction {
 
-    @Argument(index = 0, name = "files or dir", multiValued = true, required = true,
-        description = "The last one is the destination file or dir (ending with '/'),\n" +
-            "the remaining are the files to be copied")
+    @Argument(name = "files or dir", multiValued = true,
+        required = true, description =
+          "The last one is the destination file or dir (ending with '/'),\n" +
+          "the remaining are the files to be copied")
     @Completion(FileCompleter.class)
     private List<String> files;
 
-    @Option(name = "--force", aliases = "-f", description = "override existing file, never prompt")
+    @Option(name = "--force", aliases = "-f", description =
+        "override existing file, never prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
@@ -162,12 +201,15 @@ public class Actions {
       return null;
     }
 
-    private void copyFile(File sourceFile, File destFile) throws IllegalCmdParamException, IOException {
+    private void copyFile(File sourceFile, File destFile)
+      throws IllegalCmdParamException, IOException {
       if (destFile.exists()) {
         if (!destFile.isFile()) {
-          throw new IllegalCmdParamException("cannot override an existing directory by a file");
+          throw new IllegalCmdParamException(
+              "cannot override an existing directory by a file");
         } else {
-          if (!force && !confirm("Do you want to override the file " + destFile.getPath(), 3)) {
+          if (!force && !confirm(
+              "Do you want to override the file " + destFile.getPath(), 3)) {
             return;
           }
         }
@@ -180,33 +222,38 @@ public class Actions {
 
   } // class CopyFile
 
-  @Command(scope = "xi", name = "file-exists", description = "test whether file or folder exists")
+  @Command(scope = "xi", name = "file-exists", description =
+      "test whether file or folder exists")
   @Service
   public static class FileExists extends XiAction {
 
-    @Argument(name = "target", required = true, description = "file or dir to be checked")
+    @Argument(name = "target", required = true, description =
+        "file or dir to be checked")
     @Completion(FileCompleter.class)
     private String target;
 
     @Override
     protected Object execute0() throws Exception {
-      return new File(target).exists();
+      return new File(expandFilepath(target)).exists();
     }
 
   } // class CopyFile
 
-  @Command(scope = "xi", name = "base64", description = "Base64 encode / decode")
+  @Command(scope = "xi", name = "base64", description =
+      "Base64 encode / decode")
   @Service
   public static class Base64EnDecode extends XiAction {
 
     @Option(name = "--decode", aliases = "-d", description = "Decode")
     private boolean decode = false;
 
-    @Argument(index = 0, name = "source", required = true, description = "source file")
+    @Argument(name = "source", required = true, description =
+        "source file")
     @Completion(FileCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true, description = "destination file")
+    @Argument(index = 1, name = "destination", required = true, description =
+        "destination file")
     @Completion(FileCompleter.class)
     private String dest;
 
@@ -225,7 +272,8 @@ public class Actions {
       }
 
       byte[] sourceBytes = IoUtil.read(sourceFile);
-      byte[] targetBytes = decode ? Base64.decode(sourceBytes) : Base64.encodeToByte(sourceBytes, true);
+      byte[] targetBytes = decode ? Base64.decode(sourceBytes)
+          : Base64.encodeToByte(sourceBytes, true);
       IoUtil.save(dest, targetBytes);
       return null;
     }
@@ -236,22 +284,27 @@ public class Actions {
   @Service
   public static class Curl extends XiAction {
 
-    @Argument(index = 0, name = "url", required = true, description = "URL")
+    @Argument(name = "url", required = true, description = "URL")
     private String url;
 
-    @Option(name = "--verbose", aliases = "-v", description = "show request and response verbosely")
+    @Option(name = "--verbose", aliases = "-v", description =
+        "show request and response verbosely")
     private Boolean verbose = Boolean.FALSE;
 
-    @Option(name = "--post", aliases = "-p", description = "send the request via HTTP POST")
+    @Option(name = "--post", aliases = "-p", description =
+        "send the request via HTTP POST")
     private Boolean usePost = Boolean.FALSE;
 
-    @Option(name = "--data", aliases = "-d", description = "data to be sent in a POST request")
+    @Option(name = "--data", aliases = "-d", description =
+        "data to be sent in a POST request")
     private String postData;
 
-    @Option(name = "--data-charset", aliases = "-c", description = "charset of data")
+    @Option(name = "--data-charset", aliases = "-c", description =
+        "charset of data")
     private String postDataCharSet = "UTF-8";
 
-    @Option(name = "--data-file", description = "file contains the data to be sent in a POST request")
+    @Option(name = "--data-file", description =
+        "file contains the data to be sent in a POST request")
     @Completion(FileCompleter.class)
     private String postDataFile;
 
@@ -259,17 +312,19 @@ public class Actions {
     @Completion(FileCompleter.class)
     private String outFile;
 
-    @Option(name = "--header", aliases = "-h", multiValued = true, description = "header in request")
+    @Option(name = "--header", aliases = "-h", multiValued = true, description =
+        "header in request")
     private List<String> headers;
 
-    @Option(name = "--user", aliases = "-u", description = "User and password of the form user:password")
+    @Option(name = "--user", aliases = "-u", description =
+        "User and password of the form user:password")
     private String userPassword;
 
     @Option(name = "--base64", description = "Base64-encode the content")
     private boolean base64;
 
     @Reference
-    private org.xipki.util.Curl curl;
+    private org.xipki.util.extra.http.Curl curl;
 
     @Override
     protected Object execute0() throws Exception {
@@ -284,12 +339,14 @@ public class Actions {
         usePost = Boolean.TRUE;
       }
 
-      Map<String, String> headerNameValues = base64 || headers != null ? new HashMap<>() : null;
+      Map<String, String> headerNameValues = base64 || headers != null
+          ? new HashMap<>() : null;
       if (headers != null) {
         for (String header : headers) {
           int idx = header.indexOf(':');
           if (idx == -1 || idx == header.length() - 1) {
-            throw new IllegalCmdParamException("invalid HTTP header: '" + header + "'");
+            throw new IllegalCmdParamException(
+                "invalid HTTP header: '" + header + "'");
           }
 
           String key = header.substring(0, idx);
@@ -305,7 +362,8 @@ public class Actions {
         }
       }
 
-      CurlResult result = usePost ? curl.curlPost(url, verbose, headerNameValues, userPassword, content)
+      CurlResult result = usePost
+          ? curl.curlPost(url, verbose, headerNameValues, userPassword, content)
           : curl.curlGet(url, verbose, headerNameValues, userPassword);
 
       if (result.getContent() == null && result.getErrorContent() == null) {
@@ -313,9 +371,11 @@ public class Actions {
       } else {
         if (outFile != null) {
           if (result.getContent() != null) {
-            saveVerbose("saved response to file", outFile, result.getContent());
+            saveVerbose("saved response to file", outFile,
+                result.getContent());
           } else {
-            saveVerbose("saved (error) response to file", "error-" + outFile, result.getErrorContent());
+            saveVerbose("saved (error) response to file",
+                "error-" + outFile, result.getErrorContent());
           }
         } else {
           String ct = result.getContentType();
@@ -370,7 +430,8 @@ public class Actions {
   @Service
   public static class Mkdir extends XiAction {
 
-    @Argument(index = 0, name = "directory", required = true, description = "directory to be created")
+    @Argument(name = "directory", required = true, description =
+        "directory to be created")
     @Completion(Completers.DirCompleter.class)
     private String dirName;
 
@@ -388,15 +449,18 @@ public class Actions {
 
   } // class Mkdir
 
-  @Command(scope = "xi", name = "move-dir", description = "move content of the directory to destination")
+  @Command(scope = "xi", name = "move-dir", description =
+      "move content of the directory to destination")
   @Service
   public static class MoveDir extends XiAction {
 
-    @Argument(index = 0, name = "source", required = true, description = "content of this directory will be copied")
+    @Argument(name = "source", required = true, description =
+        "content of this directory will be copied")
     @Completion(Completers.DirCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true, description = "destination directory")
+    @Argument(index = 1, name = "destination", required = true, description =
+        "destination directory")
     @Completion(Completers.DirCompleter.class)
     private String dest;
 
@@ -435,15 +499,18 @@ public class Actions {
   @Service
   public static class MoveFile extends XiAction {
 
-    @Argument(index = 0, name = "source-file", required = true, description = "file to be moved")
+    @Argument(name = "source-file", required = true, description =
+        "file to be moved")
     @Completion(FileCompleter.class)
     private String source;
 
-    @Argument(index = 1, name = "destination", required = true, description = "destination file")
+    @Argument(index = 1, name = "destination", required = true, description =
+        "destination file")
     @Completion(FileCompleter.class)
     private String dest;
 
-    @Option(name = "--force", aliases = "-f", description = "override existing file, never prompt")
+    @Option(name = "--force", aliases = "-f", description =
+        "override existing file, never prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
@@ -463,9 +530,11 @@ public class Actions {
       File destFile = new File(dest);
       if (destFile.exists()) {
         if (!destFile.isFile()) {
-          throw new IllegalCmdParamException("cannot override an existing directory by a file");
+          throw new IllegalCmdParamException(
+              "cannot override an existing directory by a file");
         } else {
-          if (!force && !confirm("Do you want to override the file " + dest, 3)) {
+          if (!force && !confirm(
+              "Do you want to override the file " + dest, 3)) {
             return null;
           }
         }
@@ -485,14 +554,17 @@ public class Actions {
   @Service
   public static class Replace extends XiAction {
 
-    @Argument(name = "files", multiValued = true, required = true, description = "files to be replaced")
+    @Argument(name = "files", multiValued = true, required = true, description =
+        "files to be replaced")
     @Completion(FileCompleter.class)
     private List<String> sources;
 
-    @Option(name = "--old", required = true, multiValued = true, description = "text to be replaced")
+    @Option(name = "--old", required = true, multiValued = true, description =
+        "text to be replaced")
     private List<String> oldTexts;
 
-    @Option(name = "--new", required = true, multiValued = true, description = "new text")
+    @Option(name = "--new", required = true, multiValued = true, description =
+        "new text")
     private List<String> newTexts;
 
     @Override
@@ -521,7 +593,9 @@ public class Actions {
       return null;
     }
 
-    private void replaceFile(File file, List<String> oldTexts, List<String> newTexts) throws Exception {
+    private void replaceFile(File file, List<String> oldTexts,
+                             List<String> newTexts)
+      throws Exception {
       boolean changed = false;
       byte[] newBytes = null;
       try (BufferedReader reader = Files.newBufferedReader(file.toPath());
@@ -560,14 +634,17 @@ public class Actions {
   @Service
   public static class Rm extends XiAction {
 
-    @Argument(name = "file", required = true, multiValued = true, description = "files and directories to be deleted")
+    @Argument(name = "file", required = true, multiValued = true, description =
+        "files and directories to be deleted")
     @Completion(FileCompleter.class)
     private List<String> targetPaths;
 
-    @Option(name = "--recursive", aliases = "-r", description = "remove directories and their contents recursively")
+    @Option(name = "--recursive", aliases = "-r", description =
+        "remove directories and their contents recursively")
     private Boolean recursive = Boolean.FALSE;
 
-    @Option(name = "--force", aliases = "-f", description = "remove files without prompt")
+    @Option(name = "--force", aliases = "-f", description =
+        "remove files without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
@@ -590,12 +667,14 @@ public class Actions {
             return null;
           }
 
-          if (force || confirm("Do you want to remove directory " + targetPath, 3)) {
+          if (force || confirm(
+              "Do you want to remove directory " + targetPath, 3)) {
             FileUtils.deleteDirectory(target);
             println("removed directory " + targetPath);
           }
         } else {
-          if (force || confirm("Do you want to remove file " + targetPath, 3)) {
+          if (force || confirm(
+              "Do you want to remove file " + targetPath, 3)) {
             IoUtil.deleteFile0(target);
             println("removed file " + targetPath);
           }
@@ -607,7 +686,8 @@ public class Actions {
 
   } // class Rm
 
-  @Command(scope = "xi", name = "datetime", description = "get current date-time")
+  @Command(scope = "xi", name = "datetime", description =
+      "get current date-time")
   @Service
   public static class DateTime extends XiAction {
 
@@ -621,7 +701,8 @@ public class Actions {
     }
   }
 
-  @Command(scope = "xi", name = "osinfo", description = "get info of operation system")
+  @Command(scope = "xi", name = "osinfo", description =
+      "get info of operation system")
   @Service
   public static class OsInfo extends XiAction {
 
@@ -655,18 +736,21 @@ public class Actions {
   @Service
   public static class ExecTerminalCommand extends XiAction {
 
-    @Argument(name = "terminal command", required = true, description = "Terminal command")
+    @Argument(name = "terminal command", required = true, description =
+        "Terminal command")
     @Completion(FileCompleter.class)
     private String command;
 
     @Option(name = "--ignore-error", description = "whether ignores error")
     private Boolean ignoreError;
 
-    @Option(name = "--env", multiValued = true, description = "Environment variables")
+    @Option(name = "--env", multiValued = true, description =
+        "Environment variables")
     @Completion(FileCompleter.class)
     private String[] envs;
 
-    @Option(name = "--working-dir", aliases ="-w", multiValued = true, description = "Working dir")
+    @Option(name = "--working-dir", aliases ="-w", multiValued = true,
+        description = "Working dir")
     @Completion(Completers.DirCompleter.class)
     private String workingDir;
 
@@ -697,7 +781,7 @@ public class Actions {
       System.out.write(IoUtil.readAllBytes(process.getInputStream()));
       if (status != 0) {
         System.err.write(IoUtil.readAllBytes(process.getErrorStream()));
-        if (ignoreError == null || !ignoreError.booleanValue()){
+        if (ignoreError == null || !ignoreError){
           throw new Exception("process exited with status " + status);
         }
       }

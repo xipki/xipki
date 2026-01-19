@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.wrapper.PKCS11Constants;
+import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
@@ -13,15 +13,17 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Hex;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -35,13 +37,15 @@ public class P11SignerFactory implements SignerFactory {
 
   private static final String TYPE = "pkcs11";
 
-  private static final Set<String> types = Set.copyOf(Collections.singletonList(TYPE));
+  private static final Set<String> types =
+      Set.copyOf(Collections.singletonList(TYPE));
 
   private P11CryptServiceFactory p11CryptServiceFactory;
 
   private SecurityFactory securityFactory;
 
-  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+  public void setP11CryptServiceFactory(
+      P11CryptServiceFactory p11CryptServiceFactory) {
     this.p11CryptServiceFactory = p11CryptServiceFactory;
   }
 
@@ -60,7 +64,8 @@ public class P11SignerFactory implements SignerFactory {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(String type, SignerConf conf, X509Cert[] certificateChain)
+  public ConcurrentContentSigner newSigner(
+      String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
@@ -74,46 +79,37 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException("securityFactory is not set");
     }
 
-    String str = conf.getConfValue("parallelism");
-    int parallelism = securityFactory.getDfltSignerParallelism();
-    if (str != null) {
-      try {
-        parallelism = Integer.parseInt(str);
-      } catch (NumberFormatException ex) {
-        throw new ObjectCreationException("invalid parallelism " + str);
-      }
-
-      if (parallelism < 1) {
-        throw new ObjectCreationException("invalid parallelism " + str);
-      }
+    Integer iParallelism;
+    try {
+      iParallelism = conf.getParallelism();
+    } catch (InvalidConfException e) {
+      throw new ObjectCreationException(e);
     }
 
-    String moduleName = conf.getConfValue("module");
-    str = conf.getConfValue("slot");
-    Integer slotIndex = (str == null) ? null : Integer.parseInt(str);
+    int parallelism = Objects.requireNonNullElseGet(iParallelism,
+        () -> securityFactory.getDfltSignerParallelism());
 
-    str = conf.getConfValue("slot-id");
-    Long slotId = (str == null) ? null : Long.parseLong(str);
+    String moduleName = conf.getModule();
+    Integer slotIndex = conf.getSlot();
 
-    if ((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null)) {
-      throw new ObjectCreationException("exactly one of slot (index) and slot-id must be specified");
+    Long slotId = conf.getSlotId();
+
+    if ((slotIndex == null) == (slotId == null)) {
+      throw new ObjectCreationException(
+          "exactly one of slot (index) and slot-id must be specified");
     }
 
-    String keyLabel = conf.getConfValue("key-label");
-    str = conf.getConfValue("key-id");
-    byte[] keyId = null;
-    if (str != null) {
-      keyId = Hex.decode(str);
-    }
+    String keyLabel = conf.getKeyLabel();
+    byte[] keyId = conf.getKeyId();
 
-    if ((keyId == null && keyLabel == null) || (keyId != null && keyLabel != null)) {
-      throw new ObjectCreationException("exactly one of key-id and key-label must be specified");
+    if ((keyId == null) == (keyLabel == null)) {
+      throw new ObjectCreationException(
+          "exactly one of key-id and key-label must be specified");
     }
 
     P11Slot slot;
     try {
-      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      P11Module module = p11Service.getModule();
+      P11Module module = p11CryptServiceFactory.getP11Module(moduleName);
       P11SlotId p11SlotId = (slotId != null) ? module.getSlotIdForId(slotId)
           : module.getSlotIdForIndex(slotIndex);
       slot = module.getSlot(p11SlotId);
@@ -121,12 +117,14 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
-    String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
+    String str2 = (keyId != null) ? "id " + Hex.encode(keyId)
+        : "label " + keyLabel;
     P11Key key;
     try {
       key = slot.getKey(keyId, keyLabel);
     } catch (TokenException e) {
-      throw new ObjectCreationException("error finding identity with " + str2 + ": " + e.getMessage(), e);
+      throw new ObjectCreationException("error finding identity with "
+          + str2 + ": " + e.getMessage(), e);
     }
 
     if (key == null) {
@@ -134,8 +132,10 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     try {
-      String algoName = conf.getConfValue("algo");
-      SignAlgo algo = (algoName != null) ? SignAlgo.getInstance(algoName) : SignAlgo.getInstance(key, conf);
+      SignAlgo algo = conf.getAlgo();
+      if (algo == null) {
+        algo = SignAlgo.getInstance(key, conf);
+      }
 
       List<XiContentSigner> signers = new ArrayList<>(parallelism);
       PublicKey publicKey = null;
@@ -144,11 +144,14 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       for (int i = 0; i < parallelism; i++) {
-        XiContentSigner signer = P11ContentSigner.newInstance(key, algo, securityFactory.getRandom4Sign(), publicKey);
+        XiContentSigner signer = P11ContentSigner.newInstance(key, algo,
+            securityFactory.getRandom4Sign(), publicKey);
+
         signers.add(signer);
       }
 
-      DfltConcurrentContentSigner concurrentSigner = new DfltConcurrentContentSigner(algo.isMac(), signers);
+      DfltConcurrentContentSigner concurrentSigner =
+          new DfltConcurrentContentSigner(algo.isMac(), signers);
 
       if (certificateChain != null) {
         concurrentSigner.setCertificateChain(certificateChain);
@@ -157,12 +160,13 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       if (algo.isMac()) {
-        byte[] sha1HashOfKey = key.digestSecretKey(PKCS11Constants.CKM_SHA_1);
+        byte[] sha1HashOfKey = key.digestSecretKey(PKCS11T.CKM_SHA_1);
         concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
       }
 
       return concurrentSigner;
-    } catch (TokenException | NoSuchAlgorithmException | XiSecurityException ex) {
+    } catch (TokenException | NoSuchAlgorithmException | InvalidConfException |
+             XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method newSigner

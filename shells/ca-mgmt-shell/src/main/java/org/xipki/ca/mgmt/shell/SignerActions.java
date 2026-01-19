@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -17,9 +17,9 @@ import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Base64;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,14 +40,17 @@ public class SignerActions {
   @Service
   public static class SignerAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "signer name")
     private String name;
 
-    @Option(name = "--type", required = true, description = "type of the signer")
+    @Option(name = "--type", required = true, description =
+        "type of the signer")
     @Completion(CaCompleters.SignerTypeCompleter.class)
     private String type;
 
-    @Option(name = "--conf", required = true, description = "conf of the signer")
+    @Option(name = "--conf", required = true, description =
+        "conf of the signer")
     private String conf;
 
     @Option(name = "--cert", description = "signer certificate file")
@@ -72,13 +75,15 @@ public class SignerActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class SignerAdd
 
-  @Command(scope = "ca", name = "signer-info", description = "show information of signer")
+  @Command(scope = "ca", name = "signer-info", description =
+      "show information of signer")
   @Service
   public static class SignerInfo extends CaAction {
 
@@ -86,7 +91,8 @@ public class SignerActions {
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String name;
 
-    @Option(name = "--verbose", aliases = "-v", description = "show signer information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description =
+        "show signer information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
@@ -110,8 +116,8 @@ public class SignerActions {
           sb.append("\t").append(entry).append("\n");
         }
       } else {
-        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
-            () -> new CmdFailure("could not find signer " + name));
+        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name))
+            .orElseThrow(() -> new CmdFailure("could not find signer " + name));
         sb.append(entry.toString(verbose));
       }
 
@@ -125,7 +131,8 @@ public class SignerActions {
   @Service
   public static class SignerRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true, description = "signer name")
+    @Argument(index = 0, name = "name", required = true, description =
+        "signer name")
     @Completion(CaCompleters.SignerNameCompleter.class)
     private String name;
 
@@ -140,7 +147,8 @@ public class SignerActions {
           caManager.removeSigner(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg +
+              ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -152,7 +160,8 @@ public class SignerActions {
   @Service
   public static class SignerUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "signer name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "signer name")
     @Completion(CaCompleters.SignerNameCompleter.class)
     protected String name;
 
@@ -173,8 +182,9 @@ public class SignerActions {
       }
       String tmpType = type;
       if (tmpType == null) {
-        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name)).orElseThrow(
-            () -> new IllegalCmdParamException("please specify the type"));
+        SignerEntry entry = Optional.ofNullable(caManager.getSigner(name))
+            .orElseThrow(() ->
+                new IllegalCmdParamException("please specify the type"));
         tmpType = entry.getType();
       }
 
@@ -187,7 +197,8 @@ public class SignerActions {
       if (CaManager.NULL.equalsIgnoreCase(certFile)) {
         cert = CaManager.NULL;
       } else if (certFile != null) {
-        cert = Base64.encodeToString(X509Util.parseCert(new File(certFile)).getEncoded());
+        cert = Base64.encodeToString(X509Util.parseCert(new File(certFile))
+            .getEncoded());
       }
 
       String msg = "signer " + name;
@@ -196,7 +207,8 @@ public class SignerActions {
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

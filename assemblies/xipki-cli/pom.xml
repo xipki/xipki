@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-cli</artifactId>
   <packaging>pom</packaging>
@@ -14,14 +14,14 @@
   <properties>
     <app.name>cli</app.name>
     <shared.dir>${project.basedir}/../shared</shared.dir>
-    <patchkaraf.repos>mvn:org.xipki.feature/cli/${project.version}/xml/features</patchkaraf.repos>
-    <patchkaraf.features>(-ssh,aries-blueprint),xipki-cmp-client,xipki-scep-client,xipki-ocsp-client</patchkaraf.features>
+    <patchkaraf.repos>mvn:org.xipki/karaf-features/${project.version}/xml/features</patchkaraf.repos>
+    <patchkaraf.features>(-ssh,aries-blueprint),xipki-pki-client</patchkaraf.features>
   </properties>
   <dependencies>
     <dependency>
       <!-- project base features -->
-      <groupId>org.xipki.feature</groupId>
-      <artifactId>cli</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>karaf-features</artifactId>
       <version>${project.version}</version>
       <classifier>features</classifier>
       <type>xml</type>
@@ -83,25 +83,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <!-- Patch Karaf -->
-          <execution>
-            <id>patch-karaf</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <stripVersion>false</stripVersion>
-              <outputDirectory>${project.build.directory}/jars/system/org/osgi/org.osgi.service.metatype/${osgi.metatype.version}</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.osgi</groupId>
-                  <artifactId>org.osgi.service.metatype</artifactId>
-                  <version>${osgi.metatype.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -110,15 +91,14 @@
         <extensions>true</extensions>
         <executions>
           <execution>
-            <id>add-features-to-repo</id>
+            <id>add-karaf-features-to-repo</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
-              <repository>${project.build.directory}/jars/system</repository>
+              <repository>${project.build.directory}/karaf-jars/system</repository>
               <descriptors>
-                <descriptor>mvn:org.xipki.feature/cli/${project.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</descriptor>
                 <descriptor>mvn:org.apache.karaf.features/framework/${karaf.version}/xml/features</descriptor>
               </descriptors>
@@ -128,10 +108,22 @@
                 <feature>ssh</feature>
                 <feature>jaas</feature>
                 <feature>config</feature>
-                <!-- project-core features -->
-                <feature>xipki-cmp-client</feature>
-                <feature>xipki-ocsp-client</feature>
-                <feature>xipki-scep-client</feature>
+              </features>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-features-to-repo</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <repository>${project.build.directory}/jars/system</repository>
+              <descriptors>
+                <descriptor>mvn:org.xipki/karaf-features/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <feature>xipki-pki-client</feature>
               </features>
             </configuration>
           </execution>
@@ -145,16 +137,6 @@
             <phase>prepare-package</phase>
             <configuration>
               <target>
-                <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception
-                  presented in the log file-->
-                <java failonerror="true" classname="org.xipki.patchkaraf.PatchAppend">
-                  <arg value="--backup"/>
-                  <arg value="no"/>
-                  <arg value="--file"/>
-                  <arg file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/etc/startup.properties"/>
-                  <arg value="--value"/>
-                  <arg value="mvn\:org.osgi/org.osgi.service.metatype/${osgi.metatype.version} = 9"/>
-                </java>
                 <java failonerror="true" classname="org.xipki.patchkaraf.PatchFeature">
                   <arg value="--backup"/>
                   <arg value="no"/>
@@ -196,15 +178,15 @@
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcutil-jdk18on/${karaf.bc.version}"
-                  value="bcutil-lts8on/${bc.version}"/>
+                  value="bcutil-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcprov-jdk18on/${karaf.bc.version}"
-                  value="bcprov-lts8on/${bc.version}"/>
+                  value="bcprov-jdk18on/${bc.version}"/>
                 <replace
                   file="${project.build.directory}/apache-karaf-minimal-${karaf.version}/system/org/apache/karaf/features/standard/${karaf.version}/standard-${karaf.version}-features.xml"
                   token="bcpkix-jdk18on/${karaf.bc.version}"
-                  value="bcpkix-lts8on/${bc.version}"/>
+                  value="bcpkix-jdk18on/${bc.version}"/>
               </target>
             </configuration>
             <goals>

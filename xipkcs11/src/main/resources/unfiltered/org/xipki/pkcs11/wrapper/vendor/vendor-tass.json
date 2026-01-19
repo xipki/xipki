@@ -1,0 +1,30 @@
+{
+  "name": "TASS HSM",
+  "filter": {
+    "manufacturerIDs": [
+      "tass"
+    ]
+  },
+  "vendor": "TASS",
+  "maxFrameSize": 8192,
+  "specialBehaviours": [
+    "ECDSA_X962_SIGNATURE",
+    "SM2_X962_SIGNATURE",
+    "EC_PRIVATEKEY_ECPOINT",
+    "SM2_PRIVATEKEY_ECPOINT"
+  ],
+  "nameToCodeMap": {
+    "CKM_VENDOR_SM2_KEY_PAIR_GEN": "0x80008001",
+    "CKM_VENDOR_SM4_MAC": "0x8000010A",
+    "CKK_VENDOR_SM2": "0x80000004",
+    "CKK_VENDOR_SM4": "0x80000002",
+    "CKM_VENDOR_SM4_MAC_GENERAL": "0x8000010B",
+    "CKM_VENDOR_SM4_ECB": "0x80000108",
+    "CKM_VENDOR_SM2_SM3": "0x80008100",
+    "CKM_VENDOR_SM2": "0x80008000",
+    "CKM_VENDOR_SM4_KEY_GEN": "0x80000107",
+    "CKM_VENDOR_SM4_CBC": "0x80000109",
+    "CKM_VENDOR_SM2_ENCRYPT": "0x80008200",
+    "CKM_VENDOR_SM4_CBC_PAD": "0x8000010C"
+  }
+}

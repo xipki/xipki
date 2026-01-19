@@ -15,7 +15,7 @@
 					"http://myorg.org/subca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8081/crl/?type=crl&name=subca1"
+					"http://localhost:8081/dummy/crl/?type=crl&name=subca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"
@@ -27,10 +27,10 @@
 			"certchain":[{
 				"file":"output/rootca1.crt"
 			}],
-			"kceypairGenNames":["software"],
+			"keypairGenNames":["software"],
 			"ctlogControl":{
 				"enabled":true,
-				"servers":"https://localhost:8444/ctlog/ctlogrsa;https://localhost:8444/ctlog/ctlogec",
+				"servers":"https://localhost:8444/dummy/ctlog/ctlogrsa;https://localhost:8444/dummy/ctlog/ctlogec",
 				"sslcontext.name":"ctlog1"
 			},
 			"expirationPeriod":365,

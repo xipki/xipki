@@ -1,15 +1,18 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
 import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.IoUtil;
-import org.xipki.util.JSON;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.io.IoUtil;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -17,50 +20,53 @@ import java.nio.file.Paths;
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspConf extends ValidableConf {
+public class OcspConf {
 
   public static final String DFLT_SERVER_CONF = "ocsp/etc/ocsp-responder.json";
 
-  private boolean logReqResp;
+  private final boolean logReqResp;
 
-  private String serverConf;
+  private final String serverConf;
 
-  private SecurityConf security;
+  private final SecurityConf security;
 
-  public static OcspConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
-    notBlank(fileName, "fileName");
-    OcspConf conf = JSON.parseConf(Paths.get(IoUtil.expandFilepath(fileName, true)), OcspConf.class);
-    conf.validate();
-    return conf;
+  public OcspConf(boolean logReqResp, String serverConf,
+                  SecurityConf security) {
+    this.logReqResp = logReqResp;
+    this.serverConf = serverConf;
+    this.security = security;
+  }
+
+  public static OcspConf readConfFromFile(String fileName)
+      throws IOException, InvalidConfException {
+    Args.notBlank(fileName, "fileName");
+    try {
+      Path path = Paths.get(IoUtil.expandFilepath(fileName, true));
+      return parse(JsonParser.parseMap(path, true));
+    } catch (RuntimeException | CodecException e) {
+      throw new InvalidConfException("error parsing " + fileName + ": " +
+          e.getMessage(), e);
+    }
   }
 
   public boolean isLogReqResp() {
     return logReqResp;
   }
 
-  public void setLogReqResp(boolean logReqResp) {
-    this.logReqResp = logReqResp;
-  }
-
   public String getServerConf() {
     return serverConf == null ? DFLT_SERVER_CONF : serverConf;
-  }
-
-  public void setServerConf(String serverConf) {
-    this.serverConf = serverConf;
   }
 
   public SecurityConf getSecurity() {
     return security == null ? SecurityConf.DEFAULT : security;
   }
 
-  public void setSecurity(SecurityConf security) {
-    this.security = security;
-  }
+  public static OcspConf parse(JsonMap json) throws CodecException {
+    JsonMap map = json.getMap("security");
+    SecurityConf security = (map == null) ? null : SecurityConf.parse(map);
 
-  @Override
-  public void validate() throws InvalidConfException {
-    validate(security);
+    return new OcspConf(json.getBool("logReqResp", false),
+        json.getString("serverConf"), security);
   }
 
 }

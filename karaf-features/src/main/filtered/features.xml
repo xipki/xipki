@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
+          name="pki-${project.version}"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
+  <feature name="xipki-pki-client"
+           version="${project.version}"
+           description="PKI client shell">
+    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
+    <bundle>mvn:org.xipki/xipkcs11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/xicodec/${project.version}</bundle>
+    <bundle>mvn:org.xipki/xiutil/${project.version}</bundle>
+    <bundle>mvn:org.xipki/xihsm/${project.version}</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki/util-extra/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/pki-client/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/pki-client-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-ca-mgmt"
+           version="${project.version}"
+           description="CA management shell">
+    <feature>xipki-pki-client</feature>
+    <bundle>mvn:net.lingala.zip4j/zip4j/${zip4j.version}</bundle>
+    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
+    <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt/${project.version}</bundle>
+    <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-qa"
+           version="${project.version}"
+           description="QA">
+    <feature>xipki-ca-mgmt</feature>
+    <bundle>mvn:org.xipki/ca-sdk/${project.version}</bundle>
+    <bundle>mvn:org.xipki/qa/${project.version}</bundle>
+    <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>
+  </feature>
+</features>

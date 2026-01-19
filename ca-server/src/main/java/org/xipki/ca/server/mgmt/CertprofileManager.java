@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.mgmt;
@@ -12,35 +12,36 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.ctrl.ExtensionControl;
+import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
+import org.xipki.ca.api.profile.ctrl.PublicKeyControl;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
-import org.xipki.ca.sdk.KeyType;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.pki.ErrorCode;
-import org.xipki.pki.OperationException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.TripleState;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.security.KeySpec;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.security.exception.OperationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.type.TripleState;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 /**
  * Manages the certificate profiles.
  *
- * @author Lijun Liao (xipki)
+ * @author Lijun Liao
  */
 
 class CertprofileManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CertprofileManager.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CertprofileManager.class);
 
   private boolean certprofilesInitialized;
 
@@ -93,7 +94,8 @@ class CertprofileManager {
     certprofilesInitialized = true;
   } // method initCertprofiles
 
-  void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
+  void removeCertprofileFromCa(String profileName, String caName)
+      throws CaMgmtException {
     manager.assertMasterMode();
 
     profileName = Args.toNonBlankLower(profileName, "profileName");
@@ -118,14 +120,16 @@ class CertprofileManager {
     }
   } // method removeCertprofileFromCa
 
-  void addCertprofileToCa(String profileNameAndAlias, String caName) throws CaMgmtException {
+  void addCertprofileToCa(String profileNameAndAlias, String caName)
+      throws CaMgmtException {
     manager.assertMasterMode();
 
     CaProfileEntry caProfileEntry;
     try {
       caProfileEntry = CaProfileEntry.decode(profileNameAndAlias);
     } catch (Exception ex) {
-      throw new CaMgmtException("invalid syntax of profileNameAndAlias '" + profileNameAndAlias + "'", ex);
+      throw new CaMgmtException("invalid syntax of profileNameAndAlias '"
+          + profileNameAndAlias + "'", ex);
     }
 
     String profileName = caProfileEntry.getProfileName();
@@ -149,15 +153,18 @@ class CertprofileManager {
       manager.caHasProfiles.put(caName, set);
     } else {
       for (CaProfileEntry existingEntry : set) {
-        String containedNameOrAlias = existingEntry.containedNameOrAlias(caProfileEntry);
+        String containedNameOrAlias =
+            existingEntry.containedNameOrAlias(caProfileEntry);
         if (containedNameOrAlias != null) {
-          throw manager.logAndCreateException(
-              "Certprofile (name or alias) '" + containedNameOrAlias + "' already associated with CA " + caName);
+          throw manager.logAndCreateException("Certprofile (name or alias) '"
+              + containedNameOrAlias + "' already associated with CA "
+              + caName);
         }
       }
     }
 
-    manager.caConfStore.addCertprofileToCa(ident, caIdent, caProfileEntry.getProfileAliases());
+    manager.caConfStore.addCertprofileToCa(ident, caIdent,
+        caProfileEntry.getProfileAliases());
     set.add(caProfileEntry);
   } // method addCertprofileToCa
 
@@ -182,13 +189,15 @@ class CertprofileManager {
     }
 
     LOG.info("removed profile '{}'", name);
-    manager.idNameMap.removeCertprofile(manager.certprofileDbEntries.get(name).getIdent().getId());
+    manager.idNameMap.removeCertprofile(
+        manager.certprofileDbEntries.get(name).getIdent().getId());
     manager.certprofileDbEntries.remove(name);
     IdentifiedCertprofile profile = manager.certprofiles.remove(name);
     shutdownCertprofile(profile);
   } // method removeCertprofile
 
-  void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
+  void changeCertprofile(String name, String type, String conf)
+      throws CaMgmtException {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
@@ -204,7 +213,8 @@ class CertprofileManager {
       type = type.toLowerCase();
     }
 
-    IdentifiedCertprofile profile = manager.caConfStore.changeCertprofile(ident, type, conf, manager);
+    IdentifiedCertprofile profile =
+        manager.caConfStore.changeCertprofile(ident, type, conf, manager);
 
     manager.certprofileDbEntries.remove(name);
     IdentifiedCertprofile oldProfile = manager.certprofiles.remove(name);
@@ -216,17 +226,20 @@ class CertprofileManager {
     }
   } // method changeCertprofile
 
-  void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
+  void addCertprofile(CertprofileEntry certprofileEntry)
+      throws CaMgmtException {
     manager.assertMasterMode();
-    String name = Args.notNull(certprofileEntry, "certprofileEntry").getIdent().getName();
+    String name = Args.notNull(certprofileEntry, "certprofileEntry")
+                  .getIdent().getName();
     CaManagerImpl.checkName(name, "certprofile name");
     if (manager.certprofileDbEntries.containsKey(name)) {
       throw new CaMgmtException("Certprofile '" + name + "' exists");
     }
 
     certprofileEntry.setFaulty(true);
-    IdentifiedCertprofile profile = Optional.ofNullable(createCertprofile(certprofileEntry)).orElseThrow(
-        () -> new CaMgmtException("could not create Certprofile object"));
+    IdentifiedCertprofile profile = Optional.ofNullable(
+        createCertprofile(certprofileEntry)).orElseThrow(
+            () -> new CaMgmtException("could not create Certprofile object"));
 
     certprofileEntry.setFaulty(false);
     manager.certprofiles.put(name, profile);
@@ -235,25 +248,28 @@ class CertprofileManager {
     manager.certprofileDbEntries.put(name, certprofileEntry);
   } // method addCertprofile
 
-  CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
-    IdentifiedCertprofile profile0 = Optional.ofNullable(manager.getIdentifiedCertprofile(profileName))
-        .orElseThrow(() -> new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE));
+  CertprofileInfoResponse getCertprofileInfo(String profileName)
+      throws OperationException {
+    IdentifiedCertprofile profile0 = Optional.ofNullable(
+        manager.getIdentifiedCertprofile(profileName)).orElseThrow(
+            () -> new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE));
 
     Certprofile profile = profile0.getCertprofile();
-    Map<ASN1ObjectIdentifier, Certprofile.ExtensionControl> extnControls = profile.getExtensionControls();
+    ExtensionsControl extnControls = profile.getExtensionsControl();
 
     List<String> requiredExtensionsInReq = new LinkedList<>();
     List<String> optionalExtensionsInReq = new LinkedList<>();
-    for (Map.Entry<ASN1ObjectIdentifier, Certprofile.ExtensionControl> m : extnControls.entrySet()) {
-      TripleState inRequest = m.getValue().getInRequest();
+    for (ASN1ObjectIdentifier type : extnControls.getTypes()) {
+      ExtensionControl extnCtrl = extnControls.getControl(type);
+      TripleState inRequest = extnCtrl.getInRequest();
       if (inRequest == null || inRequest == TripleState.forbidden) {
         continue;
       }
 
-      if (m.getValue().isRequired() && inRequest == TripleState.required) {
-        requiredExtensionsInReq.add(m.getKey().getId());
+      if (extnCtrl.isRequired() && inRequest == TripleState.required) {
+        requiredExtensionsInReq.add(type.getId());
       } else {
-        optionalExtensionsInReq.add(m.getKey().getId());
+        optionalExtensionsInReq.add(type.getId());
       }
     }
 
@@ -267,34 +283,20 @@ class CertprofileManager {
       optionalOids = optionalExtensionsInReq.toArray(new String[0]);
     }
 
-    KeyType[] keyTypes = null;
-    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = profile.getKeyAlgorithms();
-    if (keyAlgorithms != null) {
-      List<KeyType> keyTypeList = new LinkedList<>();
+    KeySpec[] keyTypes;
+    PublicKeyControl publicKeyControl = profile.getPublicKeyControl();
+    if (publicKeyControl != null) {
+      List<KeySpec> keyTypeList = new LinkedList<>();
 
-      for (Map.Entry<ASN1ObjectIdentifier, KeyParametersOption> m : keyAlgorithms.entrySet()) {
-        KeyParametersOption params = m.getValue();
-
-        String[] ecCurves = null;
-        if (params instanceof KeyParametersOption.ECParamatersOption) {
-          // set the curve OIDs,
-          Set<ASN1ObjectIdentifier> curveOids = ((KeyParametersOption.ECParamatersOption) params).getCurveOids();
-          if (CollectionUtil.isNotEmpty(curveOids)) {
-            List<String> curveOidsInText = new LinkedList<>();
-            for (ASN1ObjectIdentifier curveOid : curveOids) {
-              curveOidsInText.add(curveOid.getId());
-            }
-
-            ecCurves = curveOidsInText.toArray(new String[0]);
-          }
+      for (KeySpec m : KeySpec.values()) {
+        if (publicKeyControl.allowsPublicKey(m)) {
+          keyTypeList.add(m);
         }
-
-        keyTypeList.add(new KeyType(m.getKey().getId(), ecCurves));
       }
 
-      if (!keyTypeList.isEmpty()) {
-        keyTypes = keyTypeList.toArray(new KeyType[0]);
-      }
+      keyTypes = keyTypeList.toArray(new KeySpec[0]);
+    } else {
+      keyTypes = KeySpec.values();
     }
 
     return new CertprofileInfoResponse(requiredOids, optionalOids, keyTypes);
@@ -308,23 +310,28 @@ class CertprofileManager {
     try {
       profile.close();
     } catch (Exception ex) {
-      LogUtil.warn(LOG, ex, "could not shutdown Certprofile " + profile.getIdent());
+      LogUtil.warn(LOG, ex, "could not shutdown Certprofile "
+          + profile.getIdent());
     }
   } // method shutdownCertprofile
 
-  IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {
+  IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
+      throws CaMgmtException {
     String type = Args.notNull(entry, "entry").getType();
     if (!manager.certprofileFactoryRegister.canCreateProfile(type)) {
       throw new CaMgmtException("unsupported cert profile type " + type);
     }
 
     try {
-      Certprofile profile = manager.certprofileFactoryRegister.newCertprofile(type);
-      IdentifiedCertprofile identifiedCertprofile = new IdentifiedCertprofile(entry, profile);
+      Certprofile profile =
+          manager.certprofileFactoryRegister.newCertprofile(type);
+      IdentifiedCertprofile identifiedCertprofile =
+          new IdentifiedCertprofile(entry, profile);
       try {
         CertprofileValidator.validate(profile);
       } catch (CertprofileException ex) {
-        LogUtil.warn(LOG, ex, "validating certprofile " + entry.getIdent().getName() + " failed");
+        LogUtil.warn(LOG, ex, "validating certprofile "
+            + entry.getIdent().getName() + " failed");
       }
       return identifiedCertprofile;
     } catch (ObjectCreationException | CertprofileException ex) {

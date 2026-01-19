@@ -1,9 +1,8 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
@@ -11,10 +10,11 @@ import org.xipki.ca.server.kpgen.KeypoolKeypairGenerator;
 import org.xipki.ca.server.kpgen.P11KeypairGenerator;
 import org.xipki.ca.server.kpgen.SoftwareKeypairGenerator;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.util.Args;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Set;
 
@@ -37,7 +37,8 @@ public class KeypairGenEntryWrapper {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
   }
 
-  public void init(SecurityFactory securityFactory, P11CryptServiceFactory p11CryptServiceFactory,
+  public void init(SecurityFactory securityFactory,
+                   P11CryptServiceFactory p11CryptServiceFactory,
                    Set<KeypairGeneratorFactory> factories,
                    int shardId, DataSourceMap dataSourceMap)
       throws ObjectCreationException {
@@ -56,7 +57,8 @@ public class KeypairGenEntryWrapper {
     } else {
       for (KeypairGeneratorFactory factory : factories) {
         if (factory.canCreateKeypairGenerator(type)) {
-          generator = factory.newKeypairGenerator(type, dbEntry.getConf(), securityFactory);
+          generator = factory.newKeypairGenerator(type,
+              dbEntry.getConf(), securityFactory);
           break;
         }
       }
@@ -69,7 +71,8 @@ public class KeypairGenEntryWrapper {
     try {
       generator.initialize(dbEntry.getConf());
     } catch (XiSecurityException ex) {
-      throw new ObjectCreationException("error initializing keypair generator " + dbEntry.getName(), ex);
+      throw new ObjectCreationException("error initializing keypair generator "
+          + dbEntry.getName(), ex);
     }
 
     generator.setName(dbEntry.getName());

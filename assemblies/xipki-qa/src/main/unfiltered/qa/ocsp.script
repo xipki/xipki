@@ -16,7 +16,7 @@ xiqa:qa-ocsp-status \
   --cert output/subca1.crt \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -27,7 +27,7 @@ xiqa:qa-ocsp-status \
   --cert output/tls-c1.crt \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -38,7 +38,7 @@ xiqa:qa-ocsp-status \
   --cert output/tls-c2.crt \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -59,7 +59,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -71,7 +71,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -83,7 +83,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -105,7 +105,7 @@ xiqa:qa-ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -117,7 +117,7 @@ xiqa:qa-ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -129,7 +129,7 @@ xiqa:qa-ocsp-status \
   --sign \
   --exp-status affiliationChanged \
   --exp-certhash required \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -156,7 +156,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --cert output/ee-complex1.crt \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -166,7 +166,7 @@ xiqa:qa-ocsp-status \
   --issuer output/subca1.crt \
   --serial 99999 \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -177,7 +177,7 @@ xiqa:qa-ocsp-status \
   --cert output/ee-complex1.crt \
   --http-get \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -188,7 +188,7 @@ xiqa:qa-ocsp-status \
   --serial 99999 \
   --http-get \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -199,7 +199,7 @@ xiqa:qa-ocsp-status \
   --cert output/ee-complex1.crt \
   --sign \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -210,7 +210,7 @@ xiqa:qa-ocsp-status \
   --serial 99999 \
   --sign \
   --exp-status unknown \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -285,7 +285,7 @@ xiqa:qa-ocsp-status \
   --serial 99999 \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -297,7 +297,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -309,7 +309,7 @@ xiqa:qa-ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -320,7 +320,7 @@ xiqa:qa-ocsp-status \
   --cert output/ocsp2.crt \
   --exp-status keyCompromise \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -332,7 +332,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -344,7 +344,7 @@ xiqa:qa-ocsp-status \
   --http-get \
   --exp-status keyCompromise \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -356,7 +356,7 @@ xiqa:qa-ocsp-status \
   --cert output/ocsp1.crt \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -368,7 +368,7 @@ xiqa:qa-ocsp-status \
   --sign \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -379,7 +379,7 @@ xiqa:qa-ocsp-status \
   --cert output/ocsp2.crt --sign \
   --exp-status keyCompromise \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt
@@ -390,7 +390,7 @@ xiqa:qa-ocsp-status \
   --cert output/subca1.crt \
   --exp-status good \
   --exp-certhash forbidden \
-  --exp-sig-alg $SIGALGO \
+  --exp-sig-alg $CA_SIGALG \
   --url $URL_CRL \
   --nonce \
   --resp-issuer output/rootca1.crt

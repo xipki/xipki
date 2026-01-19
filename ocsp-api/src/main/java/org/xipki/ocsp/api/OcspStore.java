@@ -1,18 +1,18 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.api;
 
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.Validity;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.type.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;
 import java.time.Instant;
-import java.util.Map;
 
 /**
  * Store of certificate status.
@@ -25,7 +25,8 @@ public abstract class OcspStore implements Closeable {
 
   protected String name;
 
-  protected UnknownCertBehaviour unknownCertBehaviour = UnknownCertBehaviour.unknown;
+  protected UnknownCertBehaviour unknownCertBehaviour =
+      UnknownCertBehaviour.unknown;
 
   protected int retentionInterval;
 
@@ -92,8 +93,8 @@ public abstract class OcspStore implements Closeable {
    *           If OCSP store failed to retrieve the status.
    */
   public final CertStatusInfo getCertStatus(
-      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
-      boolean includeRit, boolean inheritCaRevocation)
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
+      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
       throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
         includeCertHash, includeRit, inheritCaRevocation);
@@ -155,7 +156,7 @@ public abstract class OcspStore implements Closeable {
    * @throws OcspStoreException
    *           If OCSP store cannot be initialized.
    */
-  public abstract void init(Map<String, ?> sourceConf, DataSourceWrapper datasource)
+  public abstract void init(JsonMap sourceConf, DataSourceWrapper datasource)
       throws OcspStoreException;
 
   public abstract boolean isHealthy();
@@ -172,7 +173,8 @@ public abstract class OcspStore implements Closeable {
     return unknownCertBehaviour;
   }
 
-  public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
+  public void setUnknownCertBehaviour(
+      UnknownCertBehaviour unknownCertBehaviour) {
     this.unknownCertBehaviour = unknownCertBehaviour;
   }
 
@@ -220,12 +222,13 @@ public abstract class OcspStore implements Closeable {
     return minNextUpdatePeriod;
   }
 
-  public void setNextUpdatePeriodLimit(Validity minNextUpdatePeriod, Validity maxNextUpdatePeriod) {
+  public void setNextUpdatePeriodLimit(
+      Validity minNextUpdatePeriod, Validity maxNextUpdatePeriod) {
     if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
       if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
-        throw new IllegalArgumentException(
-            String.format("minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
-                minNextUpdatePeriod, maxNextUpdatePeriod));
+        throw new IllegalArgumentException(String.format(
+            "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is " +
+            "not allowed", minNextUpdatePeriod, maxNextUpdatePeriod));
       }
     }
 
@@ -246,8 +249,8 @@ public abstract class OcspStore implements Closeable {
   }
 
   protected static String overviewString(X509Cert cert) {
-    return "subject: " + cert.getSubjectText() + ", issuer: " + cert.getIssuerText() +
-        ", serialNo: " + cert.getSerialNumberHex();
+    return "subject: " + cert.getSubjectText() + ", issuer: " +
+        cert.getIssuerText() + ", serialNo: " + cert.getSerialNumberHex();
   }
 
 }

@@ -1,23 +1,36 @@
 printUsage = "false"
 ocsp = "false"
 
-if { "$1" equals "" } then {
-  printUsage = "false"
-} elif { "$1" equals "help" } then {
+if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
-} elif { "$1" equals "ocsp" } then {
-  ocsp = "true"
+  argsValid = "true"
+} else {
+  if { "$1" equals "-ocsp" } then {
+    ocsp = "true"
+    KEYSPEC = $2
+  } else {
+    KEYSPEC = $1
+  }
+
+  if { "$KEYSPEC" equals "" } then {
+    argsValid = "false"
+    errMsg = "no key-spec is specified"
+  }
 }
 
 if { $printUsage equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/client-script/rest-client.script [help|ocsp]"
-  echo "    help:      Print this usage"
-  echo "    ocsp:      Also test the OCSP status"
+  echo "source file:./xipki/client-script/rest-client.script [option] <key spec>"
+  echo "       keyspec:      RSA2048, RSA3072, RSA4096,"
+  echo "                     SECP256R1, SECP384R1, SECP521R1,"
+  echo "                     BRAINPOOLP256R1, BRAINPOOLP384R1, BRAINPOOLP512R1,"
+  echo "                     SM2P256V1, FRP256V1,"
+  echo "                     MLDSA44, MLDSA65, MLDSA87"
+  echo "                     X25519, X448, MLKEM512, MLKEM768, MLKEM1024"
+  echo "options"
+  echo "    -ocsp:           Also test the OCSP status"
 } else {
-  HASH = SHA256
-
   ## URL pattern: https://<host>:<port>/gw/rest/<CA-name>. To enroll certificate, the
   ## profile parameter shall be specified. e.g.
   ## https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]/enroll-cert?profile=smime
@@ -59,7 +72,7 @@ if { $printUsage equals "true" } then {
 
   CN = rest-smime-${CUR_TIME}
 
-  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
     --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}" \
@@ -95,7 +108,7 @@ if { $printUsage equals "true" } then {
 
   CN = rest-tls-${CUR_TIME}
 
-  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
     --subject "C=DE,O=myorg,CN=${CN}.myorg.org" \
@@ -111,7 +124,7 @@ if { $printUsage equals "true" } then {
 
   REKEY.CN = rest-tls-rekey-${CUR_TIME}
 
-  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${REKEY.CN}.p12 --subject "CN=${REKEY.CN}"
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${REKEY.CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${REKEY.CN}.p12 --password CHANGEIT \
     --subject "C=DE,O=myorg,CN=${REKEY.CN}.myorg.org" \
@@ -170,7 +183,7 @@ if { $printUsage equals "true" } then {
 
   CN = rest-tls-sm2-twin-${CUR_TIME}
 
-  xi:sm2-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 --subject "CN=${CN}"
+  xi:keypair-p12 --keyspec SM2P256V1 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
     --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \

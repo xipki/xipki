@@ -1,22 +1,25 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.xipki.audit.Audits.AuditConf;
-import org.xipki.ca.api.mgmt.CaJson;
-import org.xipki.datasource.DataSourceConf;
 import org.xipki.security.Securities.SecurityConf;
 import org.xipki.security.util.TlsHelper;
-import org.xipki.util.Args;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.http.SslContextConf;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.datasource.DataSourceConf;
+import org.xipki.util.extra.audit.Audits.AuditConf;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.http.SslContextConf;
+import org.xipki.util.io.FileOrBinary;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,85 +29,74 @@ import java.util.Map;
  *
  * @author Lijun Liao (xipki)
  */
-public class CaServerConf extends ValidableConf {
+public class CaServerConf {
 
-  public static class SslContext extends ValidableConf {
+  public static class SslContext {
 
-    private String name;
+    private final String name;
 
-    private FileOrBinary[] trustanchors;
+    private final FileOrBinary[] trustanchors;
 
-    private String hostverifier;
+    private final String hostverifier;
 
-    public String getName() {
-      return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    public FileOrBinary[] getTrustanchors() {
-      return trustanchors;
-    }
-
-    public void setTrustanchors(FileOrBinary[] trustanchors) {
+    public SslContext(String name, String hostverifier,
+                      FileOrBinary[] trustanchors) {
+      this.name = Args.notBlank(name, "name");
       this.trustanchors = trustanchors;
-    }
-
-    public String getHostverifier() {
-      return hostverifier;
-    }
-
-    public void setHostverifier(String hostverifier) {
       this.hostverifier = hostverifier;
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+    public static SslContext parse(JsonMap json) throws CodecException {
+      String name = json.getNnString("name");
+      String hostverifier = json.getString("hostverifier");
+      FileOrBinary[] trustanchors = FileOrBinary.parseArray(
+          json.getList("trustanchors"));
+      return new SslContext(name, hostverifier, trustanchors);
     }
 
   } // class SslContext
 
-  public static class RemoteMgmt extends ValidableConf {
+  public static class RemoteMgmt {
 
-    private boolean enabled;
+    private final boolean enabled;
 
-    private List<FileOrBinary> certs;
+    private final List<FileOrBinary> certs;
+
+    public RemoteMgmt(boolean enabled, List<FileOrBinary> certs) {
+      this.enabled = enabled;
+      this.certs = certs;
+    }
 
     public boolean isEnabled() {
       return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-      this.enabled = enabled;
     }
 
     public List<FileOrBinary> getCerts() {
       return certs;
     }
 
-    public void setCerts(List<FileOrBinary> certs) {
-      this.certs = certs;
-    }
-
-    @Override
-    public void validate() {
+    public static RemoteMgmt parse(JsonMap json) throws CodecException {
+      boolean enabled = json.getBool("enabled", false);
+      List<FileOrBinary> certs = FileOrBinary.parseList(json.getList("certs"));
+      return new RemoteMgmt(enabled, certs);
     }
 
   } // class RemoteMgmt
 
   public static class CtLogConf {
 
-    private String keydir;
+    private final String keydir;
+
+    public CtLogConf(String keydir) {
+      this.keydir = Args.notBlank(keydir, "keydir");
+    }
 
     public String getKeydir() {
       return keydir;
     }
 
-    public void setKeydir(String keydir) {
-      this.keydir = keydir;
+    public static CtLogConf parse(JsonMap json) throws CodecException {
+      return new CtLogConf(json.getNnString("keydir"));
     }
 
   } // class CtLogConf
@@ -153,7 +145,8 @@ public class CaServerConf extends ValidableConf {
   private List<String> certprofileFactories;
 
   /**
-   * list of classes that implement org.xipki.ca.api.kpgen.KeypairGeneratorFactory
+   * list of classes that implement
+   * org.xipki.ca.api.kpgen.KeypairGeneratorFactory
    */
   private List<String> keypairGeneratorFactories;
 
@@ -161,145 +154,139 @@ public class CaServerConf extends ValidableConf {
 
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
-  public static CaServerConf readConfFromFile(String fileName) throws IOException, InvalidConfException {
+  public static CaServerConf readConfFromFile(String fileName)
+      throws IOException, InvalidConfException {
     Args.notBlank(fileName, "fileName");
-    CaServerConf conf = CaJson.parseObject(new File(fileName), CaServerConf.class);
-    conf.validate();
-    return conf;
+    try {
+      return parse(JsonParser.parseMap(Paths.get(fileName), true));
+    } catch (CodecException e) {
+      throw new InvalidConfException(
+          "error parsing configuration " + fileName, e);
+    }
+  }
+
+  public static CaServerConf parse(JsonMap json)
+      throws CodecException, InvalidConfException {
+    JsonMap map = json.getMap("audit");
+    CaServerConf ret = new CaServerConf();
+    if (map != null) {
+      ret.audit = AuditConf.parse(map);
+    }
+
+    map = json.getMap("security");
+    if (map != null) {
+      ret.security = SecurityConf.parse(map);
+    }
+
+    map = json.getMap("remoteMgmt");
+    if (map != null) {
+      ret.remoteMgmt = RemoteMgmt.parse(map);
+    }
+
+    Boolean b = json.getBool("master");
+    if (b != null) {
+      ret.master = b;
+    }
+
+    b = json.getBool("noLock");
+    if (b != null) {
+      ret.noLock = b;
+    }
+
+    b = json.getBool("noRA");
+    if (b != null) {
+      ret.noRA = b;
+    }
+
+    Integer i = json.getInt("shardId");
+    if (i != null) {
+      ret.shardId = i;
+    }
+
+    b = json.getBool("logReqResp");
+    if (b != null) {
+      ret.logReqResp = b;
+    }
+
+    ret.reverseProxyMode = json.getString("reverseProxyMode");
+    ret.datasources = DataSourceConf.parseList(json.getList("datasources"));
+
+    JsonList list = json.getList("sslContexts");
+    if (list != null) {
+      ret.sslContexts = new ArrayList<>(list.size());
+      for (JsonMap v : list.toMapList()) {
+        ret.sslContexts.add(SslContext.parse(v));
+      }
+    }
+
+    map = json.getMap("ctLog");
+    if (map != null) {
+      ret.ctLog = CtLogConf.parse(map);
+    }
+
+    ret.certprofileFactories = json.getStringList("certprofileFactories");
+    ret.keypairGeneratorFactories = json.getStringList(
+        "keypairGeneratorFactories");
+    ret.caConfFiles = json.getStringList("caConfFiles");
+
+    ret.validate();
+    return ret;
   }
 
   public boolean isMaster() {
     return master;
   }
 
-  public void setMaster(boolean master) {
-    this.master = master;
-  }
-
   public boolean isNoLock() {
     return noLock;
-  }
-
-  public void setNoLock(boolean noLock) {
-    this.noLock = noLock;
   }
 
   public boolean isNoRA() {
     return noRA;
   }
 
-  public void setNoRA(boolean noRA) {
-    this.noRA = noRA;
-  }
-
   public boolean isLogReqResp() {
     return logReqResp;
-  }
-
-  public void setLogReqResp(boolean logReqResp) {
-    this.logReqResp = logReqResp;
   }
 
   public String getReverseProxyMode() {
     return reverseProxyMode;
   }
 
-  public void setReverseProxyMode(String reverseProxyMode) {
-    this.reverseProxyMode = reverseProxyMode;
-  }
-
   public int getShardId() {
     return shardId;
-  }
-
-  public void setShardId(int shardId) {
-    this.shardId = shardId;
   }
 
   public List<String> getCaConfFiles() {
     return caConfFiles;
   }
 
-  public void setCaConfFiles(List<String> caConfFiles) {
-    this.caConfFiles = caConfFiles;
-  }
-
   public List<DataSourceConf> getDatasources() {
     return datasources;
-  }
-
-  public void setDatasources(List<DataSourceConf> datasources) {
-    this.datasources = datasources;
-  }
-
-  public List<SslContext> getSslContexts() {
-    return sslContexts;
-  }
-
-  public void setSslContexts(List<SslContext> sslContexts) {
-    this.sslContexts = sslContexts;
-  }
-
-  public SslContext getSslContext(String name) {
-    if (sslContexts == null) {
-      return null;
-    }
-
-    for (SslContext m : sslContexts) {
-      if (m.getName().equals(name)) {
-        return m;
-      }
-    }
-
-    return null;
   }
 
   public AuditConf getAudit() {
     return audit == null ? AuditConf.DEFAULT : audit;
   }
 
-  public void setAudit(AuditConf audit) {
-    this.audit = audit;
-  }
-
   public SecurityConf getSecurity() {
     return security == null ? SecurityConf.DEFAULT : security;
-  }
-
-  public void setSecurity(SecurityConf security) {
-    this.security = security;
   }
 
   public RemoteMgmt getRemoteMgmt() {
     return remoteMgmt;
   }
 
-  public void setRemoteMgmt(RemoteMgmt remoteMgmt) {
-    this.remoteMgmt = remoteMgmt;
-  }
-
   public List<String> getCertprofileFactories() {
     return certprofileFactories;
-  }
-
-  public void setCertprofileFactories(List<String> certprofileFactories) {
-    this.certprofileFactories = certprofileFactories;
   }
 
   public List<String> getKeypairGeneratorFactories() {
     return keypairGeneratorFactories;
   }
 
-  public void setKeypairGeneratorFactories(List<String> keypairGeneratorFactories) {
-    this.keypairGeneratorFactories = keypairGeneratorFactories;
-  }
-
   public CtLogConf getCtLog() {
     return ctLog;
-  }
-
-  public void setCtLog(CtLogConf ctLog) {
-    this.ctLog = ctLog;
   }
 
   public void initSsl() {
@@ -309,13 +296,14 @@ public class CaServerConf extends ValidableConf {
 
     if (sslContextConfMap.isEmpty()) {
       for (SslContext m : sslContexts) {
-        SslContextConf conf = new SslContextConf(m.trustanchors, m.getHostverifier());
+        SslContextConf conf = new SslContextConf(m.trustanchors,
+            m.hostverifier);
         try {
           conf.init();
         } catch (ObjectCreationException e) {
           throw new RuntimeException(e);
         }
-        sslContextConfMap.put(m.getName(), conf);
+        sslContextConfMap.put(m.name, conf);
       }
     }
   }
@@ -324,7 +312,6 @@ public class CaServerConf extends ValidableConf {
     return sslContextConfMap.get(name);
   }
 
-  @Override
   public void validate() throws InvalidConfException {
     if (shardId < 0 || shardId > 127) {
       throw new InvalidConfException("shardId is not in [0, 127]");
@@ -340,14 +327,15 @@ public class CaServerConf extends ValidableConf {
 
     if (caConfFiles == null) {
       if (!withCaconfDb) {
-        throw new InvalidConfException("datasource 'caconf' is required but is not configured.");
+        throw new InvalidConfException(
+            "datasource 'caconf' is required but is not configured.");
       }
     } else {
       if (withCaconfDb) {
-        throw new InvalidConfException("datasource 'caconf' is not allowed but is configured.");
+        throw new InvalidConfException(
+            "datasource 'caconf' is not allowed but is configured.");
       }
     }
-    validate(remoteMgmt, security);
     TlsHelper.checkReverseProxyMode(reverseProxyMode);
   }
 

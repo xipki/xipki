@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-gateway</artifactId>
   <packaging>pom</packaging>
@@ -87,8 +87,8 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Copy the BouncyCastle and JDBC jars -->
-            <id>ext-libs</id>
+            <!-- Copy the JDBC jars to tomcat's lib folder -->
+            <id>copy-jars</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
@@ -98,30 +98,16 @@
               <outputDirectory>${project.build.directory}/tomcat/lib</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>xipki-tomcat-password</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>ipkcs11wrapper</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>password</artifactId>
-                  <version>${project.version}</version>
+                  <groupId>org.bouncycastle</groupId>
+                  <artifactId>bcpkix-jdk18on</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcpkix-lts8on</artifactId>
+                  <artifactId>bcprov-jdk18on</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcprov-lts8on</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.bouncycastle</groupId>
-                  <artifactId>bcutil-lts8on</artifactId>
+                  <artifactId>bcutil-jdk18on</artifactId>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.mariadb.jdbc</groupId>

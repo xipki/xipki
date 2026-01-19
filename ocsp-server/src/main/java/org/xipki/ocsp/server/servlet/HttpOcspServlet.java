@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.servlet;
@@ -10,18 +10,17 @@ import org.xipki.ocsp.server.OcspServer;
 import org.xipki.ocsp.server.Responder;
 import org.xipki.ocsp.server.ResponderAndPath;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.Base64Url;
-import org.xipki.util.Hex;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.http.HttpResponse;
-import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.extra.http.HttpConstants;
+import org.xipki.util.extra.http.HttpResponse;
+import org.xipki.util.extra.http.HttpStatusCode;
+import org.xipki.util.extra.http.XiHttpRequest;
+import org.xipki.util.extra.http.XiHttpResponse;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -38,7 +37,8 @@ import java.util.Map;
 
 class HttpOcspServlet {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(HttpOcspServlet.class);
 
   private static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
@@ -55,7 +55,8 @@ class HttpOcspServlet {
     this.server = Args.notNull(server, "server");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp)
+      throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       doGet(req).fillResponse(resp);
@@ -92,19 +93,23 @@ class HttpOcspServlet {
         return new HttpResponse(HttpStatusCode.SC_REQUEST_ENTITY_TOO_LARGE);
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, reqContent, false);
-      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
+      OcspRespWithCacheInfo ocspRespWithCacheInfo =
+          server.answer(responder, reqContent, false);
+      if (ocspRespWithCacheInfo == null
+          || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
         return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
       if (logReqResp && LOG.isDebugEnabled()) {
-        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
-            LogUtil.base64Encode(reqContent), LogUtil.base64Encode(encodedOcspResp));
+        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}",
+            req.getRequestURI(), LogUtil.base64Encode(reqContent),
+            LogUtil.base64Encode(encodedOcspResp));
       }
 
-      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedOcspResp);
+      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null,
+          encodedOcspResp);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "Connection reset by peer");
@@ -144,10 +149,10 @@ class HttpOcspServlet {
     }
 
     try {
-      // 1. RFC 2560/6960 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by
-      //    POST, we support GET for longer requests anyway.
-      // 2. If OCSP request is sent via HTTP GET, it should be Base64-then-URL encoded, we relax
-      //    this limitation by accepting also OCSP requests:
+      // 1. RFC 2560/6960 A.1.1 specifies that request longer than 255 bytes
+      //    SHOULD be sent by POST, we support GET for longer requests anyway.
+      // 2. If OCSP request is sent via HTTP GET, it should be Base64-then-URL
+      //    encoded, we relax this limitation by accepting also OCSP requests:
       //      - Which are Base64Url encoded, and/or
       //      - Which do not containing the Base64 padding char '='.
       if (b64OcspReq.length() > responder.getMaxRequestSize()) {
@@ -159,32 +164,35 @@ class HttpOcspServlet {
         return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocsReqBytes, true);
-      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.getResponse() == null) {
+      OcspRespWithCacheInfo ocspRespWithCacheInfo =
+          server.answer(responder, ocsReqBytes, true);
+      if (ocspRespWithCacheInfo == null
+          || ocspRespWithCacheInfo.getResponse() == null) {
         LOG.error("processRequest returned null, this should not happen");
         return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.getResponse();
       if (logReqResp && LOG.isDebugEnabled()) {
-        LOG.debug("HTTP GET OCSP path: {}\nResponse:\n{}", req.getRequestURI(), LogUtil.base64Encode(encodedOcspResp));
+        LOG.debug("HTTP GET OCSP path: {}\nResponse:\n{}", req.getRequestURI(),
+            LogUtil.base64Encode(encodedOcspResp));
       }
 
-      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
+      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo =
+          ocspRespWithCacheInfo.getCacheInfo();
       Map<String, String> headers = new HashMap<>();
       if (cacheInfo != null) {
         encodedOcspResp = ocspRespWithCacheInfo.getResponse();
         long now = Clock.systemUTC().millis();
 
-        // RFC 5019 6.2: Date: The date and time at which the OCSP server generated
-        // the HTTP response.
+        // RFC 5019 6.2: Date: The date and time at which the OCSP server
+        // generated he HTTP response.
         headers.put("Date",Long.toString(now));
-        // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder
-        // last modified the response.
+        // RFC 5019 6.2: Last-Modified: date and time at which the OCSP
+        // responder last modified the response.
         headers.put("Last-Modified", Long.toString(cacheInfo.getGeneratedAt()));
         // RFC 5019 6.2: Expires: This date and time will be the same as the
-        // nextUpdate time-stamp in the OCSP
-        // response itself.
+        // nextUpdate time-stamp in the OCSP response itself.
         // This is overridden by max-age on HTTP/1.1 compatible components
 
         Long nextUpdate = cacheInfo.getNextUpdate();
@@ -192,9 +200,11 @@ class HttpOcspServlet {
         if (nextUpdate != null) {
           headers.put("Expires", Long.toString(nextUpdate));
         }
-        // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII
-        // HEX representation of the SHA1 hash of the OCSPResponse structure.
-        headers.put("ETag", StringUtil.concat("\"", HashAlgo.SHA1.hexHash(encodedOcspResp), "\""));
+        // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the
+        // ASCII HEX representation of the SHA1 hash of the OCSPResponse
+        // structure.
+        headers.put("ETag", StringUtil.concat("\"",
+            HashAlgo.SHA1.hexHash(encodedOcspResp), "\""));
 
         // Max age must be in seconds in the cache-control header
         long maxAge;
@@ -205,14 +215,16 @@ class HttpOcspServlet {
         }
 
         if (nextUpdate != null) {
-          maxAge = Math.min(maxAge, (nextUpdate - cacheInfo.getGeneratedAt()) / 1000);
+          maxAge = Math.min(maxAge,
+              (nextUpdate - cacheInfo.getGeneratedAt()) / 1000);
         }
 
-        headers.put("Cache-Control",
-            StringUtil.concat("max-age=", Long.toString(maxAge), ",public,no-transform,must-revalidate"));
+        headers.put("Cache-Control", StringUtil.concat("max-age=",
+            Long.toString(maxAge), ",public,no-transform,must-revalidate"));
       } // end if (ocspRespWithCacheInfo)
 
-      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, headers, encodedOcspResp);
+      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE,
+          headers, encodedOcspResp);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
@@ -220,16 +232,14 @@ class HttpOcspServlet {
   } // method doGet
 
   private static byte[] base64Decode(byte[] b64OcspReqBytes) {
-    final int len = b64OcspReqBytes.length;
-    if (Base64.containsOnlyBase64Chars(b64OcspReqBytes, 0, len)) {
+    if (Base64.containsOnlyValidChars(b64OcspReqBytes)) {
       // Base64 encoded, no URL decoding is required
       return Base64.decodeFast(b64OcspReqBytes);
-    } else if (Base64Url.containsOnlyBase64UrlChars(b64OcspReqBytes, 0, len)) {
-      // Base64Url encoded, no URL decode is required
-      return Base64Url.decodeFast(b64OcspReqBytes);
     } else {
       // Base64-then-URL encoded, URL decode required
       // count the number of encoded chars
+      final int len = b64OcspReqBytes.length;
+
       int cnt = 0;
       for (int i = 0; i < len - 2; i++) {
         if (b64OcspReqBytes[i] == '%') {
@@ -252,12 +262,9 @@ class HttpOcspServlet {
         }
       }
 
-      if (Base64.containsOnlyBase64Chars(realB64Bytes, 0, len)) {
+      if (Base64.containsOnlyValidChars(realB64Bytes)) {
         // Base64 encoded
         return Base64.decodeFast(realB64Bytes);
-      } else if (Base64Url.containsOnlyBase64UrlChars(realB64Bytes, 0, len)) {
-        // Base64Url encoded
-        return Base64Url.decodeFast(realB64Bytes);
       } else {
         return null;
       }

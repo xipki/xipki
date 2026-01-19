@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -14,7 +14,7 @@ import java.time.temporal.ChronoUnit;
  * Control of the certificate's NotBefore field.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 public class NotBeforeOption {
 
@@ -37,24 +37,31 @@ public class NotBeforeOption {
   }
 
   Instant getNotBefore(Instant requestedNotBefore) {
-    long nowSecond = Instant.now().getEpochSecond();
+    Instant now = Instant.now();
+    long nowSecond = now.getEpochSecond();
     if (requestedNotBefore != null) {
-      long notOlderThan = (offsetSeconds != null && offsetSeconds < 0) ? nowSecond + offsetSeconds : nowSecond;
-      long notBefore = Math.max(requestedNotBefore.getEpochSecond(), notOlderThan);
-      return (midNightTimeZone != null) ? setToMidnight(notBefore) : Instant.now();
+      long notOlderThan = (offsetSeconds != null && offsetSeconds < 0)
+          ? nowSecond + offsetSeconds : nowSecond;
+      long notBefore = Math.max(requestedNotBefore.getEpochSecond(),
+          notOlderThan);
+      return (midNightTimeZone != null) ? setToMidnight(notBefore) : now;
     } else {
-      return (midNightTimeZone != null) ? setToMidnight(nowSecond) : Instant.now().plusSeconds(offsetSeconds);
+      return (midNightTimeZone != null) ? setToMidnight(nowSecond)
+          : now.plusSeconds(offsetSeconds);
     }
   } // method getNotBefore
 
   // get the next mid-night time.
   private Instant setToMidnight(long epochSeconds) {
     ZonedDateTime zd = ZonedDateTime.ofInstant(
-        Instant.ofEpochSecond(epochSeconds).plus(1, ChronoUnit.DAYS).minus(1, ChronoUnit.MILLIS),
+        Instant.ofEpochSecond(epochSeconds).plus(1, ChronoUnit.DAYS)
+            .minus(1, ChronoUnit.MILLIS),
         midNightTimeZone);
 
-    return ZonedDateTime.of(zd.getYear(), zd.getMonthValue(), zd.getDayOfMonth(),
-        0, 0, 0, 0, midNightTimeZone).toInstant();
+    return ZonedDateTime.of(zd.getYear(), zd.getMonthValue(),
+        zd.getDayOfMonth(), 0, 0, 0, 0,
+        midNightTimeZone)
+        .toInstant();
   } // method setToMidnight
 
   public ZoneId getMidNightTimeZone() {

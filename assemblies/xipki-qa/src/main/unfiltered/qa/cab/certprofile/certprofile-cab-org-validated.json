@@ -1,0 +1,96 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile TLS (CA/Browser Forum BR, Organization Validiated)"
+  },
+  "certLevel": "EndEntity",
+  "certDomain": "CABForumBR",
+  "maxSize": 8400,
+  "validity": "397d",
+  "notBeforeTime": "current",
+  "keypairGeneration": "InheritCA",
+  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
+    "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
+    "SM2P256V1","FRP256V1"],
+  "subject": [{
+      "type": "country"
+    },{
+      "type": "2.5.4.8",
+      "minOccurs": 0
+    },{
+      "type": "locality",
+      "minOccurs": 0
+    },{
+      "type": "organization"
+    },{
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },{
+      "type": "serialNumber",
+      "minOccurs": 0
+    },{
+      "type": "commonName",
+      "toSAN": "DNSName",
+      "regex": ":FQDN"
+    }
+  ],
+  "extensions": [{
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },{
+      "type": "CRLDistributionPoints"
+    },{
+      "type": "SubjectAlternativeName",
+      "required": true,
+      "inRequest": "optional",
+      "subjectAltName": {
+        "modes": ["IPAddress","DNSName"]
+      }
+    },{
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },{
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },{
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },{
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [{
+            "required": ["digitalSignature","keyEncipherment","dataEncipherment"]
+          }
+        ]
+      }
+    },{
+      "type": "ExtendedKeyUsage",
+      "required": true,
+      "inRequest": "optional",
+      "extendedKeyUsage": {
+        "required": ["serverAuth"],
+        "optional": ["clientAuth"]
+      }
+    },{
+      "type": "SignedCertificateTimestampList",
+      "required": true
+    },{
+      "type": "CertificatePolicies",
+      "required": true,
+      "certificatePolicies": {
+        "certificatePolicyInformations": [{
+            "policyIdentifier": "OrganizationValidation"
+          }
+        ]
+      }
+    }
+  ]
+}

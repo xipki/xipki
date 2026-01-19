@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson;
@@ -7,93 +7,51 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.bouncycastle.asn1.x509.qualified.MonetaryValue;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.util.Pack;
-import org.xipki.ca.api.profile.BaseCertprofile;
-import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
-import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
-import org.xipki.ca.api.profile.Certprofile.GeneralNameMode;
-import org.xipki.ca.api.profile.Certprofile.GeneralNameTag;
-import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.SubjectControl;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
+import org.xipki.ca.api.profile.ProfileUtil;
+import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
+import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
+import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
+import org.xipki.ca.api.profile.ctrl.SubjectControl;
+import org.xipki.ca.api.profile.id.AttributeType;
+import org.xipki.ca.api.profile.id.QCStatementID;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
-import org.xipki.ca.certprofile.xijson.conf.SubjectToSubjectAltNameType;
-import org.xipki.ca.certprofile.xijson.conf.X509ProfileType;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
-import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
-import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
-import org.xipki.ca.certprofile.xijson.conf.extn.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.extn.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.extn.KeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.extn.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.extn.PrivateKeyUsagePeriod;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.PdsLocationType;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcEuLimitValueType;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementType;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.QcStatementValueType;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements.Range2Type;
-import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
-import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
+import org.xipki.ca.certprofile.xijson.conf.RdnType;
+import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
+import org.xipki.ca.certprofile.xijson.conf.extn.*;
 import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapability;
-import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities.SmimeCapabilityParameter;
-import org.xipki.ca.certprofile.xijson.conf.extn.SubjectDirectoryAttributs;
-import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess.Access;
-import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.extn.ValidityModel;
-import org.xipki.pki.BadCertTemplateException;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.Extn;
+import org.xipki.security.KeySpec;
+import org.xipki.security.OIDs;
+import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
+import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.extra.type.Validity;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Extensions configuration.
@@ -103,39 +61,34 @@ import java.util.Set;
 
 public class XijsonExtensions {
 
-  private ExtensionValue additionalInformation;
+  private final boolean keepOrder;
 
-  private AdmissionExtension.AdmissionSyntaxOption admission;
+  private final List<ASN1ObjectIdentifier> extensionIDs;
 
   private AuthorityInfoAccessControl aiaControl;
 
-  private CrlDistributionPointsControl crlDpControl;
+  private Map<ASN1ObjectIdentifier, GeneralNameTag>
+      subjectToSubjectAltNameModes;
 
-  private CrlDistributionPointsControl freshestCrlControl;
+  private Set<GeneralNameTag> subjectAltNameModes;
 
-  private Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes;
+  private Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> subjectInfoAccessModes;
 
-  private Set<GeneralNameMode> subjectAltNameModes;
+  private BiometricInfo biometricInfo;
 
-  private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> subjectInfoAccessModes;
-
-  private BiometricInfoOption biometricInfo;
-
-  private org.bouncycastle.asn1.x509.CertificatePolicies certificatePolicies;
+  private CertificatePolicies certificatePolicies;
 
   private final Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
   private Set<ExtKeyUsageControl> extendedKeyusages;
 
-  private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
-
-  private boolean useIssuerAndSerialInAki;
+  private final ExtensionsControl extensionsControl;
 
   private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
   private ExtensionValue inhibitAnyPolicy;
 
-  private Set<KeyUsageControl> keyusages;
+  private KeyUsageControl keyUsage;
 
   private ExtensionValue nameConstraints;
 
@@ -147,49 +100,48 @@ public class XijsonExtensions {
 
   private Validity privateKeyUsagePeriod;
 
-  private ExtensionValue qcStatments;
+  private ExtensionValue qcStatements;
 
   private List<QcStatementOption> qcStatementsOption;
-
-  private ExtensionValue restriction;
 
   private ExtensionValue smimeCapabilities;
 
   private ExtensionValue tlsFeature;
 
-  private ExtensionValue validityModel;
-
-  private SubjectDirectoryAttributesControl subjectDirAttrsControl;
-
   private ASN1ObjectIdentifier cccExtensionSchemaType;
 
   private ExtensionValue cccExtensionSchemaValue;
 
-  XijsonExtensions(XijsonCertprofile certProfile, X509ProfileType conf, SubjectControl subjectControl)
+  XijsonExtensions(XijsonCertprofileType conf, SubjectControl subjectControl)
       throws CertprofileException {
     Args.notNull(subjectControl, "subjectControl");
 
+    Boolean b = conf.getKeepExtensionsOrder();
+    this.keepOrder = b != null && b;
+
+    List<ExtensionType> extensionsConf = conf.getExtensions();
+    List<ASN1ObjectIdentifier> extensionIDs =
+        new ArrayList<>(extensionsConf.size());
+    for (ExtensionType t : extensionsConf) {
+      extensionIDs.add(t.getType().getOid());
+    }
+    this.extensionIDs = Collections.unmodifiableList(extensionIDs);
+
     // Extensions
-    Map<String, ExtensionType> extensions = Args.notNull(conf, "conf").buildExtensions();
+    Map<String, ExtensionType> extensions =
+        Args.notNull(conf, "conf").buildExtensions();
 
     // Extension controls
-    this.extensionControls = conf.buildExtensionControls();
-    Set<ASN1ObjectIdentifier> extnIds = new HashSet<>(this.extensionControls.keySet());
+    this.extensionsControl = conf.buildExtensionControls();
 
-    // SubjectToSubjectAltName
-    initSubjectToSubjectAltNames(conf.getSubjectToSubjectAltNames());
-
-    // AdditionalInformation
-    initAdditionalInformation(extnIds, extensions);
-
-    // Admission
-    initAdmission(extnIds, extensions);
+    // get a copy of extensions IDs
+    Set<ASN1ObjectIdentifier> extnIds = new HashSet<>(this.extensionIDs);
 
     // AuthorityInfoAccess
     initAuthorityInfoAccess(extnIds, extensions);
 
     // AuthorityKeyIdentifier
-    initAuthorityKeyIdentifier(extnIds, extensions);
+    initAuthorityKeyIdentifier(extnIds);
 
     // SubjectKeyIdentifier
     initSubjectKeyIdentifier(extnIds, extensions);
@@ -197,20 +149,14 @@ public class XijsonExtensions {
     // BasicConstraints
     initBasicConstraints(extnIds, extensions);
 
-    // BiometricInfo
-    initBiometricInfo(extnIds, extensions);
-
     // Certificate Policies
     initCertificatePolicies(extnIds, extensions);
 
-    // CRLDistributionPoints
-    initCrlDistributionPoints(extnIds, extensions);
+    // BiometricInfo
+    initBiometricInfo(extnIds, extensions);
 
     // ExtendedKeyUsage
     initExtendedKeyUsage(extnIds, extensions);
-
-    // CRLDistributionPoints
-    initFreshestCrl(extnIds, extensions);
 
     // Inhibit anyPolicy
     initInhibitAnyPolicy(extnIds, extensions);
@@ -233,14 +179,13 @@ public class XijsonExtensions {
     // QCStatements
     initQcStatements(extnIds, extensions);
 
-    // Restriction
-    initRestriction(extnIds, extensions);
-
     // SMIMECapabilities
     initSmimeCapabilities(extnIds, extensions);
 
     // SubjectAltNameMode
     initSubjectAlternativeName(extnIds, extensions);
+
+    initSubjectToSubjectAltNames(conf.getSubject());
 
     // SubjectInfoAccess
     initSubjectInfoAccess(extnIds, extensions);
@@ -248,20 +193,11 @@ public class XijsonExtensions {
     // TlsFeature
     initTlsFeature(extnIds, extensions);
 
-    // validityModel
-    initValidityModel(extnIds, extensions);
-
-    // SubjectDirectoryAttributes
-    initSubjectDirAttrs(extnIds, extensions);
-
-    // Extensions defined in Chinese Standard GMT 0015
-    initGmt0015Extensions(extnIds);
-
     // CCC
     initCCCExtensionSchemas(extnIds, extensions);
 
     // constant extensions
-    this.constantExtensions = conf.buildConstantExtesions();
+    this.constantExtensions = conf.buildConstantExtensions();
     if (this.constantExtensions != null) {
       extnIds.removeAll(this.constantExtensions.keySet());
     }
@@ -277,301 +213,306 @@ public class XijsonExtensions {
      *    the subject distinguished name to support legacy implementations is
      *    deprecated but permitted.
      *
-     * Make sure that if email address is contained in subject, it must be duplicated
-     * in the SubjectAltName extension as rfc822Name.
+     * Make sure that if email address is contained in subject, it must be
+     * duplicated in the SubjectAltName extension as rfc822Name.
      */
-    if (subjectControl.getControl(ObjectIdentifiers.DN.emailAddress) != null) {
-      ASN1ObjectIdentifier type = ObjectIdentifiers.DN.emailAddress;
-
-      if (subjectToSubjectAltNameModes == null || subjectToSubjectAltNameModes.get(type) == null) {
-        throw new CertprofileException("subjectToSubjectAltNames for " + ObjectIdentifiers.oidToDisplayName(type)
-            + " must be configured if subject RDN emailAddress is permitted");
-      }
-
-      GeneralNameTag nameTag = subjectToSubjectAltNameModes.get(type);
-      if (nameTag != GeneralNameTag.rfc822Name) {
-        throw new CertprofileException("For the RDN " + ObjectIdentifiers.DN.emailAddress.getId()
-            + ", only target SubjectAltName type rfc822Name is permitted, but not " + nameTag);
-      }
-    }
-
-    if (subjectToSubjectAltNameModes != null) {
-      ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
-      if (!extensionControls.containsKey(type)) {
-        throw new CertprofileException("subjectToSubjectAltNames cannot be configured if extension"
-            + " subjectAltNames is not permitted");
+    if (subjectControl.getControl(OIDs.DN.emailAddress) != null) {
+      ASN1ObjectIdentifier type = OIDs.Extn.subjectAlternativeName;
+      if (!extensionsControl.containsID(type)) {
+        throw new CertprofileException(
+            "attribute emailAddress cannot be configured if extension" +
+            " subjectAltNames is not permitted");
       }
 
       if (subjectAltNameModes != null) {
-        for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry : subjectToSubjectAltNameModes.entrySet()) {
-          GeneralNameTag nameTag = entry.getValue();
-
-          boolean allowed = false;
-          for (GeneralNameMode m : subjectAltNameModes) {
-            if (m.getTag() == nameTag) {
-              allowed = true;
-              break;
-            }
-          }
-
-          if (!allowed) {
-            throw new CertprofileException("target SubjectAltName type " + nameTag + " is not allowed");
-          }
+        if (!subjectAltNameModes.contains(GeneralNameTag.rfc822Name)) {
+          throw new CertprofileException("attribute emailAddress cannot be " +
+              "configured if extension subjectAltNames with rfc822Name is " +
+              "not permitted");
         }
       }
     }
 
     // Remove the extension processed not by the Certprofile, but by the CA
     Arrays.asList(
-        Extension.issuerAlternativeName,     Extension.authorityInfoAccess,  Extension.cRLDistributionPoints,
-        Extension.freshestCRL,               Extension.subjectKeyIdentifier, Extension.subjectInfoAccess,
-        Extn.id_extension_pkix_ocsp_nocheck, Extn.id_SCTs).forEach(extnIds::remove);
+        OIDs.Extn.issuerAlternativeName,
+        OIDs.Extn.authorityInfoAccess,
+        OIDs.Extn.cRLDistributionPoints,
+        OIDs.Extn.freshestCRL,
+        OIDs.Extn.subjectKeyIdentifier,
+        OIDs.Extn.subjectInfoAccess,
+        OIDs.Extn.id_pkix_ocsp_nocheck,
+        OIDs.Extn.id_SignedCertificateTimestampList)
+        .forEach(extnIds::remove);
 
-    // to avoid race conflict.
     Set<ASN1ObjectIdentifier> copyOfExtnIds = new HashSet<>(extnIds);
-    for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
-      ExtensionType extn = getExtension(extnId, extensions);
-      boolean processed = certProfile.initExtraExtension(extn);
-      if (processed) {
-        extnIds.remove(extnId);
+
+    // extensions that will just use the requested value
+    if (!extnIds.isEmpty()) {
+      for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
+        ExtensionType type = extensions.get(extnId.getId());
+        TripleState state = type.getInRequest();
+        if (state == TripleState.required) {
+          extnIds.remove(extnId);
+        }
       }
     }
 
     if (!extnIds.isEmpty()) {
-      throw new CertprofileException("Cannot process the extensions: " + extnIds);
+      throw new CertprofileException(
+          "Cannot process the extensions: " + extnIds);
     }
   } // method initialize0
 
-  private void initSubjectToSubjectAltNames(List<SubjectToSubjectAltNameType> list) throws CertprofileException {
-    if (CollectionUtil.isEmpty(list)) {
+  private void initAuthorityInfoAccess(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.authorityInfoAccess;
+    if (!extensionsControl.containsID(type)) {
       return;
     }
 
-    subjectToSubjectAltNameModes = new HashMap<>();
-    for (SubjectToSubjectAltNameType m : list) {
-      GeneralNameTag targetTag = m.getTarget();
-      switch (targetTag) {
-        case rfc822Name:
-        case DNSName:
-        case uniformResourceIdentifier:
-        case IPAddress:
-        case directoryName:
-        case registeredID:
-          break;
-        default:
-          throw new CertprofileException("unsupported target tag " + targetTag);
-      }
+    extnIds.remove(type);
+    AuthorityInfoAccess extConf =
+        getExtension(type, extensions).getAuthorityInfoAccess();
+    this.aiaControl = (extConf == null)
+        ? new AuthorityInfoAccessControl(false, true)
+        : new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
+              extConf.isIncludeOcsp());
+  }
 
-      subjectToSubjectAltNameModes.put(new ASN1ObjectIdentifier(m.getSource().getOid()), targetTag);
-    }
-  } // method initSubjectToSubjectAltNames
-
-  private void initAdditionalInformation(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_additionalInformation;
-    if (extensionControls.containsKey(type)) {
+  private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds) {
+    ASN1ObjectIdentifier type = OIDs.Extn.authorityKeyIdentifier;
+    if (extensionsControl.containsID(type)) {
       extnIds.remove(type);
-      AdditionalInformation extConf = getExtension(type, extensions).getAdditionalInformation();
-      if (extConf != null) {
-        additionalInformation = new ExtensionValue(critical(type),
-            extConf.getType().createDirectoryString(extConf.getText()));
-      }
     }
-  } // method initAdditionalInformation
+  }
 
-  private void initAdmission(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+  private void initSubjectKeyIdentifier(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.subjectKeyIdentifier;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    this.subjectKeyIdentifier =
+        getExtension(type, extensions).getSubjectKeyIdentifier();
+
+    if (subjectKeyIdentifier == null) {
+      subjectKeyIdentifier = new SubjectKeyIdentifierControl();
+    }
+  }
+
+  private void initBasicConstraints(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.basicConstraints;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    BasicConstraints extConf =
+        getExtension(type, extensions).getBasicConstraints();
+    if (extConf == null) {
+      extConf = getExtension(type, extensions).getBasicConstraints();
+    }
+
+    if (extConf != null) {
+      this.pathLen = extConf.getPathLen();
+    }
+  }
+
+  private void initBiometricInfo(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.biometricInfo;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+
+    this.biometricInfo = getExtension(type, extensions).getBiometricInfo();
+  }
+
+  private void initCertificatePolicies(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.certificatePolicies;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies extConf
+        = getExtension(type, extensions).getCertificatePolicies();
+    if (extConf == null) {
+      return;
+    }
+
+    certificatePolicies = extConf.toCertificatePolicies();
+  }
+
+  private void initExtendedKeyUsage(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.extendedKeyUsage;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    ExtendedKeyUsage extConf = getExtension(type, extensions)
+        .getExtendedKeyUsage();
+    if (extConf != null) {
+      this.extendedKeyusages = extConf.toXiExtKeyUsageOptions();
+    }
+  }
+
+  private void initInhibitAnyPolicy(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions)
       throws CertprofileException {
-    ASN1ObjectIdentifier type = Extn.id_extension_admission;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-
-      ExtensionType extn = getExtension(type, extensions);
-      AdmissionSyntax extConf = extn.getAdmissionSyntax();
-      if (extConf != null) {
-        this.admission = extConf.toXiAdmissionSyntax(critical(type));
-        if (!extn.permittedInRequest() && this.admission.isInputFromRequestRequired()) {
-          throw new CertprofileException("Extension " + ObjectIdentifiers.getName(type)
-            + " should be permitted in request");
-        }
-      }
+    ASN1ObjectIdentifier type = OIDs.Extn.inhibitAnyPolicy;
+    if (!extensionsControl.containsID(type)) {
+      return;
     }
-  } // method initAdmission
 
-  private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.authorityInfoAccess;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      AuthorityInfoAccess extConf = getExtension(type, extensions).getAuthorityInfoAccess();
-      this.aiaControl = (extConf == null)
-        ? new AuthorityInfoAccessControl(false, true, null, null)
-        : new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(), extConf.isIncludeOcsp(),
-              extConf.getCaIssuersProtocols(), extConf.getOcspProtocols());
+    extnIds.remove(type);
+    InhibitAnyPolicy extConf = getExtension(type, extensions)
+        .getInhibitAnyPolicy();
+    if (extConf == null) {
+      return;
     }
-  } // method initAuthorityInfoAccess
 
-  private void initAuthorityKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      AuthorityKeyIdentifier extConf = getExtension(type, extensions).getAuthorityKeyIdentifier();
-      this.useIssuerAndSerialInAki = extConf != null && extConf.isUseIssuerAndSerial();
+    int skipCerts = extConf.getSkipCerts();
+    if (skipCerts < 0) {
+      throw new CertprofileException(
+          "negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
     }
-  } // method initAuthorityKeyIdentifier
 
-  private void initSubjectKeyIdentifier(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.subjectKeyIdentifier;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      this.subjectKeyIdentifier = getExtension(type, extensions).getSubjectKeyIdentifier();
+    boolean critical = critical(type);
+    this.inhibitAnyPolicy = new ExtensionValue(critical,
+        new ASN1Integer(BigInteger.valueOf(skipCerts)));
+  }
+
+  private void initKeyUsage(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.keyUsage;
+    if (!extensionsControl.containsID(type)) {
+      return;
     }
-  } // method initSubjectKeyIdentifier
 
-  private void initBasicConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.basicConstraints;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      BasicConstraints extConf = getExtension(type, extensions).getBasicConstraints();
-      if (extConf == null) {
-        extConf = getExtension(type, extensions).getBasicConstraints();
-      }
-      if (extConf != null) {
-        this.pathLen = extConf.getPathLen();
-      }
+    extnIds.remove(type);
+    KeyUsage extConf = getExtension(type, extensions).getKeyUsage();
+    if (extConf != null) {
+      this.keyUsage = extConf.toXiKeyUsageOptions();
     }
-  } // method initBasicConstraints
+  }
 
-  private void initBiometricInfo(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+  private void initNameConstraints(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.nameConstraints;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    NameConstraints extConf = getExtension(type, extensions)
+        .getNameConstraints();
+    if (extConf == null) {
+      return;
+    }
+
+    boolean critical = critical(type);
+    this.nameConstraints = new ExtensionValue(critical,
+        extConf.toNameConstraints());
+  }
+
+  private void initPolicyConstraints(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions)
       throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.biometricInfo;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      BiometricInfo extConf = getExtension(type, extensions).getBiometricInfo();
-      if (extConf != null) {
-        try {
-          this.biometricInfo = new BiometricInfoOption(extConf);
-        } catch (NoSuchAlgorithmException ex) {
-          throw new CertprofileException("NoSuchAlgorithmException: " + ex.getMessage());
-        }
-      }
+    ASN1ObjectIdentifier type = OIDs.Extn.policyConstraints;
+    if (!extensionsControl.containsID(type)) {
+      return;
     }
-  } // method initBiometricInfo
 
-  private void initCertificatePolicies(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.certificatePolicies;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      CertificatePolicies extConf = getExtension(type, extensions).getCertificatePolicies();
-      if (extConf != null) {
-        certificatePolicies = extConf.toXiCertificatePolicies();
-      }
+    extnIds.remove(type);
+    PolicyConstraints extConf = getExtension(type, extensions)
+        .getPolicyConstraints();
+    if (extConf == null) {
+      return;
     }
-  } // method initCertificatePolicies
 
-  private void initCrlDistributionPoints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.cRLDistributionPoints;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      CrlDistributionPoints extConf = getExtension(type, extensions).getCrlDistributionPoints();
-      crlDpControl = new CrlDistributionPointsControl(extConf == null ? null : extConf.getProtocols());
+    Integer require = extConf.getRequireExplicitPolicy();
+    if (require != null && require < 0) {
+      throw new CertprofileException(
+          "negative requireExplicitPolicy is not allowed: " + require);
     }
-  } // method initCrlDistributionPoints
 
-  private void initExtendedKeyUsage(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.extendedKeyUsage;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      ExtendedKeyUsage extConf = getExtension(type, extensions).getExtendedKeyUsage();
-      if (extConf != null) {
-        this.extendedKeyusages = extConf.toXiExtKeyUsageOptions();
-      }
+    Integer inhibit = extConf.getInhibitPolicyMapping();
+    if (inhibit != null && inhibit < 0) {
+      throw new CertprofileException(
+          "negative inhibitPolicyMapping is not allowed: " + inhibit);
     }
-  } // method initExtendedKeyUsage
 
-  private void initFreshestCrl(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.freshestCRL;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      CrlDistributionPoints extConf = getExtension(type, extensions).getFreshestCrl();
-      freshestCrlControl = new CrlDistributionPointsControl(extConf == null ? null : extConf.getProtocols());
+    if (require == null && inhibit == null) {
+      return;
     }
-  } // method initFreshestCrl
 
-  private void initInhibitAnyPolicy(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.inhibitAnyPolicy;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      InhibitAnyPolicy extConf = getExtension(type, extensions).getInhibitAnyPolicy();
-      if (extConf != null) {
-        int skipCerts = extConf.getSkipCerts();
-        if (skipCerts < 0) {
-          throw new CertprofileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
-        }
-        this.inhibitAnyPolicy = new ExtensionValue(critical(type), new ASN1Integer(BigInteger.valueOf(skipCerts)));
-      }
-    }
-  } // method initInhibitAnyPolicy
+    BigInteger requireBn = require == null ? null : BigInteger.valueOf(require);
+    BigInteger inhibitBn = inhibit == null ? null : BigInteger.valueOf(inhibit);
 
-  private void initKeyUsage(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.keyUsage;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      KeyUsage extConf = getExtension(type, extensions).getKeyUsage();
-      if (extConf != null) {
-        this.keyusages = extConf.toXiKeyUsageOptions();
-      }
-    }
-  } // method initKeyUsage
+    boolean critical = critical(type);
+    this.policyConstraints = new ExtensionValue(critical,
+        new org.bouncycastle.asn1.x509.PolicyConstraints(requireBn, inhibitBn));
+  } // method initPolicyConstraints
 
-  private void initNameConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.nameConstraints;
-    if (extensionControls.containsKey(type)) {
+  private void initPrivateKeyUsagePeriod(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.privateKeyUsagePeriod;
+    if (extensionsControl.containsID(type)) {
       extnIds.remove(type);
-      NameConstraints extConf = getExtension(type, extensions).getNameConstraints();
-      if (extConf != null) {
-        this.nameConstraints = new ExtensionValue(critical(type), extConf.toXiNameConstraints());
-      }
-    }
-  } // method initNameConstraints
-
-  private void initPrivateKeyUsagePeriod(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.privateKeyUsagePeriod;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      PrivateKeyUsagePeriod extConf = getExtension(type, extensions).getPrivateKeyUsagePeriod();
+      PrivateKeyUsagePeriod extConf =
+          getExtension(type, extensions).getPrivateKeyUsagePeriod();
       if (extConf != null) {
         privateKeyUsagePeriod = Validity.getInstance(extConf.getValidity());
       }
     }
-  } // method initPrivateKeyUsagePeriod
+  }
 
-  private void initPolicyConstraints(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.policyConstraints;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      PolicyConstraints extConf = getExtension(type, extensions).getPolicyConstraints();
-      if (extConf != null) {
-        this.policyConstraints = new ExtensionValue(critical(type), extConf.toXiPolicyConstraints());
-      }
+  private void initPolicyMappings(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.policyMappings;
+    if (!extensionsControl.containsID(type)) {
+      return;
     }
-  } // method initPolicyConstraints
 
-  private void initPolicyMappings(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.policyMappings;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      PolicyMappings extConf = getExtension(type, extensions).getPolicyMappings();
-      if (extConf != null) {
-        this.policyMappings = new ExtensionValue(critical(type), extConf.toXiPolicyMappings());
-      }
+    extnIds.remove(type);
+    PolicyMappings extConf = getExtension(type, extensions).getPolicyMappings();
+    if (extConf == null) {
+      return;
     }
-  } // method initPolicyMappings
 
-  private void initQcStatements(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+    boolean critical = critical(type);
+    this.policyMappings = new ExtensionValue(critical,
+        extConf.toPolicyMappings());
+  }
+
+  private void initQcStatements(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions)
       throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.qCStatements;
-    if (!extensionControls.containsKey(type)) {
+    ASN1ObjectIdentifier type = OIDs.Extn.qCStatements;
+    if (!extensionsControl.containsID(type)) {
       return;
     }
 
@@ -581,61 +522,75 @@ public class XijsonExtensions {
       return;
     }
 
-    List<QcStatementType> qcStatementTypes = extConf.getQcStatements();
+    List<QcStatements.QcStatementType> qcStatementTypes =
+        extConf.getQcStatements();
     this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
     Set<String> currencyCodes = new HashSet<>();
     boolean requireInfoFromReq = false;
 
-    for (QcStatementType m : qcStatementTypes) {
-      ASN1ObjectIdentifier qcStatementId = new ASN1ObjectIdentifier(m.getStatementId().getOid());
-      QcStatementOption qcStatementOption;
+    for (QcStatements.QcStatementType m : qcStatementTypes) {
+      QCStatementID qcStatementId = m.getStatementId();
 
-      QcStatementValueType statementValue = m.getStatementValue();
+      QcStatements.QcStatementValueType statementValue = m.getStatementValue();
+      QcStatementOption qcStatementOption;
       if (statementValue == null) {
-        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId));
+        qcStatementOption = new QcStatementOption(
+            new QCStatement(qcStatementId.getOid()));
       } else if (statementValue.getQcRetentionPeriod() != null) {
-        QCStatement qcStatment = new QCStatement(qcStatementId, new ASN1Integer(statementValue.getQcRetentionPeriod()));
-        qcStatementOption = new QcStatementOption(qcStatment);
+        QCStatement qcStatement = new QCStatement(qcStatementId.getOid(),
+            new ASN1Integer(statementValue.getQcRetentionPeriod()));
+        qcStatementOption = new QcStatementOption(qcStatement);
       } else if (statementValue.getConstant() != null) {
         ASN1Encodable constantStatementValue;
         try {
-          constantStatementValue = new ASN1StreamParser(statementValue.getConstant().getValue()).readObject();
+          constantStatementValue = statementValue.getConstant().toASN1();
         } catch (IOException ex) {
-          throw new CertprofileException("can not parse the constant value of QcStatement");
+          throw new CertprofileException(
+              "can not parse the constant value of QcStatement");
         }
-        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, constantStatementValue));
+        qcStatementOption = new QcStatementOption(
+            new QCStatement(qcStatementId.getOid(), constantStatementValue));
       } else if (statementValue.getQcEuLimitValue() != null) {
-        QcEuLimitValueType euLimitType = statementValue.getQcEuLimitValue();
+        QcStatements.QcEuLimitValueType euLimitType =
+            statementValue.getQcEuLimitValue();
         String tmpCurrency = euLimitType.getCurrency().toUpperCase();
         if (currencyCodes.contains(tmpCurrency)) {
-          throw new CertprofileException("Duplicated definition of qcStatments with QCEuLimitValue"
-              + " for the currency " + tmpCurrency);
+          throw new CertprofileException(
+              "Duplicated definition of qcStatements with " +
+              "QCEuLimitValue for the currency " + tmpCurrency);
         }
 
         Iso4217CurrencyCode currency = StringUtil.isNumber(tmpCurrency)
-            ? new Iso4217CurrencyCode(Integer.parseInt(tmpCurrency)) : new Iso4217CurrencyCode(tmpCurrency);
+            ? new Iso4217CurrencyCode(Integer.parseInt(tmpCurrency))
+            : new Iso4217CurrencyCode(tmpCurrency);
 
-        Range2Type r1 = euLimitType.getAmount();
-        Range2Type r2 = euLimitType.getExponent();
+        QcStatements.Range2Type r1 = euLimitType.getAmount();
+        QcStatements.Range2Type r2 = euLimitType.getExponent();
         if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
-          MonetaryValue monetaryValue = new MonetaryValue(currency, r1.getMin(), r2.getMin());
-          qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, monetaryValue));
+          MonetaryValue monetaryValue =
+              new MonetaryValue(currency, r1.getMin(), r2.getMin());
+          qcStatementOption = new QcStatementOption(
+              new QCStatement(qcStatementId.getOid(), monetaryValue));
         } else {
-          qcStatementOption = new QcStatementOption(qcStatementId, new MonetaryValueOption(currency, r1, r2));
+          qcStatementOption = new QcStatementOption(qcStatementId.getOid(),
+              new MonetaryValueOption(currency, r1, r2));
           requireInfoFromReq = true;
         }
         currencyCodes.add(tmpCurrency);
       } else if (statementValue.getPdsLocations() != null) {
         ASN1EncodableVector vec = new ASN1EncodableVector();
-        for (PdsLocationType pl : statementValue.getPdsLocations()) {
+        for (QcStatements.PdsLocationType pl
+            : statementValue.getPdsLocations()) {
           String lang = pl.getLanguage();
           if (lang.length() != 2) {
             throw new CertprofileException("invalid language '" + lang + "'");
           }
 
-          vec.add(new DERSequence(new ASN1Encodable[]{new DERIA5String(pl.getUrl()), new DERPrintableString(lang)}));
+          vec.add(new DERSequence(new ASN1Encodable[]{
+              new DERIA5String(pl.getUrl()), new DERPrintableString(lang)}));
         }
-        qcStatementOption = new QcStatementOption(new QCStatement(qcStatementId, new DERSequence(vec)));
+        qcStatementOption = new QcStatementOption(new QCStatement(
+            qcStatementId.getOid(), new DERSequence(vec)));
       } else {
         throw new CertprofileException("unknown value of qcStatment");
       }
@@ -654,89 +609,143 @@ public class XijsonExtensions {
       }
       vec.add(m.getStatement());
     }
-    qcStatments = new ExtensionValue(critical(type), new DERSequence(vec));
+    qcStatements = new ExtensionValue(critical(type), new DERSequence(vec));
     qcStatementsOption = null;
   } // method initQcStatements
 
-  private void initRestriction(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_restriction;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      Restriction extConf = getExtension(type, extensions).getRestriction();
-      if (extConf != null) {
-        restriction = new ExtensionValue(critical(type), extConf.getType().createDirectoryString(extConf.getText()));
-      }
-    }
-  } // method initRestriction
-
-  private void initSmimeCapabilities(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extn.id_smimeCapabilities;
-    if (!extensionControls.containsKey(type)) {
+  private void initSmimeCapabilities(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.id_smimeCapabilities;
+    if (!extensionsControl.containsID(type)) {
       return;
     }
+
     extnIds.remove(type);
 
-    SmimeCapabilities extConf = getExtension(type, extensions).getSmimeCapabilities();
+    SmimeCapabilities extConf =
+        getExtension(type, extensions).getSmimeCapabilities();
     if (extConf == null) {
       return;
     }
 
     List<SmimeCapability> list = extConf.getCapabilities();
 
+    boolean critical = critical(type);
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (SmimeCapability m : list) {
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getCapabilityId().getOid());
+      ASN1ObjectIdentifier oid = m.getCapabilityId();
       ASN1Encodable params = null;
-      SmimeCapabilityParameter capParams = m.getParameter();
+      Integer capParams = m.getParameter();
       if (capParams != null) {
-        if (capParams.getInteger() != null) {
-          params = new ASN1Integer(capParams.getInteger());
-        } else if (capParams.getBinary() != null) {
-          params = readAsn1Encodable(capParams.getBinary().getValue());
-        }
+        params = new ASN1Integer(capParams);
       }
       vec.add(new org.bouncycastle.asn1.smime.SMIMECapability(oid, params));
     }
 
-    smimeCapabilities = new ExtensionValue(critical(type), new DERSequence(vec));
+    smimeCapabilities = new ExtensionValue(critical, new DERSequence(vec));
   } // method initSmimeCapabilities
 
-  private void initSubjectAlternativeName(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.subjectAlternativeName;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      GeneralNameType extConf = getExtension(type, extensions).getSubjectAltName();
-      if (extConf != null) {
-        this.subjectAltNameModes = extConf.toGeneralNameModes();
-      }
+  private void initSubjectAlternativeName(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.subjectAlternativeName;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    GeneralNameType extConf = getExtension(type, extensions)
+        .getSubjectAltName();
+    if (extConf != null) {
+      this.subjectAltNameModes = extConf.getModes();
     }
   } // method initSubjectAlternativeName
 
-  private void initSubjectInfoAccess(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
+  private void initSubjectToSubjectAltNames(List<RdnType> list)
       throws CertprofileException {
-    ASN1ObjectIdentifier type = Extension.subjectInfoAccess;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      SubjectInfoAccess extConf = getExtension(type, extensions).getSubjectInfoAccess();
-      if (extConf != null) {
-        List<Access> list = extConf.getAccesses();
-        this.subjectInfoAccessModes = new HashMap<>();
-        for (Access entry : list) {
-          this.subjectInfoAccessModes.put(new ASN1ObjectIdentifier(entry.getAccessMethod().getOid()),
-              entry.getAccessLocation().toGeneralNameModes());
+    if (CollectionUtil.isEmpty(list)) {
+      return;
+    }
+
+    subjectToSubjectAltNameModes = new HashMap<>();
+    for (RdnType m : list) {
+      GeneralNameTag targetTag = m.getToSAN();
+      /*
+       * RFC 5280, Section 4.1.2.7 Subject
+       *    Conforming implementations generating new certificates with
+       *    electronic mail addresses MUST use the rfc822Name in the subject
+       *    alternative name extension (Section 4.2.1.6) to describe such
+       *    identities.  Simultaneous inclusion of the emailAddress attribute
+       *    in the subject distinguished name to support legacy implementations
+       *    is deprecated but permitted.
+       *
+       * Make sure that if email address is contained in subject, it must be
+       * duplicated in the SubjectAltName extension as rfc822Name.
+       */
+      if (m.getType() == AttributeType.emailAddress) {
+        // we allow targetTag to be null to generate legacy certificates.
+        if (targetTag != null && targetTag != GeneralNameTag.rfc822Name) {
+          throw new CertprofileException("toSAN != rfc822Name: " + targetTag);
         }
       }
+
+      if (targetTag == null) {
+        continue;
+      }
+
+      if (!subjectAltNameModes.contains(targetTag)) {
+        throw new CertprofileException("target tag " + targetTag +
+            " not allowed in SAN");
+      }
+
+      switch (targetTag) {
+        case rfc822Name:
+        case DNSName:
+        case uri:
+        case IPAddress:
+        case directoryName:
+        case registeredID:
+          break;
+        default:
+          throw new CertprofileException("unsupported toSAN tag " + targetTag);
+      }
+
+      subjectToSubjectAltNameModes.put(m.getType().getOid(), targetTag);
+    }
+  } // method initSubjectToSubjectAltNames
+
+  private void initSubjectInfoAccess(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.subjectInfoAccess;
+    if (!extensionsControl.containsID(type)) {
+      return;
+    }
+
+    extnIds.remove(type);
+    SubjectInfoAccess extConf = getExtension(type, extensions)
+        .getSubjectInfoAccess();
+    if (extConf == null) {
+      return;
+    }
+
+    List<Access> list = extConf.getAccesses();
+    this.subjectInfoAccessModes = new HashMap<>();
+    for (Access entry : list) {
+      this.subjectInfoAccessModes.put(entry.getAccessMethod().getOid(),
+          entry.getAccessLocation().getModes());
     }
   } // method initSubjectInfoAccess
 
-  private void initTlsFeature(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
-    ASN1ObjectIdentifier type = Extn.id_pe_tlsfeature;
-    if (!extensionControls.containsKey(type)) {
+  private void initTlsFeature(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.id_pe_tlsfeature;
+    if (!extensionsControl.containsID(type)) {
       return;
     }
+
     extnIds.remove(type);
     TlsFeature extConf = getExtension(type, extensions).getTlsFeature();
     if (extConf == null) {
@@ -744,68 +753,26 @@ public class XijsonExtensions {
     }
 
     List<Integer> features = new ArrayList<>(extConf.getFeatures().size());
-    for (DescribableInt m : extConf.getFeatures()) {
-      int value = m.getValue();
-      if (value < 0 || value > 65535) {
-        throw new CertprofileException("invalid TLS feature (extensionType) " + value);
-      }
-      features.add(value);
-    }
+    features.addAll(extConf.getFeatures());
     Collections.sort(features);
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (Integer m : features) {
       vec.add(new ASN1Integer(m));
     }
-    tlsFeature = new ExtensionValue(critical(type), new DERSequence(vec));
-  } // method initTlsFeature
+    boolean critical = critical(type);
+    tlsFeature = new ExtensionValue(critical, new DERSequence(vec));
+  }
 
-  /**
-   * See <a href="https://www.hrz.tu-darmstadt.de/itsicherheit/object_identifier/oids_der_informatik__cdc/index.de.jsp#validity_models">Validity Model</a>
-   * for details.
-   * <pre>
-   * SEQUENCE {
-   *    validityModelId OBJECT IDENTIFIER,
-   *    validityModelInfo ANY DEFINED BY validityModelId OPTIONAL
-   *  }
-   * </pre>
-   */
-  private void initValidityModel(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extn.id_extension_validityModel;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      ValidityModel extConf = getExtension(type, extensions).getValidityModel();
-      if (extConf != null) {
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(extConf.getModelId().getOid());
-        validityModel = new ExtensionValue(critical(type), new DERSequence(oid));
-      }
-    }
-  } // method initValidityModel
-
-  private void initSubjectDirAttrs(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
-    ASN1ObjectIdentifier type = Extension.subjectDirectoryAttributes;
-    if (extensionControls.containsKey(type)) {
-      extnIds.remove(type);
-      SubjectDirectoryAttributs extConf = getExtension(type, extensions).getSubjectDirectoryAttributs();
-      if (extConf != null) {
-        subjectDirAttrsControl = new SubjectDirectoryAttributesControl(toOidList(extConf.getTypes()));
-      }
-    }
-  } // method initSubjectDirAttrs
-
-  private void initGmt0015Extensions(Set<ASN1ObjectIdentifier> extnIds) {
-    Arrays.asList(Extn.id_GMT_0015_ICRegistrationNumber,   Extn.id_GMT_0015_IdentityCode,
-        Extn.id_GMT_0015_InsuranceNumber, Extn.id_GMT_0015_OrganizationCode, Extn.id_GMT_0015_TaxationNumber)
-        .forEach(extnIds::remove);
-  } // method initGmt0015Extensions
-
-  private void initCCCExtensionSchemas(Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions)
-      throws CertprofileException {
+  private void initCCCExtensionSchemas(
+      Set<ASN1ObjectIdentifier> extnIds,
+      Map<String, ExtensionType> extensions) throws CertprofileException {
     ASN1ObjectIdentifier type = null;
     for (ASN1ObjectIdentifier m : extnIds) {
-      if (m.on(Extn.id_ccc_extn)) {
+      if (m.on(OIDs.Extn.id_ccc_extn)) {
         if (type != null) {
-          throw new CertprofileException("Maximal one CCC Extension is allowed, but configured at least 2.");
+          throw new CertprofileException("Maximal one CCC Extension is " +
+              "allowed, but configured at least 2.");
         }
         type = m;
       }
@@ -817,16 +784,23 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     ExtensionType ex = extensions.get(type.getId());
-    if (!ex.critical()) {
-      throw new CertprofileException("CCC Extension must be set to critical, but configured non-critical.");
+    if (!ex.isCritical()) {
+      throw new CertprofileException("CCC Extension must be set to " +
+          "critical, but configured non-critical.");
     }
 
     List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
-        Extn.id_ccc_Vehicle_Cert_K,       Extn.id_ccc_External_CA_Cert_F,   Extn.id_ccc_VehicleOEM_Enc_Cert,
-        Extn.id_ccc_VehicleOEM_Sig_Cert,  Extn.id_ccc_Device_Enc_Cert,      Extn.id_ccc_Vehicle_Intermediate_Cert,
-        Extn.id_ccc_VehicleOEM_CA_Cert_J, Extn.id_ccc_VehicleOEM_CA_Cert_M);
+        OIDs.Extn.id_ccc_K_Vehicle_Cert,
+        OIDs.Extn.id_ccc_F_External_CA_Cert,
+        OIDs.Extn.id_ccc_P_VehicleOEM_Enc_Cert,
+        OIDs.Extn.id_ccc_Q_VehicleOEM_Sig_Cert,
+        OIDs.Extn.id_ccc_Device_Enc_Cert,
+        OIDs.Extn.id_ccc_Vehicle_Intermediate_Cert,
+        OIDs.Extn.id_ccc_J_VehicleOEM_CA_Cert,
+        OIDs.Extn.id_ccc_M_VehicleOEM_CA_Cert);
 
-    boolean isInstanceCAExtensionSchema = Extn.id_ccc_Instance_CA_Cert_E.equals(type);
+    boolean isInstanceCAExtensionSchema =
+        OIDs.Extn.id_ccc_E_Instance_CA_Cert.equals(type);
     if (!isInstanceCAExtensionSchema && !simpleSchemaTypes.contains(type)) {
       return;
     }
@@ -836,7 +810,8 @@ public class XijsonExtensions {
 
     if (schema == null) {
       throw new CertprofileException(
-          (isInstanceCAExtensionSchema ? "cccInstanceCAExtensionSchema" : "ccExtensionSchema") +
+          (isInstanceCAExtensionSchema ? "cccInstanceCAExtensionSchema"
+              : "ccExtensionSchema") +
           " is not set for " + type);
     }
 
@@ -845,7 +820,9 @@ public class XijsonExtensions {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     vec.add(new ASN1Integer(schema.getVersion()));
     if (isInstanceCAExtensionSchema) {
-      CCCInstanceCAExtensionSchema schema1 = (CCCInstanceCAExtensionSchema) schema;
+      CCCInstanceCAExtensionSchema schema1 =
+          (CCCInstanceCAExtensionSchema) schema;
+
       byte[] bytes = Pack.longToBigEndian(schema1.getAppletVersion());
       vec.add(new DEROctetString(Arrays.copyOfRange(bytes, 4, 8)));
       if (schema1.getPlatformInformation() != null) {
@@ -853,126 +830,83 @@ public class XijsonExtensions {
       }
     }
 
-    this.cccExtensionSchemaValue = new ExtensionValue(ex.critical(), new DERSequence(vec));
+    this.cccExtensionSchemaValue =
+        new ExtensionValue(ex.isCritical(), new DERSequence(vec));
   }
 
-  private static List<ASN1ObjectIdentifier> toOidList(List<DescribableOid> oidWithDescTypes) {
-    if (CollectionUtil.isEmpty(oidWithDescTypes)) {
-      return null;
-    }
-
-    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-    for (DescribableOid type : oidWithDescTypes) {
-      oids.add(new ASN1ObjectIdentifier(type.getOid()));
-    }
-    return Collections.unmodifiableList(oids);
-  } // method toOidList
-
-  GeneralNames createRequestedSubjectAltNames(
-      X500Name requestedSubject, X500Name grantedSubject, Map<ASN1ObjectIdentifier, Extension> requestedExtensions)
+  public static GeneralNames createRequestedSubjectAltNames(
+      X500Name reqSubject, GeneralNames sanExtnValue,
+      Set<GeneralNameTag> subjectAltNameModes,
+      Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes)
       throws BadCertTemplateException {
-    Extension extn = (requestedExtensions == null) ? null : requestedExtensions.get(Extension.subjectAlternativeName);
-    ASN1Encodable extValue = (extn == null) ? null : extn.getParsedValue();
+    List<GeneralName> list = new LinkedList<>();
 
-    if (extValue == null && subjectToSubjectAltNameModes == null) {
-      return null;
+    if (sanExtnValue != null) {
+      for (GeneralName generalName : sanExtnValue.getNames()) {
+        list.add(ProfileUtil.createGeneralName(
+                  generalName, subjectAltNameModes));
+      }
     }
 
-    GeneralNames reqNames = (extValue == null) ? null : GeneralNames.getInstance(extValue);
-    if (subjectAltNameModes == null && subjectToSubjectAltNameModes == null) {
-      return reqNames;
-    }
-
-    List<GeneralName> grantedNames = new LinkedList<>();
-    // copy the required attributes of Subject
     if (subjectToSubjectAltNameModes != null) {
-      for (Entry<ASN1ObjectIdentifier, GeneralNameTag> entry : subjectToSubjectAltNameModes.entrySet()) {
-        ASN1ObjectIdentifier attrType = entry.getKey();
-        GeneralNameTag tag = entry.getValue();
+      for (ASN1ObjectIdentifier attrType
+          : subjectToSubjectAltNameModes.keySet()) {
+        GeneralNameTag targetTag = subjectToSubjectAltNameModes.get(attrType);
 
-        RDN[] rdns = grantedSubject.getRDNs(attrType);
-        if (rdns == null || rdns.length == 0) {
-          rdns = requestedSubject.getRDNs(attrType);
-        }
-
+        RDN[] rdns = reqSubject.getRDNs(attrType);
         if (rdns == null) {
           continue;
         }
 
         for (RDN rdn : rdns) {
-          String rdnValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
-          GeneralName gn;
-          switch (tag) {
-            case rfc822Name:
-            case IPAddress:
-            case uniformResourceIdentifier:
-            case DNSName:
-            case directoryName:
-            case registeredID:
-              gn = new GeneralName(tag.getTag(), rdnValue);
-              break;
-            default:
-              throw new IllegalStateException("unsupported GeneralName tag " + tag);
-          } // end switch (tag)
-
-          if (!grantedNames.contains(gn)) {
-            grantedNames.add(gn);
+          String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
+          if (subjectAltNameModes == null
+              || subjectAltNameModes.contains(targetTag)) {
+            list.add(new GeneralName(targetTag.getTag(), text));
           }
         }
       }
     }
 
-    // copy the requested SubjectAltName entries
-    if (reqNames != null) {
-      GeneralName[] reqL = reqNames.getNames();
-      for (GeneralName generalName : reqL) {
-        GeneralName gn = BaseCertprofile.createGeneralName(generalName, subjectAltNameModes);
-        if (!grantedNames.contains(gn)) {
-          grantedNames.add(gn);
-        }
-      }
-    }
-
-    return grantedNames.isEmpty() ? null : new GeneralNames(grantedNames.toArray(new GeneralName[0]));
-  } // method createRequestedSubjectAltNames
-
-  public ExtensionValue getAdditionalInformation() {
-    return additionalInformation;
-  }
-
-  public AdmissionExtension.AdmissionSyntaxOption getAdmission() {
-    return admission;
+    return list.isEmpty() ? null
+        : new GeneralNames(list.toArray(new GeneralName[0]));
   }
 
   public AuthorityInfoAccessControl getAiaControl() {
     return aiaControl;
   }
 
-  public CrlDistributionPointsControl getCrlDpControl() {
-    return crlDpControl;
-  }
-
-  public CrlDistributionPointsControl getFreshestCrlControl() {
-    return freshestCrlControl;
-  }
-
-  public Map<ASN1ObjectIdentifier, GeneralNameTag> getSubjectToSubjectAltNameModes() {
-    return subjectToSubjectAltNameModes;
-  }
-
-  public Set<GeneralNameMode> getSubjectAltNameModes() {
-    return subjectAltNameModes;
-  }
-
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes() {
-    return subjectInfoAccessModes;
-  }
-
-  public BiometricInfoOption getBiometricInfo() {
+  public BiometricInfo getBiometricInfo() {
     return biometricInfo;
   }
 
-  public org.bouncycastle.asn1.x509.CertificatePolicies getCertificatePolicies() {
+  public Validity getPrivateKeyUsagePeriod() {
+    return privateKeyUsagePeriod;
+  }
+
+  public ExtensionValue getQcStatements() {
+    return qcStatements;
+  }
+
+  List<QcStatementOption> getQcStatementsOption() {
+    return qcStatementsOption;
+  }
+
+  public Set<GeneralNameTag> getSubjectAltNameModes() {
+    return subjectAltNameModes;
+  }
+
+  public Map<ASN1ObjectIdentifier, GeneralNameTag>
+      getSubjectToSubjectAltNameModes() {
+    return subjectToSubjectAltNameModes;
+  }
+
+  public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>>
+      getSubjectInfoAccessModes() {
+    return subjectInfoAccessModes;
+  }
+
+  public CertificatePolicies getCertificatePolicies() {
     return certificatePolicies;
   }
 
@@ -984,12 +918,8 @@ public class XijsonExtensions {
     return extendedKeyusages;
   }
 
-  public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls() {
-    return extensionControls;
-  }
-
-  public boolean isUseIssuerAndSerialInAki() {
-    return useIssuerAndSerialInAki;
+  public ExtensionsControl getExtensionControls() {
+    return extensionsControl;
   }
 
   public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
@@ -1000,8 +930,8 @@ public class XijsonExtensions {
     return inhibitAnyPolicy;
   }
 
-  public Set<KeyUsageControl> getKeyusages() {
-    return keyusages;
+  public Set<KeySingleUsage> getKeyUsage(KeySpec keySpec) {
+    return keyUsage == null ? null : keyUsage.getUsages(keySpec);
   }
 
   public ExtensionValue getNameConstraints() {
@@ -1020,36 +950,12 @@ public class XijsonExtensions {
     return policyMappings;
   }
 
-  public Validity getPrivateKeyUsagePeriod() {
-    return privateKeyUsagePeriod;
-  }
-
-  public ExtensionValue getQcStatments() {
-    return qcStatments;
-  }
-
-  public List<QcStatementOption> getQcStatementsOption() {
-    return qcStatementsOption;
-  }
-
-  public ExtensionValue getRestriction() {
-    return restriction;
-  }
-
   public ExtensionValue getSmimeCapabilities() {
     return smimeCapabilities;
   }
 
   public ExtensionValue getTlsFeature() {
     return tlsFeature;
-  }
-
-  public ExtensionValue getValidityModel() {
-    return validityModel;
-  }
-
-  public SubjectDirectoryAttributesControl getSubjectDirAttrsControl() {
-    return subjectDirAttrsControl;
   }
 
   public ASN1ObjectIdentifier getCccExtensionSchemaType() {
@@ -1060,24 +966,23 @@ public class XijsonExtensions {
     return cccExtensionSchemaValue;
   }
 
+  public boolean isKeepOrder() {
+    return keepOrder;
+  }
+
+  public List<ASN1ObjectIdentifier> getExtensionIDs() {
+    return extensionIDs;
+  }
+
   private static ExtensionType getExtension(
       ASN1ObjectIdentifier type, Map<String, ExtensionType> extensions) {
     return Optional.ofNullable(extensions.get(type.getId())).orElseThrow(() ->
         new IllegalStateException("should not reach here: undefined extension "
-          + ObjectIdentifiers.oidToDisplayName(type)));
-  } // method getExtension
-
-  private static ASN1Encodable readAsn1Encodable(byte[] encoded) throws CertprofileException {
-    ASN1StreamParser parser = new ASN1StreamParser(encoded);
-    try {
-      return parser.readObject();
-    } catch (IOException ex) {
-      throw new CertprofileException("could not parse the constant extension value", ex);
-    }
-  } // method readAsn1Encodable
+          + OIDs.oidToDisplayName(type)));
+  }
 
   private boolean critical(ASN1ObjectIdentifier type) {
-    return extensionControls.get(type).isCritical();
+    return extensionsControl.getControl(type).isCritical();
   }
 
 }

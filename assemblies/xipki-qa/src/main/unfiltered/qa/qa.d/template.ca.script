@@ -3,7 +3,7 @@ source file:./qa/qa.d/initdb.script
 echo "Restart CA (tomcat) server!"
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
-sleep 3
+sleep 1
 
 echo "#################################################################"
 echo "#                       Prepare environment                     #"
@@ -14,10 +14,10 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 
 ## Certificate Profiles
 
-list = [ cross subca subca-complex ocsp scep multiple-ous multi-valued-rdn \
+list = [ cross subca subca-complex ocsp scep multiple-ous \
   qc ee-complex smime smime-legacy tls tls-enc tls-c max-time fixed-partial-subject \
-  constant-ext gmt0015 \
-  tls-dsa tls-ec tls-ed25519 tls-rsa tls-sm2 tls-sm2-enc]
+  constant-ext \
+  tls-rsa tls-ec tls-edwards tls-montgomery tls-mldsa tls-mlkem tls-sm2 tls-sm2-enc]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -34,12 +34,12 @@ ca:publisher-add \
 ca:keypairgen-add \
   --name pkcs11 \
   --type pkcs11 \
-  --conf slot=0,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+  --conf slot=0,keyspecs=SM2:ED25519:X25519:RSA2048:RSA3072:RSA4096:SECP256R1:SECP384R1:SECP521R1:BRAINPOOLP256R1:BRAINPOOLP384R1:BRAINPOOLP521R1
 
 ca:keypairgen-add \
   --name keypool \
   --type keypool \
-  --conf datasource=keypool,password=CHANGEIT,keyspecs=RSA:DSA:EC:SM2:ED25519:ED448:X25519:X448
+  --conf datasource=keypool,password=CHANGEIT,keyspecs=SM2:ED25519:ED448:X25519:X448:RSA2048:RSA3072:RSA4096:SECP256R1:SECP384R1:SECP521R1:BRAINPOOLP256R1:BRAINPOOLP384R1:BRAINPOOLP521R1
 
 # CMP Requestors
 ca:requestor-add \
@@ -59,10 +59,10 @@ ca:profile-add \
 
 ## Generate selfsigned rootca
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "algo=$SIGALGO,keystore=file:output/rootca1.p12,password=CHANGEIT"
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,keystore=file:output/rootca1.p12,password=CHANGEIT"
 }
 
 ca:gen-rootca \
@@ -80,7 +80,7 @@ ca:gen-rootca \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
   --ca-cert-uri http://myorg.org/rootca1.der \
-  --crl-uri "http://localhost:8081/crl/?type=crl&name=rootca1" \
+  --crl-uri "http://localhost:8081/dummy/crl/?type=crl&name=rootca1" \
   --validity-mode cutoff \
   --save-cert yes \
   --save-keypair no \
@@ -91,7 +91,7 @@ ca:gen-rootca \
 ca:profile-rm -f rootca
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 \
     --p12 output/rootca1.p12 \
     --password CHANGEIT \
@@ -123,15 +123,15 @@ ca:careq-add \
   --ca rootca1
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT \
     --label subca1 \
     --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subca1.p12 \
     --password CHANGEIT \
     --outform $OUTFORM \
@@ -146,7 +146,7 @@ ca:enroll-cert \
   --out output/subca1.crt \
   --profile subca
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 \
     --p12 output/subca1.p12 \
     --password CHANGEIT \
@@ -155,8 +155,8 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 }
 
 ## Generate keys and CSR for subcawithcrl1
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
@@ -171,7 +171,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
     --keyusage cRLSign
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subcawithcrl1.p12 \
     --password CHANGEIT \
     --outform $OUTFORM \
@@ -195,7 +195,7 @@ ca:enroll-cert \
   --out output/subcawithcrl1.crt \
   --profile subca-complex
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 \
     --p12 output/subcawithcrl1.p12 \
     --password CHANGEIT \
@@ -204,15 +204,15 @@ if { $TOKEN_TYPE equals "pkcs12" } then {
 }
 
 ## Generate keys and CSR for OCSPResponder
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT \
     --label ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-CHANGEIT56789,O=myorg,C=DE"
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/ocsp99.p12 \
     --password CHANGEIT \
     --outform $OUTFORM \
@@ -227,7 +227,7 @@ ca:enroll-cert \
   --out output/ocsp99.crt \
   --profile ocsp
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 \
     --p12 output/ocsp99.p12 \
     --password CHANGEIT \
@@ -244,10 +244,10 @@ echo "#                   Add subca with OCSP & CRL                   #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
 }
 
 ca:ca-add \
@@ -259,7 +259,7 @@ ca:ca-add \
   --signer-type $TOKEN_TYPE \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder1 \
-  --crl-uri "http://localhost:8081/crl/?type=crl&name=subca1" \
+  --crl-uri "http://localhost:8081/dummy/crl/?type=crl&name=subca1" \
   --ca-cert-uri http://myorg.org/subca1.der \
   --save-cert yes \
   --save-keypair yes \
@@ -268,7 +268,7 @@ ca:ca-add \
   --certchain output/rootca1.crt \
   --crl-control "interval.hours=24,fullcrl.intervals=7,overlap=3d,interval.time=02:00" \
   --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
-  --ctlog-control "enabled=true,sslcontext.name=ctlog1,servers=https://localhost/ctlog/"
+  --ctlog-control "enabled=true,sslcontext.name=ctlog1,servers=https://localhost:8444/dummy/ctlog/"
 
 ca:caalias-add \
   --ca subca1 \
@@ -285,10 +285,12 @@ ca:caprofile-add \
   --profile tls:tls-alias1,tls-alias2 \
   --profile tls-c \
   --profile fixed-partial-subject \
-  --profile tls-dsa \
-  --profile tls-ec \
-  --profile tls-ed25519 \
   --profile tls-rsa \
+  --profile tls-ec \
+  --profile tls-edwards \
+  --profile tls-montgomery \
+  --profile tls-mldsa \
+  --profile tls-mlkem \
   --profile tls-sm2
 
 ## Add publisher
@@ -311,10 +313,10 @@ echo "#                       Add subca with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subcawithcrl1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$CA_SIGALG"
 }
 
 ca:ca-add \
@@ -327,8 +329,8 @@ ca:ca-add \
   --signer-conf "$CA_SIGNER_CONF" \
   --ocsp-uri http://localhost:8080/ocsp/responder2 \
   --ca-cert-uri http://myorg.org/subcawithcrl1.der \
-  --crl-uri "http://localhost:8081/crl/?type=crl&name=subcawithcrl1" \
-  --deltacrl-uri "http://localhost:8081/crl/?type=deltacrl&name=subcawithcrl1" \
+  --crl-uri "http://localhost:8081/dummy/crl/?type=crl&name=subcawithcrl1" \
+  --deltacrl-uri "http://localhost:8081/dummy/crl/?type=deltacrl&name=subcawithcrl1" \
   --validity-mode lax \
   --save-cert yes \
   --save-keypair yes \
@@ -349,9 +351,7 @@ ca:caprofile-add \
   --profile tls-enc \
   --profile scep \
   --profile multiple-ous \
-  --profile multi-valued-rdn \
   --profile max-time \
-  --profile gmt0015 \
   --profile tls-sm2 \
   --profile tls-sm2-enc
 

@@ -1,10 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 /**
  * Extension value control.

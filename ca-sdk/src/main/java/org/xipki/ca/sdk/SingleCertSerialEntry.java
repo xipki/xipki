@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -40,27 +38,28 @@ public class SingleCertSerialEntry extends SdkEncodable {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(2);
-    encoder.writeBigInt(serialNumber);
-    encoder.writeObject(error);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(2).writeBigInt(serialNumber)
+        .writeObject(error);
   }
 
-  public static SingleCertSerialEntry decode(CborDecoder decoder) throws DecodeException {
+  public static SingleCertSerialEntry decode(CborDecoder decoder)
+      throws CodecException {
     try {
       if (decoder.readNullOrArrayLength(2)) {
         return null;
       }
 
       return new SingleCertSerialEntry(
-          decoder.readBigInt(),
-          ErrorEntry.decode(decoder));
+          decoder.readBigInt(), ErrorEntry.decode(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
     }
   }
 
-  public static SingleCertSerialEntry[] decodeArray(CborDecoder decoder) throws DecodeException {
+  public static SingleCertSerialEntry[] decodeArray(CborDecoder decoder)
+      throws CodecException {
     Integer arrayLen = decoder.readNullOrArrayLength();
     if (arrayLen == null) {
       return null;

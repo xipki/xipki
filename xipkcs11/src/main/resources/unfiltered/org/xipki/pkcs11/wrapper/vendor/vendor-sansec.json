@@ -1,0 +1,26 @@
+{
+  "name": "SANSEC HSM",
+  "filter": {
+    "manufacturerIDs": [
+      "sansec"
+    ]
+  },
+  "vendor": "SANSEC",
+  "specialBehaviours": [
+    "EC_PRIVATEKEY_ECPOINT",
+    "SM2_PRIVATEKEY_ECPOINT"
+  ],
+  "nameToCodeMap": {
+    "CKM_VENDOR_SM2_SM3": "0x80008100",
+    "CKM_VENDOR_SM2": "0x80008104",
+    "CKM_VENDOR_SM3": "0x80009001",
+    "CKM_VENDOR_SM4_KEY_GEN": "0x80000107",
+    "CKM_VENDOR_SM4_CBC_PAD": "0x8000A102",
+    "CKM_VENDOR_SM2_KEY_PAIR_GEN": "0x80008001",
+    "CKK_VENDOR_SM2": "0x80000004",
+    "CKK_VENDOR_SM4": "0x80000106",
+    "CKM_VENDOR_SM4_ECB": "0x80000108",
+    "CKM_VENDOR_SM4_CBC": "0x80000109",
+    "CKM_VENDOR_SM2_ENCRYPT": "0x80008200"
+  }
+}

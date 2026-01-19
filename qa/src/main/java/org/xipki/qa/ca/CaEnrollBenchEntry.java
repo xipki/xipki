@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ca;
@@ -8,15 +8,15 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.OIDs;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 /**
  * Entry for benchmark enrollment test.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public class CaEnrollBenchEntry {
@@ -52,37 +52,41 @@ public class CaEnrollBenchEntry {
     private IncreasableSubject(String subjectTemplate, RandomDn randomDn) {
       Args.notNull(randomDn, "randomDn");
 
-      this.subjectTemplate = new X500Name(Args.notBlank(subjectTemplate, "subjectTemplate"));
+      this.subjectTemplate = new X500Name(Args.notBlank(subjectTemplate,
+          "subjectTemplate"));
 
       switch (randomDn) {
         case GIVENNAME:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.givenName;
+          this.subjectRdnForIncrement = OIDs.DN.givenName;
           break;
         case SURNAME:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.surname;
+          this.subjectRdnForIncrement = OIDs.DN.surname;
           break;
         case STREET:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.street;
+          this.subjectRdnForIncrement = OIDs.DN.street;
           break;
         case POSTALCODE:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.postalCode;
+          this.subjectRdnForIncrement = OIDs.DN.postalCode;
           break;
         case O:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.O;
+          this.subjectRdnForIncrement = OIDs.DN.organization;
           break;
         case OU:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.OU;
+          this.subjectRdnForIncrement = OIDs.DN.organizationalUnit;
           break;
         case CN:
-          this.subjectRdnForIncrement = ObjectIdentifiers.DN.CN;
+          this.subjectRdnForIncrement = OIDs.DN.commonName;
           break;
         default:
-          throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);
+          throw new IllegalStateException(
+              "should not reach here, unknown randomDn " + randomDn);
       }
 
-      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
-        throw new IllegalArgumentException("subjectTemplate does not contain DN field "
-            + ObjectIdentifiers.oidToDisplayName(this.subjectRdnForIncrement));
+      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length
+          == 0) {
+        throw new IllegalArgumentException(
+            "subjectTemplate does not contain DN field "
+            + OIDs.oidToDisplayName(this.subjectRdnForIncrement));
       }
     } // constructor
 
@@ -98,7 +102,8 @@ public class CaEnrollBenchEntry {
         if (!incremented) {
           if (rdn.getFirst().getType().equals(subjectRdnForIncrement)) {
             String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
-            rdn = new RDN(subjectRdnForIncrement, new DERUTF8String(text + index));
+            rdn = new RDN(subjectRdnForIncrement,
+                  new DERUTF8String(text + index));
             incremented = true;
           }
         }
@@ -116,8 +121,8 @@ public class CaEnrollBenchEntry {
 
   private final IncreasableSubject subject;
 
-  public CaEnrollBenchEntry(
-      String certprofile, CaEnrollBenchKeyEntry keyEntry, String subjectTemplate, RandomDn randomDn) {
+  public CaEnrollBenchEntry(String certprofile, CaEnrollBenchKeyEntry keyEntry,
+                            String subjectTemplate, RandomDn randomDn) {
     this.certprofile = Args.notBlank(certprofile, "certprofile");
     this.keyEntry = keyEntry;
     this.subject = new IncreasableSubject(subjectTemplate, randomDn);

@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -37,20 +35,20 @@ public class ConfirmCertsRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(2);
-    encoder.writeTextString(transactionId);
-    encoder.writeObjects(entries);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(2)
+        .writeTextString(transactionId).writeObjects(entries);
   }
 
-  public static ConfirmCertsRequest decode(byte[] encoded) throws DecodeException {
+  public static ConfirmCertsRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("ConfirmCertsRequest", decoder, 2);
       return new ConfirmCertsRequest(
-          decoder.readTextString(),
-          Entry.decodeArray(decoder));
+          decoder.readTextString(), Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
     }
   }
 
@@ -84,14 +82,14 @@ public class ConfirmCertsRequest extends SdkRequest {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException {
+    protected void encode0(CborEncoder encoder) throws CodecException {
       encoder.writeArrayStart(3);
       encoder.writeBoolean(accept);
       encoder.writeBigInt(certReqId);
       encoder.writeByteString(certhash);
     }
 
-    public static Entry decode(CborDecoder decoder) throws DecodeException {
+    public static Entry decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(3)) {
           return null;
@@ -102,11 +100,12 @@ public class ConfirmCertsRequest extends SdkRequest {
             decoder.readBigInt(),
             decoder.readByteString());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    public static Entry[] decodeArray(CborDecoder decoder)
+        throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

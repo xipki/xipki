@@ -1,12 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
-import org.xipki.util.Args;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.time.Instant;
 
@@ -17,18 +20,13 @@ import java.time.Instant;
  * @since 2.0.0
  */
 
-public class CertRevocationInfo {
+public class CertRevocationInfo implements JsonEncodable {
 
   private CrlReason reason;
 
   private Instant revocationTime;
 
   private Instant invalidityTime;
-
-  // For the deserialization only
-  @SuppressWarnings("unused")
-  private CertRevocationInfo() {
-  }
 
   public CertRevocationInfo(CrlReason reason) {
     this(reason, Instant.now(), null);
@@ -38,7 +36,8 @@ public class CertRevocationInfo {
     this(reason, revocationTime, null);
   }
 
-  public CertRevocationInfo(CrlReason reason, Instant revocationTime, Instant invalidityTime) {
+  public CertRevocationInfo(
+      CrlReason reason, Instant revocationTime, Instant invalidityTime) {
     this.reason = Args.notNull(reason, "reason");
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
@@ -52,22 +51,27 @@ public class CertRevocationInfo {
     this(reasonCode, revocationTime, null);
   }
 
-  public CertRevocationInfo(int reasonCode, Instant revocationTime, Instant invalidityTime) {
+  public CertRevocationInfo(int reasonCode, Instant revocationTime,
+                            Instant invalidityTime) {
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
     this.invalidityTime = invalidityTime;
-  }
-
-  public void setReason(CrlReason reason) {
-    this.reason = Args.notNull(reason, "reason");
   }
 
   public CrlReason getReason() {
     return reason;
   }
 
+  public void setReason(CrlReason reason) {
+    this.reason = Args.notNull(reason, "reason");
+  }
+
   public void setRevocationTime(Instant revocationTime) {
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
+  }
+
+  public void setInvalidityTime(Instant invalidityTime) {
+    this.invalidityTime = invalidityTime;
   }
 
   /**
@@ -75,9 +79,6 @@ public class CertRevocationInfo {
    * @return revocation time, never be null
    */
   public Instant getRevocationTime() {
-    if (revocationTime == null) {
-      revocationTime = Instant.now();
-    }
     return revocationTime;
   }
 
@@ -89,24 +90,22 @@ public class CertRevocationInfo {
     return invalidityTime;
   }
 
-  public void setInvalidityTime(Instant invalidityTime) {
-    this.invalidityTime = invalidityTime;
-  }
-
   @Override
   public String toString() {
-    return StringUtil.concatObjects("reason: ", reason, "\nrevocationTime: ", revocationTime,
+    return StringUtil.concatObjects("reason: ", reason,
+        "\nrevocationTime: ", revocationTime,
         "\ninvalidityTime: ", invalidityTime);
   }
 
   public static CertRevocationInfo fromEncoded(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
     CrlReason reason = CrlReason.forNameOrText(pairs.value("reason"));
-    Instant revocationTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("revocationTime")));
+    Instant revocationTime = Instant.ofEpochSecond(
+        Long.parseLong(pairs.value("revocationTime")));
     String str = pairs.value("invalidityTime");
     Instant invalidityTime = null;
     if (str != null) {
-      invalidityTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("invalidityTime")));
+      invalidityTime = Instant.ofEpochSecond(Long.parseLong(str));
     }
 
     return new CertRevocationInfo(reason, revocationTime, invalidityTime);
@@ -115,9 +114,11 @@ public class CertRevocationInfo {
   public String encode() {
     ConfPairs pairs = new ConfPairs()
         .putPair("reason", reason.getDescription())
-        .putPair("revocationTime", Long.toString(revocationTime.getEpochSecond()));
+        .putPair("revocationTime",
+            Long.toString(revocationTime.getEpochSecond()));
     if (invalidityTime != null) {
-      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getEpochSecond()));
+      pairs.putPair("invalidityTime",
+          Long.toString(invalidityTime.getEpochSecond()));
     }
     return pairs.getEncoded();
   }
@@ -140,8 +141,27 @@ public class CertRevocationInfo {
 
     CertRevocationInfo other = (CertRevocationInfo) obj;
     return reason == other.reason
-        && CompareUtil.equalsObject(revocationTime, other.revocationTime)
-        && CompareUtil.equalsObject(invalidityTime, other.invalidityTime);
+        && CompareUtil.equals(revocationTime, other.revocationTime)
+        && CompareUtil.equals(invalidityTime, other.invalidityTime);
+  }
+
+  @Override
+  public JsonMap toCodec() {
+    JsonMap ret = new JsonMap();
+    if (reason != null) {
+      ret.put("reason", reason.getDescription());
+    }
+    ret.put("revocationTime", revocationTime);
+    ret.put("invalidityTime", invalidityTime);
+    return ret;
+  }
+
+  public static CertRevocationInfo parse(JsonMap json) throws CodecException {
+    String str = json.getString("reason");
+    CrlReason reason = str == null ? null : CrlReason.forNameOrText(str);
+    return new CertRevocationInfo(reason,
+        json.getInstant("revocationTime"),
+        json.getInstant("invalidityTime"));
   }
 
 }

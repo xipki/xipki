@@ -19,7 +19,7 @@ Please refer to [commands.md](commands.md) for more details.
 ## Setup CA Server
 
 * _(If error like "Identity or Certificate with label=mylabel already exists" occurs,
-      you need to comment the line in the file `setup-p11.script` which generate the key (e.g. dsa-p11 ec-p11, rsa-p11, sm2-p12)
+      you need to comment the line in the file `setup-p11.script` which generate the key (e.g. ec-p11, rsa-p11, sm2-p12)
       or delete the existing key using command `delete-key-p11`)_.
 
 * Start Management CLI.
@@ -28,21 +28,21 @@ Please refer to [commands.md](commands.md) for more details.
 
 * Setup CA (MGMT-CLI shall be on the same machine as the tomcat CA server)  
   Edit (e.g. subject and password) and execcute the script file `xipki/ca-setup/<folder>/setup-{p11|p12}.script` 
-  `source <script-file> {rsa|ec|dsa|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
+  `source <script-file> {rsa|ec|sm2|eddsa} <tomcat-dir> [<xipki-dir>]`,  
   `xipki-dir` is optional and has default value `<tomca-dir>/xipki`.
   And `<folder>` is:
   * If the CA configuration is saved in the database (2 database instances are needed, 
       as specified in `caconf-db.properties` and `ca-db.properties`):
       * In case of using new keys and certificates:  
-        `cacert-none-dbbased`
+        `cacert-none-db`
       * In case of using existing keys and certificates:  
-        `cacert-present-dbbased`
+        `cacert-present-db`
   * If the CA configuration is read from configuration files (CA itself is not configurable, only 1
     database instance is needed, as specified in `ca-db.properties`):
       * In case of using new keys and certificates:  
-        `cacert-none-filebased`
+        `cacert-none-file`
       * In case of using existing keys and certificates:  
-        `cacert-present-filebased`
+        `cacert-present-file`
 
 * (Optional) Generate Key and Certificate for OCSP Responder
     * If you wish to generate the signing key and certificate for the OCSP responder, in the Management CLI:  

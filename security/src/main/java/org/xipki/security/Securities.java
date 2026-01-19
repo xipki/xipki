@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
@@ -6,41 +6,35 @@ package org.xipki.security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolverException;
-import org.xipki.security.pkcs11.NativeP11ModuleFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
-import org.xipki.security.pkcs11.P11ModuleFactory;
-import org.xipki.security.pkcs11.P11ModuleFactoryRegisterImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
-import org.xipki.security.pkcs11.Pkcs11conf;
-import org.xipki.security.pkcs11.emulator.EmulatorP11ModuleFactory;
-import org.xipki.security.pkcs11.hsmproxy.HsmProxyP11ModuleFactory;
+import org.xipki.security.pkcs11.P11SystemConf;
 import org.xipki.security.pkcs12.P12SignerFactory;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.JSON;
-import org.xipki.util.ReflectiveUtil;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.ReflectiveUtil;
+import org.xipki.util.io.FileOrValue;
+import org.xipki.util.password.PasswordResolverException;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
- * Utility class to initialize {@link SecurityFactory} and {@link P11CryptServiceFactory}.
+ * Utility class to initialize {@link SecurityFactory} and
+ * {@link P11CryptServiceFactory}.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class Securities implements Closeable {
 
-  public static class SecurityConf extends ValidableConf {
+  public static class SecurityConf {
 
     private boolean keyStrongrandomEnabled;
 
@@ -107,43 +101,47 @@ public class Securities implements Closeable {
     }
 
     @Deprecated
-    public void setKeypairGeneratorFactories(List<String> keypairGeneratorFactories) {
-      if (keypairGeneratorFactories != null && !keypairGeneratorFactories.isEmpty()) {
+    public void setKeypairGeneratorFactories(
+        List<String> keypairGeneratorFactories) {
+      if (keypairGeneratorFactories != null &&
+          !keypairGeneratorFactories.isEmpty()) {
         LOG.warn("keypairGeneratorFactories is not allowed");
       }
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
+    public static SecurityConf parse(JsonMap json) throws CodecException {
+      SecurityConf ret = new SecurityConf();
+
+      Boolean b = json.getBool("keyStrongrandomEnabled");
+      if (b != null) {
+        ret.setKeyStrongrandomEnabled(b);
+      }
+
+      b = json.getBool("signStrongrandomEnabled");
+      if (b != null) {
+        ret.setSignStrongrandomEnabled(b);
+      }
+
+      Integer i = json.getInt("defaultSignerParallelism");
+      if (i != null) {
+        ret.setDefaultSignerParallelism(i);
+      }
+
+      ret.setPkcs11Conf(FileOrValue.parse(json.getMap("pkcs11Conf")));
+      ret.setSignerFactories(json.getStringList("signerFactories"));
+
+      return ret;
     }
 
   } // class SecurityConf
 
   private static final Logger LOG = LoggerFactory.getLogger(Securities.class);
 
-  private P11ModuleFactoryRegisterImpl p11ModuleFactoryRegister;
-
   private P11CryptServiceFactoryImpl p11CryptServiceFactory;
 
   private SecurityFactoryImpl securityFactory;
 
-  private final List<P11ModuleFactory> p11ModuleFactories;
-
   public Securities() {
-    this(createDefaultFactories());
-  }
-
-  public Securities(List<P11ModuleFactory> p11ModuleFactories) {
-    this.p11ModuleFactories = p11ModuleFactories != null
-        ? new ArrayList<>(p11ModuleFactories) : Collections.emptyList();
-  }
-
-  private static List<P11ModuleFactory> createDefaultFactories() {
-    List<P11ModuleFactory> factories = new ArrayList<>(3);
-    factories.add(new NativeP11ModuleFactory());
-    factories.add(new EmulatorP11ModuleFactory());
-    factories.add(new HsmProxyP11ModuleFactory());
-    return factories;
   }
 
   public SecurityFactory getSecurityFactory() {
@@ -180,15 +178,6 @@ public class Securities implements Closeable {
 
   @Override
   public void close() {
-    if (p11ModuleFactoryRegister != null) {
-      try {
-        p11ModuleFactoryRegister.close();
-      } catch (Throwable th) {
-        LOG.error("error while closing P11ModuleFactoryRegister", th);
-      }
-      p11ModuleFactoryRegister = null;
-    }
-
     if (p11CryptServiceFactory != null) {
       try {
         p11CryptServiceFactory.close();
@@ -199,15 +188,20 @@ public class Securities implements Closeable {
     }
   } // method close
 
-  private void initSecurityFactory(SecurityConf conf) throws PasswordResolverException, InvalidConfException {
+  private void initSecurityFactory(SecurityConf conf)
+      throws PasswordResolverException, InvalidConfException {
     securityFactory = new SecurityFactoryImpl();
 
-    securityFactory.setStrongRandom4SignEnabled(conf.isSignStrongrandomEnabled());
-    securityFactory.setStrongRandom4KeyEnabled(conf.isKeyStrongrandomEnabled());
-    securityFactory.setDefaultSignerParallelism(conf.getDefaultSignerParallelism());
+    securityFactory.setStrongRandom4SignEnabled(
+        conf.isSignStrongrandomEnabled());
+    securityFactory.setStrongRandom4KeyEnabled(
+        conf.isKeyStrongrandomEnabled());
+    securityFactory.setDefaultSignerParallelism(
+        conf.getDefaultSignerParallelism());
 
     //----- Factories
-    SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
+    SignerFactoryRegisterImpl signerFactoryRegister =
+        new SignerFactoryRegisterImpl();
     securityFactory.setSignerFactoryRegister(signerFactoryRegister);
 
     // PKCS#12 (software)
@@ -237,19 +231,9 @@ public class Securities implements Closeable {
   private void initSecurityPkcs11(
       FileOrValue pkcs11Conf, SignerFactoryRegisterImpl signerFactoryRegister)
       throws InvalidConfException {
-    p11ModuleFactoryRegister = new P11ModuleFactoryRegisterImpl();
-    for (P11ModuleFactory m : p11ModuleFactories) {
-      p11ModuleFactoryRegister.registFactory(m);
-    }
+    p11CryptServiceFactory = new P11CryptServiceFactoryImpl();
 
-    p11CryptServiceFactory = new P11CryptServiceFactoryImpl(p11ModuleFactoryRegister);
-
-    Pkcs11conf pkcs11ConfObj;
-    try {
-      pkcs11ConfObj = JSON.parseConf(pkcs11Conf.readContent(), Pkcs11conf.class);
-    } catch (IOException ex) {
-      throw new InvalidConfException("could not create P11Conf: " + ex.getMessage(), ex);
-    }
+    P11SystemConf pkcs11ConfObj = P11SystemConf.parse(pkcs11Conf);
     p11CryptServiceFactory.setPkcs11Conf(pkcs11ConfObj);
 
     p11CryptServiceFactory.init();
@@ -259,6 +243,6 @@ public class Securities implements Closeable {
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
 
     signerFactoryRegister.registFactory(p11SignerFactory);
-  } // method initSecurityPkcs11
+  }
 
 }

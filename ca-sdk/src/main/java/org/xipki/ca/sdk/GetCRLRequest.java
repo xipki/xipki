@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 
@@ -55,22 +53,19 @@ public class GetCRLRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(3);
-    encoder.writeBigInt(crlNumber);
-    encoder.writeInstant(thisUpdate);
-    encoder.writeTextString(crlDp);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(3).writeBigInt(crlNumber)
+        .writeInstant(thisUpdate).writeTextString(crlDp);
   }
 
-  public static GetCRLRequest decode(byte[] encoded) throws DecodeException {
+  public static GetCRLRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("GetCRLRequest", decoder, 3);
-      return new GetCRLRequest(
-          decoder.readBigInt(),
-          decoder.readInstant(),
-          decoder.readTextString());
+      return new GetCRLRequest(decoder.readBigInt(),
+          decoder.readInstant(), decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
     }
   }
 

@@ -4,7 +4,7 @@
 		"ca.signerConf":"REPLACEME-CA_SIGNERCONF",
 		"keycerts.dir":"xipki/keycerts",
 		"output.dir":"output",
-		"profiles.dir":"qa/certprofile",
+		"profiles.dir":"qa/cab/certprofile",
 		"token.type":"REPLACEME-TOKEN_TYPE"
 	},
 	"signers":[],
@@ -64,7 +64,7 @@
 					"http://myorg.org/rootca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8081/crl/?type=crl&name=rootca1"
+					"http://localhost:8081/dummy/crl/?type=crl&name=rootca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"

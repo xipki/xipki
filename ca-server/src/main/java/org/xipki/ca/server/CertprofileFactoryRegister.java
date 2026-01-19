@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.util.Args;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,9 +24,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class CertprofileFactoryRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegister.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CertprofileFactoryRegister.class);
 
-  private final ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<CertprofileFactory> factories =
+      new ConcurrentLinkedDeque<>();
 
   /**
    * Retrieves the types of supported certificate profiles.
@@ -65,7 +67,8 @@ public class CertprofileFactoryRegister {
    * @throws ObjectCreationException
    *           If certificate profile could not be created.
    */
-  public Certprofile newCertprofile(String type) throws ObjectCreationException {
+  public Certprofile newCertprofile(String type)
+      throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertprofileFactory service : factories) {
@@ -102,7 +105,8 @@ public class CertprofileFactoryRegister {
     if (factories.remove(factory)) {
       LOG.info("removed CertprofileFactory binding for {}", factory);
     } else {
-      LOG.info("no CertprofileFactory binding found to remove for '{}'", factory);
+      LOG.info("no CertprofileFactory binding found to remove for '{}'",
+          factory);
     }
   } // method unregistFactory
 

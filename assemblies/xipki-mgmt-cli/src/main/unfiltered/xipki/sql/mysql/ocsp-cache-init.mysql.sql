@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS OCSP;
 CREATE TABLE ISSUER (
     ID INT NOT NULL,
     S1C CHAR(28) NOT NULL COMMENT 'base64 encoded SHA1 sum of the certificate',
-    CERT VARCHAR(6000) NOT NULL,
+    CERT LONGTEXT NOT NULL,
     CONSTRAINT PK_ISSUER PRIMARY KEY (ID)
 );
 
@@ -18,7 +18,7 @@ CREATE TABLE OCSP (
     IDENT VARCHAR(48) NOT NULL COMMENT 'Identifier consists of hex(SIG_ALG) | hex(CERTHASH_ALG) | hex(serial number)',
     GENERATED_AT BIGINT NOT NULL COMMENT 'generatedAt, seconds since January 1, 1970, 00:00:00 GMT',
     NEXT_UPDATE BIGINT NOT NULL COMMENT 'next update, seconds since January 1, 1970, 00:00:00 GMT',
-    RESP VARCHAR(4000) NOT NULL COMMENT 'Base64 DER-encoded OCSP response',
+    RESP VARCHAR(8000) CHARACTER SET ascii NOT NULL COMMENT 'Base64 DER-encoded OCSP response',
     CONSTRAINT PK_OCSP PRIMARY KEY (ID)
 )
 COMMENT='Only OCSP response without nonce is cached here';

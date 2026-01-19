@@ -1,1 +1,2 @@
-Scripts to setup CA by generating new CA key and certificate pair, and the CA configuration is stored in database.
+Scripts to setup CA by generating new CA key and certificate pair, and the CA
+configuration is stored in database.

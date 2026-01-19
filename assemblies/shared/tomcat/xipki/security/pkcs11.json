@@ -1,0 +1,22 @@
+{
+	"modules":[{
+		"name":"default",
+		"readonly":false,
+		"user":"CKU_USER",
+		"numSessions": 100,
+		"maxMessageSize":16384,
+		"newSessionTimeout":30000,
+		"includeSlots":[{
+			"index":0
+		}],
+		"nativeLibraries":[{
+			"path": "xihsm:file:env=test,vendor=utimaco,tenant=utimaco"
+		}],
+		"passwordSets":[{
+			"passwords":[
+				"123456"
+			]
+		}]
+	}]
+}
+

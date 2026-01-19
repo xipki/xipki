@@ -21,7 +21,7 @@
 			"names":["subcawithcrl"],
 			"signer":{
 				"type":"pkcs12",
-				"conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12,algo=SHA256withRSA"
+				"conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12"
 			}
 		}]
 	}

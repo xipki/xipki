@@ -3,16 +3,16 @@ source file:./qa/qa.d/initdb.script
 echo "Restart CA (tomcat) server!"
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
-sleep 3
+sleep 1
 
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGALG"
 }
 
 xi:copy-file -f qa/qa.d/template.rootca.json qa/qa.d/rootca.json
@@ -20,7 +20,7 @@ xi:copy-file -f qa/qa.d/template.rootca.json qa/qa.d/rootca.json
 xi:replace --old "REPLACEME-SUBJECT" --new "CN=rootca1,O=myorg,C=DE" \
   --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-SIGALG" --new "$CA_SIGALG" \
   qa/qa.d/rootca.json
 
 ca:load-conf qa/qa.d/rootca.json
@@ -28,19 +28,19 @@ ca:load-conf qa/qa.d/rootca.json
 ca:cacert --out output/rootca1.crt rootca1
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label subca1 \
     --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subca1.p12 --password CHANGEIT \
     --outform $OUTFORM \
     --out output/subca1.csr \
@@ -51,14 +51,14 @@ ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --outform $OUTFORM \
   --out output/subca1.crt --profile subca
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
     --cert output/subca1.crt --ca-cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subcawithcrl
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
@@ -73,7 +73,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
     --subject-info-access "1.3.6.1.5.5.7.48.5=[6]http://myorg.org/abc" \
     --keyusage cRLSign
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/subcawithcrl1.p12 --password CHANGEIT \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
@@ -94,20 +94,20 @@ ca:enroll-cert --ca rootca1 --csr output/subcawithcrl1.csr \
   --out output/subcawithcrl1.crt \
   --profile subca-Complex
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/subcawithcrl1.p12 --password CHANGEIT \
     --cert output/subcawithcrl1.crt --ca-cert output/rootca1.crt
 }
 
-## Generate keys and CSR for OCSPResponder
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  xi:csr-p11 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+## Generate CSR for OCSPResponder
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-CHANGEIT56789,O=myorg,C=DE"
 } else {
-  xi:csr-p12 REPLACEME-DSAPLAIN REPLACEME-RSAPSS \
+  xi:csr-p12 REPLACEME-RSAPSS \
     --p12 output/ocsp99.p12 --password CHANGEIT \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
@@ -119,7 +119,7 @@ ca:enroll-cert --ca rootca1 --csr output/ocsp99.csr \
   --out output/ocsp99.crt \
   --profile ocsp
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/ocsp99.p12 --password CHANGEIT \
     --cert output/ocsp99.crt --ca-cert output/rootca1.crt
 }
@@ -131,17 +131,17 @@ echo "#                   Add subca with OCSP & CRL                   #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
 }
 
 xi:copy-file -f qa/qa.d/template.subca.json qa/qa.d/subca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-SIGALG" --new "$CA_SIGALG" \
   qa/qa.d/subca.json
 
 ca:load-conf qa/qa.d/subca.json
@@ -155,10 +155,10 @@ echo "#                       Add subca with CRL                      #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subcawithcrl1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subcawithcrl1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$CA_SIGALG"
 }
 
 xi:copy-file -f qa/qa.d/template.subcawithcrl.json qa/qa.d/subcawithcrl.json
@@ -166,7 +166,7 @@ xi:copy-file -f qa/qa.d/template.subcawithcrl.json qa/qa.d/subcawithcrl.json
 xi:replace \
   --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-SIGALG" --new "$CA_SIGALG" \
   qa/qa.d/subcawithcrl.json
 
 ca:load-conf qa/qa.d/subcawithcrl.json

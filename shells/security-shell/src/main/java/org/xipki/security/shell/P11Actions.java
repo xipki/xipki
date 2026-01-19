@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.shell;
@@ -9,37 +9,28 @@ import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.password.PasswordResolverException;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
+import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignatureAlgoControl;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
+import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
+import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
+import org.xipki.security.KeySpec;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11Slot.P11NewKeyControl;
 import org.xipki.security.pkcs11.P11SlotId;
-import org.xipki.security.shell.SecurityActions.CsrGenAction;
 import org.xipki.security.shell.SecurityActions.SecurityAction;
-import org.xipki.security.util.AlgorithmUtil;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
+import org.xipki.util.password.PasswordResolverException;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -51,10 +42,7 @@ import java.security.KeyStore;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_AES;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_DES3;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_GENERIC_SECRET;
+import java.util.Set;
 
 /**
  * Actions for PKCS#11 security.
@@ -64,138 +52,96 @@ import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKK_GENERIC_SECRET;
 
 public class P11Actions {
 
-  @Command(scope = "xi", name = "csr-p11", description = "generate CSR request with PKCS#11 device")
+  @Command(scope = "xi", name = "keypair-p11", description =
+      "generate keypair in PKCS#11 device")
   @Service
-  public static class CsrP11 extends CsrGenAction {
+  public static class KeypairP11 extends P11KeyGenAction {
 
-    @Option(name = "--slot", description = "slot index")
-    private String slotIndex = "0"; // use String instead int so that the default value 0 will be shown in the help.
-
-    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String id;
-
-    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
-    private String label;
-
-    @Option(name = "--module", description = "name of the PKCS#11 module")
-    @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
-    private String moduleName = "default";
-
-    @Override
-    protected ConcurrentContentSigner getSigner() throws Exception {
-      SignatureAlgoControl signatureAlgoControl = getSignatureAlgoControl();
-
-      byte[] idBytes = null;
-      if (id != null) {
-        idBytes = Hex.decode(id);
-      }
-
-      SignerConf conf = getPkcs11SignerConf(moduleName, Integer.parseInt(slotIndex), label,
-          idBytes, 1, null, signatureAlgoControl);
-      return securityFactory.createSigner("PKCS11", conf, (X509Cert[]) null);
-    }
-
-    public static SignerConf getPkcs11SignerConf(
-        String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId, int parallelism,
-        HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-      Args.positive(parallelism, "parallelism");
-
-      if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
-      }
-
-      ConfPairs conf = new ConfPairs();
-      conf.putPair("parallelism", Integer.toString(parallelism));
-
-      if (pkcs11ModuleName != null && !pkcs11ModuleName.isEmpty()) {
-        conf.putPair("module", pkcs11ModuleName);
-      }
-
-      conf.putPair("slot", Integer.toString(slotIndex));
-
-      if (keyId != null) {
-        conf.putPair("key-id", Hex.encode(keyId));
-      }
-
-      if (keyLabel != null) {
-        conf.putPair("key-label", keyLabel);
-      }
-
-      return new SignerConf(conf.getEncoded(), hashAlgo, signatureAlgoControl);
-    } // method getPkcs11SignerConf
-
-  } // class CsrP11
-
-  @Command(scope = "xi", name = "dsa-p11", description = "generate DSA keypair in PKCS#11 device")
-  @Service
-  public static class Dsa11 extends P11KeyGenAction {
-
-    @Option(name = "--plen", description = "bit length of the prime")
-    private Integer plen = 2048;
-
-    @Option(name = "--qlen", description = "bit length of the sub-prime")
-    private Integer qlen;
+    @Option(name = "--keyspec", required = true, description = "key spec")
+    @Completion(SecurityCompleters.KeySpecCompleter.class)
+    private String keyspecStr;
 
     @Override
     protected Object execute0() throws Exception {
-      if (plen % 1024 != 0) {
-        throw new IllegalCmdParamException("plen is not multiple of 1024: " + plen);
-      }
-
-      if (qlen == null) {
-        qlen = (plen <= 1024) ? 160 : ((plen <= 2048) ? 224 : 256);
-      }
+      KeySpec keySpec = KeySpec.ofKeySpec(keyspecStr);
 
       P11Slot slot = getSlot();
-      finalize("DSA", slot.generateDSAKeypair(plen, qlen, getControl()));
-      return null;
-    }
+      NewKeyControl control = getControl();
 
-  } // method Dsa11
+      PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
+          .token(true)
+          .generateId(true)
+          .id(control.getId())
+          .label(control.getLabel())
+          .extractable(control.getExtractable())
+          .sensitive(control.getSensitive());
 
-  @Command(scope = "xi", name = "ec-p11", description = "generate EC keypair in PKCS#11 device")
-  @Service
-  public static class EcP11 extends P11KeyGenAction {
-
-    @Option(name = "--curve", description = "EC curve name")
-    @Completion(Completers.ECCurveNameCompleter.class)
-    private String curveName = "secp256r1";
-
-    @Override
-    protected Object execute0() throws Exception {
-      P11Slot slot = getSlot();
-      P11NewKeyControl control = getControl();
-
-      ASN1ObjectIdentifier curveOid = EdECConstants.getCurveOid(curveName);
-      if (curveOid == null) {
-        curveOid = AlgorithmUtil.getCurveOidForCurveNameOrOid(curveName);
+      Set<NewKeyControl.P11KeyUsage> usages = control.getUsages();
+      if (usages == null) {
+        if (keySpec.isRSA() || keySpec.isWeierstrassEC()) {
+          spec.signVerify(true).decryptEncrypt(true).signVerifyRecover(true);
+        } else if (keySpec.isEdwardsEC() || keySpec.isMldsa()) {
+          spec.signVerify(true);
+        } else if (keySpec.isMontgomeryEC() || keySpec.isMlkem()) {
+          spec.decryptEncrypt(true);
+        } else {
+          spec.signVerify(true);
+        }
+      } else {
+        for (NewKeyControl.P11KeyUsage usage : usages) {
+          switch (usage) {
+            case ENCRYPT:
+              spec.encrypt(true);
+              break;
+            case DECRYPT:
+              spec.decrypt(true);
+              break;
+            case DERIVE:
+              spec.derive(true);
+              break;
+            case SIGN:
+              spec.sign(true);
+              break;
+            case VERIFY:
+              spec.verify(true);
+              break;
+            case SIGN_RECOVER:
+              spec.signRecover(true);
+              break;
+            case VERIFY_RECOVER:
+              spec.verifyRecover(true);
+              break;
+            case WRAP:
+              spec.wrap(true);
+            case UNWRAP:
+              spec.unwrap(true);
+          }
+        }
       }
 
-      if (curveOid == null) {
-        throw new Exception("unknown curve " + curveName);
-      }
-
-      finalize("EC", slot.generateECKeypair(curveOid, control));
+      finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
       return null;
     }
 
   } // class EcP11
 
-  @Command(scope = "xi", name = "delete-key-p11", description = "delete key in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-key-p11", description =
+      "delete key in PKCS#11 device")
   @Service
   public static class DeleteKeyP11 extends P11SecurityAction {
 
-    @Option(name = "--id", description = "id (hex) of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
+    @Option(name = "--id", description =
+        "id (hex) of the private key in the PKCS#11 device\n" +
+        "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label", description = "label of the private key in the PKCS#11 device\n"
-            + "either keyId or keyLabel must be specified")
+    @Option(name = "--label", description =
+        "label of the private key in the PKCS#11 device\n" +
+        "either keyId or keyLabel must be specified")
     protected String label;
 
-    @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
+    @Option(name = "--force", aliases = "-f", description =
+        "remove identifies without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
@@ -206,14 +152,10 @@ public class P11Actions {
         return null;
       }
 
-      if (force || confirm("Do you want to remove the identity " + identity, 3)) {
-        Long publicKeyHandle = identity.getPublicKeyHandle();
-        long[] failedHandles;
-        if (publicKeyHandle == null) {
-          failedHandles = getSlot().destroyObjectsByHandle(identity.getHandle());
-        } else {
-          failedHandles = getSlot().destroyObjectsByHandle(identity.getHandle(), publicKeyHandle);
-        }
+      if (force || confirm(
+          "Do you want to remove the identity " + identity, 3)) {
+        long[] failedHandles = getSlot()
+            .destroyObjectsAndReturnFailedHandles(identity.getAllHandles());
 
         if (failedHandles == null || failedHandles.length == 0) {
           println("deleted identity " + identity);
@@ -226,16 +168,19 @@ public class P11Actions {
 
   } // class DeleteKeyP11
 
-  @Command(scope = "xi", name = "object-exists-p11", description = "return whether objects exist in PKCS#11 device")
+  @Command(scope = "xi", name = "object-exists-p11",
+      description = "return whether objects exist in PKCS#11 device")
   @Service
-  public static class ObjecctExistsP11 extends P11SecurityAction {
+  public static class ObjectExistsP11 extends P11SecurityAction {
 
-    @Option(name = "--id", description = "id (hex) of the object in the PKCS#11 device\n"
-        + "either keyId or keyLabel must be specified")
+    @Option(name = "--id", description =
+        "id (hex) of the object in the PKCS#11 device\n" +
+        "either keyId or keyLabel must be specified")
     protected String id;
 
-    @Option(name = "--label", description = "label of the object key in the PKCS#11 device\n"
-        + "either id or label must be specified")
+    @Option(name = "--label", description =
+        "label of the object key in the PKCS#11 device\n" +
+        "either id or label must be specified")
     protected String label;
 
     @Override
@@ -251,36 +196,100 @@ public class P11Actions {
     @Option(name = "--id", description = "id (hex) of the PKCS#11 objects")
     private String id;
 
-    @Option(name = "--label", required = true, description = "label of the PKCS#11 objects")
+    @Option(name = "--label", required = true, description =
+        "label of the PKCS#11 objects")
     protected String label;
 
-    @Option(name = "--extractable", aliases = {"-x"},
-        description = "whether the key is extractable, valid values are yes|no|true|false")
+    @Option(name = "--extractable", aliases = {"-x"}, description =
+        "whether the key is extractable, valid values are yes|no|true|false")
     private String extractable;
 
-    @Option(name = "--sensitive", description = "whether the key is sensitive, valid values are yes|no|true|false")
+    @Option(name = "--sensitive", description =
+        "whether the key is sensitive, valid values are yes|no|true|false")
     private String sensitive;
 
-    @Option(name = "--key-usage", multiValued = true, description = "key usage of the private key")
+    @Option(name = "--key-usage", multiValued = true, description =
+        "key usage of the private key")
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
-    protected void finalize(String keyType, PKCS11KeyId keyId) {
+    protected void finalize(String keySpec, PKCS11KeyId keyId) {
       Args.notNull(keyId, "keyId");
-      println("generated " + keyType + " key " + keyId + " on slot " + slotIndex);
+      println("generated " + keySpec + " key " + keyId +
+          " on slot " + slotIndex);
     }
 
-    protected P11NewKeyControl getControl() {
+    protected PKCS11SecretKeySpec getSecretKeyControl(long keyType) {
+      NewKeyControl control = getControl();
+      PKCS11SecretKeySpec spec = new PKCS11SecretKeySpec()
+          .token(true)
+          .keyType(keyType)
+          .id(control.getId())
+          .label(control.getLabel())
+          .extractable(control.getExtractable())
+          .sensitive(control.getSensitive());
+
+      Set<NewKeyControl.P11KeyUsage> usages = control.getUsages();
+
+      if (usages == null) {
+        if (keyType == PKCS11T.CKK_GENERIC_SECRET
+            || keyType == PKCS11T.CKK_SHA_1_HMAC
+            || keyType == PKCS11T.CKK_SHA224_HMAC
+            || keyType == PKCS11T.CKK_SHA3_224_HMAC
+            || keyType == PKCS11T.CKK_SHA256_HMAC
+            || keyType == PKCS11T.CKK_SHA3_256_HMAC
+            || keyType == PKCS11T.CKK_SHA384_HMAC
+            || keyType == PKCS11T.CKK_SHA3_384_HMAC
+            || keyType == PKCS11T.CKK_SHA512_HMAC
+            || keyType == PKCS11T.CKK_SHA3_512_HMAC) {
+          spec.sign(true).verify(true);
+        } else {
+          spec.sign(true).verify(true).encrypt(true).decrypt(true);
+        }
+      } else {
+        for (NewKeyControl.P11KeyUsage usage : usages) {
+          switch (usage) {
+            case ENCRYPT:
+              spec.encrypt(true);
+              break;
+            case DECRYPT:
+              spec.decrypt(true);
+              break;
+            case DERIVE:
+              spec.derive(true);
+              break;
+            case SIGN:
+              spec.sign(true);
+              break;
+            case VERIFY:
+              spec.verify(true);
+              break;
+            case WRAP:
+              spec.wrap(true);
+            case UNWRAP:
+              spec.unwrap(true);
+          }
+        }
+      }
+
+      return spec;
+    }
+
+    protected NewKeyControl getControl() {
       byte[] id0 = (id == null) ? null : Hex.decode(id);
-      P11NewKeyControl control = new P11NewKeyControl(id0, label);
+      NewKeyControl control = new NewKeyControl(id0, label);
+
       if (StringUtil.isNotBlank(extractable)) {
         control.setExtractable(isEnabled(extractable, false, "extractable"));
       }
+
       if (StringUtil.isNotBlank(sensitive)) {
         control.setSensitive(isEnabled(sensitive, false, "sensitive"));
       }
+
       if (CollectionUtil.isNotEmpty(keyusages)) {
-        control.setUsages(SecurityCompleters.P11KeyUsageCompleter.parseUsages(keyusages));
+        control.setUsages(
+            SecurityCompleters.P11KeyUsageCompleter.parseUsages(keyusages));
       }
 
       return control;
@@ -288,64 +297,63 @@ public class P11Actions {
 
   } // class P11KeyGenAction
 
-  @Command(scope = "xi", name = "delete-objects-p11", description = "delete objects in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-objects-p11",
+      description = "delete objects in PKCS#11 device")
   @Service
   public static class DeleteObjectsP11 extends P11SecurityAction {
 
-    @Option(name = "--handle", aliases = "-h", multiValued = true,
-        description = "Object handle, if specified, id and label must not be set")
+    @Option(name = "--handle", aliases = "-h", multiValued = true, description =
+        "Object handle, if specified, id and label must not be set")
     private long[] handles;
 
-    @Option(name = "--id", description = "id (hex) of the objects in the PKCS#11 device\n"
-            + "at least one of id and label must be specified (if handle is not set).")
+    @Option(name = "--id", description =
+        "id (hex) of the objects in the PKCS#11 device\n" +
+        "at least one of id and label must be specified " +
+            "(if handle is not set).")
     private String id;
 
-    @Option(name = "--label", description = "label of the objects in the PKCS#11 device\n"
-            + "at least one of id and label must be specified (if handle is not set).")
+    @Option(name = "--label", description =
+        "label of the objects in the PKCS#11 device\n" +
+        "at least one of id and label must be specified " +
+            "(if handle is not set).")
     private String label;
 
-    @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
+    @Option(name = "--force", aliases = "-f", description =
+        "remove identifies without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
       if (handles != null && handles.length > 0) {
         if (id != null || label != null) {
-          throw new IllegalCmdParamException("If handle is set, id an label must not be set.");
+          throw new IllegalCmdParamException(
+              "If handle is set, id an label must not be set.");
         }
 
-        if (force || confirm("Do you want to remove the PKCS#11 objects " + Arrays.toString(handles), 3)) {
+        if (force || confirm("Do you want to remove the PKCS#11 objects "
+            + Arrays.toString(handles), 3)) {
           P11Slot slot = getSlot();
-          long[] failedHandles = slot.destroyObjectsByHandle(handles);
+          long[] failedHandles =
+              slot.destroyObjectsAndReturnFailedHandles(handles);
           if (failedHandles.length == 0) {
             println("deleted all " + handles.length + " objects");
           } else {
-            println("deleted " + (handles.length - failedHandles.length) + " objects except " +
-                failedHandles.length + " objects: " + Arrays.toString(failedHandles));
+            println("deleted " + (handles.length - failedHandles.length) +
+                " objects except " + failedHandles.length + " objects: " +
+                Arrays.toString(failedHandles));
           }
         }
-
       } else {
         if (id == null && label == null) {
-          throw new IllegalCmdParamException("If handle is not set, at least one of id and label must be set.");
+          throw new IllegalCmdParamException("If handle is not set, at " +
+              "least one of id and label must be set.");
         }
 
-        if (force || confirm("Do you want to remove the PKCS#11 objects (id = " + id
-            + ", label = " + label + ")", 3)) {
+        if (force || confirm("Do you want to remove the PKCS#11 " +
+            "objects (id = " + id + ", label = " + label + ")", 3)) {
           P11Slot slot = getSlot();
-          byte[] idBytes = null;
-
-          int num;
-          if (id != null) {
-            idBytes = Hex.decode(id);
-            if (label == null) {
-              num = slot.destroyObjectsById(idBytes);
-            } else {
-              num = slot.destroyObjectsByIdLabel(idBytes, label);
-            }
-          } else {
-            num = slot.destroyObjectsByLabel(label);
-          }
+          byte[] idBytes = (id == null) ? null : Hex.decode(id);
+          int num = slot.destroyObjectsByIdLabel(idBytes, label);
           println("deleted " + num + " objects");
         }
       }
@@ -354,13 +362,15 @@ public class P11Actions {
 
   } // class DeleteObjectsP11
 
-  @Command(scope = "xi", name = "delete-all-objects-p11", description = "delete all objects in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-all-objects-p11",
+      description = "delete all objects in PKCS#11 device")
   @Service
   public static class DeleteAllObjectsP11 extends P11SecurityAction {
 
     @Override
     protected Object execute0() throws Exception {
-      String prompt = "!!!DANGEROUS OPERATION!!!, do you want to remove ALL PKCS#11 objects";
+      String prompt = "!!!DANGEROUS OPERATION!!!, " +
+          "do you want to remove ALL PKCS#11 objects";
       // this is not a bug to require 3 confirmations.
       if (confirm(prompt, 1)) {
         if (confirm(prompt, 1)) {
@@ -376,64 +386,53 @@ public class P11Actions {
 
   } // class DeleteAllObjectsP11
 
-  @Command(scope = "xi", name = "rsa-p11", description = "generate RSA keypair in PKCS#11 device")
-  @Service
-  public static class RsaP11 extends P11KeyGenAction {
-
-    @Option(name = "--key-size", description = "keysize in bit")
-    private Integer keysize = 2048;
-
-    @Option(name = "-e", description = "public exponent")
-    private String publicExponent = SecurityActions.TEXT_F4;
-
-    @Override
-    protected Object execute0() throws Exception {
-      if (keysize % 1024 != 0) {
-        throw new IllegalCmdParamException("keysize is not multiple of 1024: " + keysize);
-      }
-
-      P11Slot slot = getSlot();
-      finalize("RSA", slot.generateRSAKeypair(keysize, toBigInt(publicExponent), getControl()));
-      return null;
-    }
-
-  } // class RsaP11
-
-  @Command(scope = "xi", name = "secretkey-p11", description = "generate secret key in PKCS#11 device")
+  @Command(scope = "xi", name = "secretkey-p11",
+      description = "generate secret key in PKCS#11 device")
   @Service
   public static class SecretkeyP11 extends P11KeyGenAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SecretkeyP11.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(SecretkeyP11.class);
 
-    @Option(name = "--key-type", required = true,
-        description = "keytype, current only AES, DES3 and GENERIC are supported")
+    @Option(name = "--key-type", required = true, description =
+        "keytype, current only AES, DES3, SM4 and GENERIC are supported")
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
     private String keyType;
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize;
 
-    @Option(name = "--extern-if-gen-unsupported",
-        description = "If set, if the generation mechanism is not supported by the PKCS#11 "
-            + "device, create in memory and then import it to the device")
+    @Option(name = "--extern-if-gen-unsupported", description =
+        "If set, if the generation mechanism is not supported by the PKCS#11 " +
+        "device, create in memory and then import it to the device")
     private Boolean createExternIfGenUnsupported = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
       if (keysize != null && keysize % 8 != 0) {
-        throw new IllegalCmdParamException("keysize is not multiple of 8: " + keysize);
+        throw new IllegalCmdParamException(
+            "keysize is not multiple of 8: " + keysize);
       }
 
       long p11KeyType;
       if ("AES".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_AES;
+        p11KeyType = PKCS11T.CKK_AES;
       } else if ("DES3".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_DES3;
+        p11KeyType = PKCS11T.CKK_DES3;
         keysize = 192;
+      } else if ("SM4".equalsIgnoreCase(keyType)) {
+        p11KeyType = PKCS11T.CKK_VENDOR_SM4;
+        keysize = 128;
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_GENERIC_SECRET;
+        p11KeyType = PKCS11T.CKK_GENERIC_SECRET;
       } else {
-        throw new IllegalCmdParamException("invalid keyType " + keyType);
+        Long keyTypeL = PKCS11T.ckkNameToCode(
+            "CKK_" + keyType.replace('-', '_'));
+        if (keyTypeL == null) {
+          throw new IllegalCmdParamException("invalid keyType " + keyType);
+        } else {
+          p11KeyType = keyTypeL;
+        }
       }
 
       if (keysize == null) {
@@ -441,31 +440,29 @@ public class P11Actions {
       }
 
       P11Slot slot = getSlot();
-      P11NewKeyControl control = getControl();
+      PKCS11SecretKeySpec spec = getSecretKeyControl(p11KeyType);
 
       try {
-        finalize(keyType, slot.generateSecretKey(p11KeyType, keysize, control));
+        finalize(keyType, slot.generateSecretKey(keysize, spec));
       } catch (TokenException ex) {
         if (!createExternIfGenUnsupported) {
           throw ex;
         }
 
         String msgPrefix = "could not generate secret key ";
-        if (control.getId() != null) {
-          msgPrefix += "id=" + Hex.encode(control.getId());
+        if (spec.id() != null) {
+          msgPrefix += "id=" + Hex.encode(spec.id());
 
-          if (control.getLabel() != null) {
+          if (spec.label() != null) {
             msgPrefix += " and ";
           }
         }
 
-        if (control.getLabel() != null) {
-          msgPrefix += "label=" + control.getLabel();
+        if (spec.label() != null) {
+          msgPrefix += "label=" + spec.label();
         }
 
-        if (LOG.isInfoEnabled()) {
-          LOG.info(msgPrefix + ex.getMessage());
-        }
+        LOG.info("{}{}", msgPrefix, ex.getMessage());
 
         if (LOG.isDebugEnabled()) {
           LOG.debug(msgPrefix, ex);
@@ -474,9 +471,11 @@ public class P11Actions {
         byte[] keyValue = new byte[keysize / 8];
         securityFactory.getRandom4Key().nextBytes(keyValue);
 
-        PKCS11KeyId objId = slot.importSecretKey(p11KeyType, keyValue, control);
+        spec.keyType(p11KeyType);
+        PKCS11KeyId objId = slot.importSecretKey(keyValue, spec);
         Arrays.fill(keyValue, (byte) 0); // clear the memory
-        String msg = "generated in memory and imported " + keyType + " key " + objId;
+        String msg = "generated in memory and imported " + keyType +
+            " key " + objId;
         if (LOG.isInfoEnabled()) {
           LOG.info(msg);
         }
@@ -488,38 +487,41 @@ public class P11Actions {
 
   } // class SecretkeyP11
 
-  @Command(scope = "xi", name = "import-secretkey-p11",
-      description = "import secret key with given value in PKCS#11 device")
+  @Command(scope = "xi", name = "import-secretkey-p11", description =
+      "import secret key with given value in PKCS#11 device")
   @Service
   public static class ImportSecretkeyP11 extends P11KeyGenAction {
 
-    @Option(name = "--key-type", required = true,
-        description = "keytype, current only AES, DES3 and GENERIC are supported")
+    @Option(name = "--key-type", required = true, description =
+        "keytype, current only AES, DES3 and GENERIC are supported")
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
     private String keyType;
 
-    @Option(name = "--keystore", required = true, description = "JCEKS keystore from which the key is imported")
+    @Option(name = "--keystore", required = true, description =
+        "JCEKS keystore from which the key is imported")
     @Completion(FileCompleter.class)
     private String keyOutFile;
 
-    @Option(name = "--password", description = "password of the keystore file, as plaintext or PBE-encrypted.")
+    @Option(name = "--password", description =
+        "password of the keystore file, as plaintext or PBE-encrypted.")
     private String passwordHint;
 
     @Override
     protected Object execute0() throws Exception {
       long p11KeyType;
       if ("AES".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_AES;
+        p11KeyType = PKCS11T.CKK_AES;
       } else if ("DES3".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_DES3;
+        p11KeyType = PKCS11T.CKK_DES3;
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
-        p11KeyType = CKK_GENERIC_SECRET;
+        p11KeyType = PKCS11T.CKK_GENERIC_SECRET;
       } else {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
       KeyStore ks = KeyUtil.getInKeyStore("JCEKS");
-      InputStream ksStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(keyOutFile)));
+      InputStream ksStream = Files.newInputStream(
+          Paths.get(IoUtil.expandFilepath(keyOutFile)));
       char[] pwd = getPassword();
       try {
         ks.load(ksStream, pwd);
@@ -543,17 +545,21 @@ public class P11Actions {
       }
 
       if (keyValue == null) {
-        throw new IllegalCmdParamException("keystore does not contain secret key");
+        throw new IllegalCmdParamException(
+            "keystore does not contain secret key");
       }
 
       P11Slot slot = getSlot();
-      PKCS11KeyId objId = slot.importSecretKey(p11KeyType, keyValue, getControl());
+      PKCS11SecretKeySpec spec = getSecretKeyControl(p11KeyType);
+      PKCS11KeyId objId = slot.importSecretKey(keyValue, spec);
       println("imported " + keyType + " key " + objId);
       return null;
     } // method execute0
 
-    protected char[] getPassword() throws IOException, PasswordResolverException {
-      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
+    protected char[] getPassword()
+        throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet(
+          "Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
         passwordHint = new String(pwdInChar);
       }
@@ -564,10 +570,13 @@ public class P11Actions {
 
   public abstract static class P11SecurityAction extends SecurityAction {
 
-    protected static final String DEFAULT_P11MODULE_NAME = P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
+    protected static final String DEFAULT_P11MODULE_NAME =
+        P11CryptServiceFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "--slot", description = "slot index")
-    protected String slotIndex = "0"; // use String instead int so that the default value 0 will be shown in the help.
+    // use String instead int so that default value 0 will be shown in
+    // the help.
+    protected String slotIndex = "0";
 
     @Option(name = "--module", description = "name of the PKCS#11 module")
     @Completion(SecurityCompleters.P11ModuleNameCompleter.class)
@@ -576,7 +585,8 @@ public class P11Actions {
     @Reference (optional = true)
     protected P11CryptServiceFactory p11CryptServiceFactory;
 
-    protected P11Slot getSlot() throws XiSecurityException, TokenException, IllegalCmdParamException {
+    protected P11Slot getSlot()
+      throws XiSecurityException, TokenException, IllegalCmdParamException {
       P11Module module = getP11Module(moduleName);
       P11SlotId slotId = module.getSlotIdForIndex(Integer.parseInt(slotIndex));
       return module.getSlot(slotId);
@@ -584,11 +594,11 @@ public class P11Actions {
 
     protected P11Module getP11Module(String moduleName)
         throws XiSecurityException, TokenException, IllegalCmdParamException {
-      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      if (p11Service == null) {
+      P11Module module = p11CryptServiceFactory.getP11Module(moduleName);
+      if (module == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
       }
-      return p11Service.getModule();
+      return module;
     }
 
     public PKCS11KeyId getIdentity(String hexId, String label)
@@ -600,24 +610,13 @@ public class P11Actions {
 
   } // class P11SecurityAction
 
-  @Command(scope = "xi", name = "sm2-p11", description = "generate SM2 (curve sm2p256v1) keypair in PKCS#11 device")
-  @Service
-  public static class Sm2P11 extends P11KeyGenAction {
-
-    @Override
-    protected Object execute0() throws Exception {
-      P11Slot slot = getSlot();
-      finalize("SM2", slot.generateSM2Keypair(getControl()));
-      return null;
-    }
-
-  } // class Sm2P11
-
-  @Command(scope = "xi", name = "token-info-p11", description = "list objects in PKCS#11 device")
+  @Command(scope = "xi", name = "token-info-p11", description =
+      "list objects in PKCS#11 device")
   @Service
   public static class TokenInfoP11 extends SecurityAction {
 
-    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description =
+        "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--module", description = "name of the PKCS#11 module.")
@@ -635,12 +634,11 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      P11CryptService p11Service = p11CryptServiceFactory.getP11CryptService(moduleName);
-      if (p11Service == null) {
+      P11Module module = p11CryptServiceFactory.getP11Module(moduleName);
+      if (module == null) {
         throw new IllegalCmdParamException("undefined module " + moduleName);
       }
 
-      P11Module module = p11Service.getModule();
       println("module: " + moduleName);
       println(module.getDescription());
 

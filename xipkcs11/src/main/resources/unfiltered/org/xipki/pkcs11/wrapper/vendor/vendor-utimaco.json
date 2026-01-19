@@ -1,0 +1,12 @@
+{
+  "name": "Utimaco Crypto Server HSM",
+  "filter": {
+    "manufacturerIDs": [
+      "utimaco"
+    ]
+  },
+  "vendor": "UTIMACO",
+  "nameToCodeMap": {
+    "CKU_CS_GENERIC": "0x83"
+  }
+}

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.shell</groupId>
   <artifactId>shells</artifactId>
@@ -18,10 +18,7 @@
   <modules>
     <module>shell-base</module>
     <module>security-shell</module>
-    <module>cmp-client-shell</module>
-    <module>ocsp-client-shell</module>
-    <module>scep-client-shell</module>
-    <module>ca-mgmt-db-shell</module>
+    <module>pki-client-shell</module>
     <module>ca-mgmt-shell</module>
     <module>qa-shell</module>
   </modules>

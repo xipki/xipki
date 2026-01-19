@@ -6,7 +6,7 @@ CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
 } else {
-  KEY_TYPE = $1
+  keyspec = $1
   TOMCAT_DIR = $2
   XIPKI_DIR = $3
 
@@ -15,10 +15,9 @@ if { "$1" equals "" | "$1" equals "help" } then {
     echo "TOMCAT_DIR is not specified"
     printUsage = "true"
   } else {
-    argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $KEY_TYPE)
-    if { "$argsValid" equals "false" } then {
-      echo "invalid KEY_TYPE $KEY_TYPE"
-      printUsage = "true"
+    source xipki/ca-setup/c14n-keyspec.script
+    if { "$sigalg" equals "" } then {
+      printUsage = true
     }
   }
 }
@@ -28,26 +27,12 @@ THIS_DIR = xipki/ca-setup/cacert-present-dbbased
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
+  echo "source ${THIS_DIR}/setup-p12.script <key spec> <tomcat dir> [<xipki dir>]"
+  source xipki/ca-setup/print-keyspecs.script
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
   if { "$XIPKI_DIR" equals "" } then {
     XIPKI_DIR = ${TOMCAT_DIR}/xipki
-  }
-
-  if { $KEY_TYPE equals "rsa" } then {
-    SIG_ALG = SHA256WITHRSA
-  } elif { $KEY_TYPE equals "ec" } then {
-    SIG_ALG = SHA256WITHECDSA
-  } elif { $KEY_TYPE equals "ed25519" } then {
-    SIG_ALG = ED25519
-  } elif { $KEY_TYPE equals "ed448" } then {
-    SIG_ALG = ED448
-  } elif { $KEY_TYPE equals "dsa" } then {
-    SIG_ALG = SHA256WITHDSA
-  } else {
-    SIG_ALG = SM3WITHSM2
   }
 
   echo "#################################################################"
@@ -61,7 +46,7 @@ if { "$printUsage" equals "true" } then {
   xi:replace \
     --old "REPLACEME-TOKEN_TYPE"    --new "PKCS12" \
     --old "REPLACEME-CA_SIGNERCONF" \
-    --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
+    --new "algo=${sigalg},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
     ${CONF_FILE}
 
   ## init databases
@@ -77,7 +62,7 @@ if { "$printUsage" equals "true" } then {
   echo "#################################################################"
   xi:exec "${TOMCAT_DIR}/bin/shutdown.sh"
   xi:exec "${TOMCAT_DIR}/bin/startup.sh"
-  sleep 5
+  sleep 1
 
   echo "#################################################################"
   echo "#                       Load ca-conf.json                       #"

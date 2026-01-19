@@ -1,15 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.pki.ErrorCode;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
-
-import java.io.IOException;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  *
@@ -57,23 +54,20 @@ public class ErrorEntry extends SdkEncodable {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
-    encoder.writeArrayStart(2);
-    encoder.writeInt(code);
-    encoder.writeTextString(message);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(2).writeInt(code).writeTextString(message);
   }
 
-  public static ErrorEntry decode(CborDecoder decoder) throws DecodeException {
+  public static ErrorEntry decode(CborDecoder decoder) throws CodecException {
     try {
       if (decoder.readNullOrArrayLength(2)) {
         return null;
       }
 
-      return new ErrorEntry(
-          decoder.readInt(),
-          decoder.readTextString());
+      return new ErrorEntry(decoder.readInt(), decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, ErrorEntry.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, ErrorEntry.class), ex);
     }
   }
 

@@ -1,10 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.misc.StringUtil;
 
 /**
  * Identifier of a {@link P11Slot}.
@@ -45,7 +45,8 @@ public class P11SlotId {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(30, "(index = ", index, ", id = ", id, ")");
+    return StringUtil.concatObjectsCap(30, "(index = ", index,
+        ", id = ", id, ")");
   }
 
   @Override

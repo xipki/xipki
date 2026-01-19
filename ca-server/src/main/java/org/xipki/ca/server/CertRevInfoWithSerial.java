@@ -1,10 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
 import org.xipki.security.CrlReason;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -16,7 +16,8 @@ import java.time.Instant;
  * @since 2.0.0
  */
 
-public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> {
+public class CertRevInfoWithSerial
+    implements Comparable<CertRevInfoWithSerial> {
 
   private final long id;
 
@@ -39,7 +40,8 @@ public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> 
 
   public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
                                Instant revocationTime, Instant invalidityTime) {
-    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
+    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime,
+        invalidityTime);
   } // method constructor
 
   public BigInteger getSerial() {

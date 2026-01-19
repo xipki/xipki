@@ -1,0 +1,169 @@
+// Copyright (c) 2013-2025 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.ca.gateway.cmp;
+
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonMap;
+
+import java.util.List;
+
+/**
+ * CMP control configuration.
+ *
+ * @author Lijun Liao (xipki)
+ * @since 6.0.0
+ */
+
+public class CmpControlConf {
+
+  private Boolean confirmCert;
+
+  private Boolean sendCaCert;
+
+  private Boolean sendCertChain;
+
+  private Boolean messageTimeRequired;
+
+  private Boolean sendResponderCert;
+
+  private Integer messageTimeBias;
+
+  private Integer confirmWaitTime;
+
+  private List<String> requestSigAlgos;
+
+  private List<String> requestPbmOwfs;
+
+  private List<String> requestPbmMacs;
+
+  private String responsePbmMac;
+
+  private String responsePbmOwf;
+
+  private Integer responsePbmIterationCount;
+
+  public Boolean getConfirmCert() {
+    return confirmCert;
+  }
+
+  public void setConfirmCert(Boolean confirmCert) {
+    this.confirmCert = confirmCert;
+  }
+
+  public Boolean getSendCaCert() {
+    return sendCaCert;
+  }
+
+  public void setSendCaCert(Boolean sendCaCert) {
+    this.sendCaCert = sendCaCert;
+  }
+
+  public Boolean getSendCertChain() {
+    return sendCertChain;
+  }
+
+  public void setSendCertChain(Boolean sendCertChain) {
+    this.sendCertChain = sendCertChain;
+  }
+
+  public Boolean getMessageTimeRequired() {
+    return messageTimeRequired;
+  }
+
+  public void setMessageTimeRequired(Boolean messageTimeRequired) {
+    this.messageTimeRequired = messageTimeRequired;
+  }
+
+  public Boolean getSendResponderCert() {
+    return sendResponderCert;
+  }
+
+  public void setSendResponderCert(Boolean sendResponderCert) {
+    this.sendResponderCert = sendResponderCert;
+  }
+
+  public Integer getMessageTimeBias() {
+    return messageTimeBias;
+  }
+
+  public void setMessageTimeBias(Integer messageTimeBias) {
+    this.messageTimeBias = messageTimeBias;
+  }
+
+  public Integer getConfirmWaitTime() {
+    return confirmWaitTime;
+  }
+
+  public void setConfirmWaitTime(Integer confirmWaitTime) {
+    this.confirmWaitTime = confirmWaitTime;
+  }
+
+  public String getResponsePbmOwf() {
+    return responsePbmOwf;
+  }
+
+  public void setResponsePbmOwf(String responsePbmOwf) {
+    this.responsePbmOwf = responsePbmOwf;
+  }
+
+  public List<String> getRequestPbmOwfs() {
+    return requestPbmOwfs;
+  }
+
+  public void setRequestPbmOwfs(List<String> requestPbmOwfs) {
+    this.requestPbmOwfs = requestPbmOwfs;
+  }
+
+  public String getResponsePbmMac() {
+    return responsePbmMac;
+  }
+
+  public void setResponsePbmMac(String responsePbmMac) {
+    this.responsePbmMac = responsePbmMac;
+  }
+
+  public List<String> getRequestSigAlgos() {
+    return requestSigAlgos;
+  }
+
+  public void setRequestSigAlgos(List<String> requestSigAlgos) {
+    this.requestSigAlgos = requestSigAlgos;
+  }
+
+  public List<String> getRequestPbmMacs() {
+    return requestPbmMacs;
+  }
+
+  public void setRequestPbmMacs(List<String> requestPbmMacs) {
+    this.requestPbmMacs = requestPbmMacs;
+  }
+
+  public Integer getResponsePbmIterationCount() {
+    return responsePbmIterationCount;
+  }
+
+  public void setResponsePbmIterationCount(Integer responsePbmIterationCount) {
+    this.responsePbmIterationCount = responsePbmIterationCount;
+  }
+
+  public static CmpControlConf parse(JsonMap json) throws CodecException {
+    CmpControlConf ret = new CmpControlConf();
+    ret.setConfirmCert(json.getBool("confirmCert"));
+    ret.setSendCaCert (json.getBool("sendCaCert"));
+    ret.setSendCertChain(json.getBool("sendCertChain"));
+    ret.setMessageTimeRequired(json.getBool("messageTimeRequired"));
+    ret.setSendResponderCert(json.getBool("sendResponderCert"));
+    ret.setMessageTimeBias(json.getInt("messageTimeBias"));
+    ret.setConfirmWaitTime(json.getInt("confirmWaitTime"));
+    ret.setRequestSigAlgos(json.getStringList("requestSigAlgos"));
+    ret.setRequestPbmOwfs(json.getStringList("requestPbmOwfs"));
+    ret.setRequestPbmMacs(json.getStringList("requestPbmMacs"));
+    ret.setResponsePbmMac(json.getString("responsePbmMac"));
+    ret.setResponsePbmOwf(json.getString("responsePbmOwf"));
+    ret.setResponsePbmIterationCount(
+        json.getInt("responsePbmIterationCount"));
+    return ret;
+  }
+
+}

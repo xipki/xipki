@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12.test;
@@ -22,8 +22,8 @@ import java.security.Security;
 import java.security.Signature;
 
 /**
- * Abstract class of JUnit tests to test the signature creation and verification
- * of PKCS#12 token.
+ * Abstract class of JUnit tests to test the signature creation and
+ * verification of PKCS#12 token.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
@@ -62,8 +62,10 @@ public abstract class Pkcs12SignVerifyTest {
       keypairWithCert = KeypairWithCert.fromKeystore("PKCS12", ks,
           password, null, password, cert);
     }
-    P12ContentSignerBuilder builder = new P12ContentSignerBuilder(keypairWithCert);
-    signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
+    P12ContentSignerBuilder builder =
+        new P12ContentSignerBuilder(keypairWithCert);
+    signer = builder.createSigner(getSignatureAlgorithm(), 1,
+        new SecureRandom());
     return signer;
   }
 
@@ -75,7 +77,8 @@ public abstract class Pkcs12SignVerifyTest {
     }
 
     byte[] signatureValue = sign(data);
-    boolean signatureValid = verify(data, signatureValue, getSigner().getCertificate());
+    boolean signatureValid = verify(data, signatureValue,
+        getSigner().getCertificate());
     Assert.assertTrue("Signature invalid", signatureValid);
   }
 
@@ -83,8 +86,10 @@ public abstract class Pkcs12SignVerifyTest {
     return getSigner().sign(data);
   }
 
-  protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert) throws Exception {
-    Signature signature = Signature.getInstance(getSignatureAlgorithm().getJceName());
+  protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
+      throws Exception {
+    Signature signature = Signature.getInstance(
+        getSignatureAlgorithm().getJceName());
     signature.initVerify(cert.getPublicKey());
     signature.update(data);
     return signature.verify(signatureValue);

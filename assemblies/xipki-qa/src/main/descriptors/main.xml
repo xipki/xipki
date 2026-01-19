@@ -150,11 +150,6 @@
       <directory>${project.build.directory}/xipki-gateway-${project.version}/</directory>
       <outputDirectory>xipki-gateway</outputDirectory>
     </fileSet>
-    <!-- Copy xipki-hsmproxy -->
-    <fileSet>
-      <directory>${project.build.directory}/xipki-hsmproxy-${project.version}/</directory>
-      <outputDirectory>xipki-hsmproxy</outputDirectory>
-    </fileSet>
   </fileSets>
   <files>
     <file>
@@ -163,9 +158,8 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${shared.dir}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
+      <source>${shared.dir}/tomcat/xipki/security/pkcs11.json</source>
       <outputDirectory>xipki/security</outputDirectory>
-      <destName>pkcs11.json</destName>
       <fileMode>0644</fileMode>
     </file>
     <file>
@@ -175,15 +169,9 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/webapps/dummy-ctlog-servlet.war</source>
+      <source>${project.build.directory}/webapps/dummy-servlet.war</source>
       <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat/webapps</outputDirectory>
-      <destName>ctlog.war</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/dummy-crl-servlet.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat/webapps</outputDirectory>
-      <destName>crl.war</destName>
+      <destName>dummy.war</destName>
       <fileMode>0644</fileMode>
     </file>
   </files>

@@ -1,4 +1,4 @@
-Deployment in Tomcat (8, 9 and 10)
+Deployment in Tomcat (10 and 11)
 ----
 1. (Optional) If you use OCSP store type other than `xipki-ca-db`, 
    (namely `xipki-db`, `ejbca-db`, and `crl`):  

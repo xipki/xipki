@@ -1,12 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api;
 
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,9 +21,10 @@ import java.util.List;
  * @since 2.0.0
  */
 
-public class CaUris {
+public class CaUris implements JsonEncodable {
 
-  public static final CaUris EMPTY_INSTANCE = new CaUris(null, null, null, null);
+  public static final CaUris EMPTY_INSTANCE =
+      new CaUris(null, null, null, null);
 
   public static final String NAME_CACERT_URIS = "cacert.uris";
 
@@ -35,12 +39,11 @@ public class CaUris {
   private List<String> crlUris;
   private List<String> deltaCrlUris;
 
-  // For the deserialization only
-  @SuppressWarnings("unused")
   private CaUris() {
   }
 
-  public CaUris(List<String> cacertUris, List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris) {
+  public CaUris(List<String> cacertUris, List<String> ocspUris,
+                List<String> crlUris, List<String> deltaCrlUris) {
     setCacertUris(cacertUris);
     setOcspUris(ocspUris);
     setCrlUris(crlUris);
@@ -48,7 +51,8 @@ public class CaUris {
   } // constructor
 
   public void setCacertUris(List<String> cacertUris) {
-    this.cacertUris = CollectionUtil.isEmpty(cacertUris) ? null : Collections.unmodifiableList(cacertUris);
+    this.cacertUris = CollectionUtil.isEmpty(cacertUris) ? null
+        : Collections.unmodifiableList(cacertUris);
   }
 
   public List<String> getCacertUris() {
@@ -56,7 +60,8 @@ public class CaUris {
   }
 
   public void setOcspUris(List<String> ocspUris) {
-    this.ocspUris = CollectionUtil.isEmpty(ocspUris) ? null : Collections.unmodifiableList(ocspUris);
+    this.ocspUris = CollectionUtil.isEmpty(ocspUris) ? null
+        : Collections.unmodifiableList(ocspUris);
   }
 
   public List<String> getOcspUris() {
@@ -64,7 +69,8 @@ public class CaUris {
   }
 
   public void setCrlUris(List<String> crlUris) {
-    this.crlUris = CollectionUtil.isEmpty(crlUris) ? null : Collections.unmodifiableList(crlUris);
+    this.crlUris = CollectionUtil.isEmpty(crlUris) ? null
+        : Collections.unmodifiableList(crlUris);
   }
 
   public List<String> getCrlUris() {
@@ -72,7 +78,8 @@ public class CaUris {
   }
 
   public void setDeltaCrlUris(List<String> deltaCrlUris) {
-    this.deltaCrlUris = CollectionUtil.isEmpty(deltaCrlUris) ? null : Collections.unmodifiableList(deltaCrlUris);
+    this.deltaCrlUris = CollectionUtil.isEmpty(deltaCrlUris) ? null
+        : Collections.unmodifiableList(deltaCrlUris);
   }
 
   public List<String> getDeltaCrlUris() {
@@ -87,10 +94,10 @@ public class CaUris {
     }
 
     CaUris other = (CaUris) obj;
-    return CompareUtil.equalsObject(cacertUris, other.cacertUris)
-        && CompareUtil.equalsObject(ocspUris, other.ocspUris)
-        && CompareUtil.equalsObject(crlUris, other.crlUris)
-        && CompareUtil.equalsObject(deltaCrlUris, other.deltaCrlUris);
+    return CompareUtil.equals(cacertUris, other.cacertUris)
+        && CompareUtil.equals(ocspUris, other.ocspUris)
+        && CompareUtil.equals(crlUris, other.crlUris)
+        && CompareUtil.equals(deltaCrlUris, other.deltaCrlUris);
   } // method equals
 
   @Override
@@ -121,9 +128,9 @@ public class CaUris {
   public static CaUris decode(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
     return new CaUris(
-        StringUtil.split(pairs.value(NAME_CACERT_URIS), "|"),
-        StringUtil.split(pairs.value(NAME_OCSP_URIS), "|"),
-        StringUtil.split(pairs.value(NAME_CRL_URIS), "|"),
+        StringUtil.split(pairs.value(NAME_CACERT_URIS),   "|"),
+        StringUtil.split(pairs.value(NAME_OCSP_URIS),     "|"),
+        StringUtil.split(pairs.value(NAME_CRL_URIS),      "|"),
         StringUtil.split(pairs.value(NAME_DELTACRL_URIS), "|"));
   } // method decode
 
@@ -151,5 +158,24 @@ public class CaUris {
 
     return pairs.getEncoded();
   } // method getEncoded
+
+  public static CaUris parse(JsonMap json) throws CodecException {
+    CaUris ret = new CaUris();
+    ret.setCacertUris(json.getStringList("cacertUris"));
+    ret.setCrlUris(json.getStringList("crlUris"));
+    ret.setOcspUris(json.getStringList("ocspUris"));
+    ret.setDeltaCrlUris(json.getStringList("deltaCrlUris"));
+    return ret;
+  }
+
+  @Override
+  public JsonMap toCodec() {
+    JsonMap ret = new JsonMap();
+    ret.putStrings("cacertUris", cacertUris);
+    ret.putStrings("crlUris", crlUris);
+    ret.putStrings("ocspUris", ocspUris);
+    ret.putStrings("deltaCrlUris", deltaCrlUris);
+    return ret;
+  }
 
 }

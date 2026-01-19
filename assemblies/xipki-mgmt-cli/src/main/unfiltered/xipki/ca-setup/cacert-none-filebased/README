@@ -1,2 +1,3 @@
 Scripts to setup CA by generating new CA key and certificate pair.
-No database for caconf is used here. Database to store certificates and CRLs is still needed.
+No database for caconf is used here. Database to store certificates and CRLs is
+still needed.

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>shell-base</artifactId>
   <packaging>bundle</packaging>
@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>util</artifactId>
+      <artifactId>util-extra</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

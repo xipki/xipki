@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.mgmt;
@@ -10,14 +10,13 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.pkcs11.P11CryptService;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotId;
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,7 +30,8 @@ import java.util.List;
 
 class SignerManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SignerManager.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(SignerManager.class);
 
   private boolean signerInitialized;
 
@@ -73,7 +73,8 @@ class SignerManager {
     String name = Args.notNull(signerEntry, "signerEntry").getName();
     CaManagerImpl.checkName(name, "signer name");
     if (manager.signerDbEntries.containsKey(name)) {
-      throw new CaMgmtException(StringUtil.concat("Signer named ", name, " exists"));
+      throw new CaMgmtException(
+          StringUtil.concat("Signer named ", name, " exists"));
     }
 
     String conf = signerEntry.getConf();
@@ -125,7 +126,8 @@ class SignerManager {
       type = type.toLowerCase();
     }
 
-    SignerEntry newSigner = manager.caConfStore.changeSigner(name, type, conf, base64Cert, manager);
+    SignerEntry newSigner = manager.caConfStore.changeSigner(
+        name, type, conf, base64Cert, manager);
 
     manager.signers.remove(name);
     manager.signerDbEntries.remove(name);
@@ -144,16 +146,17 @@ class SignerManager {
     }
   } // method createSigner
 
-  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
+  String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
+      throws CaMgmtException {
     StringBuilder sb = new StringBuilder();
     final String NL = "\n";
     try {
-      P11CryptService p11Service = manager.p11CryptServiceFactory.getP11CryptService(moduleName);
-      if (p11Service == null) {
+      P11Module module =
+          manager.p11CryptServiceFactory.getP11Module(moduleName);
+      if (module == null) {
         throw new CaMgmtException("undefined module " + moduleName);
       }
 
-      P11Module module = p11Service.getModule();
       sb.append("module: ").append(moduleName).append(NL);
       sb.append(module.getDescription()).append(NL);
 
@@ -190,7 +193,8 @@ class SignerManager {
     }
 
     for (P11SlotId slotId : slots) {
-      sb.append("\tslot[").append(slotId.getIndex()).append("]: ").append(slotId.getId()).append("\n");
+      sb.append("\tslot[").append(slotId.getIndex()).append("]: ")
+          .append(slotId.getId()).append("\n");
     }
   }
 

@@ -1,31 +1,35 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
-import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
-import org.xipki.security.CertpathValidationModel;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.JSON;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.Validity;
-import org.xipki.util.Validity.Unit;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.security.CertPathValidationModel;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.datasource.DataSourceConf;
+import org.xipki.util.extra.type.Validity;
+import org.xipki.util.extra.type.Validity.Unit;
+import org.xipki.util.io.FileOrBinary;
 
-import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Configuration of OCSP server.
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspServerConf extends ValidableConf {
+public class OcspServerConf {
 
   public enum EmbedCertsMode {
     NONE,
@@ -33,78 +37,78 @@ public class OcspServerConf extends ValidableConf {
     SIGNER_AND_CA
   } // class EmbedCertsMode
 
-  public static class CertCollection extends ValidableConf {
+  public static class CertCollection {
 
-    private String dir;
+    private final String dir;
 
-    private FileOrBinary[] certs;
+    private final FileOrBinary[] certs;
+
+    public CertCollection(String dir) {
+      this.dir = Args.notBlank(dir, "dir");
+      this.certs = null;
+    }
+
+    public CertCollection(FileOrBinary[] certs) {
+      this.dir = null;
+      this.certs = Args.notNull(certs, "certs");
+    }
 
     public String getDir() {
       return dir;
-    }
-
-    public void setDir(String value) {
-      this.dir = value;
     }
 
     public FileOrBinary[] getCerts() {
       return certs;
     }
 
-    public void setCerts(FileOrBinary[] certs) {
-      this.certs = certs;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      exactOne(certs, "certs", dir, "dir");
+    public static CertCollection parse(JsonMap json) throws CodecException {
+      String dir = json.getString("dir");
+      FileOrBinary[] certs = FileOrBinary.parseArray(json.getList("certs"));
+      Args.exactOne(dir, "dir", certs, "certs");
+      return (dir != null) ? new CertCollection(dir)
+          : new CertCollection(certs);
     }
 
   } // class CertCollection
 
-  public static class Nonce extends ValidableConf {
+  public static class Nonce {
 
     /**
      * valid values are ignore, forbidden, optional and required.
      */
-    private QuadrupleState occurrence;
+    private final QuadrupleState occurrence;
 
-    private Integer minLen;
+    private final Integer minLen;
 
-    private Integer maxLen;
+    private final Integer maxLen;
+
+    public Nonce(QuadrupleState occurrence, Integer minLen, Integer maxLen) {
+      this.occurrence = Args.notNull(occurrence, "occurrence");
+      this.minLen = minLen;
+      this.maxLen = maxLen;
+    }
 
     public QuadrupleState getOccurrence() {
       return occurrence;
-    }
-
-    public void setOccurrence(QuadrupleState occurrence) {
-      this.occurrence = occurrence;
     }
 
     public Integer getMinLen() {
       return minLen;
     }
 
-    public void setMinLen(Integer minLen) {
-      this.minLen = minLen;
-    }
-
     public Integer getMaxLen() {
       return maxLen;
     }
 
-    public void setMaxLen(Integer maxLen) {
-      this.maxLen = maxLen;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(occurrence, "occurrence");
+    public static Nonce parse(JsonMap json) throws CodecException {
+      return new Nonce(
+          json.getNnEnum("occurrence", QuadrupleState.class),
+          json.getInt("minLen"), json.getInt("maxLen"));
     }
 
   } // class Nonce
 
-  public static class RequestOption extends ValidableConf {
+  public static class RequestOption {
 
     /**
      * Whether to support HTTP GET for small request.
@@ -122,12 +126,14 @@ public class OcspServerConf extends ValidableConf {
      */
     private int maxRequestSize;
 
+    private final String name;
+
     /**
      * version of the request, current support values are v1.
      */
-    private List<String> versions;
+    private final List<String> versions;
 
-    private Nonce nonce;
+    private final Nonce nonce;
 
     private boolean signatureRequired;
 
@@ -137,7 +143,11 @@ public class OcspServerConf extends ValidableConf {
 
     private CertpathValidation certpathValidation;
 
-    private String name;
+    public RequestOption(String name, List<String> versions, Nonce nonce) {
+      this.name = Args.notBlank(name, "name");
+      this.versions = Args.notEmpty(versions, "versions");
+      this.nonce = Args.notNull(nonce, "nonce");
+    }
 
     public boolean isSupportsHttpGet() {
       return supportsHttpGet;
@@ -167,16 +177,8 @@ public class OcspServerConf extends ValidableConf {
       return versions;
     }
 
-    public void setVersions(List<String> versions) {
-      this.versions = versions;
-    }
-
     public Nonce getNonce() {
       return nonce;
-    }
-
-    public void setNonce(Nonce nonce) {
-      this.nonce = nonce;
     }
 
     public boolean isSignatureRequired() {
@@ -218,205 +220,198 @@ public class OcspServerConf extends ValidableConf {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
-    }
+    public static RequestOption parse(JsonMap json) throws CodecException {
+      RequestOption ret = new RequestOption(
+          json.getNnString("name"), json.getNnStringList("versions"),
+          Nonce.parse(json.getNnMap("nonce")));
 
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(versions, "versions");
-      notNull(nonce, "nonce");
-      validate(nonce, certpathValidation);
+      ret.setSupportsHttpGet(json.getBool("supportsHttpGet", false));
+      ret.setSignatureRequired(json.getBool("signatureRequired", false));
+      ret.setValidateSignature(json.getBool("validateSignature", false));
+      ret.setHashAlgorithms(json.getStringList("hashAlgorithms"));
+
+      Integer i = json.getInt("maxRequestListCount");
+      if (i != null) {
+        ret.setMaxRequestListCount(i);
+      }
+
+      i = json.getInt("maxRequestSize");
+      if (i != null) {
+        ret.setMaxRequestSize(i);
+      }
+
+      JsonMap map = json.getMap("certpathValidation");
+      if (map != null) {
+        ret.setCertpathValidation(CertpathValidation.parse(map));
+      }
+
+      return ret;
     }
 
   } // class RequestOption
 
-  public static class CertpathValidation extends ValidableConf {
+  public static class CertpathValidation {
 
-    private CertpathValidationModel validationModel;
+    private final CertPathValidationModel validationModel;
 
-    private CertCollection trustanchors;
+    private final CertCollection trustanchors;
 
-    private CertCollection certs;
+    private final CertCollection certs;
 
-    public CertpathValidationModel getValidationModel() {
-      return validationModel;
+    public CertpathValidation(
+        CertPathValidationModel validationModel,
+        CertCollection trustanchors, CertCollection certs) {
+      this.validationModel = Args.notNull(validationModel, "validationModel");
+      this.trustanchors    = Args.notNull(trustanchors, "trustanchors");
+      this.certs = certs;
     }
 
-    public void setValidationModel(CertpathValidationModel validationModel) {
-      this.validationModel = validationModel;
+    public CertPathValidationModel getValidationModel() {
+      return validationModel;
     }
 
     public CertCollection getTrustanchors() {
       return trustanchors;
     }
 
-    public void setTrustanchors(CertCollection trustanchors) {
-      this.trustanchors = trustanchors;
-    }
-
     public CertCollection getCerts() {
       return certs;
     }
 
-    public void setCerts(CertCollection certs) {
-      this.certs = certs;
-    }
+    public static CertpathValidation parse(JsonMap json)
+        throws CodecException {
+      JsonMap map = json.getMap("certs");
+      CertCollection certs = null;
+      if (map != null) {
+        certs = CertCollection.parse(map);
+      }
 
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(validationModel, "validationModel");
-      notNull(trustanchors, "trustanchors");
-      validate(trustanchors, certs);
+      return new CertpathValidation(
+          json.getNnEnum("validationModel", CertPathValidationModel.class),
+          CertCollection.parse(json.getNnMap("trustanchors")), certs);
     }
 
   } // class CertpathValidation
 
-  public static class Responder extends ValidableConf {
+  public static class Responder {
 
     /**
-     * To answer OCSP request via URI http://myorg.com/foo/abc, you can use the combination
+     * To answer OCSP request via URI http://myorg.com/foo/abc, you can use the
+     * combination
      * (servlet.alias = '/', servletPath = '/foo/abc') or
      * (servlet.alias = '/foo', servletPath = '/abc').
      */
-    private List<String> servletPaths;
+    private final List<String> servletPaths;
 
     /**
-     * Valid values are RFC2560 and RFC6960. If not present, then RFC6960 mode will be applied.
+     * Valid values are RFC2560 and RFC6960. If not present, then RFC6960 mode
+     * will be applied.
      */
-    private String mode;
+    private final String mode;
 
     /**
      * Whether to consider certificate as revoked if CA is revoked.
      */
-    private boolean inheritCaRevocation;
+    private final boolean inheritCaRevocation;
 
-    private String signer;
+    private final String signer;
 
-    private String request;
+    private final String request;
 
-    private String response;
+    private final String response;
 
-    private List<String> stores;
+    private final List<String> stores;
 
-    private String name;
+    private final String name;
 
-    public List<String> getServletPaths() {
-      if (servletPaths == null) {
-        servletPaths = new LinkedList<>();
-      }
-      return servletPaths;
+    public Responder(String name, String mode, List<String> servletPaths,
+                     boolean inheritCaRevocation, String signer,
+                     String request, String response, List<String> stores) {
+      this.name     = Args.notBlank(name, "name");
+      this.signer   = Args.notBlank(signer, "signer");
+      this.request  = Args.notBlank(request, "request");
+      this.response = Args.notBlank(response, "response");
+      this.stores   = Args.notEmpty(stores, "stores");
+      this.servletPaths = Args.notEmpty(servletPaths, "servletPaths");
+
+      this.mode = mode;
+      this.inheritCaRevocation = inheritCaRevocation;
     }
 
-    public void setServletPaths(List<String> servletPaths) {
-      this.servletPaths = servletPaths;
+    public List<String> getServletPaths() {
+      return servletPaths;
     }
 
     public String getMode() {
       return mode;
     }
 
-    public void setMode(String mode) {
-      this.mode = mode;
-    }
-
     public boolean isInheritCaRevocation() {
       return inheritCaRevocation;
-    }
-
-    public void setInheritCaRevocation(boolean inheritCaRevocation) {
-      this.inheritCaRevocation = inheritCaRevocation;
     }
 
     public String getSigner() {
       return signer;
     }
 
-    public void setSigner(String signer) {
-      this.signer = signer;
-    }
-
     public String getRequest() {
       return request;
-    }
-
-    public void setRequest(String request) {
-      this.request = request;
     }
 
     public String getResponse() {
       return response;
     }
 
-    public void setResponse(String response) {
-      this.response = response;
-    }
-
     public List<String> getStores() {
-      if (stores == null) {
-        stores = new LinkedList<>();
-      }
       return stores;
-    }
-
-    public void setStores(List<String> stores) {
-      this.stores = stores;
     }
 
     public String getName() {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notEmpty(servletPaths, "servletPaths");
-      notBlank(signer, "signer");
-      notBlank(request, "request");
-      notBlank(response, "response");
-      notEmpty(stores, "stores");
-      notBlank(name, "name");
+    public static Responder parse(JsonMap json) throws CodecException {
+      return new Responder(json.getString("name"),
+          json.getString("mode"), json.getStringList("servletPaths"),
+          json.getBool("inheritCaRevocation", false),
+          json.getString("signer"),   json.getString("request"),
+          json.getString("response"), json.getStringList("stores"));
     }
 
   } // class Responder
 
-  public static class ResponseCache extends ValidableConf {
+  public static class ResponseCache {
 
-    private DataSourceConf datasource;
+    private final DataSourceConf datasource;
 
-    private String validity;
+    private final Validity validity;
+
+    public ResponseCache(DataSourceConf datasource, Validity validity) {
+      this.datasource = Args.notNull(datasource, "datasource");
+      this.validity = validity;
+    }
 
     public DataSourceConf getDatasource() {
       return datasource;
     }
 
-    public void setDatasource(DataSourceConf datasource) {
-      this.datasource = datasource;
+    public Validity getValidity() {
+      return validity == null ? new Validity(1, Unit.DAY) : validity;
     }
 
-    public String getValidity() {
-      return validity;
-    }
+    public static ResponseCache parse(JsonMap json) throws CodecException {
+      String str = json.getString("validity");
+      Validity validity = str == null ? null : Validity.getInstance(str);
 
-    public void setValidity(String validity) {
-      this.validity = validity;
-    }
-
-    public Validity validity() {
-      return validity == null ? new Validity(1, Unit.DAY) : Validity.getInstance(validity);
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(datasource, "datasource");
+      return new ResponseCache(
+          DataSourceConf.parse(json.getMap("datasource")), validity);
     }
 
   } // class ResponseCache
 
-  public static class ResponseOption extends ValidableConf {
+  public static class ResponseOption {
+
+    private final String name;
 
     private boolean responderIdByName = true;
 
@@ -430,7 +425,9 @@ public class OcspServerConf extends ValidableConf {
 
     private Long cacheMaxAge;
 
-    private String name;
+    public ResponseOption(String name) {
+      this.name = Args.notBlank(name, "name");
+    }
 
     public boolean isResponderIdByName() {
       return responderIdByName;
@@ -484,98 +481,110 @@ public class OcspServerConf extends ValidableConf {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
-    }
+    public static ResponseOption parse(JsonMap json) throws CodecException {
+      ResponseOption ret = new ResponseOption(json.getNnString("name"));
 
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
+      Boolean b = json.getBool("responderIdByName");
+      if (b != null) {
+        ret.setResponderIdByName(b);
+      }
+
+      b = json.getBool("includeInvalidityDate");
+      if (b != null) {
+        ret.setIncludeInvalidityDate(b);
+      }
+
+      b = json.getBool("includeRevReason");
+      if (b != null) {
+        ret.setIncludeRevReason(b);
+      }
+
+      b = json.getBool("includeCerthash");
+      if (b != null) {
+        ret.setIncludeCerthash(b);
+      }
+
+      ret.setCacheMaxAge(json.getLong("cacheMaxAge"));
+
+      EmbedCertsMode certsMode = json.getEnum("embedCertsMode",
+          EmbedCertsMode.class);
+      if (certsMode != null) {
+        ret.setEmbedCertsMode(certsMode);
+      }
+
+      return ret;
     }
 
   } // class ResponseOption
 
-  public static class Signer extends ValidableConf {
+  public static class Signer {
 
-    private String name;
+    private final String name;
 
-    private String type;
+    private final String type;
 
-    private String key;
+    private final String key;
 
-    private List<String> algorithms;
+    private final List<String> algorithms;
 
-    private FileOrBinary cert;
+    private final FileOrBinary cert;
 
-    private List<FileOrBinary> caCerts;
+    private final List<FileOrBinary> caCerts;
+
+    public Signer(String name, String type, String key,
+                  List<String> algorithms, FileOrBinary cert,
+                  List<FileOrBinary> caCerts) {
+      this.name = Args.notBlank(name, "name");
+      this.type = Args.notBlank(type, "type");
+      this.key  = Args.notBlank(key, "key");
+      this.algorithms = algorithms;
+      this.cert = cert;
+      this.caCerts = (caCerts == null) ? Collections.emptyList() : caCerts;
+    }
 
     public String getName() {
       return name;
-    }
-
-    public void setName(String name) {
-      this.name = name;
     }
 
     public String getType() {
       return type;
     }
 
-    public void setType(String type) {
-      this.type = type;
-    }
-
     public String getKey() {
       return key;
     }
 
-    public void setKey(String key) {
-      this.key = key;
-    }
-
     public List<String> getAlgorithms() {
-      if (algorithms == null) {
-        algorithms = new LinkedList<>();
-      }
       return algorithms;
-    }
-
-    public void setAlgorithms(List<String> algorithms) {
-      this.algorithms = algorithms;
     }
 
     public FileOrBinary getCert() {
       return cert;
     }
 
-    public void setCert(FileOrBinary cert) {
-      this.cert = cert;
-    }
-
     public List<FileOrBinary> getCaCerts() {
-      if (caCerts == null) {
-        caCerts = new LinkedList<>();
-      }
       return caCerts;
     }
 
-    public void setCaCerts(List<FileOrBinary> caCerts) {
-      this.caCerts = caCerts;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notBlank(type, "type");
-      notBlank(key, "key");
-      notEmpty(algorithms, "algorithms");
+    public static Signer parse(JsonMap json) throws CodecException {
+      return new Signer(json.getNnString("name"),
+          json.getNnString("type"), json.getNnString("key"),
+          json.getStringList("algorithms"),
+          FileOrBinary.parse(json.getMap("cert")),
+          FileOrBinary.parseList(json.getList("caCerts")));
     }
 
   } // class Signer
 
-  public static class Store extends ValidableConf {
+  public static class Store {
 
-    private Source source;
+    private final String name;
+
+    private final String minNextUpdatePeriod;
+
+    private final String maxNextUpdatePeriod;
+
+    private final Source source;
 
     /**
      * Update interval. Either "NEVER" or {@link Validity}.
@@ -594,18 +603,27 @@ public class OcspServerConf extends ValidableConf {
 
     private Boolean includeCrlId;
 
-    private String minNextUpdatePeriod;
+    public Store(String name, Source source, String minNextUpdatePeriod,
+                 String maxNextUpdatePeriod) {
+      this.name = Args.notBlank(name, "name");
+      this.source = Args.notNull(source, "source");
 
-    private String maxNextUpdatePeriod;
+      if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
+        Validity min = Validity.getInstance(minNextUpdatePeriod);
+        Validity max = Validity.getInstance(maxNextUpdatePeriod);
+        if (min.compareTo(max) > 0) {
+          throw new IllegalArgumentException(String.format(
+              "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not " +
+                  "allowed", minNextUpdatePeriod, maxNextUpdatePeriod));
+        }
+      }
 
-    private String name;
+      this.minNextUpdatePeriod = minNextUpdatePeriod;
+      this.maxNextUpdatePeriod = maxNextUpdatePeriod;
+    }
 
     public Source getSource() {
       return source;
-    }
-
-    public void setSource(Source source) {
-      this.source = source;
     }
 
     public Boolean getIgnoreExpiredCert() {
@@ -636,12 +654,9 @@ public class OcspServerConf extends ValidableConf {
       return unknownCertBehaviour;
     }
 
-    public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
+    public void setUnknownCertBehaviour(
+        UnknownCertBehaviour unknownCertBehaviour) {
       this.unknownCertBehaviour = unknownCertBehaviour;
-    }
-
-    public void setMinNextUpdatePeriod(String minNextUpdatePeriod) {
-      this.minNextUpdatePeriod = minNextUpdatePeriod;
     }
 
     public String getMinNextUpdatePeriod() {
@@ -650,10 +665,6 @@ public class OcspServerConf extends ValidableConf {
 
     public String getMaxNextUpdatePeriod() {
       return maxNextUpdatePeriod;
-    }
-
-    public void setMaxNextUpdatePeriod(String maxNextUpdatePeriod) {
-      this.maxNextUpdatePeriod = maxNextUpdatePeriod;
     }
 
     public Boolean getIncludeArchiveCutoff() {
@@ -676,10 +687,6 @@ public class OcspServerConf extends ValidableConf {
       return name;
     }
 
-    public void setName(String name) {
-      this.name = name;
-    }
-
     public String getUpdateInterval() {
       return updateInterval;
     }
@@ -688,201 +695,253 @@ public class OcspServerConf extends ValidableConf {
       this.updateInterval = updateInterval;
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(name, "name");
-      notNull(source, "source");
+    public static Store parse(JsonMap json) throws CodecException {
+      JsonMap map = json.getMap("source");
+      Source source = (map == null) ? null : Source.parse(map);
+      Store ret = new Store(json.getString("name"), source,
+          json.getString("minNextUpdatePeriod"),
+          json.getString("maxNextUpdatePeriod"));
 
-      if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
-        try {
-          Validity min = Validity.getInstance(minNextUpdatePeriod);
-          Validity max = Validity.getInstance(maxNextUpdatePeriod);
-          if (min.compareTo(max) > 0) {
-            throw new InvalidConfException(String.format(
-                    "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
-                    minNextUpdatePeriod, maxNextUpdatePeriod));
-          }
-        } catch (IllegalArgumentException ex) {
-          throw new InvalidConfException(ex.getMessage());
-        }
+      ret.setUpdateInterval(json.getString("updateInterval"));
+      ret.setIgnoreNotYetValidCert(json.getBool("ignoreNotYetValidCert"));
+      ret.setIgnoreExpiredCert(json.getBool("ignoreExpiredCert"));
+      ret.setRetentionInterval(json.getInt("retentionInterval"));
+
+      String str = json.getString("unknownCertBehaviour");
+      if (str != null) {
+        ret.setUnknownCertBehaviour(UnknownCertBehaviour.valueOf(str));
       }
+
+      ret.setIncludeArchiveCutoff(json.getBool("includeArchiveCutoff"));
+      ret.setIncludeCrlId(json.getBool("includeCrlId"));
+
+      return ret;
     }
 
   } // class Store
 
-  public static class Source extends ValidableConf {
+  public static class Source {
 
-    private String type;
+    private final String type;
 
-    private String datasource;
+    private final String datasource;
 
-    private Map<String, ?> conf;
+    private final JsonMap conf;
+
+    public Source(String type, String datasource, JsonMap conf) {
+      this.datasource = datasource;
+      this.type = Args.notBlank(type, "type");
+      this.conf = Args.notNull(conf, "conf");
+    }
 
     public String getType() {
       return type;
-    }
-
-    public void setType(String value) {
-      this.type = value;
     }
 
     public String getDatasource() {
       return datasource;
     }
 
-    public void setDatasource(String value) {
-      this.datasource = value;
-    }
-
-    public Map<String, ?> getConf() {
+    public JsonMap getConf() {
       return conf;
     }
 
-    public void setConf(Map<String, ?> value) {
-      this.conf = value;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notBlank(type, "type");
+    public static Source parse(JsonMap json) throws CodecException {
+      return new Source(json.getString("type"),
+          json.getString("datasource"), json.getMap("conf"));
     }
 
   } // class Source
 
-  public static class CaCerts extends ValidableConf {
+  public static class CaCerts {
 
     /**
      * Files of CA certificates to be considered.<br/>
      * optional. Default is all.
      */
-    private List<String> includes;
+    private final List<String> includes;
 
     /**
      * Comma-separated files of CA certificates to be not considered
      * optional. Default is none.
      */
-    private List<String> excludes;
+    private final List<String> excludes;
+
+    public CaCerts(List<String> includes, List<String> excludes) {
+      this.includes = includes;
+      this.excludes = excludes;
+    }
 
     public List<String> getIncludes() {
       return includes;
-    }
-
-    public void setIncludes(List<String> includes) {
-      this.includes = includes;
     }
 
     public List<String> getExcludes() {
       return excludes;
     }
 
-    public void setExcludes(List<String> excludes) {
-      this.excludes = excludes;
+    public static CaCerts parse(JsonMap json) throws CodecException {
+      return new CaCerts(json.getStringList("includes"),
+          json.getStringList("excludes"));
     }
 
-    @Override
-    public void validate() throws InvalidConfException {
+    public static CaCerts parseSourceConf(JsonMap sourceConf)
+        throws OcspStoreException {
+      try {
+        JsonMap map = sourceConf.getMap("caCerts");
+        return map == null ? null : OcspServerConf.CaCerts.parse(map);
+      } catch (CodecException e) {
+        throw new OcspStoreException(
+            "error parsing caCerts: " + e.getMessage(), e);
+      }
     }
 
   } // class CaCerts
 
-  private ResponseCache responseCache;
+  private final ResponseCache responseCache;
 
-  private List<Responder> responders;
+  private final List<Responder> responders;
 
-  private List<Signer> signers;
+  private final List<Signer> signers;
 
-  private List<Store> stores;
+  private final List<Store> stores;
 
-  private List<DataSourceConf> datasources;
+  private final List<DataSourceConf> datasources;
 
-  private List<RequestOption> requestOptions;
+  private final List<RequestOption> requestOptions;
 
-  private List<ResponseOption> responseOptions;
+  private final List<ResponseOption> responseOptions;
 
   private boolean master = true;
 
-  private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
+  public OcspServerConf(ResponseCache responseCache,
+                        List<Responder> responders,
+                        List<Signer> signers, List<Store> stores,
+                        List<DataSourceConf> datasources,
+                        List<RequestOption> requestOptions,
+                        List<ResponseOption> responseOptions) {
+    this.responseCache = responseCache;
+    this.datasources   = (datasources == null) ? Collections.emptyList()
+        : datasources;
+    this.responders    = Args.notEmpty(responders, "responders");
+    this.signers       = Args.notEmpty(signers, "signers");
+    this.stores        = Args.notEmpty(stores, "stores");
+    this.requestOptions  = Args.notEmpty(requestOptions, "requestOptions");
+    this.responseOptions = Args.notEmpty(responseOptions, "responseOptions");
+
+  }
+
+  private UnknownIssuerBehaviour unknownIssuerBehaviour =
+      UnknownIssuerBehaviour.unknown;
 
   public static OcspServerConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
-    notBlank(fileName, "fileName");
-    OcspServerConf conf = JSON.parseConf(Paths.get(fileName), OcspServerConf.class);
-    conf.validate();
-    return conf;
+      throws InvalidConfException {
+    Args.notBlank(fileName, "fileName");
+    try {
+      JsonMap root = JsonParser.parseMap(Paths.get(fileName), true);
+      return parse(root);
+    } catch (CodecException | RuntimeException e) {
+      throw new InvalidConfException("error parsing file " + fileName + ": " +
+          e.getMessage(), e);
+    }
+  }
+
+  public static OcspServerConf parse(JsonMap json) throws CodecException {
+    JsonMap map = json.getMap("responseCache");
+    ResponseCache responseCache = (map == null) ? null
+        : ResponseCache.parse(map);
+
+    JsonList list = json.getList("responders");
+    List<Responder> responders = null;
+    if (list != null) {
+      responders = new ArrayList<>(list.size());
+      for (JsonMap m : list.toMapList()) {
+        responders.add(Responder.parse(m));
+      }
+    }
+
+    list = json.getList("signers");
+    List<Signer> signers = null;
+    if (list != null) {
+      signers = new ArrayList<>(list.size());
+      for (JsonMap m : list.toMapList()) {
+        signers.add(Signer.parse(m));
+      }
+    }
+
+    list = json.getList("stores");
+    List<Store> stores = null;
+    if (list != null) {
+      stores = new ArrayList<>(list.size());
+      for (JsonMap m : list.toMapList()) {
+        stores.add(Store.parse(m));
+      }
+    }
+
+    List<DataSourceConf> datasources =
+        DataSourceConf.parseList(json.getList("datasources"));
+
+    list = json.getList("requestOptions");
+    List<RequestOption> requestOptions = null;
+    if (list != null) {
+      requestOptions = new ArrayList<>(list.size());
+      for (JsonMap m : list.toMapList()) {
+        requestOptions.add(RequestOption.parse(m));
+      }
+    }
+
+    list = json.getList("responseOptions");
+    List<ResponseOption> responseOptions = null;
+    if (list != null) {
+      responseOptions = new ArrayList<>(list.size());
+      for (JsonMap m : list.toMapList()) {
+        responseOptions.add(ResponseOption.parse(m));
+      }
+    }
+
+    OcspServerConf ret =  new OcspServerConf(responseCache, responders,
+        signers, stores, datasources, requestOptions, responseOptions);
+
+    Boolean b = json.getBool("master");
+    if (b != null) {
+      ret.setMaster(b);
+    }
+
+    UnknownIssuerBehaviour behaviour = json.getEnum(
+        "unknownIssuerBehaviour", UnknownIssuerBehaviour.class);
+    if (behaviour != null) {
+      ret.setUnknownIssuerBehaviour(behaviour);
+    }
+
+    return ret;
   }
 
   public ResponseCache getResponseCache() {
     return responseCache;
   }
 
-  public void setResponseCache(ResponseCache responseCache) {
-    this.responseCache = responseCache;
-  }
-
   public List<Responder> getResponders() {
-    if (responders == null) {
-      responders = new LinkedList<>();
-    }
     return responders;
   }
 
-  public void setResponders(List<Responder> responders) {
-    this.responders = responders;
-  }
-
   public List<Signer> getSigners() {
-    if (signers == null) {
-      signers = new LinkedList<>();
-    }
     return signers;
   }
 
-  public void setSigners(List<Signer> signers) {
-    this.signers = signers;
-  }
-
   public List<Store> getStores() {
-    if (stores == null) {
-      stores = new LinkedList<>();
-    }
     return stores;
   }
 
-  public void setStores(List<Store> stores) {
-    this.stores = stores;
-  }
-
   public List<DataSourceConf> getDatasources() {
-    if (datasources == null) {
-      datasources = new LinkedList<>();
-    }
     return datasources;
   }
 
-  public void setDatasources(List<DataSourceConf> datasources) {
-    this.datasources = datasources;
-  }
-
   public List<RequestOption> getRequestOptions() {
-    if (requestOptions == null) {
-      requestOptions = new LinkedList<>();
-    }
     return requestOptions;
   }
 
-  public void setRequestOptions(List<RequestOption> requestOptions) {
-    this.requestOptions = requestOptions;
-  }
-
   public List<ResponseOption> getResponseOptions() {
-    if (responseOptions == null) {
-      responseOptions = new LinkedList<>();
-    }
     return responseOptions;
-  }
-
-  public void setResponseOptions(List<ResponseOption> responseOptions) {
-    this.responseOptions = responseOptions;
   }
 
   public boolean isMaster() {
@@ -897,19 +956,9 @@ public class OcspServerConf extends ValidableConf {
     return unknownIssuerBehaviour;
   }
 
-  public void setUnknownIssuerBehaviour(UnknownIssuerBehaviour unknownIssuerBehaviour) {
+  public void setUnknownIssuerBehaviour(
+      UnknownIssuerBehaviour unknownIssuerBehaviour) {
     this.unknownIssuerBehaviour = unknownIssuerBehaviour;
   }
-
-  @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(responders, "responders");
-    notEmpty(signers, "signers");
-    notEmpty(stores, "stores");
-    notEmpty(requestOptions, "requestOptions");
-    notEmpty(responseOptions, "responseOptions");
-
-    validate(responders, signers, stores, datasources, requestOptions, responseOptions);
-  } // method validate
 
 }

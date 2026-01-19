@@ -1,17 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.xipki.pki.ErrorCode;
-import org.xipki.pki.OperationException;
 import org.xipki.security.X509Cert;
+import org.xipki.security.exception.OperationException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
+import org.xipki.util.codec.Args;
+import org.xipki.util.conf.ConfPairs;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -55,21 +53,14 @@ public class PublicCaInfo {
     this.c14nSubject = X509Util.canonicalizeName(subject);
     this.subjectKeyIdentifier = caCert.getSubjectKeyId();
     this.extraControl = extraControl;
-
-    byte[] encodedSubjectAltName = caCert.getExtensionCoreValue(Extension.subjectAlternativeName);
-    if (encodedSubjectAltName == null) {
-      subjectAltName = null;
-    } else {
-      try {
-        subjectAltName = GeneralNames.getInstance(encodedSubjectAltName);
-      } catch (RuntimeException ex) {
-        throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid SubjectAltName extension in CA certificate");
-      }
-    }
+    this.subjectAltName = (caCert.getSubjectAltNames() == null) ? null
+        : GeneralNames.getInstance(caCert.getSubjectAltNames());
   } // constructor
 
-  public PublicCaInfo(X500Name subject, X500Name issuer, BigInteger serialNumber, GeneralNames subjectAltName,
-                      byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl) {
+  public PublicCaInfo(
+      X500Name subject, X500Name issuer, BigInteger serialNumber,
+      GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
+      CaUris caUris, ConfPairs extraControl) {
     this.subject = Args.notNull(subject, "subject");
     this.issuer = Args.notNull(issuer, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
@@ -117,8 +108,9 @@ public class PublicCaInfo {
     return subjectAltName;
   }
 
-  public byte[] getSubjectKeyIdentifer() {
-    return (subjectKeyIdentifier == null) ? null : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
+  public byte[] getSubjectKeyIdentifier() {
+    return (subjectKeyIdentifier == null) ? null
+        : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }
 
   public BigInteger getSerialNumber() {

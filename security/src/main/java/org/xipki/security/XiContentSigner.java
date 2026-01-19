@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
@@ -6,7 +6,8 @@ package org.xipki.security;
 import org.bouncycastle.operator.ContentSigner;
 
 /**
- * Extends {@link ContentSigner} by a new method {@link #getEncodedAlgorithmIdentifier()}.
+ * Extends {@link ContentSigner} by a new method
+ * {@link #getEncodedAlgorithmIdentifier()}.
  *
  * @author Lijun Liao (xipki)
  * @since 2.2.0

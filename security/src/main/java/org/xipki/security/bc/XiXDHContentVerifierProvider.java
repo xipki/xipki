@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.bc;
@@ -12,10 +12,10 @@ import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.DHSigStaticKeyCertPair;
-import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers.Xipki;
-import org.xipki.util.Args;
+import org.xipki.security.OIDs;
+import org.xipki.security.util.EcCurveEnum;
+import org.xipki.util.codec.Args;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
@@ -23,15 +23,15 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
- * {@link ContentVerifierProvider} for the algorithm X25519 static HMAC (XiPKI own
- * algorithm, based on RFC 6955).
+ * {@link ContentVerifierProvider} for the algorithm X25519 static HMAC
+ * (XiPKI own algorithm, based on RFC 6955).
  *
  * @author Lijun Liao (xipki)
  */
@@ -67,7 +67,8 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
     private final SecretKey macKey;
 
-    private XDHContentVerifier(AlgorithmIdentifier algId, Mac hmac, SecretKey macKey) {
+    private XDHContentVerifier(AlgorithmIdentifier algId, Mac hmac,
+                               SecretKey macKey) {
       this.algId = algId;
       this.hmac = hmac;
       this.macKey = macKey;
@@ -84,7 +85,8 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       try {
         hmac.init(macKey);
       } catch (InvalidKeyException ex) {
-        throw new RuntimeCryptoException("could not init MAC: " + ex.getMessage());
+        throw new RuntimeCryptoException(
+            "could not init MAC: " + ex.getMessage());
       }
       return outputStream;
     }
@@ -107,27 +109,31 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
   private final ASN1ObjectIdentifier sigAlgOid;
 
-  public XiXDHContentVerifierProvider(PublicKey verifyKey, DHSigStaticKeyCertPair ownerKeyAndCert)
+  public XiXDHContentVerifierProvider(
+      PublicKey verifyKey, DHSigStaticKeyCertPair ownerKeyAndCert)
       throws InvalidKeyException {
     Args.notNull(ownerKeyAndCert, "ownerKeyAndCert");
 
     String keyAlgName = Args.notNull(verifyKey, "verifyKey").getAlgorithm();
+    EcCurveEnum curveEnum = EcCurveEnum.ofAlias(keyAlgName);
 
     HashAlgo hash;
-    if (EdECConstants.X25519.equalsIgnoreCase(keyAlgName)) {
-      this.sigAlgOid = Xipki.id_alg_dhPop_x25519;
+    if (EcCurveEnum.X25519 == curveEnum) {
+      this.sigAlgOid = OIDs.Xipki.id_alg_dhPop_x25519;
       this.hmacAlgorithm = "HMAC-SHA512";
       hash = HashAlgo.SHA512;
-    } else if (EdECConstants.X448.equalsIgnoreCase(keyAlgName)) {
-      this.sigAlgOid = Xipki.id_alg_dhPop_x448;
+    } else if (EcCurveEnum.X448 == curveEnum) {
+      this.sigAlgOid = OIDs.Xipki.id_alg_dhPop_x448;
       this.hmacAlgorithm = "HMAC-SHA512";
       hash = HashAlgo.SHA512;
     }  else {
-      throw new InvalidKeyException("unsupported verifyKey.getAlgorithm(): " + keyAlgName);
+      throw new InvalidKeyException(
+          "unsupported verifyKey.getAlgorithm(): " + keyAlgName);
     }
 
     if (!keyAlgName.equals(ownerKeyAndCert.getPrivateKey().getAlgorithm())) {
-      throw new InvalidKeyException("verifyKey and ownerKeyAndCert does not match");
+      throw new InvalidKeyException(
+          "verifyKey and ownerKeyAndCert does not match");
     }
 
     // compute the secret key
@@ -137,7 +143,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
       keyAgreement.init(ownerKeyAndCert.getPrivateKey());
       keyAgreement.doPhase(verifyKey, true);
       zz = keyAgreement.generateSecret();
-    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | IllegalStateException ex) {
+    } catch (GeneralSecurityException | RuntimeException ex) {
       throw new InvalidKeyException("KeyChange error", ex);
     }
 
@@ -162,10 +168,12 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
   }
 
   @Override
-  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier) throws OperatorCreationException {
+  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier)
+      throws OperatorCreationException {
     ASN1ObjectIdentifier oid = verifierAlgorithmIdentifier.getAlgorithm();
     if (!this.sigAlgOid.equals(oid)) {
-      throw new OperatorCreationException("given public key is not suitable for the algorithm " + oid.getId());
+      throw new OperatorCreationException(
+          "given public key is not suitable for the algorithm " + oid.getId());
     }
 
     Mac hmac;
@@ -176,6 +184,6 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     }
 
     return new XDHContentVerifier(verifierAlgorithmIdentifier, hmac, hmacKey);
-  } // method get
+  }
 
 }

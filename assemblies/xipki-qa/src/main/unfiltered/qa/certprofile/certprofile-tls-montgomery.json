@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "details": "certprofile tls",
+    "category": "A"
+  },
+  "certLevel": "EndEntity",
+  "certDomain": "RFC5280",
+  "maxSize": 8400,
+  "validity": "5y",
+  "notBeforeTime": "current",
+  "keypairGeneration": "X25519",
+  "keyAlgorithms": ["X25519","X448"],
+  "subject": [{
+    "type": "country",
+    "minOccurs": 0
+  },{
+    "type": "organization",
+    "minOccurs": 0
+  },{
+    "type": "organizationalUnit",
+    "minOccurs": 0
+  },{
+    "type": "serialNumber",
+    "minOccurs": 0
+  },{
+    "type": "commonName",
+    "regex": ":FQDN",
+    "toSAN": "DNSName"
+  }],
+  "extensions": [{
+    "type": "SubjectKeyIdentifier",
+    "required": true
+  },{
+    "type": "CRLDistributionPoints"
+  },{
+    "type": "FreshestCRL"
+  },{
+    "type": "SubjectAlternativeName",
+    "required": true,
+    "inRequest": "optional",
+    "subjectAltName": {
+      "modes": ["DNSName","IPAddress"]
+    }
+  },{
+    "type": "BasicConstraints",
+    "critical": true,
+    "required": true
+  },{
+    "type": "AuthorityInfoAccess",
+    "required": true,
+    "authorityInfoAccess": {
+      "includeCaIssuers": true,
+      "includeOcsp": true
+    }
+  },{
+    "type": "AuthorityKeyIdentifier",
+    "required": true
+  },{
+    "type": "KeyUsage",
+    "critical": true,
+    "required": true,
+    "inRequest": "optional",
+    "keyUsage": {
+      "usages": [{
+        "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
+      }]
+    }
+  },{
+    "type": "ExtendedKeyUsage",
+    "required": true,
+    "inRequest": "optional",
+    "extendedKeyUsage": {
+      "required": ["serverAuth"],
+      "optional": ["clientAuth"]
+    }
+  }]
+}

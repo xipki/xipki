@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -61,15 +59,14 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
-    encoder.writeArrayStart(4);
-    encoder.writeTextString(transactionId);
-    encoder.writeIntObj(confirmWaitTime);
-    encoder.writeObjects(entries);
-    encoder.writeByteStrings(extraCerts);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(4).writeTextString(transactionId)
+        .writeLongObj(confirmWaitTime).writeObjects(entries)
+        .writeByteStrings(extraCerts);
   }
 
-  public static EnrollOrPollCertsResponse decode(byte[] encoded) throws DecodeException {
+  public static EnrollOrPollCertsResponse decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("EnrollOrPollCertsResponse", decoder, 4);
       EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
@@ -79,7 +76,8 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
     }
   }
 
@@ -93,7 +91,8 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
     private final byte[] privateKey;
 
-    public Entry(BigInteger id, ErrorEntry error, byte[] cert, byte[] privateKey) {
+    public Entry(BigInteger id, ErrorEntry error, byte[] cert,
+                 byte[] privateKey) {
       this.id = id;
       this.error = error;
       this.cert = cert;
@@ -117,31 +116,26 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws EncodeException, IOException {
-      encoder.writeArrayStart(4);
-      encoder.writeBigInt(id);
-      encoder.writeObject(error);
-      encoder.writeByteString(cert);
-      encoder.writeByteString(privateKey);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(4).writeBigInt(id).writeObject(error)
+          .writeByteString(cert).writeByteString(privateKey);
     }
 
-    public static Entry decode(CborDecoder decoder) throws DecodeException {
+    public static Entry decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(4)) {
           return null;
         }
 
-        return new Entry(
-            decoder.readBigInt(),
-            ErrorEntry.decode(decoder),
-            decoder.readByteString(),
-            decoder.readByteString());
+        return new Entry(decoder.readBigInt(), ErrorEntry.decode(decoder),
+            decoder.readByteString(), decoder.readByteString());
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    public static Entry[] decodeArray(CborDecoder decoder)
+        throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

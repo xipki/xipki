@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12;
@@ -8,8 +8,8 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
@@ -54,11 +54,13 @@ public class HmacContentSigner implements XiContentSigner {
 
   private final int outLen;
 
-  public HmacContentSigner(SignAlgo algorithm, SecretKey signingKey) throws XiSecurityException {
+  public HmacContentSigner(SignAlgo algorithm, SecretKey signingKey)
+      throws XiSecurityException {
     this.algorithm = Args.notNull(algorithm, "algorithm");
     Args.notNull(signingKey, "signingKey");
     try {
-      this.encodedAlgorithmIdentifier = algorithm.getAlgorithmIdentifier().getEncoded();
+      this.encodedAlgorithmIdentifier =
+          algorithm.getAlgorithmIdentifier().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -77,7 +79,8 @@ public class HmacContentSigner implements XiContentSigner {
 
   @Override
   public byte[] getEncodedAlgorithmIdentifier() {
-    return Arrays.copyOf(encodedAlgorithmIdentifier, encodedAlgorithmIdentifier.length);
+    return Arrays.copyOf(encodedAlgorithmIdentifier,
+        encodedAlgorithmIdentifier.length);
   }
 
   @Override

@@ -1,18 +1,19 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ca;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.Args;
-import org.xipki.util.JSON;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.misc.StringUtil;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,19 +24,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * An implementation of {@link CaQaSystemManager}.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
 
   private String confFile;
 
-  private final Map<String, CertprofileQa> x509ProfileMap = new HashMap<>();
+  private final Map<String, CertprofileQa> profileMap = new HashMap<>();
 
-  private final Map<String, IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+  private final Map<String, IssuerInfo> issuerInfoMap = new HashMap<>();
 
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -58,11 +60,12 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
     LOG.info("initializing ...");
     initialized.set(false);
-    x509IssuerInfoMap.clear();
+    issuerInfoMap.clear();
 
     QaconfType qaConf;
     try {
-      qaConf = JSON.parseConf(new File(confFile), QaconfType.class);
+      JsonMap json = JsonParser.parseMap(Path.of(confFile), true);
+      qaConf = QaconfType.parse(json);
     } catch (Exception ex) {
       final String message = "could not parse the QA configuration";
       LogUtil.error(LOG, ex, message);
@@ -74,7 +77,8 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
       try {
         certBytes = issuer.getCert().readContent();
       } catch (IOException ex) {
-        LogUtil.error(LOG, ex, "could not read the certificate bytes of issuer " + issuer.getName());
+        LogUtil.error(LOG, ex, "could not read the certificate " +
+            "bytes of issuer " + issuer.getName());
         continue;
       }
 
@@ -91,14 +95,16 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
       IssuerInfo issuerInfo;
       try {
-        issuerInfo = new IssuerInfo(issuer.getCaIssuerUrls(), issuer.getOcspUrls(),
-            issuer.getCrlUrls(), issuer.getDeltaCrlUrls(), certBytes, cutoffNotAfter);
+        issuerInfo = new IssuerInfo(issuer.getCaIssuerUrls(),
+            issuer.getOcspUrls(), issuer.getCrlUrls(),
+            issuer.getDeltaCrlUrls(), certBytes, cutoffNotAfter);
       } catch (CertificateException ex) {
-        LogUtil.error(LOG, ex, "could not parse certificate of issuer " + issuer.getName());
+        LogUtil.error(LOG, ex,
+            "could not parse certificate of issuer " + issuer.getName());
         continue;
       }
 
-      x509IssuerInfoMap.put(issuer.getName(), issuerInfo);
+      issuerInfoMap.put(issuer.getName(), issuerInfo);
       LOG.info("configured X509 issuer {}", issuer.getName());
     }
 
@@ -106,10 +112,13 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
       String name = type.getName();
       try {
         String content = type.readContent();
-        x509ProfileMap.put(name, new CertprofileQa(content));
+        CertprofileQa certprofileQa = new X509CertprofileQa(content);
+
+        profileMap.put(name, certprofileQa);
         LOG.info("configured X509 certificate profile {}", name);
       } catch (IOException | CertprofileException ex) {
-        LogUtil.error(LOG, ex, "could not parse QA certificate profile " + name);
+        LogUtil.error(LOG, ex,
+            "could not parse QA certificate profile " + name);
       }
     }
 
@@ -126,25 +135,25 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   @Override
   public Set<String> getIssuerNames() {
     assertInitialized();
-    return Collections.unmodifiableSet(x509IssuerInfoMap.keySet());
+    return Collections.unmodifiableSet(issuerInfoMap.keySet());
   }
 
   @Override
   public IssuerInfo getIssuer(String issuerName) {
     assertInitialized();
-    return x509IssuerInfoMap.get(Args.notNull(issuerName, "issuerName"));
+    return issuerInfoMap.get(Args.notNull(issuerName, "issuerName"));
   }
 
   @Override
   public Set<String> getCertprofileNames() {
     assertInitialized();
-    return Collections.unmodifiableSet(x509ProfileMap.keySet());
+    return Collections.unmodifiableSet(profileMap.keySet());
   }
 
   @Override
   public CertprofileQa getCertprofile(String certprofileName) {
     assertInitialized();
-    return x509ProfileMap.get(Args.notNull(certprofileName, "certprofileName"));
+    return profileMap.get(Args.notNull(certprofileName, "certprofileName"));
   }
 
   private void assertInitialized() {

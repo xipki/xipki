@@ -1,20 +1,21 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api.publisher;
 
-import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.X509Crl;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.extra.exception.CertPublisherException;
 
 import java.io.Closeable;
 
 /**
- * Defines how to publish the certificates and CRLs. All CertPublisher classes must extend this
- * class.
+ * Defines how to publish the certificates and CRLs. All CertPublisher classes
+ * must extend this class.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
@@ -75,7 +76,8 @@ public abstract class CertPublisher implements Closeable {
    * @return whether the revocation is published.
    */
   public abstract boolean certificateRevoked(
-      X509Cert caCert, CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
+      X509Cert caCert, CertWithDbId cert, String certprofile,
+      CertRevocationInfo revInfo);
 
   /**
    * Publishes the unrevocation of a certificate.
@@ -86,7 +88,8 @@ public abstract class CertPublisher implements Closeable {
    *          Target certificate. Must not be {@code null}.
    * @return whether the unrevocation is published.
    */
-  public abstract boolean certificateUnrevoked(X509Cert caCert, CertWithDbId cert);
+  public abstract boolean certificateUnrevoked(
+      X509Cert caCert, CertWithDbId cert);
 
   /**
    * Publishes the remove of a certificate.
@@ -97,7 +100,8 @@ public abstract class CertPublisher implements Closeable {
    *          Target certificate. Must not be {@code null}.
    * @return whether the remove is published.
    */
-  public abstract boolean certificateRemoved(X509Cert caCert, CertWithDbId cert);
+  public abstract boolean certificateRemoved(
+      X509Cert caCert, CertWithDbId cert);
 
   /**
    * Publishes a CRL.
@@ -108,7 +112,7 @@ public abstract class CertPublisher implements Closeable {
    *          CRL to be published. Must not be {@code null}.
    * @return whether the CRL is published.
    */
-  public abstract boolean crlAdded(X509Cert caCert, X509CRLHolder crl);
+  public abstract boolean crlAdded(X509Cert caCert, X509Crl crl);
 
   /**
    * Publishes the revocation of a CA.
@@ -119,7 +123,8 @@ public abstract class CertPublisher implements Closeable {
    *          Revocation information. Must not be {@code null}.
    * @return whether the CA revocation is published.
    */
-  public abstract boolean caRevoked(X509Cert caCert, CertRevocationInfo revInfo);
+  public abstract boolean caRevoked(
+      X509Cert caCert, CertRevocationInfo revInfo);
 
   /**
    * Publishes the unrevocation of a CA.

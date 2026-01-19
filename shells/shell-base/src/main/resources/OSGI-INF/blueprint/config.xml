@@ -8,10 +8,10 @@
     </cm:default-properties>
   </cm:property-placeholder>
 
-  <bean id="curl" class="org.xipki.util.DefaultCurl">
+  <bean id="curl" class="org.xipki.util.extra.http.DefaultCurl">
     <property name="useSslConf" value="${useSslConf}"/>
     <property name="confFile" value="${confFile}"/>
   </bean>
 
-  <service ref="curl" interface="org.xipki.util.Curl"/>
+  <service ref="curl" interface="org.xipki.util.extra.http.Curl"/>
 </blueprint>

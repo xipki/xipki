@@ -1,13 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
+import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +33,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DfltConcurrentContentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+      DfltConcurrentContentSigner.class);
 
   private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
 
@@ -69,16 +72,20 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
   } // method static
 
-  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers) throws NoSuchAlgorithmException {
+  public DfltConcurrentContentSigner(
+      boolean mac, List<XiContentSigner> signers)
+      throws NoSuchAlgorithmException {
     this(mac, signers, null);
   }
 
-  public DfltConcurrentContentSigner(boolean mac, List<XiContentSigner> signers, Key signingKey)
+  public DfltConcurrentContentSigner(
+      boolean mac, List<XiContentSigner> signers, Key signingKey)
       throws NoSuchAlgorithmException {
     Args.notEmpty(signers, "signers");
 
     this.mac = mac;
-    this.algorithm = SignAlgo.getInstance(signers.get(0).getAlgorithmIdentifier());
+    this.algorithm = SignAlgo.getInstance(signers.get(0)
+        .getAlgorithmIdentifier());
     this.signers = new ArrayBlockingQueue<>(signers.size());
     this.signers.addAll(signers);
 
@@ -102,7 +109,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     } else if (digest.length == 20) {
       this.sha1OfMacKey = Arrays.copyOf(digest, 20);
     } else {
-      throw new IllegalArgumentException("invalid sha1Digest.length (" + digest.length + " != 20)");
+      throw new IllegalArgumentException(
+          "invalid sha1Digest.length (" + digest.length + " != 20)");
     }
   }
 
@@ -127,7 +135,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
    * @param soTimeout timeout in milliseconds, 0 for infinitely.
    */
   @Override
-  public XiContentSigner borrowSigner(int soTimeout) throws NoIdleSignerException {
+  public XiContentSigner borrowSigner(int soTimeout)
+      throws NoIdleSignerException {
     XiContentSigner signer = null;
     try {
       signer = signers.poll(soTimeout, TimeUnit.MILLISECONDS);
@@ -175,7 +184,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   @Override
   public X509Cert getCertificate() {
-    return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
+    return CollectionUtil.isEmpty(certificateChain) ? null
+        : certificateChain[0];
   }
 
   @Override
@@ -207,14 +217,16 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException {
+  public byte[] sign(byte[] data)
+      throws NoIdleSignerException, SignatureException {
     XiContentSigner signer = borrowSigner();
     try {
       OutputStream signatureStream = signer.getOutputStream();
       try {
         signatureStream.write(data);
       } catch (IOException ex) {
-        throw new SignatureException("could not write data to SignatureStream: " + ex.getMessage(), ex);
+        throw new SignatureException("could not write data to SignatureStream: "
+            + ex.getMessage(), ex);
       }
       return signer.getSignature();
     } finally {
@@ -223,7 +235,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   } // method sign
 
   @Override
-  public byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException {
+  public byte[][] sign(byte[][] data)
+      throws NoIdleSignerException, SignatureException {
     byte[][] signatures = new byte[data.length][];
     XiContentSigner signer = borrowSigner();
 
@@ -233,7 +246,8 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
         try {
           signatureStream.write(data[i]);
         } catch (IOException ex) {
-          throw new SignatureException("could not write data to SignatureStream: " + ex.getMessage(), ex);
+          throw new SignatureException("could not write data to " +
+              "SignatureStream: " + ex.getMessage(), ex);
         }
         signatures[i] = signer.getSignature();
       }

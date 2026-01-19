@@ -1,12 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.Audits;
-import org.xipki.audit.Audits.AuditConf;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.profile.CertprofileFactory;
 import org.xipki.ca.server.CaServerConf;
@@ -19,21 +17,23 @@ import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.ReflectiveUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.XipkiBaseDir;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
-import org.xipki.util.http.HttpStatusCode;
-import org.xipki.util.http.XiHttpFilter;
-import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.audit.Audits;
+import org.xipki.util.extra.audit.Audits.AuditConf;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.http.HttpConstants;
+import org.xipki.util.extra.http.HttpStatusCode;
+import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.extra.http.XiHttpRequest;
+import org.xipki.util.extra.http.XiHttpResponse;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.misc.ReflectiveUtil;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.io.XipkiBaseDir;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -49,7 +49,8 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaHttpFilter.class);
 
-  private static final String XIJSON_CERTFACTORY = "org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl";
+  private static final String XIJSON_CERT_FACTORY =
+      "org.xipki.ca.certprofile.xijson.CertprofileFactoryImpl";
 
   private static final String DFLT_CFG = "etc/ca/ca.json";
 
@@ -61,8 +62,6 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private HttpRaServlet raServlet;
 
-  private final boolean remoteMgmtEnabled;
-
   private CaHttpMgmtServlet mgmtServlet;
 
   public CaHttpFilter() throws Exception {
@@ -70,11 +69,14 @@ public class CaHttpFilter implements XiHttpFilter {
 
     CaServerConf conf;
     try {
-      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
+      conf = CaServerConf.readConfFromFile(
+          IoUtil.expandFilepath(DFLT_CFG, true));
     } catch (IOException ex) {
-      throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      throw new IOException("could not parse configuration file " + DFLT_CFG,
+          ex);
     } catch (InvalidConfException ex) {
-      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
+      throw new InvalidConfException(
+          "could not parse configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -105,17 +107,20 @@ public class CaHttpFilter implements XiHttpFilter {
     caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
 
     // Certprofiles
-    caManager.setCertprofileFactoryRegister(initCertprofileFactoryRegister(conf.getCertprofileFactories()));
+    caManager.setCertprofileFactoryRegister(
+        initCertprofileFactoryRegister(conf.getCertprofileFactories()));
 
     // KeypairGen
     Set<KeypairGeneratorFactory> keypairGeneratorFactories = new HashSet<>();
     if (conf.getKeypairGeneratorFactories() != null) {
       for (String className : conf.getKeypairGeneratorFactories()) {
         try {
-          KeypairGeneratorFactory factory = ReflectiveUtil.newInstance(className);
+          KeypairGeneratorFactory factory =
+              ReflectiveUtil.newInstance(className);
           keypairGeneratorFactories.add(factory);
         } catch (ObjectCreationException ex) {
-          LOG.error("error creating KeypairGeneratorFactory " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
+          LOG.error("error creating KeypairGeneratorFactory {} : {}",
+              ex.getClass().getName(), ex.getMessage(), ex);
         }
       }
     }
@@ -123,7 +128,8 @@ public class CaHttpFilter implements XiHttpFilter {
     caManager.setKeyPairGeneratorFactories(keypairGeneratorFactories);
 
     // Publisher
-    CertPublisherFactoryRegister publisherFactoryRegister = new CertPublisherFactoryRegister();
+    CertPublisherFactoryRegister publisherFactoryRegister =
+        new CertPublisherFactoryRegister();
     publisherFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publisherFactoryRegister);
     caManager.setCaServerConf(conf);
@@ -138,25 +144,30 @@ public class CaHttpFilter implements XiHttpFilter {
     }
 
     RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
-    this.remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
-    LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
+    boolean remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
+    LOG.info("remote management is {}",
+        remoteMgmtEnabled ? "enabled" : "disabled");
 
-    if (this.remoteMgmtEnabled) {
+    if (remoteMgmtEnabled) {
       List<FileOrBinary> certFiles = remoteMgmt.getCerts();
       if (CollectionUtil.isEmpty(certFiles)) {
-        LOG.error("no client certificate is configured, disable the remote management");
+        LOG.error("no client certificate is configured, disable the " +
+            "remote management");
       } else {
         List<X509Cert> certs = null;
         try {
           certs = X509Util.parseCerts(certFiles);
         } catch (InvalidConfException ex) {
-          LOG.error("error parsing remote management's client certificates", ex);
+          LOG.error("error parsing remote management's client certificates",
+              ex);
         }
 
         if (CollectionUtil.isEmpty(certs)) {
-          LOG.error("could not find any valid client certificates, disable the remote management");
+          LOG.error("could not find any valid client certificates, " +
+              "disable the remote management");
         } else {
-          mgmtServlet = new CaHttpMgmtServlet(caManager, conf.getReverseProxyMode(), certs);
+          mgmtServlet = new CaHttpMgmtServlet(caManager,
+              conf.getReverseProxyMode(), certs, logReqResp);
         }
       }
     }
@@ -185,16 +196,19 @@ public class CaHttpFilter implements XiHttpFilter {
     }
   } // method destroy
 
-  private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories) {
-    CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
+  private CertprofileFactoryRegister initCertprofileFactoryRegister(
+      List<String> factories) {
+    CertprofileFactoryRegister certprofileFactoryRegister =
+        new CertprofileFactoryRegister();
     try {
-      CertprofileFactory certprofileFactory = ReflectiveUtil.newInstance(XIJSON_CERTFACTORY);
+      CertprofileFactory certprofileFactory =
+          ReflectiveUtil.newInstance(XIJSON_CERT_FACTORY);
       certprofileFactoryRegister.registFactory(certprofileFactory);
     } catch (ObjectCreationException ex) {
       LogUtil.warn(LOG, ex);
     }
 
-    // register additional CertprofileFactories
+    // register additional certprofile factories
     if (factories != null) {
       for (String className : factories) {
         try {
@@ -210,18 +224,21 @@ public class CaHttpFilter implements XiHttpFilter {
   } // method initCertprofileFactoryRegister
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
+      throws IOException {
     String path = req.getServletPath();
     if (path.startsWith("/ra/")) {
       if (raServlet != null) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3)); // 3 = "/ra".length()
+        // 3 = "/ra".length()
+        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(3));
         raServlet.service(req, resp);
       } else {
         resp.sendError(HttpStatusCode.SC_NOT_FOUND);
       }
     } else if (path.startsWith("/mgmt/")) {
       if (mgmtServlet != null) {
-        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5)); // 5 = "/mgmt".length()
+        // 5 = "/mgmt".length()
+        req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path.substring(5));
         mgmtServlet.service(req, resp);
       } else {
         resp.sendError(HttpStatusCode.SC_FORBIDDEN);

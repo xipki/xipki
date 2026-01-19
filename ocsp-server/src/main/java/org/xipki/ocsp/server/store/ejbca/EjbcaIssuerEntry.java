@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store.ejbca;
@@ -9,8 +9,8 @@ import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.CompareUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CompareUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
@@ -46,13 +46,15 @@ class EjbcaIssuerEntry {
     this.issuerHashMap = getIssuerHashAndKeys(encodedCert);
   }
 
-  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert) throws CertificateEncodingException {
+  private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
+      throws CertificateEncodingException {
     byte[] encodedName;
     byte[] encodedKey;
     try {
       Certificate bcCert = Certificate.getInstance(encodedCert);
       encodedName = bcCert.getSubject().getEncoded("DER");
-      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData()
+                    .getBytes();
     } catch (IllegalArgumentException | IOException ex) {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }
@@ -88,7 +90,8 @@ class EjbcaIssuerEntry {
   public boolean matchHash(RequestIssuer reqIssuer) {
     byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
     return issuerHash != null &&
-        CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(), reqIssuer.getNameHashFrom(), issuerHash.length);
+        CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
+            reqIssuer.getNameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Instant revocationTime) {
@@ -124,8 +127,10 @@ class EjbcaIssuerEntry {
     }
 
     EjbcaIssuerEntry other = (EjbcaIssuerEntry) obj;
-    return id.equals(other.id) && CompareUtil.equalsObject(revocationInfo, other.revocationInfo);
-    // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
+    return id.equals(other.id)
+            && CompareUtil.equals(revocationInfo, other.revocationInfo);
+    // The comparison of id implies the comparison of issuerHashMap, notBefore
+    // and cert.
   } // method equals
 
 }

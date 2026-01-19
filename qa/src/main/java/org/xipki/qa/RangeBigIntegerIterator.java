@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -60,7 +60,8 @@ public class RangeBigIntegerIterator implements Iterator<BigInteger> {
         currentIndex = 0;
       }
 
-      currentNumber = (currentIndex < sizeRanges) ? ranges.get(currentIndex).getFrom() : null;
+      currentNumber = (currentIndex < sizeRanges)
+          ? ranges.get(currentIndex).getFrom() : null;
     }
 
     return ret;

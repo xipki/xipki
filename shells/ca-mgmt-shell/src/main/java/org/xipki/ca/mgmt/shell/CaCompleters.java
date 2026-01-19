@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -9,8 +9,8 @@ import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.security.CrlReason;
 import org.xipki.security.X509Cert;
 import org.xipki.shell.DynamicEnumCompleter;

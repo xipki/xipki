@@ -1,13 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  *
@@ -35,20 +33,19 @@ public class CaNameResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException {
-    encoder.writeArrayStart(2);
-    encoder.writeTextString(name);
-    encoder.writeTextStrings(aliases);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(2).writeTextString(name)
+        .writeTextStrings(aliases);
   }
 
-  public static CaNameResponse decode(byte[] encoded) throws DecodeException {
+  public static CaNameResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CaNameResponse", decoder, 2);
       return new CaNameResponse(
-          decoder.readTextString(),
-          decoder.readTextStrings());
+          decoder.readTextString(), decoder.readTextStrings());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, CaNameResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, CaNameResponse.class), ex);
     }
   }
 

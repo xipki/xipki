@@ -1,0 +1,120 @@
+{
+	"secretkeys": [
+		{
+			"name": "kem-pop",
+			"password": "$[kem-pop.keyPassword]",
+			"keys": [
+				{
+					"alias": "1",
+					"keyType":"AES/256"
+				}
+			]
+		}
+	],
+	"keycerts": [
+		{
+			"name": "ca-server",
+			"certType": "TLS-Server",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], OU=CA server, CN=$[ca.host]",
+			"validity": "20y",
+			"p12Password": "$[ca.https.keyPassword]"
+	  	},{
+			"name": "ca-mgmt-client",
+			"certType": "TLS-Client",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=CA management client",
+			"validity": "20y",
+			"p12Password": "$[ca.mgmt.client.keyPassword]"
+	  	},{
+			"name": "ra-sdk-client",
+			"certType": "TLS-Client",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=RA SDK client",
+			"validity": "20y",
+			"p12Password": "$[ra.sdk.keyPassword]"
+	  	},{
+			"name": "gateway-server",
+			"certType": "TLS-Server",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], OU=Gateway server,CN=$[gateway.host]",
+			"validity": "20y",
+			"p12Password": "$[gateway.https.keyPassword]"
+	  	},{
+			"name": "cmp-client-ca",
+			"certType": "CA",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=CMP client CA",
+			"validity": "20y",
+			"p12Password": "$[cmp.client.ca.keyPassword]"
+	  	},{
+			"name": "cmp-client",
+			"certType": "TLS-Client",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=CMP client",
+			"validity": "20y",
+			"p12Password": "$[cmp.client.keyPassword]",
+			"issuerName": "cmp-client-ca"
+	  	},{
+			"name": "est-client-ca",
+			"certType": "CA",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=EST client CA",
+			"validity": "20y",
+			"p12Password": "$[est.client.ca.keyPassword]"
+	  	},{
+			"name": "est-client",
+			"certType": "TLS-Client",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=EST client",
+			"validity": "20y",
+			"p12Password": "$[est.client.keyPassword]",
+			"issuerName": "est-client-ca"
+	  	},{
+			"name": "rest-client-ca",
+			"certType": "CA",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=REST client CA",
+			"validity": "20y",
+			"p12Password": "$[rest.client.ca.keyPassword]"
+		},{
+			"name": "rest-client",
+			"certType": "TLS-Client",
+			"keyType": "SECP256R1",
+			"subject": "O=$[organization], CN=REST client",
+			"validity": "20y",
+			"p12Password": "$[rest.client.keyPassword]",
+			"issuerName": "rest-client-ca"
+	  	}
+	],
+	"keycerts2": [
+		{
+			"name": "dh-pop",
+			"p12Password": "$[dh-pop.keyPassword]",
+			"entries": [
+				{
+					"certType": "EE",
+					"keyType": "X25519",
+					"subject": "O=$[organization], OU=Gateway, CN=DH-POP-X25519",
+					"validity": "20y"
+				}, {
+					"certType": "EE",
+					"keyType": "X448",
+					"subject": "O=$[organization], OU=Gateway, CN=DH-POP-X448",
+					"validity": "20y"
+				}
+			]
+		}
+	],
+	"certstores": [
+		{
+			"name": "gateway-client-ca",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["cmp-client-ca", "est-client-ca", "rest-client-ca"]
+		}, {
+			"name": "ca-client",
+			"p12Password":"CHANGEIT",
+			"keyCertNames": ["ca-mgmt-client", "ra-sdk-client"]
+		}
+	]
+}

@@ -10,7 +10,7 @@ echo "#################################################################"
 
 echo "# Generate PKCS#12 key and certificate for SCEP Responder"
 
-xi:rsa-p12 --key-size 2048 --password $[scep.keyPassword] --out ${KEYCERTS_DIR}/scep1.p12
+xi:keypair-p12 --keyspec RSA2048 --password $[scep.keyPassword] --out ${KEYCERTS_DIR}/scep1.p12
 
 xi:csr-p12 --password $[scep.keyPassword] --p12 ${KEYCERTS_DIR}/scep1.p12 --out ${KEYCERTS_DIR}/scep1.csr \
   --subject "${SUBJECT}"

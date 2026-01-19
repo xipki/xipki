@@ -1,64 +1,53 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.Certprofile.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.Certprofile.CertDomain;
-import org.xipki.ca.api.profile.Certprofile.CertLevel;
-import org.xipki.ca.api.profile.Certprofile.CrlDistributionPointsControl;
-import org.xipki.ca.api.profile.Certprofile.ExtKeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.ExtensionControl;
-import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.ca.api.profile.Certprofile.RdnControl;
-import org.xipki.ca.api.profile.Certprofile.SubjectControl;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.ExtensionSpec;
-import org.xipki.ca.api.profile.KeyParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.security.EdECConstants;
+import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
+import org.xipki.ca.api.profile.ctrl.CertDomain;
+import org.xipki.ca.api.profile.ctrl.CertLevel;
+import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.ctrl.ExtensionControl;
+import org.xipki.ca.api.profile.ctrl.ExtensionSpec;
+import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
+import org.xipki.ca.api.profile.ctrl.RdnControl;
+import org.xipki.ca.api.profile.ctrl.SubjectControl;
+import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.KeyUsage;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.security.ObjectIdentifiers.XKU;
+import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.TripleState;
-import org.xipki.util.Validity;
-import org.xipki.util.Validity.Unit;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.extra.type.Validity;
+import org.xipki.util.extra.type.Validity.Unit;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 /**
  * CertProfile with identifier.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 
 public class CertprofileValidator {
 
   private static final Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 
-  public static void validate(Certprofile certprofile) throws CertprofileException {
+  public static void validate(Certprofile certprofile)
+      throws CertprofileException {
     StringBuilder msg = new StringBuilder();
 
-    Map<ASN1ObjectIdentifier, ExtensionControl> controls = certprofile.getExtensionControls();
-    Set<ASN1ObjectIdentifier> types = new HashSet<>(controls.keySet());
+    ExtensionsControl controls = certprofile.getExtensionsControl();
+    List<ASN1ObjectIdentifier> types = controls.getTypes();
 
     CertLevel certLevel = certprofile.getCertLevel();
     CertDomain certDomain = certprofile.getCertDomain();
@@ -68,14 +57,15 @@ public class CertprofileValidator {
     // make sure that non-request extensions are not permitted in requests
     Set<ASN1ObjectIdentifier> set = new HashSet<>();
     for (ASN1ObjectIdentifier type : types) {
-      ExtensionControl control = controls.get(type);
+      ExtensionControl control = controls.getControl(type);
       if (control.isPermittedInRequest() && spec.isNonRequest(type)) {
         set.add(type);
       }
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
+      msg.append("extensions ").append(toString(set))
+          .append(" must not be contained in request, ");
     }
 
     // make sure that non-permitted extensions are not configured
@@ -87,26 +77,28 @@ public class CertprofileValidator {
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("extensions ").append(toString(set)).append(" must not be contained, ");
+      msg.append("extensions ").append(toString(set))
+          .append(" must not be contained, ");
     }
 
     // make sure that critical only extensions are not marked as non-critical.
     set.clear();
     for (ASN1ObjectIdentifier type : types) {
-      ExtensionControl control = controls.get(type);
+      ExtensionControl control = controls.getControl(type);
       if (control.isCritical() && spec.isNonCriticalOnly(type)) {
         set.add(type);
       }
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("critical only extensions are marked as non-critical ").append(toString(set)).append(", ");
+      msg.append("critical only extensions are marked as non-critical ")
+          .append(toString(set)).append(", ");
     }
 
     // make sure that non-critical only extensions are not marked as critical.
     set.clear();
     for (ASN1ObjectIdentifier type : types) {
-      ExtensionControl control = controls.get(type);
+      ExtensionControl control = controls.getControl(type);
       if (!control.isCritical() && spec.isCriticalOnly(type)) {
         set.add(type);
       }
@@ -122,54 +114,32 @@ public class CertprofileValidator {
     Set<ASN1ObjectIdentifier> requiredTypes = spec.getRequiredExtensions();
 
     for (ASN1ObjectIdentifier type : requiredTypes) {
-      ExtensionControl extCtrl = controls.get(type);
+      ExtensionControl extCtrl = controls.getControl(type);
       if (extCtrl == null || !extCtrl.isRequired()) {
         set.add(type);
       }
     }
 
     if (!set.isEmpty()) {
-      msg.append("required extensions are not configured or not marked as required ")
+      msg.append(
+          "required extensions are not configured or not marked as required ")
         .append(toString(set)).append(", ");
     }
 
-    // KeyUsage
-    Set<KeyUsageControl> usages = certprofile.getKeyUsage();
-
-    if (certLevel == CertLevel.EndEntity) {
-      // make sure the EE certificate does not contain CA-only usages
-      KeyUsage[] caOnlyUsages = {KeyUsage.keyCertSign};
-
-      Set<KeyUsage> setUsages = new HashSet<>();
-      for (KeyUsage caOnlyUsage : caOnlyUsages) {
-        if (containsKeyusage(usages, caOnlyUsage)) {
-          setUsages.add(caOnlyUsage);
-        }
-      }
-
-      if (CollectionUtil.isNotEmpty(setUsages)) {
-        msg.append("EndEntity profile must not contain CA-only keyUsage ").append(setUsages).append(", ");
-      }
-    } else {
-      // make sure the CA certificate contains usage keyCertSign and cRLSign
-      boolean containsCaUsage = containsKeyusage(usages, KeyUsage.keyCertSign)
-          || containsKeyusage(usages, KeyUsage.cRLSign);
-      if (!containsCaUsage) {
-        msg.append("CA profile does not contain any of keyCertSign and cRLSign, ");
-      }
-    }
-
     if (certLevel == CertLevel.CROSS) {
-      Map<ASN1ObjectIdentifier, ExtensionControl> extnControls = certprofile.getExtensionControls();
-      ASN1ObjectIdentifier[] extnTypes = {Extension.subjectKeyIdentifier, Extension.basicConstraints};
+      ExtensionsControl extnControls = certprofile.getExtensionsControl();
+      ASN1ObjectIdentifier[] extnTypes =
+          {OIDs.Extn.subjectKeyIdentifier, OIDs.Extn.basicConstraints};
       for (ASN1ObjectIdentifier extnType : extnTypes) {
-        ExtensionControl control = extnControls.get(extnType);
+        ExtensionControl control = extnControls.getControl(extnType);
         if (control == null) {
-          msg.append("Mandatory extension ").append(ObjectIdentifiers.getName(extnType)).append(" is not set, ");
+          msg.append("Mandatory extension ")
+              .append(getExtensionIDDesc(extnType)).append(" is not set, ");
         } else {
           TripleState inRequest = control.getInRequest();
-          if (inRequest != TripleState.required && inRequest != TripleState.optional) {
-            msg.append("Extension ").append(ObjectIdentifiers.getName(extnType))
+          if (inRequest != TripleState.required
+              && inRequest != TripleState.optional) {
+            msg.append("Extension ").append(getExtensionIDDesc(extnType))
                 .append(" must be allowed in the request, ");
           }
         }
@@ -188,61 +158,6 @@ public class CertprofileValidator {
       validateCABForumBR(certprofile, msg);
     }
 
-    // Edwards or Montgomery Curves (RFC8410)
-    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = certprofile.getKeyAlgorithms();
-    boolean withEdwardsCurves = keyAlgorithms.containsKey(EdECConstants.id_ED25519)
-        || keyAlgorithms.containsKey(EdECConstants.id_ED448);
-    boolean withMontgomeryCurves = keyAlgorithms.containsKey(EdECConstants.id_X25519)
-        || keyAlgorithms.containsKey(EdECConstants.id_X448);
-
-    if (withEdwardsCurves || withMontgomeryCurves) {
-      Set<KeyUsage> requiredUsages = new HashSet<>();
-      Set<KeyUsage> optionalUsages = new HashSet<>();
-      for (KeyUsageControl m : usages) {
-        if (m.isRequired()) {
-          requiredUsages.add(m.getKeyUsage());
-        } else {
-          optionalUsages.add(m.getKeyUsage());
-        }
-      }
-
-      List<KeyUsage> allowedUsages;
-      if (withMontgomeryCurves) {
-        if (certLevel != CertLevel.EndEntity) {
-          msg.append("montgomery curves are not permitted in CA certificates, ");
-        }
-
-        if (!requiredUsages.contains(KeyUsage.keyAgreement)) {
-          msg.append("required KeyUsage KeyAgreement is not marked as 'required', ");
-        }
-
-        allowedUsages = Arrays.asList(KeyUsage.keyAgreement, KeyUsage.encipherOnly, KeyUsage.decipherOnly);
-      } else {
-        if (certLevel == CertLevel.EndEntity) {
-          if (! (requiredUsages.contains(KeyUsage.digitalSignature)
-                || requiredUsages.contains(KeyUsage.contentCommitment))) {
-            msg.append("required KeyUsage digitalSignature or contentCommitment is not marked as 'required', ");
-          }
-
-          allowedUsages = Arrays.asList(KeyUsage.digitalSignature, KeyUsage.contentCommitment);
-        } else {
-          allowedUsages = Arrays.asList(KeyUsage.digitalSignature, KeyUsage.contentCommitment,
-              KeyUsage.keyCertSign, KeyUsage.cRLSign);
-        }
-      }
-
-      allowedUsages.forEach(requiredUsages::remove);
-      allowedUsages.forEach(optionalUsages::remove);
-
-      if (!requiredUsages.isEmpty()) {
-        msg.append("Required KeyUsage items ").append(requiredUsages).append(" are not permitted, ");
-      }
-
-      if (!optionalUsages.isEmpty()) {
-        msg.append("Optional KeyUsage items ").append(requiredUsages).append(" are not permitted, ");
-      }
-    }
-
     final int len = msg.length();
     if (len > 2) {
       msg.delete(len - 2, len);
@@ -251,12 +166,10 @@ public class CertprofileValidator {
 
   } // method validate
 
-  private static void validateCABForumBR(Certprofile certprofile, StringBuilder msg) {
+  private static void validateCABForumBR(
+      Certprofile certprofile, StringBuilder msg) {
     // Subject with only one entry in a RDN is allowed
     SubjectControl subjectCtl = certprofile.getSubjectControl();
-    if (CollectionUtil.isNotEmpty(subjectCtl.getGroups())) {
-      msg.append("multiple AttributeAndTypes in one RDN is not permitted, ");
-    }
 
     for (ASN1ObjectIdentifier m : subjectCtl.getTypes()) {
       RdnControl ctl = subjectCtl.getControl(m);
@@ -271,7 +184,8 @@ public class CertprofileValidator {
     if (certLevel == CertLevel.EndEntity) {
       Validity validity = certprofile.getValidity();
       if (validity.compareTo(maxCabEeValidity) > 0) {
-        msg.append("validity exceeds the maximal validity of subscriber certificate, ");
+        msg.append("validity exceeds the maximal validity of " +
+            "subscriber certificate, ");
       }
     }
 
@@ -285,118 +199,33 @@ public class CertprofileValidator {
       for (SignAlgo signAlgo : sigAlgos) {
         HashAlgo hashAlgo = signAlgo.getHashAlgo();
         if (!allowedHashAlgos.contains(hashAlgo)) {
-          msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
-        }
-      }
-    }
-
-    // Public Key
-    Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = certprofile.getKeyAlgorithms();
-    if (CollectionUtil.isEmpty(keyAlgorithms)) {
-      msg.append("keyAlgorithms is not configured, ");
-    } else {
-      for (Entry<ASN1ObjectIdentifier, KeyParametersOption> entry : keyAlgorithms.entrySet()) {
-        ASN1ObjectIdentifier m = entry.getKey();
-        KeyParametersOption opt = entry.getValue();
-
-        if (m.equals(PKCSObjectIdentifiers.rsaEncryption)) {
-          if (opt instanceof RSAParametersOption) {
-            if (((RSAParametersOption) opt).allowsModulusLength(2048 - 1)) {
-              msg.append("minimum RSA modulus size 2048 bit not satisfied, ");
-            }
-          } else {
-            msg.append("unpermitted RSA modulus are configured, ");
-          }
-        } else if (m.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
-          if (opt instanceof ECParamatersOption) {
-            Set<ASN1ObjectIdentifier> curveOids = new HashSet<>(((ECParamatersOption) opt).getCurveOids());
-            curveOids.remove(SECObjectIdentifiers.secp256r1);
-            curveOids.remove(SECObjectIdentifiers.secp384r1);
-            curveOids.remove(SECObjectIdentifiers.secp521r1);
-
-            if (!curveOids.isEmpty()) {
-              msg.append("EC curves ").append(curveOids).append(" are not permitted, ");
-            }
-          } else {
-            msg.append("unpermitted EC curves are configured, ");
-          }
-        } else if (m.equals(X9ObjectIdentifiers.id_dsa)) {
-          if (opt instanceof DSAParametersOption) {
-            DSAParametersOption dsaOpt = (DSAParametersOption) opt;
-            if (dsaOpt.allowsPlength(2048 - 1)) {
-              msg.append("minimum L (2048) not satisfied, ");
-            }
-            if (dsaOpt.allowsQlength(224 - 1)) {
-              msg.append("minimum N (224) not satisfied, ");
-            }
-          } else {
-            msg.append("unpermitted DSA (p,q) are configured, ");
-          }
-        } else {
-          msg.append("keyAlgorithm ").append(m.getId()).append(" is not permitted, ");
+          msg.append("unpermitted hash algorithm ")
+              .append(hashAlgo).append(", ");
         }
       }
     }
 
     // CRLDistributionPoints
     if (certLevel != CertLevel.RootCA) {
-      CrlDistributionPointsControl crlDpControl = certprofile.getCrlDpControl();
-      if (crlDpControl != null) {
-        Set<String> protocols = crlDpControl.getProtocols();
-        if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
-          msg.append("CRLDistributionPoints allows protocol other than http, ");
-        }
-      }
-
-      // FreshestCRLDistributionPoints
-      CrlDistributionPointsControl freshestCrlControl = certprofile.getFreshestCrlControl();
-      if (freshestCrlControl != null) {
-        Set<String> protocols = freshestCrlControl.getProtocols();
-        if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
-          msg.append("FreshestCRL allows protocol other than http, ");
-        }
-      }
-
       // AuthorityInfoAccess*
       AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
       if (aiaControl != null) {
         if (!aiaControl.isIncludesOcsp()) {
           msg.append("access method id-ad-ocsp is not configured, ");
-        } else {
-          Set<String> protocols = aiaControl.getOcspProtocols();
-          if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
-            msg.append("AIA OCSP allows protocol other than http, ");
-          }
         }
 
         if (!aiaControl.isIncludesCaIssuers()) {
           msg.append("access method id-ad-caIssuers is not configured, ");
-        } else {
-          Set<String> protocols = aiaControl.getCaIssuersProtocols();
-          if (protocols == null || protocols.size() != 1 || !protocols.contains("http")) {
-            msg.append("AIA CAIssuers allows protocol other than http, ");
-          }
         }
       }
     }
 
     // Certificate Policies
     if (certLevel == CertLevel.SubCA || certLevel == CertLevel.EndEntity) {
-      CertificatePolicies certPolicyValue = certprofile.getCertificatePolicies();
+      CertificatePolicies certPolicyValue =
+          certprofile.getCertificatePolicies();
       if (certPolicyValue == null) {
         msg.append("CertificatePolicies is not configured, ");
-      }
-    }
-
-    // KeyUsage
-    Set<KeyUsageControl> usages = certprofile.getKeyUsage();
-    if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
-      if (!containsKeyusage(usages, KeyUsage.cRLSign)) {
-        msg.append("CA profile does contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
-      }
-    } else if (certLevel == CertLevel.EndEntity) {
-      if (containsKeyusage(usages, KeyUsage.cRLSign)) {
-        msg.append("EndEntity profile must not contain keyUsage ").append(KeyUsage.cRLSign).append(", ");
       }
     }
 
@@ -409,28 +238,30 @@ public class CertprofileValidator {
       for (ExtKeyUsageControl m : ekuControls) {
         ASN1ObjectIdentifier oid = m.getExtKeyUsage();
         if (m.isRequired()) {
-          if (XKU.id_kp_serverAuth.equals(oid)) {
+          if (OIDs.XKU.id_kp_serverAuth.equals(oid)) {
             xkuTlsServerRequired = true;
-          } else if (XKU.id_kp_clientAuth.equals(oid)) {
+          } else if (OIDs.XKU.id_kp_clientAuth.equals(oid)) {
             xkuTlsClientRequired = true;
           }
         }
 
-        if (!(XKU.id_kp_serverAuth.equals(oid) || XKU.id_kp_clientAuth.equals(oid)
-            || XKU.id_kp_emailProtection.equals(oid))) {
-          msg.append("extendedKeyUsage ").append(oid.getId()).append(" is not permitted, ");
+        if (!(OIDs.XKU.id_kp_serverAuth.equals(oid)
+            || OIDs.XKU.id_kp_clientAuth.equals(oid)
+            || OIDs.XKU.id_kp_emailProtection.equals(oid))) {
+          msg.append("extendedKeyUsage ").append(oid.getId())
+              .append(" is not permitted, ");
         }
       }
 
       if (!(xkuTlsClientRequired | xkuTlsServerRequired)) {
-        msg.append("none of ").append(XKU.id_kp_clientAuth).append(" and ")
-          .append(XKU.id_kp_serverAuth).append(" is not configured, ");
+        msg.append("none of ").append(OIDs.XKU.id_kp_clientAuth).append(" and ")
+          .append(OIDs.XKU.id_kp_serverAuth).append(" is not configured, ");
       }
     } else {
       if (ekuControls != null) {
         for (ExtKeyUsageControl m : ekuControls) {
-          if (m.getExtKeyUsage().equals(XKU.id_kp_anyExtendedKeyUsage)) {
-            msg.append(XKU.id_kp_clientAuth).append(" is not allowed, ");
+          if (m.getExtKeyUsage().equals(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
+            msg.append(OIDs.XKU.id_kp_clientAuth).append(" is not allowed, ");
           }
         }
       }
@@ -438,16 +269,7 @@ public class CertprofileValidator {
 
   } // method validateCABForumBR
 
-  private static boolean containsKeyusage(Set<KeyUsageControl> usageControls, KeyUsage usage) {
-    for (KeyUsageControl entry : usageControls) {
-      if (usage == entry.getKeyUsage()) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private static String toString(Set<ASN1ObjectIdentifier> oids) {
+  private static String toString(Collection<ASN1ObjectIdentifier> oids) {
     if (oids == null) {
       return "null";
     }
@@ -456,14 +278,7 @@ public class CertprofileValidator {
     sb.append("[");
 
     for (ASN1ObjectIdentifier oid : oids) {
-      String name = ObjectIdentifiers.getName(oid);
-      if (name != null) {
-        sb.append(name);
-        sb.append(" (").append(oid.getId()).append(")");
-      } else {
-        sb.append(oid.getId());
-      }
-      sb.append(", ");
+      sb.append(getExtensionIDDesc(oid)).append(", ");
     }
 
     if (CollectionUtil.isNotEmpty(oids)) {
@@ -474,4 +289,9 @@ public class CertprofileValidator {
 
     return sb.toString();
   } // method toString
+
+  private static String getExtensionIDDesc(ASN1ObjectIdentifier oid) {
+    return ExtensionID.ofOid(oid).getMainAlias();
+  }
+
 }

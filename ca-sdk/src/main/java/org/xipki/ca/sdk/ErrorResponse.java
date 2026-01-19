@@ -1,16 +1,13 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.pki.ErrorCode;
-import org.xipki.util.Args;
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
-
-import java.io.IOException;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  * Error response.
@@ -59,14 +56,12 @@ public class ErrorResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(3);
-    encoder.writeTextString(transactionId);
-    encoder.writeInt(code.getCode());
-    encoder.writeTextString(message);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(3).writeTextString(transactionId)
+        .writeInt(code.getCode()).writeTextString(message);
   }
 
-  public static ErrorResponse decode(byte[] encoded) throws DecodeException {
+  public static ErrorResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("ErrorResponse", decoder, 3);
 
@@ -76,7 +71,8 @@ public class ErrorResponse extends SdkResponse {
 
       return new ErrorResponse(tid, errorCode, decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, ErrorResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, ErrorResponse.class), ex);
     }
   }
 

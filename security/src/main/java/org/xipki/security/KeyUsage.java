@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 /**
  * Certificate key usage enum.
@@ -14,15 +14,16 @@ import org.xipki.util.Args;
 
 public enum KeyUsage {
 
-  digitalSignature(0,  org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
-  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation, "nonRepudiation"),
-  keyEncipherment(2,   org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment),
-  dataEncipherment(3,  org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment),
-  keyAgreement(4,      org.bouncycastle.asn1.x509.KeyUsage.keyAgreement),
-  keyCertSign(5,       org.bouncycastle.asn1.x509.KeyUsage.keyCertSign),
-  cRLSign(6,           org.bouncycastle.asn1.x509.KeyUsage.cRLSign),
-  encipherOnly(7,      org.bouncycastle.asn1.x509.KeyUsage.encipherOnly),
-  decipherOnly(8,      org.bouncycastle.asn1.x509.KeyUsage.decipherOnly);
+  digitalSignature(0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
+  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
+      "nonRepudiation"),
+  keyEncipherment(2,  org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment),
+  dataEncipherment(3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment),
+  keyAgreement(4,     org.bouncycastle.asn1.x509.KeyUsage.keyAgreement),
+  keyCertSign(5,      org.bouncycastle.asn1.x509.KeyUsage.keyCertSign),
+  cRLSign(6,          org.bouncycastle.asn1.x509.KeyUsage.cRLSign),
+  encipherOnly(7,     org.bouncycastle.asn1.x509.KeyUsage.encipherOnly),
+  decipherOnly(8,     org.bouncycastle.asn1.x509.KeyUsage.decipherOnly);
 
   private final int bit;
 
@@ -79,16 +80,6 @@ public enum KeyUsage {
     }
 
     throw new IllegalArgumentException("invalid KeyUsage(bit) " + bit);
-  }
-
-  public static KeyUsage getKeyUsageFromBcUsage(int bcUsage) {
-    for (KeyUsage ku : KeyUsage.values()) {
-      if (ku.bcUsage == bcUsage) {
-        return ku;
-      }
-    }
-
-    throw new IllegalArgumentException("invalid KeyUsage(bcUsage) " + bcUsage);
   }
 
 }

@@ -1,14 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  *
@@ -32,17 +29,17 @@ public class PayloadResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-    encoder.writeArrayStart(1);
-    encoder.writeByteString(payload);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(1).writeByteString(payload);
   }
 
-  public static PayloadResponse decode(byte[] encoded) throws DecodeException {
+  public static PayloadResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, PayloadResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, PayloadResponse.class), ex);
     }
   }
 

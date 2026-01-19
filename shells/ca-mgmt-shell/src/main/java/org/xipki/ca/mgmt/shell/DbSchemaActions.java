@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -6,7 +6,7 @@ package org.xipki.ca.mgmt.shell;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.Map;
 
@@ -18,14 +18,17 @@ import java.util.Map;
  */
 public class DbSchemaActions {
 
-  @Command(scope = "ca", name = "dbschema-add", description = "add DBSchema entry")
+  @Command(scope = "ca", name = "dbschema-add", description =
+      "add DBSchema entry")
   @Service
   public static class AddDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "DBSchema entry name")
     private String name;
 
-    @Option(name = "--value", aliases = "-v", required = true, description = "DBSchema entry value")
+    @Option(name = "--value", aliases = "-v", required = true, description =
+        "DBSchema entry value")
     private String value;
 
     @Override
@@ -35,14 +38,17 @@ public class DbSchemaActions {
     }
   } // class AddDbSchema
 
-  @Command(scope = "ca", name = "dbschema-up", description = "change DBSchema entry")
+  @Command(scope = "ca", name = "dbschema-up", description =
+      "change DBSchema entry")
   @Service
   public static class ChangeDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "DBSchema entry name")
     private String name;
 
-    @Option(name = "--value", aliases = "-v", required = true, description = "DBSchema entry value")
+    @Option(name = "--value", aliases = "-v", required = true, description =
+        "DBSchema entry value")
     private String value;
 
     @Override
@@ -52,11 +58,13 @@ public class DbSchemaActions {
     }
   } // class AddDbSchema
 
-  @Command(scope = "ca", name = "dbschema-rm", description = "remove DBSchema entry")
+  @Command(scope = "ca", name = "dbschema-rm", description =
+      "remove DBSchema entry")
   @Service
   public static class RemoveDbSchema extends CaActions.CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "DBSchema entry name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "DBSchema entry name")
     private String name;
 
     @Override
@@ -66,7 +74,8 @@ public class DbSchemaActions {
     }
   } // class AddDbSchema
 
-  @Command(scope = "ca", name = "dbschema-info", description = "list DBSchema entries")
+  @Command(scope = "ca", name = "dbschema-info", description =
+      "list DBSchema entries")
   @Service
   public static class ListDbSchemas extends CaActions.CaAction {
 
@@ -80,7 +89,8 @@ public class DbSchemaActions {
 
       StringBuilder sb = new StringBuilder();
       for (Map.Entry<String, String> entry : result.entrySet()) {
-        sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        sb.append(entry.getKey()).append(": ")
+            .append(entry.getValue()).append("\n");
       }
       print(sb.toString());
 

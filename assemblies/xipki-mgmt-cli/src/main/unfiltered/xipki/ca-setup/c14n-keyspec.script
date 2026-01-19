@@ -1,0 +1,72 @@
+RSAPSS = ""
+
+keyspec = $(xi:uppercase "$keyspec")
+
+if { "$keyspec" equals "RSA2048" } then {
+  sigalg = SHA256WITHRSA
+} elif { "$keyspec" equals "RSA3072" } then {
+  sigalg = SHA256WITHRSA
+} elif { "$keyspec" equals "RSA4096" } then {
+  sigalg = SHA256WITHRSA
+} elif { "$keyspec" equals "RSA2048/PSS" } then {
+  sigalg = SHA256WITHRSAANDMGF1
+  keyspec = RSA2048
+  RSAPSS = "--RSA-PSS"
+} elif { "$keyspec" equals "RSA3072/PSS" } then {
+  sigalg = SHA384WITHRSAANDMGF1
+  keyspec = RSA3072
+  RSAPSS = "--RSA-PSS"
+} elif { "$keyspec" equals "RSA4096/PSS" } then {
+  sigalg = SHA384WITHRSAANDMGF1
+  keyspec = RSA4096
+  RSAPSS = "--RSA-PSS"
+} elif { "$keyspec" equals "ED25519" } then {
+  sigalg = ED25519
+} elif { "$keyspec" equals "ED448" } then {
+  sigalg = ED448
+} elif { $([ SM2 SM2P256V1 ] contains $keyspec) } then {
+  sigalg = SM3WITHSM2
+  keyspec = SM2P256V1
+} elif { $([ P-256 SECP256R1 ] contains $keyspec) } then {
+  sigalg = SHA256WITHECDSA
+  keyspec = SECP256R1
+} elif { $([ P-384 SECP384R1 ] contains $keyspec) } then {
+  sigalg = SHA384WITHECDSA
+  keyspec = SECP384R1
+} elif { $([ P-521 SECP521R1 ] contains $keyspec) } then {
+  sigalg = SHA512WITHECDSA
+  keyspec = SECP521R1
+} elif { $([ BRAINPOOLP256R1 ] contains $keyspec) } then {
+  sigalg = SHA256WITHECDSA
+} elif { $([ BRAINPOOLP384R1 ] contains $keyspec) } then {
+  sigalg = SHA384WITHECDSA
+} elif { $([ BRAINPOOLP512R1 ] contains $keyspec) } then {
+  sigalg = SHA512WITHECDSA
+} elif { $([ FRP256V1 ] contains $keyspec) } then {
+  sigalg = SHA256WITHECDSA
+} elif { $([ MLDSA44 ML-DSA-44 ] contains $keyspec) } then {
+  sigalg = ML-DSA-44
+  keyspec = ML-DSA-44
+} elif { $([ MLDSA65 ML-DSA-65 ] contains $keyspec) } then {
+  sigalg = ML-DSA-65
+  keyspec = ML-DSA-65
+} elif { $([ MLDSA87 ML-DSA-87 ] contains $keyspec) } then {
+  sigalg = ML-DSA-87
+  keyspec = ML-DSA-87
+} elif { $([ MLKEM512 ML-KEM-512 ] contains $keyspec) } then {
+  sigalg = ""
+  keyspec = ML-KEM-512
+} elif { $([ MLKEM768 ML-KEM-768 ] contains $keyspec) } then {
+  sigalg = ""
+  keyspec = ML-KEM-768
+} elif { $([ MLKEM1024 ML-KEM-1024 ] contains $keyspec) } then {
+  sigalg = ""
+  keyspec = ML-KEM-1024
+} elif { $([ X25519 X448 ] contains $keyspec) } then {
+  sigalg = ""
+} else {
+  echo "Invalid keyspec $keyspec"
+  sigalg = ""
+  keyspec = ""
+}
+

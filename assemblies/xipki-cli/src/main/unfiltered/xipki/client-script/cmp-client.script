@@ -43,8 +43,7 @@ if { $printUsage equals "true" } then {
 
   CN = cmp-crmf-smime
 
-  xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
-    --subject "CN=${CN}-${CUR_TIME}"
+  xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12"
 
   xi:cmp-enroll-p12 --ca ${CA} \
     --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
@@ -69,8 +68,7 @@ if { $printUsage equals "true" } then {
 
   CN = cmp-csr-smime
 
-  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 \
-    --subject "CN=${CN}-${CUR_TIME}"
+  xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
     --out ${OUT_DIR}/${CN}.csr \
@@ -89,8 +87,7 @@ if { $printUsage equals "true" } then {
 
   CN = cmp-crmf-tls
 
-  xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
-    --subject "CN=${CN}-${CUR_TIME}"
+  xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12"
 
   xi:cmp-enroll-p12 --ca ${CA} \
     --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
@@ -115,8 +112,7 @@ if { $printUsage equals "true" } then {
 
   CN = cmp-csr-tls
 
-  xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12 \
-    --subject "CN=${CN}-${CUR_TIME}"
+  xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
 
   xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
     --out ${OUT_DIR}/${CN}.csr \

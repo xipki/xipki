@@ -1,10 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension BasicConstraints.
@@ -12,20 +14,25 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class BasicConstraints extends ValidableConf {
+public class BasicConstraints implements JsonEncodable {
 
-  private int pathLen;
+  private final int pathLen;
+
+  public BasicConstraints(int pathLen) {
+    this.pathLen = Args.notNegative(pathLen, "pathLen");
+  }
 
   public int getPathLen() {
     return pathLen;
   }
 
-  public void setPathLen(int pathLen) {
-    this.pathLen = pathLen;
+  @Override
+  public JsonMap toCodec() {
+    return new JsonMap().put("pathLen", pathLen);
   }
 
-  @Override
-  public void validate() throws InvalidConfException {
+  public static BasicConstraints parse(JsonMap json) throws CodecException {
+    return new BasicConstraints(json.getNnInt("pathLen"));
   }
 
 } // class BasicConstraints

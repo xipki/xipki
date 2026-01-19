@@ -1,0 +1,75 @@
+{
+  "speed": {
+    "threads": 1,
+    "duration": "1s",
+    "module": "softhsm"
+  },
+  "modules": [
+    {
+      "name": "cloudhsm",
+      "path": "xihsm:mem:vendor=cloudhsm",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "luna",
+      "path": "xihsm:mem:vendor=luna",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "ncipher",
+      "path": "xihsm:mem:vendor=ncipher",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "sansec",
+      "path": "xihsm:mem:vendor=sansec",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "softhsm",
+      //"path": "xihsm:mem:vendor=softhsm",
+      //"path": "/usr/local/lib/softhsm/libsofthsm2.so",
+      "path": "/usr/local/lib/softhsm-mlkem/lib/softhsm/libsofthsm2.so",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "tass",
+      "path": "xihsm:mem:vendor=tass",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "utimaco",
+      "path": "xihsm:file:tenant=utimaco,vendor=utimaco",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    },
+    {
+      "name": "xihsm",
+      "path": "xihsm:mem:vendor=xihsm",
+      "pin": "123456",
+      "soPin": "123456",
+      "slotIndex": 0,
+      "numSessions": 2
+    }
+  ]
+}

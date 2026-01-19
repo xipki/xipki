@@ -1,14 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.EncodeException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
-import java.io.IOException;
 import java.math.BigInteger;
 
 /**
@@ -23,8 +21,9 @@ public class PollCertRequest extends CaIdentifierRequest {
 
   private final Entry[] entries;
 
-  public PollCertRequest(byte[] issuerCertSha1Fp, X500NameType issuer, byte[] authorityKeyIdentifier,
-                         String transactionId, Entry[] entries) {
+  public PollCertRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
+                         byte[] authorityKeyIdentifier, String transactionId,
+                         Entry[] entries) {
     super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.transactionId = transactionId;
     this.entries = entries;
@@ -39,13 +38,13 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
+  protected void encode0(CborEncoder encoder) throws CodecException {
     super.encode0(encoder, 2);
     encoder.writeTextString(transactionId);
     encoder.writeObjects(entries);
   }
 
-  public static PollCertRequest decode(byte[] encoded) throws DecodeException {
+  public static PollCertRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("PollCertRequest", decoder, 5);
       return new PollCertRequest(
@@ -55,7 +54,8 @@ public class PollCertRequest extends CaIdentifierRequest {
           decoder.readTextString(),
           Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, PollCertRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, PollCertRequest.class), ex);
     }
   }
 
@@ -82,27 +82,24 @@ public class PollCertRequest extends CaIdentifierRequest {
     }
 
     @Override
-    protected void encode0(CborEncoder encoder) throws IOException, EncodeException {
-      encoder.writeArrayStart(2);
-      encoder.writeBigInt(id);
-      encoder.writeObject(subject);
+    protected void encode0(CborEncoder encoder) throws CodecException {
+      encoder.writeArrayStart(2).writeBigInt(id).writeObject(subject);
     }
 
-    public static Entry decode(CborDecoder decoder) throws DecodeException {
+    public static Entry decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
-        return new Entry(
-            decoder.readBigInt(),
-            X500NameType.decode(decoder));
+        return new Entry(decoder.readBigInt(), X500NameType.decode(decoder));
       } catch (RuntimeException ex) {
-        throw new DecodeException(buildDecodeErrMessage(ex, Entry.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder) throws DecodeException {
+    public static Entry[] decodeArray(CborDecoder decoder)
+        throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

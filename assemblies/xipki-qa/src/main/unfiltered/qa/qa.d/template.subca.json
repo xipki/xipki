@@ -15,7 +15,7 @@
 					"http://myorg.org/subca1.der"
 				],
 				"crlUris":[
-					"http://localhost:8081/crl/?type=crl&name=subca1"
+					"http://localhost:8081/dummy/crl/?type=crl&name=subca1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder1"
@@ -36,7 +36,7 @@
 			"ctlogControl":{
 				"enabled":true,
 				"sslcontext.name":"ctlog1",
-				"servers":"https://localhost/ctlog/"
+				"servers":"https://localhost:8444/dummy/ctlog/"
 			},
 			"keypairGenNames":["software"],
 			"expirationPeriod":365,
@@ -68,7 +68,13 @@
 			"tls:tls-alias1,tls-alias2",
 			"tls-c",
 			"fixed-partial-subject",
-			"tls-dsa", "tls-ec", "tls-ed25519", "tls-rsa", "tls-sm2"
+			"tls-rsa",
+			"tls-ec",
+			"tls-edwards",
+			"tls-montgomery",
+			"tls-mldsa",
+			"tls-mlkem",
+			"tls-sm2"
 		],
 		"publishers":[
 			"ocsp-publisher"

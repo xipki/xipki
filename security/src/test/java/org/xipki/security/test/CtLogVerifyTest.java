@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.test;
@@ -8,17 +8,17 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xipki.security.CtLog;
+import org.xipki.security.CtLog.SerializedSCT;
+import org.xipki.security.CtLog.SignedCertificateTimestamp;
+import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
-import org.xipki.security.ctlog.CtLog;
-import org.xipki.security.ctlog.CtLog.SerializedSCT;
-import org.xipki.security.ctlog.CtLog.SignedCertificateTimestamp;
-import org.xipki.security.ctlog.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.io.IoUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,40 +33,48 @@ import java.security.Signature;
  */
 public class CtLogVerifyTest {
 
-  private static final String pubkeyFile = "/ctlog-certs/letsencrypt/google-xenon2020-pubkey.pem";
+  private static final String pubkeyFile =
+      "/ctlog-certs/letsencrypt/google-xenon2020-pubkey.pem";
 
-  private static final String certFile = "/ctlog-certs/letsencrypt/letsencrypt-org.pem";
+  private static final String certFile =
+      "/ctlog-certs/letsencrypt/letsencrypt-org.pem";
 
-  private static final String caCertFile = "/ctlog-certs/letsencrypt/ca-of-letsencrypt-org.pem";
+  private static final String caCertFile =
+      "/ctlog-certs/letsencrypt/ca-of-letsencrypt-org.pem";
 
   @Test
   public void testVerify() throws Exception {
     Security.addProvider(new BouncyCastleProvider());
     byte[] keyBytes = read(pubkeyFile);
 
-    SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(X509Util.toDerEncoded(keyBytes));
+    SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
+        X509Util.toDerEncoded(keyBytes));
     byte[] keyId = HashAlgo.SHA256.hash(spki.getEncoded());
     System.out.println("keyId: " + Hex.encode(keyId));
 
-    PublicKey key = KeyUtil.generatePublicKey(spki);
+    PublicKey key = KeyUtil.getPublicKey(spki);
     X509Cert cert = X509Util.parseCert(read(certFile));
     X509Cert caCert = X509Util.parseCert(read(caCertFile));
 
-    byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
+    byte[] issuerKeyHash = HashAlgo.SHA256.hash(
+        caCert.getSubjectPublicKeyInfo().getEncoded());
     byte[] preCertTbsCert = CtLog.getPreCertTbsCert(
-                              cert.toBcCert().toASN1Structure().getTBSCertificate());
+        cert.toBcCert().toASN1Structure().getTBSCertificate());
 
-    byte[] extnValue = cert.getExtensionCoreValue(ObjectIdentifiers.Extn.id_SCTs);
+    byte[] extnValue = cert.getExtensionCoreValue(
+        OIDs.Extn.id_SignedCertificateTimestampList);
 
     byte[] encodedScts = ASN1OctetString.getInstance(extnValue).getOctets();
-    SignedCertificateTimestampList list = SignedCertificateTimestampList.getInstance(encodedScts);
+    SignedCertificateTimestampList list =
+        SignedCertificateTimestampList.getInstance(encodedScts);
     SerializedSCT sctList = list.getSctList();
     int size = sctList.size();
     Assert.assertEquals("SCT size", 2, size);
 
     SignedCertificateTimestamp sct = sctList.get(1);
     byte[] logId = sct.getLogId();
-    Assert.assertEquals("logId", Hex.encodeUpper(keyId), Hex.encodeUpper(logId));
+    Assert.assertEquals("logId", Hex.encodeUpper(keyId),
+        Hex.encodeUpper(logId));
 
     Signature sig = Signature.getInstance("SHA256withECDSA");
     sig.initVerify(key);

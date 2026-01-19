@@ -1,69 +1,38 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdditionalInformation;
-import org.xipki.ca.certprofile.xijson.conf.extn.AdmissionSyntax;
-import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.extn.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.xijson.conf.extn.BasicConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.BiometricInfo;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCInstanceCAExtensionSchema;
-import org.xipki.ca.certprofile.xijson.conf.extn.CCCSimpleExtensionSchema;
-import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.extn.CrlDistributionPoints;
-import org.xipki.ca.certprofile.xijson.conf.extn.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.extn.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.extn.KeyUsage;
-import org.xipki.ca.certprofile.xijson.conf.extn.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.extn.PrivateKeyUsagePeriod;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.extn.Restriction;
-import org.xipki.ca.certprofile.xijson.conf.extn.SmimeCapabilities;
-import org.xipki.ca.certprofile.xijson.conf.extn.SubjectDirectoryAttributs;
-import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
-import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
-import org.xipki.ca.certprofile.xijson.conf.extn.ValidityModel;
-import org.xipki.util.TripleState;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.ca.api.profile.id.ExtensionID;
+import org.xipki.ca.certprofile.xijson.conf.extn.*;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
+import org.xipki.util.extra.type.TripleState;
 
 /**
  * Extension configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 
-public class ExtensionType extends ValidableConf {
+public class ExtensionType implements JsonEncodable {
 
-  private DescribableOid type;
+  private final ExtensionID type;
 
   /**
    * Critical will be considered if both values (true and false) are allowed,
    * otherwise it will be ignored.
    */
-  private Boolean critical;
+  private final boolean critical;
 
-  private Boolean required;
+  private final boolean required;
 
-  @Deprecated
-  private Boolean permittedInRequest;
-
-  private TripleState inRequest;
-
-  private AdditionalInformation additionalInformation;
-
-  private AdmissionSyntax admissionSyntax;
+  private TripleState inRequest = TripleState.forbidden;
 
   private AuthorityInfoAccess authorityInfoAccess;
-
-  private AuthorityKeyIdentifier authorityKeyIdentifier;
 
   private SubjectKeyIdentifierControl subjectKeyIdentifier;
 
@@ -73,8 +42,6 @@ public class ExtensionType extends ValidableConf {
 
   private CertificatePolicies certificatePolicies;
 
-  private CrlDistributionPoints crlDistributionPoints;
-
   /**
    * For constant encoded Extension.
    */
@@ -82,14 +49,13 @@ public class ExtensionType extends ValidableConf {
 
   private ExtendedKeyUsage extendedKeyUsage;
 
-  private CrlDistributionPoints freshestCrl;
-
   private InhibitAnyPolicy inhibitAnyPolicy;
 
   private KeyUsage keyUsage;
 
   /**
-   * Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present.
+   * Only for CA, at least one of permittedSubtrees and excludedSubtrees must
+   * be present.
    */
   private NameConstraints nameConstraints;
 
@@ -98,107 +64,48 @@ public class ExtensionType extends ValidableConf {
    */
   private PolicyMappings policyMappings;
 
-  private PrivateKeyUsagePeriod privateKeyUsagePeriod;
-
   private PolicyConstraints policyConstraints;
 
-  private QcStatements qcStatements;
+  private PrivateKeyUsagePeriod privateKeyUsagePeriod;
 
-  private Restriction restriction;
+  private QcStatements qcStatements;
 
   private SmimeCapabilities smimeCapabilities;
 
   private GeneralNameType subjectAltName;
 
-  private SubjectDirectoryAttributs subjectDirectoryAttributs;
-
   private SubjectInfoAccess subjectInfoAccess;
 
   private TlsFeature tlsFeature;
-
-  private ValidityModel validityModel;
 
   private CCCSimpleExtensionSchema cccExtensionSchema;
 
   private CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema;
 
-  private Object custom;
+  public ExtensionType(ExtensionID type, Boolean critical, Boolean required) {
+    this.type = type;
+    this.critical  = (critical != null && critical);
+    this.required  = (required != null && required);
+  }
 
-  public DescribableOid getType() {
+  public ExtensionID getType() {
     return type;
   }
 
-  public void setType(DescribableOid type) {
-    this.type = type;
+  public boolean isCritical() {
+    return critical;
   }
 
-  // do not encode the default value.
-  public Boolean getCritical() {
-    return critical != null && critical ? Boolean.TRUE :null;
-  }
-
-  public void setCritical(Boolean critical) {
-    this.critical = critical;
-  }
-
-  public boolean critical() {
-    return critical != null && critical;
-  }
-
-  // do not encode the default value.
-  public Boolean getRequired() {
-    return required != null && required ? Boolean.TRUE :null;
-  }
-
-  public void setRequired(Boolean required) {
-    this.required = required;
-  }
-
-  public boolean required() {
-    return required != null && required;
-  }
-
-  @Deprecated
-  public void setPermittedInRequest(boolean permittedInRequest) {
-    this.permittedInRequest = permittedInRequest;
-  }
-
-  public boolean permittedInRequest() {
-    TripleState ts = getInRequest();
-    return TripleState.optional == ts || TripleState.required == ts;
-  }
-
-  // do not encode the default value.
-  public TripleState getInRequest() {
-    return inRequest() == TripleState.forbidden ? null : inRequest;
-  }
-
-  public TripleState inRequest() {
-    if (inRequest != null) {
-      return inRequest;
-    }
-
-    return (permittedInRequest != null && permittedInRequest) ? TripleState.optional : TripleState.forbidden;
+  public boolean isRequired() {
+    return required;
   }
 
   public void setInRequest(TripleState inRequest) {
-    this.inRequest = inRequest;
+    this.inRequest = (inRequest == null) ? TripleState.forbidden : inRequest;
   }
 
-  public AdditionalInformation getAdditionalInformation() {
-    return additionalInformation;
-  }
-
-  public void setAdditionalInformation(AdditionalInformation additionalInformation) {
-    this.additionalInformation = additionalInformation;
-  }
-
-  public AdmissionSyntax getAdmissionSyntax() {
-    return admissionSyntax;
-  }
-
-  public void setAdmissionSyntax(AdmissionSyntax admissionSyntax) {
-    this.admissionSyntax = admissionSyntax;
+  public TripleState getInRequest() {
+    return inRequest;
   }
 
   public AuthorityInfoAccess getAuthorityInfoAccess() {
@@ -209,34 +116,17 @@ public class ExtensionType extends ValidableConf {
     this.authorityInfoAccess = authorityInfoAccess;
   }
 
-  public AuthorityKeyIdentifier getAuthorityKeyIdentifier() {
-    return authorityKeyIdentifier;
-  }
-
-  public void setAuthorityKeyIdentifier(AuthorityKeyIdentifier authorityKeyIdentifier) {
-    this.authorityKeyIdentifier = authorityKeyIdentifier;
-  }
-
   public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
     return subjectKeyIdentifier;
   }
 
-  public void setSubjectKeyIdentifier(SubjectKeyIdentifierControl subjectKeyIdentifier) {
+  public void setSubjectKeyIdentifier(
+      SubjectKeyIdentifierControl subjectKeyIdentifier) {
     this.subjectKeyIdentifier = subjectKeyIdentifier;
-  }
-
-  @Deprecated
-  public BasicConstraints getBasicConstrains() {
-    return getBasicConstraints();
   }
 
   public BasicConstraints getBasicConstraints() {
     return basicConstraints;
-  }
-
-  @Deprecated
-  public void setBasicConstrains(BasicConstraints basicConstraints) {
-    setBasicConstraints(basicConstraints);
   }
 
   public void setBasicConstraints(BasicConstraints basicConstraints) {
@@ -267,28 +157,12 @@ public class ExtensionType extends ValidableConf {
     this.constant = constant;
   }
 
-  public CrlDistributionPoints getCrlDistributionPoints() {
-    return crlDistributionPoints;
-  }
-
-  public void setCrlDistributionPoints(CrlDistributionPoints crlDistributionPoints) {
-    this.crlDistributionPoints = crlDistributionPoints;
-  }
-
   public ExtendedKeyUsage getExtendedKeyUsage() {
     return extendedKeyUsage;
   }
 
   public void setExtendedKeyUsage(ExtendedKeyUsage extendedKeyUsage) {
     this.extendedKeyUsage = extendedKeyUsage;
-  }
-
-  public CrlDistributionPoints getFreshestCrl() {
-    return freshestCrl;
-  }
-
-  public void setFreshestCrl(CrlDistributionPoints freshestCrl) {
-    this.freshestCrl = freshestCrl;
   }
 
   public InhibitAnyPolicy getInhibitAnyPolicy() {
@@ -323,14 +197,6 @@ public class ExtensionType extends ValidableConf {
     this.policyMappings = policyMappings;
   }
 
-  public PrivateKeyUsagePeriod getPrivateKeyUsagePeriod() {
-    return privateKeyUsagePeriod;
-  }
-
-  public void setPrivateKeyUsagePeriod(PrivateKeyUsagePeriod privateKeyUsagePeriod) {
-    this.privateKeyUsagePeriod = privateKeyUsagePeriod;
-  }
-
   public PolicyConstraints getPolicyConstraints() {
     return policyConstraints;
   }
@@ -339,20 +205,21 @@ public class ExtensionType extends ValidableConf {
     this.policyConstraints = policyConstraints;
   }
 
+  public PrivateKeyUsagePeriod getPrivateKeyUsagePeriod() {
+    return privateKeyUsagePeriod;
+  }
+
+  public void setPrivateKeyUsagePeriod(
+      PrivateKeyUsagePeriod privateKeyUsagePeriod) {
+    this.privateKeyUsagePeriod = privateKeyUsagePeriod;
+  }
+
   public QcStatements getQcStatements() {
     return qcStatements;
   }
 
   public void setQcStatements(QcStatements qcStatements) {
     this.qcStatements = qcStatements;
-  }
-
-  public Restriction getRestriction() {
-    return restriction;
-  }
-
-  public void setRestriction(Restriction restriction) {
-    this.restriction = restriction;
   }
 
   public SmimeCapabilities getSmimeCapabilities() {
@@ -371,14 +238,6 @@ public class ExtensionType extends ValidableConf {
     this.subjectAltName = subjectAltName;
   }
 
-  public SubjectDirectoryAttributs getSubjectDirectoryAttributs() {
-    return subjectDirectoryAttributs;
-  }
-
-  public void setSubjectDirectoryAttributs(SubjectDirectoryAttributs subjectDirectoryAttributs) {
-    this.subjectDirectoryAttributs = subjectDirectoryAttributs;
-  }
-
   public SubjectInfoAccess getSubjectInfoAccess() {
     return subjectInfoAccess;
   }
@@ -395,19 +254,12 @@ public class ExtensionType extends ValidableConf {
     this.tlsFeature = tlsFeature;
   }
 
-  public ValidityModel getValidityModel() {
-    return validityModel;
-  }
-
-  public void setValidityModel(ValidityModel validityModel) {
-    this.validityModel = validityModel;
-  }
-
   public CCCSimpleExtensionSchema getCccExtensionSchema() {
     return cccExtensionSchema;
   }
 
-  public void setCccExtensionSchema(CCCSimpleExtensionSchema cccExtensionSchema) {
+  public void setCccExtensionSchema(
+      CCCSimpleExtensionSchema cccExtensionSchema) {
     this.cccExtensionSchema = cccExtensionSchema;
   }
 
@@ -415,26 +267,158 @@ public class ExtensionType extends ValidableConf {
     return cccInstanceCAExtensionSchema;
   }
 
-  public void setCccInstanceCAExtensionSchema(CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema) {
+  public void setCccInstanceCAExtensionSchema(
+      CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema) {
     this.cccInstanceCAExtensionSchema = cccInstanceCAExtensionSchema;
   }
 
-  public Object getCustom() {
-    return custom;
-  }
-
-  public void setCustom(Object custom) {
-    this.custom = custom;
-  }
-
   @Override
-  public void validate() throws InvalidConfException {
-    notNull(type, "type");
-    validate(type, additionalInformation, admissionSyntax, authorityInfoAccess, authorityKeyIdentifier);
-    validate(basicConstraints, biometricInfo, certificatePolicies, constant, extendedKeyUsage, inhibitAnyPolicy);
-    validate(keyUsage, nameConstraints, policyMappings, privateKeyUsagePeriod, policyConstraints, qcStatements);
-    validate(restriction, smimeCapabilities, subjectAltName, subjectDirectoryAttributs, subjectInfoAccess);
-    validate(subjectKeyIdentifier, tlsFeature, validityModel, cccExtensionSchema, cccInstanceCAExtensionSchema);
-  } // method validate
+  public JsonMap toCodec() {
+    JsonMap ret = new JsonMap();
+
+    ret.put("type", type.getMainAlias());
+    // do not encode default value
+    ret.put("required", required ? true : null) ;
+    // do not encode default value
+    ret.put("critical", critical ? true : null) ;
+    // do not encode default value
+    ret.putEnum("inRequest",
+        (inRequest == TripleState.forbidden) ? null : inRequest);
+
+    ret.put("authorityInfoAccess", authorityInfoAccess);
+    ret.put("subjectKeyIdentifier", subjectKeyIdentifier);
+    ret.put("basicConstraints", basicConstraints);
+    ret.put("biometricInfo", biometricInfo);
+    ret.put("certificatePolicies", certificatePolicies);
+    ret.put("constant", constant);
+    ret.put("extendedKeyUsage", extendedKeyUsage);
+    ret.put("inhibitAnyPolicy", inhibitAnyPolicy);
+    ret.put("keyUsage", keyUsage);
+    ret.put("nameConstraints", nameConstraints);
+    ret.put("policyMappings", policyMappings);
+    ret.put("policyConstraints", policyConstraints);
+    ret.put("privateKeyUsagePeriod", privateKeyUsagePeriod);
+    ret.put("qcStatements", qcStatements);
+    ret.put("smimeCapabilities", smimeCapabilities);
+    ret.put("subjectAltName", subjectAltName);
+    ret.put("subjectInfoAccess", subjectInfoAccess);
+    ret.put("tlsFeature", tlsFeature);
+    ret.put("cccExtensionSchema", cccExtensionSchema);
+    ret.put("cccInstanceCAExtensionSchema", cccInstanceCAExtensionSchema);
+    return ret;
+  }
+
+  public static ExtensionType parse(JsonMap json) throws CodecException {
+    ExtensionID type = ExtensionID.ofOidOrName(json.getNnString("type"));
+    ExtensionType ret = new ExtensionType(type, json.getBool("critical"),
+        json.getBool("required"));
+
+    TripleState inRequest = json.getEnum("inRequest", TripleState.class);
+    if (inRequest != null) {
+      ret.setInRequest(inRequest);
+    }
+
+    JsonMap map = json.getMap("authorityInfoAccess");
+    if (map != null) {
+      ret.setAuthorityInfoAccess(AuthorityInfoAccess.parse(map));
+    }
+
+    map = json.getMap("subjectKeyIdentifier");
+    if (map != null) {
+      ret.setSubjectKeyIdentifier(SubjectKeyIdentifierControl.parse(map));
+    }
+    map = json.getMap("basicConstraints");
+    if (map != null) {
+      ret.setBasicConstraints(BasicConstraints.parse(map));
+    }
+
+    map = json.getMap("biometricInfo");
+    if (map != null) {
+      ret.setBiometricInfo(BiometricInfo.parse(map));
+    }
+
+    map = json.getMap("certificatePolicies");
+    if (map != null) {
+      ret.setCertificatePolicies(CertificatePolicies.parse(map));
+    }
+
+    map = json.getMap("constant");
+    if (map != null) {
+      ret.setConstant(ConstantExtnValue.parse(map));
+    }
+
+    map = json.getMap("extendedKeyUsage");
+    if (map != null) {
+      ret.setExtendedKeyUsage(ExtendedKeyUsage.parse(map));
+    }
+
+    map = json.getMap("inhibitAnyPolicy");
+    if (map != null) {
+      ret.setInhibitAnyPolicy(InhibitAnyPolicy.parse(map));
+    }
+
+    map = json.getMap("keyUsage");
+    if (map != null) {
+      ret.setKeyUsage(KeyUsage.parse(map));
+    }
+
+    map = json.getMap("nameConstraints");
+    if (map != null) {
+      ret.setNameConstraints(NameConstraints.parse(map));
+    }
+
+    map = json.getMap("policyMappings");
+    if (map != null) {
+      ret.setPolicyMappings(PolicyMappings.parse(map));
+    }
+
+    map = json.getMap("policyConstraints");
+    if (map != null) {
+      ret.setPolicyConstraints(PolicyConstraints.parse(map));
+    }
+
+    map = json.getMap("privateKeyUsagePeriod");
+    if (map != null) {
+      ret.setPrivateKeyUsagePeriod(PrivateKeyUsagePeriod.parse(map));
+    }
+
+    map = json.getMap("qcStatements");
+    if (map != null) {
+      ret.setQcStatements(QcStatements.parse(map));
+    }
+
+    map = json.getMap("smimeCapabilities");
+    if (map != null) {
+      ret.setSmimeCapabilities(SmimeCapabilities.parse(map));
+    }
+
+    map = json.getMap("subjectAltName");
+    if (map != null) {
+      ret.setSubjectAltName(GeneralNameType.parse(map));
+    }
+
+    map = json.getMap("subjectInfoAccess");
+    if (map != null) {
+      ret.setSubjectInfoAccess(SubjectInfoAccess.parse(map));
+    }
+
+    map = json.getMap("tlsFeature");
+    if (map != null) {
+      ret.setTlsFeature(TlsFeature.parse(map));
+    }
+
+    map = json.getMap("cccExtensionSchema");
+    if (map != null) {
+      ret.setCccExtensionSchema(CCCSimpleExtensionSchema.parse(map));
+    }
+
+    map = json.getMap("cccInstanceCAExtensionSchema");
+    if (map != null) {
+      ret.setCccInstanceCAExtensionSchema(
+          CCCInstanceCAExtensionSchema.parse(map));
+    }
+
+    return ret;
+  }
 
 }

@@ -3,16 +3,16 @@ source file:./qa/cab/initdb.script
 echo "Restart CA (tomcat) server!"
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
 xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
-sleep 5
+sleep 1
 
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=rootca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=rootca1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGALG"
 }
 
 xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
@@ -20,7 +20,7 @@ xi:copy-file -f qa/cab/template.rootca.json qa/cab/rootca.json
 xi:replace --old "REPLACEME-SUBJECT" --new "C=DE,O=myorg,CN=rootca1" \
   --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-SIGALG" --new "$CA_SIGALG" \
   qa/cab/rootca.json
 
 ca:load-conf qa/cab/rootca.json
@@ -28,12 +28,12 @@ ca:load-conf qa/cab/rootca.json
 ca:cacert --out output/rootca1.crt rootca1
 
 ## Update the certificate in the device
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/rootca1.p12 --password CHANGEIT --cert output/rootca1.crt
 }
 
 ## Generate keys and CSR for subca1
-if { $TOKEN_TYPE equals "pkcs11" } then {
+if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT --label subca1 \
     --out output/subca1.csr \
@@ -48,7 +48,7 @@ if { $TOKEN_TYPE equals "pkcs11" } then {
 ca:enroll-cert --ca rootca1 --csr output/subca1.csr \
   --out output/subca1.crt --profile cab-subca
 
-if { $TOKEN_TYPE equals "pkcs12" } then {
+if { $TOKEN_TYPE equals "PKCS12" } then {
   xi:update-cert-p12 --p12 output/subca1.p12 --password CHANGEIT \
     --cert output/subca1.crt --ca-cert output/rootca1.crt
 }
@@ -58,17 +58,17 @@ echo "#                             Add subca                         #"
 echo "#################################################################"
 ## Add CA
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
-  CA_SIGNER_CONF = "algo=$SIGALGO,slot=$SLOT,key-label=subca1"
+if { $TOKEN_TYPE equals "PKCS11" } then {
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subca1"
 } else {
-  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$SIGALGO"
+  CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
 }
 
 xi:copy-file -f qa/cab/template.subca.json qa/cab/subca.json
 
 xi:replace --old "REPLACEME-TOKEN_TYPE" --new "$TOKEN_TYPE" \
   --old "REPLACEME-CA_SIGNERCONF" --new "$CA_SIGNER_CONF" \
-  --old "REPLACEME-SIGALGO" --new "$SIGALGO" \
+  --old "REPLACEME-SIGALG" --new "$CA_SIGALG" \
   qa/cab/subca.json
 
 ca:load-conf qa/cab/subca.json

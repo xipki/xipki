@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.security.cert.CRLReason;
 import java.util.HashMap;
@@ -83,8 +83,10 @@ public enum CrlReason {
   AA_COMPROMISE(10, "aACompromise");
 
   public static final List<CrlReason> PERMITTED_CLIENT_CRLREASONS = List.of(
-      CrlReason.UNSPECIFIED, CrlReason.KEY_COMPROMISE, CrlReason.AFFILIATION_CHANGED, CrlReason.SUPERSEDED,
-      CrlReason.CESSATION_OF_OPERATION, CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN);
+      CrlReason.UNSPECIFIED,            CrlReason.KEY_COMPROMISE,
+      CrlReason.AFFILIATION_CHANGED,    CrlReason.SUPERSEDED,
+      CrlReason.CESSATION_OF_OPERATION, CrlReason.CERTIFICATE_HOLD,
+      CrlReason.PRIVILEGE_WITHDRAWN);
 
   private static final Map<Integer, CrlReason> REASONS = new HashMap<>();
 

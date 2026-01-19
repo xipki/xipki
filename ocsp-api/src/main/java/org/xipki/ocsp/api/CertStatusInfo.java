@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.api;
@@ -6,7 +6,7 @@ package org.xipki.ocsp.api;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.time.Instant;
 
@@ -62,7 +62,8 @@ public class CertStatusInfo {
 
   private Instant archiveCutOff;
 
-  private CertStatusInfo(CertStatus certStatus, Instant thisUpdate, Instant nextUpdate, String certprofile) {
+  private CertStatusInfo(CertStatus certStatus, Instant thisUpdate,
+                         Instant nextUpdate, String certprofile) {
     this.certStatus = Args.notNull(certStatus, "certStatus");
     this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");
     this.nextUpdate = nextUpdate;
@@ -130,30 +131,38 @@ public class CertStatusInfo {
   }
 
   public static CertStatusInfo getCrlExpiredStatusInfo() {
-    return new CertStatusInfo(CertStatus.CRL_EXPIRED, Instant.now(), null, null);
+    return new CertStatusInfo(CertStatus.CRL_EXPIRED, Instant.now(),
+        null, null);
   }
 
-  public static CertStatusInfo getUnknownCertStatusInfo(Instant thisUpdate, Instant nextUpdate) {
+  public static CertStatusInfo getUnknownCertStatusInfo(
+      Instant thisUpdate, Instant nextUpdate) {
     return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
   }
 
-  public static CertStatusInfo getIgnoreCertStatusInfo(Instant thisUpdate, Instant nextUpdate) {
+  public static CertStatusInfo getIgnoreCertStatusInfo(
+      Instant thisUpdate, Instant nextUpdate) {
     return new CertStatusInfo(CertStatus.IGNORE, thisUpdate, nextUpdate, null);
   }
 
-  public static CertStatusInfo getIssuerUnknownCertStatusInfo(Instant thisUpdate, Instant nextUpdate) {
-    return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
+  public static CertStatusInfo getIssuerUnknownCertStatusInfo(
+      Instant thisUpdate, Instant nextUpdate) {
+    return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate,
+        nextUpdate, null);
   }
 
   public static CertStatusInfo getGoodCertStatusInfo(
-      HashAlgo certHashAlgo, byte[] certHash, Instant thisUpdate, Instant nextUpdate, String certprofile) {
-    CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
+      HashAlgo certHashAlgo, byte[] certHash, Instant thisUpdate,
+      Instant nextUpdate, String certprofile) {
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate,
+        nextUpdate, certprofile);
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
     return ret;
   } // method getGoodCertStatusInfo
 
-  public static CertStatusInfo getGoodCertStatusInfo(Instant thisUpdate, Instant nextUpdate) {
+  public static CertStatusInfo getGoodCertStatusInfo(
+      Instant thisUpdate, Instant nextUpdate) {
     return new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, null);
   }
 
@@ -161,7 +170,8 @@ public class CertStatusInfo {
       CertRevocationInfo revocationInfo, HashAlgo certHashAlgo, byte[] certHash,
       Instant thisUpdate, Instant nextUpdate, String certprofile) {
     Args.notNull(revocationInfo, "revocationInfo");
-    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate,
+                          nextUpdate, certprofile);
     ret.revocationInfo = revocationInfo;
     ret.certHashAlgo = certHashAlgo;
     ret.certHash = certHash;
@@ -169,9 +179,11 @@ public class CertStatusInfo {
   } // method getRevokedCertStatusInfo
 
   public static CertStatusInfo getRevokedCertStatusInfo(
-      CertRevocationInfo revocationInfo, Instant thisUpdate, Instant nextUpdate) {
+      CertRevocationInfo revocationInfo, Instant thisUpdate,
+      Instant nextUpdate) {
     Args.notNull(revocationInfo, "revocationInfo");
-    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, null);
+    CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED,
+        thisUpdate, nextUpdate, null);
     ret.revocationInfo = revocationInfo;
     return ret;
   } // method getRevokedCertStatusInfo

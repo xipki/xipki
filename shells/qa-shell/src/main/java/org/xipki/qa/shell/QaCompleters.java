@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.shell;
@@ -11,8 +11,8 @@ import org.xipki.qa.ocsp.OcspError;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.TripleState;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.type.TripleState;
 
 import java.util.Collections;
 import java.util.LinkedList;

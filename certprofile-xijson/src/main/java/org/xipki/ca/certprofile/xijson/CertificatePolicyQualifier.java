@@ -1,15 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 /**
- * Control of the CertificatePolicyQualifier (in the extension CertificatePolicies).
+ * Control of the CertificatePolicyQualifier (in the extension
+ * CertificatePolicies).
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertificatePolicyQualifier {
@@ -31,7 +31,8 @@ public class CertificatePolicyQualifier {
     return userNotice;
   }
 
-  public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice) {
+  public static CertificatePolicyQualifier getInstanceForUserNotice(
+      String userNotice) {
     Args.notNull(userNotice, "userNotice");
     Args.range(userNotice.length(), "userNotice.length", 1, 200);
     return new CertificatePolicyQualifier(null, userNotice);

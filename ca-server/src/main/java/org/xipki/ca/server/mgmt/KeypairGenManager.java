@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.mgmt;
@@ -10,10 +10,10 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.KeypairGenEntryWrapper;
-import org.xipki.util.Args;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,7 +28,8 @@ import java.util.List;
 
 class KeypairGenManager {
 
-  private static final Logger LOG = LoggerFactory.getLogger(KeypairGenManager.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(KeypairGenManager.class);
 
   private boolean keypairGenInitialized;
 
@@ -47,7 +48,8 @@ class KeypairGenManager {
       try {
         entry.getGenerator().close();
       } catch (IOException e) {
-        LogUtil.warn(LOG, e, "error closing keypair generator " + entry.getDbEntry().getName());
+        LogUtil.warn(LOG, e, "error closing keypair generator "
+            + entry.getDbEntry().getName());
       }
     }
   }
@@ -64,7 +66,8 @@ class KeypairGenManager {
 
     List<KeypairGenEntry> entries;
     if (dbSchemaVersion < 9) {
-      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
+      throw new CaMgmtException(
+          "dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
     }
 
     List<String> names = manager.caConfStore.getKeyPairGenNames();
@@ -90,8 +93,10 @@ class KeypairGenManager {
   } // method initSigners
 
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
-    if ("software".equalsIgnoreCase(Args.notNull(keypairGenEntry, "keypairGenEntry").getName())) {
-      throw new CaMgmtException("Adding keypair generation 'software' is not allowed");
+    if ("software".equalsIgnoreCase(
+        Args.notNull(keypairGenEntry, "keypairGenEntry").getName())) {
+      throw new CaMgmtException(
+          "Adding keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
@@ -99,7 +104,8 @@ class KeypairGenManager {
     String name = keypairGenEntry.getName();
     CaManagerImpl.checkName(name, "keypair generation name");
     if (manager.keypairGenDbEntries.containsKey(name)) {
-      throw new CaMgmtException(StringUtil.concat("keypair generation named ", name, " exists"));
+      throw new CaMgmtException(StringUtil.concat(
+          "keypair generation named ", name, " exists"));
     }
 
     KeypairGenEntryWrapper gen = createKeypairGen(keypairGenEntry);
@@ -126,7 +132,8 @@ class KeypairGenManager {
         List<String> newNames = new ArrayList<>(names);
         newNames.remove(name);
         changeCaEntry.setKeypairGenNames(newNames);
-        manager.caConfStore.changeCa(changeCaEntry, caInfo.getCaConfColumn(), manager.securityFactory);
+        manager.caConfStore.changeCa(changeCaEntry,
+            caInfo.getCaEntry().getBase(), manager.securityFactory);
 
         caInfo.getKeypairGenNames().remove(name);
       }
@@ -137,7 +144,8 @@ class KeypairGenManager {
     LOG.info("removed keypair generation '{}'", name);
   } // method removeKeypairGen
 
-  void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
+  void changeKeypairGen(String name, String type, String conf)
+      throws CaMgmtException {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
@@ -149,7 +157,8 @@ class KeypairGenManager {
       type = type.toLowerCase();
     }
 
-    KeypairGenEntryWrapper newKeypairGen = manager.caConfStore.changeKeypairGen(name, type, conf, manager);
+    KeypairGenEntryWrapper newKeypairGen =
+        manager.caConfStore.changeKeypairGen(name, type, conf, manager);
 
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);
@@ -158,14 +167,16 @@ class KeypairGenManager {
     manager.keypairGens.put(name, newKeypairGen);
   } // method changeKeypairGen
 
-  KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry) throws CaMgmtException {
+  KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry)
+      throws CaMgmtException {
     Args.notNull(entry, "entry");
     KeypairGenEntryWrapper ret = new KeypairGenEntryWrapper();
     ret.setDbEntry(entry);
 
     try {
-      ret.init(manager.securityFactory, manager.p11CryptServiceFactory, manager.keypairGeneratorFactories,
-          manager.shardId, manager.getDataSourceMap());
+      ret.init(manager.securityFactory, manager.p11CryptServiceFactory,
+          manager.keypairGeneratorFactories, manager.shardId,
+          manager.getDataSourceMap());
     } catch (ObjectCreationException ex) {
       final String message = "error createKeypairGen";
       LOG.debug(message, ex);

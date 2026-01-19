@@ -10,8 +10,5 @@ echo "working dir: ${DIR}"
 cd ${DIR}
 mvn clean install -DskipTests
 
-cd ${DIR}/servlets
-mvn clean install
-
 cd ${DIR}/assemblies
 mvn clean install

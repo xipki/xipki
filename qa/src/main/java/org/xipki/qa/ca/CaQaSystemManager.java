@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ca;
@@ -9,8 +9,8 @@ import java.util.Set;
 /**
  * QA system manager for CA.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public interface CaQaSystemManager extends Closeable {

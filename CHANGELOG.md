@@ -2,8 +2,26 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.5.4
+## 6.6.0
 - Release date: 202y/mm/dd
+- All components:
+  - Added support of issuing certificate with ML-DSA signature.
+  - Added support of issuing certificate with ML-DSA, and ML-KEM public keys
+  - Changed (simplified) the format of certificate profiles (v2). The old 
+    certificate profiles (v1) can still be used.
+  - Use own JSON and CBOR parser and writer
+  - Use own PKCS#11 JNI library.
+  - Update servlet from 3.1.0 to 5.0
+  - Dependencies Update
+    - ipkcs11wrapper: removed
+    - jackson: removed
+    - karaf: 4.4.4 -> 4.4.8
+    - bouncycastle: 1.77 -> 1.83
+    - dnsjava: 3.5.3 -> 3.5.4
+    - log4j: 2.22.1 -> 2.25.3
+    - mariadb jdbc client: 3.3.0 -> 3.5.7
+    - postgresql jdbc client: 42.7.0 -> 42.7.9
+    - h2 jdbc client: 2.2.224 -> 2.4.240
 
 ## 6.5.3
 - Release date: 2024/01/01
@@ -195,6 +213,7 @@ See also <https://github.com/xipki/xipki/releases>
   - H2 jdbc driver from 1.4.200 to 2.1.214
   - MariaDB jdbc driver from 2.7.5 to 2.7.6
   - PostgreSQL jdbc drive from 4.2.24 to 42.2.24 to 42.4.2
+
 ## 5.3.15
 - Release date: February 12, 2022
 - CA

@@ -1,17 +1,17 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.ca.api.profile.Certprofile.KeyUsageControl;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.ca.certprofile.xijson.KeyUsageControl;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Extension KeyUsage.
@@ -19,64 +19,39 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 
-public class KeyUsage extends ValidableConf {
+public class KeyUsage implements JsonEncodable {
 
-  private List<Usage> usages;
+  private final List<SingleKeyUsages> usages;
 
-  public List<Usage> getUsages() {
-    if (usages == null) {
-      usages = new LinkedList<>();
-    }
+  public KeyUsage(List<SingleKeyUsages> usages) {
+    this.usages = Args.notEmpty(usages, "usages");
+  }
+
+  public List<SingleKeyUsages> getUsages() {
     return usages;
   }
 
-  public void setUsages(List<Usage> usages) {
-    this.usages = usages;
+  public KeyUsageControl toXiKeyUsageOptions() {
+    List<KeyUsageControl.KeySingleUsages> singleUsagesList
+        = new ArrayList<>(usages.size());
+    for (SingleKeyUsages x : usages) {
+      singleUsagesList.add(x.toXiKeyUsageOptions());
+    }
+    return new KeyUsageControl(singleUsagesList);
   }
 
   @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(usages, "usages");
-    validate(usages);
+  public JsonMap toCodec() {
+    return new JsonMap().putEncodables("usages", usages);
   }
 
-  public Set<KeyUsageControl> toXiKeyUsageOptions() {
-    List<Usage> usages = getUsages();
-    Set<KeyUsageControl> controls = new HashSet<>();
-
-    for (Usage m : usages) {
-      controls.add(new KeyUsageControl(m.getValue(), m.isRequired()));
+  public static KeyUsage parse(JsonMap json) throws CodecException {
+    JsonList list = json.getNnList("usages");
+    List<SingleKeyUsages> usagesList = new ArrayList<>(list.size());
+    for (JsonMap v : list.toMapList()) {
+      usagesList.add(SingleKeyUsages.parse(v));
     }
+    return new KeyUsage(usagesList);
+  }
 
-    return Collections.unmodifiableSet(controls);
-  } // method toXiKeyUsageOptions
-
-  public static class Usage extends ValidableConf {
-
-    private String value;
-
-    private boolean required;
-
-    public String getValue() {
-      return value;
-    }
-
-    public void setValue(String value) {
-      this.value = value;
-    }
-
-    public boolean isRequired() {
-      return required;
-    }
-
-    public void setRequired(boolean required) {
-      this.required = required;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-    }
-
-  } // class Usage
-
-} // class KeyUsage
+}

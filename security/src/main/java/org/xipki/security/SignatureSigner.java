@@ -1,11 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.util.Args;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -69,11 +70,13 @@ public class SignatureSigner implements XiContentSigner {
 
   private final PrivateKey key;
 
-  public SignatureSigner(SignAlgo sigAlgo, Signature signer, PrivateKey key) throws XiSecurityException {
+  public SignatureSigner(SignAlgo sigAlgo, Signature signer, PrivateKey key)
+      throws XiSecurityException {
     this(sigAlgo.getAlgorithmIdentifier(), signer, key);
   }
 
-  public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
+  public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer,
+                         PrivateKey key)
       throws XiSecurityException {
     this.sigAlgId = Args.notNull(sigAlgId, "sigAlgId");
     this.signer = Args.notNull(signer, "signer");
@@ -110,7 +113,8 @@ public class SignatureSigner implements XiContentSigner {
     try {
       return stream.getSignature();
     } catch (SignatureException ex) {
-      throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(), ex);
+      throw new RuntimeOperatorException(
+          "exception obtaining signature: " + ex.getMessage(), ex);
     }
   }
 

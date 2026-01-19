@@ -1,16 +1,16 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
-import org.xipki.security.CertpathValidationModel;
+import org.xipki.security.CertPathValidationModel;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.io.FileOrBinary;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,10 +32,14 @@ public class RequestOption {
   static final Set<HashAlgo> SUPPORTED_HASH_ALGORITHMS;
 
   static {
-    SUPPORTED_HASH_ALGORITHMS = CollectionUtil.asSet(HashAlgo.SHA1,
-        HashAlgo.SHA224,   HashAlgo.SHA256,   HashAlgo.SHA384,   HashAlgo.SHA512,
-        HashAlgo.SHA3_224, HashAlgo.SHA3_256, HashAlgo.SHA3_384, HashAlgo.SHA3_512,
-        HashAlgo.SHAKE128, HashAlgo.SHAKE256, HashAlgo.SM3);
+    SUPPORTED_HASH_ALGORITHMS = CollectionUtil.asSet(
+        HashAlgo.SHA1,
+        HashAlgo.SHA224,   HashAlgo.SHA256,
+        HashAlgo.SHA384,   HashAlgo.SHA512,
+        HashAlgo.SHA3_224, HashAlgo.SHA3_256,
+        HashAlgo.SHA3_384, HashAlgo.SHA3_512,
+        HashAlgo.SHAKE128, HashAlgo.SHAKE256,
+        HashAlgo.SM3);
   }
 
   private final boolean supportsHttpGet;
@@ -62,7 +66,7 @@ public class RequestOption {
 
   private final Set<X509Cert> certs;
 
-  private final CertpathValidationModel certpathValidationModel;
+  private final CertPathValidationModel certpathValidationModel;
 
   RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
     supportsHttpGet = Args.notNull(conf, "conf").isSupportsHttpGet();
@@ -78,7 +82,8 @@ public class RequestOption {
     nonceMaxLen = nonceConf.getMaxLen() != null ? nonceConf.getMaxLen() : 96;
 
     if (nonceMinLen < 0) {
-      throw new InvalidConfException("invalid nonceMinLen (<1): " + nonceMinLen);
+      throw new InvalidConfException(
+          "invalid nonceMinLen (<1): " + nonceMinLen);
     }
 
     if (nonceMinLen > nonceMaxLen) {
@@ -87,12 +92,14 @@ public class RequestOption {
 
     maxRequestListCount = conf.getMaxRequestListCount();
     if (maxRequestListCount < 1) {
-      throw new InvalidConfException("invalid maxRequestListCount " + maxRequestListCount);
+      throw new InvalidConfException(
+          "invalid maxRequestListCount " + maxRequestListCount);
     }
 
     maxRequestSize = conf.getMaxRequestSize();
     if (maxRequestSize < 100) {
-      throw new InvalidConfException("invalid maxRequestSize " + maxRequestSize);
+      throw new InvalidConfException(
+          "invalid maxRequestSize " + maxRequestSize);
     }
 
     // Request versions
@@ -102,7 +109,8 @@ public class RequestOption {
       if ("v1".equalsIgnoreCase(m)) {
         versions.add(0);
       } else {
-        throw new InvalidConfException("invalid OCSP request version '" + m + "'");
+        throw new InvalidConfException(
+            "invalid OCSP request version '" + m + "'");
       }
     }
 
@@ -122,20 +130,22 @@ public class RequestOption {
         if (SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
           hashAlgos.add(algo);
         } else {
-          throw new InvalidConfException("hash algorithm " + token + " is unsupported");
+          throw new InvalidConfException(
+              "hash algorithm " + token + " is unsupported");
         }
       }
     }
 
     // certpath validation
-    OcspServerConf.CertpathValidation certpathConf = conf.getCertpathValidation();
+    OcspServerConf.CertpathValidation certpathConf =
+        conf.getCertpathValidation();
     if (certpathConf == null) {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
       }
       trustanchors = null;
       certs = null;
-      certpathValidationModel = CertpathValidationModel.PKIX;
+      certpathValidationModel = CertPathValidationModel.PKIX;
       return;
     }
 
@@ -146,14 +156,16 @@ public class RequestOption {
       trustanchors = new HashSet<>(tmpCerts.size());
       trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
-      throw new InvalidConfException("could not initialize the trustanchors: " + ex.getMessage(), ex);
+      throw new InvalidConfException("could not initialize the trustanchors: "
+          + ex.getMessage(), ex);
     }
 
     OcspServerConf.CertCollection certsType = certpathConf.getCerts();
     try {
       certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
-      throw new InvalidConfException("could not initialize the certs: " + ex.getMessage(), ex);
+      throw new InvalidConfException(
+          "could not initialize the certs: " + ex.getMessage(), ex);
     }
   } // constructor
 
@@ -197,7 +209,7 @@ public class RequestOption {
     return hashAlgo != null && hashAlgos.contains(hashAlgo);
   }
 
-  public CertpathValidationModel getCertpathValidationModel() {
+  public CertPathValidationModel getCertpathValidationModel() {
     return certpathValidationModel;
   }
 
@@ -233,7 +245,8 @@ public class RequestOption {
         }
       }
     } else {
-      throw new IllegalStateException("should not happen, neither keystore nor dir is defined");
+      throw new IllegalStateException(
+          "should not happen, neither keystore nor dir is defined");
     }
 
     return tmpCerts;

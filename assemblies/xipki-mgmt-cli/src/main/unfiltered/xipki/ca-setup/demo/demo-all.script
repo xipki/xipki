@@ -1,41 +1,49 @@
-echo "+----------------------------------------------------------------------+"
-echo "| This script demonstrates the setup of CAs with all the combinations: |"
-echo "|     key-type x caconf-store-type x token-type x CAcert-presence      |"
-echo "|  - key-type:          rsa, ec, dsa, sm2, ed25519, ed448              |"
-echo "|  - caconf-store-type: dbbased (database), filebased (file)           |"
-echo "|  - token-type:        p11, p12                                       |"
-echo "|  - CAcert-presence:   none, present                                  |"
-echo "+----------------------------------------------------------------------+"
-
 ## Adapt me, HSM device capabilities
-hsm_keytypes = [ed25519 sm2 ec rsa dsa]
+HSM_KEYSPECs = [ ML-DSA-44 ML-DSA-65 ML-DSA-87 ED25519 ED448 \
+  RSA2048 RSA2048/PSS RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
+  SECP256R1 SECP384R1 SECP521R1 SM2P256V1 FRP256V1 \
+  BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1 ]
 
-keytypes = [ed448 ed25519 sm2 ec rsa dsa]; each ($keytypes) {
-  keytype = $it
+echo "+----------------------------Group 1-----------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|     CA-key-spec x caconf-store-type x token-type                     |"
+echo "|  - CA-key-spec:       SECP256R1                                      |"
+echo "|  - caconf-store-type: FILE, DB (database)                            |"
+echo "|  - token-type:        PKCS11, PKCS12                                 |"
+echo "+----------------------------------------------------------------------+"
+ca_keyspecs = [ SECP256R1 ]
+storetypes  = [ FILE DB ]
+tokentypes  = [ PKCS11 PKCS12 ]
+source xipki/ca-setup/demo/doDemo-group.script
 
-  storetypes = [dbbased filebased]; each ($storetypes) {
-    storetype = $it
+echo "+----------------------------Group 2------------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations:  |"
+echo "|          CA-key-spec x caconf-store-type x token-type                 |"
+echo "|  - CA-key-spec:       ML-DSA-44, ED25519, RSA2048, RSA2048/PSS        |"
+echo "|               :       SM2P256V1, FRP256V1, BRAINPOOLP256R1.           |"
+echo "|  - caconf-store-type: FILE                                            |"
+echo "|  - token-type:        PKCS11, PKCS12                                  |"
+echo "+-----------------------------------------------------------------------+"
 
-    tokentypes = [p12 p11]; each ($tokentypes) {
-      tokentype = $it
+ca_keyspecs = [ ML-DSA-44 ED25519 RSA2048 RSA2048/PSS \
+                SM2P256V1 FRP256V1 BRAINPOOLP256R1 ]
+storetypes  = [ FILE ]
+tokentypes  = [ PKCS11 PKCS12 ]
+source xipki/ca-setup/demo/doDemo-group.script
 
-      if { "$tokentype" equals "p11" } then {
-        supported = "false"
-        each ($hsm_keytypes) {
-          hsm_keytype = $it
-          if { "$keytype" equals "$hsm_keytype" } then {
-            supported = "true"
-            break
-          }
-        }
+echo "+----------------------------Group 3------------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations:  |"
+echo "|          CA-key-spec x caconf-store-type x token-type                 |"
+echo "|  - CA-key-spec:       ML-DSA-65, ML-DSA-87, ED448,                    |"
+echo "|               :       RSA3072, RSA3072/PSS, RSA4096, RSA4096/PSS,     |"
+echo "|               :       SECP384R1, SECP521R1,                           |"
+echo "|               :       BRAINPOOLP384R1, BRAINPOOLP512R1                |"
+echo "|  - caconf-store-type: FILE                                            |"
+echo "|  - token-type:        PKCS11                                          |"
+echo "+-----------------------------------------------------------------------+"
 
-        if { "$supported" equals "false" } then {
-          echo "$keytype is not supported in the p11 device, skipping it"
-          continue
-        }
-      }
-
-      source xipki/ca-setup/demo/doDemo.script
-    }
-  }
-}
+ca_keyspecs = [ ML-DSA-65 ML-DSA-87 ED448 RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
+                SECP384R1 SECP521R1 BRAINPOOLP384R1 BRAINPOOLP512R1 ]
+storetypes  = [ FILE ]
+tokentypes  = [ PKCS11 ]
+source xipki/ca-setup/demo/doDemo-group.script

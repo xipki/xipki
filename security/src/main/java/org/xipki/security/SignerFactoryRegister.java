@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Set;
 
@@ -39,7 +39,7 @@ public interface SignerFactoryRegister {
    *           If signer could not be created.
    */
   ConcurrentContentSigner newSigner(
-      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
-      throws ObjectCreationException;
+      SecurityFactory securityFactory, String type, SignerConf conf,
+      X509Cert[] certificateChain) throws ObjectCreationException;
 
 }

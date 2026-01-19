@@ -1,10 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension PrivateKeyUsagePeriod.
@@ -12,21 +14,26 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class PrivateKeyUsagePeriod extends ValidableConf {
+public class PrivateKeyUsagePeriod implements JsonEncodable {
 
-  private String validity;
+  private final String validity;
+
+  public PrivateKeyUsagePeriod(String validity) {
+    this.validity = Args.notBlank(validity, "validity");
+  }
 
   public String getValidity() {
     return validity;
   }
 
-  public void setValidity(String validity) {
-    this.validity = validity;
-  }
-
   @Override
-  public void validate() throws InvalidConfException {
-    notBlank(validity, "validity");
+  public JsonMap toCodec() {
+    return new JsonMap().put("validity", validity);
   }
 
-} // class PrivateKeyUsagePeriod
+  public static PrivateKeyUsagePeriod parse(JsonMap json)
+      throws CodecException {
+    return new PrivateKeyUsagePeriod(json.getNnString("validity"));
+  }
+
+}

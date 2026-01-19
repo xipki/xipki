@@ -30,8 +30,8 @@ CREATE TABLE ISSUER (
     NAFTER BIGINT NOT NULL COMMENT 'notAfter of certificate, seconds since January 1, 1970, 00:00:00 GMT',
     S1C CHAR(28) NOT NULL COMMENT 'base64 enoded SHA1 sum of the certificate',
     REV_INFO VARCHAR(200) NULL COMMENT 'CA revocation information',
-    CERT VARCHAR(6000) NOT NULL,
     CRL_ID INT NULL COMMENT 'CRL ID, only present for entry imported from CRL, and only if exactly one CRL is available for this CA',
+    CERT LONGTEXT NOT NULL,
     CONSTRAINT PK_ISSUER PRIMARY KEY (ID)
 );
 

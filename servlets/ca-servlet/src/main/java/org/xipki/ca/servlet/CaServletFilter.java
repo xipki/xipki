@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.servlet;
@@ -6,7 +6,7 @@ package org.xipki.ca.servlet;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ca.server.servlet.CaHttpFilter;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
  * CA ServletFilter.
@@ -16,7 +16,8 @@ import org.xipki.util.http.XiHttpFilter;
 public class CaServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig)
+      throws Exception {
     return new CaHttpFilter();
   }
 

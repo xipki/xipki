@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
@@ -6,22 +6,22 @@ package org.xipki.ocsp.server.store;
 import org.bouncycastle.crypto.ExtendedDigest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.asn1.CrlStreamParser;
-import org.xipki.util.Args;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.Curl;
-import org.xipki.util.DateUtil;
-import org.xipki.util.DefaultCurl;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.Validity;
-import org.xipki.util.http.SslContextConf;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.http.Curl;
+import org.xipki.util.extra.http.DefaultCurl;
+import org.xipki.util.extra.http.SslContextConf;
+import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.type.Validity;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -43,7 +42,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP database.
+ * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP
+ * database.
  *
  * @author Lijun Liao (xipki)
  * @since 2.2.0
@@ -58,7 +58,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       try {
         updateStore();
       } catch (Throwable th) {
-        LogUtil.error(LOG, th, "error while calling initializeStore() for store " + name);
+        LogUtil.error(LOG, th, "error while calling initializeStore() " +
+            "for store " + name);
       }
     }
 
@@ -124,7 +125,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(CrlDbCertStatusStore.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CrlDbCertStatusStore.class);
 
   private static final String CT_PKIX_CRL = "application/pkix-crl";
 
@@ -134,9 +136,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private final AtomicBoolean crlUpdateInProcess = new AtomicBoolean(false);
 
-  private final ConcurrentHashMap<String, Curl> curls = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Curl> curls =
+      new ConcurrentHashMap<>();
 
-  private final ConcurrentHashMap<String, Long> curlsConfLastModified = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Long> curlsConfLastModified =
+      new ConcurrentHashMap<>();
 
   private String dir;
 
@@ -148,7 +152,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
   private boolean firstTime = true;
 
-  private Map<String, ?> sourceConf;
+  private JsonMap sourceConf;
 
   /**
    * Initialize the store.
@@ -168,13 +172,21 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
    * </ul>
    * @param datasource DataSource.
    */
-  public void init(Map<String, ?> sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
-    // we need to canonicalize the configuration first
-    new ConfPairs(sourceConf);
+  public void init(JsonMap sourceConf, DataSourceWrapper datasource)
+      throws OcspStoreException {
+    try {
+      init0(sourceConf, datasource);
+    } catch (CodecException e) {
+      throw new OcspStoreException(e);
+    }
+  }
+
+  private void init0(JsonMap sourceConf, DataSourceWrapper datasource)
+      throws OcspStoreException, CodecException {
     this.sourceConf = Args.notNull(sourceConf, "sourceConf");
 
     // check the dir
-    this.dir = IoUtil.expandFilepath(getNonNullStrValue(sourceConf, "dir"), true);
+    this.dir = IoUtil.expandFilepath(sourceConf.getNnString("dir"), true);
     File dirObj = new File(this.dir);
     if (!dirObj.exists()) {
       throw new OcspStoreException("the dir " + this.dir + " does not exist");
@@ -201,43 +213,23 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     if (!foundCrlDir) {
-      LOG.warn("Found no sub-directory starting with 'crl-' in " + dir);
+      LOG.warn("Found no sub-directory starting with 'crl-' in {}", dir);
     }
 
-    String value = getOptionalStrValue(sourceConf, "sqlBatchCommit");
-    this.sqlBatchCommit = StringUtil.isBlank(value) ? 1000 : (int) Double.parseDouble(value);
+    this.sqlBatchCommit = sourceConf.getInt("sqlBatchCommit", 1000);
 
-    value = getOptionalStrValue(sourceConf, "ignoreExpiredCrls");
-    this.ignoreExpiredCrls = StringUtil.isBlank(value) || Boolean.parseBoolean(value);
+    this.ignoreExpiredCrls = sourceConf.getBool("ignoreExpiredCrls", true);
 
     super.datasource = datasource;
 
-    value = getOptionalStrValue(sourceConf, "startupDelay");
-    int startupDelaySeconds = value == null ? 5 : (int) Double.parseDouble(value);
+    int startupDelaySeconds = sourceConf.getInt("startupDelay", 5);
     // so that the ocsp service (tomcat) can start without blocking.
     Runnable runnable = this :: updateStore;
-    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    ScheduledThreadPoolExecutor executor =
+        new ScheduledThreadPoolExecutor(1);
     executor.schedule(runnable, startupDelaySeconds, TimeUnit.SECONDS);
     executor.shutdown();
   } // method init
-
-  private static String getNonNullStrValue(Map<String, ?> sourceConf, String confName) {
-    Object objVal = sourceConf.get(confName);
-    if (objVal == null) {
-      throw new IllegalArgumentException("mandatory " + confName + " is not specified in sourceConf");
-    }
-
-    return (objVal instanceof String) ? (String) objVal : objVal.toString();
-  } // method getStrValue
-
-  private static String getOptionalStrValue(Map<String, ?> sourceConf, String confName) {
-    Object objVal = sourceConf.get(confName);
-    if (objVal == null) {
-      return null;
-    }
-
-    return (objVal instanceof String) ? (String) objVal : objVal.toString();
-  } // method getStrValue
 
   @Override
   protected boolean isIgnoreExpiredCrls() {
@@ -293,7 +285,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
           try {
             downloadCrl(subDir);
           } catch (Exception ex) {
-            LogUtil.error(LOG, ex, "error downloading CRL for path " + subDir.getPath());
+            LogUtil.error(LOG, ex,
+                "error downloading CRL for path " + subDir.getPath());
           }
         }
 
@@ -312,7 +305,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
         }
 
         if (updateMe) {
-          ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit, ignoreExpiredCrls);
+          ImportCrl importCrl = new ImportCrl(datasource, dir, sqlBatchCommit,
+              ignoreExpiredCrls);
 
           if (importCrl.importCrlToOcspDb()) {
             LOG.info("updated CertStore {} successfully", name);
@@ -380,7 +374,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     } else {
       // Check if there exists fresher CRL
       Properties props = loadProperties(crlInfoFile);
-      nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(props.getProperty("nextupdate"));
+      nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(
+          props.getProperty("nextupdate"));
       crlNumber = new BigInteger(props.getProperty("crlnumber"));
       String hash = props.getProperty("hash");
       if (hash != null && !hash.isEmpty()) {
@@ -390,7 +385,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       }
 
       props = loadProperties(crlDownloadFile);
-      Validity validity = Validity.getInstance(props.getProperty("download.before.nextupdate"));
+      Validity validity = Validity.getInstance(
+          props.getProperty("download.before.nextupdate"));
       if (validity.getValidity() < 1) {
         LOG.error("invalid download.before.nextupdate {}", validity);
       } else {
@@ -411,7 +407,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     }
 
     if (StringUtil.isBlank(downloadUrl)) {
-      LOG.error("Neither download.url nor crldp in {} is specified, skip it", crlDownloadFile.getPath());
+      LOG.error("Neither download.url nor crldp in {} is specified, skip it",
+          crlDownloadFile.getPath());
       return;
     }
 
@@ -444,7 +441,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
       if (curl == null) {
         SslContextConf sslContextConf = new SslContextConf(
-            new FileOrBinary[] {FileOrBinary.ofFile(trustanchorFile.getPath())}, null);
+            new FileOrBinary[]{FileOrBinary.ofFile(trustanchorFile.getPath())},
+            null);
         curl = new DefaultCurl();
         ((DefaultCurl) curl).setSslContextConf(sslContextConf);
         curls.put(subDirPath, curl);
@@ -461,8 +459,10 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     // download the fingerprint if download.fp.url is specified
     if (hashUrl != null) {
       Curl.CurlResult downResult = curl.curlGet(hashUrl, false, null, null);
-      if (downResult.getContentLength() > 0 && Arrays.equals(hashValue, downResult.getContent())) {
-        LOG.info("Fingerprint of the CRL has not changed, skip downloading CRL");
+      if (downResult.getContentLength() > 0
+          && Arrays.equals(hashValue, downResult.getContent())) {
+        LOG.info("Fingerprint of the CRL has not changed, " +
+            "skip downloading CRL");
         return;
       }
     }
@@ -470,7 +470,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     File tmpCrlFile = new File(generatedDir, "tmp-ca.crl");
 
     CompositeOutputStream crlStream = new CompositeOutputStream(
-        hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo), Files.newOutputStream(tmpCrlFile.toPath()));
+        hashAlgo == null ? null : HashAlgo.getInstance(hashAlgo),
+        Files.newOutputStream(tmpCrlFile.toPath()));
 
     Curl.CurlResult downResult;
     try {
@@ -481,16 +482,19 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     String contentType = downResult.getContentType();
 
     if (!CT_PKIX_CRL.equals(contentType)) {
-      LOG.error("Downloading CRL failed, expected content type {}, but received {}", CT_PKIX_CRL, contentType);
+      LOG.error("Downloading CRL failed, expected content type {}, " +
+              "but received {}", CT_PKIX_CRL, contentType);
       return;
     }
 
     if (downResult.getContentLength() < 10) {
       byte[] errorContent = downResult.getErrorContent();
       if (errorContent == null) {
-        LOG.error("Downloading CRL failed, CRL too short (len={}): ", downResult.getContentLength());
+        LOG.error("Downloading CRL failed, CRL too short (len={}): ",
+            downResult.getContentLength());
       } else {
-        LOG.error("Downloading CRL failed with error: {}", new String(errorContent));
+        LOG.error("Downloading CRL failed with error: {}",
+            new String(errorContent));
       }
       return;
     }
@@ -499,18 +503,23 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     CrlStreamParser newCrlStreamParser = new CrlStreamParser(tmpCrlFile);
     BigInteger newCrlNumber = newCrlStreamParser.getCrlNumber();
 
-    boolean useNewCrl = crlNumber == null || newCrlNumber.compareTo(crlNumber) > 0;
+    boolean useNewCrl = crlNumber == null
+        || newCrlNumber.compareTo(crlNumber) > 0;
+
     if (useNewCrl) {
       if (hashAlgo != null) {
         byte[] crlHashValue = crlStream.getHashValue();
         if (crlHashValue == null) {
-          throw new IllegalStateException("should not reach here, crlHashValue is null");
+          throw new IllegalStateException(
+              "should not reach here, crlHashValue is null");
         }
         String hashProp = hashAlgo + " " + Hex.encode(crlHashValue);
-        IoUtil.save(new File(generatedDir, "new-ca.crl.fp"), hashProp.getBytes(StandardCharsets.UTF_8));
+        IoUtil.save(new File(generatedDir, "new-ca.crl.fp"),
+            hashProp.getBytes(StandardCharsets.UTF_8));
       }
       IoUtil.renameTo(tmpCrlFile, new File(generatedDir, "new-ca.crl"));
-      LOG.info(crlNumber == null ? "Downloaded CRL at first time" : "Downloaded CRL is newer than existing one");
+      LOG.info(crlNumber == null ? "Downloaded CRL at first time"
+          : "Downloaded CRL is newer than existing one");
       // notify the change
       updatemeFile.createNewFile();
     } else {

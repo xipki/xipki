@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.type;
@@ -53,13 +53,15 @@ public class OcspRequest {
 
   private final List<CertID> requestList;
 
-  public OcspRequest(int version, List<CertID> requestList, List<ExtendedExtension> extensions) {
+  public OcspRequest(int version, List<CertID> requestList,
+                     List<ExtendedExtension> extensions) {
     this.version = version;
     this.requestList = requestList;
     this.extensions = extensions;
   }
 
-  public static OcspRequest getInstance(byte[] request) throws EncodingException {
+  public static OcspRequest getInstance(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -94,11 +96,14 @@ public class OcspRequest {
     Header hdrSingleReq = readHeader(request, hdr.readerIndex);
     // requestList
     while (true) {
-      Header hdrCertId = readHeader(request, hdrSingleReq.readerIndex);
+      Header hdrCertId   = readHeader(request, hdrSingleReq.readerIndex);
       Header hdrHashAlgo = readHeader(request, hdrCertId.readerIndex);
-      Header hdrNameHash = readHeader(request, hdrHashAlgo.readerIndex + hdrHashAlgo.len);
-      Header hdrKeyHash = readHeader(request, hdrNameHash.readerIndex + hdrNameHash.len);
-      Header hdrSerial = readHeader(request, hdrKeyHash.readerIndex + hdrKeyHash.len);
+      Header hdrNameHash = readHeader(request,
+          hdrHashAlgo.readerIndex + hdrHashAlgo.len);
+      Header hdrKeyHash  = readHeader(request,
+          hdrNameHash.readerIndex + hdrNameHash.len);
+      Header hdrSerial   = readHeader(request,
+          hdrKeyHash.readerIndex + hdrKeyHash.len);
       RequestIssuer issuer;
       try {
         issuer = new RequestIssuer(request, hdrCertId.readerIndex,
@@ -133,8 +138,10 @@ public class OcspRequest {
 
       Header hdrExtension = readHeader(request, hdrExtensions.readerIndex);
       while (true) {
-        int extensionLen = hdrExtension.readerIndex - hdrExtension.tagIndex + hdrExtension.len;
-        ExtendedExtension extn = ExtendedExtension.getInstance(request, hdrExtension.tagIndex, extensionLen);
+        int extensionLen = hdrExtension.readerIndex - hdrExtension.tagIndex
+                            + hdrExtension.len;
+        ExtendedExtension extn = ExtendedExtension.getInstance(
+                                  request, hdrExtension.tagIndex, extensionLen);
         if (extn != null) {
           extensions.add(extn);
         }
@@ -151,10 +158,12 @@ public class OcspRequest {
     return new OcspRequest(version, requestList, extensions);
   } // method getInstance
 
-  public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
+  public static OcspRequest getInstance(OCSPRequest req)
+      throws EncodingException {
     TBSRequest tbsReq = req.getTbsRequest();
 
-    org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq.getRequestExtensions();
+    org.bouncycastle.asn1.x509.Extensions extensions0 =
+        tbsReq.getRequestExtensions();
     ASN1Sequence requestList0 = tbsReq.getRequestList();
 
     final int n = requestList0.size();
@@ -168,8 +177,10 @@ public class OcspRequest {
         out.write(certId0.getIssuerNameHash().getEncoded());
         out.write(certId0.getIssuerKeyHash().getEncoded());
         byte[] encodedIssuer = out.toByteArray();
-        RequestIssuer issuer = new RequestIssuer(encodedIssuer,0, encodedIssuer.length);
-        CertID certId = new CertID(issuer, certId0.getSerialNumber().getValue());
+        RequestIssuer issuer =
+            new RequestIssuer(encodedIssuer,0, encodedIssuer.length);
+        CertID certId =
+            new CertID(issuer, certId0.getSerialNumber().getValue());
         requestList.add(certId);
       } catch (IOException | NoSuchAlgorithmException ex) {
         throw new EncodingException(ex.getMessage(), ex);
@@ -180,21 +191,26 @@ public class OcspRequest {
     if (extensions0 != null) {
       ASN1ObjectIdentifier[] extOids = extensions0.getExtensionOIDs();
       for (ASN1ObjectIdentifier oid : extOids) {
-        org.bouncycastle.asn1.x509.Extension extension0 = extensions0.getExtension(oid);
+        org.bouncycastle.asn1.x509.Extension extension0 =
+            extensions0.getExtension(oid);
+
         byte[] encoded;
         try {
           encoded = extension0.getEncoded();
         } catch (IOException ex) {
           throw new EncodingException("error encoding Extension", ex);
         }
-        extensions.add(ExtendedExtension.getInstance(encoded, 0, encoded.length));
+        extensions.add(ExtendedExtension.getInstance(
+            encoded, 0, encoded.length));
       }
     }
 
-    return new OcspRequest(tbsReq.getVersion().getValue().intValue(), requestList, extensions);
+    return new OcspRequest(tbsReq.getVersion().getValue().intValue(),
+        requestList, extensions);
   } // method getInstance
 
-  public static int readRequestVersion(byte[] request) throws EncodingException {
+  public static int readRequestVersion(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -214,7 +230,8 @@ public class OcspRequest {
     }
   } // method readRequestVersion
 
-  public static boolean containsSignature(byte[] request) throws EncodingException {
+  public static boolean containsSignature(byte[] request)
+      throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -223,7 +240,8 @@ public class OcspRequest {
     return signatureIndex < request.length;
   }
 
-  static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
+  static Header readHeader(byte[] encoded, int readerIndex)
+      throws EncodingException {
     int off = readerIndex;
     byte tag = encoded[off++];
     int len = 0xFF & encoded[off++];
@@ -234,7 +252,8 @@ public class OcspRequest {
       } else if (lenSize == 2) {
         len = ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);
       } else if (lenSize == 3) {
-        len = ((0xFF & encoded[off++]) << 16) | ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);
+        len = ((0xFF & encoded[off++]) << 16) | ((0xFF & encoded[off++]) << 8)
+              | (0xFF & encoded[off++]);
       } else if (lenSize == 4) {
         len = ((0xFF & encoded[off++]) << 24) | ((0xFF & encoded[off++]) << 16)
             | ((0xFF & encoded[off++]) << 8)  | (0xFF & encoded[off++]);

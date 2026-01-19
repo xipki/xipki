@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -11,10 +11,7 @@ import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
@@ -27,16 +24,18 @@ import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
+import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
+import org.xipki.security.X509Crl;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.PemEncoder;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.misc.PemEncoder;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -59,29 +58,35 @@ import java.util.Optional;
  */
 public class CertActions {
 
-  @Command(scope = "ca", name = "cert-status", description = "show certificate status and save the certificate")
+  @Command(scope = "ca", name = "cert-status", description =
+      "show certificate status and save the certificate")
   @Service
   public static class CertStatus extends UnsuspendRmCertAction {
 
-    @Option(name = "--outform", description = "output format of the certificate")
+    @Option(name = "--outform", description =
+        "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", description =
+        "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
     @Override
     protected Object execute0() throws Exception {
-      CertWithRevocationInfo certInfo = caManager.getCert(caName, getSerialNumber());
+      CertWithRevocationInfo certInfo =
+          caManager.getCert(caName, getSerialNumber());
 
       if (certInfo == null) {
         System.out.println("certificate unknown");
         return null;
       }
 
-      String msg = StringUtil.concat("certificate profile: ", certInfo.getCertprofile(),
-          "\nstatus: ", (certInfo.getRevInfo() == null ? "good" : "revoked with " + certInfo.getRevInfo()));
+      String msg = StringUtil.concat("certificate profile: ",
+          certInfo.getCertprofile(), "\nstatus: ",
+          (certInfo.getRevInfo() == null ? "good"
+              : "revoked with " + certInfo.getRevInfo()));
       println(msg);
       if (outputFile != null) {
         saveVerbose("saved certificate to file", outputFile,
@@ -102,14 +107,14 @@ public class CertActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    protected abstract X509CRLHolder retrieveCrl() throws Exception;
+    protected abstract X509Crl retrieveCrl() throws Exception;
 
     @Override
     protected Object execute0() throws Exception {
       CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
           () -> new CmdFailure("CA " + caName + " not available"));
 
-      X509CRLHolder crl;
+      X509Crl crl;
       try {
         crl = retrieveCrl();
       } catch (Exception ex) {
@@ -122,7 +127,8 @@ public class CertActions {
 
       String outFile = getOutFile();
       if (outFile != null) {
-        saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+        saveVerbose("saved CRL to file", outFile,
+            encodeCrl(crl.getEncoded(), outform));
       }
       return null;
     } // method execute0
@@ -131,7 +137,8 @@ public class CertActions {
 
   } // class CrlAction
 
-  @Command(scope = "ca", name = "enroll-cert", description = "enroll certificate")
+  @Command(scope = "ca", name = "enroll-cert", description =
+      "enroll certificate")
   @Service
   public static class EnrollCert extends CaAction {
 
@@ -139,39 +146,50 @@ public class CertActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--subject", description = "Subject of the certificate.\n" +
-        "Exactly one of subject (keypair generated by CA) or CSR must be specified.")
+    @Option(name = "--subject", description =
+        "Subject of the certificate.\n" +
+        "Exactly one of subject (keypair generated by CA) or CSR " +
+        "must be specified.")
     protected String subject;
 
     @Option(name = "--csr", description = "The CSR file.\n" +
-        "Exactly one of subject (keypair generated by CA) or csr must be specified.")
+        "Exactly one of subject (keypair generated by CA) or CSR " +
+        "must be specified.")
     @Completion(FileCompleter.class)
     protected String csrFile;
 
-    @Option(name = "--outform", description = "output format of the certificate")
+    @Option(name = "--outform", description =
+        "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--key-outform", description = "output format of the private key (pem or p12)")
+    @Option(name = "--key-outform", description =
+        "output format of the private key (pem or p12)")
     protected String keyOutform = "p12";
 
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true, description =
+        "where to save the certificate")
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    @Option(name = "--key-password",
-        description = "Password to protect the private key, as plaintext or PBE-encrypted.\n" +
-        "For key-outform PEM, NONE may be used to save the key in unecrypted form.")
+    @Option(name = "--key-password", description =
+        "Password to protect the private key, as plaintext or " +
+            "PBE-encrypted.\n" +
+        "For key-outform PEM, NONE may be used to save the key " +
+            "in unecrypted form.")
     protected String keyPasswordHint;
 
-    @Option(name = "--profile", aliases = "-p", required = true, description = "profile name")
+    @Option(name = "--profile", aliases = "-p", required = true,
+        description = "profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     protected String profileName;
 
-    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-before", description =
+        "notBefore, UTC time of format yyyyMMddHHmmss")
     protected String notBeforeS;
 
-    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-after", description =
+        "notAfter, UTC time of format yyyyMMddHHmmss")
     protected String notAfterS;
 
     @Override
@@ -180,12 +198,13 @@ public class CertActions {
           () -> new CmdFailure("CA " + caName + " not available"));
 
       if (StringUtil.isBlank(subject) == StringUtil.isBlank(csrFile)) {
-        throw new IllegalCmdParamException(
-            "Exactly one of subject (keypair generated by CA) or CSR must be specified.");
+        throw new IllegalCmdParamException("Exactly one of subject " +
+            "(keypair generated by CA) or CSR must be specified.");
       }
 
       if (!StringUtil.orEqualsIgnoreCase(keyOutform, "pem", "p12", "pkcs12")) {
-        throw  new IllegalCmdParamException("invalid key-outform " + keyOutform);
+        throw  new IllegalCmdParamException(
+            "invalid key-outform " + keyOutform);
       }
 
       Instant notBefore = parseDate(notBeforeS);
@@ -193,8 +212,11 @@ public class CertActions {
 
       byte[] certBytes;
       if (StringUtil.isNotBlank(csrFile)) {
-        byte[] encodedCsr = StringUtil.isNotBlank(csrFile) ? X509Util.toDerEncoded(IoUtil.read(csrFile)) : null;
-        certBytes = caManager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter).getEncoded();
+        byte[] encodedCsr = StringUtil.isNotBlank(csrFile)
+            ? X509Util.toDerEncoded(IoUtil.read(csrFile)) : null;
+
+        certBytes = caManager.generateCertificate(caName, profileName,
+            encodedCsr, notBefore, notAfter).getEncoded();
       } else {
         boolean needKeyPwd = true;
         if ("NONE".equalsIgnoreCase(keyPasswordHint)) {
@@ -206,17 +228,20 @@ public class CertActions {
 
         char[] keyPwd = null;
         if (needKeyPwd) {
-          keyPwd = readPasswordIfNotSet("Enter password to protect the private key", keyPasswordHint);
+          keyPwd = readPasswordIfNotSet(
+              "Enter password to protect the private key",
+              keyPasswordHint);
         }
 
-        KeyCertBytesPair keyCertBytesPair =
-            caManager.generateKeyCert(caName, profileName, subject, notBefore, notAfter);
+        KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(
+            caName, profileName, subject, notBefore, notAfter);
 
         certBytes = keyCertBytesPair.getCert();
 
         String ksFilePrefix = outFile.substring(0, outFile.lastIndexOf('.'));
 
-        PrivateKey privKey = BouncyCastleProvider.getPrivateKey(PrivateKeyInfo.getInstance(keyCertBytesPair.getKey()));
+        PrivateKey privKey = KeyUtil.getPrivateKey(
+            PrivateKeyInfo.getInstance(keyCertBytesPair.getKey()));
 
         if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
           CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -236,38 +261,49 @@ public class CertActions {
             ksBytes = os.toByteArray();
           }
 
-          saveVerbose("saved PKCS#12 keystore to file", ksFilePrefix + ".p12", ksBytes);
+          saveVerbose("saved PKCS#12 keystore to file",
+              ksFilePrefix + ".p12", ksBytes);
         } else {
           if (keyPwd == null) {
-            saveVerbose("save unencrypted key to file", ksFilePrefix + "-key.pem",
-                PemEncoder.encode(keyCertBytesPair.getKey(), PemEncoder.PemLabel.PRIVATE_KEY));
+            saveVerbose("save unencrypted key to file",
+                ksFilePrefix + "-key.pem",
+                PemEncoder.encode(keyCertBytesPair.getKey(),
+                    PemEncoder.PemLabel.PRIVATE_KEY));
           } else {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
-                new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
+                new JceOpenSSLPKCS8EncryptorBuilder(
+                    PKCS8Generator.PBE_SHA1_3DES);
             encryptorBuilder.setRandom(securityFactory.getRandom4Sign());
             encryptorBuilder.setPassword(keyPwd);
-            JcaPKCS8Generator gen = new JcaPKCS8Generator(privKey, encryptorBuilder.build());
+
+            JcaPKCS8Generator gen =
+                new JcaPKCS8Generator(privKey, encryptorBuilder.build());
             PemObject obj = gen.generate();
 
-            saveVerbose("save key to file", ksFilePrefix + "-key.pem",
-                PemEncoder.encode(obj.getContent(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
+            saveVerbose("save key to file",
+                ksFilePrefix + "-key.pem",
+                PemEncoder.encode(obj.getContent(),
+                    PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
           }
         }
       }
 
-      saveVerbose("saved certificate to file", outFile, encodeCert(certBytes, outform));
+      saveVerbose("saved certificate to file", outFile,
+          encodeCert(certBytes, outform));
       return null;
     } // method execute0
 
   } // class EnrollCert
 
-  @Command(scope = "ca", name = "enroll-cross-cert", description = "enroll cross certificate")
+  @Command(scope = "ca", name = "enroll-cross-cert", description =
+      "enroll cross certificate")
   @Service
   public static class EnrollCrossCert extends EnrollCert {
 
     @Option(name = "--target-cert", required = true, description =
-            " certificate file, for which the cross certificate will be generated. There shall "
-            + "be no difference in subject and public key between certFile and csrFile.")
+            " certificate file, for which the cross certificate will be " +
+            "generated. There shall be no difference in subject and public " +
+            "key between certFile and csrFile.")
     @Completion(FileCompleter.class)
     private String targetCertFile;
 
@@ -280,11 +316,13 @@ public class CertActions {
       Instant notAfter = parseDate(notAfterS);
 
       byte[] encodedCsr = X509Util.toDerEncoded(IoUtil.read(csrFile));
-      byte[] encodedTargetCert = X509Util.toDerEncoded(IoUtil.read(targetCertFile));
+      byte[] encodedTargetCert = X509Util.toDerEncoded(
+          IoUtil.read(targetCertFile));
 
       X509Cert cert = caManager.generateCrossCertificate(caName, profileName,
           encodedCsr, encodedTargetCert, notBefore, notAfter);
-      saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
+      saveVerbose("saved certificate to file", outFile,
+          encodeCert(cert.getEncoded(), outform));
 
       return null;
     } // method execute0
@@ -295,12 +333,13 @@ public class CertActions {
   @Service
   public static class GenCrl extends CrlAction {
 
-    @Option(name = "--out", aliases = "-o", description = "where to save the CRL")
+    @Option(name = "--out", aliases = "-o", description =
+        "where to save the CRL")
     @Completion(FileCompleter.class)
     protected String outFile;
 
     @Override
-    protected X509CRLHolder retrieveCrl() throws Exception {
+    protected X509Crl retrieveCrl() throws Exception {
       return caManager.generateCrlOnDemand(caName);
     }
 
@@ -319,20 +358,24 @@ public class CertActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
+    @Option(name = "--serial", aliases = "-s", required = true,
+        description = "serial number")
     private String serialNumberS;
 
-    @Option(name = "--outform", description = "output format of the certificate")
+    @Option(name = "--outform", description =
+        "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the certificate")
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String outputFile;
 
     @Override
     protected Object execute0() throws Exception {
-      CertWithRevocationInfo certInfo = caManager.getCert(caName, toBigInt(serialNumberS));
+      CertWithRevocationInfo certInfo = caManager.getCert(caName,
+          toBigInt(serialNumberS));
 
       if (certInfo == null) {
         System.out.println("certificate unknown");
@@ -350,19 +393,23 @@ public class CertActions {
   @Service
   public static class GetCrl extends CrlAction {
 
-    @Option(name = "--with-basecrl", description = "whether to retrieve the baseCRL if the current CRL is a delta CRL")
+    @Option(name = "--with-basecrl", description =
+        "whether to retrieve the baseCRL if the current CRL is a delta CRL")
     private Boolean withBaseCrl = Boolean.FALSE;
 
-    @Option(name = "--basecrl-out", description = "where to save the baseCRL\n(defaults to <out>-baseCRL)")
+    @Option(name = "--basecrl-out", description =
+        "where to save the baseCRL\n" +
+        "(defaults to <out>-baseCRL)")
     @Completion(FileCompleter.class)
     private String baseCrlOut;
 
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
+    @Option(name = "--out", aliases = "-o", required = true,
+        description = "where to save the CRL")
     @Completion(FileCompleter.class)
     protected String outFile;
 
     @Override
-    protected X509CRLHolder retrieveCrl() throws Exception {
+    protected X509Crl retrieveCrl() throws Exception {
       return caManager.getCurrentCrl(caName);
     }
 
@@ -371,7 +418,7 @@ public class CertActions {
       CaEntry ca = Optional.ofNullable(caManager.getCa(caName)).orElseThrow(
           () -> new CmdFailure("CA " + caName + " not available"));
 
-      X509CRLHolder crl;
+      X509Crl crl;
       try {
         crl = retrieveCrl();
       } catch (Exception ex) {
@@ -382,28 +429,33 @@ public class CertActions {
         throw new CmdFailure("received no CRL from server");
       }
 
-      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outFile,
+          encodeCrl(crl.getEncoded(), outform));
 
       if (withBaseCrl) {
         Extensions extns = crl.getExtensions();
-        byte[] extnValue = X509Util.getCoreExtValue(extns, Extension.deltaCRLIndicator);
+        byte[] extnValue = X509Util.getCoreExtValue(extns,
+            OIDs.Extn.deltaCRLIndicator);
         if (extnValue != null) {
           if (baseCrlOut == null) {
             baseCrlOut = outFile + "-baseCRL";
           }
 
-          BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+          BigInteger baseCrlNumber =
+              ASN1Integer.getInstance(extnValue).getPositiveValue();
 
           try {
             crl = caManager.getCrl(caName, baseCrlNumber);
           } catch (Exception ex) {
-            throw new CmdFailure("received no baseCRL from server: " + ex.getMessage());
+            throw new CmdFailure("received no baseCRL from server: "
+                + ex.getMessage());
           }
 
           if (crl == null) {
             throw new CmdFailure("received no baseCRL from server");
           } else {
-            saveVerbose("saved baseCRL to file", baseCrlOut, encodeCrl(crl.getEncoded(), outform));
+            saveVerbose("saved baseCRL to file", baseCrlOut,
+                encodeCrl(crl.getEncoded(), outform));
           }
         }
       }
@@ -418,7 +470,8 @@ public class CertActions {
 
   } // class GetCrl
 
-  @Command(scope = "ca", name = "list-cert", description = "show a list of certificates")
+  @Command(scope = "ca", name = "list-cert", description =
+      "show a list of certificates")
   @Service
   public static class ListCert extends CaAction {
 
@@ -426,18 +479,22 @@ public class CertActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--subject", description = "the subject pattern, * is allowed.")
+    @Option(name = "--subject", description =
+        "the subject pattern, * is allowed.")
     protected String subjectPatternS;
 
-    @Option(name = "--valid-from",
-        description = "start UTC time when the certificate is still valid, in form of yyyyMMdd or yyyyMMddHHmmss")
+    @Option(name = "--valid-from", description =
+        "start UTC time when the certificate is still valid, " +
+        "in form of yyyyMMdd or yyyyMMddHHmmss")
     private String validFromS;
 
-    @Option(name = "--valid-to",
-        description = "end UTC time when the certificate is still valid, in form of yyyMMdd or yyyyMMddHHmmss")
+    @Option(name = "--valid-to", description =
+        "end UTC time when the certificate is still valid, in " +
+        "form of yyyMMdd or yyyyMMddHHmmss")
     private String validToS;
 
-    @Option(name = "-n", description = "maximal number of entries (between 1 and 1000)")
+    @Option(name = "-n", description =
+        "maximal number of entries (between 1 and 1000)")
     private int num = 1000;
 
     @Option(name = "--order", description = "by which the result is ordered")
@@ -446,27 +503,33 @@ public class CertActions {
 
     @Override
     protected Object execute0() throws Exception {
-      X500Name subjectPattern = StringUtil.isBlank(subjectPatternS) ? null : new X500Name(subjectPatternS);
+      X500Name subjectPattern = StringUtil.isBlank(subjectPatternS)
+          ? null : new X500Name(subjectPatternS);
 
       CertListOrderBy orderBy = null;
       if (orderByS != null) {
         orderBy = CertListOrderBy.forValue(orderByS);
         if (orderBy == null) {
-          throw new IllegalCmdParamException("invalid order '" + orderByS + "'");
+          throw new IllegalCmdParamException(
+              "invalid order '" + orderByS + "'");
         }
       }
 
       List<CertListInfo> certInfos =
-          caManager.listCertificates(caName, subjectPattern, parseDate(validFromS), parseDate(validToS), orderBy, num);
+          caManager.listCertificates(caName, subjectPattern,
+          parseDate(validFromS), parseDate(validToS), orderBy, num);
       final int n = certInfos.size();
       if (n == 0) {
         println("found no certificate");
         return null;
       }
 
-      println("     |                    serial                |    notBefore   |    notAfter    |         subject");
-      println("-----+------------------------------------------+----------------+----------------+" +
-          "---------------------------");
+      println(
+          "     |                    serial                |    notBefore   |" +
+          "    notAfter    |         subject");
+      println(
+          "-----+------------------------------------------+----------------+" +
+          "----------------+---------------------------");
       for (int i = 0; i < n; i++) {
         println(format(i + 1, certInfos.get(i)));
       }
@@ -476,8 +539,9 @@ public class CertActions {
 
     private String format(int index, CertListInfo info) {
       return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
-          StringUtil.formatText(info.getSerialNumber().toString(16), 40), " | ",
-          info.getNotBefore(), " | ", info.getNotAfter(), " | ", info.getSubject());
+          StringUtil.formatText(info.getSerialNumber().toString(16), 40),
+          " | ", info.getNotBefore().toString(), " | ",
+          info.getNotAfter().toString(), " | ", info.getSubject());
     } // method format
 
   } // class ListCert
@@ -492,13 +556,16 @@ public class CertActions {
     @Override
     protected Object execute0() throws Exception {
       BigInteger serialNo = getSerialNumber();
-      String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+      String msg = "certificate (serial number = 0x" +
+          serialNo.toString(16) + ")";
+
       if (force || confirm("Do you want to remove " + msg, 3)) {
         try {
           caManager.removeCertificate(caName, serialNo);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg +
+              ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -506,15 +573,18 @@ public class CertActions {
 
   } // class RmCert
 
-  @Command(scope = "ca", name = "revoke-cert", description = "revoke certificate")
+  @Command(scope = "ca", name = "revoke-cert",
+      description = "revoke certificate")
   @Service
   public static class RevokeCert extends UnsuspendRmCertAction {
 
-    @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
+    @Option(name = "--reason", aliases = "-r", required = true,
+        description = "CRL reason")
     @Completion(Completers.ClientCrlReasonCompleter.class)
     private String reason;
 
-    @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--inv-date", description =
+        "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override
@@ -522,36 +592,43 @@ public class CertActions {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-        throw new InvalidConfException("reason " + reason + " is not permitted");
+        throw new InvalidConfException(
+            "reason " + reason + " is not permitted");
       }
 
       BigInteger serialNo = getSerialNumber();
-      String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+      String msg = "certificate (serial number = 0x" +
+          serialNo.toString(16) + ")";
       try {
-        caManager.revokeCertificate(caName, serialNo, crlReason, parseDate(invalidityDateS));
+        caManager.revokeCertificate(caName, serialNo, crlReason,
+            parseDate(invalidityDateS));
         println("revoked " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not revoke " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not revoke " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class RevokeCert
 
-  @Command(scope = "ca", name = "unsuspend-cert", description = "unsuspend certificate")
+  @Command(scope = "ca", name = "unsuspend-cert", description =
+      "unsuspend certificate")
   @Service
   public static class UnsuspendCert extends UnsuspendRmCertAction {
 
     @Override
     protected Object execute0() throws Exception {
       BigInteger serialNo = getSerialNumber();
-      String msg = "certificate (serial number = 0x" + serialNo.toString(16) + ")";
+      String msg = "certificate (serial number = 0x" +
+          serialNo.toString(16) + ")";
       try {
         caManager.unsuspendCertificate(caName, serialNo);
         println("unsuspended " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not unsuspend " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not unsuspend " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -563,12 +640,13 @@ public class CertActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     protected String caName;
 
-    @Option(name = "--cert", aliases = "-c",
-        description = "certificate file\n(either cert or serial must be specified)")
+    @Option(name = "--cert", aliases = "-c", description =
+        "certificate file\n(either cert or serial must be specified)")
     @Completion(FileCompleter.class)
     protected String certFile;
 
-    @Option(name = "--serial", aliases = "-s", description = "serial number\n(either cert or serial must be specified)")
+    @Option(name = "--serial", aliases = "-s", description =
+        "serial number\n(either cert or serial must be specified)")
     private String serialNumberS;
 
     protected BigInteger getSerialNumber() throws Exception  {
@@ -584,11 +662,13 @@ public class CertActions {
         X509Cert caCert = ca.getCert();
         X509Cert cert = X509Util.parseCert(new File(certFile));
         if (!X509Util.issues(caCert, cert)) {
-          throw new CmdFailure("certificate '" + certFile + "' is not issued by CA " + caName);
+          throw new CmdFailure("certificate '" + certFile +
+              "' is not issued by CA " + caName);
         }
         serialNumber = cert.getSerialNumber();
       } else {
-        throw new IllegalCmdParamException("neither serialNumber nor certFile is specified");
+        throw new IllegalCmdParamException(
+            "neither serialNumber nor certFile is specified");
       }
 
       return serialNumber;

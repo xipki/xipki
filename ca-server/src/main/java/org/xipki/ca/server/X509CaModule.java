@@ -1,20 +1,20 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditEvent;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditService;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.Audits;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.audit.AuditEvent;
+import org.xipki.util.extra.audit.AuditLevel;
+import org.xipki.util.extra.audit.AuditService;
+import org.xipki.util.extra.audit.AuditStatus;
+import org.xipki.util.extra.audit.Audits;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,13 +54,15 @@ public abstract class X509CaModule {
     return Audits.getAuditService();
   }
 
-  protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
+  protected AuditEvent newAuditEvent(
+      String eventType, RequestorInfo requestor) {
     Args.notNull(eventType, "eventType");
     AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
     event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
     event.setEventType(eventType);
     if (requestor != null) {
-      event.setEventData(CaAuditConstants.NAME_requestor, requestor.getIdent().getName());
+      event.setEventData(CaAuditConstants.NAME_requestor,
+          requestor.getIdent().getName());
     }
     return event;
   }
@@ -82,7 +84,8 @@ public abstract class X509CaModule {
       Args.notNull(cert, "cert").verify(caCert.getPublicKey());
       return true;
     } catch (Exception ex) {
-      LOG.debug("{} while verifying signature: {}", ex.getClass().getName(), ex.getMessage());
+      LOG.debug("{} while verifying signature: {}",
+          ex.getClass().getName(), ex.getMessage());
       return false;
     }
   } // method verifySignature

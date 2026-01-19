@@ -7,8 +7,11 @@ CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].pem
 if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
 } else {
-  keytype = $1
-  printUsage = "$([rsa ec dsa sm2 ed25519 ed448] contains $keytype)" equals "false"
+  keyspec = $1
+  source xipki/ca-setup/c14n-keyspec.script
+  if { "$sigalg" equals "" } then {
+    printUsage = true
+  }
 }
 
 echo "key type: $keytype"
@@ -16,8 +19,8 @@ echo "key type: $keytype"
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./xipki/ocsp/setup-ocsp-p12.script <key type>"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
+  echo "source file:./xipki/ocsp/setup-ocsp-p12.script <key spec>"
+  source xipki/ca-setup/print-keyspecs.script
 } else {
   echo "#################################################################"
   echo "#                 Generate Key, CSR and Certificate             #"
@@ -28,21 +31,7 @@ if { "$printUsage" equals "true" } then {
   OCSP_FILE_PREFIX = ${OCSP_KEYCERTS_DIR}/ocsp1
   PASSWORD_P12 = $[ocsp.keyPassword]
 
-  if { "$keytype" equals "dsa" } then {
-    xi:dsa-p12 --plen 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "ec" } then {
-    xi:ec-p12 --curve secp256r1 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "rsa" } then {
-    xi:rsa-p12 --key-size 2048 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "sm2" } then {
-    xi:sm2-p12 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "ec" } then {
-    xi:ec-p12 --curve secp256r1 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "ed25519" } then {
-    xi:ec-p12 --curve ed25519 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  } elif { "$keytype" equals "ed448" } then {
-    xi:ec-p12 --curve ed448 --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
-  }
+  xi:keypair-p12 --keyspec ${keyspec} --password ${PASSWORD_P12} --out ${OCSP_FILE_PREFIX}.p12
 
   xi:csr-p12 --password ${PASSWORD_P12} --p12 ${OCSP_FILE_PREFIX}.p12 --out ${OCSP_FILE_PREFIX}.csr \
     --subject "${SUBJECT}"

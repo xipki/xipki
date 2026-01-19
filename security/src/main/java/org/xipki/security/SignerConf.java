@@ -1,13 +1,16 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.misc.CollectionUtil;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
@@ -19,57 +22,186 @@ import java.util.List;
 
 public class SignerConf {
 
+  public static final String name_hash = "hash";
+
+  public static final String name_mode = "mode";
+
+  public static final String name_password = "password";
+
+  public static final String name_keystore = "keystore";
+
+  public static final String name_algo = "algo";
+
+  public static final String name_parallelism = "parallelism";
+
+  // PKCS#11
+  public static final String name_module = "module";
+
+  public static final String name_slot = "slot";
+
+  public static final String name_slotId = "slot-id";
+
+  public static final String name_keyId = "key-id";
+
+  public static final String name_keyLabel = "key-label";
+
   private final ConfPairs confPairs;
 
-  private final HashAlgo hashAlgo;
-
-  private final SignatureAlgoControl signatureAlgoControl;
+  private KemEncapKey kemEncapKey;
 
   private List<X509Cert> peerCertificates;
 
-  public SignerConf(String conf) {
-    this(new ConfPairs(conf));
+  public SignerConf() {
+    this.confPairs = new ConfPairs();
   }
 
   public SignerConf(ConfPairs conf) {
-    this.hashAlgo = null;
-    this.signatureAlgoControl = null;
     this.confPairs = Args.notNull(conf, "conf");
-    if (getConfValue("algo") == null) {
-      throw new IllegalArgumentException("conf must contain the entry 'algo'");
+  }
+
+  public SignerConf(String conf) {
+    this.confPairs = new ConfPairs(Args.notBlank(conf, "conf"));
+  }
+
+  public SignerConf copy() {
+    SignerConf copy = new SignerConf(confPairs);
+    copy.kemEncapKey = kemEncapKey;
+    copy.peerCertificates = peerCertificates;
+    return copy;
+  }
+
+  public SignerConf setHash(HashAlgo hashAlgo) {
+    return putPair(name_hash, hashAlgo.getJceName());
+  }
+
+  public HashAlgo getHash() throws NoSuchAlgorithmException {
+    String str = value(name_algo);
+    return str == null ? null : HashAlgo.getInstance(str);
+  }
+
+  public SignerConf setAlgo(SignAlgo signAlgo) {
+    return putPair(name_algo, signAlgo.getJceName());
+  }
+
+  public SignAlgo getAlgo() throws InvalidConfException {
+    String str = value(name_algo);
+    try {
+      return str == null ? null : SignAlgo.getInstance(str);
+    } catch (NoSuchAlgorithmException e) {
+      throw new InvalidConfException(e);
     }
   }
 
-  public SignerConf(String confWithoutAlgo, SignatureAlgoControl signatureAlgoControl) {
-    this(confWithoutAlgo, null, signatureAlgoControl);
+  public SignerConf setMode(SignAlgoMode mode) {
+    return putPair(name_mode, mode.name());
   }
 
-  public SignerConf(String confWithoutAlgo, HashAlgo hashAlgo, SignatureAlgoControl signatureAlgoControl) {
-    this.hashAlgo = hashAlgo;
-    this.signatureAlgoControl = signatureAlgoControl;
-    this.confPairs = new ConfPairs(Args.notBlank(confWithoutAlgo, "confWithoutAlgo"));
-    if (getConfValue("algo") != null) {
-      throw new IllegalArgumentException("confWithoutAlgo may not contain the entry 'algo'");
+  public SignAlgoMode getMode() throws InvalidConfException {
+    String str = value(name_mode);
+    try {
+      return str == null ? null : SignAlgoMode.getInstance(str);
+    } catch (NoSuchAlgorithmException e) {
+      throw new InvalidConfException(e);
     }
   }
 
-  public HashAlgo getHashAlgo() {
-    return hashAlgo;
+  public SignerConf setPassword(String password) {
+    return putPair(name_password, Args.notBlank(password, "password"));
   }
 
-  public SignatureAlgoControl getSignatureAlgoControl() {
-    return signatureAlgoControl;
+  public String getPassword() {
+    return value(name_password);
   }
 
-  public void putConfEntry(String name, String value) {
+  public SignerConf setKeystore(String keystore) {
+    return putPair(name_keystore,
+        Args.notBlank(keystore, "keystore"));
+  }
+
+  public String getKeystore() {
+    return value(name_keystore);
+  }
+
+  public SignerConf setParallelism(int parallelism) {
+    return putPair(name_parallelism, Integer.toString(
+        Args.positive(parallelism, "parallelism")));
+  }
+
+  public Integer getParallelism() throws InvalidConfException {
+    String str = value(name_parallelism);
+    if (str == null) {
+      return null;
+    }
+
+    int ret;
+    try {
+      ret = Integer.parseInt(str);
+    } catch (NumberFormatException ex) {
+      throw new InvalidConfException("invalid parallelism " + str);
+    }
+
+    if (ret < 1) {
+      throw new InvalidConfException("invalid parallelism " + str);
+    }
+
+    return ret;
+  }
+
+  public SignerConf setModule(String module) {
+    return putPair(name_module, Args.notBlank(module, "module"));
+  }
+
+  public String getModule() {
+    return value(name_module);
+  }
+
+  public SignerConf setSlot(int slot) {
+    return putPair(name_slot, Integer.toString(
+        Args.notNegative(slot, "slot")));
+  }
+
+  public Integer getSlot() {
+    String str = value(name_slot);
+    return str == null ? null : Integer.parseInt(str);
+  }
+
+  public SignerConf setSlotId(long slotId) {
+    return putPair(name_slotId, Long.toString(slotId));
+  }
+
+  public Long getSlotId() {
+    String str = value(name_slotId);
+    return str == null ? null : Long.parseLong(str);
+  }
+
+  public SignerConf setKeyId(byte[] keyId) {
+    return putPair(name_keyId, Hex.encode(keyId));
+  }
+
+  public byte[] getKeyId() {
+    String str = value(name_keyId);
+    return str == null ? null : Hex.decode(str);
+  }
+
+  public SignerConf setKeyLabel(String keyLabel) {
+    return putPair(name_keyLabel, Args.notBlank(keyLabel, "keyLabel"));
+  }
+
+  public String getKeyLabel() {
+    return value(name_keyLabel);
+  }
+
+  public SignerConf putPair(String name, String value) {
     confPairs.putPair(name, value);
+    return this;
   }
 
-  public void removeConfEntry(String name) {
+  public SignerConf removePair(String name) {
     confPairs.removePair(name);
+    return this;
   }
 
-  public String getConfValue(String name) {
+  public String value(String name) {
     return confPairs.value(name);
   }
 
@@ -83,6 +215,14 @@ public class SignerConf {
 
   public void setPeerCertificates(List<X509Cert> peerCertificates) {
     this.peerCertificates = peerCertificates;
+  }
+
+  public KemEncapKey getKemEncapKey() {
+    return kemEncapKey;
+  }
+
+  public void setKemEncapKey(KemEncapKey kemEncapKey) {
+    this.kemEncapKey = kemEncapKey;
   }
 
   @Override
@@ -101,15 +241,8 @@ public class SignerConf {
     StringBuilder sb = new StringBuilder(txtConf.length() + 50);
     sb.append("conf: ");
     sb.append(txtConf);
-    if (hashAlgo != null) {
-      sb.append("\nhash algo: ").append(hashAlgo.getJceName());
-    }
 
-    if (signatureAlgoControl != null) {
-      sb.append("\nsiganture algo control: ").append(signatureAlgoControl);
-    }
-
-    sb.append("\npeerCertificates: ");
+    sb.append("\npeer Certificates: ");
     if (CollectionUtil.isEmpty(peerCertificates)) {
       sb.append("null");
     } else {

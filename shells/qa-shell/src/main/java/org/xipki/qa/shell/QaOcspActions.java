@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.shell;
@@ -36,16 +36,16 @@ import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.RandomUtil;
-import org.xipki.util.ReqRespDebug;
-import org.xipki.util.ReqRespDebug.ReqRespPair;
-import org.xipki.util.StringUtil;
-import org.xipki.util.TripleState;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.misc.RandomUtil;
+import org.xipki.util.extra.misc.ReqRespDebug;
+import org.xipki.util.extra.misc.ReqRespDebug.ReqRespPair;
+import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,30 +75,36 @@ public class QaOcspActions {
   @Command(scope = "xiqa", name = "batch-ocsp-status",
       description = "batch request status of certificates (QA)")
   @Service
-  public static class BatchOcspQaStatusAction extends CommonOcspStatusAction {
+  public static class BatchOcspQaStatusAction
+      extends CommonOcspStatusAction {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BatchOcspQaStatusAction.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(BatchOcspQaStatusAction.class);
 
     private static final String FILE_SEP = File.separator;
 
-    @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
+    @Option(name = "--resp-issuer", description =
+        "certificate file of the responder's issuer")
     @Completion(FileCompleter.class)
     private String respIssuerFile;
 
-    @Option(name = "--url", required = true, description = "OCSP responder URL")
+    @Option(name = "--url", required = true, description =
+        "OCSP responder URL")
     private String serverUrlStr;
 
-    @Option(name = "--sn-file", required = true,
-        description = "file containing the serial number and revocation information"
-            + "\nEach line starts with # for comment or is of following format"
-            + "\nserial-number[,status[,revocation-time]]")
+    @Option(name = "--sn-file", required = true, description =
+        "file containing the serial number and revocation information" +
+        "\nEach line starts with # for comment or is of following format" +
+        "\nserial-number[,status[,revocation-time]]")
     @Completion(FileCompleter.class)
     private String snFile;
 
-    @Option(name = "--hex", description = "serial number without prefix is hex number")
+    @Option(name = "--hex", description =
+        "serial number without prefix is hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--out-dir", required = true, description = "folder to save the request and response")
+    @Option(name = "--out-dir", required = true, description =
+        "folder to save the request and response")
     @Completion(Completers.DirCompleter.class)
     private String outDirStr;
 
@@ -108,23 +114,28 @@ public class QaOcspActions {
     @Option(name = "--save-resp", description = "whether to save the request")
     private Boolean saveResp = Boolean.FALSE;
 
-    @Option(name = "--unknown-as", description = "expected status for unknown certificate")
+    @Option(name = "--unknown-as", description =
+        "expected status for unknown certificate")
     @Completion(QaCompleters.CertStatusCompleter.class)
     private String unknownAs;
 
-    @Option(name = "--no-sig-verify", description = "where to verify the signature")
+    @Option(name = "--no-sig-verify", description =
+        "where to verify the signature")
     private Boolean noSigVerify = Boolean.FALSE;
 
-    @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
+    @Option(name = "--exp-sig-alg", description =
+        "expected signature algorithm")
     @Completion(Completers.SigAlgCompleter.class)
     private String sigAlgo;
 
-    @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
+    @Option(name = "--exp-nextupdate", description =
+        "occurrence of nextUpdate")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = TripleState.optional.name();
 
-    @Option(name = "--exp-certhash", description = "occurrence of certHash, "
-            + "will be set to forbidden for status unknown and issuerUnknown")
+    @Option(name = "--exp-certhash", description =
+        "occurrence of certHash, will be set to forbidden for status " +
+        "unknown and issuerUnknown")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String certhashOccurrenceText = TripleState.optional.name();
 
@@ -150,8 +161,10 @@ public class QaOcspActions {
 
     @Override
     protected final Object execute0() throws Exception {
-      expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
-      expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
+      expectedCerthashOccurrence =
+          TripleState.valueOf(certhashOccurrenceText);
+      expectedNextUpdateOccurrence =
+          TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
 
       File outDir = new File(outDirStr);
@@ -163,9 +176,13 @@ public class QaOcspActions {
 
       println("The result is saved in the folder " + outDir.getPath());
 
-      String linuxIssuer = (respIssuerFile != null) ? "-CAfile ../../responder_issuer.pem" : "-no_cert_verify";
+      String linuxIssuer = (respIssuerFile != null)
+          ? "-CAfile ../../responder_issuer.pem"
+          : "-no_cert_verify";
 
-      String winIssuer = (respIssuerFile != null) ? "-CAfile ..\\..\\responder_issuer.pem" : "-no_cert_verify";
+      String winIssuer = (respIssuerFile != null)
+          ? "-CAfile ..\\..\\responder_issuer.pem"
+          : "-no_cert_verify";
 
       String linuxMsg = "openssl ocsp -text ";
       String winMsg = "openssl ocsp -text ";
@@ -188,8 +205,10 @@ public class QaOcspActions {
 
       if (shellFilePath != null) {
         File linuxShellFile = new File(shellFilePath + ".sh");
-        IoUtil.save(linuxShellFile, StringUtil.toUtf8Bytes("#!/bin/sh\n" + linuxMsg));
-        IoUtil.save(shellFilePath + ".bat", StringUtil.toUtf8Bytes("@echo off\r\n" + winMsg));
+        IoUtil.save(linuxShellFile,
+            StringUtil.toUtf8Bytes("#!/bin/sh\n" + linuxMsg));
+        IoUtil.save(shellFilePath + ".bat",
+            StringUtil.toUtf8Bytes("@echo off\r\n" + winMsg));
         linuxShellFile.setExecutable(true);
       }
 
@@ -204,19 +223,23 @@ public class QaOcspActions {
 
       RequestOptions requestOptions = getRequestOptions();
 
-      IssuerHash issuerHash = new IssuerHash(requestOptions.getHashAlgorithm(), issuerCert);
+      IssuerHash issuerHash = new IssuerHash(
+          requestOptions.getHashAlgorithm(), issuerCert);
 
       int numSucc = 0;
       int numFail = 0;
 
-      try (OutputStream resultOut = Files.newOutputStream(Paths.get(outDir.getPath(), "overview.txt"));
-           BufferedReader snReader = Files.newBufferedReader(Paths.get(snFile))) {
+      try (OutputStream resultOut = Files.newOutputStream(
+              Paths.get(outDir.getPath(), "overview.txt"));
+          BufferedReader snReader =
+              Files.newBufferedReader(Paths.get(snFile))) {
         URL serverUrl = new URL(serverUrlStr);
 
         OcspQa ocspQa = new OcspQa(securityFactory);
 
         // Content of a line:
-        // <hex-encoded serial number>[,<reason code>,<revocation time in epoch seconds>]
+        // <hex-encoded serial number>[,<reason code>,<revocation time in
+        //   epoch seconds>]
         int lineNo = 0;
         String line;
 
@@ -236,8 +259,9 @@ public class QaOcspActions {
           sum++;
           String resultText = lineNo + ": " + line + ": ";
           try {
-            ValidationResult result = processOcspQuery(ocspQa, line, messageDir, detailsDir,
-                serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
+            ValidationResult result = processOcspQuery(ocspQa, line,
+                messageDir, detailsDir, serverUrl, respIssuer, issuerCert,
+                issuerHash, requestOptions);
             if (result.isAllSuccessful()) {
               numSucc++;
               resultText += "valid";
@@ -254,8 +278,11 @@ public class QaOcspActions {
           println(resultText, resultOut);
 
           Instant now = Instant.now();
-          if (Duration.between(lastPrintDate, now).toMillis() > 980) { // use 980 ms to ensure the output every second.
-            String duration = StringUtil.formatTime(Duration.between(startDate, now).getSeconds(), false);
+            // use 980 ms to ensure the output every second.
+          if (Duration.between(lastPrintDate, now).toMillis() > 980) {
+            String duration = StringUtil.formatTime(
+                Duration.between(startDate, now).getSeconds(), false);
+
             print("\rProcessed " + sum + " requests in " + duration);
             lastPrintDate = now;
           }
@@ -267,10 +294,12 @@ public class QaOcspActions {
         bytes[0] = (byte) (0x7F & bytes[0]);
         BigInteger serialNumber = new BigInteger(bytes);
 
-        String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
+        String resultText = lineNo + ": " + serialNumber.toString(16) +
+            ",unknown: ";
         try {
-          ValidationResult result = processOcspQuery(ocspQa, serialNumber, OcspCertStatus.unknown,
-              null, messageDir, detailsDir, serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
+          ValidationResult result = processOcspQuery(ocspQa, serialNumber,
+              OcspCertStatus.unknown, null, messageDir, detailsDir,
+              serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
           if (result.isAllSuccessful()) {
             numSucc++;
             resultText += "valid";
@@ -286,15 +315,18 @@ public class QaOcspActions {
 
         sum++;
 
-        print("\rProcessed " + sum + " requests in "
-            + StringUtil.formatTime(Duration.between(startDate, Instant.now()).getSeconds(), false));
+        print("\rProcessed " + sum + " requests in " + StringUtil.formatTime(
+            Duration.between(startDate, Instant.now()).getSeconds(), false));
         println("");
 
         println(resultText, resultOut);
 
-        String message = StringUtil.concatObjectsCap(200, "=====BEGIN SUMMARY=====",
-            "\n       url: ", serverUrlStr, "\n       sum: ", numFail + numSucc,
-            "\nsuccessful: ", numSucc, "\n    failed: ", numFail, "\n=====END SUMMARY=====");
+        String message = StringUtil.concatObjectsCap(200,
+            "=====BEGIN SUMMARY=====",
+            "\n       url: ", serverUrlStr,
+            "\n       sum: ", numFail + numSucc,
+            "\nsuccessful: ", numSucc, "\n    failed: ",
+            numFail, "\n=====END SUMMARY=====");
         println(message);
         println(message, resultOut);
       }
@@ -303,8 +335,9 @@ public class QaOcspActions {
     } // method execute0
 
     private ValidationResult processOcspQuery(
-        OcspQa ocspQa, String line, File messageDir, File detailsDir, URL serverUrl, X509Cert respIssuer,
-        X509Cert issuerCert, IssuerHash issuerHash, RequestOptions requestOptions)
+        OcspQa ocspQa, String line, File messageDir, File detailsDir,
+        URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
+        IssuerHash issuerHash, RequestOptions requestOptions)
         throws Exception {
       StringTokenizer tokens = new StringTokenizer(line, ",;:");
 
@@ -359,7 +392,8 @@ public class QaOcspActions {
           status = OcspCertStatus.good;
         }
 
-        if (count > 2 && status != OcspCertStatus.good && status != OcspCertStatus.unknown) {
+        if (count > 2 && status != OcspCertStatus.good
+            && status != OcspCertStatus.unknown) {
           revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(tokens.nextToken());
         }
       } catch (Exception ex) {
@@ -367,15 +401,16 @@ public class QaOcspActions {
         throw new IllegalArgumentException("illegal line");
       }
 
-      return processOcspQuery(ocspQa, serialNumber, status, revTime, messageDir, detailsDir,
-          serverUrl, respIssuer, issuerCert, issuerHash, requestOptions);
+      return processOcspQuery(ocspQa, serialNumber, status, revTime,
+          messageDir, detailsDir, serverUrl, respIssuer, issuerCert,
+          issuerHash, requestOptions);
     } // method processOcspQuery
 
     private ValidationResult processOcspQuery(
-        OcspQa ocspQa, BigInteger serialNumber, OcspCertStatus status, Instant revTime,
-        File messageDir, File detailsDir, URL serverUrl, X509Cert respIssuer,
-        X509Cert issuerCert, IssuerHash issuerHash, RequestOptions requestOptions)
-        throws Exception {
+        OcspQa ocspQa, BigInteger serialNumber, OcspCertStatus status,
+        Instant revTime, File messageDir, File detailsDir, URL serverUrl,
+        X509Cert respIssuer, X509Cert issuerCert, IssuerHash issuerHash,
+        RequestOptions requestOptions) throws Exception {
       if (status == OcspCertStatus.unknown) {
         if (isNotBlank(unknownAs)) {
           status = OcspCertStatus.forName(unknownAs);
@@ -389,7 +424,8 @@ public class QaOcspActions {
 
       OCSPResp response;
       try {
-        response = requestor.ask(issuerCert, serialNumber, serverUrl, requestOptions, debug);
+        response = requestor.ask(issuerCert, serialNumber, serverUrl,
+            requestOptions, debug);
       } finally {
         if (debug != null && debug.size() > 0) {
           ReqRespPair reqResp = debug.get(0);
@@ -398,14 +434,16 @@ public class QaOcspActions {
           if (saveReq) {
             byte[] bytes = reqResp.getRequest();
             if (bytes != null) {
-              IoUtil.save(new File(messageDir, filename + FILE_SEP + "request.der"), bytes);
+              IoUtil.save(new File(messageDir,
+                  filename + FILE_SEP + "request.der"), bytes);
             }
           }
 
           if (saveResp) {
             byte[] bytes = reqResp.getResponse();
             if (bytes != null) {
-              IoUtil.save(new File(messageDir, filename + FILE_SEP + "response.der"), bytes);
+              IoUtil.save(new File(messageDir,
+                  filename + FILE_SEP + "response.der"), bytes);
             }
           }
         } // end if
@@ -424,20 +462,23 @@ public class QaOcspActions {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
       }
 
-      ValidationResult ret = ocspQa.checkOcsp(response, issuerHash, serialNumber, null,
-          status, responseOption, revTime, noSigVerify);
+      ValidationResult ret = ocspQa.checkOcsp(response, issuerHash,
+          serialNumber, null, status, responseOption,
+          revTime, noSigVerify);
 
       String validity = ret.isAllSuccessful() ? "valid" : "invalid";
       String hexSerial = serialNumber.toString(16);
       StringBuilder sb = new StringBuilder("OCSP response for ");
-      sb.append(serialNumber).append(" (0x").append(hexSerial).append(") is ").append(validity);
+      sb.append(serialNumber).append(" (0x").append(hexSerial)
+          .append(") is ").append(validity);
 
       for (ValidationIssue issue : ret.getValidationIssues()) {
         sb.append("\n");
         OcspQaStatusAction.format(issue, "    ", sb);
       }
 
-      IoUtil.save(new File(detailsDir, hexSerial + "." + validity), StringUtil.toUtf8Bytes(sb.toString()));
+      IoUtil.save(new File(detailsDir, hexSerial + "." + validity),
+          StringUtil.toUtf8Bytes(sb.toString()));
       return ret;
     } // method processOcspQuery
 
@@ -448,22 +489,27 @@ public class QaOcspActions {
 
   } // class BatchOcspQaStatusAction
 
-  @Command(scope = "xiqa", name = "benchmark-ocsp-status", description = "OCSP benchmark")
+  @Command(scope = "xiqa", name = "benchmark-ocsp-status", description =
+      "OCSP benchmark")
   @Service
-  public static class BenchmarkOcspStatusAction extends CommonOcspStatusAction {
-    @Option(name = "--hex", description = "serial number without prefix is hex number")
+  public static class BenchmarkOcspStatusAction
+      extends CommonOcspStatusAction {
+    @Option(name = "--hex", description =
+        "serial number without prefix is hex number")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--serial", aliases = "-s",
-        description = "comma-separated serial numbers or ranges (like 1,3,6-10)\n"
-            + "(exactly one of serial, serial-file and cert must be specified)")
+    @Option(name = "--serial", aliases = "-s", description =
+        "comma-separated serial numbers or ranges (like 1,3,6-10)\n" +
+        "(exactly one of serial, serial-file and cert must be specified)")
     private String serialNumberList;
 
-    @Option(name = "--serial-file", description = "file that contains serial numbers")
+    @Option(name = "--serial-file", description =
+        "file that contains serial numbers")
     @Completion(FileCompleter.class)
     private String serialNumberFile;
 
-    @Option(name = "--cert", multiValued = true, description = "certificate files")
+    @Option(name = "--cert", multiValued = true, description =
+        "certificate files")
     @Completion(FileCompleter.class)
     private List<String> certFiles;
 
@@ -473,10 +519,12 @@ public class QaOcspActions {
     @Option(name = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
-    @Option(name = "--url", required = true, description = "OCSP responder URL")
+    @Option(name = "--url", required = true, description =
+        "OCSP responder URL")
     private String serverUrl;
 
-    @Option(name = "--max-num", description = "maximal number of OCSP queries\n0 for unlimited")
+    @Option(name = "--max-num", description =
+        "maximal number of OCSP queries\n0 for unlimited")
     private Integer maxRequests = 0;
 
     @Override
@@ -495,17 +543,20 @@ public class QaOcspActions {
       }
 
       if (ii != 1) {
-        throw new IllegalCmdParamException("exactly one of serial, serial-file and cert must be specified");
+        throw new IllegalCmdParamException(
+            "exactly one of serial, serial-file and cert must be specified");
       }
 
       if (numThreads < 1) {
-        throw new IllegalCmdParamException("invalid number of threads " + numThreads);
+        throw new IllegalCmdParamException(
+            "invalid number of threads " + numThreads);
       }
 
       Iterator<BigInteger> serialNumberIterator;
 
       if (serialNumberFile != null) {
-        serialNumberIterator = new FileBigIntegerIterator(IoUtil.expandFilepath(serialNumberFile), hex, true);
+        serialNumberIterator = new FileBigIntegerIterator(
+            IoUtil.expandFilepath(serialNumberFile), hex, true);
       } else {
         List<BigIntegerRange> serialNumbers = new LinkedList<>();
         if (serialNumberList != null) {
@@ -514,7 +565,8 @@ public class QaOcspActions {
             String token = st.nextToken();
             StringTokenizer st2 = new StringTokenizer(token, "-");
             BigInteger from = toBigInt(st2.nextToken(), hex);
-            BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : from;
+            BigInteger to = st2.hasMoreTokens()
+                ? toBigInt(st2.nextToken(), hex) : from;
             serialNumbers.add(new BigIntegerRange(from, to));
           }
         } else {
@@ -523,7 +575,8 @@ public class QaOcspActions {
             try {
               cert = X509Util.parseCert(new File(certFile));
             } catch (Exception ex) {
-              throw new IllegalCmdParamException("invalid certificate file  '" + certFile + "'", ex);
+              throw new IllegalCmdParamException(
+                  "invalid certificate file  '" + certFile + "'", ex);
             }
             BigInteger serial = cert.getSerialNumber();
             serialNumbers.add(new BigIntegerRange(serial, serial));
@@ -534,14 +587,15 @@ public class QaOcspActions {
       }
 
       try {
-        String description = StringUtil.concatObjects("issuer cert: ", issuerCertFile,
-            "\nserver URL: ",serverUrl, "\nmaxRequest: ", maxRequests, "\nhash: ", hashAlgo);
+        String description = StringUtil.concatObjects("issuer cert: ",
+            issuerCertFile, "\nserver URL: ",serverUrl,
+            "\nmaxRequest: ", maxRequests, "\nhash: ", hashAlgo);
 
         X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
 
         RequestOptions options = getRequestOptions();
-        OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl, options,
-            serialNumberIterator, maxRequests, description);
+        OcspBenchmark loadTest = new OcspBenchmark(issuerCert, serverUrl,
+            options, serialNumberIterator, maxRequests, description);
         loadTest.setDuration(duration).setThreads(numThreads).execute();
       } finally {
         if (serialNumberIterator instanceof FileBigIntegerIterator) {
@@ -554,7 +608,8 @@ public class QaOcspActions {
 
   } // class BenchmarkOcspStatusAction
 
-  @Command(scope = "xiqa", name = "qa-ocsp-status", description = "request certificate status (QA)")
+  @Command(scope = "xiqa", name = "qa-ocsp-status", description =
+      "request certificate status (QA)")
   @Service
   public static class OcspQaStatusAction extends BaseOcspStatusAction {
 
@@ -562,30 +617,37 @@ public class QaOcspActions {
     @Completion(QaCompleters.OcspErrorCompleter.class)
     private String errorText;
 
-    @Option(name = "--exp-status", multiValued = true, description = "expected status")
+    @Option(name = "--exp-status", multiValued = true, description =
+        "expected status")
     @Completion(QaCompleters.CertStatusCompleter.class)
     private List<String> statusTexts;
 
-    @Option(name = "--rev-time", multiValued = true, description = "revocation time, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--rev-time", multiValued = true, description =
+        "revocation time, UTC time of format yyyyMMddHHmmss")
     private List<String> revTimeTexts;
 
-    @Option(name = "--exp-sig-alg", description = "expected signature algorithm")
+    @Option(name = "--exp-sig-alg", description =
+        "expected signature algorithm")
     @Completion(Completers.SigAlgCompleter.class)
     private String sigAlgo;
 
-    @Option(name = "--no-sig-verify", description = "no verification of the signature")
+    @Option(name = "--no-sig-verify", description =
+        "no verification of the signature")
     private Boolean noSigVerify = Boolean.FALSE;
 
-    @Option(name = "--exp-nextupdate", description = "occurrence of nextUpdate")
+    @Option(name = "--exp-nextupdate", description =
+        "occurrence of nextUpdate")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nextUpdateOccurrenceText = TripleState.optional.name();
 
-    @Option(name = "--exp-certhash", description = "occurrence of certHash, "
-            + "will be set to forbidden for status unknown and issuerUnknown")
+    @Option(name = "--exp-certhash", description =
+        "occurrence of certHash, will be set to forbidden for status " +
+            "unknown and issuerUnknown")
     @Completion(QaCompleters.OccurrenceCompleter.class)
     private String certhashOccurrenceText = TripleState.optional.name();
 
-    @Option(name = "--exp-certhash-alg", description = "occurrence of certHash")
+    @Option(name = "--exp-certhash-alg", description =
+        "occurrence of certHash")
     @Completion(Completers.HashAlgCompleter.class)
     private String certhashAlg;
 
@@ -612,16 +674,19 @@ public class QaOcspActions {
 
     @Override
     protected void checkParameters(
-        X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+        X509Cert respIssuer, List<BigInteger> serialNumbers,
+        Map<BigInteger, byte[]> encodedCerts)
         throws Exception {
       Args.notEmpty(serialNumbers, "serialNunmbers");
 
       if (isBlank(errorText) && isEmpty(statusTexts)) {
-        throw new IllegalArgumentException("neither expError nor expStatus is set, this is not permitted");
+        throw new IllegalArgumentException(
+            "neither expError nor expStatus is set, this is not permitted");
       }
 
       if (isNotBlank(errorText) && isNotEmpty(statusTexts)) {
-        throw new IllegalArgumentException("both expError and expStatus are set, this is not permitted");
+        throw new IllegalArgumentException(
+            "both expError and expStatus are set, this is not permitted");
       }
 
       if (isNotBlank(errorText)) {
@@ -631,7 +696,8 @@ public class QaOcspActions {
       if (isNotEmpty(statusTexts)) {
         if (statusTexts.size() != serialNumbers.size()) {
           throw new IllegalArgumentException("number of expStatus is invalid: "
-              + (statusTexts.size()) + ", it should be " + serialNumbers.size());
+              + (statusTexts.size()) + ", it should be "
+              + serialNumbers.size());
         }
 
         expectedStatuses = new HashMap<>();
@@ -639,7 +705,8 @@ public class QaOcspActions {
 
         for (int i = 0; i < n; i++) {
           String expectedStatusText = statusTexts.get(i);
-          OcspCertStatus certStatus = OcspCertStatus.forName(expectedStatusText);
+          OcspCertStatus certStatus =
+              OcspCertStatus.forName(expectedStatusText);
           expectedStatuses.put(serialNumbers.get(i), certStatus);
         }
       }
@@ -647,20 +714,23 @@ public class QaOcspActions {
       if (isNotEmpty(revTimeTexts)) {
         if (revTimeTexts.size() != serialNumbers.size()) {
           throw new IllegalArgumentException("number of revTimes is invalid: "
-              + (revTimeTexts.size()) + ", it should be " + serialNumbers.size());
+              + (revTimeTexts.size()) + ", it should be "
+              + serialNumbers.size());
         }
 
         expectedRevTimes = new HashMap<>();
         final int n = serialNumbers.size();
 
         for (int i = 0; i < n; i++) {
-          Instant revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(revTimeTexts.get(i));
+          Instant revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(
+              revTimeTexts.get(i));
           expectedRevTimes.put(serialNumbers.get(i), revTime);
         }
       }
 
       expectedCerthashOccurrence = TripleState.valueOf(certhashOccurrenceText);
-      expectedNextUpdateOccurrence = TripleState.valueOf(nextUpdateOccurrenceText);
+      expectedNextUpdateOccurrence =
+          TripleState.valueOf(nextUpdateOccurrenceText);
       expectedNonceOccurrence = TripleState.valueOf(nonceOccurrenceText);
     } // method checkParameters
 
@@ -690,12 +760,14 @@ public class QaOcspActions {
       if (expectedOcspError != null) {
         result = ocspQa.checkOcsp(response, expectedOcspError);
       } else {
-        result = ocspQa.checkOcsp(response, issuerHash, serialNumbers, encodedCerts,
-                    expectedStatuses, expectedRevTimes, responseOption, noSigVerify);
+        result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
+            encodedCerts, expectedStatuses, expectedRevTimes,
+            responseOption, noSigVerify);
       }
 
       StringBuilder sb = new StringBuilder(50);
-      sb.append("OCSP response is ").append(result.isAllSuccessful() ? "valid" : "invalid");
+      sb.append("OCSP response is ").append(result.isAllSuccessful()
+          ? "valid" : "invalid");
 
       if (verbose) {
         for (ValidationIssue issue : result.getValidationIssues()) {
@@ -718,7 +790,8 @@ public class QaOcspActions {
     } // method processResponse
 
     static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
-      sb.append(prefix).append(issue.getCode()).append(", ").append(issue.getDescription());
+      sb.append(prefix).append(issue.getCode()).append(", ")
+          .append(issue.getDescription());
       sb.append(", ").append(issue.isFailed() ? "failed" : "successful");
       if (issue.getFailureMessage() != null) {
         sb.append(", ").append(issue.getFailureMessage());

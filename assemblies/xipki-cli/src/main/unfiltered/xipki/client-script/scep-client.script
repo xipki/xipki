@@ -33,21 +33,21 @@ echo "=====SCEP: Enroll (self-signed identity cert) ====="
 CN = scep-smime-${CUR_TIME}
 
 # Must use the same CN as in the CSR
-xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
-  --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}"
+xi:keypair-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12"
 
 xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-    -challenge-password user1:password1 \
-    -out ${OUT_DIR}/${CN}.csr
+    --challenge-password user1:password1 \
+    --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}" \
+    --out ${OUT_DIR}/${CN}.csr
 
 echo "# Enroll certificate via PKCSReq"
 xi:scep-enroll --method pkcs --url ${SMIME_URL} --ca-cert ${CACERT} \
-    -p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-    -csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
+    --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+    --csr ${OUT_DIR}/${CN}.csr --out ${OUT_DIR}/${CN}.der
 
 echo "# Update the certificate in PKCS#12 file"
 xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
-    -cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
+    --cert ${OUT_DIR}/${CN}.der --ca-cert ${CACERT}
 
 # Enroll certificate of profile tls
 
@@ -56,8 +56,7 @@ echo "=====SCEP: Enroll (self-signed identity cert) ====="
 CN = scep-tls-${CUR_TIME}
 
 # Must use the same CN as in the CSR
-xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12" \
-    -subject "C=DE,O=myorg,CN=${CN}.myorg.org"
+xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out "${OUT_DIR}/${CN}.p12"
 
 xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
   --challenge-password user1:password1 \
@@ -90,7 +89,7 @@ xi:scep-get-crl --url ${URL} --ca-cert ${CACERT} --cert ${OUT_DIR}/${CN}.der \
   --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT --out ${OUT_DIR}/scep.crl
 
 echo "# Renewal"
-xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-2.p12" --subject "CN=dummy"
+xi:keypair-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-2.p12"
 
 xi:csr-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-2.myorg.org" --out ${OUT_DIR}/${CN}-2.csr
@@ -105,7 +104,7 @@ xi:update-cert-p12 --p12 ${OUT_DIR}/${CN}-2.p12 --password CHANGEIT \
   --cert ${OUT_DIR}/${CN}-2.der --ca-cert ${CACERT}
 
 echo "# Renewal with different CommonName"
-xi:rsa-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-3.p12" --subject "CN=dummy"
+xi:keypair-p12 --password CHANGEIT --out "${OUT_DIR}/${CN}-3.p12"
 
 xi:csr-p12 --p12 ${OUT_DIR}/${CN}-3.p12 --password CHANGEIT \
   --subject "C=DE,O=myorg,CN=${CN}-3.myorg.org" --out ${OUT_DIR}/${CN}-3.csr

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.servlet</groupId>
     <artifactId>servlet-parent</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>ca-servlet</artifactId>
   <packaging>war</packaging>
@@ -16,7 +16,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.servlet</groupId>
       <artifactId>servlet-common</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -27,14 +27,19 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>audit-extra</artifactId>
+      <artifactId>certprofile-xijson</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>certprofile-xijson</artifactId>
+      <artifactId>xihsm</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j2-impl</artifactId>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

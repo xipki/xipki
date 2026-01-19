@@ -136,21 +136,13 @@ Security Commands
 
      deobfuscate password
 
-   * `xi:dsa-p11`
+   * `xi:keypair-p11`
 
-     generate DSA keypair in PKCS#11 device
+     generate keypair in PKCS#11 device
 
-   * `xi:dsa-p12`
+   * `xi:keypair-p12`
 
-     generate RSA keypair in PKCS#12 keystore
-
-   * `xi:ec-p11`
-
-     generate EC keypair in PKCS#11 device
-
-   * `xi:ec-p12`
-
-     generate EC keypair in PKCS#12 keystore
+     generate keypair in PKCS#12 keystore
 
    * `xi:export-cert-p12`
 
@@ -192,14 +184,6 @@ Security Commands
 
      export PKCS#12 key store, like the 'openssl pkcs12' command
 
-   * `xi:rsa-p11`
-
-     generate RSA keypair in PKCS#11 device
-
-   * `xi:rsa-p12`
-
-     generate RSA keypair in PKCS#12 keystore
-
    * `xi:secretkey-p11`
 
      generate secret key in PKCS#11 device
@@ -207,14 +191,6 @@ Security Commands
    * `xi:secretkey-p12`
 
      generate secret key in JCEKS (not PKCS#12) keystore
-
-   * `xi:sm2-p11`
-
-     generate SM2 keypair in PKCS#11 device
-
-   * `xi:sm2-p12`
-
-     generate SM2 keypair in PKCS#12 keystore
 
    * `xi:token-info-p11`
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -9,11 +9,10 @@ import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
-import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.entry.CaConfColumn;
+import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -23,28 +22,29 @@ import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
-import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.exception.OperationException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.DateUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.FileOrValue;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,9 +70,11 @@ import java.util.Set;
  */
 public class FileCaConfStore implements CaConfStore {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FileCaConfStore.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(FileCaConfStore.class);
 
-  private static final CaMgmtException readOnlyException = new CaMgmtException("File based CaConfStore is read-only");
+  private static final CaMgmtException readOnlyException =
+      new CaMgmtException("File based CaConfStore is read-only");
 
   private static final int REQUESTOR_BY_CA_ID = 1;
 
@@ -94,7 +96,8 @@ public class FileCaConfStore implements CaConfStore {
 
   private final Map<String, CaEntry> caTable = new HashMap<>();
 
-  private final Map<String, CertprofileEntry> certprofileTable = new HashMap<>();
+  private final Map<String, CertprofileEntry> certprofileTable =
+      new HashMap<>();
 
   private final Map<String, PublisherEntry> publisherTable = new HashMap<>();
 
@@ -122,9 +125,7 @@ public class FileCaConfStore implements CaConfStore {
                          CertprofileFactoryRegister certprofileFactoryRegister,
                          List<String> confFiles)
       throws IOException, CaMgmtException, InvalidConfException {
-    if (confFiles == null || confFiles.isEmpty()) {
-      throw new IllegalArgumentException("confFile shall not be empty");
-    }
+    Args.notEmpty(confFiles, "confFiles");
 
     String baseDir = null;
     for (String confFile : confFiles) {
@@ -132,8 +133,9 @@ public class FileCaConfStore implements CaConfStore {
       if (baseDir == null) {
         baseDir = fileobj.getParent();
       } else {
-        if (!CompareUtil.equalsObject(baseDir, fileobj.getParent())) {
-          throw new IllegalArgumentException("Not all confFiles have the same parent dir");
+        if (!CompareUtil.equals(baseDir, fileobj.getParent())) {
+          throw new IllegalArgumentException(
+              "Not all confFiles have the same parent dir");
         }
       }
     }
@@ -145,25 +147,31 @@ public class FileCaConfStore implements CaConfStore {
     CaConfType.CaSystem root = mergeConfs(confFiles);
 
     //-- make sure all names, IDs are unique
-    Map<String, Integer> profileNameIdMap = assertNameIdUnique(root.getProfiles(), "profile");
+    Map<String, Integer> profileNameIdMap =
+        assertNameIdUnique(root.getProfiles(), "profile");
     profileNames = List.copyOf(profileNameIdMap.keySet());
 
-    Map<String, Integer> publisherNameIdMap = assertNameIdUnique(root.getPublishers(), "publisher");
+    Map<String, Integer> publisherNameIdMap =
+        assertNameIdUnique(root.getPublishers(), "publisher");
     publisherNames = List.copyOf(publisherNameIdMap.keySet());
 
-    signerNames = Collections.unmodifiableList(assertNameUnique(root.getSigners(), "signer"));
+    signerNames = Collections.unmodifiableList(
+        assertNameUnique(root.getSigners(), "signer"));
 
-    Map<String, Integer> requestorNameIdMap = assertNameIdUnique(root.getRequestors(), "requestor");
+    Map<String, Integer> requestorNameIdMap =
+        assertNameIdUnique(root.getRequestors(), "requestor");
     if (requestorNameIdMap.containsKey(RequestorInfo.NAME_BY_CA)) {
       throw new InvalidConfException(
-          "requestor name " + RequestorInfo.NAME_BY_CA + " is reserved and shall no be used");
+          "requestor name " + RequestorInfo.NAME_BY_CA +
+              " is reserved and shall no be used");
     }
     requestorNameIdMap.put(RequestorInfo.NAME_BY_CA, REQUESTOR_BY_CA_ID);
 
     this.requestorNames = List.copyOf(requestorNameIdMap.keySet());
     this.requestorNameToIdMap = Collections.unmodifiableMap(requestorNameIdMap);
 
-    keyPairGenNames = Collections.unmodifiableList(assertNameUnique(root.getKeypairGens(), "keypairGen"));
+    keyPairGenNames = Collections.unmodifiableList(
+        assertNameUnique(root.getKeypairGens(), "keypairGen"));
 
     Map<String, Integer> caNameIdMap = assertNameIdUnique(root.getCas(), "CA");
     caNames = List.copyOf(caNameIdMap.keySet());
@@ -171,11 +179,13 @@ public class FileCaConfStore implements CaConfStore {
     //-- make sure the requestor does not have reserved id
     for (CaConfType.Requestor m : root.getRequestors()) {
       if (m.getId() == REQUESTOR_BY_CA_ID) {
-        throw new InvalidConfException("requestor id " + m.getId() + " is reserved and shall not be used");
+        throw new InvalidConfException("requestor id " + m.getId()
+            + " is reserved and shall not be used");
       }
     }
 
-    //-- make sure all referenced names (e.g. signer, requestor, publisher) are present.
+    //-- make sure all referenced names (e.g. signer, requestor, publisher)
+    // are present.
     Map<String, Integer> caAliasNameIdMap = new HashMap<>();
     for (CaConfType.Ca ca : root.getCas()) {
       // aliases
@@ -196,7 +206,8 @@ public class FileCaConfStore implements CaConfStore {
       // requestor
       for (CaConfType.CaHasRequestor m : ca.getRequestors()) {
         if (!requestorNameIdMap.containsKey(m.getRequestorName())) {
-          throw new InvalidConfException("unknown requestor " + m.getRequestorName());
+          throw new InvalidConfException("unknown requestor " +
+              m.getRequestorName());
         }
       }
 
@@ -205,13 +216,15 @@ public class FileCaConfStore implements CaConfStore {
       for (String profile : ca.getProfiles()) {
         CaProfileEntry entry = CaProfileEntry.decode(profile);
         if (!profileNameIdMap.containsKey(entry.getProfileName())) {
-          throw new InvalidConfException("unknown certprofile " + entry.getProfileName());
+          throw new InvalidConfException("unknown certprofile " +
+              entry.getProfileName());
         }
 
         localProfileNames.add(entry.getProfileName());
         for (String alias : entry.getProfileAliases()) {
           if (localProfileNames.contains(alias)) {
-            throw new InvalidConfException("duplicated cerprofile alias " + alias);
+            throw new InvalidConfException(
+                "duplicated cerprofile alias " + alias);
           }
           localProfileNames.add(alias);
         }
@@ -220,13 +233,14 @@ public class FileCaConfStore implements CaConfStore {
       CaConfType.CaInfo caInfo = ca.getCaInfo();
       if (caInfo != null) {
         // CRL signner
-        String tname = caInfo.getCrlSignerName();
+        BaseCaInfo base = caInfo.getBase();
+        String tname = base.getCrlSignerName();
         if (tname != null && !signerNames.contains(tname)) {
           throw new InvalidConfException("unknown signer " + tname);
         }
 
-        if (caInfo.getKeypairGenNames() != null) {
-          for (String m : caInfo.getKeypairGenNames()) {
+        if (base.getKeypairGenNames() != null) {
+          for (String m : base.getKeypairGenNames()) {
             if (!keyPairGenNames.contains(m)) {
               throw new InvalidConfException("unknown keypairGen " + m);
             }
@@ -256,7 +270,8 @@ public class FileCaConfStore implements CaConfStore {
       String name = m.getName();
       try {
         SignerEntry entry = new SignerEntry(name, m.getType(),
-            getValue(m.getConf(), baseDir), getBase64Value(m.getCert(), baseDir));
+            getValue(m.getConf(), baseDir), getBase64Value(m.getCert(),
+            baseDir));
         signerTable.put(name, entry);
         LOG.info("initialized signer {}", name);
       } catch (Exception ex) {
@@ -289,7 +304,8 @@ public class FileCaConfStore implements CaConfStore {
         requestorTable.put(ident.getName(), entry);
         LOG.info("initialized requestor {}", ident);
       } catch (Exception ex) {
-        throw new InvalidConfException("error initializing requestor " + ident, ex);
+        throw new InvalidConfException("error initializing requestor " + ident,
+            ex);
       }
     }
 
@@ -297,11 +313,14 @@ public class FileCaConfStore implements CaConfStore {
     for (CaConfType.NameTypeConf m : root.getPublishers()) {
       NameId ident = new NameId(m.getId(), m.getName());
       try {
-        PublisherEntry entry = new PublisherEntry(ident, m.getType(), getValue(m.getConf(), baseDir));
+        PublisherEntry entry = new PublisherEntry(ident, m.getType(),
+            getValue(m.getConf(), baseDir));
+
         publisherTable.put(ident.getName(), entry);
         LOG.info("initialized publisher {}", ident);
       } catch (Exception ex) {
-        throw new InvalidConfException("error initializing publisher " + ident, ex);
+        throw new InvalidConfException(
+            "error initializing publisher " + ident, ex);
       }
     }
 
@@ -309,11 +328,14 @@ public class FileCaConfStore implements CaConfStore {
     for (CaConfType.NameTypeConf m : root.getKeypairGens()) {
       String name = m.getName();
       try {
-        KeypairGenEntry entry = new KeypairGenEntry(name, m.getType(), getValue(m.getConf(), baseDir));
+        KeypairGenEntry entry = new KeypairGenEntry(name, m.getType(),
+            getValue(m.getConf(), baseDir));
+
         keypairGenTable.put(name, entry);
         LOG.info("initialized KeyPairGen {}", name);
       } catch (RuntimeException ex) {
-        throw new InvalidConfException("error initializing KeyPairGen " + name, ex);
+        throw new InvalidConfException("error initializing KeyPairGen " + name,
+            ex);
       }
     }
 
@@ -321,11 +343,14 @@ public class FileCaConfStore implements CaConfStore {
     for (CaConfType.NameTypeConf m : root.getProfiles()) {
       NameId ident = new NameId(m.getId(), m.getName());
       try {
-        CertprofileEntry entry = new CertprofileEntry(ident, m.getType(), getValue(m.getConf(), baseDir));
+        CertprofileEntry entry = new CertprofileEntry(ident, m.getType(),
+            getValue(m.getConf(), baseDir));
+
         certprofileTable.put(ident.getName(), entry);
         LOG.info("initialized certprofile {}", ident);
       } catch (RuntimeException ex) {
-        throw new InvalidConfException("error initializing certprofile " + ident, ex);
+        throw new InvalidConfException(
+            "error initializing certprofile " + ident, ex);
       }
     }
 
@@ -340,7 +365,8 @@ public class FileCaConfStore implements CaConfStore {
         String caName = m.getName();
         NameId ident = new NameId(m.getId(), caName);
         try {
-          CaEntry entry = buildCaEntry(m, baseDir, certprofileFactoryRegister, securityFactory);
+          CaEntry entry = buildCaEntry(m, baseDir, certprofileFactoryRegister,
+                            securityFactory);
           caTable.put(caName, entry);
           LOG.info("initialized CA {}", ident);
         } catch (Exception ex) {
@@ -366,12 +392,17 @@ public class FileCaConfStore implements CaConfStore {
             try {
               CaProfileEntry entry0 = CaProfileEntry.decode(combinedProfile);
               String profileName = entry0.getProfileName();
-              CertprofileEntry certprofileEntry = certprofileTable.get(profileName);
+              CertprofileEntry certprofileEntry =
+                  certprofileTable.get(profileName);
+
               CaProfileIdAliases entry = new CaProfileIdAliases(
-                  certprofileEntry.getIdent().getId(), entry0.getEncodedAliases());
+                  certprofileEntry.getIdent().getId(),
+                  entry0.getEncodedAliases());
+
               set.add(entry);
             } catch (Exception ex) {
-              throw new CaMgmtException("invalid syntax of CaProfileEntry '" + combinedProfile + "'", ex);
+              throw new CaMgmtException("invalid syntax of CaProfileEntry '"
+                  + combinedProfile + "'", ex);
             }
           }
           caHasProfileMap.put(caName, set);
@@ -382,11 +413,10 @@ public class FileCaConfStore implements CaConfStore {
           Set<CaHasRequestorEntry> set = new HashSet<>();
           for (CaConfType.CaHasRequestor c : m.getRequestors()) {
             RequestorEntry entry0 = requestorTable.get(c.getRequestorName());
-            CaHasRequestorEntry entry = new CaHasRequestorEntry(entry0.getIdent());
-            entry.setPermissions(c.getPermissions());
-            entry.setProfiles(c.getProfiles() == null
-                ? Collections.emptySet() : new HashSet<>(c.getProfiles()));
-            set.add(entry);
+            set.add(new CaHasRequestorEntry(
+                entry0.getIdent(), c.getPermissions(),
+                c.getProfiles() == null ? Collections.emptyList()
+                    : c.getProfiles()));
           }
           caHasRequestorMap.put(caName, set);
         }
@@ -422,7 +452,8 @@ public class FileCaConfStore implements CaConfStore {
 
     boolean saveCertOrKey = false;
     for (CaConfType.Ca ca : root.getCas()) {
-      if (ca.getCaInfo().isSaveCert() || ca.getCaInfo().isSaveKeypair()) {
+      BaseCaInfo base = ca.getCaInfo().getBase();
+      if (base.isSaveCert() || base.isSaveKeypair()) {
         saveCertOrKey = true;
         break;
       }
@@ -431,26 +462,30 @@ public class FileCaConfStore implements CaConfStore {
     this.needsCertStore = saveCertOrKey;
   }
 
-  private CaEntry buildCaEntry(CaConfType.Ca ca, String baseDir,
-                               CertprofileFactoryRegister certprofileFactoryRegister,
-                               SecurityFactory securityFactory)
+  private CaEntry buildCaEntry(
+      CaConfType.Ca ca, String baseDir,
+      CertprofileFactoryRegister certprofileFactoryRegister,
+      SecurityFactory securityFactory)
       throws InvalidConfException, IOException, CaMgmtException {
     NameId ident = new NameId(ca.getId(), ca.getName());
     CaConfType.CaInfo ci = ca.getCaInfo();
 
     if (ci.getGenSelfIssued() != null) {
       if (ci.getCert() != null) {
-        throw new InvalidConfException("cert.file of CA " + ident + " may not be set");
+        throw new InvalidConfException(
+            "cert.file of CA " + ident + " may not be set");
       }
 
       // check if the certificate has been generated before.
-      File certFile = new File(baseDir, "generated-rootcerts/" + ident.getName() + ".pem");
+      File certFile = new File(baseDir,
+          "generated-rootcerts/" + ident.getName() + ".pem");
       X509Cert cert;
       if (certFile.exists()) {
         try {
           cert = X509Util.parseCert(certFile);
         } catch (CertificateException e) {
-          throw new CaMgmtException("error parsing certificate " + certFile.getPath());
+          throw new CaMgmtException("error parsing certificate " +
+              certFile.getPath());
         }
       } else {
         CaConfType.GenSelfIssued gsi = ci.getGenSelfIssued();
@@ -458,43 +493,51 @@ public class FileCaConfStore implements CaConfStore {
             : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotBefore());
         Instant notAfter = gsi.getNotAfter() == null ? null
             : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotAfter());
-        CaConf.GenSelfIssued genSelfIssued =
-            new CaConf.GenSelfIssued(gsi.getProfile(), gsi.getSubject(), gsi.getSerialNumber(), notBefore, notAfter);
+        CaConf.GenSelfIssued genSelfIssued = new CaConf.GenSelfIssued(
+            gsi.getProfile(), gsi.getSubject(), gsi.getSerialNumber(),
+            notBefore, notAfter);
 
         IdentifiedCertprofile certprofile;
         try {
-          CertprofileEntry certprofileConfEntry = certprofileTable.get(gsi.getProfile());
-          Certprofile certprofile0 = certprofileFactoryRegister.newCertprofile(certprofileConfEntry.getType());
+          CertprofileEntry certprofileConfEntry =
+              certprofileTable.get(gsi.getProfile());
+          Certprofile certprofile0 = certprofileFactoryRegister.newCertprofile(
+              certprofileConfEntry.getType());
+
           certprofile0.initialize(certprofileConfEntry.getConf());
-          certprofile = new IdentifiedCertprofile(certprofileConfEntry, certprofile0);
-        } catch (ObjectCreationException | CertprofileException | RuntimeException ex) {
-          throw new CaMgmtException("error initializing certprofile " + gsi.getProfile());
+          certprofile = new IdentifiedCertprofile(certprofileConfEntry,
+                        certprofile0);
+        } catch (ObjectCreationException | CertprofileException
+                 | RuntimeException ex) {
+          throw new CaMgmtException("error initializing certprofile " +
+              gsi.getProfile());
         }
 
         String signerConf = getValue(ci.getSignerConf(), baseDir);
 
         try {
           cert = SelfSignedCertBuilder.generateSelfSigned(securityFactory,
-              ci.getSignerType(), signerConf, certprofile, genSelfIssued.getSubject(),
-              genSelfIssued.getSerialNumber(), genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
+              ci.getBase().getSignerType(), signerConf, certprofile,
+              genSelfIssued.getSubject(), genSelfIssued.getSerialNumber(),
+              genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
         } catch (OperationException ex) {
-          throw new CaMgmtException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+          throw new CaMgmtException(
+              ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         // save the binary, and replace the configuration file.
-        IoUtil.save(certFile, X509Util.toPemCert(cert).getBytes(StandardCharsets.UTF_8));
+        IoUtil.save(certFile,
+            X509Util.toPemCert(cert).getBytes(StandardCharsets.UTF_8));
       }
 
       ci.setCert(FileOrBinary.ofBinary(cert.getEncoded()));
     }
 
-    CaEntry caEntry = new CaEntry(ident);
-    ci.copyBaseInfoTo(caEntry);
+    CaEntry caEntry = new CaEntry(ci.getBase(), ident,
+        getValue(ci.getSignerConf(), baseDir));
 
-    caEntry.setSignerConf(getValue(ci.getSignerConf(), baseDir));
-
-    if (caEntry.getCaUris() == null) {
-      caEntry.setCaUris(CaUris.EMPTY_INSTANCE);
+    if (caEntry.getBase().getCaUris() == null) {
+      caEntry.getBase().setCaUris(CaUris.EMPTY_INSTANCE);
     }
 
     X509Cert caCert;
@@ -504,20 +547,26 @@ public class FileCaConfStore implements CaConfStore {
       try {
         caCert = X509Util.parseCert(bytes);
       } catch (CertificateException ex) {
-        throw new InvalidConfException("invalid certificate of CA " + ident, ex);
+        throw new InvalidConfException("invalid certificate of CA " + ident,
+            ex);
       }
     } else {
       // extract from the signer configuration
       try {
-        List<CaEntry.CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(getValue(ci.getSignerConf(), baseDir));
+        List<CaEntry.CaSignerConf> signerConfs =
+            CaEntry.splitCaSignerConfs(getValue(ci.getSignerConf(), baseDir));
         SignerConf signerConf = new SignerConf(signerConfs.get(0).getConf());
 
-        try (ConcurrentContentSigner signer = securityFactory.createSigner(
-            ci.getSignerType(), signerConf, (X509Cert) null)) {
+        ConcurrentContentSigner signer = securityFactory.createSigner(
+            ci.getBase().getSignerType(), signerConf, (X509Cert) null);
+        try {
           caCert = signer.getCertificate();
+        } finally {
+          signer.close();
         }
       } catch (IOException | ObjectCreationException | XiSecurityException ex) {
-        throw new InvalidConfException("could not create CA signer for CA " + ident, ex);
+        throw new InvalidConfException(
+            "could not create CA signer for CA " + ident, ex);
       }
     }
 
@@ -531,24 +580,29 @@ public class FileCaConfStore implements CaConfStore {
         try {
           certchain.add(X509Util.parseCert(bytes));
         } catch (CertificateException ex) {
-          throw new InvalidConfException("invalid certchain for CA " + ident, ex);
+          throw new InvalidConfException("invalid certchain for CA " + ident,
+              ex);
         }
       }
 
       caEntry.setCertchain(certchain);
     }
 
-    if (caEntry.getCrlControl() != null && !caEntry.isSaveCert()) {
-      throw new InvalidConfException("crlCControl shall be null, since saveCert=true");
+    BaseCaInfo base = caEntry.getBase();
+    if (base.getCrlControl() != null && !base.isSaveCert()) {
+      throw new InvalidConfException(
+          "crlCControl shall be null, since saveCert=true");
     }
 
     return caEntry;
   }
 
-  private static String getValue(FileOrValue fv, String baseDir) throws IOException {
+  private static String getValue(FileOrValue fv, String baseDir)
+      throws IOException {
     if (fv == null) {
       return null;
     }
+
     if (fv.getValue() != null) {
       String value = fv.getValue();
       if (value.contains("${basedir}")) {
@@ -567,9 +621,9 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   private static CaConfType.CaSystem mergeConfs(List<String> confFiles)
-      throws IOException, InvalidConfException {
-    CaConfType.CaSystem conf0 = CaJson.parseObject(
-        Paths.get(IoUtil.expandFilepath(confFiles.get(0), true)), CaConfType.CaSystem.class);
+      throws InvalidConfException {
+    CaConfType.CaSystem conf0 = CaConfType.CaSystem.parse(
+        Paths.get(IoUtil.expandFilepath(confFiles.get(0), true)));
 
     Map<String, String> dbSchemas = conf0.getDbSchemas();
     if (dbSchemas == null) {
@@ -614,16 +668,17 @@ public class FileCaConfStore implements CaConfStore {
     }
 
     for (int i = 1; i < confFiles.size(); i++) {
-      CaConfType.CaSystem root = CaJson.parseObject(
-          Paths.get(IoUtil.expandFilepath(confFiles.get(i), true)), CaConfType.CaSystem.class);
+      CaConfType.CaSystem root = CaConfType.CaSystem.parse(
+          Paths.get(IoUtil.expandFilepath(confFiles.get(i), true)));
 
       // Db Schemas
       if (root.getDbSchemas() != null) {
         for (Map.Entry<String, String> entry : root.getDbSchemas().entrySet()) {
           String name = entry.getKey();
           if (dbSchemas.containsKey(name)) {
-            if (!CompareUtil.equalsObject(dbSchemas.get(name), entry.getValue())) {
-              throw new InvalidConfException("Duplicated DbSchema '" + name + "' but with differnt values");
+            if (!CompareUtil.equals(dbSchemas.get(name), entry.getValue())) {
+              throw new InvalidConfException("Duplicated DbSchema '" +
+                  name + "' but with differnt values");
             }
           }
         }
@@ -666,7 +721,8 @@ public class FileCaConfStore implements CaConfStore {
         withSoftwareKeyPairGen = true;
 
         if (!"software".equalsIgnoreCase(kg.getType())) {
-          throw new InvalidConfException("KeyPairGen name 'software' is reserved");
+          throw new InvalidConfException(
+              "KeyPairGen name 'software' is reserved");
         }
 
         break;
@@ -674,22 +730,23 @@ public class FileCaConfStore implements CaConfStore {
     }
 
     if (!withSoftwareKeyPairGen) {
-      CaConfType.NameTypeConf sw = new CaConfType.NameTypeConf();
-      sw.setName(nameSoftware);
-      sw.setType("software");
+      CaConfType.NameTypeConf sw = new CaConfType.NameTypeConf(
+          null, nameSoftware, "software", null);
       keypairGens.add(sw);
     }
 
     return conf0;
   }
 
-  private static Map<String, Integer> assertNameIdUnique(List<? extends CaConfType.IdNameConf> list, String type)
+  private static Map<String, Integer> assertNameIdUnique(
+      List<? extends CaConfType.IdNameConf> list, String type)
       throws InvalidConfException {
     Map<String, Integer> nameIdMap = new HashMap<>();
     for (CaConfType.IdNameConf c : list) {
       String name = c.getName();
       if (nameIdMap.containsKey(name)) {
-        throw new InvalidConfException("Duplicated name of " + type + " " + name);
+        throw new InvalidConfException(
+            "Duplicated name of " + type + " " + name);
       }
 
       Integer id = c.getId();
@@ -702,7 +759,8 @@ public class FileCaConfStore implements CaConfStore {
       }
 
       if (nameIdMap.containsValue(id)) {
-        throw new InvalidConfException("Duplicated id of " + type + " " + name);
+        throw new InvalidConfException(
+            "Duplicated id of " + type + " " + name);
       }
 
       nameIdMap.put(name, id);
@@ -717,22 +775,26 @@ public class FileCaConfStore implements CaConfStore {
     for (CaConfType.NameTypeConf c : list) {
       String name = c.getName();
       if (names.contains(name)) {
-        throw new InvalidConfException("Duplicated name of " + type + " " + name);
+        throw new InvalidConfException(
+            "Duplicated name of " + type + " " + name);
       }
       names.add(name);
     }
     return names;
   }
 
-  private static String getBase64Value(FileOrBinary fb, String baseDir) throws IOException {
+  private static String getBase64Value(FileOrBinary fb, String baseDir)
+      throws IOException {
     byte[] binary = getBinary(fb, baseDir);
     return binary == null ? null : Base64.encodeToString(binary);
   }
 
-  private static byte[] getBinary(FileOrBinary fb, String baseDir) throws IOException {
+  private static byte[] getBinary(FileOrBinary fb, String baseDir)
+      throws IOException {
     if (fb == null) {
       return null;
     }
+
     if (fb.getBinary() != null) {
       return fb.getBinary();
     }
@@ -757,7 +819,8 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void changeSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
+  public void changeSystemEvent(SystemEvent systemEvent)
+      throws CaMgmtException {
     // do nothing
   }
 
@@ -767,7 +830,8 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
+  public CertprofileEntry createCertprofile(String name)
+      throws CaMgmtException {
     return Optional.ofNullable(certprofileTable.get(name)).orElseThrow(
         () -> new CaMgmtException("Unknown Certprofile " + name));
   }
@@ -802,26 +866,29 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException {
+  public CaInfo createCaInfo(String name, CertStore certstore)
+      throws CaMgmtException {
     CaEntry caEntry = caTable.get(name);
     if (caEntry == null) {
       throw new CaMgmtException("unknown CA " + name);
     }
 
     try {
-      return new CaInfo(caEntry, CaConfColumn.fromBaseCaInfo(caEntry), certstore);
+      return new CaInfo(caEntry, certstore);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex);
     }
   }
 
   @Override
-  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException {
+  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca)
+      throws CaMgmtException {
     return caHasRequestors.get(ca.getName());
   }
 
   @Override
-  public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException {
+  public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca)
+      throws CaMgmtException {
     return caHasProfiles.get(ca.getName());
   }
 
@@ -846,12 +913,15 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException {
+  public void addCertprofileToCa(NameId profile, NameId ca,
+                                 List<String> aliases)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
-  public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
+  public void addPublisherToCa(NameId publisher, NameId ca)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
@@ -861,7 +931,8 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException {
+  public NameId addEmbeddedRequestor(String requestorName)
+      throws CaMgmtException {
     if (RequestorInfo.NAME_BY_CA.equals(requestorName)) {
       return new NameId(REQUESTOR_BY_CA_ID, RequestorInfo.NAME_BY_CA);
     }
@@ -870,7 +941,8 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
+  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
@@ -880,19 +952,24 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void changeCa(ChangeCaEntry changeCaEntry, CaConfColumn currentCaConfColumn,
-                       SecurityFactory securityFactory) throws CaMgmtException {
+  public void changeCa(ChangeCaEntry changeCaEntry,
+                       BaseCaInfo currentCaConf,
+                       SecurityFactory securityFactory)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
-  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
-    // Not supported. Relies solely on the analysis of the CRLs saved in the database.
+  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo)
+      throws CaMgmtException {
+    // Not supported. Relies solely on the analysis of the CRLs saved in
+    // the database.
   }
 
   @Override
   public IdentifiedCertprofile changeCertprofile(
-      NameId nameId, String type, String conf, CaManagerImpl certprofileManager) throws CaMgmtException {
+      NameId nameId, String type, String conf, CaManagerImpl certprofileManager)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
@@ -904,19 +981,23 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public SignerEntry changeSigner(
-      String name, String type, String conf, String base64Cert, CaManagerImpl signerManager) throws CaMgmtException {
+      String name, String type, String conf, String base64Cert,
+      CaManagerImpl signerManager)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
   public KeypairGenEntryWrapper changeKeypairGen(
-      String name, String type, String conf, CaManagerImpl manager) throws CaMgmtException {
+      String name, String type, String conf, CaManagerImpl manager)
+          throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
   public IdentifiedCertPublisher changePublisher(
-      String name, String type, String conf, CaManagerImpl publisherManager) throws CaMgmtException {
+      String name, String type, String conf, CaManagerImpl publisherManager)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
@@ -926,17 +1007,20 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
+  public void removeCertprofileFromCa(String profileName, String caName)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
-  public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
+  public void removeRequestorFromCa(String requestorName, String caName)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
   @Override
-  public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
+  public void removePublisherFromCa(String publisherName, String caName)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 
@@ -946,7 +1030,8 @@ public class FileCaConfStore implements CaConfStore {
   }
 
   @Override
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+      throws CaMgmtException {
     throw readOnlyException;
   }
 

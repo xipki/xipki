@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -10,7 +10,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
@@ -18,47 +17,26 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.sdk.CaIdentifierRequest;
-import org.xipki.ca.sdk.CaNameResponse;
-import org.xipki.ca.sdk.CertChainResponse;
-import org.xipki.ca.sdk.CertprofileInfoRequest;
-import org.xipki.ca.sdk.CertsMode;
-import org.xipki.ca.sdk.ConfirmCertsRequest;
-import org.xipki.ca.sdk.CrlResponse;
-import org.xipki.ca.sdk.EnrollCertsRequest;
-import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
-import org.xipki.ca.sdk.ErrorEntry;
-import org.xipki.ca.sdk.ErrorResponse;
-import org.xipki.ca.sdk.GenCRLRequest;
-import org.xipki.ca.sdk.GetCRLRequest;
-import org.xipki.ca.sdk.GetCertRequest;
-import org.xipki.ca.sdk.OldCertInfo;
-import org.xipki.ca.sdk.PayloadResponse;
-import org.xipki.ca.sdk.PollCertRequest;
-import org.xipki.ca.sdk.RevokeCertsRequest;
-import org.xipki.ca.sdk.RevokeCertsResponse;
-import org.xipki.ca.sdk.SdkResponse;
-import org.xipki.ca.sdk.SingleCertSerialEntry;
-import org.xipki.ca.sdk.TransactionIdRequest;
-import org.xipki.ca.sdk.UnSuspendOrRemoveCertsResponse;
-import org.xipki.ca.sdk.UnsuspendOrRemoveCertsRequest;
-import org.xipki.ca.sdk.X500NameType;
+import org.xipki.ca.api.profile.ctrl.CertLevel;
+import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.pki.ErrorCode;
-import org.xipki.pki.OperationException;
 import org.xipki.security.CrlReason;
+import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
+import org.xipki.security.X509Crl;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.security.exception.OperationException;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.Hex;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.DecodeException;
-import org.xipki.util.exception.InsufficientPermissionException;
-import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.extra.exception.InsufficientPermissionException;
+import org.xipki.util.extra.http.XiHttpRequest;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.type.EmbedCertsMode;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -83,35 +61,8 @@ import static org.xipki.ca.api.mgmt.PermissionConstants.REENROLL_CERT;
 import static org.xipki.ca.api.mgmt.PermissionConstants.REMOVE_CERT;
 import static org.xipki.ca.api.mgmt.PermissionConstants.REVOKE_CERT;
 import static org.xipki.ca.api.mgmt.PermissionConstants.UNSUSPEND_CERT;
-import static org.xipki.ca.sdk.SdkConstants.CMD_cacert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_cacert2;
-import static org.xipki.ca.sdk.SdkConstants.CMD_cacerts;
-import static org.xipki.ca.sdk.SdkConstants.CMD_cacerts2;
-import static org.xipki.ca.sdk.SdkConstants.CMD_caname;
-import static org.xipki.ca.sdk.SdkConstants.CMD_confirm_enroll;
-import static org.xipki.ca.sdk.SdkConstants.CMD_crl;
-import static org.xipki.ca.sdk.SdkConstants.CMD_enroll;
-import static org.xipki.ca.sdk.SdkConstants.CMD_enroll_cross;
-import static org.xipki.ca.sdk.SdkConstants.CMD_gen_crl;
-import static org.xipki.ca.sdk.SdkConstants.CMD_get_cert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_health;
-import static org.xipki.ca.sdk.SdkConstants.CMD_poll_cert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_profileinfo;
-import static org.xipki.ca.sdk.SdkConstants.CMD_reenroll;
-import static org.xipki.ca.sdk.SdkConstants.CMD_remove_cert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_revoke_cert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_revoke_pending_cert;
-import static org.xipki.ca.sdk.SdkConstants.CMD_unsuspend_cert;
-import static org.xipki.pki.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.pki.ErrorCode.BAD_REQUEST;
-import static org.xipki.pki.ErrorCode.CERT_REVOKED;
-import static org.xipki.pki.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pki.ErrorCode.PATH_NOT_FOUND;
-import static org.xipki.pki.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.pki.ErrorCode.SYSTEM_UNAVAILABLE;
-import static org.xipki.pki.ErrorCode.UNAUTHORIZED;
-import static org.xipki.pki.ErrorCode.UNKNOWN_CERT;
-import static org.xipki.pki.ErrorCode.UNKNOWN_CERT_PROFILE;
+import static org.xipki.ca.sdk.SdkConstants.*;
+import static org.xipki.security.exception.ErrorCode.*;
 
 /**
  * SDK responder.
@@ -126,7 +77,8 @@ public class SdkResponder {
 
     @Override
     public void run() {
-      Set<CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
+      Set<CertificateInfo> remainingCerts =
+          pendingCertPool.removeConfirmTimeoutedCertificates();
       if (CollectionUtil.isEmpty(remainingCerts)) {
         return;
       }
@@ -135,30 +87,36 @@ public class SdkResponder {
       X509Ca ca = null;
       for (CertificateInfo remainingCert : remainingCerts) {
         String caName = remainingCert.getIssuer().getName();
-        BigInteger serialNumber = remainingCert.getCert().getCert().getSerialNumber();
+        BigInteger serialNumber =
+            remainingCert.getCert().getCert().getSerialNumber();
 
         if (ca == null || !ca.getCaIdent().getName().equals(caName)) {
           try {
             ca = caManager.getX509Ca(caName);
           } catch (CaMgmtException e) {
-            LOG.error("could not revoke certificate (CA={}, serialNumber={}): unknown CA",
+            LOG.error("could not revoke certificate (CA={}, " +
+                    "serialNumber={}): unknown CA",
                 caName, LogUtil.formatCsn(serialNumber));
             continue;
           }
         }
 
         try {
-          ca.revokeCert(null, serialNumber, CrlReason.CESSATION_OF_OPERATION, invalidityDate);
+          ca.revokeCert(null, serialNumber,
+              CrlReason.CESSATION_OF_OPERATION, invalidityDate);
         } catch (Throwable th) {
-          LOG.error("could not revoke certificate (CA={}, serialNumber={}): {}",
-              ca.getCaInfo().getIdent(), LogUtil.formatCsn(serialNumber), th.getMessage());
+          LOG.error("could not revoke certificate (CA={}, " +
+                  "serialNumber={}): {}",
+              ca.getCaInfo().getIdent(), LogUtil.formatCsn(serialNumber),
+              th.getMessage());
         }
       }
     } // method run
 
   } // class PendingPoolCleaner
 
-  private static final int DFLT_CONFIRM_WAIT_TIME_MS = 600 * 1000; // 10 minutes
+  // 10 minutes
+  private static final int DFLT_CONFIRM_WAIT_TIME_MS = 600 * 1000;
   private final PendingCertificatePool pendingCertPool;
 
   private static final Logger LOG = LoggerFactory.getLogger(SdkResponder.class);
@@ -173,9 +131,12 @@ public class SdkResponder {
 
   static {
     reenrollCertExtnIds = CollectionUtil.asUnmodifiableSet(
-        Extension.biometricInfo.getId(),          Extension.extendedKeyUsage.getId(),
-        Extension.keyUsage.getId(),               Extension.qCStatements.getId(),
-        Extension.subjectAlternativeName.getId(), Extension.subjectInfoAccess.getId());
+        OIDs.Extn.biometricInfo.getId(),
+        OIDs.Extn.extendedKeyUsage.getId(),
+        OIDs.Extn.keyUsage.getId(),
+        OIDs.Extn.qCStatements.getId(),
+        OIDs.Extn.subjectAlternativeName.getId(),
+        OIDs.Extn.subjectInfoAccess.getId());
   }
 
   public SdkResponder(String reverseProxyMode, CaManagerImpl caManager) {
@@ -185,10 +146,12 @@ public class SdkResponder {
 
     threadPoolExecutor = new ScheduledThreadPoolExecutor(1);
     threadPoolExecutor.setRemoveOnCancelPolicy(true);
-    threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
+    threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(),
+        10, 10, TimeUnit.MINUTES);
   }
 
-  public SdkResponse service(String path, byte[] request, XiHttpRequest httpRequest) {
+  public SdkResponse service(String path, byte[] request,
+                             XiHttpRequest httpRequest) {
     try {
       SdkResponse resp = service0(path, request, httpRequest);
       if (resp instanceof ErrorResponse) {
@@ -197,14 +160,17 @@ public class SdkResponder {
       return resp;
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      return new ErrorResponse(null, SYSTEM_FAILURE, "internal error");
+      return new ErrorResponse(null, SYSTEM_FAILURE,
+          "internal error");
     }
   }
 
-  private SdkResponse service0(String path, byte[] request, XiHttpRequest httpRequest) {
+  private SdkResponse service0(String path, byte[] request,
+                               XiHttpRequest httpRequest) {
     try {
       if (caManager == null) {
-        return new ErrorResponse(null, SYSTEM_FAILURE, "responderManager in servlet not configured");
+        return new ErrorResponse(null, SYSTEM_FAILURE,
+            "responderManager in servlet not configured");
       }
 
       String caName = null;
@@ -215,7 +181,8 @@ public class SdkResponder {
         String coreUri = path;
         int sepIndex = coreUri.indexOf('/', 1);
         if (sepIndex == -1 || sepIndex == coreUri.length() - 1) {
-          return new ErrorResponse(null, PATH_NOT_FOUND, "invalid path " + path);
+          return new ErrorResponse(null, PATH_NOT_FOUND,
+              "invalid path " + path);
         }
 
         // skip also the first char ('/')
@@ -233,7 +200,8 @@ public class SdkResponder {
       }
 
       if (StringUtil.isBlank(command)) {
-        return new ErrorResponse(null, PATH_NOT_FOUND, "command is not specified");
+        return new ErrorResponse(null, PATH_NOT_FOUND,
+            "command is not specified");
       }
 
       CaIdentifierRequest req = null;
@@ -244,11 +212,13 @@ public class SdkResponder {
         try {
           ca = caManager.getX509Ca(caName);
         } catch (CaMgmtException e) {
-          return new ErrorResponse(null, PATH_NOT_FOUND, "CA unknown");
+          return new ErrorResponse(null, PATH_NOT_FOUND,
+              "CA unknown");
         }
 
         if (ca == null) {
-          return new ErrorResponse(null, PATH_NOT_FOUND, "unknown CA '" + caName + "'");
+          return new ErrorResponse(null, PATH_NOT_FOUND,
+              "unknown CA '" + caName + "'");
         }
       } else {
         switch (command) {
@@ -267,12 +237,14 @@ public class SdkResponder {
             } else if (CMD_revoke_cert.equals(command)) {
               req = RevokeCertsRequest.decode(requireNonNullRequest(request));
             } else {
-              req = UnsuspendOrRemoveCertsRequest.decode(requireNonNullRequest(request));
+              req = UnsuspendOrRemoveCertsRequest.decode(
+                      requireNonNullRequest(request));
             }
             break;
           }
           default:
-            return new ErrorResponse(null, PATH_NOT_FOUND, "invalid command '" + command + "'");
+            return new ErrorResponse(null, PATH_NOT_FOUND,
+                "invalid command '" + command + "'");
         }
 
         ca = caManager.getCa(req);
@@ -292,61 +264,78 @@ public class SdkResponder {
         clientCert = TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
       } catch (IOException ex) {
         LogUtil.error(LOG, ex, "error getTlsClientCert");
-        return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
+        return new ErrorResponse(null, UNAUTHORIZED,
+            "error retrieving client certificate");
       }
 
       if (clientCert == null) {
-        return new ErrorResponse(null, UNAUTHORIZED, "no client certificate");
+        return new ErrorResponse(null, UNAUTHORIZED,
+            "no client certificate");
       }
 
       RequestorInfo requestor = ca.getRequestor(clientCert);
 
       if (requestor == null) {
-        return new ErrorResponse(null, NOT_PERMITTED, "no requestor specified");
+        return new ErrorResponse(null, NOT_PERMITTED,
+            "no requestor specified");
       }
 
       switch (command) {
         case CMD_health:
-          return ca.healthy() ? null : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
+          return ca.healthy() ? null
+              : new ErrorResponse(null, SYSTEM_UNAVAILABLE,
+              "CA is not healthy");
         case CMD_cacert:
           return buildCertChainResponse(ca.getCaInfo().getCert(), null);
         case CMD_cacerts:
-          return buildCertChainResponse(ca.getCaInfo().getCert(), ca.getCaInfo().getCertchain());
+          return buildCertChainResponse(ca.getCaInfo().getCert(),
+              ca.getCaInfo().getCertchain());
         case CMD_enroll:
           assertPermitted(requestor, ENROLL_CERT);
-          return enroll(ca, requireNonNullRequest(request), requestor, false, false);
+          return enroll(ca, requireNonNullRequest(request), requestor,
+              false, false);
         case CMD_reenroll:
           assertPermitted(requestor, REENROLL_CERT);
-          return enroll(ca, requireNonNullRequest(request), requestor, true, false);
+          return enroll(ca, requireNonNullRequest(request), requestor,
+              true, false);
         case CMD_enroll_cross:
           assertPermitted(requestor, ENROLL_CROSS);
-          return enroll(ca, requireNonNullRequest(request), requestor, false, true);
+          return enroll(ca, requireNonNullRequest(request), requestor,
+              false, true);
         case CMD_poll_cert:
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
+          if (!(requestor.isPermitted(ENROLL_CERT)
+                || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           return poll(ca, (PollCertRequest) req, "-".equals(caName));
         case CMD_revoke_cert:
           assertPermitted(requestor, REVOKE_CERT);
-          return revoke(requestor, ca, (RevokeCertsRequest) req, "-".equals(caName));
+          return revoke(requestor, ca, (RevokeCertsRequest) req,
+                  "-".equals(caName));
         case CMD_confirm_enroll:
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
+          if (!(requestor.isPermitted(ENROLL_CERT)
+              || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          return confirmCertificates(requestor, ca, requireNonNullRequest(request));
+          return confirmCertificates(requestor, ca,
+              requireNonNullRequest(request));
         case CMD_revoke_pending_cert:
-          if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
+          if (!(requestor.isPermitted(ENROLL_CERT)
+                || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
-          revokePendingCertificates(requestor, ca,
-              TransactionIdRequest.decode(requireNonNullRequest(request)).getTid());
+          revokePendingCertificates(requestor, ca, TransactionIdRequest.decode(
+              requireNonNullRequest(request)).getTid());
           return null;
         case CMD_unsuspend_cert:
           assertPermitted(requestor, UNSUSPEND_CERT);
-          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveCertsRequest) req, true, "-".equals(caName));
+          return removeOrUnsuspend(requestor, ca,
+              (UnsuspendOrRemoveCertsRequest) req, true, "-".equals(caName));
         case CMD_remove_cert:
           assertPermitted(requestor, REMOVE_CERT);
-          return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveCertsRequest) req, false, "-".equals(caName));
+          return removeOrUnsuspend(requestor, ca,
+              (UnsuspendOrRemoveCertsRequest) req,
+              false, "-".equals(caName));
         case CMD_gen_crl:
           assertPermitted(requestor, GEN_CRL);
           return genCrl(requestor, ca, requireNonNullRequest(request));
@@ -360,28 +349,35 @@ public class SdkResponder {
         case CMD_cacert2:
           return buildCertChainResponse(ca.getCaCert(), null);
         case CMD_cacerts2:
-          return buildCertChainResponse(ca.getCaCert(), ca.caInfo.getCertchain());
+          return buildCertChainResponse(ca.getCaCert(),
+              ca.caInfo.getCertchain());
         case CMD_caname:
           String name = ca.getCaIdent().getName();
           Set<String> aliases = caManager.getAliasesForCa(name);
-          String[] aliasArray = CollectionUtil.isEmpty(aliases) ? null : aliases.toArray(new String[0]);
+          String[] aliasArray = CollectionUtil.isEmpty(aliases) ? null
+              : aliases.toArray(new String[0]);
+
           return new CaNameResponse(name, aliasArray);
         default:
-          return new ErrorResponse(null, PATH_NOT_FOUND, "invalid command '" + command + "'");
+          return new ErrorResponse(null, PATH_NOT_FOUND,
+              "invalid command '" + command + "'");
       }
-    } catch (DecodeException ex) {
+    } catch (CodecException ex) {
       return new ErrorResponse(null, BAD_REQUEST, ex.getMessage());
     } catch (OperationException ex) {
-      return new ErrorResponse(null, ex.getErrorCode(), ex.getErrorMessage());
+      return new ErrorResponse(null, ex.getErrorCode(),
+          ex.getErrorMessage());
     }
   } // method service
 
-  private static byte[] requireNonNullRequest(byte[] reqBytes) throws DecodeException {
+  private static byte[] requireNonNullRequest(byte[] reqBytes)
+      throws CodecException {
     return Optional.ofNullable(reqBytes).orElseThrow(
-        () -> new DecodeException("request must no be null"));
+        () -> new CodecException("request must no be null"));
   }
 
-  private CertChainResponse buildCertChainResponse(X509Cert cert, List<X509Cert> certchain) {
+  private CertChainResponse buildCertChainResponse(
+      X509Cert cert, List<X509Cert> certchain) {
     int size = 1 + (certchain == null ? 0 : certchain.size());
     byte[][] certs = new byte[size][];
     certs[0] = cert.getEncoded();
@@ -394,8 +390,10 @@ public class SdkResponder {
     return new CertChainResponse(certs);
   }
 
-  private SdkResponse enroll(X509Ca ca, byte[] request, RequestorInfo requestor, boolean reenroll, boolean crossCert)
-      throws OperationException, DecodeException {
+  private SdkResponse enroll(
+      X509Ca ca, byte[] request, RequestorInfo requestor,
+      boolean reenroll, boolean crossCert)
+      throws OperationException, CodecException {
     EnrollCertsRequest req = EnrollCertsRequest.decode(request);
     EnrollCertsRequest.Entry[] entries = req.getEntries();
 
@@ -413,14 +411,16 @@ public class SdkResponder {
       SubjectPublicKeyInfo publicKeyInfo = null;
 
       if (entry.getP10req() != null) {
-        // The PKCS#10 will only be used for transport of public key, subject and extensions.
-        // The verification of POP is skipped here.
+        // The PKCS#10 will only be used for transport of public key, subject
+        // and extensions. The verification of POP is skipped here.
         CertificationRequestInfo certTemp;
         try {
-          certTemp = CertificationRequest.getInstance(X509Util.toDerEncoded(entry.getP10req()))
-                      .getCertificationRequestInfo();
+          certTemp = CertificationRequest.getInstance(
+                        X509Util.toDerEncoded(entry.getP10req()))
+                    .getCertificationRequestInfo();
         } catch (Exception ex) {
-          throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
+          throw new OperationException(ErrorCode.BAD_REQUEST,
+              "invalid CSR: " + ex.getMessage());
         }
         subject = certTemp.getSubject();
         publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
@@ -429,7 +429,8 @@ public class SdkResponder {
         X500NameType subject0 = entry.getSubject();
         if (subject0 == null) {
           if (!reenroll) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "subject is not set");
+            throw new OperationException(BAD_CERT_TEMPLATE,
+                "subject is not set");
           }
         } else {
           try {
@@ -444,15 +445,17 @@ public class SdkResponder {
         }
 
         if (entry.getSubjectPublicKey() != null) {
-          publicKeyInfo = SubjectPublicKeyInfo.getInstance(entry.getSubjectPublicKey());
+          publicKeyInfo = SubjectPublicKeyInfo.getInstance(
+                            entry.getSubjectPublicKey());
         }
 
         if (reenroll) {
           OldCertInfo oldCertInfo = entry.getOldCertInfo();
 
           if (oldCertInfo == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "Neither oldCertIsn nor oldCertSubject is specified" +
-                " in reenroll_cert command, but exactly one of them is permitted");
+            throw new OperationException(BAD_CERT_TEMPLATE,
+                "Neither oldCertIsn nor oldCertSubject is specified in " +
+                "reenroll_cert command, but exactly one of them is permitted");
           }
 
           boolean reusePublicKey = oldCertInfo.isReusePublicKey();
@@ -465,31 +468,37 @@ public class SdkResponder {
             try {
               issuer = X509Util.x500NameText(ocIsn.getIssuer().toX500Name());
             } catch (IOException ex) {
-              throw new OperationException(BAD_CERT_TEMPLATE, "Invalid oldIsn.issuer: " + ex.getMessage());
+              throw new OperationException(BAD_CERT_TEMPLATE,
+                  "Invalid oldIsn.issuer: " + ex.getMessage());
             }
             if (!issuer.equals(ca.getCaCert().getSubjectText())) {
-              throw new OperationException(UNKNOWN_CERT, "unknown issuer " + issuer);
+              throw new OperationException(UNKNOWN_CERT,
+                  "unknown issuer " + issuer);
             }
 
             BigInteger serialNumber = ocIsn.getSerialNumber();
-            text = "certificate with the issuer '" + issuer + "' and serial number " + serialNumber;
+            text = "certificate with the issuer '" + issuer +
+                    "' and serial number " + serialNumber;
             oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else if (oldCertInfo.getFsn() != null) {
             OldCertInfo.BySha1FpAndSerial ocFsn = oldCertInfo.getFsn();
             String sha1Fp = Hex.encode(ocFsn.getCaCertSha1());
             if (!sha1Fp.equalsIgnoreCase(ca.getHexSha1OfCert())) {
-              throw new OperationException(UNKNOWN_CERT, "unknown issuer sha1fp" + sha1Fp);
+              throw new OperationException(UNKNOWN_CERT,
+                  "unknown issuer sha1fp" + sha1Fp);
             }
 
             BigInteger serialNumber = ocFsn.getSerialNumber();
-            text = "certificate with the issuer (sha1fp) '" + sha1Fp + "' and serial number " + serialNumber;
+            text = "certificate with the issuer (sha1fp) '" + sha1Fp +
+                    "' and serial number " + serialNumber;
             oldCert = ca.getCertWithRevocationInfo(serialNumber);
           } else {
             OldCertInfo.BySubject ocSubject = oldCertInfo.getSubject();
             X500Name oldSubject = X500Name.getInstance(ocSubject.getSubject());
             String subjectText = X509Util.x500NameText(oldSubject);
             text = "certificate with subject '" + subjectText + "'";
-            oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.getSan());
+            oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject,
+                      ocSubject.getSan());
           }
 
           if (oldCert == null) {
@@ -497,7 +506,8 @@ public class SdkResponder {
           }
 
           if (oldCert.isRevoked()) {
-            throw new OperationException(CERT_REVOKED, "could not update a revoked " + text);
+            throw new OperationException(CERT_REVOKED,
+                "could not update a revoked " + text);
           }
 
           if (profile == null) {
@@ -510,7 +520,8 @@ public class SdkResponder {
           }
 
           if (publicKeyInfo == null && reusePublicKey) {
-            publicKeyInfo = oldCert.getCert().getCert().getSubjectPublicKeyInfo();
+            publicKeyInfo =
+                oldCert.getCert().getCert().getSubjectPublicKeyInfo();
           }
 
           // extensions
@@ -524,7 +535,8 @@ public class SdkResponder {
           }
 
           // extract extensions from the certificate
-          Extensions oldExtensions = oldCert.getCert().getCert().toBcCert().getExtensions();
+          Extensions oldExtensions =
+              oldCert.getCert().getCert().toBcCert().getExtensions();
           ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
           for (ASN1ObjectIdentifier oid : oldOids) {
             String id = oid.getId();
@@ -538,13 +550,15 @@ public class SdkResponder {
       }
 
       if (profile == null) {
-        throw new OperationException(UNKNOWN_CERT_PROFILE, "cert profile is not set");
+        throw new OperationException(UNKNOWN_CERT_PROFILE,
+            "cert profile is not set");
       }
 
       profiles.add(profile);
       boolean serverkeygen = publicKeyInfo == null;
-      CertTemplateData certTemplate = new CertTemplateData(subject, publicKeyInfo,
-          notBefore, notAfter, extensions, profile, entry.getCertReqId(), serverkeygen);
+      CertTemplateData certTemplate = new CertTemplateData(subject,
+          publicKeyInfo, notBefore, notAfter, extensions, profile,
+          entry.getCertReqId(), serverkeygen);
       certTemplate.setForCrossCert(crossCert);
       certTemplates.add(certTemplate);
     }
@@ -552,21 +566,26 @@ public class SdkResponder {
     // check the profile
     for (String profile : profiles) {
       if (!requestor.isCertprofilePermitted(profile)) {
-        throw new OperationException(NOT_PERMITTED, "cert profile " + profile + " is not allowed");
+        throw new OperationException(NOT_PERMITTED,
+            "cert profile " + profile + " is not allowed");
       }
 
       if (crossCert) {
-        IdentifiedCertprofile idProfile = Optional.ofNullable(caManager.getIdentifiedCertprofile(profile))
-            .orElseThrow(() -> new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + profile));
+        IdentifiedCertprofile idProfile = Optional.ofNullable(
+            caManager.getIdentifiedCertprofile(profile)).orElseThrow(() ->
+                new OperationException(UNKNOWN_CERT_PROFILE,
+                    "unknown cert profile " + profile));
 
-        if (Certprofile.CertLevel.CROSS != idProfile.getCertLevel()) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "cert profile " + profile + " is not for CROSS certificate");
+        if (CertLevel.CROSS != idProfile.getCertLevel()) {
+          throw new OperationException(BAD_CERT_TEMPLATE,
+              "cert profile " + profile + " is not for CROSS certificate");
         }
       }
     }
 
     long waitForConfirmUtil = 0;
-    boolean explicitConform = req.getExplicitConfirm() != null && req.getExplicitConfirm();
+    boolean explicitConform = req.getExplicitConfirm() != null
+        && req.getExplicitConfirm();
 
     if (explicitConform) {
       int confirmWaitTimeMs = req.getConfirmWaitTimeMs() == null
@@ -574,8 +593,8 @@ public class SdkResponder {
       waitForConfirmUtil = Clock.systemUTC().millis() + confirmWaitTimeMs;
     }
 
-    EnrollOrPollCertsResponse.Entry[] rentries =
-        generateCertificates(requestor, ca, certTemplates, req, waitForConfirmUtil);
+    EnrollOrPollCertsResponse.Entry[] rentries = generateCertificates(
+        requestor, ca, certTemplates, req, waitForConfirmUtil);
     if (rentries == null) {
       return new ErrorResponse(req.getTransactionId(), SYSTEM_FAILURE, null);
     }
@@ -588,10 +607,10 @@ public class SdkResponder {
       resp.setConfirmWaitTime(waitForConfirmUtil);
     }
 
-    CertsMode caCertMode = req.getCaCertMode();
-    if (caCertMode == CertsMode.CERT) {
+    EmbedCertsMode caCertMode = req.getCaCertMode();
+    if (caCertMode == EmbedCertsMode.CERT) {
       resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
-    } else if (caCertMode == CertsMode.CHAIN) {
+    } else if (caCertMode == EmbedCertsMode.CHAIN) {
       List<X509Cert> chain = ca.getCaInfo().getCertchain();
       if (CollectionUtil.isEmpty(chain)) {
         resp.setExtraCerts(new byte[][] {ca.getCaCert().getEncoded()});
@@ -603,7 +622,9 @@ public class SdkResponder {
     return resp;
   } // enroll
 
-  private SdkResponse poll(X509Ca ca, PollCertRequest req, boolean caReqMatchChecked) throws OperationException {
+  private SdkResponse poll(X509Ca ca, PollCertRequest req,
+                           boolean caReqMatchChecked)
+      throws OperationException {
     if (!caReqMatchChecked) {
       assertIssuerMatch(ca, req);
     }
@@ -611,7 +632,8 @@ public class SdkResponder {
     String tid = req.getTransactionId();
 
     PollCertRequest.Entry[] entries = req.getEntries();
-    EnrollOrPollCertsResponse.Entry[] rentries = new EnrollOrPollCertsResponse.Entry[entries.length];
+    EnrollOrPollCertsResponse.Entry[] rentries =
+        new EnrollOrPollCertsResponse.Entry[entries.length];
 
     for (int i = 0; i < entries.length; i++) {
       PollCertRequest.Entry m = entries[i];
@@ -634,7 +656,8 @@ public class SdkResponder {
         }
       }
 
-      rentries[i] = new EnrollOrPollCertsResponse.Entry(m.getId(), error, certBytes, null);
+      rentries[i] = new EnrollOrPollCertsResponse.Entry(m.getId(),
+          error, certBytes, null);
     }
 
     EnrollOrPollCertsResponse resp = new EnrollOrPollCertsResponse();
@@ -643,15 +666,16 @@ public class SdkResponder {
     return resp;
   }
 
-  private SdkResponse revoke(RequestorInfo requestor, X509Ca ca, RevokeCertsRequest req,
-                             boolean caReqMatchChecked)
+  private SdkResponse revoke(RequestorInfo requestor, X509Ca ca,
+                             RevokeCertsRequest req, boolean caReqMatchChecked)
       throws OperationException {
     if (!caReqMatchChecked) {
       assertIssuerMatch(ca, req);
     }
 
     RevokeCertsRequest.Entry[] entries = req.getEntries();
-    SingleCertSerialEntry[] rentries = new SingleCertSerialEntry[entries.length];
+    SingleCertSerialEntry[] rentries =
+        new SingleCertSerialEntry[entries.length];
     for (int i = 0; i < entries.length; i++) {
       RevokeCertsRequest.Entry entry = entries[i];
 
@@ -676,15 +700,17 @@ public class SdkResponder {
     return new RevokeCertsResponse(rentries);
   }
 
-  private SdkResponse removeOrUnsuspend(RequestorInfo requestor, X509Ca ca,
-                                        UnsuspendOrRemoveCertsRequest req, boolean unsuspend, boolean caReqMatchChecked)
+  private SdkResponse removeOrUnsuspend(
+      RequestorInfo requestor, X509Ca ca, UnsuspendOrRemoveCertsRequest req,
+      boolean unsuspend, boolean caReqMatchChecked)
       throws OperationException {
     if (!caReqMatchChecked) {
       assertIssuerMatch(ca, req);
     }
 
     BigInteger[] entries = req.getEntries();
-    SingleCertSerialEntry[] rentries = new SingleCertSerialEntry[entries.length];
+    SingleCertSerialEntry[] rentries =
+        new SingleCertSerialEntry[entries.length];
 
     for (int i = 0; i < entries.length; i++) {
       BigInteger serialNumber = entries[i];
@@ -706,13 +732,15 @@ public class SdkResponder {
     return new UnSuspendOrRemoveCertsResponse(rentries);
   }
 
-  private void assertIssuerMatch(X509Ca ca, CaIdentifierRequest req) throws OperationException {
+  private void assertIssuerMatch(X509Ca ca, CaIdentifierRequest req)
+      throws OperationException {
     X500NameType issuer = req.getIssuer();
     byte[] authorityKeyId = req.getAuthorityKeyIdentifier();
     byte[] issuerCertSha1Fp = req.getIssuerCertSha1Fp();
 
     if (issuer == null && authorityKeyId == null && issuerCertSha1Fp == null) {
-      throw new OperationException(BAD_REQUEST, "no issuer's identifier is specified");
+      throw new OperationException(BAD_REQUEST,
+          "no issuer's identifier is specified");
     }
 
     if (issuer != null) {
@@ -725,54 +753,55 @@ public class SdkResponder {
 
       X500Name caSubject = ca.getCaCert().getSubject();
       if (!x500Issuer.equals(caSubject)) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "issuer does not target at the CA");
+        throw new OperationException(BAD_CERT_TEMPLATE,
+            "issuer does not target at the CA");
       }
     }
 
     if (authorityKeyId != null) {
       byte[] caSki = ca.getCaCert().getSubjectKeyId();
       if (!Arrays.equals(caSki, authorityKeyId)) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "AuthorityKeyIdentifier does not target at the CA");
+        throw new OperationException(BAD_CERT_TEMPLATE,
+            "AuthorityKeyIdentifier does not target at the CA");
       }
     }
 
     if (issuerCertSha1Fp != null) {
-      if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(ca.getHexSha1OfCert())) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "IssuerCertSha256Fp does not target at the CA");
+      if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(
+            ca.getHexSha1OfCert())) {
+        throw new OperationException(BAD_CERT_TEMPLATE,
+            "IssuerCertSha256Fp does not target at the CA");
       }
     }
   }
 
   private SdkResponse genCrl(RequestorInfo requestor, X509Ca ca, byte[] request)
-      throws OperationException, DecodeException {
+      throws OperationException, CodecException {
     GenCRLRequest req = GenCRLRequest.decode(request);
     // TODO: consider req
-    X509CRLHolder crl = ca.generateCrlOnDemand(requestor);
+    X509Crl crl = ca.generateCrlOnDemand(requestor);
     return buildCrlResp(crl, "generate CRL");
   }
 
   private SdkResponse getCrl(RequestorInfo requestor, X509Ca ca, byte[] request)
-      throws OperationException, DecodeException {
+      throws OperationException, CodecException {
     GetCRLRequest req = GetCRLRequest.decode(request);
-    X509CRLHolder crl = ca.getCrl(requestor, req.getCrlNumber());
+    X509Crl crl = ca.getCrl(requestor, req.getCrlNumber());
     return buildCrlResp(crl, "get CRL");
   }
 
-  private static SdkResponse buildCrlResp(X509CRLHolder crl, String desc) {
+  private static SdkResponse buildCrlResp(X509Crl crl, String desc) {
     if (crl == null) {
       String message = "could not " + desc;
       LOG.warn(message);
       return new ErrorResponse(null, SYSTEM_FAILURE, message);
     }
 
-    try {
-      return new CrlResponse(crl.getEncoded());
-    } catch (IOException e) {
-      return new ErrorResponse(null, SYSTEM_FAILURE, "error encoding CRL");
-    }
+    return new CrlResponse(crl.getEncoded());
   }
 
-  private SdkResponse getCert(X509Ca ca, byte[] request) throws OperationException, DecodeException {
+  private SdkResponse getCert(X509Ca ca, byte[] request)
+      throws OperationException, CodecException {
     GetCertRequest req = GetCertRequest.decode(request);
 
     X500Name issuer;
@@ -794,13 +823,14 @@ public class SdkResponder {
   }
 
   private SdkResponse getProfileInfo(byte[] request)
-      throws OperationException, DecodeException {
+      throws OperationException, CodecException {
     CertprofileInfoRequest req = CertprofileInfoRequest.decode(request);
     String profileName = req.getProfile();
     return caManager.getCertprofileInfo(profileName);
   }
 
-  private static void assertPermitted(RequestorInfo requestor, int permission) throws OperationException {
+  private static void assertPermitted(RequestorInfo requestor, int permission)
+      throws OperationException {
     try {
       requestor.assertPermitted(permission);
     } catch (InsufficientPermissionException ex) {
@@ -832,7 +862,8 @@ public class SdkResponder {
 
           BigInteger certReqId = certTemplates.get(i).getCertReqId();
           if (explicitConfirm) {
-            pendingCertPool.addCertificate(tid, certReqId, certInfo, waitForConfirmUtil);
+            pendingCertPool.addCertificate(tid, certReqId, certInfo,
+                waitForConfirmUtil);
           }
 
           byte[] privateKeyBytes = null;
@@ -850,7 +881,8 @@ public class SdkResponder {
             certBytes = certInfo.getCert().getCert().getEncoded();
           }
 
-          ret.add(new EnrollOrPollCertsResponse.Entry(certReqId, error, certBytes, privateKeyBytes));
+          ret.add(new EnrollOrPollCertsResponse.Entry(
+              certReqId, error, certBytes, privateKeyBytes));
         }
 
         return ret.toArray(new EnrollOrPollCertsResponse.Entry[0]);
@@ -859,9 +891,11 @@ public class SdkResponder {
           for (CertificateInfo certInfo : certInfos) {
             BigInteger sn = certInfo.getCert().getCert().getSerialNumber();
             try {
-              ca.revokeCert(requestor, sn, CrlReason.CESSATION_OF_OPERATION, null);
+              ca.revokeCert(requestor, sn, CrlReason.CESSATION_OF_OPERATION,
+                  null);
             } catch (OperationException ex2) {
-              LogUtil.error(LOG, ex2, "CA " + caName + " could not revoke certificate " + sn);
+              LogUtil.error(LOG, ex2,
+                  "CA " + caName + " could not revoke certificate " + sn);
             }
           }
         }
@@ -876,10 +910,12 @@ public class SdkResponder {
       byte[] privateKeyBytes = null;
       ErrorEntry error = null;
       try {
-        CertificateInfo certInfo = ca.generateCert(requestor, certTemplate, tid);
+        CertificateInfo certInfo =
+            ca.generateCert(requestor, certTemplate, tid);
 
         if (explicitConfirm) {
-          pendingCertPool.addCertificate(tid, certReqId, certInfo, waitForConfirmUtil);
+          pendingCertPool.addCertificate(tid, certReqId, certInfo,
+              waitForConfirmUtil);
         }
 
         if (certInfo.getPrivateKey() != null) {
@@ -897,24 +933,27 @@ public class SdkResponder {
         error = new ErrorEntry(ex.getErrorCode(), ex.getErrorMessage());
       }
 
-      ret.add(new EnrollOrPollCertsResponse.Entry(certReqId, error, certBytes, privateKeyBytes));
+      ret.add(new EnrollOrPollCertsResponse.Entry(
+          certReqId, error, certBytes, privateKeyBytes));
     }
 
     return ret.toArray(new EnrollOrPollCertsResponse.Entry[0]);
   } // method generateCertificates
 
-  protected SdkResponse confirmCertificates(RequestorInfo requestor, X509Ca ca, byte[] request)
-      throws DecodeException {
+  protected SdkResponse confirmCertificates(
+      RequestorInfo requestor, X509Ca ca, byte[] request)
+      throws CodecException {
     ConfirmCertsRequest req = ConfirmCertsRequest.decode(request);
     String tid = req.getTransactionId();
     boolean successful = true;
     for (ConfirmCertsRequest.Entry m : req.getEntries()) {
       BigInteger certReqId = m.getCertReqId();
       byte[] certHash = m.getCerthash();
-      CertificateInfo certInfo = pendingCertPool.removeCertificate(tid, certReqId, certHash);
+      CertificateInfo certInfo = pendingCertPool.removeCertificate(
+          tid, certReqId, certHash);
       if (certInfo == null) {
-        LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
-            tid, certReqId, Hex.encode(certHash));
+        LOG.warn("no cert under transactionId={}, certReqId={} and " +
+                "certHash=0X{}", tid, certReqId, Hex.encode(certHash));
         continue;
       }
 
@@ -924,10 +963,12 @@ public class SdkResponder {
 
       BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
       try {
-        ca.revokeCert(requestor, serialNumber, CrlReason.CESSATION_OF_OPERATION, Instant.now());
+        ca.revokeCert(requestor, serialNumber, CrlReason.CESSATION_OF_OPERATION,
+            Instant.now());
       } catch (OperationException ex) {
-        LogUtil.warn(LOG, ex, "could not revoke certificate ca=" + ca.getCaInfo().getIdent()
-            + " serialNumber=" + LogUtil.formatCsn(serialNumber));
+        LogUtil.warn(LOG, ex, "could not revoke certificate ca=" +
+            ca.getCaInfo().getIdent() + " serialNumber=" +
+            LogUtil.formatCsn(serialNumber));
       }
 
       successful = false;
@@ -945,8 +986,10 @@ public class SdkResponder {
     return new ErrorResponse(tid, SYSTEM_FAILURE, null);
   } // method confirmCertificates
 
-  public boolean revokePendingCertificates(RequestorInfo requestor, X509Ca ca, String transactionId) {
-    Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId);
+  public boolean revokePendingCertificates(
+      RequestorInfo requestor, X509Ca ca, String transactionId) {
+    Set<CertificateInfo> remainingCerts =
+        pendingCertPool.removeCertificates(transactionId);
 
     if (CollectionUtil.isEmpty(remainingCerts)) {
       return true;
@@ -956,7 +999,8 @@ public class SdkResponder {
     Instant invalidityDate = Instant.now();
     for (CertificateInfo remainingCert : remainingCerts) {
       try {
-        ca.revokeCert(requestor, remainingCert.getCert().getCert().getSerialNumber(),
+        ca.revokeCert(requestor,
+            remainingCert.getCert().getCert().getSerialNumber(),
             CrlReason.CESSATION_OF_OPERATION, invalidityDate);
       } catch (OperationException ex) {
         successful = false;

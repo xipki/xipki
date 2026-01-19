@@ -1,9 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12;
 
-import org.xipki.util.Args;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.util.codec.Args;
 
 import java.security.KeyStore;
 
@@ -20,6 +21,8 @@ public class KeyStoreWrapper {
 
   private KeyStore keystoreObject;
 
+  private SubjectPublicKeyInfo subjectPublicKeyInfo;
+
   public KeyStoreWrapper(byte[] keystore) {
     this.keystore = Args.notNull(keystore, "keystore");
   }
@@ -34,6 +37,15 @@ public class KeyStoreWrapper {
 
   public void setKeystoreObject(KeyStore keystoreObject) {
     this.keystoreObject = keystoreObject;
+  }
+
+  public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+    return subjectPublicKeyInfo;
+  }
+
+  public void setSubjectPublicKeyInfo(
+      SubjectPublicKeyInfo subjectPublicKeyInfo) {
+    this.subjectPublicKeyInfo = subjectPublicKeyInfo;
   }
 
 }

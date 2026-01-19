@@ -1,0 +1,502 @@
+[{
+    "oid": "1.2.156.10197.1.301",
+    "names": ["sm2p256v1"],
+    "fieldSize": 256,
+    "order": "fffffffeffffffffffffffffffffffff7203df6b21c6052b53bbf40939d54123",
+    "baseX": "32c4ae2c1f1981195f9904466a39c9948fe30bbff2660be1715a4589334c74c7"
+  },{
+    "oid": "1.2.156.10197.1.301.101",
+    "names": ["wapip192v1"],
+    "fieldSize": 192,
+    "order": "bdb6f4fe3e8b1d9e0da8c0d40fc962195dfae76f56564677",
+    "baseX": "4ad5f7048de709ad51236de65e4d4b482c836dc6e4106640"
+  },{
+    "oid": "1.2.250.1.223.101.256.1",
+    "names": ["FRP256v1"],
+    "fieldSize": 256,
+    "order": "f1fd178c0b3ad58f10126de8ce42435b53dc67e140d2bf941ffdd459c6d655e1",
+    "baseX": "b6b3d4c356c139eb31183d4749d423958c27d2dcaf98b70164c97a2dd98f5cff"
+  },{
+    "oid": "1.2.643.2.2.35.1",
+    "names": ["GostR3410-2001-CryptoPro-A"],
+    "fieldSize": 256,
+    "order": "ffffffffffffffffffffffffffffffff6c611070995ad10045841b09b761b893",
+    "baseX": "1"
+  },{
+    "oid": "1.2.643.2.2.35.2",
+    "names": ["GostR3410-2001-CryptoPro-B"],
+    "fieldSize": 256,
+    "order": "800000000000000000000000000000015f700cfff1a624e5e497161bcc8a198f",
+    "baseX": "1"
+  },{
+    "oid": "1.2.643.2.2.35.3",
+    "names": ["GostR3410-2001-CryptoPro-C"],
+    "fieldSize": 256,
+    "order": "9b9f605f5a858107ab1ec85e6b41c8aa582ca3511eddfb74f02f3a6598980bb9",
+    "baseX": "0"
+  },{
+    "oid": "1.2.643.2.2.36.0",
+    "names": ["GostR3410-2001-CryptoPro-XchA"],
+    "fieldSize": 256,
+    "order": "ffffffffffffffffffffffffffffffff6c611070995ad10045841b09b761b893",
+    "baseX": "1"
+  },{
+    "oid": "1.2.643.2.2.36.1",
+    "names": ["GostR3410-2001-CryptoPro-XchB"],
+    "fieldSize": 256,
+    "order": "9b9f605f5a858107ab1ec85e6b41c8aa582ca3511eddfb74f02f3a6598980bb9",
+    "baseX": "0"
+  },{
+    "oid": "1.2.643.7.1.2.1.1.1",
+    "names": ["Tc26-Gost-3410-12-256-paramSetA"],
+    "fieldSize": 256,
+    "order": "400000000000000000000000000000000fd8cddfc87b6635c115af556c360c67",
+    "baseX": "91e38443a5e82c0d880923425712b2bb658b9196932e02c78b2582fe742daa28"
+  },{
+    "oid": "1.2.643.7.1.2.1.2.1",
+    "names": ["Tc26-Gost-3410-12-512-paramSetA"],
+    "fieldSize": 512,
+    "order": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff27e69532f48d89116ff22b8d4e0560609b4b38abfad2b85dcacdb1411f10b275",
+    "baseX": "3"
+  },{
+    "oid": "1.2.643.7.1.2.1.2.2",
+    "names": ["Tc26-Gost-3410-12-512-paramSetB"],
+    "fieldSize": 512,
+    "order": "800000000000000000000000000000000000000000000000000000000000000149a1ec142565a545acfdb77bd9d40cfa8b996712101bea0ec6346c54374f25bd",
+    "baseX": "2"
+  },{
+    "oid": "1.2.643.7.1.2.1.2.3",
+    "names": ["Tc26-Gost-3410-12-512-paramSetC"],
+    "fieldSize": 512,
+    "order": "3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc98cdba46506ab004c33a9ff5147502cc8eda9e7a769a12694623cef47f023ed",
+    "baseX": "e2e31edfc23de7bdebe241ce593ef5de2295b7a9cbaef021d385f7074cea043aa27272a7ae602bf2a7b9033db9ed3610c6fb85487eae97aac5bc7928c1950148"
+  },{
+    "oid": "1.2.840.10045.3.0.1",
+    "names": ["c2pnb163v1"],
+    "fieldSize": 163,
+    "order": "400000000000000000001e60fc8821cc74daeafc1",
+    "baseX": "7af69989546103d79329fcc3d74880f33bbe803cb"
+  },{
+    "oid": "1.2.840.10045.3.0.10",
+    "names": ["c2pnb208w1"],
+    "fieldSize": 208,
+    "order": "101baf95c9723c57b6c21da2eff2d5ed588bdd5717e212f9d",
+    "baseX": "89fdfbe4abe193df9559ecf07ac0ce78554e2784eb8c1ed1a57a"
+  },{
+    "oid": "1.2.840.10045.3.0.11",
+    "names": ["c2tnb239v1"],
+    "fieldSize": 239,
+    "order": "2000000000000000000000000000000f4d42ffe1492a4993f1cad666e447",
+    "baseX": "57927098fa932e7c0a96d3fd5b706ef7e5f5c156e16b7e7c86038552e91d"
+  },{
+    "oid": "1.2.840.10045.3.0.12",
+    "names": ["c2tnb239v2"],
+    "fieldSize": 239,
+    "order": "1555555555555555555555555555553c6f2885259c31e3fcdf154624522d",
+    "baseX": "28f9d04e900069c8dc47a08534fe76d2b900b7d7ef31f5709f200c4ca205"
+  },{
+    "oid": "1.2.840.10045.3.0.13",
+    "names": ["c2tnb239v3"],
+    "fieldSize": 239,
+    "order": "cccccccccccccccccccccccccccccac4912d2d9df903ef9888b8a0e4cff",
+    "baseX": "70f6e9d04d289c4e89913ce3530bfde903977d42b146d539bf1bde4e9c92"
+  },{
+    "oid": "1.2.840.10045.3.0.16",
+    "names": ["c2pnb272w1"],
+    "fieldSize": 272,
+    "order": "100faf51354e0e39e4892df6e319c72c8161603fa45aa7b998a167b8f1e629521",
+    "baseX": "6108babb2ceebcf787058a056cbe0cfe622d7723a289e08a07ae13ef0d10d171dd8d"
+  },{
+    "oid": "1.2.840.10045.3.0.17",
+    "names": ["c2pnb304w1"],
+    "fieldSize": 304,
+    "order": "101d556572aabac800101d556572aabac8001022d5c91dd173f8fb561da6899164443051d",
+    "baseX": "197b07845e9be2d96adb0f5f3c7f2cffbd7a3eb8b6fec35c7fd67f26ddf6285a644f740a2614"
+  },{
+    "oid": "1.2.840.10045.3.0.18",
+    "names": ["c2tnb359v1"],
+    "fieldSize": 359,
+    "order": "1af286bca1af286bca1af286bca1af286bca1af286bc9fb8f6b85c556892c20a7eb964fe7719e74f490758d3b",
+    "baseX": "3c258ef3047767e7ede0f1fdaa79daee3841366a132e163aced4ed2401df9c6bdcde98e8e707c07a2239b1b097"
+  },{
+    "oid": "1.2.840.10045.3.0.19",
+    "names": ["c2pnb368w1"],
+    "fieldSize": 368,
+    "order": "10090512da9af72b08349d98a5dd4c7b0532eca51ce03e2d10f3b7ac579bd87e909ae40a6f131e9cfce5bd967",
+    "baseX": "1085e2755381dccce3c1557afa10c2f0c0c2825646c5b34a394cbcfa8bc16b22e7e789e927be216f02e1fb136a5f"
+  },{
+    "oid": "1.2.840.10045.3.0.2",
+    "names": ["c2pnb163v2"],
+    "fieldSize": 163,
+    "order": "3fffffffffffffffffffdf64de1151adbb78f10a7",
+    "baseX": "24266e4eb5106d0a964d92c4860e2671db9b6cc5"
+  },{
+    "oid": "1.2.840.10045.3.0.20",
+    "names": ["c2tnb431r1"],
+    "fieldSize": 431,
+    "order": "340340340340340340340340340340340340340340340340340340323c313fab50589703b5ec68d3587fec60d161cc149c1ad4a91",
+    "baseX": "120fc05d3c67a99de161d2f4092622feca701be4f50f4758714e8a87bbf2a658ef8c21e7c5efe965361f6c2999c0c247b0dbd70ce6b7"
+  },{
+    "oid": "1.2.840.10045.3.0.3",
+    "names": ["c2pnb163v3"],
+    "fieldSize": 163,
+    "order": "3fffffffffffffffffffe1aee140f110aff961309",
+    "baseX": "2f9f87b7c574d0bdecf8a22e6524775f98cdebdcb"
+  },{
+    "oid": "1.2.840.10045.3.0.4",
+    "names": ["c2pnb176w1"],
+    "fieldSize": 176,
+    "order": "10092537397eca4f6145799d62b0a19ce06fe26ad",
+    "baseX": "8d16c2866798b600f9f08bb4a8e860f3298ce04a5798"
+  },{
+    "oid": "1.2.840.10045.3.0.5",
+    "names": ["c2tnb191v1"],
+    "fieldSize": 191,
+    "order": "40000000000000000000000004a20e90c39067c893bbb9a5",
+    "baseX": "36b3daf8a23206f9c4f299d7b21a9c369137f2c84ae1aa0d"
+  },{
+    "oid": "1.2.840.10045.3.0.6",
+    "names": ["c2tnb191v2"],
+    "fieldSize": 191,
+    "order": "20000000000000000000000050508cb89f652824e06b8173",
+    "baseX": "3809b2b7cc1b28cc5a87926aad83fd28789e81e2c9e3bf10"
+  },{
+    "oid": "1.2.840.10045.3.0.7",
+    "names": ["c2tnb191v3"],
+    "fieldSize": 191,
+    "order": "155555555555555555555555610c0b196812bfb6288a3ea3",
+    "baseX": "375d4ce24fde434489de8746e71786015009e66e38a926dd"
+  },{
+    "oid": "1.2.840.10045.3.1.1",
+    "names": ["P-192","prime192v1","secp192r1"],
+    "fieldSize": 192,
+    "order": "ffffffffffffffffffffffff99def836146bc9b1b4d22831",
+    "baseX": "188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012"
+  },{
+    "oid": "1.2.840.10045.3.1.2",
+    "names": ["prime192v2"],
+    "fieldSize": 192,
+    "order": "fffffffffffffffffffffffe5fb1a724dc80418648d8dd31",
+    "baseX": "eea2bae7e1497842f2de7769cfe9c989c072ad696f48034a"
+  },{
+    "oid": "1.2.840.10045.3.1.3",
+    "names": ["prime192v3"],
+    "fieldSize": 192,
+    "order": "ffffffffffffffffffffffff7a62d031c83f4294f640ec13",
+    "baseX": "7d29778100c65a1da1783716588dce2b8b4aee8e228f1896"
+  },{
+    "oid": "1.2.840.10045.3.1.4",
+    "names": ["prime239v1"],
+    "fieldSize": 239,
+    "order": "7fffffffffffffffffffffff7fffff9e5e9a9f5d9071fbd1522688909d0b",
+    "baseX": "ffa963cdca8816ccc33b8642bedf905c3d358573d3f27fbbd3b3cb9aaaf"
+  },{
+    "oid": "1.2.840.10045.3.1.5",
+    "names": ["prime239v2"],
+    "fieldSize": 239,
+    "order": "7fffffffffffffffffffffff800000cfa7e8594377d414c03821bc582063",
+    "baseX": "38af09d98727705120c921bb5e9e26296a3cdcf2f35757a0eafd87b830e7"
+  },{
+    "oid": "1.2.840.10045.3.1.6",
+    "names": ["prime239v3"],
+    "fieldSize": 239,
+    "order": "7fffffffffffffffffffffff7fffff975deb41b3a6057c3c432146526551",
+    "baseX": "6768ae8e18bb92cfcf005c949aa2c6d94853d0e660bbf854b1c9505fe95a"
+  },{
+    "oid": "1.2.840.10045.3.1.7",
+    "names": ["P-256","prime256v1","secp256r1"],
+    "fieldSize": 256,
+    "order": "ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551",
+    "baseX": "6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296"
+  },{
+    "oid": "1.3.132.0.1",
+    "names": ["K-163","sect163k1"],
+    "fieldSize": 163,
+    "order": "4000000000000000000020108a2e0cc0d99f8a5ef",
+    "baseX": "2fe13c0537bbc11acaa07d793de4e6d5e5c94eee8"
+  },{
+    "oid": "1.3.132.0.10",
+    "names": ["secp256k1"],
+    "fieldSize": 256,
+    "order": "fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+    "baseX": "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  },{
+    "oid": "1.3.132.0.15",
+    "names": ["B-163","sect163r2"],
+    "fieldSize": 163,
+    "order": "40000000000000000000292fe77e70c12a4234c33",
+    "baseX": "3f0eba16286a2d57ea0991168d4994637e8343e36"
+  },{
+    "oid": "1.3.132.0.16",
+    "names": ["K-283","sect283k1"],
+    "fieldSize": 283,
+    "order": "1ffffffffffffffffffffffffffffffffffe9ae2ed07577265dff7f94451e061e163c61",
+    "baseX": "503213f78ca44883f1a3b8162f188e553cd265f23c1567a16876913b0c2ac2458492836"
+  },{
+    "oid": "1.3.132.0.17",
+    "names": ["B-283","sect283r1"],
+    "fieldSize": 283,
+    "order": "3ffffffffffffffffffffffffffffffffffef90399660fc938a90165b042a7cefadb307",
+    "baseX": "5f939258db7dd90e1934f8c70b0dfec2eed25b8557eac9c80e2e198f8cdbecd86b12053"
+  },{
+    "oid": "1.3.132.0.2",
+    "names": ["sect163r1"],
+    "fieldSize": 163,
+    "order": "3ffffffffffffffffffff48aab689c29ca710279b",
+    "baseX": "369979697ab43897789566789567f787a7876a654"
+  },{
+    "oid": "1.3.132.0.22",
+    "names": ["sect131r1"],
+    "fieldSize": 131,
+    "order": "400000000000000023123953a9464b54d",
+    "baseX": "81baf91fdf9833c40f9c181343638399"
+  },{
+    "oid": "1.3.132.0.23",
+    "names": ["sect131r2"],
+    "fieldSize": 131,
+    "order": "400000000000000016954a233049ba98f",
+    "baseX": "356dcd8f2f95031ad652d23951bb366a8"
+  },{
+    "oid": "1.3.132.0.24",
+    "names": ["sect193r1"],
+    "fieldSize": 193,
+    "order": "1000000000000000000000000c7f34a778f443acc920eba49",
+    "baseX": "1f481bc5f0ff84a74ad6cdf6fdef4bf6179625372d8c0c5e1"
+  },{
+    "oid": "1.3.132.0.25",
+    "names": ["sect193r2"],
+    "fieldSize": 193,
+    "order": "10000000000000000000000015aab561b005413ccd4ee99d5",
+    "baseX": "d9b67d192e0367c803f39e1a7e82ca14a651350aae617e8f"
+  },{
+    "oid": "1.3.132.0.26",
+    "names": ["K-233","sect233k1"],
+    "fieldSize": 233,
+    "order": "8000000000000000000000000000069d5bb915bcd46efb1ad5f173abdf",
+    "baseX": "17232ba853a7e731af129f22ff4149563a419c26bf50a4c9d6eefad6126"
+  },{
+    "oid": "1.3.132.0.27",
+    "names": ["B-233","sect233r1"],
+    "fieldSize": 233,
+    "order": "1000000000000000000000000000013e974e72f8a6922031d2603cfe0d7",
+    "baseX": "fac9dfcbac8313bb2139f1bb755fef65bc391f8b36f8f8eb7371fd558b"
+  },{
+    "oid": "1.3.132.0.28",
+    "names": ["secp128r1"],
+    "fieldSize": 128,
+    "order": "fffffffe0000000075a30d1b9038a115",
+    "baseX": "161ff7528b899b2d0c28607ca52c5b86"
+  },{
+    "oid": "1.3.132.0.29",
+    "names": ["secp128r2"],
+    "fieldSize": 128,
+    "order": "3fffffff7fffffffbe0024720613b5a3",
+    "baseX": "7b6aa5d85e572983e6fb32a7cdebc140"
+  },{
+    "oid": "1.3.132.0.3",
+    "names": ["sect239k1"],
+    "fieldSize": 239,
+    "order": "2000000000000000000000000000005a79fec67cb6e91f1c1da800e478a5",
+    "baseX": "29a0b6a887a983e9730988a68727a8b2d126c44cc2cc7b2a6555193035dc"
+  },{
+    "oid": "1.3.132.0.30",
+    "names": ["secp160r2"],
+    "fieldSize": 160,
+    "order": "100000000000000000000351ee786a818f3a1a16b",
+    "baseX": "52dcb034293a117e1f4ff11b30f7199d3144ce6d"
+  },{
+    "oid": "1.3.132.0.31",
+    "names": ["secp192k1"],
+    "fieldSize": 192,
+    "order": "fffffffffffffffffffffffe26f2fc170f69466a74defd8d",
+    "baseX": "db4ff10ec057e9ae26b07d0280b7f4341da5d1b1eae06c7d"
+  },{
+    "oid": "1.3.132.0.32",
+    "names": ["secp224k1"],
+    "fieldSize": 224,
+    "order": "10000000000000000000000000001dce8d2ec6184caf0a971769fb1f7",
+    "baseX": "a1455b334df099df30fc28a169a467e9e47075a90f7e650eb6b7a45c"
+  },{
+    "oid": "1.3.132.0.33",
+    "names": ["P-224","secp224r1"],
+    "fieldSize": 224,
+    "order": "ffffffffffffffffffffffffffff16a2e0b8f03e13dd29455c5c2a3d",
+    "baseX": "b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21"
+  },{
+    "oid": "1.3.132.0.34",
+    "names": ["P-384","secp384r1"],
+    "fieldSize": 384,
+    "order": "ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973",
+    "baseX": "aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7"
+  },{
+    "oid": "1.3.132.0.35",
+    "names": ["P-521","secp521r1"],
+    "fieldSize": 521,
+    "order": "1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409",
+    "baseX": "c6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66"
+  },{
+    "oid": "1.3.132.0.36",
+    "names": ["K-409","sect409k1"],
+    "fieldSize": 409,
+    "order": "7ffffffffffffffffffffffffffffffffffffffffffffffffffe5f83b2d4ea20400ec4557d5ed3e3e7ca5b4b5c83b8e01e5fcf",
+    "baseX": "60f05f658f49c1ad3ab1890f7184210efd0987e307c84c27accfb8f9f67cc2c460189eb5aaaa62ee222eb1b35540cfe9023746"
+  },{
+    "oid": "1.3.132.0.37",
+    "names": ["B-409","sect409r1"],
+    "fieldSize": 409,
+    "order": "10000000000000000000000000000000000000000000000000001e2aad6a612f33307be5fa47c3c9e052f838164cd37d9a21173",
+    "baseX": "15d4860d088ddb3496b0c6064756260441cde4af1771d4db01ffe5b34e59703dc255a868a1180515603aeab60794e54bb7996a7"
+  },{
+    "oid": "1.3.132.0.38",
+    "names": ["K-571","sect571k1"],
+    "fieldSize": 571,
+    "order": "20000000000000000000000000000000000000000000000000000000000000000000000131850e1f19a63e4b391a8db917f4138b630d84be5d639381e91deb45cfe778f637c1001",
+    "baseX": "26eb7a859923fbc82189631f8103fe4ac9ca2970012d5d46024804801841ca44370958493b205e647da304db4ceb08cbbd1ba39494776fb988b47174dca88c7e2945283a01c8972"
+  },{
+    "oid": "1.3.132.0.39",
+    "names": ["B-571","sect571r1"],
+    "fieldSize": 571,
+    "order": "3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe661ce18ff55987308059b186823851ec7dd9ca1161de93d5174d66e8382e9bb2fe84e47",
+    "baseX": "303001d34b856296c16c0d40d3cd7750a93d1d2955fa80aa5f40fc8db7b2abdbde53950f4c0d293cdd711a35b67fb1499ae60038614f1394abfa3b4c850d927e1e7769c8eec2d19"
+  },{
+    "oid": "1.3.132.0.4",
+    "names": ["sect113r1"],
+    "fieldSize": 113,
+    "order": "100000000000000d9ccec8a39e56f",
+    "baseX": "9d73616f35f4ab1407d73562c10f"
+  },{
+    "oid": "1.3.132.0.5",
+    "names": ["sect113r2"],
+    "fieldSize": 113,
+    "order": "10000000000000108789b2496af93",
+    "baseX": "1a57a6a7b26ca5ef52fcdb8164797"
+  },{
+    "oid": "1.3.132.0.6",
+    "names": ["secp112r1"],
+    "fieldSize": 112,
+    "order": "db7c2abf62e35e7628dfac6561c5",
+    "baseX": "9487239995a5ee76b55f9c2f098"
+  },{
+    "oid": "1.3.132.0.7",
+    "names": ["secp112r2"],
+    "fieldSize": 112,
+    "order": "36df0aafd8b8d7597ca10520d04b",
+    "baseX": "4ba30ab5e892b4e1649dd0928643"
+  },{
+    "oid": "1.3.132.0.8",
+    "names": ["secp160r1"],
+    "fieldSize": 160,
+    "order": "100000000000000000001f4c8f927aed3ca752257",
+    "baseX": "4a96b5688ef573284664698968c38bb913cbfc82"
+  },{
+    "oid": "1.3.132.0.9",
+    "names": ["secp160k1"],
+    "fieldSize": 160,
+    "order": "100000000000000000001b8fa16dfab9aca16b6b3",
+    "baseX": "3b4c382ce37aa192a4019e763036f4f5dd4d7ebb"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.1",
+    "names": ["brainpoolP160r1"],
+    "fieldSize": 160,
+    "order": "e95e4a5f737059dc60df5991d45029409e60fc09",
+    "baseX": "bed5af16ea3f6a4f62938c4631eb5af7bdbcdbc3"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.10",
+    "names": ["brainpoolP320t1"],
+    "fieldSize": 320,
+    "order": "d35e472036bc4fb7e13c785ed201e065f98fcfa5b68f12a32d482ec7ee8658e98691555b44c59311",
+    "baseX": "925be9fb01afc6fb4d3e7d4990010f813408ab106c4f09cb7ee07868cc136fff3357f624a21bed52"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.11",
+    "names": ["brainpoolP384r1"],
+    "fieldSize": 384,
+    "order": "8cb91e82a3386d280f5d6f7e50e641df152f7109ed5456b31f166e6cac0425a7cf3ab6af6b7fc3103b883202e9046565",
+    "baseX": "1d1c64f068cf45ffa2a63a81b7c13f6b8847a3e77ef14fe3db7fcafe0cbd10e8e826e03436d646aaef87b2e247d4af1e"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.12",
+    "names": ["brainpoolP384t1"],
+    "fieldSize": 384,
+    "order": "8cb91e82a3386d280f5d6f7e50e641df152f7109ed5456b31f166e6cac0425a7cf3ab6af6b7fc3103b883202e9046565",
+    "baseX": "18de98b02db9a306f2afcd7235f72a819b80ab12ebd653172476fecd462aabffc4ff191b946a5f54d8d0aa2f418808cc"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.13",
+    "names": ["brainpoolP512r1"],
+    "fieldSize": 512,
+    "order": "aadd9db8dbe9c48b3fd4e6ae33c9fc07cb308db3b3c9d20ed6639cca70330870553e5c414ca92619418661197fac10471db1d381085ddaddb58796829ca90069",
+    "baseX": "81aee4bdd82ed9645a21322e9c4c6a9385ed9f70b5d916c1b43b62eef4d0098eff3b1f78e2d0d48d50d1687b93b97d5f7c6d5047406a5e688b352209bcb9f822"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.14",
+    "names": ["brainpoolP512t1"],
+    "fieldSize": 512,
+    "order": "aadd9db8dbe9c48b3fd4e6ae33c9fc07cb308db3b3c9d20ed6639cca70330870553e5c414ca92619418661197fac10471db1d381085ddaddb58796829ca90069",
+    "baseX": "640ece5c12788717b9c1ba06cbc2a6feba85842458c56dde9db1758d39c0313d82ba51735cdb3ea499aa77a7d6943a64f7a3f25fe26f06b51baa2696fa9035da"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.2",
+    "names": ["brainpoolP160t1"],
+    "fieldSize": 160,
+    "order": "e95e4a5f737059dc60df5991d45029409e60fc09",
+    "baseX": "b199b13b9b34efc1397e64baeb05acc265ff2378"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.3",
+    "names": ["brainpoolP192r1"],
+    "fieldSize": 192,
+    "order": "c302f41d932a36cda7a3462f9e9e916b5be8f1029ac4acc1",
+    "baseX": "c0a0647eaab6a48753b033c56cb0f0900a2f5c4853375fd6"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.4",
+    "names": ["brainpoolP192t1"],
+    "fieldSize": 192,
+    "order": "c302f41d932a36cda7a3462f9e9e916b5be8f1029ac4acc1",
+    "baseX": "3ae9e58c82f63c30282e1fe7bbf43fa72c446af6f4618129"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.5",
+    "names": ["brainpoolP224r1"],
+    "fieldSize": 224,
+    "order": "d7c134aa264366862a18302575d0fb98d116bc4b6ddebca3a5a7939f",
+    "baseX": "d9029ad2c7e5cf4340823b2a87dc68c9e4ce3174c1e6efdee12c07d"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.6",
+    "names": ["brainpoolP224t1"],
+    "fieldSize": 224,
+    "order": "d7c134aa264366862a18302575d0fb98d116bc4b6ddebca3a5a7939f",
+    "baseX": "6ab1e344ce25ff3896424e7ffe14762ecb49f8928ac0c76029b4d580"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.7",
+    "names": ["brainpoolP256r1"],
+    "fieldSize": 256,
+    "order": "a9fb57dba1eea9bc3e660a909d838d718c397aa3b561a6f7901e0e82974856a7",
+    "baseX": "8bd2aeb9cb7e57cb2c4b482ffc81b7afb9de27e1e3bd23c23a4453bd9ace3262"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.8",
+    "names": ["brainpoolP256t1"],
+    "fieldSize": 256,
+    "order": "a9fb57dba1eea9bc3e660a909d838d718c397aa3b561a6f7901e0e82974856a7",
+    "baseX": "a3e8eb3cc1cfe7b7732213b23a656149afa142c47aafbc2b79a191562e1305f4"
+  },{
+    "oid": "1.3.36.3.3.2.8.1.1.9",
+    "names": ["brainpoolP320r1"],
+    "fieldSize": 320,
+    "order": "d35e472036bc4fb7e13c785ed201e065f98fcfa5b68f12a32d482ec7ee8658e98691555b44c59311",
+    "baseX": "43bd7e9afb53d8b85289bcc48ee5bfe6f20137d10a087eb6e7871e2a10a599c710af8d0d39e20611"
+  },{
+    "oid": "1.3.101.110",
+    "names": ["curve25519","x25519"],
+    "fieldSize": 256,
+    "orderSize": 256
+  },{
+    "oid": "1.3.101.111",
+    "names": ["curve448","x448"],
+    "fieldSize": 448,
+    "orderSize": 448
+  },{
+    "oid": "1.3.101.112",
+    "names": ["edwards25519","ed25519"],
+    "fieldSize": 256,
+    "orderSize": 256
+  },{
+    "oid": "1.3.101.113",
+    "names": ["edwards448","ed448"],
+    "fieldSize": 449,
+    "orderSize": 449
+  }
+]

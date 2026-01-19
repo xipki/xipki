@@ -1,30 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.mgmt;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.AuditLevel;
-import org.xipki.audit.AuditStatus;
-import org.xipki.audit.Audits;
-import org.xipki.audit.PciAuditEvent;
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
-import org.xipki.ca.api.mgmt.CaConfs;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaProfileEntry;
-import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CaSystemStatus;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertListOrderBy;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -36,43 +21,34 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.ca.server.CaConfStore;
-import org.xipki.ca.server.CaIdNameMap;
-import org.xipki.ca.server.CaInfo;
-import org.xipki.ca.server.CaServerConf;
-import org.xipki.ca.server.CertPublisherFactoryRegister;
-import org.xipki.ca.server.CertStore;
-import org.xipki.ca.server.CertprofileFactoryRegister;
-import org.xipki.ca.server.CtLogPublicKeyFinder;
-import org.xipki.ca.server.FileCaConfStore;
-import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.ca.server.KeypairGenEntryWrapper;
-import org.xipki.ca.server.RequestorEntryWrapper;
-import org.xipki.ca.server.SystemEvent;
-import org.xipki.ca.server.UniqueIdGenerator;
-import org.xipki.ca.server.X509Ca;
+import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.DbCaConfStore;
 import org.xipki.ca.server.db.DbCertStore;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceConf;
-import org.xipki.datasource.DataSourceFactory;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.pki.OperationException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
+import org.xipki.security.X509Crl;
+import org.xipki.security.exception.OperationException;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.Hex;
-import org.xipki.util.IoUtil;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceConf;
+import org.xipki.util.datasource.DataSourceFactory;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.audit.AuditLevel;
+import org.xipki.util.extra.audit.AuditStatus;
+import org.xipki.util.extra.audit.Audits;
+import org.xipki.util.extra.audit.PciAuditEvent;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.FileOrValue;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -85,17 +61,8 @@ import java.sql.Connection;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -120,7 +87,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     public DataSourceWrapper getDataSource(String name) {
       if (underlying == null) {
         return null;
-      } else if ("ca".equalsIgnoreCase(name) || "caconf".equalsIgnoreCase(name)) {
+      } else if ("ca".equalsIgnoreCase(name)
+          || "caconf".equalsIgnoreCase(name)) {
         return null;
       } else {
         return underlying.get(name.toLowerCase());
@@ -144,7 +112,8 @@ public class CaManagerImpl implements CaManager, Closeable {
         SystemEvent event = caConfStore.getSystemEvent(EVENT_CACHANGE);
         long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
-        LOG.info("check the restart CA system event: changed at={}, lastStartTime={}",
+        LOG.info("check the restart CA system event: changed at={}, " +
+                "lastStartTime={}",
             Instant.ofEpochSecond(caChangedTime), lastStartTime);
 
         if (caChangedTime > lastStartTime.getEpochSecond()) {
@@ -162,7 +131,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   } // class CaRestarter
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaManagerImpl.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CaManagerImpl.class);
 
   private static final String EVENT_LOCK = "LOCK";
 
@@ -176,27 +146,38 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, SignerEntry> signerDbEntries = new ConcurrentHashMap<>();
 
-  final Map<String, IdentifiedCertprofile> certprofiles = new ConcurrentHashMap<>();
+  final Map<String, IdentifiedCertprofile> certprofiles =
+      new ConcurrentHashMap<>();
 
-  final Map<String, CertprofileEntry> certprofileDbEntries = new ConcurrentHashMap<>();
+  final Map<String, CertprofileEntry> certprofileDbEntries =
+      new ConcurrentHashMap<>();
 
-  final Map<String, IdentifiedCertPublisher> publishers = new ConcurrentHashMap<>();
+  final Map<String, IdentifiedCertPublisher> publishers =
+      new ConcurrentHashMap<>();
 
-  final Map<String, PublisherEntry> publisherDbEntries = new ConcurrentHashMap<>();
+  final Map<String, PublisherEntry> publisherDbEntries =
+      new ConcurrentHashMap<>();
 
-  final Map<String, RequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
+  final Map<String, RequestorEntryWrapper> requestors =
+      new ConcurrentHashMap<>();
 
-  final Map<String, RequestorEntry> requestorDbEntries = new ConcurrentHashMap<>();
+  final Map<String, RequestorEntry> requestorDbEntries =
+      new ConcurrentHashMap<>();
 
-  final Map<String, KeypairGenEntryWrapper> keypairGens = new ConcurrentHashMap<>();
+  final Map<String, KeypairGenEntryWrapper> keypairGens =
+      new ConcurrentHashMap<>();
 
-  final Map<String, KeypairGenEntry> keypairGenDbEntries = new ConcurrentHashMap<>();
+  final Map<String, KeypairGenEntry> keypairGenDbEntries =
+      new ConcurrentHashMap<>();
 
-  final Map<String, Set<CaProfileEntry>> caHasProfiles = new ConcurrentHashMap<>();
+  final Map<String, Set<CaProfileEntry>> caHasProfiles =
+      new ConcurrentHashMap<>();
 
-  final Map<String, Set<String>> caHasPublishers = new ConcurrentHashMap<>();
+  final Map<String, Set<String>> caHasPublishers =
+      new ConcurrentHashMap<>();
 
-  final Map<String, Set<CaHasRequestorEntry>> caHasRequestors = new ConcurrentHashMap<>();
+  final Map<String, Set<CaHasRequestorEntry>> caHasRequestors =
+      new ConcurrentHashMap<>();
 
   final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
@@ -265,7 +246,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   private final String calockFilePath;
 
   static {
-    LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(CaManagerImpl.class));
+    LOG.info("XiPKI CA version {}",
+        StringUtil.getBundleVersion(CaManagerImpl.class));
   }
 
   public CaManagerImpl() {
@@ -278,7 +260,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       try {
         calockId = StringUtil.toUtf8String(IoUtil.read(calockFile));
       } catch (IOException ex) {
-        LOG.error("could not read {}: {}", calockFile.getName(), ex.getMessage());
+        LOG.error("could not read {}: {}", calockFile.getName(),
+            ex.getMessage());
       }
     }
 
@@ -287,7 +270,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       try {
         IoUtil.save(calockFile, StringUtil.toUtf8Bytes(calockId));
       } catch (IOException ex) {
-        LOG.error("could not save {}: {}", calockFile.getName(), ex.getMessage());
+        LOG.error("could not save {}: {}", calockFile.getName(),
+            ex.getMessage());
       }
     }
 
@@ -298,7 +282,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       LOG.warn("could not get host address: {}", ex.getMessage());
     }
 
-    this.lockInstanceId = (hostAddress == null) ? calockId : hostAddress + "/" + calockId;
+    this.lockInstanceId = (hostAddress == null) ? calockId
+        : hostAddress + "/" + calockId;
 
     this.ca2Manager = new Ca2Manager(this);
     this.certprofileManager = new CertprofileManager(this);
@@ -325,7 +310,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return p11CryptServiceFactory;
   }
 
-  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
+  public void setP11CryptServiceFactory(
+      P11CryptServiceFactory p11CryptServiceFactory) {
     this.p11CryptServiceFactory = p11CryptServiceFactory;
   }
 
@@ -349,7 +335,9 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose) throws CaMgmtException {
+  public String getTokenInfoP11(String moduleName, Integer slotIndex,
+                                boolean verbose)
+      throws CaMgmtException {
     return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
   }
 
@@ -364,7 +352,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       throw new IllegalStateException("certprofileFactoryRegister is not set");
     }
     if (certPublisherFactoryRegister == null) {
-      throw new IllegalStateException("certPublisherFactoryRegister is not set");
+      throw new IllegalStateException(
+          "certPublisherFactoryRegister is not set");
     }
     if (keypairGeneratorFactories == null) {
       throw new IllegalStateException("keypairGeneratorFactories is not set");
@@ -386,9 +375,11 @@ public class CaManagerImpl implements CaManager, Closeable {
 
     if (caServerConf.getCtLog() != null) {
       try {
-        ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.getCtLog());
+        ctLogPublicKeyFinder =
+            new CtLogPublicKeyFinder(caServerConf.getCtLog());
       } catch (Exception ex) {
-        throw new CaMgmtException("could not load CtLogPublicKeyFinder: " + ex.getMessage(), ex);
+        throw new CaMgmtException("could not load CtLogPublicKeyFinder: " +
+            ex.getMessage(), ex);
       }
     }
 
@@ -415,11 +406,13 @@ public class CaManagerImpl implements CaManager, Closeable {
       } else {
         LOG.info("loading CAConf from files {}", caServerConf.getCaConfFiles());
         try {
-          caConfStore = new FileCaConfStore(securityFactory, certprofileFactoryRegister, caServerConf.getCaConfFiles());
+          caConfStore = new FileCaConfStore(securityFactory,
+              certprofileFactoryRegister, caServerConf.getCaConfFiles());
         } catch (IOException ex) {
           throw new CaMgmtException("IO error: " + ex.getMessage(), ex);
         } catch (InvalidConfException ex) {
-          throw new CaMgmtException("Invalid Configuration: " + ex.getMessage(), ex);
+          throw new CaMgmtException("Invalid Configuration: " + ex.getMessage(),
+              ex);
         }
       }
 
@@ -427,7 +420,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       LOG.info("needsCertStore: {}", needsCertStore);
       if (needsCertStore) {
         if (caDataSourceConf == null) {
-          throw new CaMgmtException("no datasource named '" + caDataSourceName + "' configured");
+          throw new CaMgmtException("no datasource named '" +
+              caDataSourceName + "' configured");
         }
 
         addDataSource(caDataSourceName, caDataSourceConf);
@@ -438,7 +432,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     // 2010-01-01T00:00:00.000 UTC
-    final long epochSecond = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toEpochSecond();
+    final long epochSecond = ZonedDateTime.of(2010, 1, 1, 0, 0, 0, 0,
+        ZoneOffset.UTC).toEpochSecond();
     UniqueIdGenerator idGen = new UniqueIdGenerator(epochSecond, shardId);
 
     if (masterMode) {
@@ -466,7 +461,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     boolean initSucc = true;
     if (caConfStore.needsCertStore()) {
       try {
-        this.certstore = new DbCertStore(certstoreDatasource, caConfStore, idGen);
+        this.certstore =
+            new DbCertStore(certstoreDatasource, caConfStore, idGen);
       } catch (DataAccessException ex) {
         initSucc = false;
         LogUtil.error(LOG, ex, "error constructing CertStore");
@@ -537,7 +533,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       for (CaInfo entry : caInfos.values()) {
-        certstore.addCa(entry.getIdent(), entry.getCert(), entry.getRevocationInfo());
+        certstore.addCa(entry.getIdent(), entry.getCert(),
+            entry.getRevocationInfo());
       }
     }
 
@@ -546,7 +543,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method init
 
-  private void addDataSource(String name, FileOrValue conf) throws CaMgmtException {
+  private void addDataSource(String name, FileOrValue conf)
+      throws CaMgmtException {
     DataSourceWrapper datasource;
     try {
       datasource = datasourceFactory.createDataSource(name, conf);
@@ -556,9 +554,10 @@ public class CaManagerImpl implements CaManager, Closeable {
       datasource.returnConnection(conn);
 
       LOG.info("loaded datasource.{}", name);
-    } catch (DataAccessException | InvalidConfException | IOException | RuntimeException ex) {
-      throw new CaMgmtException(
-          ex.getClass().getName() + " while parsing datasource " + name + ": " + ex.getMessage(), ex);
+    } catch (DataAccessException | InvalidConfException | IOException
+             | RuntimeException ex) {
+      throw new CaMgmtException(ex.getClass().getName() +
+          " while parsing datasource " + name + ": " + ex.getMessage(), ex);
     }
 
     allDataSources.put(name, datasource);
@@ -576,7 +575,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public CaSystemStatus getCaSystemStatus() {
     if (caSystemSetuped) {
-      return masterMode ? CaSystemStatus.STARTED_AS_MASTER : CaSystemStatus.STARTED_AS_SLAVE;
+      return masterMode ? CaSystemStatus.STARTED_AS_MASTER
+          : CaSystemStatus.STARTED_AS_SLAVE;
     } else if (initializing) {
       return CaSystemStatus.INITIALIZING;
     } else if (!caLockedByMe) {
@@ -594,17 +594,20 @@ public class CaManagerImpl implements CaManager, Closeable {
       Instant lockedAt = Instant.ofEpochSecond(lockInfo.getEventTime());
 
       if (!this.lockInstanceId.equals(lockedBy)) {
-        String msg = "could not lock CA, it has been locked by " + lockedBy + " since " +
-            lockedAt +  ". In general this indicates that another CA software in master mode is "
-                + "accessing the database or the last shutdown of CA software in master mode is abnormal. "
-                + "If you know what you do, you can unlock it executing the ca:unlock command.";
+        String msg = "could not lock CA, it has been locked by " + lockedBy +
+            " since " + lockedAt +  ". In general this indicates that " +
+            "another CA software in master mode is accessing the database " +
+            "or the last shutdown of CA software in master mode is abnormal. " +
+            "If you know what you do, you can unlock it executing the " +
+            "ca:unlock command.";
         throw logAndCreateException(msg);
       }
 
       LOG.info("CA has been locked by me since {}, re-lock it", lockedAt);
     }
 
-    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, Instant.now().getEpochSecond());
+    SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId,
+        Instant.now().getEpochSecond());
     caConfStore.changeSystemEvent(newLockInfo);
     caLockedByMe = true;
   } // method lockCa
@@ -658,7 +661,9 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void notifyCaChange() throws CaMgmtException {
     try {
-      SystemEvent systemEvent = new SystemEvent(EVENT_CACHANGE, lockInstanceId, Instant.now().getEpochSecond());
+      SystemEvent systemEvent = new SystemEvent(EVENT_CACHANGE, lockInstanceId,
+          Instant.now().getEpochSecond());
+
       caConfStore.changeSystemEvent(systemEvent);
       LOG.info("notified the change of CA system");
     } catch (CaMgmtException ex) {
@@ -717,9 +722,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     return noReserved;
   }
 
-  private static void checkModificationOfDbSchema(String name) throws CaMgmtException {
-    if (StringUtil.orEqualsIgnoreCase(name, "VERSION", "VENDOR", "X500NAME_MAXLEN")) {
-      throw new CaMgmtException("modification of reserved DBSCHEMA " + name + " is not allowed");
+  private static void checkModificationOfDbSchema(String name)
+      throws CaMgmtException {
+    if (StringUtil.orEqualsIgnoreCase(name, "VERSION", "VENDOR",
+        "X500NAME_MAXLEN")) {
+      throw new CaMgmtException("modification of reserved DBSCHEMA " +
+          name + " is not allowed");
     }
   }
 
@@ -828,10 +836,11 @@ public class CaManagerImpl implements CaManager, Closeable {
     } finally {
       initializing = false;
       if (!masterMode && persistentScheduledThreadPoolExecutor == null) {
-        persistentScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        persistentScheduledThreadPoolExecutor =
+            new ScheduledThreadPoolExecutor(1);
         persistentScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
-        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(new CaRestarter(),
-            300, 300, TimeUnit.SECONDS);
+        persistentScheduledThreadPoolExecutor.scheduleAtFixedRate(
+            new CaRestarter(), 300, 300, TimeUnit.SECONDS);
       }
     }
 
@@ -880,7 +889,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     File caLockFile = new File(calockFilePath);
     if (caLockFile.exists()) {
       if (!caLockFile.delete()) {
-        LOG.warn("could not delete file " + caLockFile.getAbsolutePath());
+        LOG.warn("could not delete file {}", caLockFile.getAbsolutePath());
       }
     }
 
@@ -937,7 +946,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca2Manager.getInactiveCaNames();
   }
 
-  public void commitNextCrlNo(NameId ca, long nextCrlNo) throws OperationException {
+  public void commitNextCrlNo(NameId ca, long nextCrlNo)
+      throws OperationException {
     ca2Manager.commitNextCrlNo(ca, nextCrlNo);
   }
 
@@ -973,28 +983,33 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
+  public void removeCertprofileFromCa(String profileName, String caName)
+      throws CaMgmtException {
     certprofileManager.removeCertprofileFromCa(profileName, caName);
   }
 
   @Override
-  public void addCertprofileToCa(String profileNameAndAliases, String caName) throws CaMgmtException {
+  public void addCertprofileToCa(String profileNameAndAliases, String caName)
+      throws CaMgmtException {
     certprofileManager.addCertprofileToCa(profileNameAndAliases, caName);
   }
 
   @Override
-  public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
+  public void removePublisherFromCa(String publisherName, String caName)
+      throws CaMgmtException {
     publisherManager.removePublisherFromCa(publisherName, caName);
   }
 
   @Override
-  public void addPublisherToCa(String publisherName, String caName) throws CaMgmtException {
+  public void addPublisherToCa(String publisherName, String caName)
+      throws CaMgmtException {
     publisherManager.addPublisherToCa(publisherName, caName);
   }
 
   @Override
   public Set<CaProfileEntry> getCertprofilesForCa(String caName) {
-    Set<CaProfileEntry> caProfileEntries = caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
+    Set<CaProfileEntry> caProfileEntries =
+        caHasProfiles.get(Args.toNonBlankLower(caName, "caName"));
     if (CollectionUtil.isEmpty(caProfileEntries)) {
       return Collections.emptySet();
     } else {
@@ -1017,7 +1032,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addRequestor(RequestorEntry requestorEntry) throws CaMgmtException {
+  public void addRequestor(RequestorEntry requestorEntry)
+      throws CaMgmtException {
     requestorManager.addRequestor(requestorEntry);
     certstore.addRequestor(requestorEntry.getIdent());
   }
@@ -1030,17 +1046,20 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changeRequestor(String name, String type, String conf) throws CaMgmtException {
+  public void changeRequestor(String name, String type, String conf)
+      throws CaMgmtException {
     requestorManager.changeRequestor(name, type, conf);
   }
 
   @Override
-  public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
+  public void removeRequestorFromCa(String requestorName, String caName)
+      throws CaMgmtException {
     requestorManager.removeRequestorFromCa(requestorName, caName);
   }
 
   @Override
-  public void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException {
+  public void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
+      throws CaMgmtException {
     requestorManager.addRequestorToCa(requestor, caName);
   }
 
@@ -1057,17 +1076,20 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
+  public void changeCertprofile(String name, String type, String conf)
+      throws CaMgmtException {
     certprofileManager.changeCertprofile(name, type, conf);
   }
 
   @Override
-  public void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
+  public void addCertprofile(CertprofileEntry certprofileEntry)
+      throws CaMgmtException {
     certprofileManager.addCertprofile(certprofileEntry);
     certstore.addCertProfile(certprofileEntry.getIdent());
   }
 
-  public CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
+  public CertprofileInfoResponse getCertprofileInfo(String profileName)
+      throws OperationException {
     return certprofileManager.getCertprofileInfo(profileName);
   }
 
@@ -1082,12 +1104,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
+  public void changeKeypairGen(String name, String type, String conf)
+      throws CaMgmtException {
     keypairGenManager.changeKeypairGen(name, type, conf);
   }
 
   @Override
-  public void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
+  public void addKeypairGen(KeypairGenEntry keypairGenEntry)
+      throws CaMgmtException {
     keypairGenManager.addKeypairGen(keypairGenEntry);
   }
 
@@ -1102,7 +1126,9 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changeSigner(String name, String type, String conf, String base64Cert) throws CaMgmtException {
+  public void changeSigner(
+      String name, String type, String conf, String base64Cert)
+      throws CaMgmtException {
     signerManager.changeSigner(name, type, conf, base64Cert);
   }
 
@@ -1130,11 +1156,6 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public List<PublisherEntry> getPublishersForCa(String caName) {
-    return publisherManager.getPublishersForCa(caName);
-  }
-
-  @Override
   public PublisherEntry getPublisher(String name) {
     return publisherDbEntries.get(Args.toNonBlankLower(name, "name"));
   }
@@ -1145,7 +1166,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void changePublisher(String name, String type, String conf) throws CaMgmtException {
+  public void changePublisher(String name, String type, String conf)
+      throws CaMgmtException {
     publisherManager.changePublisher(name, type, conf);
   }
 
@@ -1154,7 +1176,8 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void addCaAlias(String aliasName, String caName) throws CaMgmtException {
+  public void addCaAlias(String aliasName, String caName)
+      throws CaMgmtException {
     CaManagerImpl.checkName(aliasName, "CA alias");
     ca2Manager.addCaAlias(aliasName, caName);
   }
@@ -1187,13 +1210,15 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void republishCertificates(String caName, List<String> publisherNames, int numThreads)
+  public void republishCertificates(
+      String caName, List<String> publisherNames, int numThreads)
       throws CaMgmtException {
     publisherManager.republishCertificates(caName, publisherNames, numThreads);
   }
 
   @Override
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+      throws CaMgmtException {
     ca2Manager.revokeCa(caName, revocationInfo);
     certstore.revokeCa(caName, revocationInfo);
   }
@@ -1204,15 +1229,19 @@ public class CaManagerImpl implements CaManager, Closeable {
     certstore.unrevokeCa(caName);
   }
 
-  public void setCertprofileFactoryRegister(CertprofileFactoryRegister register) {
+  public void setCertprofileFactoryRegister(
+      CertprofileFactoryRegister register) {
     this.certprofileFactoryRegister = register;
   }
 
-  public void setKeyPairGeneratorFactories(Set<KeypairGeneratorFactory> factories) {
-    this.keypairGeneratorFactories = factories == null ? Collections.emptySet() : factories;
+  public void setKeyPairGeneratorFactories(
+      Set<KeypairGeneratorFactory> factories) {
+    this.keypairGeneratorFactories = factories == null
+        ? Collections.emptySet() : factories;
   }
 
-  public void setCertPublisherFactoryRegister(CertPublisherFactoryRegister register) {
+  public void setCertPublisherFactoryRegister(
+      CertPublisherFactoryRegister register) {
     this.certPublisherFactoryRegister = register;
   }
 
@@ -1238,40 +1267,49 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void revokeCertificate(String caName, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
+  public void revokeCertificate(String caName, BigInteger serialNumber,
+                                CrlReason reason, Instant invalidityTime)
       throws CaMgmtException {
     ca2Manager.revokeCertificate(caName, serialNumber, reason, invalidityTime);
   }
 
   @Override
-  public void unsuspendCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public void unsuspendCertificate(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     ca2Manager.unsuspendCertificate(caName, serialNumber);
   }
 
   @Override
-  public void removeCertificate(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public void removeCertificate(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     ca2Manager.removeCertificate(caName, serialNumber);
   }
 
   @Override
   public X509Cert generateCertificate(
-      String caName, String profileName, byte[] encodedCsr, Instant notBefore, Instant notAfter)
+      String caName, String profileName, byte[] encodedCsr,
+      Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
+    return ca2Manager.generateCertificate(caName, profileName, encodedCsr,
+        notBefore, notAfter);
   }
 
   @Override
-  public X509Cert generateCrossCertificate(String caName, String profileName, byte[] encodedCsr,
-                                           byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
+  public X509Cert generateCrossCertificate(
+      String caName, String profileName, byte[] encodedCsr,
+      byte[] encodedTargetCert, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateCrossCertificate(caName, profileName, encodedCsr, encodedTargetCert, notBefore, notAfter);
+    return ca2Manager.generateCrossCertificate(caName, profileName,
+        encodedCsr, encodedTargetCert, notBefore, notAfter);
   }
 
   @Override
   public KeyCertBytesPair generateKeyCert(
-      String caName, String profileName, String subject, Instant notBefore, Instant notAfter)
+      String caName, String profileName, String subject,
+      Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateKeyCert(caName, profileName, subject, notBefore, notAfter);
+    return ca2Manager.generateKeyCert(caName, profileName, subject,
+        notBefore, notAfter);
   }
 
   public X509Ca getX509Ca(String name) throws CaMgmtException {
@@ -1288,16 +1326,18 @@ public class CaManagerImpl implements CaManager, Closeable {
     return certprofiles.get(Args.toNonBlankLower(profileName, "profileName"));
   }
 
-  public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName) {
+  public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(
+      String caName) {
     return publisherManager.getIdentifiedPublishersForCa(caName);
   }
 
   @Override
   public X509Cert generateRootCa(
-      CaEntry caEntry, String profileName, String subject, String serialNumber, Instant notBefore, Instant notAfter)
+      CaEntry caEntry, String profileName, String subject,
+      String serialNumber, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, subject, serialNumber,
-        notBefore, notAfter, certstore);
+    return ca2Manager.generateRootCa(caEntry, profileName, subject,
+        serialNumber, notBefore, notAfter, certstore);
   }
 
   void assertMasterMode() throws CaMgmtException {
@@ -1317,15 +1357,18 @@ public class CaManagerImpl implements CaManager, Closeable {
     signerManager.createSigner(entry);
   }
 
-  public IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {
+  public IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
+      throws CaMgmtException {
     return certprofileManager.createCertprofile(entry);
   }
 
-  public IdentifiedCertPublisher createPublisher(PublisherEntry entry) throws CaMgmtException {
+  public IdentifiedCertPublisher createPublisher(PublisherEntry entry)
+      throws CaMgmtException {
     return publisherManager.createPublisher(entry);
   }
 
-  public KeypairGenEntryWrapper createKeypairGenerator(KeypairGenEntry entry) throws CaMgmtException {
+  public KeypairGenEntryWrapper createKeypairGenerator(KeypairGenEntry entry)
+      throws CaMgmtException {
     return keypairGenManager.createKeypairGen(entry);
   }
 
@@ -1334,35 +1377,41 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509CRLHolder generateCrlOnDemand(String caName) throws CaMgmtException {
+  public X509Crl generateCrlOnDemand(String caName) throws CaMgmtException {
     return ca2Manager.generateCrlOnDemand(caName);
   }
 
   @Override
-  public X509CRLHolder getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509Crl getCrl(String caName, BigInteger crlNumber)
+      throws CaMgmtException {
     return ca2Manager.getCrl(caName, crlNumber);
   }
 
   @Override
-  public X509CRLHolder getCurrentCrl(String caName) throws CaMgmtException {
+  public X509Crl getCurrentCrl(String caName) throws CaMgmtException {
     return ca2Manager.getCurrentCrl(caName);
   }
 
   @Override
-  public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber) throws CaMgmtException {
+  public CertWithRevocationInfo getCert(String caName, BigInteger serialNumber)
+      throws CaMgmtException {
     return ca2Manager.getCert(caName, serialNumber);
   }
 
   @Override
-  public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber) throws CaMgmtException {
+  public CertWithRevocationInfo getCert(
+      X500Name issuer, BigInteger serialNumber)
+      throws CaMgmtException {
     return ca2Manager.getCert(issuer, serialNumber);
   }
 
   @Override
-  public List<CertListInfo> listCertificates(String caName, X500Name subjectPattern, Instant validFrom,
-                                             Instant validTo, CertListOrderBy orderBy, int numEntries)
+  public List<CertListInfo> listCertificates(
+      String caName, X500Name subjectPattern, Instant validFrom,
+      Instant validTo, CertListOrderBy orderBy, int numEntries)
       throws CaMgmtException {
-    return ca2Manager.listCertificates(caName, subjectPattern, validFrom, validTo, orderBy, numEntries);
+    return ca2Manager.listCertificates(caName, subjectPattern,
+        validFrom, validTo, orderBy, numEntries);
   }
 
   @Override
@@ -1375,12 +1424,14 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public void loadConfAndClose(InputStream zippedConfStream) throws CaMgmtException {
+  public void loadConfAndClose(InputStream zippedConfStream)
+      throws CaMgmtException {
     confLoader.loadConf(zippedConfStream);
   }
 
   @Override
-  public InputStream exportConf(List<String> caNames) throws CaMgmtException, IOException {
+  public InputStream exportConf(List<String> caNames)
+      throws CaMgmtException, IOException {
     return confLoader.exportConf(caNames);
   }
 
@@ -1402,7 +1453,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     byte[] authorityKeyId = req.getAuthorityKeyIdentifier();
     byte[] issuerCertSha1Fp = req.getIssuerCertSha1Fp();
 
-    if (x500Issuer == null && authorityKeyId == null && issuerCertSha1Fp == null) {
+    if (x500Issuer == null
+        && authorityKeyId == null
+        && issuerCertSha1Fp == null) {
       return null;
     }
 
@@ -1421,7 +1474,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
 
       if (issuerCertSha1Fp != null) {
-        if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(ca.getHexSha1OfCert())) {
+        if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(
+              ca.getHexSha1OfCert())) {
           continue;
         }
       }

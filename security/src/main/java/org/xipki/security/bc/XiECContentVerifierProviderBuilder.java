@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.bc;
@@ -12,21 +12,21 @@ import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
-import org.xipki.security.DSAPlainDigestSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Extends {@link BcECContentVerifierProviderBuilder} to support the signature algorithms
- * Plain-ECDSA and SM3.
+ * Extends {@link BcECContentVerifierProviderBuilder} to support the signature
+ * algorithms Plain-ECDSA and SM3.
  *
  * @author Lijun Liao (xipki)
  * @since 2.1.0
  */
 
-public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProviderBuilder {
+public class XiECContentVerifierProviderBuilder
+    extends BcECContentVerifierProviderBuilder {
 
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder
       = new DefaultDigestAlgorithmIdentifierFinder();
@@ -36,7 +36,8 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
   }
 
   @Override
-  protected Signer createSigner(AlgorithmIdentifier sigAlgId) throws OperatorCreationException {
+  protected Signer createSigner(AlgorithmIdentifier sigAlgId)
+      throws OperatorCreationException {
     SignAlgo signAlgo;
     try {
       signAlgo = SignAlgo.getInstance(sigAlgId);
@@ -45,14 +46,16 @@ public class XiECContentVerifierProviderBuilder extends BcECContentVerifierProvi
     }
 
     if (signAlgo == null) {
-      throw new OperatorCreationException("could not detect SignAlgo from sigAlgId");
+      throw new OperatorCreationException(
+          "could not detect SignAlgo from sigAlgId");
     }
 
     HashAlgo hashAlgo = signAlgo.getHashAlgo();
+    if (SignAlgo.SM2_SM3 == signAlgo) {
+      return new SM2Signer();
+    }
 
-    return (SignAlgo.SM2_SM3 == signAlgo) ? new SM2Signer()
-        : signAlgo.isPlainECDSASigAlgo()  ? new DSAPlainDigestSigner(new ECDSASigner(), hashAlgo.createDigest())
-        : new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
+    return new DSADigestSigner(new ECDSASigner(), hashAlgo.createDigest());
   } // method createSigner
 
 }

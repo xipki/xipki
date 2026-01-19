@@ -1,109 +1,92 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.util.Base64;
-import org.xipki.util.StringUtil;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.security.util.X509Util;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.misc.StringUtil;
 
-import java.util.Locale;
+import java.io.IOException;
 
 /**
  * Configure extension with given (constant) extension value.
  * @author Lijun Liao (xipki)
  */
-public class ConstantExtnValue extends ValidableConf {
-
-  public static final String TYPE_ASN1 = "ASN1";
-
-  public static final String TYPE_OCTET_STRING = "OCTET STRING";
-
-  public static final String TYPE_BIT_STRING = "BIT STRING";
-
-  public static final String TYPE_UTF8_STRING = "UTF8String";
-
-  public static final String TYPE_PRINTABLE_STRING = "PrintableString";
-
-  public static final String TYPE_INTEGER = "INTEGER";
+public class ConstantExtnValue implements JsonEncodable {
 
   /**
-   * Type of the extension. If not present, default to asn1.
-   * <ul>
-   *   <li>ASN1:  value is the BASE64-encoded ASN.1 object in DER-encoding.</li>
-   *   <li>INTEGER: value will be encoded as an INTEGER in the certificate. Hex number is prefixed with 0x.</li>
-   *   <li>OCTET STRING: value is the BASE64-encoded content which will be encoded as an OCTET STRING
-   *       in the certificate.</li>
-   *   <li>BIT STRING: value is the BASE64-encoded content which will be encoded as an BIT STRING
-   *       in the certificate.</li>
-   *   <li>UTF8String:  value will be encoded as a UTF8 String in the certificate.</li>
-   *   <li>PrintableString: value will be encoded as a Printable String in the certificate.</li>
-   * </ul>
+   * Type of the extension. If not present, default to ASN11.
    */
-  private String type;
+  private final Type type;
 
   /**
    * Value of the extension. Its content depends on the type:
    *
    */
-  private String value;
+  private final String value;
 
-  public String getType() {
-    return type;
+  public ConstantExtnValue(Type type, String value) {
+    this.type = (type == null) ? Type.ASN1 : type;
+    this.value = Args.notNull(value, "value");
   }
 
-  public void setType(String type) {
-    this.type = type == null ? null : type.toUpperCase(Locale.ROOT);
+  public ConstantExtnValue(Type type, byte[] value) {
+    this.type = (type == null) ? Type.ASN1 : type;
+    this.value = Base64.encodeToString(Args.notNull(value, "value"));
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public String getValue() {
     return value;
   }
 
-  public void setValue(String value) {
-    this.value = value;
-  }
-
-  public ASN1Encodable toASN1Encodable() throws InvalidConfException {
-    if (value == null) {
-      throw new InvalidConfException("value must not be non-null");
-    }
-
-    String tType = type == null ? TYPE_ASN1 : type;
-
-    try {
-      if (tType.equalsIgnoreCase(TYPE_ASN1)) {
-        ASN1StreamParser parser = new ASN1StreamParser(Base64.decode(value));
-        return parser.readObject();
-      } else if (tType.equalsIgnoreCase(TYPE_INTEGER)) {
-        return new ASN1Integer(StringUtil.toBigInt(value));
-      } else if (tType.equalsIgnoreCase(TYPE_OCTET_STRING)) {
-          return new DEROctetString(Base64.decode(value));
-      } else if (tType.equalsIgnoreCase(TYPE_BIT_STRING)) {
-          return new DERBitString(Base64.decode(value));
-      } else if (tType.equalsIgnoreCase(TYPE_PRINTABLE_STRING)) {
-          return new DERPrintableString(value);
-      } else if (tType.equalsIgnoreCase(TYPE_UTF8_STRING)) {
-        return new DERUTF8String(value);
-      } else {
-        throw new InvalidConfException("invalid type " + type);
-      }
-    } catch (Exception ex) {
-      throw new InvalidConfException("could not parse the constant extension value", ex);
+  public ASN1Encodable toASN1() throws IOException {
+    if (type == Type.OCTETSTRING) {
+      return new DEROctetString(Base64.decode(value));
+    } else if (type == Type.BITSTRING) {
+      return new DERBitString(Base64.decode(value));
+    } else if (type == Type.INTEGER) {
+      return new ASN1Integer(StringUtil.toBigInt(value));
+    } else if (type == Type.UTF8) {
+      return new DERUTF8String(value);
+    } else if (type == Type.PRINTABLE) {
+      return new DERPrintableString(value);
+    } else { // if (type == null || type == Type.ASN1) {
+      return X509Util.readAsn1Encodable(Base64.decode(value));
     }
   }
 
   @Override
-  public void validate() throws InvalidConfException {
-    toASN1Encodable();
+  public JsonMap toCodec() {
+    return new JsonMap().putEnum("type", type).put("value", value);
+  }
+
+  public static ConstantExtnValue parse(JsonMap json) throws CodecException {
+    return new ConstantExtnValue(Type.valueOf(json.getNnString("type")),
+        json.getNnString("value"));
+  }
+
+  public enum Type {
+    ASN1,
+    OCTETSTRING,
+    BITSTRING,
+    UTF8,
+    PRINTABLE,
+    INTEGER
   }
 
 }

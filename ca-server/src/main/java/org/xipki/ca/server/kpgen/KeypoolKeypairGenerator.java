@@ -1,25 +1,26 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.kpgen;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.LogUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.security.KeyInfoPair;
+import org.xipki.security.KeySpec;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.misc.StringUtil;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
@@ -27,15 +28,13 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.spec.KeySpec;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,6 +51,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     int encAlg;
     byte[] encMeta;
     byte[] cipherText;
+    byte[] pukData;
   }
 
   /**
@@ -63,7 +63,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private static class KeypoolQueryExecutor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KeypoolQueryExecutor.class);
+    private static final Logger LOG =
+        LoggerFactory.getLogger(KeypoolQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
 
@@ -72,20 +73,27 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     KeypoolQueryExecutor(DataSourceWrapper datasource, int shardId) {
       this.datasource = Args.notNull(datasource, "datasource");
       this.sqlGetKeyData = datasource.buildSelectFirstSql(1,
-          "ID,ENC_ALG,ENC_META,DATA FROM KEYPOOL WHERE SHARD_ID=" + shardId + " AND KID=?");
+          "ID,ENC_ALG,ENC_META,DATA,PUKDATA FROM KEYPOOL WHERE " +
+              "SHARD_ID=" + shardId + " AND KID=?");
     } // constructor
 
-    Map<String, Integer> getKeyspecs() throws DataAccessException {
+    Map<KeySpec, Integer> getKeyspecs() throws DataAccessException {
       final String sql = "SELECT ID,KEYSPEC FROM KEYSPEC";
       PreparedStatement ps = datasource.prepareStatement(sql);
       ResultSet rs = null;
 
-      Map<String, Integer> rv = new HashMap<>();
+      Map<KeySpec, Integer> rv = new HashMap<>();
 
       try {
         rs = ps.executeQuery();
         while (rs.next()) {
-          rv.put(rs.getString("KEYSPEC").toUpperCase(Locale.ROOT), rs.getInt("ID"));
+          String str = rs.getString("KEYSPEC");
+          try {
+            KeySpec ks = KeySpec.ofKeySpec(str);
+            rv.put(ks, rs.getInt("ID"));
+          } catch (NoSuchAlgorithmException e) {
+            LOG.warn("ignore unknown KEYSPEC '{}'", str);
+          }
         }
 
         return rv;
@@ -96,7 +104,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       }
     } // method initIssuerStore
 
-    KeypoolKeypairGenerator.CipherData nextKeyData(int keyspecId) throws DataAccessException {
+    KeypoolKeypairGenerator.CipherData nextKeyData(int keyspecId)
+        throws DataAccessException {
       final String sql = sqlGetKeyData;
       PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -109,10 +118,13 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
         }
 
         int id = rs.getInt("ID");
-        KeypoolKeypairGenerator.CipherData cd = new KeypoolKeypairGenerator.CipherData();
+        KeypoolKeypairGenerator.CipherData cd =
+            new KeypoolKeypairGenerator.CipherData();
         cd.encAlg = rs.getInt("ENC_ALG");
-        cd.encMeta = org.xipki.util.Base64.decodeFast(rs.getString("ENC_META"));
+        cd.encMeta = Base64.decodeFast(rs.getString("ENC_META"));
         cd.cipherText = Base64.decodeFast(rs.getString("DATA"));
+        String b64 = rs.getString("PUKDATA");
+        cd.pukData = b64 == null ? null : Base64.decodeFast(b64);
         datasource.releaseResources(ps, rs);
         ps = null;
         rs = null;
@@ -164,7 +176,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private DataSourceMap datasources;
 
-  private final Map<String, Integer> keyspecToId = new HashMap<>();
+  private final Map<KeySpec, Integer> keyspecToId = new HashMap<>();
 
   public void setShardId(int shardId) {
     this.shardId = shardId;
@@ -189,7 +201,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     if (datasource == null) {
-      throw new XiSecurityException("no datasource named '" + datasourceName + "' is specified");
+      throw new XiSecurityException("no datasource named '" + datasourceName
+          + "' is specified");
     }
 
     try {
@@ -197,12 +210,13 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       keyspecToId.clear();
       keyspecToId.putAll(queryExecutor.getKeyspecs());
 
-      Set<String> set = new HashSet<>();
-      for (String m : keyspecs) {
+      Set<KeySpec> set = new HashSet<>();
+      for (KeySpec m : keyspecs) {
         if (keyspecToId.containsKey(m)) {
           set.add(m);
         }
       }
+
       super.keyspecs.clear();
       super.keyspecs.addAll(set);
     } catch (DataAccessException ex) {
@@ -215,13 +229,16 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     try {
-      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(
+          "PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
 
       int[] keyLengths = {128, 192, 256};
       for (int keyLength : keyLengths) {
-        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
-        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+        PBEKeySpec spec = new PBEKeySpec(passwordChars,
+            "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
+        SecretKey key = new SecretKeySpec(
+            factory.generateSecret(spec).getEncoded(), "AES");
         if (keyLength == 128) {
           aes128key = key;
         } else if (keyLength == 192) {
@@ -239,7 +256,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public synchronized PrivateKeyInfo generateKeypair(String keyspec)
+  public KeyInfoPair generateKeypair(KeySpec keyspec)
       throws XiSecurityException {
     Integer keyspecId = keyspecToId.get(keyspec);
     if (keyspecId == null) {
@@ -257,7 +274,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     if (cd == null) {
-      throw new XiSecurityException("found no keypair of spec " + keyspec + " in the keypool");
+      throw new XiSecurityException("found no keypair of spec " + keyspec
+          + " in the keypool");
     }
 
     GCMParameterSpec spec = new GCMParameterSpec(128, cd.encMeta);
@@ -269,18 +287,24 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     } else if (cd.encAlg == 3) {
       key = aes256key;
     } else {
-      throw new XiSecurityException("unknown encryption algorithm " + cd.encAlg);
+      throw new XiSecurityException("unknown encryption algorithm "
+          + cd.encAlg);
     }
 
     byte[] plain;
     try {
       cipher.init(Cipher.DECRYPT_MODE, key, spec);
       plain = cipher.doFinal(cd.cipherText);
-    } catch (IllegalBlockSizeException | BadPaddingException | InvalidKeyException
-             | InvalidAlgorithmParameterException ex) {
+    } catch (GeneralSecurityException ex) {
       throw new XiSecurityException("error decrypting ciphertext", ex);
     }
-    return PrivateKeyInfo.getInstance(plain);
+
+    PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(plain);
+    SubjectPublicKeyInfo publicKeyInfo = null;
+    if (cd.pukData != null) {
+      publicKeyInfo = SubjectPublicKeyInfo.getInstance(cd.pukData);
+    }
+    return new KeyInfoPair(publicKeyInfo, privateKeyInfo);
   }
 
   @Override

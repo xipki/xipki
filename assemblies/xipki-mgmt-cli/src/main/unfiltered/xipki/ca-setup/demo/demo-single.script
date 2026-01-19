@@ -1,10 +1,55 @@
-# Configure me: valid values are ec, rsa, dsa, sm2, ed25519 and ed448
-keytype = ec
+printUsage = "false"
+argsValid = "false"
+errMsg = ""
 
-# Configure me: valid values are dbbased and filebased
-storetype = dbbased
+if { "$1" equals "" | "$1" equals "help" } then {
+  printUsage = "true"
+  argsValid = "true"
+} else {
+  storetype  = $1
+  tokentype  = $2
+  keyspec    = $3
 
-# Configure me: valid values are p11 (not for ed448) and p12
-tokentype = p12
+  storetype = $(xi:lowercase "$storetype")
+  tokentype = $(xi:uppercase "$tokentype")
 
-source xipki/ca-setup/demo/doDemo.script
+  argsValid = $([db file] contains $storetype)
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid store type $storetype"
+  } else {
+    argsValid = $([PKCS11 PKCS12] contains $tokentype)
+  }
+
+  if { "$argsValid" equals "false" } then {
+    errMsg = "invalid token type $tokentype"
+  } else {
+    source xipki/ca-setup/c14n-keyspec.script
+    if { "$sigalg" equals "" } then {
+      argsValid = "false"
+    } else {
+      CA_KEYSPEC = $keyspec
+      CA_SIGALG = $sigalg
+    }
+  }
+}
+
+if { "$argsValid" equals "false" } then {
+  echo "$errMsg"
+  echo ""
+  printUsage = "true"
+}
+
+if { "$printUsage" equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/ca-setup/demo/demo-single.script <store type> <token type> <CA keyspec>"
+  echo "    store type:      DB, FILE"
+  echo "    token type:      PKCS11, PKCS12"
+  echo "    CA-keyspec:      RSA2048, RSA3072, RSA4096, RSA2048/PSS, RSA3072/PSS, RSA4096/PSS,"
+  echo "                     SECP256R1, SECP384R1, SECP521R1, SM2P256V1, FRP256V1,"
+  echo "                     BRAINPOOLP256R1, BRAINPOOLP384R1, BRAINPOOLP512R1,"
+  echo "                     MLDSA44, MLDSA65, MLDSA87"
+} else {
+  source xipki/ca-setup/demo/doDemo.script
+}

@@ -97,7 +97,7 @@
         </SSLHostConfig>
     </Connector>
     -->
-    <Connector port="$[gateway.https.port]" protocol="org.xipki.tomcat.XiHttp11Nio2Protocol"
+    <Connector port="$[gateway.https.port]" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
                connectionTimeout="4000">
       <SSLHostConfig

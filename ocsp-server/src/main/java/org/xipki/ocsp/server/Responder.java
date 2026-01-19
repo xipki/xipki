@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.util.List;
 
@@ -30,7 +30,8 @@ public class Responder {
 
   Responder(
       ResponderOption responderOption, RequestOption requestOption,
-      ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
+      ResponseOption responseOption, ResponseSigner signer,
+      List<OcspStore> stores) {
     this.responderOption = Args.notNull(responderOption, "responderOption");
     this.requestOption = Args.notNull(requestOption, "requestOption");
     this.responseOption = Args.notNull(responseOption, "responseOption");

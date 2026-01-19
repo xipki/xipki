@@ -1,0 +1,12 @@
+ {
+   "name": "Entrust nCipher / nShield HSM",
+   "filter": {
+     "manufacturerIDs": [
+       "ncipher"
+     ]
+   },
+   "vendor": "NCIPHER",
+   "specialBehaviours": [
+     "EC_PARAMS_NAME_ONLY_EDWARDS",
+     "EC_PARAMS_NAME_ONLY_MONTGOMERY"]
+ }

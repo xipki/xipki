@@ -1,15 +1,16 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard RFC 6960.
+ * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard
+ * RFC 6960.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
@@ -22,7 +23,8 @@ public class IssuerHash {
 
   private final byte[] issuerKeyHash;
 
-  public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
+  public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash,
+                    byte[] issuerKeyHash) {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
     this.issuerNameHash = Args.notNull(issuerNameHash, "issuerNameHash");
     this.issuerKeyHash = Args.notNull(issuerKeyHash, "issuerKeyHash");
@@ -34,10 +36,12 @@ public class IssuerHash {
 
   public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert) throws IOException {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
-    byte[] encodedName = Args.notNull(issuerCert, "issuerCert").getSubject().getEncoded();
-    byte[] encodedKey = issuerCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+    byte[] encodedName = Args.notNull(issuerCert, "issuerCert")
+        .getSubject().getEncoded();
+    byte[] encodedKey  = issuerCert.getSubjectPublicKeyInfo()
+        .getPublicKeyData().getBytes();
     this.issuerNameHash = hashAlgo.hash(encodedName);
-    this.issuerKeyHash = hashAlgo.hash(encodedKey);
+    this.issuerKeyHash  = hashAlgo.hash(encodedKey);
   }
 
   public HashAlgo getHashAlgo() {
@@ -52,10 +56,13 @@ public class IssuerHash {
     return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
   }
 
-  public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
+  public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash,
+                       byte[] issuerKeyHash) {
     return this.hashAlgo == Args.notNull(hashAlgo, "hashAlgo")
-        && Arrays.equals(this.issuerNameHash, Args.notNull(issuerNameHash, "issuerNameHash"))
-        && Arrays.equals(this.issuerKeyHash, Args.notNull(issuerKeyHash, "issuerKeyHash"));
+        && Arrays.equals(this.issuerNameHash,
+              Args.notNull(issuerNameHash, "issuerNameHash"))
+        && Arrays.equals(this.issuerKeyHash,
+              Args.notNull(issuerKeyHash, "issuerKeyHash"));
   }
 
 }

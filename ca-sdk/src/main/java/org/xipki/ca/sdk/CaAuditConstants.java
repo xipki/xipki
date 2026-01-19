@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
@@ -80,6 +80,7 @@ public class CaAuditConstants {
 
   public static final String TYPE_unsuspend_ca = "unrevoke_ca";
 
-  public static final String TYPE_revoke_suspendedCert = "revoke_suspended_cert";
+  public static final String TYPE_revoke_suspendedCert =
+      "revoke_suspended_cert";
 
 }

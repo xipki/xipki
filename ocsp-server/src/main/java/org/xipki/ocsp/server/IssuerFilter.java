@@ -1,12 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
 import org.xipki.security.HashAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.HashSet;
 import java.util.Set;

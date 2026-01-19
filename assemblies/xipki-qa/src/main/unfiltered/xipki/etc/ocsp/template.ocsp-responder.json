@@ -1,15 +1,13 @@
 {
-	/*
-	"responseCache":{
-		"datasource":{
-			"name":"datasource-cache",
-			"conf":{
-				"file":"etc/ocsp/database/ocsp-cache-db.properties"
-			}
-		},
-		"validity":"1d"
-	},
-	*/
+	//"responseCache":{
+	//	"datasource":{
+	//		"name":"datasource-cache",
+	//		"conf":{
+	//			"file":"etc/ocsp/database/ocsp-cache-db.properties"
+	//		}
+	//	},
+	//	"validity":"1d"
+	//},
 	"master":true,
 	"unknownIssuerBehaviour":"malformedRequest",
 	"datasources":[{
@@ -30,22 +28,20 @@
 	}],
 	"requestOptions":[{
 		"name":"request1",
-		/*
-		"certpathValidation":{
-			"trustanchors":[{
-				"file":"keycerts/ocsp-server-cert.pem"
-			}],
-			"validationModel":"PKIX"
-		},
-		*/
+		//"certpathValidation":{
+		//	"trustanchors":[{
+		//		"file":"keycerts/ocsp-server-cert.pem"
+		//	}],
+		//	"validationModel":"PKIX"
+		//},
 		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
 		"maxRequestListCount":10,
 		"maxRequestSize":4096,
 		"nonce":{
 			"maxLen":32,
 			"minLen":4,
-			// valid values are ignore, forbidden, optional and required.
-			// in case of ignore and forbidded, maxLen and minLen will be ignored.
+			// valid values are ignore, forbidden, optional and required. In
+			// case of ignore and forbidded, maxLen and minLen will be ignored.
 			"occurrence":"optional"
 		},
 		"signatureRequired":false,
@@ -99,7 +95,7 @@
 	"signers":[{
 		"name":"signer1",
 		"type":"REPLACEME-TOKENTYPE",
-		"algorithms":["REPLACEME-SIGALGO"],
+		"algorithms":["REPLACEME-SIGALG"],
 		"caCerts":[],
 		"cert": {
 			"file":"keycerts/ocsp.crt"
@@ -119,12 +115,10 @@
 			"datasource":"datasource1",
 			"type":"xipki-db",
 			"conf":{
-				/*
-				"caCerts": {
-					"includes":[],
-					"excludes":[],
-				}
-				*/
+				//"caCerts": {
+				//	"includes":[],
+				//	"excludes":[]
+				//}
 			}
 		},
 		"unknownCertBehaviour":"unknown"
@@ -161,12 +155,10 @@
 			"datasource":"datasource3",
 			"type":"xipki-ca-db",
 			"conf":{
-				/*
-				"caCerts": {
-				"includes":[],
-					"excludes":[],
-				}
-				*/
+				//"caCerts": {
+				//	"includes":[],
+				//	"excludes":[],
+				//}
 			}
 		},
 		"unknownCertBehaviour":"unknown"

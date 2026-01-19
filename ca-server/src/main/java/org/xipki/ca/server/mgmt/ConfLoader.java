@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server.mgmt;
@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaConfType.NameTypeConf;
-import org.xipki.ca.api.mgmt.CaJson;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -22,23 +21,26 @@ import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.FileOrBinary;
-import org.xipki.util.FileOrValue;
-import org.xipki.util.LogUtil;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.json.JsonBuilder;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.io.FileOrValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
@@ -77,12 +79,20 @@ class ConfLoader {
     } catch (IOException | InvalidConfException ex) {
       throw new CaMgmtException("could not parse the CA configuration", ex);
     } catch (RuntimeException ex) {
-      throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
+      throw new CaMgmtException("caught RuntimeException while parsing " +
+          "the CA configuration", ex);
     }
 
     // DBSCHEMA
-    for (String dbSchemaName : conf.getDbSchemaNames()) {
-      manager.addDbSchema(dbSchemaName, conf.getDbSchema(dbSchemaName));
+    Set<String> dbSchemaNames = conf.getDbSchemaNames();
+    if (dbSchemaNames != null && !dbSchemaNames.isEmpty()) {
+      Map<String, String> currentDbSchemas = manager.getDbSchemas();
+      for (String dbSchemaName : conf.getDbSchemaNames()) {
+        String value = conf.getDbSchema(dbSchemaName);
+        if (!value.equals(currentDbSchemas.get(dbSchemaName))) {
+          manager.addDbSchema(dbSchemaName, conf.getDbSchema(dbSchemaName));
+        }
+      }
     }
 
     // KeypairGen
@@ -94,7 +104,8 @@ class ConfLoader {
           LOG.info("ignore existed keypairGen {}", name);
           continue;
         } else {
-          throw logAndCreateException("keypairGen " + name + " existed, could not re-added it");
+          throw logAndCreateException("keypairGen " + name +
+              " existed, could not re-added it");
         }
       }
 
@@ -117,7 +128,8 @@ class ConfLoader {
           LOG.info("ignore existed signer {}", name);
           continue;
         } else {
-          throw logAndCreateException("signer " + name + " existed, could not re-added it");
+          throw logAndCreateException("signer " + name +
+              " existed, could not re-added it");
         }
       }
 
@@ -141,7 +153,8 @@ class ConfLoader {
           LOG.info("ignore existed cert-based requestor {}", name);
           continue;
         } else {
-          throw logAndCreateException("cert-based requestor " + name + " existed, could not re-added it");
+          throw logAndCreateException("cert-based requestor " + name
+              + " existed, could not re-added it");
         }
       }
 
@@ -164,7 +177,8 @@ class ConfLoader {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
-          throw logAndCreateException("publisher " + name + " existed, could not re-added it");
+          throw logAndCreateException("publisher " + name +
+              " existed, could not re-added it");
         }
       }
 
@@ -187,7 +201,8 @@ class ConfLoader {
           LOG.info("ignore existed certprofile {}", name);
           continue;
         } else {
-          throw logAndCreateException("certprofile " + name + " existed, could not re-added it");
+          throw logAndCreateException("certprofile " + name +
+              " existed, could not re-added it");
         }
       }
 
@@ -212,23 +227,33 @@ class ConfLoader {
           CaEntry entryB = manager.caInfos.get(caName).getCaEntry();
           if (caEntry.getCert() == null && genSelfIssued != null) {
             SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
-            try (ConcurrentContentSigner signer
-                     = securityFactory.createSigner(caEntry.getSignerType(), signerConf, (X509Cert) null)) {
+            ConcurrentContentSigner signer = null;
+            try {
+              signer = securityFactory.createSigner(
+                  caEntry.getBase().getSignerType(), signerConf,
+                  (X509Cert) null);
               caEntry.setCert(signer.getCertificate());
-            } catch (IOException | ObjectCreationException ex) {
-              throw new CaMgmtException("could not create signer for CA " + caName, ex);
+            } catch (ObjectCreationException ex) {
+              throw new CaMgmtException(
+                  "could not create signer for CA " + caName, ex);
+            } finally {
+              if (signer != null) {
+                signer.close();
+              }
             }
           }
 
           if (caEntry.equals(entryB, true, true)) {
             LOG.info("ignore existing CA {}", caName);
           } else {
-            throw logAndCreateException("CA " + caName + " existed, could not re-added it");
+            throw logAndCreateException("CA " + caName +
+                " existed, could not re-added it");
           }
         } else {
           if (genSelfIssued != null) {
-            manager.generateRootCa(caEntry, genSelfIssued.getProfile(), genSelfIssued.getSubject(),
-                genSelfIssued.getSerialNumber(), genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
+            manager.generateRootCa(caEntry, genSelfIssued.getProfile(),
+                genSelfIssued.getSubject(), genSelfIssued.getSerialNumber(),
+                genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
             LOG.info("generated root CA {}", caName);
           } else {
             try {
@@ -247,13 +272,15 @@ class ConfLoader {
         Set<String> aliasesB = manager.getAliasesForCa(caName);
         for (String aliasName : scc.getAliases()) {
           if (aliasesB != null && aliasesB.contains(aliasName)) {
-            LOG.info("ignored adding existing CA alias {} to CA {}", aliasName, caName);
+            LOG.info("ignored adding existing CA alias {} to CA {}",
+                aliasName, caName);
           } else {
             try {
               manager.addCaAlias(aliasName, caName);
               LOG.info("associated alias {} to CA {}", aliasName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not associate alias " + aliasName + " to CA " + caName;
+              String msg = "could not associate alias " + aliasName +
+                  " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -267,7 +294,8 @@ class ConfLoader {
             manager.addCertprofileToCa(profileName, caName);
             LOG.info("added certprofile {} to CA {}", profileName, caName);
           } catch (CaMgmtException ex) {
-            String msg = "could not add certprofile " + profileName + " to CA " + caName;
+            String msg = "could not add certprofile " + profileName +
+                " to CA " + caName;
             LogUtil.error(LOG, ex, msg);
             throw new CaMgmtException(msg);
           }
@@ -278,13 +306,16 @@ class ConfLoader {
         Set<String> publishersB = manager.caHasPublishers.get(caName);
         for (String publisherName : scc.getPublisherNames()) {
           if (publishersB != null && publishersB.contains(publisherName)) {
-            LOG.info("ignored adding publisher {} to CA {}", publisherName, caName);
+            LOG.info("ignored adding publisher {} to CA {}",
+                publisherName, caName);
           } else {
             try {
               manager.addPublisherToCa(publisherName, caName);
-              LOG.info("added publisher {} to CA {}", publisherName, caName);
+              LOG.info("added publisher {} to CA {}",
+                  publisherName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not add publisher " + publisherName + " to CA " + caName;
+              String msg = "could not add publisher " + publisherName +
+                  " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -293,7 +324,8 @@ class ConfLoader {
       }
 
       if (scc.getRequestors() != null) {
-        Set<CaHasRequestorEntry> requestorsB = manager.caHasRequestors.get(caName);
+        Set<CaHasRequestorEntry> requestorsB =
+            manager.caHasRequestors.get(caName);
 
         for (CaHasRequestorEntry requestor : scc.getRequestors()) {
           String requestorName = requestor.getRequestorIdent().getName();
@@ -309,16 +341,19 @@ class ConfLoader {
 
           if (requestorB != null) {
             if (requestor.equals(requestorB, ignoreId)) {
-              LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
+              LOG.info("ignored adding requestor {} to CA {}",
+                  requestorName, caName);
             } else {
-              throw logAndCreateException("could not add requestor " + requestorName + " to CA" + caName);
+              throw logAndCreateException("could not add requestor "
+                  + requestorName + " to CA" + caName);
             }
           } else {
             try {
               manager.addRequestorToCa(requestor, caName);
               LOG.info("added publisher {} to CA {}", requestorName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not add requestor " + requestorName + " to CA " + caName;
+              String msg = "could not add requestor " + requestorName +
+                  " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -328,7 +363,8 @@ class ConfLoader {
     } // cas
   } // method loadConf
 
-  InputStream exportConf(List<String> caNames) throws CaMgmtException, IOException {
+  InputStream exportConf(List<String> caNames)
+      throws CaMgmtException, IOException {
     manager.assertMasterModeAndSetuped();
 
     if (caNames != null) {
@@ -344,7 +380,8 @@ class ConfLoader {
       caNames = new ArrayList<>(manager.x509cas.keySet());
     }
 
-    ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576); // initial 1M
+    // initial 1M
+    ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576);
 
     CaConfType.CaSystem root = new CaConfType.CaSystem();
 
@@ -363,72 +400,73 @@ class ConfLoader {
             continue;
           }
 
-          CaConfType.Ca ca = new CaConfType.Ca();
-          ca.setName(name);
-
           Set<String> strs = manager.getAliasesForCa(name);
+          List<String> aliases = null;
           if (CollectionUtil.isNotEmpty(strs)) {
-            ca.setAliases(new ArrayList<>(strs));
+            aliases = new ArrayList<>(strs);
           }
 
           // CaHasRequestors
-          Set<CaHasRequestorEntry> requestors = manager.caHasRequestors.get(name);
-          if (CollectionUtil.isNotEmpty(requestors)) {
-            ca.setRequestors(new ArrayList<>());
+          Set<CaHasRequestorEntry> requestors2 =
+              manager.caHasRequestors.get(name);
+          List<CaConfType.CaHasRequestor> requestors = null;
+          if (CollectionUtil.isNotEmpty(requestors2)) {
+            requestors = new ArrayList<>(requestors2.size());
 
-            for (CaHasRequestorEntry m : requestors) {
-              String requestorName = m.getRequestorIdent().getName();
+            for (CaHasRequestorEntry m : requestors2) {
+              CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor(
+                  m.getRequestorIdent().getName(), m.getPermissions(),
+                  new ArrayList<>(m.getProfiles()));
 
-              CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor();
-              chr.setRequestorName(requestorName);
-              chr.setProfiles(new ArrayList<>(m.getProfiles()));
-              chr.setPermissions(m.getPermissions());
-
-              ca.getRequestors().add(chr);
+              requestors.add(chr);
             }
           }
 
           Set<CaProfileEntry> caPofileEntries = manager.caHasProfiles.get(name);
+          List<String> profiles = null;
           if (CollectionUtil.isNotEmpty(caPofileEntries)) {
-            List<String> profileNameAndAliasesList = new ArrayList<>(caPofileEntries.size());
+            profiles = new ArrayList<>(caPofileEntries.size());
+
             for (CaProfileEntry entry : caPofileEntries) {
-              profileNameAndAliasesList.add(entry.getEncoded());
+              profiles.add(entry.getEncoded());
             }
-            Collections.sort(profileNameAndAliasesList);
-            ca.setProfiles(profileNameAndAliasesList);
+            Collections.sort(profiles);
           }
 
           strs = manager.caHasPublishers.get(name);
+          List<String> publishers = null;
           if (CollectionUtil.isNotEmpty(strs)) {
-            ca.setPublishers(new ArrayList<>(strs));
+            publishers = new ArrayList<>(strs);
           }
 
-          CaConfType.CaInfo caInfoType = new CaConfType.CaInfo();
-          ca.setCaInfo(caInfoType);
-
           CaEntry entry = manager.x509cas.get(name).getCaInfo().getCaEntry();
-          entry.copyBaseInfoTo(caInfoType);
 
           // Certificate
           byte[] certBytes = entry.getCert().getEncoded();
-          caInfoType.setCert(createFileOrBinary(zipStream, certBytes, "files/ca-" + name + "-cert.der"));
+          FileOrBinary cert = createFileOrBinary(zipStream, certBytes,
+              "files/ca-" + name + "-cert.der");
 
           // certchain
           List<X509Cert> certchain = entry.getCertchain();
+          List<FileOrBinary> ccList = null;
           if (CollectionUtil.isNotEmpty(certchain)) {
-            List<FileOrBinary> ccList = new LinkedList<>();
+            ccList = new ArrayList<>(certchain.size());
 
             for (int i = 0; i < certchain.size(); i++) {
               certBytes = certchain.get(i).getEncoded();
-              ccList.add(createFileOrBinary(zipStream, certBytes, "files/ca-" + name + "-certchain-" + i + ".der"));
+              ccList.add(createFileOrBinary(zipStream, certBytes,
+                  "files/ca-" + name + "-certchain-" + i + ".der"));
             }
-            caInfoType.setCertchain(ccList);
           }
 
-          caInfoType.setPermissions(entry.getPermissions());
+          FileOrValue signerConf = createFileOrValue(zipStream,
+              entry.getSignerConf(), "files/ca-" + name + "-signerconf.conf");
 
-          caInfoType.setSignerConf(createFileOrValue(zipStream, entry.getSignerConf(),
-              "files/ca-" + name + "-signerconf.conf"));
+          CaConfType.CaInfo caInfo = new CaConfType.CaInfo(entry.getBase(),
+              signerConf, cert, ccList);
+
+          CaConfType.Ca ca = new CaConfType.Ca(null, name, caInfo, aliases,
+              profiles, requestors, publishers);
 
           list.add(ca);
         }
@@ -444,17 +482,17 @@ class ConfLoader {
 
         for (String name : manager.requestorDbEntries.keySet()) {
           RequestorEntry entry = manager.requestorDbEntries.get(name);
-          CaConfType.Requestor type = new CaConfType.Requestor();
-          type.setName(name);
-          type.setType(entry.getType());
+          CaConfType.Requestor type;
 
           if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
             FileOrBinary fob = createFileOrBinary(zipStream,
-                Base64.decode(entry.getConf()), "files/requestor-" + name + ".der");
-            type.setBinaryConf(fob);
+                Base64.decode(entry.getConf()),
+                "files/requestor-" + name + ".der");
+            type = new CaConfType.Requestor(null, name, entry.getType(), fob);
           } else {
-            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(), "files/requestor-" + name + ".conf");
-            type.setConf(fov);
+            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(),
+                "files/requestor-" + name + ".conf");
+            type = new CaConfType.Requestor(null, name, entry.getType(), fov);
           }
 
           list.add(type);
@@ -471,10 +509,9 @@ class ConfLoader {
 
         for (String name : manager.publisherDbEntries.keySet()) {
           PublisherEntry entry = manager.publisherDbEntries.get(name);
-          NameTypeConf conf = new NameTypeConf();
-          conf.setName(name);
-          conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/publisher-" + name + ".conf"));
+          NameTypeConf conf = new NameTypeConf(null, name, entry.getType(),
+              createFileOrValue(zipStream, entry.getConf(),
+                  "files/publisher-" + name + ".conf"));
           list.add(conf);
         }
 
@@ -488,10 +525,9 @@ class ConfLoader {
         List<NameTypeConf> list = new LinkedList<>();
         for (String name : manager.certprofileDbEntries.keySet()) {
           CertprofileEntry entry = manager.certprofileDbEntries.get(name);
-          NameTypeConf conf = new NameTypeConf();
-          conf.setName(name);
-          conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/certprofile-" + name + ".conf"));
+          NameTypeConf conf = new NameTypeConf(null, name, entry.getType(),
+              createFileOrValue(zipStream, entry.getConf(),
+                  "files/certprofile-" + name + ".conf"));
           list.add(conf);
         }
 
@@ -506,11 +542,12 @@ class ConfLoader {
 
         for (String name : manager.signerDbEntries.keySet()) {
           SignerEntry entry = manager.signerDbEntries.get(name);
-          CaConfType.Signer conf = new CaConfType.Signer();
-          conf.setName(name);
-          conf.setType(entry.getType());
-          conf.setConf(createFileOrValue(zipStream, entry.getConf(), "files/signer-" + name + ".conf"));
-          conf.setCert(createFileOrBase64Value(zipStream, entry.base64Cert(), "files/signer-" + name + ".der"));
+          CaConfType.Signer conf = new CaConfType.Signer(
+              null, name, entry.getType(),
+              createFileOrValue(zipStream, entry.getConf(),
+                  "files/signer-" + name + ".conf"),
+              createFileOrBase64Value(zipStream, entry.base64Cert(),
+                  "files/signer-" + name + ".der"));
 
           list.add(conf);
         }
@@ -525,16 +562,12 @@ class ConfLoader {
 
         for (String name : manager.keypairGenDbEntries.keySet()) {
           KeypairGenEntry entry = manager.keypairGenDbEntries.get(name);
-          CaConfType.NameTypeConf conf = new CaConfType.NameTypeConf();
-          conf.setName(name);
-          conf.setType(entry.getType());
-          if (entry.getConf() != null) {
-            FileOrValue fv = new FileOrValue();
-            fv.setValue(entry.getConf());
-            conf.setConf(fv);
-          }
 
-          list.add(conf);
+          FileOrValue fv = (entry.getConf() == null) ? null
+              : FileOrValue.ofValue(entry.getConf());
+
+          list.add(new CaConfType.NameTypeConf(
+              null, name, entry.getType(), fv));
         }
 
         if (!list.isEmpty()) {
@@ -544,8 +577,8 @@ class ConfLoader {
 
       // add the CAConf json file
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
-        root.validate();
-        CaJson.writePrettyJSON(root, bout);
+        String jsonStr = JsonBuilder.toPrettyJson(root.toCodec());
+        bout.write(jsonStr.getBytes(StandardCharsets.UTF_8));
 
         zipStream.putNextEntry(new ZipEntry("caconf.json"));
         try {
@@ -553,9 +586,10 @@ class ConfLoader {
         } finally {
           zipStream.closeEntry();
         }
-      } catch (InvalidConfException ex) {
+      } catch (RuntimeException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
-        throw new CaMgmtException("could not marshal CAConf: " + ex.getMessage(), ex);
+        throw new CaMgmtException(
+            "could not marshal CAConf: " + ex.getMessage(), ex);
       }
     }
 

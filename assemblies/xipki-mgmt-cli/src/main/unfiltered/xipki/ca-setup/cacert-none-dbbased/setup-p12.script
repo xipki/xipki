@@ -9,7 +9,7 @@ CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
 if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
 } else {
-  KEY_TYPE = $1
+  keyspec = $1
   TOMCAT_DIR = $2
   XIPKI_DIR = $3
 
@@ -18,10 +18,9 @@ if { "$1" equals "" | "$1" equals "help" } then {
     echo "TOMCAT_DIR is not specified"
     printUsage = "true"
   } else {
-    argsValid = $([rsa ec dsa sm2 ed25519 ed448] contains $KEY_TYPE)
-    if { "$argsValid" equals "false" } then {
-      echo "invalid KEY_TYPE $KEY_TYPE"
-      printUsage = "true"
+    source xipki/ca-setup/c14n-keyspec.script
+    if { "$sigalg" equals "" } then {
+      printUsage = true
     }
   }
 }
@@ -31,9 +30,9 @@ THIS_DIR = xipki/ca-setup/cacert-none-dbbased
 if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p12.script <key type> <tomcat dir> [<xipki dir>]"
-  echo "    key type:  rsa, ec, dsa, sm2, ed25519, ed448"
-  echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
+  echo "source ${THIS_DIR}/setup-p12.script <key spec> <tomcat dir> [<xipki dir>]"
+  source xipki/ca-setup/print-keyspecs.script
+  echo "   xipki dir: optional, required if is not <tomcat dir>/xipki"
 } else {
   if { "$XIPKI_DIR" equals "" } then {
     XIPKI_DIR = ${TOMCAT_DIR}/xipki
@@ -43,25 +42,7 @@ if { "$printUsage" equals "true" } then {
   echo "#                     Generate CA Keypair                       #"
   echo "#################################################################"
 
-  if { $KEY_TYPE equals "rsa" } then {
-    SIG_ALG = SHA256WITHRSA
-    xi:rsa-p12 --password ${CA_P12_PWD} --out ${CA_P12} --key-size 2048
-  } elif { $KEY_TYPE equals "ec" } then {
-    SIG_ALG = SHA256WITHECDSA
-    xi:ec-p12 --password ${CA_P12_PWD} --out ${CA_P12} --curve secp256r1
-  } elif { $KEY_TYPE equals "ed25519" } then {
-    SIG_ALG = ED25519
-    xi:ec-p12 --password ${CA_P12_PWD} --out ${CA_P12} --curve ed25519
-  } elif { $KEY_TYPE equals "ed448" } then {
-    SIG_ALG = ED448
-    xi:ec-p12 --password ${CA_P12_PWD} --out ${CA_P12} --curve ed448
-  } elif { $KEY_TYPE equals "dsa" } then {
-    SIG_ALG = SHA256WITHDSA
-    xi:dsa-p12 --password ${CA_P12_PWD} --out ${CA_P12} --plen  2048
-  } else {
-    SIG_ALG = SM3WITHSM2
-    xi:sm2-p12 --password ${CA_P12_PWD} --out ${CA_P12}
-  }
+  xi:keypair-p12 --password ${CA_P12_PWD} --out ${CA_P12} --keyspec ${keyspec}
 
   echo "#################################################################"
   echo "#                  Configure ca-conf.json                       #"
@@ -74,7 +55,7 @@ if { "$printUsage" equals "true" } then {
   xi:replace \
     --old "REPLACEME-SUBJECT"       --new "${CA_SUBJECT}" \
     --old "REPLACEME-TOKEN_TYPE"    --new "pkcs12" \
-    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${SIG_ALG},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
+    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${sigalg},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
     ${CONF_FILE}
 
   ## init databases
@@ -90,7 +71,7 @@ if { "$printUsage" equals "true" } then {
   echo "#################################################################"
   xi:exec "${TOMCAT_DIR}/bin/shutdown.sh"
   xi:exec "${TOMCAT_DIR}/bin/startup.sh"
-  sleep 5
+  sleep 1
 
   echo "#################################################################"
   echo "#                       Load ca-conf.json                       #"

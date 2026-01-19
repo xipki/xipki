@@ -24,7 +24,7 @@ OUT_DIR = output/est-${CUR_TIME}
 
 #####
 echo "generate example PKCS#12 file"
-xi:rsa-p12 --password CHANGEIT --out ${OUT_DIR}/demo.p12 --subject "CN=dummy"
+xi:keypair-p12 --keyspec RSA2048 --password CHANGEIT --out ${OUT_DIR}/demo.p12
 
 #####
 CMD = cacerts

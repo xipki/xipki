@@ -1,18 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
-
-import java.math.BigInteger;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension PolicyConstraints.
@@ -20,60 +13,42 @@ import java.math.BigInteger;
  * @author Lijun Liao (xipki)
  */
 
-public class PolicyConstraints extends ValidableConf {
+public class PolicyConstraints implements JsonEncodable {
 
-  private Integer requireExplicitPolicy;
+  private final Integer requireExplicitPolicy;
 
-  private Integer inhibitPolicyMapping;
+  private final Integer inhibitPolicyMapping;
+
+  public PolicyConstraints(Integer requireExplicitPolicy,
+                           Integer inhibitPolicyMapping) {
+    // Only for CA, at least one of requireExplicitPolicy and
+    // inhibitPolicyMapping must be present
+    if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
+      throw new IllegalArgumentException("requireExplicitPolicy and " +
+          "inhibitPolicyMapping may not be both null");
+    }
+
+    this.requireExplicitPolicy = requireExplicitPolicy;
+    this.inhibitPolicyMapping = inhibitPolicyMapping;
+  }
 
   public Integer getRequireExplicitPolicy() {
     return requireExplicitPolicy;
-  }
-
-  public void setRequireExplicitPolicy(Integer requireExplicitPolicy) {
-    this.requireExplicitPolicy = requireExplicitPolicy;
   }
 
   public Integer getInhibitPolicyMapping() {
     return inhibitPolicyMapping;
   }
 
-  public void setInhibitPolicyMapping(Integer inhibitPolicyMapping) {
-    this.inhibitPolicyMapping = inhibitPolicyMapping;
-  }
-
   @Override
-  public void validate() throws InvalidConfException {
-    // Only for CA, at least one of requireExplicitPolicy and inhibitPolicyMapping must be present
-    if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
-      throw new InvalidConfException("requireExplicitPolicy and inhibitPolicyMapping may not be both null");
-    }
+  public JsonMap toCodec() {
+    return new JsonMap().put("requireExplicitPolicy", requireExplicitPolicy)
+        .put("inhibitPolicyMapping",  inhibitPolicyMapping);
   }
 
-  public ASN1Sequence toXiPolicyConstraints() throws CertprofileException {
-    if (requireExplicitPolicy != null && requireExplicitPolicy < 0) {
-      throw new CertprofileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
-    }
+  public static PolicyConstraints parse(JsonMap json) throws CodecException {
+    return new PolicyConstraints(json.getInt("requireExplicitPolicy"),
+        json.getInt("inhibitPolicyMapping"));
+  }
 
-    if (inhibitPolicyMapping != null && inhibitPolicyMapping < 0) {
-      throw new CertprofileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
-    }
-
-    if (requireExplicitPolicy == null && inhibitPolicyMapping == null) {
-      return null;
-    }
-
-    final boolean explicit = false;
-    ASN1EncodableVector vec = new ASN1EncodableVector();
-    if (requireExplicitPolicy != null) {
-      vec.add(new DERTaggedObject(explicit, 0, new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
-    }
-
-    if (inhibitPolicyMapping != null) {
-      vec.add(new DERTaggedObject(explicit, 1, new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
-    }
-
-    return new DERSequence(vec);
-  } //method toXiPolicyConstraints
-
-} // class PolicyConstraints
+}

@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.qualified.QCStatement;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 /**
  * Control of the QC-Statement (in the extension QCStatements).
@@ -28,10 +28,12 @@ class QcStatementOption {
     this.monetaryValueOption = null;
   }
 
-  public QcStatementOption(ASN1ObjectIdentifier statementId, MonetaryValueOption monetaryValueOption) {
+  public QcStatementOption(ASN1ObjectIdentifier statementId,
+                           MonetaryValueOption monetaryValueOption) {
     this.statement = null;
     this.statementId = Args.notNull(statementId, "statementId");
-    this.monetaryValueOption = Args.notNull(monetaryValueOption, "monetaryValueOption");
+    this.monetaryValueOption =
+        Args.notNull(monetaryValueOption, "monetaryValueOption");
   }
 
   public QCStatement getStatement() {

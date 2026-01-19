@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -14,8 +14,8 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,22 +31,26 @@ import java.util.Set;
  */
 public class KeypairGenActions {
 
-  @Command(scope = "ca", name = "keypairgen-add", description = "add keypair generation")
+  @Command(scope = "ca", name = "keypairgen-add", description =
+      "add keypair generation")
   @Service
   public static class KeypairGenAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "keypair generation name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "keypair generation name")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private String name;
 
-    @Option(name = "--type", required = true, description = "keypair generation type")
+    @Option(name = "--type", required = true, description =
+        "keypair generation type")
     @Completion(CaCompleters.KeypairGenTypeCompleter.class)
     private String type;
 
     @Option(name = "--conf", description = "keypair generation configuration")
     private String conf;
 
-    @Option(name = "--conf-file", description = "keypair generation configuration file")
+    @Option(name = "--conf-file", description =
+        "keypair generation configuration file")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -63,13 +67,15 @@ public class KeypairGenActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class KeypairGenActions
 
-  @Command(scope = "ca", name = "keypairgen-info", description = "show information of keypair generation")
+  @Command(scope = "ca", name = "keypairgen-info", description =
+      "show information of keypair generation")
   @Service
   public static class KeypairGenInfo extends CaAction {
 
@@ -85,9 +91,11 @@ public class KeypairGenActions {
 
         StringBuilder sb = new StringBuilder();
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1").append(" keypair generation is configured\n");
+          sb.append((size == 0) ? "no" : "1")
+              .append(" keypair generation is configured\n");
         } else {
-          sb.append(size).append(" keypair generation entries are configured:\n");
+          sb.append(size)
+              .append(" keypair generation entries are configured:\n");
         }
 
         List<String> sorted = new ArrayList<>(names);
@@ -98,8 +106,10 @@ public class KeypairGenActions {
         }
         println(sb.toString());
       } else {
-        KeypairGenEntry entry = Optional.ofNullable(caManager.getKeypairGen(name)).orElseThrow(
-            () -> new CmdFailure("\tno keypair generation named '" + name + "' is configured"));
+        KeypairGenEntry entry = Optional.ofNullable(
+            caManager.getKeypairGen(name)).orElseThrow(() ->
+            new CmdFailure("\tno keypair generation named '" + name +
+                "' is configured"));
         println(entry.toString());
       }
 
@@ -108,11 +118,13 @@ public class KeypairGenActions {
 
   } // class KeypairGenInfo
 
-  @Command(scope = "ca", name = "keypairgen-rm", description = "remove keypair generation")
+  @Command(scope = "ca", name = "keypairgen-rm", description =
+      "remove keypair generation")
   @Service
   public static class KeypairGenRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true, description = "keypair generation name")
+    @Argument(index = 0, name = "name", required = true, description =
+        "keypair generation name")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     private String name;
 
@@ -127,7 +139,8 @@ public class KeypairGenActions {
           caManager.removeKeypairGen(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg +
+              ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -135,11 +148,13 @@ public class KeypairGenActions {
 
   } // class KeypairGenRm
 
-  @Command(scope = "ca", name = "keypairgen-up", description = "update keypair generation")
+  @Command(scope = "ca", name = "keypairgen-up", description =
+      "update keypair generation")
   @Service
   public static class KeypairGenUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "keypair generation name")
+    @Option(name = "--name", aliases = "-n", required = true, description =
+        "keypair generation name")
     @Completion(CaCompleters.KeypairGenNameCompleter.class)
     protected String name;
 
@@ -147,10 +162,12 @@ public class KeypairGenActions {
     @Completion(CaCompleters.KeypairGenTypeCompleter.class)
     protected String type;
 
-    @Option(name = "--conf", description = "keypair generation configuration or 'null'")
+    @Option(name = "--conf", description =
+        "keypair generation configuration or 'null'")
     protected String conf;
 
-    @Option(name = "--conf-file", description = "keypair generation configuration file")
+    @Option(name = "--conf-file", description =
+        "keypair generation configuration file")
     @Completion(FileCompleter.class)
     protected String confFile;
 
@@ -170,7 +187,8 @@ public class KeypairGenActions {
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

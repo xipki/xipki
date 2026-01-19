@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.servlet;
@@ -6,7 +6,7 @@ package org.xipki.ocsp.servlet;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ocsp.server.servlet.OcspHttpFilter;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
  * The Servlet Filter of OCSP servlets.
@@ -17,7 +17,8 @@ import org.xipki.util.http.XiHttpFilter;
 public class OcspServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig)
+      throws Exception {
     return new OcspHttpFilter();
   }
 

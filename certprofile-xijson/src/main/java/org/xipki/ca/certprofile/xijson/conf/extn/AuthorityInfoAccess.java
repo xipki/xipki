@@ -1,12 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
-
-import java.util.Set;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension AuthorityInfoAccess.
@@ -14,50 +13,35 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 
-public class AuthorityInfoAccess extends ValidableConf {
+public class AuthorityInfoAccess implements JsonEncodable {
 
-  private boolean includeCaIssuers;
+  private final boolean includeCaIssuers;
 
-  private boolean includeOcsp;
+  private final boolean includeOcsp;
 
-  private Set<String> ocspProtocols;
-
-  private Set<String> caIssuersProtocols;
+  public AuthorityInfoAccess(boolean includeCaIssuers, boolean includeOcsp) {
+    this.includeCaIssuers = includeCaIssuers;
+    this.includeOcsp = includeOcsp;
+  }
 
   public boolean isIncludeCaIssuers() {
     return includeCaIssuers;
-  }
-
-  public void setIncludeCaIssuers(boolean includeCaIssuers) {
-    this.includeCaIssuers = includeCaIssuers;
   }
 
   public boolean isIncludeOcsp() {
     return includeOcsp;
   }
 
-  public void setIncludeOcsp(boolean includeOcsp) {
-    this.includeOcsp = includeOcsp;
-  }
-
-  public Set<String> getOcspProtocols() {
-    return ocspProtocols;
-  }
-
-  public void setOcspProtocols(Set<String> ocspProtocols) {
-    this.ocspProtocols = ocspProtocols;
-  }
-
-  public Set<String> getCaIssuersProtocols() {
-    return caIssuersProtocols;
-  }
-
-  public void setCaIssuersProtocols(Set<String> caIssuersProtocols) {
-    this.caIssuersProtocols = caIssuersProtocols;
-  }
-
   @Override
-  public void validate() throws InvalidConfException {
+  public JsonMap toCodec() {
+    return new JsonMap().put("includeCaIssuers", includeCaIssuers)
+        .put("includeOcsp", includeOcsp);
   }
 
-} // class AuthorityInfoAccess
+  public static AuthorityInfoAccess parse(JsonMap json) throws CodecException {
+    return new AuthorityInfoAccess(
+        json.getBool("includeCaIssuers", false),
+        json.getBool("includeOcsp", false));
+  }
+
+}

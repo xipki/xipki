@@ -6,93 +6,29 @@ xi:rm -r -f error-output
 
 xi:mkdir error-output
 
-echo "========================================================"
-echo "HASH:       $HASH"
-echo "TOKEN_TYPE: $TOKEN_TYPE"
-echo "SIG_TYPE:   $SIG_TYPE"
-echo "KEYSPEC:    $KEYSPEC"
-echo "========================================================"
-
-KEY_TYPE = ""
-KEY_DIR = ""
-
-if { $SIG_TYPE equals "rsa" } then {
-  KEY_TYPE = "rsa"
-  KEY_DIR = "rsa"
-  SIGALGO = "${HASH}withRSA"
-} elif { $SIG_TYPE equals "rsapss" } then {
-  KEY_TYPE = "rsa"
-  KEY_DIR = "rsa"
-  SIGALGO = "${HASH}withRSAPSS"
-} elif { $SIG_TYPE equals "ec" } then {
-  KEY_TYPE = "ec"
-  KEY_DIR = "ec"
-  SIGALGO = "${HASH}withECDSA"
-} elif { $SIG_TYPE equals "plainec" } then {
-  KEY_TYPE = "ec"
-  KEY_DIR = "ec"
-  SIGALGO = "${HASH}withPlainECDSA"
-} elif { $SIG_TYPE equals "dsa" } then {
-  KEY_TYPE = "dsa"
-  KEY_DIR = "dsa"
-  SIGALGO = "${HASH}withDSA"
-} elif { $SIG_TYPE equals "sm2" } then {
-  KEY_TYPE = "sm2"
-  KEY_DIR = "sm2"
-  SIGALGO = "${HASH}withSM2"
-}
-
-CMP_SIGALGO = "SHA256withECDSA"
-
 xi:copy-dir qa/p12/shared output
 
-xi:copy-dir qa/p12/${KEY_DIR} output
+xi:copy-dir qa/p12/${KEYSPEC} output
 
-if { "$KEYSPEC" equals "" } then {
-  if { $KEY_TYPE equals "rsa" } then {
-    KEYSPEC = "2048"
-  } elif { $KEY_TYPE equals "ec" } then {
-    KEYSPEC = "secp256r1"
-  } elif { $KEY_TYPE equals "dsa" } then {
-    KEYSPEC = "2048"
-  }
-}
-
+# OCSP uses the same key type as the CA
 list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
-if { $TOKEN_TYPE equals "pkcs11" } then {
+if { "$TOKEN_TYPE" equals "PKCS11" } then {
   SLOT = "0"
 
   OCSP_KEYCONF = "slot=$SLOT,key-label=ocsp99"
 
   each ($list) {
     xi:delete-key-p11 --force --slot $SLOT --label ${it}
-
-    if { $KEY_TYPE equals "rsa" } then {
-      xi:rsa-p11 --key-size $KEYSPEC --slot $SLOT --label ${it}
-    } elif { $KEY_TYPE equals "ec" } then {
-      xi:ec-p11 --curve $KEYSPEC --slot $SLOT --label ${it}
-    } elif { $KEY_TYPE equals "dsa" } then {
-      xi:dsa-p11 --plen $KEYSPEC --slot $SLOT --label ${it}
-    } elif { $KEY_TYPE equals "sm2" } then {
-      xi:sm2-p11 --slot $SLOT --label ${it}
-    }
+    xi:keypair-p11 --keyspec $CA_KEYSPEC --slot $SLOT --label ${it}
   }
 
-} elif { $TOKEN_TYPE equals "pkcs12" } then {
+} elif { "$TOKEN_TYPE" equals "PKCS12" } then {
 
   OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
 
   each ($list) {
-    if { $KEY_TYPE equals "rsa" } then {
-      xi:rsa-p12 --password CHANGEIT --key-size $KEYSPEC --out output/${it}.p12
-    } elif { $KEY_TYPE equals "dsa" } then {
-      xi:dsa-p12 --password CHANGEIT --plen $KEYSPEC --out output/${it}.p12
-    } elif { $KEY_TYPE equals "ec" } then {
-      xi:ec-p12 --curve $KEYSPEC --password CHANGEIT --out output/${it}.p12
-    } elif { $KEY_TYPE equals "sm2" } then {
-      xi:sm2-p12 --password CHANGEIT --out output/${it}.p12
-    }
+    xi:keypair-p12 --password CHANGEIT --keyspec $CA_KEYSPEC --out output/${it}.p12
   }
 
 }

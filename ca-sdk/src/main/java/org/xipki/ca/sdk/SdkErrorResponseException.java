@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.pki.ErrorCode;
+import org.xipki.security.exception.ErrorCode;
 
 /**
  * Exception wraps the error response.

@@ -1,19 +1,19 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.DataSourceMap;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
+import org.xipki.security.X509Crl;
+import org.xipki.util.codec.Args;
+import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.util.extra.exception.CertPublisherException;
 
 import java.io.Closeable;
 
@@ -30,12 +30,14 @@ public class IdentifiedCertPublisher implements Closeable {
 
   private final CertPublisher certPublisher;
 
-  public IdentifiedCertPublisher(PublisherEntry entry, CertPublisher certPublisher) {
+  public IdentifiedCertPublisher(PublisherEntry entry,
+                                 CertPublisher certPublisher) {
     this.entry = Args.notNull(entry, "entry");
     this.certPublisher = Args.notNull(certPublisher, "certPublisher");
   }
 
-  public void initialize(DataSourceMap datasourceConfs) throws CertPublisherException {
+  public void initialize(DataSourceMap datasourceConfs)
+      throws CertPublisherException {
     certPublisher.initialize(entry.getConf(), datasourceConfs);
   }
 
@@ -47,12 +49,13 @@ public class IdentifiedCertPublisher implements Closeable {
     return certPublisher.certificateAdded(certInfo);
   }
 
-  public boolean certificateRevoked(X509Cert caCert, CertWithDbId cert, String certprofile,
-                                    CertRevocationInfo revInfo) {
+  public boolean certificateRevoked(
+      X509Cert caCert, CertWithDbId cert, String certprofile,
+      CertRevocationInfo revInfo) {
     return certPublisher.certificateRevoked(caCert, cert, certprofile, revInfo);
   }
 
-  public boolean crlAdded(X509Cert caCert, X509CRLHolder crl) {
+  public boolean crlAdded(X509Cert caCert, X509Crl crl) {
     return certPublisher.crlAdded(caCert, crl);
   }
 

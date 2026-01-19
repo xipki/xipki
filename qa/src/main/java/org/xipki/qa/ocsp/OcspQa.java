@@ -1,13 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ocsp;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.ResponderID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -27,15 +25,15 @@ import org.xipki.qa.ValidationResult;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.IssuerHash;
-import org.xipki.security.ObjectIdentifiers;
+import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.DateUtil;
-import org.xipki.util.TripleState;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.util.extra.type.TripleState;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -66,8 +64,9 @@ public class OcspQa {
   }
 
   public ValidationResult checkOcsp(
-      OCSPResp response, IssuerHash issuerHash, BigInteger serialNumber, byte[] encodedCert,
-      OcspCertStatus expectedOcspStatus, OcspResponseOption responseOption, Instant exptectedRevTime,
+      OCSPResp response, IssuerHash issuerHash, BigInteger serialNumber,
+      byte[] encodedCert, OcspCertStatus expectedOcspStatus,
+      OcspResponseOption responseOption, Instant exptectedRevTime,
       boolean noSigVerify) {
     List<BigInteger> serialNumbers = new ArrayList<>(1);
     serialNumbers.add(serialNumber);
@@ -94,7 +93,8 @@ public class OcspQa {
         expectedOcspStatuses, exptectedRevTimes, responseOption, noSigVerify);
   } // method checkOcsp
 
-  public ValidationResult checkOcsp(OCSPResp response, OcspError expectedOcspError) {
+  public ValidationResult checkOcsp(
+      OCSPResp response, OcspError expectedOcspError) {
     Args.notNull(response, "response");
     Args.notNull(expectedOcspError, "expectedOcspError");
 
@@ -103,10 +103,12 @@ public class OcspQa {
     int status = response.getStatus();
 
     // Response status
-    ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
+    ValidationIssue issue = new ValidationIssue("OCSP.STATUS",
+        "response.status");
     resultIssues.add(issue);
     if (status != expectedOcspError.getStatus()) {
-      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected '"
+      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) +
+          "', but expected '"
           + Unsuccessful.getStatusText(expectedOcspError.getStatus()) + "'");
     }
 
@@ -114,8 +116,10 @@ public class OcspQa {
   } // method checkOcsp
 
   public ValidationResult checkOcsp(
-      OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts,
-      Map<BigInteger, OcspCertStatus> expectedOcspStatuses, Map<BigInteger, Instant> expectedRevTimes,
+      OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers,
+      Map<BigInteger, byte[]> encodedCerts,
+      Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+      Map<BigInteger, Instant> expectedRevTimes,
       OcspResponseOption responseOption, boolean noSigVerify) {
     Args.notNull(response, "response");
     Args.notEmpty(serialNumbers, "serialNumbers");
@@ -127,14 +131,17 @@ public class OcspQa {
     int status = response.getStatus();
 
     // Response status
-    ValidationIssue issue = new ValidationIssue("OCSP.STATUS", "response.status");
+    ValidationIssue issue = new ValidationIssue("OCSP.STATUS",
+        "response.status");
     resultIssues.add(issue);
     if (status != 0) {
-      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) + "', but expected 'successful'");
+      issue.setFailureMessage("is '" + Unsuccessful.getStatusText(status) +
+          "', but expected 'successful'");
       return new ValidationResult(resultIssues);
     }
 
-    ValidationIssue encodingIssue = new ValidationIssue("OCSP.ENCODING", "response encoding");
+    ValidationIssue encodingIssue = new ValidationIssue("OCSP.ENCODING",
+        "response encoding");
     resultIssues.add(encodingIssue);
 
     BasicOCSPResp basicResp;
@@ -147,7 +154,8 @@ public class OcspQa {
 
     SingleResp[] singleResponses = basicResp.getResponses();
 
-    issue = new ValidationIssue("OCSP.RESPONSES.NUM", "number of single responses");
+    issue = new ValidationIssue("OCSP.RESPONSES.NUM",
+        "number of single responses");
     resultIssues.add(issue);
 
     if (singleResponses == null || singleResponses.length == 0) {
@@ -157,7 +165,8 @@ public class OcspQa {
 
     final int n = singleResponses.length;
     if (n != serialNumbers.size()) {
-      issue.setFailureMessage("is '" + n + "', but expected '" + serialNumbers.size() + "'");
+      issue.setFailureMessage("is '" + n + "', but expected '" +
+          serialNumbers.size() + "'");
       return new ValidationResult(resultIssues);
     }
 
@@ -165,7 +174,9 @@ public class OcspQa {
 
     // check the signature if available
     issue = noSigVerify
-        ? new ValidationIssue("OCSP.SIG", (hasSignature ? "signature presence (Ignore)" : "signature presence"))
+        ? new ValidationIssue("OCSP.SIG",
+            (hasSignature ? "signature presence (Ignore)"
+                : "signature presence"))
         : new ValidationIssue("OCSP.SIG", "signature presence");
 
     resultIssues.add(issue);
@@ -182,10 +193,12 @@ public class OcspQa {
       SignAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
         try {
-          SignAlgo signAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithmID());
+          SignAlgo signAlgo = SignAlgo.getInstance(
+              basicResp.getSignatureAlgorithmID());
+
           if (signAlgo != expectedSigalgo) {
-            issue.setFailureMessage("is '" + signAlgo.getJceName() + "', but expected '"
-                + expectedSigalgo.getJceName() + "'");
+            issue.setFailureMessage("is '" + signAlgo.getJceName() +
+                "', but expected '" + expectedSigalgo.getJceName() + "'");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage("could not extract the signature algorithm");
@@ -193,19 +206,23 @@ public class OcspQa {
       } // end if (expectedSigalgo != null)
 
       // signer certificate
-      ValidationIssue sigSignerCertIssue = new ValidationIssue("OCSP.SIGNERCERT", "signer certificate");
+      ValidationIssue sigSignerCertIssue = new ValidationIssue(
+          "OCSP.SIGNERCERT", "signer certificate");
       resultIssues.add(sigSignerCertIssue);
 
       // signature validation
-      ValidationIssue sigValIssue = new ValidationIssue("OCSP.SIG.VALIDATION", "signature validation");
+      ValidationIssue sigValIssue = new ValidationIssue("OCSP.SIG.VALIDATION",
+          "signature validation");
       resultIssues.add(sigValIssue);
 
       X509CertificateHolder respSigner = null;
 
       X509CertificateHolder[] responderCerts = basicResp.getCerts();
       if (responderCerts == null || responderCerts.length < 1) {
-        sigSignerCertIssue.setFailureMessage("no responder certificate is contained in the response");
-        sigValIssue.setFailureMessage("could not find certificate to validate signature");
+        sigSignerCertIssue.setFailureMessage(
+            "no responder certificate is contained in the response");
+        sigValIssue.setFailureMessage(
+            "could not find certificate to validate signature");
       } else {
         ResponderID respId = basicResp.getResponderId().toASN1Primitive();
         X500Name respIdByName = respId.getName();
@@ -230,21 +247,24 @@ public class OcspQa {
         }
 
         if (respSigner == null) {
-          sigSignerCertIssue.setFailureMessage("no responder certificate match the ResponderId");
-          sigValIssue.setFailureMessage("could not find certificate matching the ResponderId to validate signature");
+          sigSignerCertIssue.setFailureMessage(
+              "no responder certificate match the ResponderId");
+          sigValIssue.setFailureMessage("could not find certificate " +
+              "matching the ResponderId to validate signature");
         }
       }
 
       if (respSigner != null) {
-        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST", "signer certificate validation");
+        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST",
+            "signer certificate validation");
         resultIssues.add(issue);
 
         for (int i = 0; i < singleResponses.length; i++) {
           SingleResp singleResp = singleResponses[i];
           if (!respSigner.isValidOn(singleResp.getThisUpdate())) {
             issue.setFailureMessage(String.format(
-                "responder certificate is not valid on the thisUpdate[%d]: %s", i,
-                singleResp.getThisUpdate()));
+                "responder certificate is not valid on the thisUpdate[%d]: %s",
+                i, singleResp.getThisUpdate()));
           }
         } // end for
 
@@ -264,8 +284,11 @@ public class OcspQa {
         }
 
         try {
-          PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
-          ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
+          PublicKey responderPubKey = KeyUtil.getPublicKey(
+              respSigner.getSubjectPublicKeyInfo());
+
+          ContentVerifierProvider cvp =
+              securityFactory.getContentVerifierProvider(responderPubKey);
           if (!basicResp.isSignatureValid(cvp)) {
             sigValIssue.setFailureMessage("signature is invalid");
           }
@@ -276,10 +299,12 @@ public class OcspQa {
     } // end if (hasSignature)
 
     // nonce
-    Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-    resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn, responseOption.getNonceOccurrence()));
+    Extension nonceExtn = basicResp.getExtension(OIDs.OCSP.id_pkix_ocsp_nonce);
+    resultIssues.add(checkOccurrence("OCSP.NONCE", nonceExtn,
+        responseOption.getNonceOccurrence()));
 
-    boolean extendedRevoke = basicResp.getExtension(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke) != null;
+    boolean extendedRevoke = basicResp.getExtension(
+        OIDs.Extn.id_pkix_ocsp_extendedRevoke) != null;
 
     for (int i = 0; i < singleResponses.length; i++) {
       SingleResp singleResp = singleResponses[i];
@@ -295,41 +320,50 @@ public class OcspQa {
         encodedCert = encodedCerts.get(serialNumber);
       }
 
-      List<ValidationIssue> issues = checkSingleCert(i, singleResp, issuerHash, expectedStatus,
-          encodedCert, expectedRevTime, extendedRevoke, responseOption.getNextUpdateOccurrence(),
-          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlg());
+      List<ValidationIssue> issues = checkSingleCert(i, singleResp,
+          issuerHash, expectedStatus, encodedCert, expectedRevTime,
+          extendedRevoke, responseOption.getNextUpdateOccurrence(),
+          responseOption.getCerthashOccurrence(),
+          responseOption.getCerthashAlg());
       resultIssues.addAll(issues);
     } // end for
 
     return new ValidationResult(resultIssues);
   } // method checkOcsp
 
-  private List<ValidationIssue> checkSingleCert(int index, SingleResp singleResp,
-      IssuerHash issuerHash, OcspCertStatus expectedStatus, byte[] encodedCert,
-      Instant expectedRevTime, boolean extendedRevoke, TripleState nextupdateOccurrence,
-      TripleState certhashOccurrence, HashAlgo certhashAlg) {
-    if (expectedStatus == OcspCertStatus.unknown || expectedStatus == OcspCertStatus.issuerUnknown) {
+  private List<ValidationIssue> checkSingleCert(
+      int index, SingleResp singleResp, IssuerHash issuerHash,
+      OcspCertStatus expectedStatus, byte[] encodedCert,
+      Instant expectedRevTime, boolean extendedRevoke,
+      TripleState nextupdateOccurrence, TripleState certhashOccurrence,
+      HashAlgo certhashAlg) {
+    if (expectedStatus == OcspCertStatus.unknown
+        || expectedStatus == OcspCertStatus.issuerUnknown) {
       certhashOccurrence = TripleState.forbidden;
     }
 
     List<ValidationIssue> issues = new LinkedList<>();
 
     // issuer hash
-    ValidationIssue issue = new ValidationIssue("OCSP.RESPONSE." + index + ".ISSUER", "certificate issuer");
+    ValidationIssue issue = new ValidationIssue(
+        "OCSP.RESPONSE." + index + ".ISSUER", "certificate issuer");
     issues.add(issue);
 
     CertificateID certId = singleResp.getCertID();
     try {
       HashAlgo hashAlgo = HashAlgo.getInstance(certId.getHashAlgOID());
-      if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(), certId.getIssuerKeyHash())) {
+      if (!issuerHash.match(hashAlgo, certId.getIssuerNameHash(),
+          certId.getIssuerKeyHash())) {
         issue.setFailureMessage("issuer not match");
       }
     } catch (NoSuchAlgorithmException ex) {
-      issue.setFailureMessage("unknown hash algorithm " + certId.getHashAlgOID().getId());
+      issue.setFailureMessage(
+          "unknown hash algorithm " + certId.getHashAlgOID().getId());
     }
 
     // status
-    issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS", "certificate status");
+    issue = new ValidationIssue("OCSP.RESPONSE." + index + ".STATUS",
+        "certificate status");
     issues.add(issue);
 
     CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -344,7 +378,9 @@ public class OcspQa {
 
       if (revStatus.hasRevocationReason()) {
         int reason = revStatus.getRevocationReason();
-        if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode() && revTimeSec == 0) {
+        if (extendedRevoke
+            && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+            && revTimeSec == 0) {
           status = OcspCertStatus.unknown;
           revTimeSec = null;
         } else {
@@ -381,7 +417,8 @@ public class OcspQa {
               status = OcspCertStatus.cessationOfOperation;
               break;
             default:
-              issue.setFailureMessage("should not reach here, unknown CRLReason " + revocationReason);
+              issue.setFailureMessage("should not reach here, unknown " +
+                  "CRLReason " + revocationReason);
               break;
           }
         } // end if
@@ -389,50 +426,62 @@ public class OcspQa {
         status = OcspCertStatus.rev_noreason;
       } // end if (revStatus.hasRevocationReason())
     } else if (singleCertStatus instanceof UnknownStatus) {
-      status = extendedRevoke ? OcspCertStatus.issuerUnknown : OcspCertStatus.unknown;
+      status = extendedRevoke ? OcspCertStatus.issuerUnknown
+          : OcspCertStatus.unknown;
     } else {
-      issue.setFailureMessage("unknown certstatus: " + singleCertStatus.getClass().getName());
+      issue.setFailureMessage("unknown certstatus: " +
+          singleCertStatus.getClass().getName());
     }
 
     if (!issue.isFailed() && expectedStatus != status) {
-      issue.setFailureMessage("is='" + status + "', but expected='" + expectedStatus + "'");
+      issue.setFailureMessage("is='" + status + "', but expected='" +
+          expectedStatus + "'");
     }
 
     // revocation time
-    issue = new ValidationIssue("OCSP.RESPONSE." + index + ".REVTIME", "certificate time");
+    issue = new ValidationIssue("OCSP.RESPONSE." + index + ".REVTIME",
+        "certificate time");
     issues.add(issue);
     if (expectedRevTime != null) {
       if (revTimeSec == null) {
-        issue.setFailureMessage("is='null', but expected='" + formatTime(expectedRevTime) + "'");
+        issue.setFailureMessage("is='null', but expected='" +
+            formatTime(expectedRevTime) + "'");
       } else if (revTimeSec != expectedRevTime.getEpochSecond()) {
-        issue.setFailureMessage("is='" +  formatTime(Instant.ofEpochSecond(revTimeSec))
-            + "', but expected='" + formatTime(expectedRevTime) + "'");
+        issue.setFailureMessage("is='" +
+            formatTime(Instant.ofEpochSecond(revTimeSec)) +
+            "', but expected='" + formatTime(expectedRevTime) + "'");
       }
     }
 
     // nextUpdate
     Date d = singleResp.getNextUpdate();
     Instant nextUpdate = (d == null) ? null : d.toInstant();
-    issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE", nextUpdate, nextupdateOccurrence);
+    issue = checkOccurrence("OCSP.RESPONSE." + index + ".NEXTUPDATE",
+        nextUpdate, nextupdateOccurrence);
     issues.add(issue);
 
-    Extension extension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-    issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH", extension, certhashOccurrence);
+    Extension extension = singleResp.getExtension(
+        OIDs.Misc.isismtt_at_certHash);
+    issue = checkOccurrence("OCSP.RESPONSE." + index + ".CERTHASH",
+        extension, certhashOccurrence);
     issues.add(issue);
 
     if (extension != null) {
       ASN1Encodable extensionValue = extension.getParsedValue();
       CertHash certHash = CertHash.getInstance(extensionValue);
-      ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
+      ASN1ObjectIdentifier hashAlgOid =
+          certHash.getHashAlgorithm().getAlgorithm();
       if (certhashAlg != null) {
         // certHash algorithm
-        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG", "certhash algorithm");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.ALG",
+            "certhash algorithm");
         issues.add(issue);
 
         try {
           HashAlgo is = HashAlgo.getInstance(certHash.getHashAlgorithm());
           if (is != certhashAlg) {
-            issue.setFailureMessage("is '" + is + "', but expected '" + certhashAlg + "'");
+            issue.setFailureMessage("is '" + is + "', but expected '" +
+                certhashAlg + "'");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage(ex.getMessage());
@@ -443,14 +492,16 @@ public class OcspQa {
       if (encodedCert != null) {
         encodedCert = X509Util.toDerEncoded(encodedCert);
 
-        issue = new ValidationIssue("OCSP.RESPONSE." + index + ".CHASH.VALIDITY", "certhash validity");
+        issue = new ValidationIssue("OCSP.RESPONSE." + index +
+            ".CHASH.VALIDITY", "certhash validity");
         issues.add(issue);
 
         try {
           MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
           byte[] expectedHashValue = md.digest(encodedCert);
           if (!Arrays.equals(expectedHashValue, hashValue)) {
-            issue.setFailureMessage("certhash does not match the requested certificate");
+            issue.setFailureMessage(
+                "certhash does not match the requested certificate");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage("NoSuchAlgorithm " + hashAlgOid.getId());
@@ -461,8 +512,8 @@ public class OcspQa {
     return issues;
   } // method checkSingleCert
 
-  private static ValidationIssue checkOccurrence(String targetName, Object target,
-      TripleState occurrence) {
+  private static ValidationIssue checkOccurrence(
+      String targetName, Object target, TripleState occurrence) {
     ValidationIssue issue = new ValidationIssue(targetName, targetName);
     if (occurrence == TripleState.forbidden) {
       if (target != null) {

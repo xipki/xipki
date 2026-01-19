@@ -1,15 +1,17 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.CertPolicyId;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.ca.api.profile.id.CertificatePolicyID;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,59 +21,19 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class PolicyMappings extends ValidableConf {
+public class PolicyMappings implements JsonEncodable {
 
-  public static class PolicyIdMappingType extends ValidableConf {
+  private final List<PolicyIdMappingType> mappings;
 
-    private DescribableOid issuerDomainPolicy;
-
-    private DescribableOid subjectDomainPolicy;
-
-    public DescribableOid getIssuerDomainPolicy() {
-      return issuerDomainPolicy;
-    }
-
-    public void setIssuerDomainPolicy(DescribableOid issuerDomainPolicy) {
-      this.issuerDomainPolicy = issuerDomainPolicy;
-    }
-
-    public DescribableOid getSubjectDomainPolicy() {
-      return subjectDomainPolicy;
-    }
-
-    public void setSubjectDomainPolicy(DescribableOid subjectDomainPolicy) {
-      this.subjectDomainPolicy = subjectDomainPolicy;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(issuerDomainPolicy, "issuerDomainPolicy");
-      notNull(subjectDomainPolicy, "subjectDomainPolicy");
-      validate(issuerDomainPolicy, subjectDomainPolicy);
-    }
-
-  } // class PolicyIdMappingType
-
-  private List<PolicyIdMappingType> mappings;
+  public PolicyMappings(List<PolicyIdMappingType> mappings) {
+    this.mappings = Args.notEmpty(mappings, "mappings");
+  }
 
   public List<PolicyIdMappingType> getMappings() {
-    if (mappings == null) {
-      mappings = new LinkedList<>();
-    }
     return mappings;
   }
 
-  public void setMappings(List<PolicyIdMappingType> mappings) {
-    this.mappings = mappings;
-  }
-
-  @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(mappings, "mappings");
-    validate(mappings);
-  }
-
-  public org.bouncycastle.asn1.x509.PolicyMappings toXiPolicyMappings() {
+  public org.bouncycastle.asn1.x509.PolicyMappings toPolicyMappings() {
     List<PolicyIdMappingType> mappings = getMappings();
     final int n = mappings.size();
 
@@ -80,15 +42,77 @@ public class PolicyMappings extends ValidableConf {
 
     for (int i = 0; i < n; i++) {
       PolicyIdMappingType mapping = mappings.get(i);
-
-      issuerDomainPolicy[i] = CertPolicyId.getInstance(
-          new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getOid()));
-
+      issuerDomainPolicy[i]  = CertPolicyId.getInstance(
+          mapping.getIssuerDomainPolicy().getOid());
       subjectDomainPolicy[i] = CertPolicyId.getInstance(
-          new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getOid()));
+          mapping.getSubjectDomainPolicy().getOid());
     }
 
-    return new org.bouncycastle.asn1.x509.PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
-  } // method toXiPolicyMappings
+    return new org.bouncycastle.asn1.x509.PolicyMappings(
+        issuerDomainPolicy, subjectDomainPolicy);
+  }
 
-} // class PolicyMappings
+  @Override
+  public JsonMap toCodec() {
+    return new JsonMap().putEncodables("mappings", mappings);
+  }
+
+  public static PolicyMappings parse(JsonMap json) throws CodecException {
+    JsonList list = json.getNnList("mappings");
+    List<PolicyIdMappingType> mappings = new ArrayList<>(list.size());
+    for (JsonMap v : list.toMapList()) {
+      mappings.add(PolicyIdMappingType.parse(v));
+    }
+    return new PolicyMappings(mappings);
+  }
+
+  public static class PolicyIdMappingType implements JsonEncodable {
+
+    private final CertificatePolicyID issuerDomainPolicy;
+
+    private final CertificatePolicyID subjectDomainPolicy;
+
+    public PolicyIdMappingType(CertificatePolicyID issuerDomainPolicy,
+                               CertificatePolicyID subjectDomainPolicy) {
+      this.issuerDomainPolicy =
+          Args.notNull(issuerDomainPolicy, "issuerDomainPolicy");
+      this.subjectDomainPolicy =
+          Args.notNull(subjectDomainPolicy, "subjectDomainPolicy");
+    }
+
+    public CertificatePolicyID getIssuerDomainPolicy() {
+      return issuerDomainPolicy;
+    }
+
+    public CertificatePolicyID getSubjectDomainPolicy() {
+      return subjectDomainPolicy;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      if (issuerDomainPolicy != null) {
+        ret.put("issuerDomainPolicy", issuerDomainPolicy.getMainAlias());
+      }
+      if (issuerDomainPolicy != null) {
+        ret.put("subjectDomainPolicy", subjectDomainPolicy.getMainAlias());
+      }
+      return ret;
+    }
+
+    public static PolicyIdMappingType parse(JsonMap json)
+        throws CodecException {
+      String str = json.getString("issuerDomainPolicy");
+      CertificatePolicyID issuerDomainPolicy = (str == null) ? null
+          : CertificatePolicyID.ofOidOrName(str);
+
+      str = json.getString("subjectDomainPolicy");
+      CertificatePolicyID subjectDomainPolicy = (str == null) ? null
+          : CertificatePolicyID.ofOidOrName(str);
+
+      return new PolicyIdMappingType(issuerDomainPolicy, subjectDomainPolicy);
+    }
+
+  } // class PolicyIdMappingType
+
+}

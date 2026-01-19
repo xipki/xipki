@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.Args;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,9 +24,11 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class CertPublisherFactoryRegister {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CertPublisherFactoryRegister.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CertPublisherFactoryRegister.class);
 
-  private final ConcurrentLinkedDeque<CertPublisherFactory> factories = new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<CertPublisherFactory> factories =
+      new ConcurrentLinkedDeque<>();
 
   /**
    * Whether publisher of given type can be created.
@@ -53,7 +55,8 @@ public class CertPublisherFactoryRegister {
    * @throws ObjectCreationException
    *           if publisher could not be created.
    */
-  public CertPublisher newPublisher(String type) throws ObjectCreationException {
+  public CertPublisher newPublisher(String type)
+      throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertPublisherFactory service : factories) {
@@ -62,7 +65,8 @@ public class CertPublisherFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException("could not find factory to create Publisher of type " + type);
+    throw new ObjectCreationException(
+        "could not find factory to create Publisher of type " + type);
   } // method newPublisher
 
   /**
@@ -109,7 +113,8 @@ public class CertPublisherFactoryRegister {
     if (factories.remove(factory)) {
       LOG.info("removed CertPublisherFactory binding for {}", factory);
     } else {
-      LOG.info("no CertPublisherFactory binding found to remove for {}", factory);
+      LOG.info("no CertPublisherFactory binding found to remove for {}",
+          factory);
     }
   } // method unregistFactory
 

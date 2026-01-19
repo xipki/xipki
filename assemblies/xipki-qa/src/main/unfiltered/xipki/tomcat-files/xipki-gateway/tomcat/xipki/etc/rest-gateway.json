@@ -8,16 +8,5 @@
 		"name": "myalias",
 		"ca": "subcawithcrl",
 		"certprofile": "tls"
-	}],
-	"pop":{
-		"sigAlgos":[
-			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
-			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		],
-		"dh":{
-			"type":"pkcs12",
-			"password":"CHANGEIT",
-			"keystore":"keycerts/dhpop.p12"
-		}
-	}
+	}]
 }

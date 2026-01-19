@@ -1,10 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api.kpgen;
 
 import org.xipki.security.SecurityFactory;
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Set;
 
@@ -24,7 +24,8 @@ public interface KeypairGeneratorFactory {
   Set<String> getSupportedKeypairTypes();
 
   /**
-   * Indicates whether a keypair generator of the given {@code type} can be created or not.
+   * Indicates whether a keypair generator of the given {@code type} can be
+   * created or not.
    *
    * @param type
    *          Type of the signer. Must not be {@code null}.
@@ -45,7 +46,8 @@ public interface KeypairGeneratorFactory {
    * @throws ObjectCreationException
    *         if signer could not be created.
    */
-  KeypairGenerator newKeypairGenerator(String type, String conf, SecurityFactory securityFactory)
+  KeypairGenerator newKeypairGenerator(String type, String conf,
+                                       SecurityFactory securityFactory)
       throws ObjectCreationException;
 
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.shell;
@@ -41,7 +41,8 @@ public abstract class EnumCompleter implements Completer {
   }
 
   @Override
-  public int complete(Session session, CommandLine commandLine, List<String> candidates) {
+  public int complete(Session session, CommandLine commandLine,
+                      List<String> candidates) {
     StringsCompleter delegate = new StringsCompleter();
     for (String entry : enums) {
       delegate.getStrings().add(entry);

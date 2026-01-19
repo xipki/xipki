@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.entry.CaConfColumn;
+import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -59,7 +59,8 @@ public interface CaConfStore {
 
   CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException;
 
-  Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException;
+  Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca)
+      throws CaMgmtException;
 
   Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException;
 
@@ -71,7 +72,8 @@ public interface CaConfStore {
 
   void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
 
-  void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException;
+  void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases)
+      throws CaMgmtException;
 
   void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException;
 
@@ -79,12 +81,13 @@ public interface CaConfStore {
 
   NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException;
 
-  void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException;
+  void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca)
+      throws CaMgmtException;
 
   void addPublisher(PublisherEntry dbEntry) throws CaMgmtException;
 
-  void changeCa(ChangeCaEntry changeCaEntry,
-                       CaConfColumn currentCaConfColumn, SecurityFactory securityFactory)
+  void changeCa(ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConfInfo,
+                SecurityFactory securityFactory)
       throws CaMgmtException;
 
   void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException;
@@ -97,26 +100,32 @@ public interface CaConfStore {
       NameId nameId, String type, String conf) throws CaMgmtException;
 
   SignerEntry changeSigner(
-      String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
+      String name, String type, String conf, String base64Cert,
+      CaManagerImpl signerManager) throws CaMgmtException;
+
+  KeypairGenEntryWrapper changeKeypairGen(
+      String name, String type, String conf, CaManagerImpl manager)
       throws CaMgmtException;
 
-  KeypairGenEntryWrapper changeKeypairGen(String name, String type, String conf, CaManagerImpl manager)
-      throws CaMgmtException;
-
-  IdentifiedCertPublisher changePublisher(String name, String type, String conf, CaManagerImpl publisherManager)
+  IdentifiedCertPublisher changePublisher(
+      String name, String type, String conf, CaManagerImpl publisherManager)
       throws CaMgmtException;
 
   void removeCaAlias(String aliasName) throws CaMgmtException;
 
-  void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
+  void removeCertprofileFromCa(String profileName, String caName)
+      throws CaMgmtException;
 
-  void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
+  void removeRequestorFromCa(String requestorName, String caName)
+      throws CaMgmtException;
 
-  void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException;
+  void removePublisherFromCa(String publisherName, String caName)
+      throws CaMgmtException;
 
   void removeDbSchema(String name) throws CaMgmtException;
 
-  void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
+  void revokeCa(String caName, CertRevocationInfo revocationInfo)
+      throws CaMgmtException;
 
   void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException;
 

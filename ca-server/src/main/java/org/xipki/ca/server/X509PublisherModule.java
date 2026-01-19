@@ -1,9 +1,8 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.cert.X509CRLHolder;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -12,10 +11,11 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.Base64;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.LogUtil;
+import org.xipki.security.X509Crl;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,8 @@ class X509PublisherModule extends X509CaModule {
 
   private final CaManagerImpl caManager;
 
-  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore) {
+  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo,
+                      CertStore certstore) {
     super(caInfo);
 
     this.caManager = Args.notNull(caManager, "caManager");
@@ -50,8 +51,9 @@ class X509PublisherModule extends X509CaModule {
    * Publish certificate.
    *
    * @param certInfo certificate to be published.
-   * @return 0: for published successfully, 1: if could not be published to CA certstore and
-   *     any publishers, 2: if could be published to CA certstore but not to all publishers.
+   * @return 0: for published successfully, 1: if could not be published to CA
+   *         certstore and any publishers, 2: if could be published to CA
+   *         certstore but not to all publishers.
    */
   int publishCert(CertificateInfo certInfo, boolean saveKeypair) {
     if (Args.notNull(certInfo, "certInfo").isAlreadyIssued()) {
@@ -86,7 +88,8 @@ class X509PublisherModule extends X509CaModule {
 
     if (LOG.isWarnEnabled()) {
       LOG.warn("could not publish to publishers {}: {}", failedPublishers,
-          Base64.encodeToString(certInfo.getCert().getCert().getEncoded(), true));
+          Base64.encodeToString(certInfo.getCert().getCert().getEncoded(),
+              true));
     }
     return 2;
   } // method publishCert0
@@ -108,8 +111,8 @@ class X509PublisherModule extends X509CaModule {
         }
 
         if (publisher == null) {
-          throw new IllegalArgumentException(
-              "could not find publisher " + publisherName + " for CA " + caIdent.getName());
+          throw new IllegalArgumentException("could not find publisher "
+              + publisherName + " for CA " + caIdent.getName());
         }
         publishers.add(publisher);
       }
@@ -135,17 +138,20 @@ class X509PublisherModule extends X509CaModule {
       for (IdentifiedCertPublisher publisher : publishers) {
         boolean successful = publisher.caAdded(caCert);
         if (!successful) {
-          LOG.error("republish CA certificate {} to publisher {} failed", caIdent.getName(),
-              publisher.getIdent().getName());
+          LOG.error("republish CA certificate {} to publisher {} failed",
+              caIdent.getName(), publisher.getIdent().getName());
           return false;
         }
       }
 
       if (caInfo.getRevocationInfo() != null) {
         for (IdentifiedCertPublisher publisher : publishers) {
-          boolean successful = publisher.caRevoked(caCert, caInfo.getRevocationInfo());
+          boolean successful = publisher.caRevoked(caCert,
+              caInfo.getRevocationInfo());
+
           if (!successful) {
-            LOG.error("republishing CA revocation to publisher {} failed", publisher.getIdent().getName());
+            LOG.error("republishing CA revocation to publisher {} failed",
+                publisher.getIdent().getName());
             return false;
           }
         }
@@ -159,7 +165,7 @@ class X509PublisherModule extends X509CaModule {
     }
   } // method republishCerts
 
-  void publishCrl(X509CRLHolder crl) {
+  void publishCrl(X509Crl crl) {
     try {
       certstore.addCrl(caIdent, crl);
     } catch (Exception ex) {
@@ -173,7 +179,8 @@ class X509PublisherModule extends X509CaModule {
       try {
         publisher.crlAdded(caCert, crl);
       } catch (RuntimeException ex) {
-        LogUtil.error(LOG, ex, "could not publish CRL to the publisher " + publisher.getIdent());
+        LogUtil.error(LOG, ex, "could not publish CRL to the publisher "
+            + publisher.getIdent());
       }
     } // end for
   } // method publishCrl
@@ -186,7 +193,8 @@ class X509PublisherModule extends X509CaModule {
         singleSuccessful = publisher.certificateRemoved(caCert, certToRemove);
       } catch (RuntimeException ex) {
         singleSuccessful = false;
-        LogUtil.warn(LOG, ex, "could not remove certificate from the publisher " + publisher.getIdent());
+        LogUtil.warn(LOG, ex, "could not remove certificate from the publisher "
+            + publisher.getIdent());
       }
 
       if (singleSuccessful) {
@@ -196,9 +204,10 @@ class X509PublisherModule extends X509CaModule {
       successful = false;
       X509Cert cert = certToRemove.getCert();
       if (LOG.isErrorEnabled()) {
-        LOG.error("removing certificate issuer='{}', serial={}, subject='{}' from publisher"
-            + " {} failed.", cert.getIssuerText(), cert.getSerialNumberHex(),
-            cert.getSubjectText(), publisher.getIdent());
+        LOG.error("removing certificate issuer='{}', serial={}, subject='{}' " +
+                "from publisher {} failed.", cert.getIssuerText(),
+            cert.getSerialNumberHex(), cert.getSubjectText(),
+            publisher.getIdent());
       }
     } // end for
 
@@ -216,7 +225,8 @@ class X509PublisherModule extends X509CaModule {
       }
 
       if (!successful) {
-        LOG.error("could not publish revocation of certificate to the publisher {}", publisher.getIdent());
+        LOG.error("could not publish revocation of certificate to the " +
+                "publisher {}", publisher.getIdent());
       }
     } // end for
   }
@@ -243,8 +253,8 @@ class X509PublisherModule extends X509CaModule {
       return;
     }
 
-    LOG.error("could not publishCertUnrevoked of certificate {} to publishers {}",
-        unrevokedCert.getCertId(), failedPublishers);
+    LOG.error("could not publishCertUnrevoked of certificate {} to " +
+            "publishers {}", unrevokedCert.getCertId(), failedPublishers);
   }
 
   boolean publishCaRevoked(CertRevocationInfo revocationInfo) {
@@ -253,10 +263,12 @@ class X509PublisherModule extends X509CaModule {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caRevoked(caCert, revocationInfo);
       if (successful) {
-        LOG.info("published event caRevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.info("published event caRevoked of CA {} to publisher {}",
+            caIdent.getName(), ident.getName());
       } else {
         succ = false;
-        LOG.error("could not publish event caRevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.error("could not publish event caRevoked of CA {} to publisher {}",
+            caIdent.getName(), ident.getName());
       }
     }
 
@@ -269,10 +281,12 @@ class X509PublisherModule extends X509CaModule {
       NameId ident = publisher.getIdent();
       boolean successful = publisher.caUnrevoked(caCert);
       if (successful) {
-        LOG.info("published event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.info("published event caUnrevoked of CA {} to publisher {}",
+            caIdent.getName(), ident.getName());
       } else {
         succ = false;
-        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}", caIdent.getName(), ident.getName());
+        LOG.error("could not publish event caUnrevoked of CA {} to " +
+                "publisher {}", caIdent.getName(), ident.getName());
       }
     }
 

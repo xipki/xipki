@@ -1,0 +1,78 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile SubCA (CA/Browser Forum BR)"
+  },
+  "certLevel": "SubCA",
+  "certDomain": "CABForumBR",
+  "maxSize": 8400,
+  "validity": "8y",
+  "notBeforeTime": "current",
+  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
+    "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
+    "SM2P256V1","FRP256V1"],
+  "subject": [{
+      "type": "country"
+    },{
+      "type": "organization"
+    },{
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },{
+      "type": "serialNumber",
+      "minOccurs": 0
+    },{
+      "type": "commonName"
+    }
+  ],
+  "extensions": [{
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },{
+      "type": "CRLDistributionPoints",
+      "required": true
+    },{
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true,
+      "basicConstraints": {
+        "pathLen": 1
+      }
+    },{
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },{
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },{
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [{
+            "required": ["keyCertSign","cRLSign"]
+          }
+        ]
+      }
+    },{
+      "type": "CertificatePolicies",
+      "required": true,
+      "certificatePolicies": {
+        "certificatePolicyInformations": [{
+            "policyIdentifier": "1.2.3.4",
+            "policyQualifiers": [{
+                "type": "cpsUri",
+                "value": "http://abc.def.de/cfp"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

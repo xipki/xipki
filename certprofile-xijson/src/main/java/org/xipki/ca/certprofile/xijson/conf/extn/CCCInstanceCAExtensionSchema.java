@@ -1,29 +1,33 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension CCC Instance CA ExtensionSchema.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
+ *
  */
 
 public class CCCInstanceCAExtensionSchema extends CCCSimpleExtensionSchema {
 
-  private long appletVersion;
+  private final long appletVersion;
 
   private byte[] platformInformation;
 
-  public long getAppletVersion() {
-    return appletVersion;
+  public CCCInstanceCAExtensionSchema(int version, long appletVersion) {
+    super(version);
+    this.appletVersion = Args.range(appletVersion, "appletVersion",
+    1, 0xFFFFFFFFL);
   }
 
-  public void setAppletVersion(long appletVersion) {
-    this.appletVersion = appletVersion;
+  public long getAppletVersion() {
+    return appletVersion;
   }
 
   public byte[] getPlatformInformation() {
@@ -34,12 +38,17 @@ public class CCCInstanceCAExtensionSchema extends CCCSimpleExtensionSchema {
     this.platformInformation = platformInformation;
   }
 
-  @Override
-  public void validate() throws InvalidConfException {
-    super.validate();
-    if (appletVersion < 1 || appletVersion > 0xFFFFFFFFL) {
-      throw new InvalidConfException("appletVersion is not in the range [1, 0xFFFFFFFF]: " + appletVersion);
-    }
+  public JsonMap toCodec() {
+    return super.toCodec().put("appletVersion", appletVersion)
+        .put("platformInformation", platformInformation);
+  }
+
+  public static CCCInstanceCAExtensionSchema parse(JsonMap json)
+      throws CodecException {
+    CCCInstanceCAExtensionSchema ret = new CCCInstanceCAExtensionSchema(
+        json.getNnInt("version"), json.getNnInt("appletVersion"));
+    ret.setPlatformInformation(json.getBytes("platformInformation"));
+    return ret;
   }
 
 }

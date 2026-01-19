@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-setup</artifactId>
   <packaging>pom</packaging>
@@ -14,13 +14,6 @@
   <properties>
     <skipDeploy>false</skipDeploy>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.xipki.tools</groupId>
-      <artifactId>app-package</artifactId>
-      <version>${xipki.tools.version}</version>
-    </dependency>
-  </dependencies>
   <build>
     <resources>
       <resource>
@@ -86,22 +79,17 @@
             <configuration>
               <target>
                 <delete dir="${project.build.directory}/t"/>
-                <delete dir="${project.build.directory}/t2"/>
 
                 <copy file="../../README.md"
                       todir="${project.build.directory}/t"/>
                 <copy file="../../CHANGELOG.md"
                       todir="${project.build.directory}/t"/>
                 <copy todir="${project.build.directory}/t" >
-                  <fileset dir="${project.build.outputDirectory}/package">
-                  </fileset>
-                </copy>
-                <copy todir="${project.build.directory}/t/setup" >
-                  <fileset dir="${project.build.outputDirectory}/setup">
-                  </fileset>
-                </copy>
-                <copy todir="${project.build.directory}/t/license" >
-                  <fileset dir="${project.build.outputDirectory}/license">
+                  <fileset dir="${project.build.outputDirectory}">
+                    <include name="prepare.sh"/>
+                    <include name="INSTALL.md"/>
+                    <include name="license/**"/>
+                    <include name="setup/**"/>
                   </fileset>
                 </copy>
 
@@ -120,11 +108,6 @@
                 <move file="${project.build.directory}/t/xipki-gateway-${project.version}"
                       tofile="${project.build.directory}/t/xipki-gateway"/>
 
-                <unzip src="../xipki-hsmproxy/target/xipki-hsmproxy-${project.version}.zip"
-                       dest="${project.build.directory}/t"/>
-                <move file="${project.build.directory}/t/xipki-hsmproxy-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-hsmproxy"/>
-
                 <untar src="../xipki-cli/target/xipki-cli-${project.version}.tar.gz"
                        dest="${project.build.directory}/t" compression="gzip"/>
                 <move file="${project.build.directory}/t/xipki-cli-${project.version}"
@@ -134,13 +117,6 @@
                        dest="${project.build.directory}/t" compression="gzip"/>
                 <move file="${project.build.directory}/t/xipki-mgmt-cli-${project.version}"
                       tofile="${project.build.directory}/t/xipki-mgmt-cli"/>
-
-                <java failonerror="true" classname="org.xipki.apppackage.CompressPackage">
-                  <arg value="${project.basedir}/src/assembly/descriptors/package-conf.properties"/>
-                  <arg value="${project.build.directory}/t"/>
-                  <arg value="${project.build.directory}/t2"/>
-                </java>
-                <delete dir="${project.build.directory}/t"/>
               </target>
             </configuration>
             <goals>
@@ -167,8 +143,8 @@
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <recompressZippedFiles>true</recompressZippedFiles>
-              <!-- Install/publish the zip file -->
-              <attach>true</attach>
+              <!-- Do not install/publish the zip file -->
+              <attach>false</attach>
             </configuration>
           </execution>
         </executions>

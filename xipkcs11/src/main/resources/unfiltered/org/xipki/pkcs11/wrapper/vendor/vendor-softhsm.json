@@ -1,0 +1,17 @@
+{
+  "name": "softhsm",
+  "filter": {
+    "manufacturerIDs": [
+      "softhsm"
+    ]
+  },
+  "ckmMultipartExclude": [{
+      "ckm": "CKM_EDDSA",
+      "flags": ["Sign","Verify"]
+    },{
+      "ckm": "CKM_ML_DSA",
+      "flags": ["Sign"]
+    }
+  ],
+  "vendor": "SOFTHSM"
+}

@@ -13,9 +13,27 @@
 	//"reverseProxyMode":"GENERAL",
 	"pop":{
 		"sigAlgos":[
-			"SHA256withRSA", "SHA256withECDSA", "SHA256withDSA",
-			"SM3withSM2", "ED25519", "ED448", "DHPOP-X25519", "DHPOP-X448"
-		]
+			"SHA256withRSA", "SHA384withRSA", "SHA512withRSA",
+			"SHA256withRSAANDMGF1", "SHA384withRSAANDMGF1", "SHA512withRSAANDMGF1",
+			"SHA256withECDSA", "SHA384withECDSA", "SHA512withECDSA",
+			"SM3withSM2", "ED25519", "ED448",
+			"DHPOP-X25519", "DHPOP-X448", "KEM-GMAC-256",
+			"ML-DSA-44", "ML-DSA-65", "ML-DSA-87"
+		],
+		"kem":{
+			"type":"JCEKS",
+			"password":"$[kem-pop.keyPassword]",
+			"keystore":{
+				"file":"keycerts/kem-pop.jceks"
+			}
+		},
+		"dh":{
+			"type":"pkcs12",
+			"password":"$[dh-pop.keyPassword]",
+			"keystore":{
+				"file":"keycerts/dh-pop.p12"
+			}
+		}
 	},
 	"sdkClient":{
 		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
@@ -35,7 +53,9 @@
 	},
 	"audit":{
 		"type":"embed",
-		"conf": "file=${sys:catalina.home}/logs/gateway-audit.log"
+		"conf": {
+			"file": "${sys:catalina.home}/logs/gateway-audit.log"
+		}
 	},
 	"security":{
 		"keyStrongrandomEnabled":false,

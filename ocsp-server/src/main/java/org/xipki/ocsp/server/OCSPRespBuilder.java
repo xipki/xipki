@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
@@ -12,9 +12,9 @@ import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.NoIdleSignerException;
 import org.xipki.security.XiContentSigner;
-import org.xipki.util.Hex;
+import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.util.codec.Hex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +31,8 @@ import java.util.List;
 
 public class OCSPRespBuilder {
   private static final byte[] successfulStatus = Hex.decode("0a0100");
-  private static final byte[] responseTypeBasic = Hex.decode("06092b0601050507300101");
+  private static final byte[] responseTypeBasic =
+      Hex.decode("06092b0601050507300101");
 
   private final List<SingleResponse> list = new LinkedList<>();
   private Extensions responseExtensions = null;
@@ -56,9 +57,10 @@ public class OCSPRespBuilder {
    * @param certStatus status of the certificate - null if okay
    * @param singleExtensions optional extensions
    */
-  public void addResponse(
-      CertID certId, byte[] certStatus, Instant thisUpdate, Instant nextUpdate, Extensions singleExtensions) {
-    list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate, singleExtensions));
+  public void addResponse(CertID certId, byte[] certStatus, Instant thisUpdate,
+                          Instant nextUpdate, Extensions singleExtensions) {
+    list.add(new SingleResponse(certId, certStatus, thisUpdate, nextUpdate,
+        singleExtensions));
   }
 
   /**
@@ -71,9 +73,10 @@ public class OCSPRespBuilder {
   }
 
   public byte[] buildOCSPResponse(
-      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence, Instant producedAt)
-      throws OCSPException, NoIdleSignerException {
-    ResponseData responseData = new ResponseData(0, responderId, producedAt, list, responseExtensions);
+      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence,
+      Instant producedAt) throws OCSPException, NoIdleSignerException {
+    ResponseData responseData =
+        new ResponseData(0, responderId, producedAt, list, responseExtensions);
 
     byte[] tbs = new byte[responseData.getEncodedLength()];
     responseData.write(tbs, 0);
@@ -89,7 +92,8 @@ public class OCSPRespBuilder {
         sigOut.write(tbs);
         sigOut.close();
       } catch (IOException ex) {
-        throw new OCSPException("exception signing TBSRequest: " + ex.getMessage(), ex);
+        throw new OCSPException(
+            "exception signing TBSRequest: " + ex.getMessage(), ex);
       }
 
       signature = signer0.getSignature();
@@ -125,7 +129,8 @@ public class OCSPRespBuilder {
     // encode
     byte[] out = new byte[ocspResponseLen];
     int offset = 0;
-    offset += ASN1Type.writeHeader((byte) 0x30, ocspResponseBodyLen, out, offset);
+    offset += ASN1Type.writeHeader((byte) 0x30, ocspResponseBodyLen,
+              out, offset);
     // OCSPResponse.responseStatus
     offset += arraycopy(successfulStatus, out, offset);
 
@@ -133,16 +138,19 @@ public class OCSPRespBuilder {
     offset += ASN1Type.writeHeader((byte) 0xA0, responseBytesLen, out, offset);
 
     // OCSPResponse.[0]responseBytes
-    offset += ASN1Type.writeHeader((byte) 0x30, responseBytesBodyLen, out, offset);
+    offset += ASN1Type.writeHeader((byte) 0x30, responseBytesBodyLen,
+                out, offset);
 
     // OCSPResponse.[0]responseBytes.responseType
     offset += arraycopy(responseTypeBasic, out, offset);
 
     // OCSPResponse.[0]responseBytes.responseType
-    offset += ASN1Type.writeHeader((byte) 0x04, basicResponseLen, out, offset); // OCTET STRING
+    // OCTET STRING
+    offset += ASN1Type.writeHeader((byte) 0x04, basicResponseLen, out, offset);
 
     // BasicOCSPResponse
-    offset += ASN1Type.writeHeader((byte) 0x30, basicResponseBodyLen, out, offset);
+    offset += ASN1Type.writeHeader((byte) 0x30, basicResponseBodyLen,
+              out, offset);
     // BasicOCSPResponse.tbsResponseData
     offset += arraycopy(tbs, out, offset);
 

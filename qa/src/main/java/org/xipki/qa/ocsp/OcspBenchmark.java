@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ocsp;
@@ -12,8 +12,8 @@ import org.xipki.ocsp.client.HttpOcspRequestor;
 import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
-import org.xipki.util.BenchmarkExecutor;
+import org.xipki.util.benchmark.BenchmarkExecutor;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -56,7 +56,8 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(OcspBenchmark.class);
 
   private final OcspRequestor client;
 
@@ -72,7 +73,8 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   private final AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public OcspBenchmark(X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
+  public OcspBenchmark(
+      X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
       Iterator<BigInteger> serials, int maxRequests, String description)
       throws MalformedURLException {
     super(description);
@@ -108,7 +110,8 @@ public class OcspBenchmark extends BenchmarkExecutor {
   public boolean ask(BigInteger[] serialNumbers) {
     OCSPResp ocspResp;
     try {
-      ocspResp = client.ask(issuerCert, serialNumbers, responderUrl, requestOptions, null);
+      ocspResp = client.ask(issuerCert, serialNumbers, responderUrl,
+          requestOptions, null);
     } catch (Exception e) {
       LOG.warn("error client.ask", e);
       return false;
@@ -123,7 +126,8 @@ public class OcspBenchmark extends BenchmarkExecutor {
     }
 
     if (ocspResp.getStatus() != 0) {
-      LOG.warn("bad response: response status is other than OK: {}", ocspResp.getStatus());
+      LOG.warn("bad response: response status is other than OK: {}",
+          ocspResp.getStatus());
       return false;
     }
 

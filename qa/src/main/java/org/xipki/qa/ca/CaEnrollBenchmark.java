@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa.ca;
@@ -11,8 +11,8 @@ import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.util.Args;
-import org.xipki.util.BenchmarkExecutor;
+import org.xipki.util.benchmark.BenchmarkExecutor;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * CA enrollment benchmark.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public class CaEnrollBenchmark extends BenchmarkExecutor {
@@ -55,7 +55,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     }
 
     private void testNext(EnrollCertsRequest request) throws Exception {
-      EnrollOrPollCertsResponse sdkResponse = client.enrollCerts(caName, request);
+      EnrollOrPollCertsResponse sdkResponse =
+          client.enrollCerts(caName, request);
       parseEnrollCertResult(sdkResponse, num);
     } // method testNext
 
@@ -63,7 +64,8 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private static final String CONF_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaEnrollBenchmark.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(CaEnrollBenchmark.class);
 
   private final CaEnrollBenchEntry benchmarkEntry;
 
@@ -83,15 +85,15 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private final boolean caGenKeyPair;
 
-  public CaEnrollBenchmark(
-      String caName, CaEnrollBenchEntry benchmarkEntry, int maxRequests, int num, String description)
+  public CaEnrollBenchmark(String caName, CaEnrollBenchEntry benchmarkEntry,
+                           int maxRequests, int num, String description)
       throws Exception {
     super(description);
     this.caName = caName;
     this.maxRequests = maxRequests;
     this.num = Args.positive(num, "num");
     this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
-    this.index = new AtomicLong(getSecureIndex());
+    this.index = new AtomicLong(random.nextLong());
     this.caGenKeyPair = benchmarkEntry.getSubjectPublicKeyInfo() == null;
     this.client = new SdkClient(SdkClientConf.readConfFromFile(CONF_FILE));
   } // constructor
@@ -119,9 +121,11 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
       EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
-      entry.setSubject(new X500NameType(benchmarkEntry.getX500Name(thisIndex)));
+      entry.setSubject(new X500NameType(
+          benchmarkEntry.getX500Name(thisIndex).getEncoded()));
       if (!caGenKeyPair) {
-        entry.setSubjectPublicKey(benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
+        entry.setSubjectPublicKey(
+            benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
       }
       entry.setCertprofile(benchmarkEntry.getCertprofile());
       entry.setCertReqId(BigInteger.valueOf(i + 1));
@@ -134,18 +138,21 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     return req;
   } // method nextCertRequest
 
-  private void parseEnrollCertResult(EnrollOrPollCertsResponse response, int numCerts)
+  private void parseEnrollCertResult(
+      EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
     EnrollOrPollCertsResponse.Entry[] entries = response.getEntries();
     int n = entries == null ? 0 : entries.length;
     if (n != numCerts) {
-      throw new Exception("expected " + numCerts + " CertResponse, but returned " + n);
+      throw new Exception("expected " + numCerts +
+          " CertResponse, but returned " + n);
     }
 
     for (int i = 0; i < numCerts; i++) {
       EnrollOrPollCertsResponse.Entry certResp = entries[i];
       if (certResp.getError() != null) {
-        throw new Exception("CertReqId " + certResp.getId() + ": server returned PKIStatus: " + certResp.getError());
+        throw new Exception("CertReqId " + certResp.getId()
+            + ": server returned PKIStatus: " + certResp.getError());
       }
     }
   } // method parseEnrollCertResult

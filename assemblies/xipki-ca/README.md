@@ -1,4 +1,4 @@
-Deployment in Tomcat (8, 9 and 10)
+Deployment in Tomcat (10 and 11)
 ----
 1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL:
    Download the JDBC driver to the folder `tomcat/lib`.

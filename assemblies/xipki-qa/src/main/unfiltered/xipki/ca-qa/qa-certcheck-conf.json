@@ -7,7 +7,7 @@
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://myorg.org/rootca1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
-		"crlUrls":["http://localhost:8081/crl/?type=crl&name=rootca1"]
+		"crlUrls":["http://localhost:8081/dummy/crl/?type=crl&name=rootca1"]
 	},{
 		"name":"ed-subca",
 		"cert":{
@@ -16,7 +16,7 @@
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://myorg.org/subca1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
-		"crlUrls":["http://localhost:8081/crl/?type=crl&name=subca1"]
+		"crlUrls":["http://localhost:8081/dummy/crl/?type=crl&name=subca1"]
 	},{
 		"name":"cab-subca",
 		"cert":{
@@ -25,7 +25,7 @@
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://myorg.org/subca1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
-		"crlUrls":["http://localhost:8081/crl/?type=crl&name=subca1"]
+		"crlUrls":["http://localhost:8081/dummy/crl/?type=crl&name=subca1"]
 	},{
 		"name":"subca",
 		"cert":{
@@ -34,7 +34,7 @@
 		"validityMode":"cutoff",
 		"caIssuerUrls":["http://myorg.org/subca1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder1"],
-		"crlUrls":["http://localhost:8081/crl/?type=crl&name=subca1"]
+		"crlUrls":["http://localhost:8081/dummy/crl/?type=crl&name=subca1"]
 	},{
 		"name":"subcawithcrl",
 		"cert":{
@@ -43,8 +43,8 @@
 		"validityMode":"lax",
 		"caIssuerUrls":["http://myorg.org/subcawithcrl1.der"],
 		"ocspUrls":["http://localhost:8080/ocsp/responder2"],
-		"crlUrls":["http://localhost:8081/crl/?type=crl&name=subcawithcrl1"],
-		"deltaCrlUrls":["http://localhost:8081/crl/?type=deltacrl&name=subcawithcrl1"]
+		"crlUrls":["http://localhost:8081/dummy/crl/?type=crl&name=subcawithcrl1"],
+		"deltaCrlUrls":["http://localhost:8081/dummy/crl/?type=deltacrl&name=subcawithcrl1"]
 	}],
 	"certprofiles":[{
 		"name":"rootca",
@@ -64,9 +64,6 @@
 	},{
 		"name":"multiple-ous",
 		"file":"qa/certprofile/certprofile-multiple-ous.json"
-	},{
-		"name":"multi-valued-rdn",
-		"file":"qa/certprofile/certprofile-multi-valued-rdn.json"
 	},{
 		"name":"smime",
 		"file":"qa/certprofile/certprofile-smime.json"
@@ -89,9 +86,6 @@
 		"name":"max-time",
 		"file":"qa/certprofile/certprofile-max-time.json"
 	},{
-		"name":"gmt0015",
-		"file":"qa/certprofile/certprofile-gmt0015.json"
-	},{
 		"name":"fixed-partial-subject",
 		"file":"qa/certprofile/certprofile-fixed-partial-subject.json"
 	},{
@@ -107,19 +101,37 @@
 		"name":"x448",
 		"file":"qa/certprofile/certprofile-x448.json"
 	},{
+		"name":"ml-dsa-44",
+		"file":"qa/certprofile/certprofile-ml-dsa-44.json"
+	},{
+		"name":"ml-dsa-65",
+		"file":"qa/certprofile/certprofile-ml-dsa-65.json"
+	},{
+		"name":"ml-dsa-87",
+		"file":"qa/certprofile/certprofile-ml-dsa-87.json"
+	},{
+		"name":"ml-kem-512",
+		"file":"qa/certprofile/certprofile-ml-kem-512.json"
+	},{
+		"name":"ml-kem-768",
+		"file":"qa/certprofile/certprofile-ml-kem-768.json"
+	},{
+		"name":"ml-kem-1024",
+		"file":"qa/certprofile/certprofile-ml-kem-1024.json"
+	},{
 		"name":"cab-rootca",
-		"file":"qa/certprofile/certprofile-cab-rootca.json"
+		"file":"qa/cab/certprofile/certprofile-cab-rootca.json"
 	},{
 		"name":"cab-subca",
-		"file":"qa/certprofile/certprofile-cab-subca.json"
+		"file":"qa/cab/certprofile/certprofile-cab-subca.json"
 	},{
 		"name":"cab-domain-validated",
-		"file":"qa/certprofile/certprofile-cab-domain-validated.json"
+		"file":"qa/cab/certprofile/certprofile-cab-domain-validated.json"
 	},{
 		"name":"cab-org-validated",
-		"file":"qa/certprofile/certprofile-cab-org-validated.json"
+		"file":"qa/cab/certprofile/certprofile-cab-org-validated.json"
 	},{
 		"name":"cab-individual-validated",
-		"file":"qa/certprofile/certprofile-cab-individual-validated.json"
+		"file":"qa/cab/certprofile/certprofile-cab-individual-validated.json"
 	}]
 }

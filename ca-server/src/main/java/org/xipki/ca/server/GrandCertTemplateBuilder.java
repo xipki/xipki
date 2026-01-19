@@ -1,17 +1,12 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1BitString;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
-import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -19,87 +14,80 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.profile.Certprofile;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.KeypairGenControl;
-import org.xipki.ca.api.profile.NotAfterMode;
-import org.xipki.ca.server.X509Ca.GrantedCertTemplate;
-import org.xipki.pki.BadCertTemplateException;
-import org.xipki.pki.OperationException;
+import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
+import org.xipki.ca.api.profile.ctrl.SubjectInfo;
+import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.security.util.RSABrokenKey;
+import org.xipki.security.KeyInfoPair;
+import org.xipki.security.KeySpec;
+import org.xipki.security.OIDs;
+import org.xipki.security.exception.BadCertTemplateException;
+import org.xipki.security.exception.ErrorCode;
+import org.xipki.security.exception.OperationException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.LogUtil;
-import org.xipki.util.Validity;
+import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.type.Validity;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-
-import static org.xipki.pki.ErrorCode.ALREADY_ISSUED;
-import static org.xipki.pki.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.pki.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pki.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.pki.ErrorCode.UNKNOWN_CERT_PROFILE;
 
 /**
  * X509CA GrandCertTemplate builder.
  *
- * @author Lijun Liao (xipki)
+ * @author Lijun Liao
  */
 
 class GrandCertTemplateBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
 
-  private static final Instant MAX_CERT_TIME = ZonedDateTime.of(9999, 12, 31,
-      23, 59, 59, 0, ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
+  private static final Instant MAX_CERT_TIME = ZonedDateTime.of(
+      9999, 12, 31, 23, 59, 59, 0,
+      ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
 
-  private final ASN1ObjectIdentifier keyAlgOidByImplicitCA;
-  private final String keyspecByImplicitCA;
+  private final KeySpec keyspecByImplicitCA;
 
   private final CaInfo caInfo;
 
   GrandCertTemplateBuilder(CaInfo caInfo) {
     this.caInfo = caInfo;
-
-    this.keyspecByImplicitCA = caInfo.getCaKeyspec();
-    this.keyAlgOidByImplicitCA = caInfo.getCaKeyAlgId().getAlgorithm();
+    this.keyspecByImplicitCA = caInfo.getCaKeySpec();
   }
 
-  GrantedCertTemplate create(
-      boolean batch, IdentifiedCertprofile certprofile, CertTemplateData certTemplate,
-      List<KeypairGenerator> keypairGenerators)
+  X509Ca.GrantedCertTemplate create(
+      boolean batch, IdentifiedCertprofile certprofile,
+      CertTemplateData certTemplate, List<KeypairGenerator> keypairGenerators)
       throws OperationException {
     if (caInfo.getRevocationInfo() != null) {
-      throw new OperationException(NOT_PERMITTED, "CA is revoked");
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
     }
 
     if (certprofile == null) {
-      throw new OperationException(UNKNOWN_CERT_PROFILE, "unknown cert profile " + certTemplate.getCertprofileName());
+      throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
+          "unknown cert profile " + certTemplate.getCertprofileName());
     }
 
-    ConcurrentContentSigner signer = Optional.ofNullable(caInfo.getSigner(certprofile.getSignatureAlgorithms()))
-        .orElseThrow(() -> new OperationException(SYSTEM_FAILURE,
-                              "CA does not support any signature algorithm restricted by the cert profile"));
+    ConcurrentContentSigner signer = Optional.ofNullable(
+            caInfo.getSigner(certprofile.getSignatureAlgorithms()))
+        .orElseThrow(() -> new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "CA does not support any signature algorithm restricted by " +
+            "the cert profile"));
 
     final NameId certprofileIdent = certprofile.getIdent();
-    if (certprofile.getVersion() != Certprofile.X509CertVersion.v3) {
-      throw new OperationException(SYSTEM_FAILURE, "unknown cert version " + certprofile.getVersion());
-    }
 
     switch (certprofile.getCertLevel()) {
       case RootCA:
-        throw new OperationException(NOT_PERMITTED, "CA is not allowed to generate Root CA certificate");
+        throw new OperationException(ErrorCode.NOT_PERMITTED,
+            "CA is not allowed to generate Root CA certificate");
       case SubCA:
       case CROSS:
         Integer reqPathlen = certprofile.getPathLenBasicConstraint();
@@ -107,7 +95,8 @@ class GrandCertTemplateBuilder {
         boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)
                             || (reqPathlen != null && reqPathlen < caPathLen);
         if (!allowed) {
-          throw new OperationException(NOT_PERMITTED, "invalid BasicConstraint.pathLenConstraint");
+          throw new OperationException(ErrorCode.NOT_PERMITTED,
+              "invalid BasicConstraint.pathLenConstraint");
         }
         break;
       default:
@@ -120,16 +109,17 @@ class GrandCertTemplateBuilder {
     Instant reqNotBefore = certTemplate.getNotBefore();
 
     Instant grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
-    // notBefore in the past is not permitted (due to the fact that some clients may not have
-    // accurate time, we allow max. 5 minutes in the past)
+    // notBefore in the past is not permitted (due to the fact that some
+    // clients may not have accurate time, we allow max. 5 minutes in the past)
     Instant _10MinBefore = Instant.now().minus(10, ChronoUnit.MINUTES);
     if (grantedNotBefore.isBefore(_10MinBefore)) {
       grantedNotBefore = _10MinBefore;
     }
 
     if (grantedNotBefore.isAfter(caInfo.getNoNewCertificateAfter())) {
-      throw new OperationException(NOT_PERMITTED,
-          "CA is not permitted to issue certificate after " + caInfo.getNoNewCertificateAfter());
+      throw new OperationException(ErrorCode.NOT_PERMITTED,
+          "CA is not permitted to issue certificate after " +
+          caInfo.getNoNewCertificateAfter());
     }
 
     if (grantedNotBefore.isBefore(caInfo.getNotBefore())) {
@@ -137,53 +127,42 @@ class GrandCertTemplateBuilder {
       grantedNotBefore = caInfo.getNotBefore();
     }
 
-    PrivateKeyInfo privateKey = null;
     SubjectPublicKeyInfo grantedPublicKeyInfo = certTemplate.getPublicKeyInfo();
+    PrivateKeyInfo privateKey = null;
 
     if (grantedPublicKeyInfo != null) {
-      try {
-        grantedPublicKeyInfo = X509Util.toRfc3279Style(certTemplate.getPublicKeyInfo());
-      } catch (InvalidKeySpecException ex) {
-        LogUtil.warn(LOG, ex, "invalid SubjectPublicKeyInfo");
-        throw new OperationException(BAD_CERT_TEMPLATE, "invalid SubjectPublicKeyInfo");
+      grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
+
+      BigInteger rsaModulus = null;
+      if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
+          OIDs.Algo.id_rsaEncryption)) {
+        try {
+          ASN1Sequence seq = ASN1Sequence.getInstance(
+              grantedPublicKeyInfo.getPublicKeyData().getBytes());
+          rsaModulus = ((ASN1Integer) seq.getObjectAt(0)).getValue();
+        } catch (IllegalArgumentException ex) {
+          throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+              "invalid format of RSA public key", ex);
+        }
       }
 
-      // CHECK weak public key, like RSA key (ROCA)
-      if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(
-          PKCSObjectIdentifiers.rsaEncryption)) {
-        try {
-          ASN1Sequence seq = ASN1Sequence.getInstance(grantedPublicKeyInfo.getPublicKeyData().getOctets());
-          if (seq.size() != 2) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
-          }
-
-          BigInteger modulus = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-          if (RSABrokenKey.isAffected(modulus)) {
-            throw new OperationException(BAD_CERT_TEMPLATE, "RSA public key is too weak");
-          }
-        } catch (IllegalArgumentException ex) {
-          throw new OperationException(BAD_CERT_TEMPLATE, "invalid format of RSA public key");
-        }
+      if (rsaModulus != null && RSABrokenKey.isAffected(rsaModulus)) {
+        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+            "RSA public key is too weak");
       }
     } else if (certTemplate.isServerkeygen()) {
       KeypairGenControl kg = certprofile.getKeypairGenControl();
 
-      ASN1ObjectIdentifier keyAlgOid;
-      String keyspec;
-
-      if (kg == null || kg instanceof KeypairGenControl.ForbiddenKeypairGenControl) {
-        throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
+      if (kg == null || kg.isForbidden()) {
+        throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+            "no public key is specified");
       }
 
-      if (kg instanceof KeypairGenControl.InheritCAKeypairGenControl) {
-        keyspec = keyspecByImplicitCA;
-        keyAlgOid = keyAlgOidByImplicitCA;
-      } else {
-        keyspec = kg.getKeyspec();
-        keyAlgOid = kg.getKeyAlgorithmOid();
-      }
+      KeySpec keyspec = kg.isInheritCA() ? keyspecByImplicitCA
+          : kg.getKeySpec();
 
       KeypairGenerator keypairGenerator = null;
+
       if (keypairGenerators != null) {
         for (KeypairGenerator m : keypairGenerators) {
           if (m.supports(keyspec)) {
@@ -194,92 +173,70 @@ class GrandCertTemplateBuilder {
       }
 
       if (keypairGenerator == null) {
-        throw new OperationException(SYSTEM_FAILURE, "found no keypair generator for keyspec " + keyspec);
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "found no keypair generator for keyspec " + keyspec);
       }
 
       String name = keypairGenerator.getName();
+
       try {
-        privateKey = keypairGenerator.generateKeypair(keyspec);
+        KeyInfoPair keyInfoPair = keypairGenerator.generateKeypair(keyspec);
+        privateKey = keyInfoPair.getPrivate();
+        grantedPublicKeyInfo = keyInfoPair.getPublic();
+
         LOG.info("generated keypair {} with generator {}", keyspec, name);
       } catch (XiSecurityException ex) {
-        String msg = "error generating keypair " + keyspec + " using generator " + name;
+        String msg = "error generating keypair " + keyspec +
+            " using generator " + name;
         LogUtil.error(LOG, ex, msg);
-        throw new OperationException(SYSTEM_FAILURE, msg);
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE, msg);
       }
 
       // adapt the algorithm identifier in private key and public key
-      if (!privateKey.getPrivateKeyAlgorithm().getAlgorithm().equals(keyAlgOid)) {
+      AlgorithmIdentifier keyAlgId = keyspec.getAlgorithmIdentifier();
+      if (!privateKey.getPrivateKeyAlgorithm().equals(keyAlgId)) {
         ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
         try {
           privateKey = new PrivateKeyInfo(
-              new AlgorithmIdentifier(keyAlgOid, privateKey.getPrivateKeyAlgorithm().getParameters()),
+              keyAlgId,
               privateKey.getPrivateKey().toASN1Primitive(),
               privateKey.getAttributes(),
               asn1PublicKeyData == null ? null : asn1PublicKeyData.getOctets());
         } catch (IOException ex) {
-          throw new OperationException(SYSTEM_FAILURE, ex);
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
         }
       }
 
-      // construct SubjectPublicKeyInfo
-      String keyType = keyspec.split("/")[0].toUpperCase(Locale.ROOT);
-      byte[] publicKeyData;
-      switch (keyType) {
-        case "RSA": {
-          RSAPrivateKey sk = RSAPrivateKey.getInstance(privateKey.getPrivateKey().getOctets());
-          try {
-            publicKeyData = new RSAPublicKey(sk.getModulus(), sk.getPublicExponent()).getEncoded();
-          } catch (IOException ex) {
-            throw new OperationException(SYSTEM_FAILURE, ex);
-          }
-          break;
-        }
-        case "EC": {
-          ECPrivateKey sk = ECPrivateKey.getInstance(privateKey.getPrivateKey().getOctets());
-          publicKeyData = sk.getPublicKey().getBytes();
-          break;
-        }
-        case "DSA":
-        case "ED25519":
-        case "ED448":
-        case "X25519":
-        case "X448": {
-          publicKeyData = privateKey.getPublicKeyData().getBytes();
-          break;
-        }
-        default:
-          throw new IllegalStateException("unknown key type " + keyType);
-      }
-
-      grantedPublicKeyInfo = new SubjectPublicKeyInfo(privateKey.getPrivateKeyAlgorithm(), publicKeyData);
-      try {
-        grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
-      } catch (InvalidKeySpecException ex) {
-        throw new OperationException(SYSTEM_FAILURE, ex);
+      if (!grantedPublicKeyInfo.getAlgorithm().equals(keyAlgId)) {
+        grantedPublicKeyInfo = new SubjectPublicKeyInfo(keyAlgId,
+            grantedPublicKeyInfo.getPublicKeyData());
       }
     } else {
       // show not reach here
-      throw new OperationException(BAD_CERT_TEMPLATE, "no public key is specified");
+      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+          "no public key is specified");
     }
 
     // public key
     try {
       grantedPublicKeyInfo = certprofile.checkPublicKey(grantedPublicKeyInfo);
     } catch (CertprofileException ex) {
-      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
-      throw new OperationException(BAD_CERT_TEMPLATE, ex);
+      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
     StringBuilder msgBuilder = new StringBuilder();
 
-    Certprofile.SubjectInfo subjectInfo;
+    SubjectInfo subjectInfo;
     try {
-      subjectInfo = certprofile.getSubject(requestedSubject, grantedPublicKeyInfo);
+      subjectInfo = certprofile.getSubject(requestedSubject);
     } catch (CertprofileException ex) {
-      throw new OperationException(SYSTEM_FAILURE, "exception in cert profile " + certprofileIdent);
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+          "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
-      throw new OperationException(BAD_CERT_TEMPLATE, ex);
+      throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }
 
     // subject
@@ -298,11 +255,12 @@ class GrandCertTemplateBuilder {
     // make sure that the grantedSubject does not equal the CA's subject
     if (X509Util.canonicalizeName(grantedSubject).equals(
         caInfo.getPublicCaInfo().getC14nSubject())) {
-      throw new OperationException(ALREADY_ISSUED, "certificate with the same subject as CA is not allowed");
+      throw new OperationException(ErrorCode.ALREADY_ISSUED,
+          "certificate with the same subject as CA is not allowed");
     }
 
+    // notAfter
     Instant grantedNotAfter;
-
     if (certprofile.hasNoWellDefinedExpirationDate()) {
       grantedNotAfter = MAX_CERT_TIME;
     } else {
@@ -333,30 +291,31 @@ class GrandCertTemplateBuilder {
 
       if (grantedNotAfter.isAfter(caInfo.getNotAfter())) {
         ValidityMode caMode = caInfo.getValidityMode();
-        NotAfterMode profileMode = certprofile.getNotAfterMode();
+        ValidityMode profileMode = certprofile.getNotAfterMode();
         if (profileMode == null) {
-          profileMode = NotAfterMode.BY_CA;
+          profileMode = ValidityMode.BY_CA;
         }
 
-        if (profileMode == NotAfterMode.STRICT) {
-          throw new OperationException(NOT_PERMITTED,
-              "notAfter outside of CA's validity is not permitted by the CertProfile");
+        if (profileMode == ValidityMode.STRICT) {
+          throw new OperationException(ErrorCode.NOT_PERMITTED,
+              "notAfter outside of CA's validity is not permitted by " +
+              "the CertProfile");
         }
 
-        if (caMode == ValidityMode.strict) {
-          throw new OperationException(NOT_PERMITTED,
+        if (caMode == ValidityMode.STRICT) {
+          throw new OperationException(ErrorCode.NOT_PERMITTED,
               "notAfter outside of CA's validity is not permitted by the CA");
         }
 
-        if (caMode == ValidityMode.cutoff) {
+        boolean useCaNotAfter = caMode == ValidityMode.CUTOFF ||
+            profileMode == ValidityMode.CUTOFF;
+
+        if (useCaNotAfter) {
           grantedNotAfter = caInfo.getNotAfter();
-        } else if (caMode == ValidityMode.lax) {
-          if (profileMode == NotAfterMode.CUTOFF) {
-            grantedNotAfter = caInfo.getNotAfter();
-          }
         } else {
-          throw new IllegalStateException("should not reach here, CA ValidityMode " + caMode
-              + " CertProfile NotAfterMode " + profileMode);
+          throw new IllegalStateException(
+              "should not reach here, CA ValidityMode " + caMode +
+              " CertProfile NotAfterMode " + profileMode);
         } // end if (caMode)
       } // end if (grantedNotAfter)
     }
@@ -365,12 +324,75 @@ class GrandCertTemplateBuilder {
     if (msgBuilder.length() > 2) {
       warning = msgBuilder.substring(2);
     }
-    GrantedCertTemplate gct = new GrantedCertTemplate(batch,
-        certTemplate.getCertReqId(), certTemplate.getExtensions(), certprofile, grantedNotBefore, grantedNotAfter,
-        requestedSubject, grantedPublicKeyInfo, privateKey, signer, warning);
+    X509Ca.GrantedCertTemplate gct = new X509Ca.GrantedCertTemplate(batch,
+        certTemplate.getCertReqId(), certTemplate.getExtensions(), certprofile,
+        grantedNotBefore, grantedNotAfter, requestedSubject,
+        grantedPublicKeyInfo, privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);
     return gct;
 
   } // method createGrantedCertTemplate
 
+  /**
+   * RSA broken key checker.
+   *
+   * @author Lijun Liao (xipki)
+   * @since 2.1.0
+   */
+  private static class RSABrokenKey {
+
+    private static final BigInteger ONE = BigInteger.ONE;
+    private static final BigInteger ZERO = BigInteger.ZERO;
+
+    private static final BigInteger[] primes;
+
+    private static final BigInteger[] markers;
+
+    static {
+      int[] ints = new int[]{
+          3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
+          71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
+          149, 151, 157, 163, 167};
+
+      primes = new BigInteger[ints.length];
+      for (int i = 0; i < ints.length; i++) {
+        primes[i] = BigInteger.valueOf(ints[i]);
+      }
+
+      String[] strs = new String[]{
+          "6", "1e", "7e", "402", "161a", "1a316", "30af2", "7ffffe",
+          "1ffffffe", "7ffffffe", "4000402", "1fffffffffe", "7fffffffffe",
+          "7ffffffffffe",        "12dd703303aed2",    "7fffffffffffffe",
+          "1434026619900b0a",    "7fffffffffffffffe", "1164729716b1d977e",
+          "147811a48004962078a", "b4010404000640502", "7fffffffffffffffffffe",
+          "1fffffffffffffffffffffe",        "1000000006000001800000002",
+          "1ffffffffffffffffffffffffe",     "16380e9115bd964257768fe396",
+          "27816ea9821633397be6a897e1a",    "1752639f4e85b003685cbe7192ba",
+          "1fffffffffffffffffffffffffffe", "6ca09850c2813205a04c81430a190536",
+          "7fffffffffffffffffffffffffffffffe",
+          "1fffffffffffffffffffffffffffffffffe",
+          "7fffffffffffffffffffffffffffffffffe",
+          "1ffffffffffffffffffffffffffffffffffffe",
+          "50c018bc00482458dac35b1a2412003d18030a",
+          "161fb414d76af63826461899071bd5baca0b7e1a",
+          "7fffffffffffffffffffffffffffffffffffffffe",
+          "7ffffffffffffffffffffffffffffffffffffffffe"};
+
+      markers = new BigInteger[strs.length];
+      for (int i = 0; i < markers.length; i++) {
+        markers[i] = new BigInteger(strs[i], 16);
+      }
+    } // method static
+
+    public static boolean isAffected(BigInteger modulus) {
+      for (int i = 0; i < primes.length; i++) {
+        BigInteger bi = ONE.shiftLeft(modulus.remainder(primes[i]).intValue());
+        if (bi.and(markers[i]).equals(ZERO)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }
 }

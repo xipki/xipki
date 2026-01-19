@@ -1,12 +1,15 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.IoUtil;
-import org.xipki.util.JSON;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.http.SslConf;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.http.SslConf;
+import org.xipki.util.io.IoUtil;
 
 import java.io.IOException;
 
@@ -18,37 +21,38 @@ import java.io.IOException;
 
 public class SdkClientConf {
 
-  private String serverUrl;
+  private final String serverUrl;
 
-  private SslConf ssl;
+  private final SslConf ssl;
+
+  public SdkClientConf(String serverUrl, SslConf ssl) {
+    this.serverUrl = serverUrl;
+    this.ssl = Args.notNull(ssl, "ssl");
+  }
 
   public String getServerUrl() {
     return serverUrl;
-  }
-
-  public void setServerUrl(String serverUrl) {
-    this.serverUrl = serverUrl;
   }
 
   public SslConf getSsl() {
     return ssl;
   }
 
-  public void setSsl(SslConf ssl) {
-    this.ssl = ssl;
+  public static SdkClientConf parse(JsonMap json) throws CodecException {
+    JsonMap map = json.getMap("ssl");
+    SslConf ssl = (map == null) ? null : SslConf.parse(map);
+
+    return new SdkClientConf(json.getString("serverUrl"), ssl);
   }
 
-  public void validate() throws InvalidConfException {
-    if (ssl == null) {
-      throw new InvalidConfException("ssl must not be null");
+  public static SdkClientConf decode(byte[] encoded)
+      throws IOException, InvalidConfException {
+    try {
+      JsonMap root = JsonParser.parseMap(encoded, true);
+      return parse(root);
+    } catch (CodecException e) {
+      throw new InvalidConfException(e);
     }
-    ssl.validate();
-  }
-
-  public static SdkClientConf decode(byte[] encoded) throws InvalidConfException {
-    SdkClientConf conf = JSON.parseConf(encoded, SdkClientConf.class);
-    conf.validate();
-    return conf;
   }
 
   public static SdkClientConf readConfFromFile(String fileName)

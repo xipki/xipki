@@ -1,13 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  * Response containing the certificate chain.
@@ -29,17 +27,18 @@ public class CertChainResponse extends SdkResponse {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException {
-    encoder.writeArrayStart(1);
-    encoder.writeByteStrings(certificates);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(1).writeByteStrings(certificates);
   }
 
-  public static CertChainResponse decode(byte[] encoded) throws DecodeException {
+  public static CertChainResponse decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CertChainResponse", decoder, 1);
       return new CertChainResponse(decoder.readByteStrings());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, CertChainResponse.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, CertChainResponse.class), ex);
     }
   }
 

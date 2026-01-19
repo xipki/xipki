@@ -11,16 +11,14 @@
 		}
 	}],
 	"publishers":[
-		/*
-		{
-			"id":1
-			"name":"ocsp-publisher",
-			"type":"ocsp",
-			"conf":{
-				"value":"datasource=ocsp,publish.goodcerts=true"
-			}
-		}
-		*/
+		//{
+		//	"id":1
+		//	"name":"ocsp-publisher",
+		//	"type":"ocsp",
+		//	"conf":{
+		//		"value":"datasource=ocsp,publish.goodcerts=true"
+		//	}
+		//}
 	],
 	"profiles":[{
 		"id":1,

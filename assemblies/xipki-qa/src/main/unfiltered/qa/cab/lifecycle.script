@@ -6,47 +6,75 @@ if { "$1" equals "" | "$1" equals "help" } then {
   printUsage = "true"
   argsValid = "true"
 } else {
-  HASH = $1
-  TOKEN_TYPE = $2
-  SIG_TYPE = $3
-  KEYSPEC = $4
-  argsValid = $([pkcs11 pkcs12] contains $TOKEN_TYPE)
+  TOKEN_TYPE = $1
+  CA_KEYSPEC = $2
+  KEYSPEC = $3
+
+
+  TOKEN_TYPE = $(xi:uppercase "$TOKEN_TYPE")
+  CA_KEYSPEC = $(xi:uppercase "$CA_KEYSPEC")
+  KEYSPEC    = $(xi:uppercase "$KEYSPEC")
+
+  argsValid = $([PKCS11 PKCS12] contains $TOKEN_TYPE)
 
   if { "$argsValid" equals "false" } then {
     errMsg = "invalid TOKEN_TYPE $TOKEN_TYPE"
   } else {
-    argsValid = $([rsa rsapss ec dsa] contains $SIG_TYPE)
-  }
+    keyspec = $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
 
-  if { "$argsValid" equals "false" } then {
-    errMsg = "invalid SIG_TYPE $SIG_TYPE"
-  } else {
-    argsValid = $([sha256 sha384 sha512] contains $HASH)
-    if { "$argsValid" equals "false" } then {
-      if { "$errMsg" equals ""} then {
-        errMsg = "invalid HASH $HASH"
-      }
+    if { $([ RSA2048 RSA3072 RSA4096 SECP256R1 SECP384R1 SECP521R1 ] contains $keyspec) } then {
+      CA_KEYSPEC = $keyspec
+      CA_SIGALG  = $sigalg
+      CA_RSAPSS  = $rsapss
+    } else {
+      argsValid = "false"
     }
 
+    if { "$argsValid" equals "true" } {
+      if { "$KEYSPEC" equals "" } then {
+        KEYSPEC = $CA_KEYSPEC
+        RSAPSS  = $CA_RSAPSS
+      } else {
+        keyspec = $KEYSPEC
+
+        source xipki/ca-setup/c14n-keyspec.script
+
+        if { $([ RSA2048 RSA3072 RSA4096 SECP256R1 SECP384R1 SECP521R1 ] contains $keyspec) } then {
+          KEYSPEC = $keyspec
+          RSAPSS = $rsapss
+        } else {
+          argsValid = "false"
+        }
+      }
+    }
   }
 }
 
-if { $argsValid equals "false" } then {
+if { "$argsValid" equals "false" } then {
   echo "$errMsg"
   echo ""
   printUsage = "true"
 }
 
-if { $printUsage equals "true" } then {
+if { "$printUsage" equals "true" } then {
   echo "Usage: "
   echo ""
-  echo "source file:./qa/cab/lifecycle.script <hash algo> <token type> <signature type> [<keyspec>]"
-  echo "    hash algo:       sha256, sha384, sha512"
-  echo "    token type:      pkcs11, pkcs12"
-  echo "    signature type:  rsa, rsapss, ec, dsa"
-  echo "    keyspec:         keysize for signature types rsa, rsaPSS and DSA,"
-  echo "                     curve name for signature types ec"
+  echo "source file:./qa/cab/lifecycle.script <token type> <CA keyspec> [<EE keyspec>]"
+  echo "    token type:      PKCS11, PKCS12"
+  echo "    CA-keyspec:      RSA2048, RSA3072, RSA4096,"
+  echo "                     RSA2048/PSS, RSA3072/PSS, RSA4096/PSS,"
+  echo "                     SECP256R1, SECP384R1, SECP521R1"
+  echo "    EE-keyspec:      RSA2048, RSA3072, RSA4096,"
+  echo "                     SECP256R1, SECP384R1, SECP521R1"
 } else {
+  echo "========================================================"
+  echo "TOKEN_TYPE: $TOKEN_TYPE"
+  echo "CA_KEYSPEC: $CA_KEYSPEC"
+  echo "CA_SIGALG:  $CA_SIGALG"
+  echo "KEYSPEC:    $KEYSPEC"
+  echo "========================================================"
+
   source file:./qa/qa.d/prepare-keys.script
 
   echo "Restart Gateway (tomcat) server!"
@@ -60,13 +88,10 @@ if { $printUsage equals "true" } then {
   xi:copy-file -f qa/cab/template.ra.script \
     qa/cab/ra.script
 
-  rsaPss = ""
-  if { "$SIG_TYPE" equals "rsapss" } then {
-    rsaPss = "--rsa-pss"
-  }
+  xi:replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" \
+    qa/cab/ca-load.script
 
-  xi:replace --old "REPLACEME-RSAPSS" --new "${rsaPss}" \
-    qa/cab/ca-load.script \
+  xi:replace --old "REPLACEME-RSAPSS" --new "${RSAPSS}" \
     qa/cab/ra.script
 
   xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'

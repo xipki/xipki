@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.mgmt.shell;
@@ -15,8 +15,8 @@ import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.mgmt.shell.CaActions.CaAction;
 import org.xipki.shell.CmdFailure;
 import org.xipki.shell.IllegalCmdParamException;
-import org.xipki.util.IoUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +32,8 @@ import java.util.Set;
  */
 public class PublisherActions {
 
-  @Command(scope = "ca", name = "capub-add", description = "add publisher to CA")
+  @Command(scope = "ca", name = "capub-add", description =
+      "add publisher to CA")
   @Service
   public static class CapubAdd extends CaAction {
 
@@ -40,7 +41,8 @@ public class PublisherActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true, description = "publisher name")
+    @Option(name = "--publisher", required = true, multiValued = true,
+        description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private List<String> publisherNames;
 
@@ -52,7 +54,8 @@ public class PublisherActions {
           caManager.addPublisherToCa(publisherName, caName);
           println("added " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not add " + msg +
+              ", error: " + ex.getMessage(), ex);
         }
       }
 
@@ -61,7 +64,8 @@ public class PublisherActions {
 
   } // class CapubAdd
 
-  @Command(scope = "ca", name = "capub-info", description = "show information of publisher in given CA")
+  @Command(scope = "ca", name = "capub-info", description =
+      "show information of publisher in given CA")
   @Service
   public static class CapubInfo extends CaAction {
 
@@ -77,13 +81,16 @@ public class PublisherActions {
 
       Set<String> publisherNames = getPublisherNamesForCa(caName);
       if (isNotEmpty(publisherNames)) {
-        StringBuilder sb = new StringBuilder().append("publishers for CA ").append(caName).append("\n");
+        StringBuilder sb = new StringBuilder().append("publishers for CA ")
+            .append(caName).append("\n");
+
         for (String entry : publisherNames) {
           sb.append("\t").append(entry).append("\n");
         }
         println(sb.toString());
       } else {
-        println(StringUtil.concat("no publisher for CA ", caName," is configured"));
+        println(StringUtil.concat("no publisher for CA ",
+            caName," is configured"));
       }
 
       return null;
@@ -91,7 +98,8 @@ public class PublisherActions {
 
   } // class CapubInfo
 
-  @Command(scope = "ca", name = "capub-rm", description = "remove publisher from CA")
+  @Command(scope = "ca", name = "capub-rm", description =
+      "remove publisher from CA")
   @Service
   public static class CapubRm extends CaAction {
 
@@ -99,7 +107,8 @@ public class PublisherActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--publisher", required = true, multiValued = true, description = "publisher name")
+    @Option(name = "--publisher", required = true, multiValued = true,
+        description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private List<String> publisherNames;
 
@@ -115,7 +124,8 @@ public class PublisherActions {
             caManager.removePublisherFromCa(publisherName, caName);
             println("removed " + msg);
           } catch (CaMgmtException ex) {
-            throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+            throw new CmdFailure("could not remove " + msg +
+                ", error: " + ex.getMessage(), ex);
           }
         }
       }
@@ -129,7 +139,8 @@ public class PublisherActions {
   @Service
   public static class PublisherAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "publisher Name")
+    @Option(name = "--name", aliases = "-n", required = true,
+        description = "publisher Name")
     private String name;
 
     @Option(name = "--type", required = true, description = "publisher type")
@@ -151,44 +162,52 @@ public class PublisherActions {
 
       String msg = "publisher " + name;
       try {
-        caManager.addPublisher(new PublisherEntry(new NameId(null, name), type, conf));
+        caManager.addPublisher(new PublisherEntry(
+            new NameId(null, name), type, conf));
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class PublisherAdd
 
-  @Command(scope = "ca", name = "publisher-export", description = "export publisher configuration")
+  @Command(scope = "ca", name = "publisher-export", description =
+      "export publisher configuration")
   @Service
   public static class PublisherExport extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "publisher name")
+    @Option(name = "--name", aliases = "-n", required = true,
+        description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private String name;
 
-    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the publisher configuration")
+    @Option(name = "--out", aliases = "-o", required = true, description =
+        "where to save the publisher configuration")
     @Completion(FileCompleter.class)
     private String confFile;
 
     @Override
     protected Object execute0() throws Exception {
-      PublisherEntry entry = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(
-          () -> new IllegalCmdParamException("no publisher named " + name + " is defined"));
+      PublisherEntry entry = Optional.ofNullable(caManager.getPublisher(name))
+          .orElseThrow(() -> new IllegalCmdParamException(
+              "no publisher named " + name + " is defined"));
 
       if (StringUtil.isBlank(entry.getConf())) {
         println("publisher does not have conf");
       } else {
-        saveVerbose("saved publisher configuration to", confFile, StringUtil.toUtf8Bytes(entry.getConf()));
+        saveVerbose("saved publisher configuration to", confFile,
+            StringUtil.toUtf8Bytes(entry.getConf()));
       }
       return null;
     } // method execute0
 
   } // class PublisherExport
 
-  @Command(scope = "ca", name = "publisher-info", description = "show information of publisher")
+  @Command(scope = "ca", name = "publisher-info", description =
+      "show information of publisher")
   @Service
   public static class PublisherInfo extends CaAction {
 
@@ -204,7 +223,8 @@ public class PublisherActions {
 
         StringBuilder sb = new StringBuilder();
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1").append(" publisher is configured\n");
+          sb.append((size == 0) ? "no" : "1")
+              .append(" publisher is configured\n");
         } else {
           sb.append(size).append(" publishers are configured:\n");
         }
@@ -217,8 +237,10 @@ public class PublisherActions {
         }
         println(sb.toString());
       } else {
-        PublisherEntry entry = Optional.ofNullable(caManager.getPublisher(name)).orElseThrow(
-            () -> new CmdFailure("\tno publisher named '" + name + "' is configured"));
+        PublisherEntry entry = Optional.ofNullable(
+            caManager.getPublisher(name)).orElseThrow(
+                () -> new CmdFailure(
+                    "\tno publisher named '" + name + "' is configured"));
         println(entry.toString());
       }
 
@@ -227,11 +249,13 @@ public class PublisherActions {
 
   } // class PublisherInfo
 
-  @Command(scope = "ca", name = "publisher-rm", description = "remove publisher")
+  @Command(scope = "ca", name = "publisher-rm", description =
+      "remove publisher")
   @Service
   public static class PublisherRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true, description = "publisher name")
+    @Argument(index = 0, name = "name", required = true, description =
+        "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     private String name;
 
@@ -246,7 +270,8 @@ public class PublisherActions {
           caManager.removePublisher(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg +
+              ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -254,11 +279,13 @@ public class PublisherActions {
 
   } // class PublisherRm
 
-  @Command(scope = "ca", name = "publisher-up", description = "update publisher")
+  @Command(scope = "ca", name = "publisher-up", description =
+      "update publisher")
   @Service
   public static class PublisherUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description = "publisher name")
+    @Option(name = "--name", aliases = "-n", required = true,
+        description = "publisher name")
     @Completion(CaCompleters.PublisherNameCompleter.class)
     protected String name;
 
@@ -289,7 +316,8 @@ public class PublisherActions {
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg +
+            ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

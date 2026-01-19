@@ -1,0 +1,28 @@
+## Adapt me, HSM device capabilities
+HSM_KEYSPECs = [ ML-DSA-44 ML-DSA-65 ML-DSA-87 ED25519 ED448 \
+  RSA2048 RSA2048/PSS RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
+  SECP256R1 SECP384R1 SECP521R1 SM2P256V1 FRP256V1 \
+  BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1 ]
+
+each ($storetypes) {
+  storetype = $it
+
+  each ($ca_keyspecs) {
+    CA_KEYSPEC = $it
+
+    each ($tokentypes) {
+      tokentype = $(xi:uppercase "$it")
+
+      if { "$tokentype" equals "PKCS11" } then {
+        supported = $($HSM_KEYSPECs contains $CA_KEYSPEC)
+
+        if { "$supported" equals "false" } then {
+          echo "$CA_KEYSPEC is not supported in the PKCS11 device, skipping it"
+          continue
+        }
+      }
+
+      source xipki/ca-setup/demo/doDemo.script
+    }
+  }
+}

@@ -11,7 +11,7 @@
   <groupId>org.xipki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.5.4-SNAPSHOT</version>
+  <version>6.6.0-SNAPSHOT</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>http://xipki.org</url>
@@ -31,55 +31,46 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
     <xipki.tools.version>1.0.12</xipki.tools.version>
-    <javax.servlet.version>3.1.0</javax.servlet.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <karaf.version>4.4.6</karaf.version>
-    <karaf.bc.version>1.77</karaf.bc.version>
-    <bc.version>2.73.7</bc.version>
-    <slf4j.version>1.7.36</slf4j.version>
-    <pkcs11wrapper.version>1.0.9</pkcs11wrapper.version>
+    <!-- DO NOT UPGRADE TO 4.4.9 -->
+    <karaf.version>4.4.8</karaf.version>
+    <karaf.bc.version>1.81</karaf.bc.version>
+    <bc.version>1.83</bc.version>
     <hikaricp.version>4.0.3</hikaricp.version>
-    <jackson.version>2.18.1</jackson.version>
     <zip4j.version>2.11.5</zip4j.version>
-    <dnsjava.version>3.6.2</dnsjava.version>
+    <dnsjava.version>3.6.4</dnsjava.version>
+    <slf4j.version>2.0.17</slf4j.version>
     <!-- only for runtime -->
-    <log4j.version>2.24.2</log4j.version>
-    <jdbc.mariadb.version>3.5.1</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.7.4</jdbc.postgresql.version>
-    <jdbc.h2.version>2.3.232</jdbc.h2.version>
+    <log4j.version>2.25.3</log4j.version>
+    <jdbc.mariadb.version>3.5.7</jdbc.mariadb.version>
+    <jdbc.postgresql.version>42.7.9</jdbc.postgresql.version>
+    <jdbc.h2.version>2.4.240</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>
-    <!-- Fix bug introduced from karaf 4.3.8 and 4.4.2: remove this block if no exception presented in the log file-->
-    <osgi.metatype.version>1.4.1</osgi.metatype.version>
   </properties>
   <modules>
     <!-- Base components -->
-    <module>password</module>
-    <module>util</module>
-    <module>audit</module>
-    <module>audit-extra</module>
-    <module>datasource</module>
+    <module>xicodec</module>
+    <module>xipkcs11</module>
+    <module>xiutil</module>
+    <module>xihsm</module>
+    <module>pkcs11test</module>
+    <module>util-extra</module>
     <module>security</module>
-    <module>xipki-tomcat-password</module>
-    <module>servlet-common</module>
     <!-- PKI SDK/Client -->
-    <module>ocsp-client</module>
+    <module>pki-client</module>
     <!-- PKI -->
-    <module>pki-common</module>
-    <module>ca-sdk</module>
-    <module>ca-api</module>
-    <module>ca-mgmt-api</module>
-    <module>ca-server</module>
-    <module>ca-gateway</module>
-    <module>ca-mgmt-db</module>
-    <module>ca-mgmt-client</module>
-    <module>certprofile-xijson</module>
     <module>ocsp-api</module>
     <module>ocsp-server</module>
-    <module>hsmproxy</module>
+    <module>gateway</module>
+
+    <module>ca-sdk</module>
+    <module>ca-api</module>
+    <module>ca-server</module>
+    <module>ca-mgmt</module>
     <module>shells</module>
+    <module>certprofile-xijson</module>
     <module>qa</module>
-    <module>examples</module>
     <module>servlets</module>
     <module>karaf-features</module>
   </modules>
@@ -188,7 +179,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.8</version>
+          <version>3.2.0</version>
           <dependencies>
             <dependency>
               <groupId>org.xipki.tools</groupId>
@@ -247,23 +238,18 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.xipki</groupId>
-        <artifactId>ipkcs11wrapper</artifactId>
-        <version>${pkcs11wrapper.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-lts8on</artifactId>
+        <artifactId>bcprov-jdk18on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-lts8on</artifactId>
+        <artifactId>bcpkix-jdk18on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcutil-lts8on</artifactId>
+        <artifactId>bcutil-jdk18on</artifactId>
         <version>${bc.version}</version>
       </dependency>
       <dependency>
@@ -293,9 +279,14 @@
       </dependency>
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-slf4j-impl</artifactId>
+        <artifactId>log4j-slf4j2-impl</artifactId>
         <version>${log4j.version}</version>
         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>dnsjava</groupId>
+        <artifactId>dnsjava</artifactId>
+        <version>${dnsjava.version}</version>
       </dependency>
       <dependency>
         <groupId>net.lingala.zip4j</groupId>
@@ -327,11 +318,6 @@
         <artifactId>apache-karaf-minimal</artifactId>
         <version>${karaf.version}</version>
         <type>tar.gz</type>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.service.metatype</artifactId>
-        <version>${osgi.metatype.version}</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

@@ -1,32 +1,36 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
+import org.xipki.ca.api.profile.id.CertificatePolicyID;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.List;
 
 /**
- * Control of the CertificatePolicyInformation (in the extension CertificatePolicies).
+ * Control of the CertificatePolicyInformation (in the extension
+ * CertificatePolicies).
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 
 public class CertificatePolicyInformation {
 
-  private final String certPolicyId;
+  private final CertificatePolicyID certPolicyId;
 
   private final List<CertificatePolicyQualifier> qualifiers;
 
-  public CertificatePolicyInformation(String certPolicyId, List<CertificatePolicyQualifier> qualifiers) {
-    this.certPolicyId = Args.notBlank(certPolicyId, "certPolicyId");
+  public CertificatePolicyInformation(
+      CertificatePolicyID certPolicyId,
+      List<CertificatePolicyQualifier> qualifiers) {
+    this.certPolicyId = Args.notNull(certPolicyId, "certPolicyId");
     this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
   }
 
-  public String getCertPolicyId() {
+  public CertificatePolicyID getCertPolicyId() {
     return certPolicyId;
   }
 

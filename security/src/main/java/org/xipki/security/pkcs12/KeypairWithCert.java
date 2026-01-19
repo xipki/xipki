@@ -1,32 +1,26 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12;
 
-import org.bouncycastle.jcajce.interfaces.EdDSAKey;
-import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertPathBuilderException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -36,7 +30,6 @@ import java.util.Set;
  * Keypair with certificate.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class KeypairWithCert {
 
@@ -70,12 +63,14 @@ public class KeypairWithCert {
       String keystoreType, InputStream keystoreStream, char[] keystorePassword,
       String keyname, char[] keyPassword, X509Cert cert)
       throws XiSecurityException {
-    return fromKeystore(keystoreType, keystoreStream, keystorePassword, keyname, keyPassword,
-        cert == null ? null : new X509Cert[] {cert});
+    return fromKeystore(keystoreType, keystoreStream, keystorePassword,
+        keyname, keyPassword, cert == null ? null : new X509Cert[] {cert});
   }
 
   /**
-   * Read keypair and certificate from the keystore with external certificate chain.
+   * Read keypair and certificate from the keystore with external certificate
+   * chain.
+   * <p>
    * The specified stream remains open after this method returns.
    *
    * @param keystoreType the keystore type.
@@ -92,7 +87,8 @@ public class KeypairWithCert {
       String keyname, char[] keyPassword, X509Cert[] certchain)
       throws XiSecurityException {
     if (!StringUtil.orEqualsIgnoreCase(keystoreType, "PKCS12", "JCEKS")) {
-      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
+      throw new IllegalArgumentException(
+          "unsupported keystore type: " + keystoreType);
     }
 
     Args.notNull(keystoreStream, "keystoreStream");
@@ -109,14 +105,15 @@ public class KeypairWithCert {
     try {
       keystore.load(keystoreStream, keystorePassword);
       return fromKeystore(keystore, keyname, keyPassword, certchain);
-    } catch (NoSuchAlgorithmException | ClassCastException | CertificateException | IOException ex) {
+    } catch (NoSuchAlgorithmException | ClassCastException
+             | CertificateException | IOException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   }
 
   public static KeypairWithCert fromKeystore(
-      KeyStore keystore, String keyname, char[] keyPassword, X509Cert[] certchain)
-      throws XiSecurityException {
+      KeyStore keystore, String keyname, char[] keyPassword,
+      X509Cert[] certchain) throws XiSecurityException {
     Args.notNull(keyPassword, "keyPassword");
 
     try {
@@ -139,11 +136,6 @@ public class KeypairWithCert {
 
       PrivateKey key = (PrivateKey) keystore.getKey(tmpKeyname, keyPassword);
 
-      if (!(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey
-          || key instanceof ECPrivateKey || key instanceof EdDSAKey || key instanceof XDHKey)) {
-        throw new XiSecurityException("unsupported key " + key.getClass().getName());
-      }
-
       Set<X509Cert> caCerts = new HashSet<>();
 
       X509Cert cert;
@@ -154,7 +146,8 @@ public class KeypairWithCert {
           caCerts.addAll(Arrays.asList(certchain).subList(1, n));
         }
       } else {
-        cert = new X509Cert((X509Certificate) keystore.getCertificate(tmpKeyname));
+        cert = new X509Cert(
+            (X509Certificate) keystore.getCertificate(tmpKeyname));
       }
 
       Certificate[] certsInKeystore = keystore.getCertificateChain(tmpKeyname);
@@ -167,8 +160,7 @@ public class KeypairWithCert {
       X509Cert[] certificateChain = X509Util.buildCertPath(cert, caCerts);
 
       return new KeypairWithCert(key, certificateChain);
-    } catch (KeyStoreException | NoSuchAlgorithmException  | UnrecoverableKeyException
-             | ClassCastException | CertPathBuilderException ex) {
+    } catch (GeneralSecurityException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // method fromKeystore

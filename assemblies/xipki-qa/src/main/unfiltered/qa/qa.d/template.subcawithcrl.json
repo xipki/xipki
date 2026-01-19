@@ -15,10 +15,10 @@
 					"http://myorg.org/subcawithcrl1.der"
 				],
 				"crlUris":[
-					"http://localhost:8081/crl/?type=crl&name=subcawithcrl1"
+					"http://localhost:8081/dummy/crl/?type=crl&name=subcawithcrl1"
 				],
 				"deltaCrlUris":[
-					"http://localhost:8081/crl/?type=deltacrl&name=subcawithcrl1"
+					"http://localhost:8081/dummy/crl/?type=deltacrl&name=subcawithcrl1"
 				],
 				"ocspUris":[
 					"http://localhost:8080/ocsp/responder2"
@@ -56,10 +56,8 @@
 			"ocsp",
 			"scep",
 			"multiple-ous",
-			"multi-valued-rdn",
 			"max-time",
 			"tls", "tls-enc",
-			"gmt0015",
 			"tls-sm2", "tls-sm2-enc"
 		],
 		"requestors":[{

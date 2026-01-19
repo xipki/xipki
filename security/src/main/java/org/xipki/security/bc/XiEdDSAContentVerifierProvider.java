@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.bc;
@@ -9,20 +9,20 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.operator.ContentVerifier;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.security.EdECConstants;
-import org.xipki.util.Args;
+import org.xipki.security.SignAlgo;
+import org.xipki.util.codec.Args;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
 /**
- * {@link ContentVerifierProvider} for the signature algorithm EdDSA (Ed25519 and Ed448).
+ * {@link ContentVerifierProvider} for the signature algorithm EdDSA
+ * (Ed25519 and Ed448).
  *
  * @author Lijun Liao (xipki)
  * @since 2.1.0
@@ -40,9 +40,15 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
 
     private final PublicKey verifyKey;
 
-    private EdDSAContentVerifier(AlgorithmIdentifier algId, PublicKey verifyKey) {
+    private EdDSAContentVerifier(
+        AlgorithmIdentifier algId, PublicKey verifyKey) {
       this.algId = algId;
-      this.algorithm = EdECConstants.getName(algId.getAlgorithm());
+      try {
+        this.algorithm = SignAlgo.getInstance(algId).getJceName();
+      } catch (NoSuchAlgorithmException e) {
+        throw new RuntimeException("This shall not happen: " + e.getMessage(),
+            e);
+      }
       this.outstream = new ByteArrayOutputStream();
       this.verifyKey = verifyKey;
     }
@@ -65,10 +71,10 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
         sig.initVerify(verifyKey);
         sig.update(outstream.toByteArray());
         return sig.verify(expected);
-      } catch (NoSuchProviderException | NoSuchAlgorithmException | InvalidKeyException ex) {
-        throw new RuntimeCryptoException(ex.getMessage());
       } catch (SignatureException ex) {
         return false;
+      } catch (GeneralSecurityException ex) {
+        throw new RuntimeCryptoException(ex.getMessage());
       }
     }
 
@@ -91,7 +97,8 @@ public class XiEdDSAContentVerifierProvider implements ContentVerifierProvider {
   }
 
   @Override
-  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier) throws OperatorCreationException {
+  public ContentVerifier get(AlgorithmIdentifier verifierAlgorithmIdentifier)
+      throws OperatorCreationException {
     return new EdDSAContentVerifier(verifierAlgorithmIdentifier, verifyKey);
   }
 

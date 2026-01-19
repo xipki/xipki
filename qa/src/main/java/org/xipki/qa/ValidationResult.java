@@ -1,17 +1,18 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa;
 
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Validation result consisting of failed validation issues and successful issues.
+ * Validation result consisting of failed validation issues and successful
+ * issues.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0

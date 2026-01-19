@@ -1,10 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 /**
  * Extension InhibitAnyPolicy.
@@ -12,20 +13,25 @@ import org.xipki.util.exception.InvalidConfException;
  * @author Lijun Liao (xipki)
  */
 
-public class InhibitAnyPolicy extends ValidableConf {
+public class InhibitAnyPolicy implements JsonEncodable {
 
-  private int skipCerts;
+  private final int skipCerts;
 
   public int getSkipCerts() {
     return skipCerts;
   }
 
-  public void setSkipCerts(int skipCerts) {
+  public InhibitAnyPolicy(int skipCerts) {
     this.skipCerts = skipCerts;
   }
 
   @Override
-  public void validate() throws InvalidConfException {
+  public JsonMap toCodec() {
+    return new JsonMap().put("skipCerts", skipCerts);
   }
 
-} // class InhibitAnyPolicy
+  public static InhibitAnyPolicy parse(JsonMap json) throws CodecException {
+    return new InhibitAnyPolicy(json.getNnInt("skipCerts"));
+  }
+
+}

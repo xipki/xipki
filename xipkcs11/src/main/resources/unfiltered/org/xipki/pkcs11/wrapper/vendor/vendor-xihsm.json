@@ -1,0 +1,26 @@
+{
+  "name": "xihsm",
+  "filter": {
+    "manufacturerIDs": [
+      "xihsm"
+    ]
+  },
+  "vendor": "XIHSM",
+  "specialBehaviours": [
+    "SM2_PRIVATEKEY_ECPOINT"
+  ],
+  "nameToCodeMap": {
+    "CKM_VENDOR_SM2": "0xffff0002",
+    "CKM_VENDOR_SM2_KEY_PAIR_GEN": "0xffff0001",
+    "CKM_VENDOR_SM4_MAC": "0xffff000a",
+    "CKK_VENDOR_SM2": "0xffff0001",
+    "CKK_VENDOR_SM4": "0xffff0002",
+    "CKM_VENDOR_SM3": "0xffff0005",
+    "CKM_VENDOR_SM4_KEY_GEN": "0xffff0006",
+    "CKM_VENDOR_SM4_MAC_GENERAL": "0xffff0009",
+    "CKM_VENDOR_SM4_ECB": "0xffff0007",
+    "CKM_VENDOR_SM4_CBC": "0xffff0008",
+    "CKM_VENDOR_SM2_SM3": "0xffff0003",
+    "CKM_VENDOR_SM2_ENCRYPT": "0xffff0004"
+  }
+}

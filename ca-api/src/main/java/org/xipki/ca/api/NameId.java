@@ -1,11 +1,14 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api;
 
-import org.xipki.util.Args;
-import org.xipki.util.CompareUtil;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.util.misc.StringUtil;
 
 /**
  * Name and Identifier.
@@ -14,32 +17,23 @@ import org.xipki.util.StringUtil;
  * @since 2.2.0
  */
 
-public class NameId {
+public class NameId implements JsonEncodable {
 
   private Integer id;
 
-  private String name;
-
-  // For the deserialization only
-  @SuppressWarnings("unused")
-  private NameId() {
-  }
+  private final String name;
 
   public NameId(Integer id, String name) {
     this.id = id;
     this.name = Args.toNonBlankLower(name, "name");
   }
 
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
   public Integer getId() {
     return id;
   }
 
-  public void setName(String name) {
-    this.name = Args.toNonBlankLower(name, "name");
+  public void setId(Integer id) {
+    this.id = id;
   }
 
   public String getName() {
@@ -56,7 +50,7 @@ public class NameId {
 
     NameId other = (NameId) obj;
 
-    return CompareUtil.equalsObject(id, other.id) && name.equals(other.name);
+    return CompareUtil.equals(id, other.id) && name.equals(other.name);
   }
 
   public boolean equals(NameId obj, boolean ignoreId) {
@@ -68,7 +62,7 @@ public class NameId {
       return false;
     }
 
-    return ignoreId || CompareUtil.equalsObject(id, obj.id);
+    return ignoreId || CompareUtil.equals(id, obj.id);
   }
 
   @Override
@@ -83,6 +77,19 @@ public class NameId {
   @Override
   public String toString() {
     return StringUtil.concatObjects("(id=", id, ", name=", name, ")");
+  }
+
+  @Override
+  public JsonMap toCodec() {
+    JsonMap ret = new JsonMap();
+    ret.put("id", id);
+    ret.put("name", name);
+    return ret;
+  }
+
+  public static NameId parse(JsonMap json) throws CodecException {
+    return new NameId(json.getInt("id"),
+        json.getNnString("name"));
   }
 
 }

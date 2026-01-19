@@ -1,0 +1,16 @@
+{
+  "name": "Safenet Luna HSM",
+  "filter": {
+    "manufacturerIDs": [
+      "safenet"
+    ],
+    "descriptions": [
+      "chrystoki"
+    ]
+  },
+  "vendor": "LUNA",
+  "specialBehaviours": [
+    "ECDH_DER_ECPOINT",
+    "SM2_PRIVATEKEY_ECPOINT"
+  ]
+}

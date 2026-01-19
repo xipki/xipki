@@ -1,19 +1,19 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -50,7 +50,8 @@ class ResponseSigner {
 
   private final boolean macSigner;
 
-  ResponseSigner(List<ConcurrentContentSigner> signers) throws CertificateException, IOException {
+  ResponseSigner(List<ConcurrentContentSigner> signers)
+      throws CertificateException, IOException {
     this.signers = Args.notEmpty(signers, "signers");
     ConcurrentContentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
@@ -67,7 +68,8 @@ class ResponseSigner {
     } else {
       X509Cert[] tmpCertChain = firstSigner.getCertificateChain();
       if (tmpCertChain == null || tmpCertChain.length == 0) {
-        throw new CertificateException("no certificate is bound with the signer");
+        throw new CertificateException(
+            "no certificate is bound with the signer");
       }
       int len = tmpCertChain.length;
       if (len > 1) {
@@ -93,7 +95,8 @@ class ResponseSigner {
 
       Certificate bcCertificate = Certificate.getInstance(encodedCert);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-      byte[] keySha1 = HashAlgo.SHA1.hash(bcCertificate.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+      byte[] keySha1 = HashAlgo.SHA1.hash(bcCertificate
+          .getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
       this.responderIdByKey = new ResponderID(keySha1);
     }
 
@@ -112,17 +115,19 @@ class ResponseSigner {
     return signers.get(0);
   }
 
-  public ConcurrentContentSigner getSignerForPreferredSigAlgs(List<AlgorithmIdentifier> prefSigAlgs) {
+  public ConcurrentContentSigner getSignerForPreferredSigAlgs(
+      List<AlgorithmIdentifier> prefSigAlgs) {
     if (prefSigAlgs == null) {
       return signers.get(0);
     }
 
     for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
-      if (sigAlgId.getAlgorithm().equals(PKCSObjectIdentifiers.id_RSASSA_PSS)) {
+      if (sigAlgId.getAlgorithm().equals(OIDs.Algo.id_RSASSA_PSS)) {
         // return any RSAPSS with MGF1 algorithms
         ASN1Encodable params = sigAlgId.getParameters();
         if (params == null) {
-          for (Entry<SignAlgo, ConcurrentContentSigner> entry : algoSignerMap.entrySet()) {
+          for (Entry<SignAlgo, ConcurrentContentSigner> entry
+              : algoSignerMap.entrySet()) {
             SignAlgo m = entry.getKey();
             if (m.isRSAPSSMGF1SigAlgo()) {
               return entry.getValue();

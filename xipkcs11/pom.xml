@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki</groupId>
+    <artifactId>xipki-parent</artifactId>
+    <version>6.6.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xipkcs11</artifactId>
+  <packaging>bundle</packaging>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <properties>
+    <DynamicImport-Package>*</DynamicImport-Package>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xicodec</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <!-- active this plugin to generate JNI header file -->
+    <plugins>
+      <!--plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArgs>
+            <arg>-h</arg>
+            <arg>target/headers</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin-->
+    </plugins>
+    <resources>
+      <resource>
+        <directory>src/main/resources/filtered</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
+        <directory>src/main/resources/unfiltered</directory>
+        <excludes>
+          <exclude>natives/**/debug/*</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>${basedir}</directory>
+        <includes>
+          <include>LICENSE</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+</project>
+

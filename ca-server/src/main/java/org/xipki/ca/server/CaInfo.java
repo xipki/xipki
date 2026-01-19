@@ -1,19 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -22,32 +13,27 @@ import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
-import org.xipki.ca.api.mgmt.ValidityMode;
-import org.xipki.ca.api.mgmt.entry.CaConfColumn;
+import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
-import org.xipki.pki.ErrorCode;
-import org.xipki.pki.OperationException;
+import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
+import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
-import org.xipki.util.CollectionUtil;
-import org.xipki.util.ConfPairs;
-import org.xipki.util.LogUtil;
-import org.xipki.util.Validity;
+import org.xipki.security.exception.OperationException;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.conf.ConfPairs;
+import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.extra.type.Validity;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +42,8 @@ import java.util.Map;
 /**
  * CA information.
  *
- * @author Lijun Liao (xipki)
- * @since 2.0.0
+ * @author Lijun Liao
+ *
  */
 
 public class CaInfo {
@@ -65,8 +51,6 @@ public class CaInfo {
   private static final Logger LOG = LoggerFactory.getLogger(CaInfo.class);
 
   private final CaEntry caEntry;
-
-  private final CaConfColumn caConfColumn;
 
   private final Instant noNewCertificateAfter;
 
@@ -78,23 +62,15 @@ public class CaInfo {
 
   private final boolean selfSigned;
 
-  private final CMPCertificate certInCmpFormat;
-
   private final PublicCaInfo publicCaInfo;
 
-  private final byte[] encodedSubject;
-
   private final List<X509Cert> certchain;
-
-  private final List<CMPCertificate> certchainInCmpFormat;
 
   private final CertStore certStore;
 
   private final RandomSerialNumberGenerator randomSnGenerator;
 
-  private final String caKeyspec;
-
-  private final AlgorithmIdentifier caKeyAlgId;
+  private final KeySpec caKeySpec;
 
   private Map<SignAlgo, ConcurrentContentSigner> signers;
 
@@ -102,10 +78,9 @@ public class CaInfo {
 
   private final ConfPairs extraControl;
 
-  public CaInfo(CaEntry caEntry, CaConfColumn caConfColumn, CertStore certStore)
+  public CaInfo(CaEntry caEntry, CertStore certStore)
       throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
-    this.caConfColumn = Args.notNull(caConfColumn, "caConfColumn");
     this.certStore = certStore;
 
     X509Cert cert = caEntry.getCert();
@@ -113,66 +88,32 @@ public class CaInfo {
     this.notAfter = cert.getNotAfter();
     this.serialNumber = cert.getSerialNumber();
     this.selfSigned = cert.isSelfSigned();
-    this.certInCmpFormat = new CMPCertificate(cert.toBcCert().toASN1Structure());
-    this.publicCaInfo = new PublicCaInfo(cert, caEntry.getCaUris(), caEntry.getExtraControl());
-    try {
-      this.encodedSubject = cert.getSubject().getEncoded();
-    } catch (IOException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-    }
+
+    BaseCaInfo base = caEntry.getBase();
+    this.publicCaInfo = new PublicCaInfo(cert, base.getCaUris(),
+        base.getExtraControl());
     List<X509Cert> certs = caEntry.getCertchain();
-    if (certs == null || certs.isEmpty()) {
-      this.certchain = Collections.emptyList();
-      this.certchainInCmpFormat = Collections.emptyList();
-    } else {
-      this.certchain = new ArrayList<>(certs);
-      this.certchainInCmpFormat = new ArrayList<>(certs.size());
-      for (X509Cert c : certs) {
-        this.certchainInCmpFormat.add(new CMPCertificate(c.toBcCert().toASN1Structure()));
-      }
-    }
-    this.noNewCertificateAfter = notAfter.minus(caEntry.getExpirationPeriod(), ChronoUnit.DAYS);
+    this.certchain = certs == null ? Collections.emptyList() : certs;
+    this.noNewCertificateAfter = notAfter.minus(
+        base.getExpirationPeriod(), ChronoUnit.DAYS);
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
-    this.extraControl = caEntry.getExtraControl();
+    this.extraControl = base.getExtraControl();
 
     // keyspec
-    caKeyAlgId = cert.toBcCert().getSubjectPublicKeyInfo().getAlgorithm();
-    ASN1ObjectIdentifier caKeyAlgOid = caKeyAlgId.getAlgorithm();
-
-    if (caKeyAlgOid.equals(PKCSObjectIdentifiers.rsaEncryption)) {
-      java.security.interfaces.RSAPublicKey pubKey = (java.security.interfaces.RSAPublicKey) cert.getPublicKey();
-      caKeyspec = "RSA/" + pubKey.getModulus().bitLength();
-    } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_ecPublicKey)) {
-      ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(caKeyAlgId.getParameters());
-      caKeyspec = "EC/" + curveOid.getId();
-    } else if (caKeyAlgOid.equals(X9ObjectIdentifiers.id_dsa)) {
-      ASN1Sequence seq = DERSequence.getInstance(caKeyAlgId.getParameters());
-      BigInteger p = ASN1Integer.getInstance(seq.getObjectAt(0)).getValue();
-      BigInteger q = ASN1Integer.getInstance(seq.getObjectAt(1)).getValue();
-      caKeyspec = "DSA/" + p.bitLength() + "/" + q.bitLength();
-    } else if (caKeyAlgOid.equals(EdECConstants.id_ED25519)) {
-      caKeyspec = "ED25519";
-    } else if (caKeyAlgOid.equals(EdECConstants.id_ED448)) {
-      caKeyspec ="ED448";
-    } else {
-      throw new IllegalStateException("unknown key algorithm " + caKeyAlgOid.getId());
-    }
+    caKeySpec = KeySpec.ofPublicKey(
+        caEntry.getCert().getSubjectPublicKeyInfo());
   } // constructor
 
-  public String getCaKeyspec() {
-    return caKeyspec;
-  }
-
-  public AlgorithmIdentifier getCaKeyAlgId() {
-    return caKeyAlgId;
+  public KeySpec getCaKeySpec() {
+    return caKeySpec;
   }
 
   public long getNextCrlNumber() {
-    return caEntry.getNextCrlNo();
+    return caEntry.getBase().getNextCrlNo();
   }
 
   public void setNextCrlNumber(long crlNumber) {
-    caEntry.setNextCrlNo(crlNumber);
+    caEntry.getBase().setNextCrlNo(crlNumber);
   }
 
   public PublicCaInfo getPublicCaInfo() {
@@ -199,20 +140,12 @@ public class CaInfo {
     return selfSigned;
   }
 
-  public CMPCertificate getCertInCmpFormat() {
-    return certInCmpFormat;
-  }
-
   public Instant getNoNewCertificateAfter() {
     return noNewCertificateAfter;
   }
 
   public CaEntry getCaEntry() {
     return caEntry;
-  }
-
-  public CaConfColumn getCaConfColumn() {
-    return caConfColumn;
   }
 
   public int getPathLenConstraint() {
@@ -223,16 +156,8 @@ public class CaInfo {
     return caEntry.getIdent();
   }
 
-  public CaUris getCaUris() {
-    return caEntry.getCaUris();
-  }
-
   public Validity getMaxValidity() {
-    return caEntry.getMaxValidity();
-  }
-
-  public boolean hasSubject(byte[] subject) {
-    return Arrays.equals(this.encodedSubject, subject);
+    return caEntry.getBase().getMaxValidity();
   }
 
   public X509Cert getCert() {
@@ -243,28 +168,24 @@ public class CaInfo {
     return certchain;
   }
 
-  public List<CMPCertificate> getCertchainInCmpFormat() {
-    return certchainInCmpFormat;
-  }
-
   public String getCrlSignerName() {
-    return caEntry.getCrlSignerName();
+    return caEntry.getBase().getCrlSignerName();
   }
 
   public void setCrlSignerName(String crlSignerName) {
-    caEntry.setCrlSignerName(crlSignerName);
+    caEntry.getBase().setCrlSignerName(crlSignerName);
   }
 
   public CrlControl getCrlControl() {
-    return caEntry.getCrlControl();
+    return caEntry.getBase().getCrlControl();
   }
 
   public CtlogControl getCtlogControl() {
-    return caEntry.getCtlogControl();
+    return caEntry.getBase().getCtlogControl();
   }
 
   public List<String> getKeypairGenNames() {
-    return caEntry.getKeypairGenNames();
+    return caEntry.getBase().getKeypairGenNames();
   }
 
   public ConfPairs getExtraControl() {
@@ -272,15 +193,15 @@ public class CaInfo {
   }
 
   public int getNumCrls() {
-    return caEntry.getNumCrls();
+    return caEntry.getBase().getNumCrls();
   }
 
   public CaStatus getStatus() {
-    return caEntry.getStatus();
+    return caEntry.getBase().getStatus();
   }
 
   public void setStatus(CaStatus status) {
-    caEntry.setStatus(status);
+    caEntry.getBase().setStatus(status);
   }
 
   @Override
@@ -293,11 +214,11 @@ public class CaInfo {
   }
 
   public boolean isSaveCert() {
-    return caEntry.isSaveCert();
+    return caEntry.getBase().isSaveCert();
   }
 
   public boolean isSaveKeypair() {
-    return caEntry.isSaveKeypair();
+    return caEntry.getBase().isSaveKeypair();
   }
 
   public String getHexSha1OfCert() {
@@ -305,40 +226,33 @@ public class CaInfo {
   }
 
   public ValidityMode getValidityMode() {
-    return caEntry.getValidityMode();
-  }
-
-  public Permissions getPermission() {
-    return caEntry.getPermissions();
-  }
-
-  public void setPermissions(Permissions permission) {
-    caEntry.setPermissions(permission);
+    return caEntry.getBase().getValidityMode();
   }
 
   public CertRevocationInfo getRevocationInfo() {
-    return caEntry.getRevocationInfo();
+    return caEntry.getBase().getRevocationInfo();
   }
 
   public void setRevocationInfo(CertRevocationInfo revocationInfo) {
-    caEntry.setRevocationInfo(revocationInfo);
+    caEntry.getBase().setRevocationInfo(revocationInfo);
   }
 
   public int getKeepExpiredCertDays() {
-    return caEntry.getKeepExpiredCertDays();
+    return caEntry.getBase().getKeepExpiredCertDays();
   }
 
   public BigInteger nextSerial() {
-    return randomSnGenerator.nextSerialNumber(caEntry.getSnSize());
+    return randomSnGenerator.nextSerialNumber(caEntry.getBase().getSnSize());
   }
 
   public BigInteger nextCrlNumber() throws OperationException {
-    long crlNo = caEntry.getNextCrlNo();
+    BaseCaInfo base = caEntry.getBase();
+    long crlNo = base.getNextCrlNo();
     long currentMaxNo = certStore.getMaxCrlNumber(caEntry.getIdent());
     if (crlNo <= currentMaxNo) {
       crlNo = currentMaxNo + 1;
     }
-    caEntry.setNextCrlNo(crlNo + 1);
+    base.setNextCrlNo(crlNo + 1);
     return BigInteger.valueOf(crlNo);
   }
 
@@ -361,32 +275,33 @@ public class CaInfo {
     return null;
   } // method getSigner
 
-  public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
+  public boolean initSigner(SecurityFactory securityFactory)
+      throws XiSecurityException {
     if (signers != null) {
       return true;
     }
     dfltSigner = null;
 
-    List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+    List<CaEntry.CaSignerConf> signerConfs =
+        CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
 
     Map<SignAlgo, ConcurrentContentSigner> tmpSigners = new HashMap<>();
-    for (CaSignerConf m : signerConfs) {
+    for (CaEntry.CaSignerConf m : signerConfs) {
       SignerConf signerConf = new SignerConf(m.getConf());
       ConcurrentContentSigner signer;
       try {
-        signer = securityFactory.createSigner(caEntry.getSignerType(), signerConf, caEntry.getCert());
+        signer = securityFactory.createSigner(caEntry.getBase().getSignerType(),
+            signerConf, caEntry.getCert());
+
         if (dfltSigner == null) {
           dfltSigner = signer;
         }
         tmpSigners.put(m.getAlgo(), signer);
       } catch (Throwable th) {
-        LogUtil.error(LOG, th, "could not initialize the CA signer for CA " + caEntry.getIdent().getName());
+        LogUtil.error(LOG, th, "could not initialize the CA signer for CA "
+            + caEntry.getIdent().getName());
         for (ConcurrentContentSigner ccs : tmpSigners.values()) {
-          try {
-            ccs.close();
-          } catch (IOException ex) {
-            LogUtil.error(LOG, ex, "could not close ConcurrentContentSigner " + ccs.getName());
-          }
+          ccs.close();
         }
         tmpSigners.clear();
         throw new XiSecurityException("could not initialize the CA signer");
@@ -398,7 +313,7 @@ public class CaInfo {
   } // method initSigner
 
   public boolean isSignerRequired() {
-    Permissions permissions = caEntry.getPermissions();
+    Permissions permissions = caEntry.getBase().getPermissions();
     return permissions.isPermitted(PermissionConstants.ENROLL_CROSS)
         || permissions.isPermitted(PermissionConstants.ENROLL_CERT)
         || permissions.isPermitted(PermissionConstants.GEN_CRL)
@@ -406,7 +321,7 @@ public class CaInfo {
   }
 
   public RevokeSuspendedControl revokeSuspendedCertsControl() {
-    return caEntry.getRevokeSuspendedControl();
+    return caEntry.getBase().getRevokeSuspendedControl();
   }
 
 }

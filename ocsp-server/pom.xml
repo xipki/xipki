@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.5.4-SNAPSHOT</version>
+    <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>ocsp-server</artifactId>
   <packaging>bundle</packaging>
@@ -16,6 +16,11 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>ocsp-api</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

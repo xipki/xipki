@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.store;
@@ -33,7 +33,8 @@ class SimpleIssuerEntry {
     }
 
     return issuer.getRevocationInfo() != null
-        && revocationTime == Instant.ofEpochSecond(issuer.getRevocationInfo().getRevocationTime().getEpochSecond());
+        && revocationTime == Instant.ofEpochSecond(
+            issuer.getRevocationInfo().getRevocationTime().getEpochSecond());
   }
 
 } // class SimpleIssuerEntry

@@ -72,12 +72,6 @@
       <fileMode>0644</fileMode>
     </file>
     <file>
-      <source>${project.build.directory}/tomcat/xipki/security/example/pkcs11-emulator.json</source>
-      <outputDirectory>tomcat/xipki/security</outputDirectory>
-      <destName>pkcs11.json</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
       <source>${project.build.directory}/tomcat/xipki/etc/ocsp/example/xipki-ca-db-store/ocsp-responder.json</source>
       <outputDirectory>tomcat/xipki/etc/ocsp</outputDirectory>
       <fileMode>0644</fileMode>

@@ -1,135 +1,157 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.conf.InvalidConfException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Configuration of GeneralSubtree.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 
-public class GeneralSubtreeType extends ValidableConf {
+public class GeneralSubtreeType implements JsonEncodable {
 
-  public static class Base extends ValidableConf {
-    private String rfc822Name;
+  private String rfc822Name;
 
-    private String dnsName;
+  private String dnsName;
 
-    private String directoryName;
+  private String directoryName;
 
-    private String uri;
+  private String uri;
 
-    private String ipAddress;
+  private String ipAddress;
 
-    public String getRfc822Name() {
-      return rfc822Name;
-    }
-
-    public void setRfc822Name(String rfc822Name) {
-      this.rfc822Name = rfc822Name;
-    }
-
-    public String getDnsName() {
-      return dnsName;
-    }
-
-    public void setDnsName(String dnsName) {
-      this.dnsName = dnsName;
-    }
-
-    public String getDirectoryName() {
-      return directoryName;
-    }
-
-    public void setDirectoryName(String directoryName) {
-      this.directoryName = directoryName;
-    }
-
-    public String getUri() {
-      return uri;
-    }
-
-    public void setUri(String uri) {
-      this.uri = uri;
-    }
-
-    public String getIpAddress() {
-      return ipAddress;
-    }
-
-    public void setIpAddress(String ipAddress) {
-      this.ipAddress = ipAddress;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      int occurs = 0;
-      if (directoryName != null) {
-        occurs++;
-      }
-
-      if (dnsName != null) {
-        occurs++;
-      }
-
-      if (ipAddress != null) {
-        occurs++;
-      }
-
-      if (rfc822Name != null) {
-        occurs++;
-      }
-
-      if (uri != null) {
-        occurs++;
-      }
-
-      if (occurs != 1) {
-        throw new InvalidConfException(
-            "exact one of directoryName, dnsName, ipAddress, rfc822Name, and uri must be set");
-      }
-    } // method validate
-  } // class Base
-
-  private Base base;
-
-  private Integer minimum;
-
-  private Integer maximum;
-
-  public Integer getMinimum() {
-    return minimum;
+  public String getRfc822Name() {
+    return rfc822Name;
   }
 
-  public void setMinimum(Integer minimum) {
-    this.minimum = minimum;
+  private GeneralSubtreeType() {
   }
 
-  public Integer getMaximum() {
-    return maximum;
+  public static GeneralSubtreeType ofRfc822Name(String rfc822Name) {
+    GeneralSubtreeType ret = new GeneralSubtreeType();
+    ret.rfc822Name = Args.notBlank(rfc822Name, "");
+    return ret;
   }
 
-  public void setMaximum(Integer maximum) {
-    this.maximum = maximum;
+  public String getDnsName() {
+    return dnsName;
   }
 
-  public Base getBase() {
-    return base;
+  public static GeneralSubtreeType ofDnsName(String dnsName) {
+    GeneralSubtreeType ret = new GeneralSubtreeType();
+    ret.dnsName = Args.notBlank(dnsName, "dnsName");
+    return ret;
   }
 
-  public void setBase(Base base) {
-    this.base = base;
+  public String getDirectoryName() {
+    return directoryName;
   }
+
+  public static GeneralSubtreeType ofDirectoryName(String directoryName) {
+    GeneralSubtreeType ret = new GeneralSubtreeType();
+    ret.directoryName = Args.notBlank(directoryName, "directoryName");
+    return ret;
+  }
+
+  public String getUri() {
+    return uri;
+  }
+
+  public static GeneralSubtreeType ofUri(String uri) {
+    GeneralSubtreeType ret = new GeneralSubtreeType();
+    ret.uri = Args.notBlank(uri, "uri");
+    return ret;
+  }
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public static GeneralSubtreeType ofIpAddress(String ipAddress) {
+    GeneralSubtreeType ret = new GeneralSubtreeType();
+    ret.ipAddress = Args.notBlank(ipAddress, "ipAddress");
+    return ret;
+  }
+
+  public void validate() throws InvalidConfException {
+    int occurs = 0;
+    if (directoryName != null) {
+      occurs++;
+    }
+
+    if (dnsName != null) {
+      occurs++;
+    }
+
+    if (ipAddress != null) {
+      occurs++;
+    }
+
+    if (rfc822Name != null) {
+      occurs++;
+    }
+
+    if (uri != null) {
+      occurs++;
+    }
+
+    if (occurs != 1) {
+      throw new InvalidConfException("exact one of directoryName, dnsName, " +
+          "ipAddress, rfc822Name, and uri must be set");
+    }
+  } // method validate
 
   @Override
-  public void validate() throws InvalidConfException {
-    notNull(base, "base");
-    validate(base);
+  public JsonMap toCodec() {
+    return new JsonMap().put("rfc822Name", rfc822Name)
+        .put("dnsName", dnsName).put("directoryName", directoryName)
+        .put("uri", uri).put("ipAddress", ipAddress);
+  }
+
+  public static GeneralSubtreeType parse(JsonMap json) throws CodecException {
+    String str = json.getString("rfc822Name");
+    if (str != null) {
+      return ofRfc822Name(str);
+    }
+
+    str = json.getString("dnsName");
+    if (str != null) {
+      return ofDnsName(str);
+    }
+
+    str = json.getString("directoryName");
+    if (str != null) {
+      return ofDirectoryName(str);
+    }
+
+    str = json.getString("uri");
+    if (str != null) {
+      return ofUri(str);
+    }
+
+    str = json.getNnString("ipAddress");
+    return ofIpAddress(str);
+  }
+
+  public static List<GeneralSubtreeType> parse(JsonList list)
+      throws CodecException {
+    List<GeneralSubtreeType> ret = new ArrayList<>(list.size());
+    for (JsonMap v : list.toMapList()) {
+      ret.add(GeneralSubtreeType.parse(v));
+    }
+    return ret;
   }
 
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
@@ -6,7 +6,7 @@ package org.xipki.security;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An implementation of {@link AlgorithmValidator} where the permitted algorithms
- * are contained in a static collection.
+ * An implementation of {@link AlgorithmValidator} where the permitted
+ * algorithms are contained in a static collection.
  *
  * @author Lijun Liao (xipki)
  * @since 2.1.0
@@ -26,7 +26,8 @@ import java.util.Set;
 
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CollectionAlgorithmValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(
+      CollectionAlgorithmValidator.class);
 
   public static final CollectionAlgorithmValidator INSTANCE;
 
@@ -44,8 +45,8 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     INSTANCE = new CollectionAlgorithmValidator(secureAlgos);
   }
 
-  public static CollectionAlgorithmValidator buildAlgorithmValidator(Collection<String> algoNames)
-      throws NoSuchAlgorithmException {
+  public static CollectionAlgorithmValidator buildAlgorithmValidator(
+      Collection<String> algoNames) throws NoSuchAlgorithmException {
     Set<SignAlgo> algos = new HashSet<>();
     for (String algoName : algoNames) {
       SignAlgo sa;
@@ -60,7 +61,8 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     }
 
     if (algos.isEmpty()) {
-      throw new NoSuchAlgorithmException("none of the signature algorithms " + algoNames + " are supported");
+      throw new NoSuchAlgorithmException("none of the signature algorithms "
+          + algoNames + " are supported");
     }
 
     return new CollectionAlgorithmValidator(algos);
@@ -68,8 +70,9 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   /**
    * constructor.
-   * @param algos algorithms that can be accepted. <code>null</code> or empty to accept
-   *            all algorithms
+   * @param algos
+   *        algorithms that can be accepted. <code>null</code> or empty to
+   *        accept all algorithms
    */
   public CollectionAlgorithmValidator(Collection<SignAlgo> algos) {
     this.algos = Set.copyOf(algos);

@@ -13,15 +13,13 @@
 		}
 	}],
 	"publishers":[
-	    /*
-		{
-			"name":"ocsp-publisher",
-			"type":"ocsp",
-			"conf":{
-				"value":"datasource=ocsp,publish.goodcerts=true"
-			}
-		}
-		*/
+		//{
+		//	"name":"ocsp-publisher",
+		//	"type":"ocsp",
+		//	"conf":{
+		//		"value":"datasource=ocsp,publish.goodcerts=true"
+		//	}
+		//}
 	],
 	"profiles":[{
 		"name":"scep",

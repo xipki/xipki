@@ -26,7 +26,7 @@
 			"names":["myca"],
 			"signer":{
 				"type":"pkcs12",
-				"conf":"password=$[scep.keyPassword],keystore=file:keycerts/scep1.p12,algo=SHA256withRSA"
+				"conf":"password=$[scep.keyPassword],keystore=fil2"
 			}
 		}]
 	}

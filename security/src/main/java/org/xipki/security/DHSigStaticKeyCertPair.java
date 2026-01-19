@@ -1,17 +1,18 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.util.Arrays;
 
 /**
- * Specifies private key and certificate pair for the DHSig-static defined in RFC 6955.
+ * Specifies private key and certificate pair for the DHSig-static defined in
+ * RFC 6955.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0
@@ -33,9 +34,11 @@ public class DHSigStaticKeyCertPair {
 
   public DHSigStaticKeyCertPair(PrivateKey privateKey, X509Cert certificate) {
     this.privateKey = Args.notNull(privateKey, "privateKey");
-    this.serialNumber = Args.notNull(certificate, "certificate").getSerialNumber();
+    this.serialNumber = Args.notNull(certificate, "certificate")
+        .getSerialNumber();
+
     try {
-      this.encodedIssuer = certificate.getIssuer().getEncoded();
+      this.encodedIssuer  = certificate.getIssuer().getEncoded();
       this.encodedSubject = certificate.getSubject().getEncoded();
     } catch (Exception ex) {
       throw new IllegalArgumentException("error encoding certificate", ex);

@@ -1,0 +1,161 @@
+## URL pattern: https://<host>:<port>/gw/rest/<CA-name>. To enroll certificate, the
+## profile parameter shall be specified. e.g.
+## https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]/enroll-cert?profile=smime
+#
+BASE_URL = https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]
+
+## Short URL is possible (without the "profile" parameter)
+##   For all aliases:     https://<host>:<port>/gw/rest/<alias>
+##   For alias "default": https://<host>:<port>/gw/rest/
+##
+## To use the short URL, you need to configure the "CaProfiles" field
+## in the REST proxy (rest-proxy.conf) with given alias.
+
+echo "#################################################################"
+echo "#               Manage certificate via REST API                 #"
+echo "#################################################################"
+
+CUR_TIME = $(date '+%Y%m%d-%H%M%S')
+
+BASE_DIR = output/rest-${CUR_TIME}
+
+CACERT = ${BASE_DIR}/cacert.der
+
+echo "# Get CA certificate"
+
+xi:curl --out ${CACERT} $BASE_URL/cacert
+
+xi:curl --out ${BASE_DIR}/cacerts.pem $BASE_URL/cacerts
+
+CA_SHA1FP = $(xi:cert-info --fingerprint --hash SHA1 --in ${CACERT})
+
+KEYSPECs = [ ML-DSA-44 ML-DSA-65 ML-DSA-87 ED25519 ED448 \
+             RSA2048 RSA3072 RSA4096 \
+             SECP256R1 SECP384R1 SECP521R1 SM2P256V1 FRP256V1 \
+             BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1 \
+             X25519 X448 ML-KEM-512 ML-KEM-768 ML-KEM-1024 ]; each ($KEYSPECs) {
+  KEYSPEC = $it
+
+  OUT_DIR = ${BASE_DIR}/${KEYSPEC}
+
+  ## Enroll certificate (profile smime)
+
+  CN = rest-smime-${CUR_TIME}
+
+  echo "=====REST: Enroll====="
+
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
+
+  xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+    --subject "C=DE,O=myorg,E=info@myorg.com,CN=${CN}" \
+    --out ${OUT_DIR}/${CN}.csr
+
+  xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/enroll-cert?profile=smime"
+
+  ## Enroll certificate (profile tls)
+
+  echo "=====REST: Enroll (CA generates keypair)====="
+
+  CN = rest-tls-genkey-${CUR_TIME}
+
+  xi:curl --out ${OUT_DIR}/${CN}.pem \
+    --data "subject=C=DE,O=myorg,CN=${CN}.myorg.org" \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    "$BASE_URL/enroll-serverkeygen?profile=tls"
+
+  echo "=====REST: Rekey (CA generates keypair)====="
+  xi:export-keycert-pem ${OUT_DIR}/${CN}.pem ${OUT_DIR}/${CN}.key ${OUT_DIR}/${CN}.crt
+  SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.crt)
+
+  REKEY.CN = rest-tls-genkey-rekey-${CUR_TIME}
+
+  xi:curl --out ${OUT_DIR}/${REKEY.CN}.pem \
+    --data "subject=C=DE,O=myorg,CN=${REKEY.CN}.myorg.org" \
+    --header "Content-Type: text/plain; encoding=utf-8" \
+    "$BASE_URL/rekey-serverkeygen?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
+  echo "=====REST: Enroll====="
+
+  CN = rest-tls-${CUR_TIME}
+
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
+
+  xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+    --subject "C=DE,O=myorg,CN=${CN}.myorg.org" \
+    --out ${OUT_DIR}/${CN}.csr
+
+  xi:curl --out ${OUT_DIR}/${CN}.der --data-file ${OUT_DIR}/${CN}.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/enroll-cert?profile=tls"
+
+  SERIAL = $(xi:cert-info --serial --hex --in ${OUT_DIR}/${CN}.der)
+
+  echo "=====REST: Rekey ====="
+
+  REKEY.CN = rest-tls-rekey-${CUR_TIME}
+
+  xi:keypair-p12 --keyspec $KEYSPEC --password CHANGEIT --out ${OUT_DIR}/${REKEY.CN}.p12
+
+  xi:csr-p12 --p12 ${OUT_DIR}/${REKEY.CN}.p12 --password CHANGEIT \
+    --subject "C=DE,O=myorg,CN=${REKEY.CN}.myorg.org" \
+    --out ${OUT_DIR}/${REKEY.CN}.csr
+
+  xi:curl --out ${OUT_DIR}/${REKEY.CN}.der --data-file ${OUT_DIR}/${REKEY.CN}.csr \
+    --header "Content-Type: application/pkcs10" \
+    "$BASE_URL/rekey-cert?ca-sha1=${CA_SHA1FP}&oldcert-serial=${SERIAL}"
+
+  echo "=====REST: Suspend====="
+
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+
+  xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=certificateHold"
+
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+
+  echo "=====REST: Unsuspend====="
+
+  xi:curl "$BASE_URL/unsuspend-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}"
+
+  echo "Current OCSP status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+
+  echo "=====REST: Revoke====="
+
+  xi:curl "$BASE_URL/revoke-cert?ca-sha1=${CA_SHA1FP}&serial-number=${SERIAL}&reason=keyCompromise"
+
+  echo "Current OCSP Status"
+  xi:ocsp-status --issuer ${CACERT} --cert ${OUT_DIR}/${CN}.der --verbose
+}
+
+echo "=====REST: Get CRL====="
+
+xi:curl --out ${BASE_DIR}/rest-get.crl $BASE_URL/crl
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates all keypairs)====="
+
+OUT_DIR=${BASE_DIR}/sm2-twin
+
+CN = rest-tls-sm2-twin-genkey-${CUR_TIME}
+
+xi:curl --out ${OUT_DIR}/${CN}.pem \
+  --data "subject=C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --header "Content-Type: text/plain; encoding=utf-8" \
+  "$BASE_URL/enroll-serverkeygen-twin?profile=tls-sm2"
+
+echo "=====REST: Enroll Chinese SM2 Twin TLS Certificates (CA generates only keypair for the encryption)====="
+
+CN = rest-tls-sm2-twin-${CUR_TIME}
+
+xi:keypair-p12 --keyspec SM2P256V1 --password CHANGEIT --out ${OUT_DIR}/${CN}.p12
+
+xi:csr-p12 --p12 ${OUT_DIR}/${CN}.p12 --password CHANGEIT \
+  --subject "C=CN,O=myorg,CN=${CN}.myorg.org" \
+  --out ${OUT_DIR}/${CN}.csr
+
+xi:curl --out ${OUT_DIR}/${CN}.pem --data-file ${OUT_DIR}/${CN}.csr \
+  --header "Content-Type: application/pkcs10" \
+  "$BASE_URL/enroll-cert-twin?profile=tls-sm2"

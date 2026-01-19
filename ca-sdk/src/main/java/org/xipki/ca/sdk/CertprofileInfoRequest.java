@@ -1,13 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.cbor.CborDecoder;
-import org.xipki.util.cbor.CborEncoder;
-import org.xipki.util.exception.DecodeException;
-
-import java.io.IOException;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
  *
@@ -28,17 +26,18 @@ public class CertprofileInfoRequest extends SdkRequest {
   }
 
   @Override
-  protected void encode0(CborEncoder encoder) throws IOException {
-    encoder.writeArrayStart(1);
-    encoder.writeTextString(profile);
+  protected void encode0(CborEncoder encoder) throws CodecException {
+    encoder.writeArrayStart(1).writeTextString(profile);
   }
 
-  public static CertprofileInfoRequest decode(byte[] encoded) throws DecodeException {
+  public static CertprofileInfoRequest decode(byte[] encoded)
+      throws CodecException {
     try (CborDecoder decoder = new CborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoRequest", decoder, 1);
       return new CertprofileInfoRequest(decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new DecodeException(buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
+      throw new CodecException(
+          buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
     }
   }
 

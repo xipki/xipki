@@ -1,35 +1,17 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs11;
 
-import org.xipki.pkcs11.wrapper.Mechanism;
+import org.xipki.pkcs11.wrapper.ExtraParams;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.params.ByteArrayParams;
 import org.xipki.pkcs11.wrapper.params.CkParams;
-import org.xipki.pkcs11.wrapper.params.CkParamsWithExtra;
-import org.xipki.pkcs11.wrapper.params.ExtraParams;
 import org.xipki.pkcs11.wrapper.params.RSA_PKCS_PSS_PARAMS;
+import org.xipki.pkcs11.wrapper.type.CkMechanism;
 import org.xipki.security.HashAlgo;
 
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA1;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA3_224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA3_256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA3_384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA3_512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKG_MGF1_SHA512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_224;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_256;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_384;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA3_512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA512;
-import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA_1;
+import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 /**
  * PKCS#11 params.
  *
@@ -39,24 +21,25 @@ import static org.xipki.pkcs11.wrapper.PKCS11Constants.CKM_SHA_1;
 
 public interface P11Params {
 
-  default Mechanism toMechanism(long mechanism, ExtraParams extraParams)
+  default CkMechanism toMechanism(long mechanism, ExtraParams extraParams)
       throws TokenException {
     CkParams paramObj;
     if (this instanceof P11Params.P11RSAPkcsPssParams) {
-      P11Params.P11RSAPkcsPssParams param = (P11Params.P11RSAPkcsPssParams) this;
+      P11Params.P11RSAPkcsPssParams param =
+          (P11Params.P11RSAPkcsPssParams) this;
       paramObj = new RSA_PKCS_PSS_PARAMS(param.getHashAlgorithm(),
           param.getMaskGenerationFunction(), param.getSaltLength());
     } else if (this instanceof P11Params.P11ByteArrayParams) {
-      paramObj = new ByteArrayParams(((P11Params.P11ByteArrayParams) this).getBytes());
+      paramObj = new ByteArrayParams(
+          ((P11Params.P11ByteArrayParams) this).getBytes());
     } else {
-      throw new TokenException("unknown P11Parameters " + getClass().getName());
+      throw new TokenException(
+          "unknown P11Parameters " + getClass().getName());
     }
 
-    if (extraParams != null) {
-      paramObj = new CkParamsWithExtra(paramObj, extraParams);
-    }
-
-    return new Mechanism(mechanism, paramObj);
+    CkMechanism mech = new CkMechanism(mechanism, paramObj);
+    mech.setExtraParams(extraParams);
+    return mech;
   }
 
   class P11ByteArrayParams implements P11Params {
@@ -80,12 +63,6 @@ public interface P11Params {
     private final long maskGenerationFunction;
 
     private final int saltLength;
-
-    public P11RSAPkcsPssParams(long hashAlgorithm, long maskGenerationFunction, int saltLength) {
-      this.hashAlgorithm = hashAlgorithm;
-      this.maskGenerationFunction = maskGenerationFunction;
-      this.saltLength = saltLength;
-    }
 
     public P11RSAPkcsPssParams(HashAlgo hashAlgo) {
       this.saltLength = hashAlgo.getLength();
@@ -128,7 +105,8 @@ public interface P11Params {
           this.maskGenerationFunction = CKG_MGF1_SHA3_512;
           break;
         default:
-          throw new IllegalStateException("unsupported Hash algorithm " + hashAlgo);
+          throw new IllegalStateException(
+              "unsupported hash algorithm " + hashAlgo);
       }
     }
 

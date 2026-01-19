@@ -1,14 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.type;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.security.ObjectIdentifiers;
-import org.xipki.util.CompareUtil;
+import org.xipki.security.OIDs;
+import org.xipki.util.extra.misc.CompareUtil;
 
 import java.io.IOException;
 
@@ -20,13 +17,14 @@ import java.io.IOException;
  */
 
 public enum OID {
-  ID_PKIX_OCSP_NONCE(OCSPObjectIdentifiers.id_pkix_ocsp_nonce),
-  ID_PKIX_OCSP_PREFSIGALGS(ObjectIdentifiers.Extn.id_pkix_ocsp_prefSigAlgs),
-  ID_PKIX_OCSP_EXTENDEDREVOKE(ObjectIdentifiers.Extn.id_pkix_ocsp_extendedRevoke),
-  ID_ISISMTT_AT_CERTHASH(ISISMTTObjectIdentifiers.id_isismtt_at_certHash),
-  ID_INVALIDITY_DATE(Extension.invalidityDate),
-  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff),
-  ID_PKIX_OCSP_RESPONSE(OCSPObjectIdentifiers.id_pkix_ocsp_response);
+  ID_PKIX_OCSP_NONCE(OIDs.OCSP.id_pkix_ocsp_nonce),
+  ID_PKIX_OCSP_PREFSIGALGS(OIDs.Extn.id_pkix_ocsp_prefSigAlgs),
+  ID_PKIX_OCSP_EXTENDEDREVOKE(OIDs.Extn.id_pkix_ocsp_extendedRevoke),
+  ID_ISISMTT_AT_CERTHASH(OIDs.Misc.isismtt_at_certHash),
+
+  ID_INVALIDITY_DATE(OIDs.Extn.invalidityDate),
+  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OIDs.OCSP.id_pkix_ocsp_archive_cutoff),
+  ID_PKIX_OCSP_RESPONSE(OIDs.OCSP.id_pkix_ocsp_response);
 
   private final String id;
 

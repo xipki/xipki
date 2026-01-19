@@ -1,9 +1,9 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api.publisher;
 
-import org.xipki.util.exception.ObjectCreationException;
+import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Set;
 
@@ -11,7 +11,7 @@ import java.util.Set;
  * CertPublisher factory interface.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
+ *
  */
 
 public interface CertPublisherFactory {

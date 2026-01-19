@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.server;
@@ -6,7 +6,7 @@ package org.xipki.ca.server;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -38,16 +38,21 @@ public class CertTemplateData {
 
   private boolean forCrossCert;
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore,
-                          Instant notAfter, Extensions extensions, String certprofileName) {
-    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
+  public CertTemplateData(
+      X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore,
+      Instant notAfter, Extensions extensions, String certprofileName) {
+    this(subject, publicKeyInfo, notBefore, notAfter, extensions,
+        certprofileName, null, false);
   }
 
-  public CertTemplateData(X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore, Instant notAfter,
-                          Extensions extensions, String certprofileName, BigInteger certReqId, boolean serverkeygen) {
+  public CertTemplateData(
+      X500Name subject, SubjectPublicKeyInfo publicKeyInfo,
+      Instant notBefore, Instant notAfter, Extensions extensions,
+      String certprofileName, BigInteger certReqId, boolean serverkeygen) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
-    this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");
+    this.certprofileName = Args.toNonBlankLower(certprofileName,
+        "certprofileName");
     this.extensions = extensions;
     this.notBefore = notBefore;
     this.notAfter = notAfter;

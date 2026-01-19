@@ -1,10 +1,10 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.qa;
 
-import org.xipki.util.Args;
-import org.xipki.util.StringUtil;
+import org.xipki.util.codec.Args;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -34,11 +34,13 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
 
   private BufferedReader reader;
 
-  private final ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<BigInteger> nextNumbers =
+      new ConcurrentLinkedQueue<>();
 
   private BigInteger currentNumber;
 
-  public FileBigIntegerIterator(String fileName, boolean hex, boolean loop) throws IOException {
+  public FileBigIntegerIterator(String fileName, boolean hex, boolean loop)
+      throws IOException {
     this.fileName = Args.notBlank(fileName, "fileName");
     this.hex = hex;
     this.loop = loop;
@@ -82,7 +84,8 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
         return null;
       }
     } catch (IOException ex) {
-      throw new NoSuchElementException("could not read next number from file " + fileName);
+      throw new NoSuchElementException("could not read next number from file "
+          + fileName);
     }
 
     if (line.indexOf(',') == -1) {

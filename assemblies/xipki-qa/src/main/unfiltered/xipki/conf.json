@@ -8,7 +8,6 @@
 			"includes": {
 				"dirs": [
 					"xipki-ca/",
-					"xipki-hsmproxy/",
 					"xipki-gateway/",
 					"xipki-ocsp/",
 					"xipki/",
@@ -16,11 +15,8 @@
 				],
 				"suffixes": [
 					"server.xml",
-					"gateway.json",
-					"curl.json",
-					"org.xipki.ca.mgmt.client.cfg",
-					"pkcs11-hsmproxy.json",
-					"pkcs11.json"
+					".json",
+					"org.xipki.ca.mgmt.client.cfg"
 				]
 			},
 			"replacements": {
@@ -48,14 +44,10 @@
 				"gateway.https.port": "8445",
 				"gateway.host": "localhost",
 				"ra.sdk.keyPassword": "CHANGEIT",
+				"kem-pop.keyPassword":"changeit-kem",
+				"dh-pop.keyPassword":"changeit-dh",
 				// Gateway.SCEP
 				"scep.keyPassword": "CHANGEIT",
-				// HSM proxy
-				"hsmproxy.https.keyPassword": "CHANGEIT",
-				"hsmproxy.shutdown.port": "8008",
-				"hsmproxy.https.port": "8446",
-				"hsmproxy.host": "localhost",
-				"hsmproxy.client.keyPassword": "CHANGEIT",
 				// CLI
 				"cmp.client.ca.keyPassword": "CHANGEIT",
 				"cmp.client.keyPassword": "CHANGEIT",
@@ -74,13 +66,7 @@
 					"qa/"
 				],
 				"suffixes": [
-					"lifecycle.script",
-					"template.ca-load.script",
-					"test.script",
-					"scep-server.script",
-					"template.ca-load.script",
-					"template.ca.script",
-					"reimport.script"
+					".script"
 				]
 			},
 			"replacements": {

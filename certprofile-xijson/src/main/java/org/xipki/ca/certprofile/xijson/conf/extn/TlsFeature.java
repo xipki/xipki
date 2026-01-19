@@ -1,13 +1,14 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableInt;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,25 +17,38 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class TlsFeature extends ValidableConf {
+public class TlsFeature implements JsonEncodable {
 
-  private List<DescribableInt> features;
+  private final List<Integer> features;
 
-  public List<DescribableInt> getFeatures() {
-    if (features == null) {
-      features = new LinkedList<>();
+  public TlsFeature(List<Integer> features) {
+    Args.notEmpty(features, "features");
+    for (int feature : features) {
+      if (feature < 0 || feature > 65535) {
+        throw new IllegalArgumentException(
+            "feature non in [0, 65535]: " + feature);
+      }
     }
-    return features;
-  }
 
-  public void setFeatures(List<DescribableInt> features) {
     this.features = features;
   }
 
+  public List<Integer> getFeatures() {
+    return features;
+  }
+
   @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(features, "features");
-    validate(features);
+  public JsonMap toCodec() {
+    JsonList list = new JsonList();
+    for (Integer i : features) {
+      list.add(i);
+    }
+    return new JsonMap().put("features", list);
+  }
+
+  public static TlsFeature parse(JsonMap json) throws CodecException {
+    List<Integer> features = json.getNnList("features").toIntList();
+    return new TlsFeature(features);
   }
 
 } // class TlsFeature

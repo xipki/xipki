@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ocsp.server.servlet;
@@ -8,13 +8,13 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.server.OcspConf;
 import org.xipki.ocsp.server.OcspServer;
 import org.xipki.security.Securities;
-import org.xipki.util.HttpConstants;
-import org.xipki.util.LogUtil;
-import org.xipki.util.XipkiBaseDir;
-import org.xipki.util.exception.InvalidConfException;
-import org.xipki.util.http.XiHttpFilter;
-import org.xipki.util.http.XiHttpRequest;
-import org.xipki.util.http.XiHttpResponse;
+import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.extra.http.HttpConstants;
+import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.extra.http.XiHttpRequest;
+import org.xipki.util.extra.http.XiHttpResponse;
+import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.XipkiBaseDir;
 
 import java.io.IOException;
 
@@ -26,7 +26,8 @@ import java.io.IOException;
 
 public class OcspHttpFilter implements XiHttpFilter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspHttpFilter.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(OcspHttpFilter.class);
 
   private static final String DFLT_CFG = "etc/ocsp/ocsp.json";
 
@@ -45,9 +46,11 @@ public class OcspHttpFilter implements XiHttpFilter {
     try {
       conf = OcspConf.readConfFromFile(DFLT_CFG);
     } catch (IOException ex) {
-      throw new IOException("could not parse configuration file " + DFLT_CFG, ex);
+      throw new IOException("could not parse configuration file "
+          + DFLT_CFG, ex);
     } catch (InvalidConfException ex) {
-      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
+      throw new InvalidConfException("could not parse configuration file "
+          + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -83,9 +86,11 @@ public class OcspHttpFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
-    // In Tomcat, req.getServletPath() will delete one %2F (/) if the URI contains
-    // %2F%F (aka // after decoding). This may happen if the OCSP request is sent via GET.
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
+      throws IOException {
+    // In Tomcat, req.getServletPath() will delete one %2F (/) if the URI
+    // contains %2F%F (aka // after decoding). This may happen if the OCSP
+    // request is sent via GET.
     // String path = req.getServletPath();
 
     // So we use the following method to retrieve the servletPath.
@@ -96,7 +101,8 @@ public class OcspHttpFilter implements XiHttpFilter {
         : requestUri.substring(contextPath.length());
 
     if (path.startsWith("/health/")) {
-      String servletPath = path.substring(7); // 7 = "/health".length()
+      // 7 = "/health".length()
+      String servletPath = path.substring(7);
       req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, servletPath);
       healthServlet.service(req, resp);
     } else {

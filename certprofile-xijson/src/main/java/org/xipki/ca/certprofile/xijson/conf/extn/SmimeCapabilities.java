@@ -1,15 +1,16 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.certprofile.xijson.conf.extn;
 
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableBinary;
-import org.xipki.ca.certprofile.xijson.conf.Describable.DescribableOid;
-import org.xipki.util.ValidableConf;
-import org.xipki.util.exception.InvalidConfException;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
 
-import java.math.BigInteger;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,85 +19,64 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class SmimeCapabilities extends ValidableConf {
+public class SmimeCapabilities implements JsonEncodable {
 
-  public static class SmimeCapability extends ValidableConf {
+  private final List<SmimeCapability> capabilities;
 
-    private DescribableOid capabilityId;
-
-    private SmimeCapabilityParameter parameter;
-
-    public DescribableOid getCapabilityId() {
-      return capabilityId;
-    }
-
-    public void setCapabilityId(DescribableOid capabilityId) {
-      this.capabilityId = capabilityId;
-    }
-
-    public SmimeCapabilityParameter getParameter() {
-      return parameter;
-    }
-
-    public void setParameter(SmimeCapabilityParameter parameter) {
-      this.parameter = parameter;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      notNull(capabilityId, "capabilityId");
-      validate(capabilityId, parameter);
-    }
-
-  } // class SmimeCapability
-
-  public static class SmimeCapabilityParameter extends ValidableConf {
-
-    private BigInteger integer;
-
-    private DescribableBinary binary;
-
-    public BigInteger getInteger() {
-      return integer;
-    }
-
-    public void setInteger(BigInteger integer) {
-      this.integer = integer;
-    }
-
-    public DescribableBinary getBinary() {
-      return binary;
-    }
-
-    public void setBinary(DescribableBinary binary) {
-      this.binary = binary;
-    }
-
-    @Override
-    public void validate() throws InvalidConfException {
-      exactOne(integer, "integer", binary, "binary");
-      validate(binary);
-    }
-
-  } // class SmimeCapabilityParameter
-
-  private List<SmimeCapability> capabilities;
+  public SmimeCapabilities(List<SmimeCapability> capabilities) {
+    this.capabilities = Args.notEmpty(capabilities, "capabilities");
+  }
 
   public List<SmimeCapability> getCapabilities() {
-    if (capabilities == null) {
-      capabilities = new LinkedList<>();
-    }
     return capabilities;
   }
 
-  public void setCapabilities(List<SmimeCapability> capabilities) {
-    this.capabilities = capabilities;
+  @Override
+  public JsonMap toCodec() {
+    return new JsonMap().putEncodables("capabilities", capabilities);
   }
 
-  @Override
-  public void validate() throws InvalidConfException {
-    notEmpty(capabilities, "capabilities");
-    validate(capabilities);
+  public static SmimeCapabilities parse(JsonMap json) throws CodecException {
+    JsonList list = json.getNnList("capabilities");
+    List<SmimeCapability> capabilities = new ArrayList<>(list.size());
+    for (JsonMap v : list.toMapList()) {
+      capabilities.add(SmimeCapability.parse(v));
+    }
+    return new SmimeCapabilities(capabilities);
   }
+
+  public static class SmimeCapability implements JsonEncodable {
+
+    private final ASN1ObjectIdentifier capabilityId;
+
+    private final Integer parameter;
+
+    public SmimeCapability(ASN1ObjectIdentifier capabilityId,
+                           Integer parameter) {
+      this.capabilityId = Args.notNull(capabilityId, "capabilityId");
+      this.parameter = parameter;
+    }
+
+    public ASN1ObjectIdentifier getCapabilityId() {
+      return capabilityId;
+    }
+
+    public Integer getParameter() {
+      return parameter;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      return new JsonMap().put("capabilityId", capabilityId.getId())
+          .put("parameter", parameter);
+    }
+
+    public static SmimeCapability parse(JsonMap json) throws CodecException {
+      return new SmimeCapability(
+          new ASN1ObjectIdentifier(json.getNnString("capabilityId")),
+          json.getInt("parameter"));
+    }
+
+  } // class SmimeCapability
 
 } // class SmimeCapabilities

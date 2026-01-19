@@ -1,6 +1,9 @@
 echo "#################################################################"
 echo "#               Export-then-import CA and OCSP                  #"
 echo "#################################################################"
+## Restart the CA
+xi:exec --env JAVA_HOME=~/test/xipki/jdk-tomcat '~/test/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec --env JAVA_HOME=~/test/xipki/jdk-tomcat '~/test/xipki/ca-tomcat/bin/startup.sh'
 
 source qa/setenv.script
 
@@ -28,8 +31,6 @@ echo "==========================================================================
 ca:export-ocsp --out-dir output/dbexport/ocsp --password CHANGEIT \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
 
-# Reset the CA and OCSP database
-
 echo "============================================================================"
 echo "||                             Import CA Database                         ||"
 echo "============================================================================"
@@ -38,11 +39,18 @@ OS_NAME = $(osinfo --name)
 
 ## CA Database
 
-DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
-ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
+# Re-init the CA configuration database
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
+echo "Sleeping 1 second"
+sleep 1
+
+# Re-init the CA certstore database
+
+DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
+ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
 ca:import-ca --in-dir output/dbexport/ca --password CHANGEIT \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties \
@@ -56,6 +64,8 @@ echo "==========================================================================
 
 ## OCSP Database
 
+echo "Re-init the OCSP database"
+
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 
@@ -67,6 +77,8 @@ ca:import-ocsp --in-dir output/dbexport/ocsp --password CHANGEIT \
 echo "============================================================================"
 echo "||                        IMPORT OCSP DATABASE FROM CA                    ||"
 echo "============================================================================"
+
+echo "Re-init the OCSP database"
 
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
@@ -89,8 +101,6 @@ echo "==========================================================================
 ca:export-ca-certstore --out-dir output/dbexport-certstore/ca --password CHANGEIT \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
-# Reset the CA
-
 echo "============================================================================"
 echo "||                  Import CA CertStore ONLY Database                     ||"
 echo "============================================================================"
@@ -99,6 +109,7 @@ OS_NAME = $(osinfo --name)
 
 ## CA Database
 
+echo "Re-init the CA database"
 DB_CONF = "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
 ca:sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
 
@@ -106,8 +117,8 @@ ca:import-ca-certstore --in-dir output/dbexport-certstore/ca --password CHANGEIT
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Restart the CA
-xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/shutdown.sh'
-xi:exec $[tomcat.java.home] '~/test/xipki/ca-tomcat/bin/startup.sh'
+xi:exec --env JAVA_HOME=~/test/xipki/jdk-tomcat '~/test/xipki/ca-tomcat/bin/shutdown.sh'
+xi:exec --env JAVA_HOME=~/test/xipki/jdk-tomcat '~/test/xipki/ca-tomcat/bin/startup.sh'
 
 echo "Sleeping 2 seconds"
 sleep 2

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12;
@@ -8,18 +8,16 @@ import org.xipki.security.DfltConcurrentContentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -50,10 +48,12 @@ public class P12MacContentSignerBuilder {
    * @throws XiSecurityException if security error occurs.
    */
   public P12MacContentSignerBuilder(
-      String keystoreType, InputStream keystoreStream, char[] keystorePassword, String keyname, char[] keyPassword)
+      String keystoreType, InputStream keystoreStream,
+      char[] keystorePassword, String keyname, char[] keyPassword)
       throws XiSecurityException {
     if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
-      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
+      throw new IllegalArgumentException(
+          "unsupported keystore type: " + keystoreType);
     }
 
     Args.notNull(keystoreStream, "keystoreStream");
@@ -81,19 +81,21 @@ public class P12MacContentSignerBuilder {
       }
 
       this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
-    } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
-             | UnrecoverableKeyException | ClassCastException ex) {
+    } catch (GeneralSecurityException | IOException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism) throws XiSecurityException {
+  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism)
+      throws XiSecurityException {
     Args.notNull(sigAlgo, "sigAlgo");
-    List<XiContentSigner> signers = new ArrayList<>(Args.positive(parallelism, "parallelism"));
+    List<XiContentSigner> signers = new ArrayList<>(
+        Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
       XiContentSigner signer = sigAlgo.isGmac()
-          ? new AESGmacContentSigner(sigAlgo, key) : new HmacContentSigner(sigAlgo, key);
+          ? new AESGmacContentSigner(sigAlgo, key)
+          : new HmacContentSigner(sigAlgo, key);
       signers.add(signer);
     }
 
@@ -104,7 +106,8 @@ public class P12MacContentSignerBuilder {
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-    concurrentSigner.setSha1DigestOfMacKey(HashAlgo.SHA1.hash(key.getEncoded()));
+    concurrentSigner.setSha1DigestOfMacKey(
+        HashAlgo.SHA1.hash(key.getEncoded()));
 
     return concurrentSigner;
   } // method createSigner

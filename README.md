@@ -63,9 +63,9 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 * Database
   * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
-  * Any available hardware (tested on Raspberry Pi 2 Model B with 900MHz quad-core ARM CPU and 1 GB Memory)
+  * Any available hardware 
 * Servlet Container
-  * Tomcat 8, 9, 10, 11
+  * Tomcat 10, 11
 * HSM Devices
   - [AWS CloudHSM](https://aws.amazon.com/cloudhsm)
   - [Nitrokey HSM 2](https://www.nitrokey.com/#comparison) / [Smartcard HSM EA+](http://www.smartcard-hsm.com/features.html#usbstick)
@@ -98,12 +98,12 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - Support of JSON-based certificate profile
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
-  - Public key types of certificates: RSA, EC, DSA, Ed25519, Ed448, SM2, X25519, X448
+  - Public key types of certificates: RSA, EC, Ed25519, Ed448, SM2, X25519, X448,
+    ML-DSA-44, ML-DSA-65, ML-DSA-87, ML-KEM-512, ML-KEM-768, ML-KEM-1024
   - Signature algorithms of certificates
-    - DSA with hash algorithms: SHA-1, SHA-2, and SHA-3
+    - ML-DSA-44, ML-DSA-65, ML-DSA-87 
     - ECDSA with hash algorithms: SHA-1, SHA-2, SHA-3, and SHAKE
     - Ed25519, Ed448
-    - Plain ECDSA with hash algorithms: SHA-1, and SHA-2
     - RSA PKCS1v1.5 with hash algorithms: SHA-1, SHA-2, and SHA-3
     - RSA PSS with hash algorithms: SHA-1, SHA-2, and SHA-3, and SHAKE
     - SM3withSM2
@@ -111,7 +111,6 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - RFC 3739
       - BiometricInfo
       - QCStatements (also in eIDAS standard EN 319 412)
-      - SubjectDirectoryAttributes
     - RFC 4262
       - SMIMECapabilities
     - RFC 5280
@@ -128,19 +127,11 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - RFC 6960
       - OcspNoCheck
     - RFC 6962
-      - CT Precertificate SCTs
+      - CT Pre-certificate SCTs
     - RfC 7633
       - TLSFeature
     - Car Connectivity Consortium
       - ExtensionSchema
-    - Common PKI (German national standard)
-      - AdditionalInformation, Admission
-      - Restriction
-      - ValidityModel
-    - GM/T 0015-2012 (Chinese national standard)
-      - ICRegistrationNumber, IdentityCode, InsuranceNumber
-      - OrganizationCode
-      - TaxationNumber
   - Management of multiple CAs in one software instance
     - Support of database cluster
     - Multiple software instances (all can be in active mode) for the same CA
@@ -171,7 +162,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 
 ### Mgmt CLI (Management Client)
   - Configuring CA
-  - Generating keypairs of RSA, EC and DSA in token
+  - Generating keypairs of RSA, EC, Ed25519, Ed448, X25519, X448, ML-DSA, and ML-KEM in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
@@ -183,6 +174,3 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
-
-### HSM Proxy
-  - Provide the access to the HSM remotely.

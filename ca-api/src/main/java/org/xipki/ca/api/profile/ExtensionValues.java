@@ -1,11 +1,11 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.ca.api.profile;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.Args;
+import org.xipki.util.codec.Args;
+import org.xipki.util.extra.exception.CertprofileException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,20 +21,11 @@ import java.util.Set;
 
 public class ExtensionValues {
 
-  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
+  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions =
+      new HashMap<>();
 
-  public void addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
+  public void addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
       throws CertprofileException {
-    Args.notNull(type, "type");
-    Args.notNull(value, "value");
-
-    if (extensions.containsKey(type)) {
-      throw new CertprofileException("Extension " + type.getId() + " exists");
-    }
-    extensions.put(type, new ExtensionValue(critical, value));
-  } // method addExtension
-
-  public void addExtension(ASN1ObjectIdentifier type, ExtensionValue value) throws CertprofileException {
     Args.notNull(type, "type");
     Args.notNull(value, "value");
 
@@ -52,7 +43,7 @@ public class ExtensionValues {
     return extensions.get(Args.notNull(type, "type"));
   }
 
-  public ExtensionValue removeExtensionTuple(ASN1ObjectIdentifier type) {
+  public ExtensionValue removeExtensionValue(ASN1ObjectIdentifier type) {
     return extensions.remove(Args.notNull(type, "type"));
   }
 

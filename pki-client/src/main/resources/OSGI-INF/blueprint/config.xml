@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0">
+  <cm:property-placeholder persistent-id="org.xipki.pki.client">
+    <cm:default-properties>
+      <cm:property name="cmp.confFile"  value="xipki/etc/cmp-client.json"/>
+      <cm:property name="ocsp.confFile" value="xipki/etc/ocsp-client.json"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+
+  <reference id="securityFactory" interface="org.xipki.security.SecurityFactory"/>
+
+  <bean id="cmpClient" class="org.xipki.cmp.client.internal.CmpClientImpl"
+      init-method="init" destroy-method="close">
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="confFile" value="${cmp.confFile}"/>
+  </bean>
+  <service ref="cmpClient" interface="org.xipki.cmp.client.CmpClient"/>
+
+  <bean id="ocspRequestor" class="org.xipki.ocsp.client.HttpOcspRequestor"
+        init-method="init" destroy-method="close">
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="confFile" value="${ocsp.confFile}"/>
+  </bean>
+  <service ref="ocspRequestor" interface="org.xipki.ocsp.client.OcspRequestor"/>
+
+</blueprint>

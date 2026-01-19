@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2024 xipki. All rights reserved.
+// Copyright (c) 2013-2025 xipki. All rights reserved.
 // License Apache License 2.0
 
 package org.xipki.security.pkcs12;
@@ -11,21 +11,20 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.EdECConstants;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiSecurityException;
-import org.xipki.util.Args;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.EcCurveEnum;
+import org.xipki.util.codec.Args;
 
 import javax.crypto.KeyAgreement;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
@@ -46,7 +45,8 @@ public class P12XdhMacContentSignerBuilder {
 
     private final int hashLen;
 
-    private XdhMacContentSigner(SignAlgo signAlgo, SecretKey signingKey, IssuerAndSerialNumber peerIssuerAndSerial)
+    private XdhMacContentSigner(SignAlgo signAlgo, SecretKey signingKey,
+                                IssuerAndSerialNumber peerIssuerAndSerial)
         throws XiSecurityException {
       super(signAlgo, signingKey);
       this.hashLen = signAlgo.getHashAlgo().getLength();
@@ -62,9 +62,11 @@ public class P12XdhMacContentSignerBuilder {
       try {
         encodedSig = new DERSequence(vec).getEncoded();
       } catch (IOException ex) {
-        throw new XiSecurityException("exception initializing ContentSigner: " + ex.getMessage(), ex);
+        throw new XiSecurityException(
+            "exception initializing ContentSigner: " + ex.getMessage(), ex);
       }
-      this.prefix = Arrays.copyOfRange(encodedSig, 0, encodedSig.length - hashLen);
+      this.prefix = Arrays.copyOfRange(encodedSig, 0,
+          encodedSig.length - hashLen);
     }
 
     /**
@@ -82,7 +84,8 @@ public class P12XdhMacContentSignerBuilder {
     public byte[] getSignature() {
       byte[] hashValue = super.getSignature();
       if (hashValue.length != hashLen) {
-        throw new RuntimeOperatorException("exception obtaining signature: invalid signature length");
+        throw new RuntimeOperatorException(
+            "exception obtaining signature: invalid signature length");
       }
       byte[] sigValue = new byte[prefix.length + hashLen];
       System.arraycopy(prefix, 0, sigValue, 0, prefix.length);
@@ -102,32 +105,40 @@ public class P12XdhMacContentSignerBuilder {
 
   private final X509Cert[] certificateChain;
 
-  public P12XdhMacContentSignerBuilder(X509Cert peerCert, PrivateKey privateKey, PublicKey publicKey)
+  public P12XdhMacContentSignerBuilder(
+      X509Cert peerCert, PrivateKey privateKey, PublicKey publicKey)
       throws XiSecurityException {
     this.publicKey = Args.notNull(publicKey, "publicKey");
     this.certificateChain = null;
-    init(Args.notNull(privateKey, "privateKey"), Args.notNull(peerCert, "peerCert"));
+    init(Args.notNull(privateKey, "privateKey"),
+        Args.notNull(peerCert, "peerCert"));
   }
 
-  public P12XdhMacContentSignerBuilder(KeypairWithCert keypairWithCert, X509Cert peerCert)
+  public P12XdhMacContentSignerBuilder(
+      KeypairWithCert keypairWithCert, X509Cert peerCert)
       throws XiSecurityException {
-    this.publicKey = Args.notNull(keypairWithCert, "keypairWithCert").getPublicKey();
+    this.publicKey = Args.notNull(keypairWithCert, "keypairWithCert")
+        .getPublicKey();
+
     this.certificateChain = keypairWithCert.getCertificateChain();
     init(keypairWithCert.getKey(), Args.notNull(peerCert, "peerCert"));
   }
 
-  private void init(PrivateKey privateKey, X509Cert peerCert) throws XiSecurityException {
+  private void init(PrivateKey privateKey, X509Cert peerCert)
+      throws XiSecurityException {
     String algorithm = privateKey.getAlgorithm();
-    if (EdECConstants.X25519.equalsIgnoreCase(algorithm)) {
+    EcCurveEnum curve = EcCurveEnum.ofAlias(algorithm);
+    if (EcCurveEnum.X25519 == curve) {
       this.algo = SignAlgo.DHPOP_X25519;
-    } else if (EdECConstants.X448.equalsIgnoreCase(algorithm)) {
+    } else if (EcCurveEnum.X448 == curve) {
       this.algo = SignAlgo.DHPOP_X448;
     } else {
-      throw new IllegalArgumentException("unsupported key.getAlgorithm(): " + algorithm);
+      throw new IllegalArgumentException(
+          "unsupported key.getAlgorithm(): " + algorithm);
     }
 
     PublicKey peerPubKey = peerCert.getPublicKey();
-    if (!algorithm.equalsIgnoreCase(peerPubKey.getAlgorithm())) {
+    if (!algorithm.equals(peerPubKey.getAlgorithm())) {
       throw new IllegalArgumentException("peerCert and key does not match");
     }
 
@@ -138,7 +149,7 @@ public class P12XdhMacContentSignerBuilder {
       keyAgreement.init(privateKey);
       keyAgreement.doPhase(peerPubKey, true);
       zz = keyAgreement.generateSecret();
-    } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | IllegalStateException ex) {
+    } catch (GeneralSecurityException | RuntimeException ex) {
       throw new XiSecurityException("KeyChange error", ex);
     }
 
@@ -162,11 +173,14 @@ public class P12XdhMacContentSignerBuilder {
         X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
   } // method init
 
-  public ConcurrentContentSigner createSigner(int parallelism) throws XiSecurityException {
-    List<XiContentSigner> signers = new ArrayList<>(Args.positive(parallelism, "parallelism"));
+  public ConcurrentContentSigner createSigner(int parallelism)
+      throws XiSecurityException {
+    List<XiContentSigner> signers = new ArrayList<>(
+        Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = new XdhMacContentSigner(algo, key, peerIssuerAndSerial);
+      XiContentSigner signer =
+          new XdhMacContentSigner(algo, key, peerIssuerAndSerial);
       signers.add(signer);
     }
 
@@ -177,7 +191,8 @@ public class P12XdhMacContentSignerBuilder {
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-    concurrentSigner.setSha1DigestOfMacKey(HashAlgo.SHA1.hash(key.getEncoded()));
+    concurrentSigner.setSha1DigestOfMacKey(
+        HashAlgo.SHA1.hash(key.getEncoded()));
 
     if (certificateChain != null) {
       concurrentSigner.setCertificateChain(certificateChain);

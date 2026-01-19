@@ -1,4 +1,4 @@
-Deployment in Tomcat (8, 9 and 10)
+Deployment in Tomcat (10 and 11)
 ----
 1. (Optiona) If SCEP is supported:  
    You need to have a SCEP server certificate with private key. For the demo you may generate this
