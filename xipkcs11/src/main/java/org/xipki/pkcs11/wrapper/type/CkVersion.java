@@ -72,6 +72,11 @@ public class CkVersion extends CkType {
   }
 
   @Override
+  public int hashCode() {
+    return (0xFF & major) << 8 + (0xFF & minor);
+  }
+
+  @Override
   public boolean equals(Object other) {
     if (this == other) {
       return true;

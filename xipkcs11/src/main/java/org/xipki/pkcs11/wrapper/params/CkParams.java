@@ -35,6 +35,32 @@ public abstract class CkParams extends CkType {
     return contents;
   }
 
+  @Override
+  public int hashCode() {
+    return getEncodeList().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+
+    if (!(obj instanceof CkParams)) {
+      return false;
+    }
+
+    String aName = getClass().getName();
+    String bName = obj.getClass().getName();
+    if (!aName.equals(bName)) {
+      return false;
+    }
+
+    EncodeList a = getEncodeList();
+    EncodeList b = ((CkParams) obj).getEncodeList();
+    return a.equals(b);
+  }
+
   public int getEncodedLen(Arch arch) {
     return getEncodeList().getEncodedLen(arch);
   }

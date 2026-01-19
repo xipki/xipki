@@ -17,6 +17,32 @@ abstract class AbstractInfo extends CkType {
 
   protected abstract EncodeList getEncodeList();
 
+  @Override
+  public int hashCode() {
+    return getEncodeList().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+
+    if (!(obj instanceof AbstractInfo)) {
+      return false;
+    }
+
+    String aName = getClass().getName();
+    String bName = obj.getClass().getName();
+    if (!aName.equals(bName)) {
+      return false;
+    }
+
+    EncodeList a = getEncodeList();
+    EncodeList b = ((AbstractInfo) obj).getEncodeList();
+    return a.equals(b);
+  }
+
   public byte[] getEncoded(Arch arch) {
     EncodeList list = getEncodeList();
     int len = list.getEncodedLen(arch);

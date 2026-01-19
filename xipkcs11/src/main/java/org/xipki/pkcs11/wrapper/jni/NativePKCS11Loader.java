@@ -56,8 +56,7 @@ public class NativePKCS11Loader {
         System.loadLibrary("pkcs11wrapper");
       } catch (UnsatisfiedLinkError e) {
         try {
-          loadWrapperFromPath();
-          // loadWrapperFromJar();
+          loadWrapperFromJar();
         } catch (IOException ioe) {
           throw new UnsatisfiedLinkError(
               "no pkcs11wrapper in library path or jar file. "
@@ -65,17 +64,6 @@ public class NativePKCS11Loader {
         }
       }
       linkedAndInitialized = NativePKCS11.initializeLibrary();
-    }
-  }
-
-  private static void loadWrapperFromPath() throws IOException {
-    try {
-      String path = "/Users/liao/source/xipki/xipki/xipkcs11/" +
-          "src/main/c/unix/macOS/arm64/libpkcs11wrapper.jnilib";
-      System.load(path);
-      log.info("Using the library " + path);
-    } catch (UnsatisfiedLinkError e) {
-      throw new IOException(e);
     }
   }
 

@@ -54,4 +54,23 @@ public class CkDate extends CkType {
     return indent + "CK_DATE: " + year + month + day;
   }
 
+
+  @Override
+  public int hashCode() {
+    // 961 = 31^2
+    return year.hashCode() * 961 + month.hashCode() * 31 + day.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    } else if (!(other instanceof CkDate)) {
+      return false;
+    }
+
+    CkDate b = (CkDate) other;
+    return year.equals(b.year) && month.equals(b.month) && day.equals(b.day);
+  }
+
 }

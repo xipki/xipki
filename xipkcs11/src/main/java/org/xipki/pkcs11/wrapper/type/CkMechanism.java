@@ -14,6 +14,7 @@ import org.xipki.pkcs11.wrapper.jni.JniUtil;
 import org.xipki.pkcs11.wrapper.params.CkParams;
 import org.xipki.pkcs11.wrapper.params.NullParams;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.xipki.pkcs11.wrapper.Category.CKM;
@@ -65,7 +66,11 @@ public class CkMechanism extends CkType {
    */
   public CkMechanism(long mechanism, CkParams parameters) {
     this.mechanism = mechanism;
-    this.parameters = parameters;
+    if (NullParams.INSTANCE.equals(parameters)) {
+      this.parameters = null;
+    } else {
+      this.parameters = parameters;
+    }
   }
 
   public ExtraParams getExtraParams() {
@@ -153,6 +158,25 @@ public class CkMechanism extends CkType {
     JniUtil.writeLong(arch, mechanism, dest, off);
     params.encodeTo(arch, dest, off);
     return dest;
+  }
+
+  @Override
+  public int hashCode() {
+    return Long.hashCode(mechanism) * 31 +
+        (parameters == null ? 0 : parameters.hashCode());
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (this == other) {
+      return true;
+    } else if (!(other instanceof CkMechanism)) {
+      return false;
+    }
+
+    CkMechanism b = (CkMechanism) other;
+    return mechanism == b.mechanism
+        && Objects.equals(parameters, b.parameters);
   }
 
   @Override

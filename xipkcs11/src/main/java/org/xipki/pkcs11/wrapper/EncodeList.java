@@ -8,6 +8,7 @@ import org.xipki.pkcs11.wrapper.type.CkMechanism;
 import org.xipki.pkcs11.wrapper.type.CkVersion;
 import org.xipki.util.codec.Args;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -142,6 +143,83 @@ public class EncodeList {
     }
 
     return len;
+  }
+
+  @Override
+  public int hashCode() {
+    int hashCode = 0;
+    for (Object oa : list) {
+      int h = 0;
+      if (oa instanceof ByteW) {
+        h = 0xFF & ((ByteW) oa).v;
+      } else if (oa instanceof LongW) {
+        h = Long.hashCode(((LongW) oa).v);
+      } else if (oa instanceof ByteArrayW) {
+        h = Arrays.hashCode(((ByteArrayW) oa).v);
+      } else if (oa instanceof FixedLenByteArrayW) {
+        h = Arrays.hashCode(((FixedLenByteArrayW) oa).v);
+      } else if (oa instanceof VersionW) {
+        h = ((VersionW) oa).v.hashCode();
+      } else if (oa instanceof MechanismW) {
+        h = ((MechanismW) oa).v.hashCode();
+      }
+
+      hashCode *= 31;
+      hashCode += h;
+    }
+
+    return hashCode;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+
+    if (!(obj instanceof EncodeList)) {
+      return false;
+    }
+
+    EncodeList b = (EncodeList) obj;
+    int n = list.size();
+    if (n != b.list.size()) {
+      return false;
+    }
+
+    for (int i = 0; i < n; i++) {
+      Object oa =  list.get(i);
+      Object ob = b.list.get(i);
+
+      if (oa instanceof ByteW) {
+        if (ob instanceof ByteW) {
+          return ((ByteW) oa).v == ((ByteW) ob).v;
+        }
+      } else if (oa instanceof LongW) {
+        if (ob instanceof LongW) {
+          return ((LongW) oa).v == ((LongW) ob).v;
+        }
+      } else if (oa instanceof ByteArrayW) {
+        if (ob instanceof ByteArrayW) {
+          return Arrays.equals(((ByteArrayW) oa).v, ((ByteArrayW) ob).v);
+        }
+      } else if (oa instanceof FixedLenByteArrayW) {
+        if (ob instanceof FixedLenByteArrayW) {
+          return Arrays.equals(((FixedLenByteArrayW) oa).v,
+              ((FixedLenByteArrayW) ob).v);
+        }
+      } else if (oa instanceof VersionW) {
+        if (ob instanceof VersionW) {
+          return ((VersionW) oa).v.equals(((VersionW) ob).v);
+        }
+      } else if (oa instanceof MechanismW) {
+        if (ob instanceof MechanismW) {
+          return ((MechanismW) oa).v.equals(((MechanismW) ob).v);
+        }
+      }
+    }
+
+    return list.equals(b.list);
   }
 
 }
