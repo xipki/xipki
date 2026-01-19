@@ -39,9 +39,9 @@
     },
     {
       "name": "softhsm",
-      //"path": "xihsm:mem:vendor=softhsm",
+      "path": "xihsm:mem:vendor=softhsm",
       //"path": "/usr/local/lib/softhsm/libsofthsm2.so",
-      "path": "/usr/local/lib/softhsm-mlkem/lib/softhsm/libsofthsm2.so",
+      //"path": "/usr/local/lib/softhsm-mlkem/lib/softhsm/libsofthsm2.so",
       "pin": "123456",
       "soPin": "123456",
       "slotIndex": 0,

@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class TestHSMs {
 
-  private static final boolean defaultEnabled = false;
+  private static final boolean defaultEnabled = true;
 
   private static final String cloudhsm = "cloudhsm";
 
@@ -65,10 +65,10 @@ public class TestHSMs {
         ncipher,        defaultEnabled,
         luna,           defaultEnabled,
         sansec,         defaultEnabled,
-        softhsm,        true,
+        softhsm,        defaultEnabled,
         tass,           defaultEnabled,
         utimaco,        defaultEnabled,
-        xihsm,          true
+        xihsm,          defaultEnabled
     );
 
     try (InputStream is = TestHSMs.class.getClassLoader()
