@@ -1,11 +1,10 @@
-#CC = aarch64-w64-mingw32-gcc
-CC = gcc
+CC = aarch64-w64-mingw32-gcc
 
 SRC_DIR = ../../common/src
 INC_DIR = ../../common/include
 OS_SRC_DIR = ../src
 
-REL_DIR = release
+REL_DIR = release/
 
 TARGETS = release
 

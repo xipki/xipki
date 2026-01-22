@@ -1,6 +1,4 @@
-#CC = i686-w64-mingw32.static-gcc
-#CC = i686-w64-mingw32.shared-gcc
-CC = gcc
+CC = i686-w64-mingw32.shared-gcc
 
 SRC_DIR = ../../common/src
 INC_DIR = ../../common/include

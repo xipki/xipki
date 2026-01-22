@@ -218,12 +218,12 @@ static CK_RV p11_init_module(CK_ULONG mid, char* libPath) {
   }
 
   for (int i = 0; i < interfaceLen; i++) {
-    CK_INTERFACE interface = pInterface[i];
-    CK_VERSION *version = (CK_VERSION*) interface.pFunctionList;
+    CK_INTERFACE iface = pInterface[i];
+    CK_VERSION *version = (CK_VERSION*) iface.pFunctionList;
 
-    if (!strcmp((const char*) interface.pInterfaceName, "PKCS 11") &&
+    if (!strcmp((const char*) iface.pInterfaceName, "PKCS 11") &&
         version->major == 3) {
-      module->pFuncList = interface.pFunctionList;
+      module->pFuncList = iface.pFunctionList;
       module->version = (version->major * 256UL + version->minor);
       break;
     }

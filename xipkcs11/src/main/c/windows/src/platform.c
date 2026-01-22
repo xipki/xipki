@@ -7,7 +7,7 @@ CK_ULONG p11_open_lib(P11ModuleHandle* phModule, char* libPath)
 {
   HINSTANCE hLib = LoadLibrary(libPath);
   if (hLib == NULL) {
-    return CKR_JNI_RT_OPEN_LIB;
+    return CKR_JNI_OPEN_LIB;
   }
 
   phModule->hLib = hLib;
@@ -21,6 +21,6 @@ void *p11_get_lib_symbol(P11ModuleHandle hModule, const char *symbol)
 
 CK_ULONG p11_close_lib(P11ModuleHandle hModule)
 {
-  FreeLibrary(module.hLib);
+  FreeLibrary(hModule.hLib);
   return CKR_OK;
 }
