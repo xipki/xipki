@@ -82,12 +82,12 @@ public class KeyPairVisibilityTest {
 
   private static abstract class Base extends TestBase {
 
-    // TODO @Test
+    @Test
     public void testTF() throws Exception {
       testVisibility(true, false);
     }
 
-    // TODO @Test
+    @Test
     public void testTT() throws Exception {
       testVisibility(true, true);
     }
@@ -97,7 +97,7 @@ public class KeyPairVisibilityTest {
       testVisibility(false, false);
     }
 
-    // TODO @Test
+    @Test
     public void testFT() throws Exception {
       testVisibility(false, true);
     }

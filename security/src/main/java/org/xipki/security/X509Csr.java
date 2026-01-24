@@ -23,7 +23,7 @@ import org.xipki.util.codec.Args;
 
 public class X509Csr {
 
-  private CertificationRequest csr;
+  private final CertificationRequest csr;
 
   public X509Csr(CertificationRequest csr) {
     this.csr = Args.notNull(csr, "csr");

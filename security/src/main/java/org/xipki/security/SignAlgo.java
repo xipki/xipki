@@ -8,12 +8,18 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.cms.GCMParameters;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jcajce.CompositePrivateKey;
+import org.bouncycastle.jcajce.CompositePublicKey;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.MLDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.pkcs11.wrapper.PKCS11T;
+import org.xipki.security.pkcs11.composite.CompositeSigAlgoSuite;
+import org.xipki.security.pkcs11.composite.P11CompositeKey;
 import org.xipki.security.pkcs11.P11Key;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
@@ -23,6 +29,7 @@ import org.xipki.util.conf.InvalidConfException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.interfaces.ECKey;
 import java.security.interfaces.RSAKey;
@@ -175,8 +182,59 @@ public enum SignAlgo {
       OIDs.Xipki.id_alg_sig_KEM_GMAC_256, null, false),
 
   // composite algorithms
-  // TODO: add the support of composite signature algorithm when bc 1.83 is
-  // published.
+  MLDSA44_RSA2048_PSS_SHA256("MLDSA44-RSA2048-PSS-SHA256", 0x85,
+      CompositeSigAlgoSuite.MLDSA44_RSA2048_PSS_SHA256),
+
+  MLDSA44_RSA2048_PKCS15_SHA256("MLDSA44-RSA2048-PKCS15-SHA256", 0x86,
+      CompositeSigAlgoSuite.MLDSA44_RSA2048_PKCS15_SHA256),
+
+  MLDSA44_Ed25519_SHA512("MLDSA44-Ed25519-SHA512", 0x87,
+      CompositeSigAlgoSuite.MLDSA44_Ed25519_SHA512),
+
+  MLDSA44_ECDSA_P256_SHA256("MLDSA44-ECDSA-P256-SHA256", 0x88,
+      CompositeSigAlgoSuite.MLDSA44_ECDSA_P256_SHA256),
+
+  MLDSA65_RSA3072_PSS_SHA512("MLDSA65-RSA3072-PSS-SHA512", 0x89,
+      CompositeSigAlgoSuite.MLDSA65_RSA3072_PSS_SHA512),
+
+  MLDSA65_RSA3072_PKCS15_SHA512("MLDSA65-RSA3072-PKCS15-SHA512", 0x8a,
+      CompositeSigAlgoSuite.MLDSA65_RSA3072_PKCS15_SHA512),
+
+  MLDSA65_RSA4096_PSS_SHA512("MLDSA65-RSA4096-PSS-SHA512", 0x8b,
+      CompositeSigAlgoSuite.MLDSA65_RSA4096_PSS_SHA512),
+
+  MLDSA65_RSA4096_PKCS15_SHA512("MLDSA65-RSA4096-PKCS15-SHA512", 0x8c,
+      CompositeSigAlgoSuite.MLDSA65_RSA4096_PKCS15_SHA512),
+
+  MLDSA65_ECDSA_P256_SHA512("MLDSA65-ECDSA-P256-SHA512", 0x8d,
+      CompositeSigAlgoSuite.MLDSA65_ECDSA_P256_SHA512),
+
+  MLDSA65_ECDSA_P384_SHA512("MLDSA65-ECDSA-P384-SHA512", 0x8e,
+       CompositeSigAlgoSuite.MLDSA65_ECDSA_P384_SHA512),
+
+  MLDSA65_ECDSA_BP256_SHA512("MLDSA65-ECDSA-brainpoolP256r1-SHA512", 0x8f,
+       CompositeSigAlgoSuite.MLDSA65_ECDSA_BP256_SHA512),
+
+  MLDSA65_Ed25519_SHA512("MLDSA65-Ed25519-SHA512", 0x90,
+       CompositeSigAlgoSuite.MLDSA65_Ed25519_SHA512),
+
+  MLDSA87_ECDSA_P384_SHA512("MLDSA87-ECDSA-P384-SHA512", 0x91,
+       CompositeSigAlgoSuite.MLDSA87_ECDSA_P384_SHA512),
+
+  MLDSA87_ECDSA_BP384_SHA512("MLDSA87-ECDSA-brainpoolP384r1-SHA512", 0x92,
+       CompositeSigAlgoSuite.MLDSA87_ECDSA_BP384_SHA512),
+
+  MLDSA87_Ed448_SHAKE256("MLDSA87-Ed448-SHAKE256", 0x93,
+       CompositeSigAlgoSuite.MLDSA87_Ed448_SHAKE256),
+
+  MLDSA87_RSA3072_PSS_SHA512("MLDSA87-RSA3072-PSS-SHA512", 0x94,
+       CompositeSigAlgoSuite.MLDSA87_RSA3072_PSS_SHA512),
+
+  MLDSA87_RSA4096_PSS_SHA512("MLDSA87-RSA4096-PSS-SHA512", 0x95,
+       CompositeSigAlgoSuite.MLDSA87_RSA4096_PSS_SHA512),
+
+  MLDSA87_ECDSA_P521_SHA512("MLDSA87-ECDSA-P521-SHA512", 0x96,
+       CompositeSigAlgoSuite.MLDSA87_ECDSA_P521_SHA512)
   ;
 
   private static final int TRAILER_FIELD_BC = 1;
@@ -195,6 +253,8 @@ public enum SignAlgo {
   private final byte code;
 
   private final HashAlgo hashAlgo;
+
+  private final CompositeSigAlgoSuite compositeSigAlgoSuite;
 
   static {
     for (SignAlgo type : SignAlgo.values()) {
@@ -238,6 +298,7 @@ public enum SignAlgo {
     this.jceName = jceName.toUpperCase();
     this.oid = oid;
     this.hashAlgo = hashAlgo;
+    this.compositeSigAlgoSuite = null;
     this.algId = withNullParams
         ? new AlgorithmIdentifier(this.oid, DERNull.INSTANCE)
         : new AlgorithmIdentifier(this.oid);
@@ -257,6 +318,7 @@ public enum SignAlgo {
 
     this.oid = OIDs.Algo.id_RSASSA_PSS;
     this.algId = new AlgorithmIdentifier(this.oid, params);
+    this.compositeSigAlgoSuite = null;
   }
 
   // For GMAC: See https://tools.ietf.org/html/draft-ietf-lamps-cms-aes-gmac-alg-03
@@ -289,10 +351,25 @@ public enum SignAlgo {
     // defined in BouncyCastle)
     GCMParameters params = new GCMParameters(new byte[nonceLen], tagLen);
     this.algId = new AlgorithmIdentifier(oid, params);
+    this.compositeSigAlgoSuite = null;
+  }
+
+  // Composite Signature
+  SignAlgo(String jceName, int code, CompositeSigAlgoSuite algoSuite) {
+    this.code     = (byte) Args.range(code, "code", 0, 255);
+    this.jceName  = jceName;
+    this.algId    = algoSuite.algId();
+    this.oid      = algoSuite.oid();
+    this.hashAlgo = null;
+    this.compositeSigAlgoSuite = algoSuite;
   }
 
   public HashAlgo getHashAlgo() {
     return hashAlgo;
+  }
+
+  public CompositeSigAlgoSuite compositeSigAlgoSuite() {
+    return compositeSigAlgoSuite;
   }
 
   public byte getCode() {
@@ -309,6 +386,10 @@ public enum SignAlgo {
 
   public AlgorithmIdentifier getAlgorithmIdentifier() {
     return algId;
+  }
+
+  public CompositeSigAlgoSuite getCompositeSigAlgoSuite() {
+    return compositeSigAlgoSuite;
   }
 
   public Signature newSignature() throws NoSuchAlgorithmException {
@@ -370,6 +451,32 @@ public enum SignAlgo {
   public boolean isMLDSASigAlgo() {
     return this == ML_DSA_44 || this == ML_DSA_65 || this == ML_DSA_87;
   } // method isRSASigAlgo
+
+  public boolean isCompositeMLDSA() {
+    switch (this) {
+      case MLDSA44_RSA2048_PSS_SHA256:
+      case MLDSA44_RSA2048_PKCS15_SHA256:
+      case MLDSA44_Ed25519_SHA512:
+      case MLDSA44_ECDSA_P256_SHA256:
+      case MLDSA65_RSA3072_PSS_SHA512:
+      case MLDSA65_RSA3072_PKCS15_SHA512:
+      case MLDSA65_RSA4096_PSS_SHA512:
+      case MLDSA65_RSA4096_PKCS15_SHA512:
+      case MLDSA65_ECDSA_P256_SHA512:
+      case MLDSA65_ECDSA_P384_SHA512:
+      case MLDSA65_ECDSA_BP256_SHA512:
+      case MLDSA65_Ed25519_SHA512:
+      case MLDSA87_ECDSA_P384_SHA512:
+      case MLDSA87_ECDSA_BP384_SHA512:
+      case MLDSA87_Ed448_SHAKE256:
+      case MLDSA87_RSA3072_PSS_SHA512:
+      case MLDSA87_RSA4096_PSS_SHA512:
+      case MLDSA87_ECDSA_P521_SHA512:
+       return true;
+      default:
+        return false;
+    }
+  }
 
   public boolean isHmac() {
     return this == HMAC_SHA1
@@ -504,47 +611,62 @@ public enum SignAlgo {
     } else if (key instanceof MLDSAKey) {
       String paramSpec = ((MLDSAKey) key).getParameterSpec().getName();
       return checkMLDSASignAlgo(algo, hashAlgo, paramSpec);
-    } else if (!(key instanceof P11Key)) {
+    } else if (key instanceof CompositePublicKey) {
+      return checkCompositeSignAlgo(algo, hashAlgo, (CompositePublicKey) key);
+    } else if (key instanceof CompositePrivateKey) {
+      return checkCompositeSignAlgo(algo, hashAlgo, (CompositePrivateKey) key);
+    } else if (key instanceof P11Key) {
+      P11Key p11Key = (P11Key) key;
+      long keyType = p11Key.getKey().id().getKeyType();
+      if (keyType == PKCS11T.CKK_RSA) {
+        int keyBitLen = p11Key.getKey().rsaModulus().bitLength();
+        return checkRSASignAlgo(algo, mode, hashAlgo, keyBitLen);
+      } else if (keyType == PKCS11T.CKK_EC
+          || keyType == PKCS11T.CKK_VENDOR_SM2) {
+        EcCurveEnum curve = p11Key.getEcParams();
+        return checkECSignAlgo(algo, hashAlgo, curve);
+      } else if (keyType == PKCS11T.CKK_EC_EDWARDS) {
+        EcCurveEnum curve = p11Key.getEcParams();
+        return checkECSignAlgo(algo, hashAlgo, curve);
+      } else if (keyType == PKCS11T.CKK_ML_DSA) {
+        Long variant = p11Key.getKey().pqcVariant();
+        if (variant == null) {
+          throw new NoSuchAlgorithmException(
+              "P11 MLDSA Variant is not present");
+        }
+
+        String paramSpec;
+        if (variant == PKCS11T.CKP_ML_DSA_44) {
+          paramSpec = "ML-DSA-44";
+        } else if (variant == PKCS11T.CKP_ML_DSA_65) {
+          paramSpec = "ML-DSA-65";
+        } else if (variant == PKCS11T.CKP_ML_DSA_87) {
+          paramSpec = "ML-DSA-87";
+        } else {
+          throw new NoSuchAlgorithmException(
+              "unsupported MLDSA Variant " + variant);
+        }
+
+        return checkMLDSASignAlgo(algo, hashAlgo, paramSpec);
+      } else {
+        throw new NoSuchAlgorithmException("Unknown key type "
+            + PKCS11T.ckkCodeToName(keyType));
+      }
+    } else if (key instanceof P11CompositeKey) {
+      P11CompositeKey p11Key = (P11CompositeKey) key;
+      CompositeSigAlgoSuite algoSuite = p11Key.getAlgoSuite();
+      if (algo != null) {
+        if (algo.compositeSigAlgoSuite != algoSuite) {
+          throw new NoSuchAlgorithmException("compositeSigAlgoSuite unmatach");
+        }
+        return algo;
+      } else {
+        return SignAlgo.getSignAlgo(algoSuite);
+      }
+    } else {
       throw new NoSuchAlgorithmException(
           "Unknown key '" + key.getClass().getName());
     }
-
-    P11Key p11Key = (P11Key) key;
-    long keyType = p11Key.getKey().id().getKeyType();
-    if (keyType == PKCS11T.CKK_RSA) {
-      int keyBitLen = p11Key.getKey().rsaModulus().bitLength();
-      return checkRSASignAlgo(algo, mode, hashAlgo, keyBitLen);
-    } else if (keyType == PKCS11T.CKK_EC
-        || keyType == PKCS11T.CKK_VENDOR_SM2) {
-      EcCurveEnum curve = p11Key.getEcParams();
-      return checkECSignAlgo(algo, hashAlgo, curve);
-    } else if (keyType == PKCS11T.CKK_EC_EDWARDS) {
-      EcCurveEnum curve = p11Key.getEcParams();
-      return checkECSignAlgo(algo, hashAlgo, curve);
-    } else if (keyType == PKCS11T.CKK_ML_DSA) {
-      Long variant = p11Key.getKey().pqcVariant();
-      if (variant == null) {
-        throw new NoSuchAlgorithmException("P11 MLDSA Variant is not present");
-      }
-
-      String paramSpec;
-      if (variant == PKCS11T.CKP_ML_DSA_44) {
-        paramSpec = "ML-DSA-44";
-      } else if (variant == PKCS11T.CKP_ML_DSA_65) {
-        paramSpec = "ML-DSA-65";
-      } else if (variant == PKCS11T.CKP_ML_DSA_87) {
-        paramSpec = "ML-DSA-87";
-      } else {
-        throw new NoSuchAlgorithmException(
-            "unsupported MLDSA Variant " + variant);
-      }
-
-      return checkMLDSASignAlgo(algo, hashAlgo, paramSpec);
-    } else {
-      throw new NoSuchAlgorithmException("Unknown key type "
-          + PKCS11T.ckkCodeToName(keyType));
-    }
-
   } // method getInstance
 
   private static SignAlgo checkRSASignAlgo(
@@ -629,6 +751,39 @@ public enum SignAlgo {
     }
 
     return allowedSignAlgo;
+  }
+
+  private static SignAlgo checkCompositeSignAlgo(
+      SignAlgo algo, HashAlgo hashAlgo, Key key)
+      throws NoSuchAlgorithmException {
+    if (hashAlgo != null) {
+      throw new NoSuchAlgorithmException(
+          "Composite ML-DSA  does not allow any hash algorithm");
+    }
+
+    AlgorithmIdentifier algId;
+    if (key instanceof PublicKey) {
+      algId = SubjectPublicKeyInfo.getInstance(key.getEncoded()).getAlgorithm();
+    } else {
+      PrivateKeyInfo pkInfo = PrivateKeyInfo.getInstance(key.getEncoded());
+      algId = pkInfo.getPrivateKeyAlgorithm();
+    }
+
+    SignAlgo allowedSignAlgo = SignAlgo.getInstance(algId);
+    if (allowedSignAlgo == null) {
+      throw new NoSuchAlgorithmException(
+          "unknown key OID " + algId.getAlgorithm());
+    }
+
+    if (algo != null) {
+      if (algo != allowedSignAlgo) {
+        throw new NoSuchAlgorithmException("Algo " + algo +
+            " is not allowed for composite ML-DSA key with OID " +
+            algId.getAlgorithm());
+      }
+    }
+
+    return algo;
   }
 
   private static HashAlgo getDefaultHashAlgo(long keyType, int keySize) {
@@ -716,6 +871,19 @@ public enum SignAlgo {
     }
   } // method getECDSASigAlgo
 
+  private static SignAlgo getSignAlgo(CompositeSigAlgoSuite algoSuite)
+      throws NoSuchAlgorithmException {
+    Args.notNull(algoSuite, "algoSuite");
+    for (SignAlgo algo : SignAlgo.values()) {
+      if (algo.compositeSigAlgoSuite == algoSuite) {
+        return algo;
+      }
+    }
+
+    throw new NoSuchAlgorithmException(
+        "unsupported CompositeSigAlgoSuite " + algoSuite);
+  }
+
   public void assertSameAlgorithm(
       AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
       throws OperatorCreationException {
@@ -731,12 +899,6 @@ public enum SignAlgo {
       if (digAlgId != null) {
         throw new OperatorCreationException("digAlgId differs");
       }
-    }
-  }
-
-  public static void main(String[] args) {
-    for (SignAlgo a : values()) {
-      System.out.print("\"" + a.getJceName() + "\",");
     }
   }
 

@@ -67,6 +67,12 @@ abstract class P11ContentSigner implements XiContentSigner {
   static P11ContentSigner newInstance(
       P11Key identity, SignAlgo signAlgo, SecureRandom random,
       PublicKey publicKey) throws XiSecurityException {
+    return newInstance(identity, signAlgo, random, publicKey, null);
+  }
+
+  static P11ContentSigner newInstance(
+      P11Key identity, SignAlgo signAlgo, SecureRandom random,
+      PublicKey publicKey, byte[] context) throws XiSecurityException {
     long keyType = identity.getKey().id().getKeyType();
     if (keyType == CKK_RSA) {
       return signAlgo.isRSAPSSSigAlgo() ? new RSAPSS(identity, signAlgo, random)
@@ -103,15 +109,16 @@ abstract class P11ContentSigner implements XiContentSigner {
       boolean match = false;
       if (variant != null) {
         match = (signAlgo == ML_DSA_44) ? variant == CKP_ML_DSA_44
-            : (signAlgo == ML_DSA_65) ? variant == CKP_ML_DSA_65
-            : signAlgo == ML_DSA_87 && variant == CKP_ML_DSA_87;
+              : (signAlgo == ML_DSA_65) ? variant == CKP_ML_DSA_65
+              : signAlgo == ML_DSA_87 && variant == CKP_ML_DSA_87;
       }
+
       if (!match) {
         throw new XiSecurityException(
             "key is not suitable for the sign algo " + signAlgo);
       }
 
-      return new MLDSA(identity, signAlgo);
+      return new MLDSA(identity, signAlgo, context);
     } else if (keyType == CKK_AES || keyType == CKK_GENERIC_SECRET) {
       return new Mac(identity, signAlgo);
     } else {
@@ -216,28 +223,12 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   private static class EdDSA extends P11ContentSigner {
 
-    private static final byte[] Ed448Params;
+    private static final P11Params.P11EddsaParams ed448Params =
+        new P11Params.P11EddsaParams(false, null);
 
     private final ByteArrayOutputStream outputStream;
 
     private final long mechanism;
-
-    static {
-      /* construct CK_EDDSA_PARAMS with ulContextDataLen=0 and
-         pContextData = NULL_PTR
-        typedef struct CK_EDDSA_PARAMS {
-            CK_BBOOL     phFlag;
-            CK_ULONG     ulContextDataLen; // CK_ULONG := unsigned long int
-            CK_BYTE_PTR  pContextData;
-        }  CK_EDDSA_PARAMS;
-      */
-      boolean is64bit = System.getProperty("os.arch").contains("64");
-      int CK_ULONG_SIZE = 4;
-      int PTR_SIZE = is64bit ? 4 : 8;
-      byte[] bytes = new byte[1 + CK_ULONG_SIZE + PTR_SIZE];
-      bytes[0] = 0x00; // for phFlag = false
-      Ed448Params = bytes;
-    }
 
     EdDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
       super(identity, signAlgo);
@@ -269,7 +260,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       try {
         P11Params params = null;
         if (signAlgo == ED448) {
-         params = new P11Params.P11ByteArrayParams(Ed448Params.clone());
+         params = ed448Params;
         }
 
         return identity.sign(mechanism, params, content);
@@ -285,11 +276,17 @@ abstract class P11ContentSigner implements XiContentSigner {
   private static class MLDSA extends P11ContentSigner {
 
     private final ByteArrayOutputStream outputStream;
-
+    private final byte[] context;
     private final long mechanism;
 
     MLDSA(P11Key identity, SignAlgo signAlgo) throws XiSecurityException {
+      this(identity, signAlgo, null);
+    }
+
+    MLDSA(P11Key identity, SignAlgo signAlgo, byte[] context)
+        throws XiSecurityException {
       super(identity, signAlgo);
+      this.context = context == null ? new byte[0] : context.clone();
 
       this.mechanism = CKM_ML_DSA;
       if (!identity.supportsSign(this.mechanism)) {
@@ -311,7 +308,9 @@ abstract class P11ContentSigner implements XiContentSigner {
       byte[] content = outputStream.toByteArray();
       outputStream.reset();
       try {
-        return identity.sign(mechanism, null, content);
+        P11Params params = (content.length == 0) ? null
+            : new P11Params.P11SignAdditionalContext(context);
+        return identity.sign(mechanism, params, content);
       } catch (Throwable th) {
         LogUtil.warn(LOG, th);
         throw new RuntimeCryptoException(
@@ -706,7 +705,7 @@ abstract class P11ContentSigner implements XiContentSigner {
    * @since 2.0.0
    */
 
-  private static class DigestOutputStream extends OutputStream {
+  static class DigestOutputStream extends OutputStream {
 
     private final Digest digest;
 

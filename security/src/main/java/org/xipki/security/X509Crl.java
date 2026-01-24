@@ -95,7 +95,7 @@ public class X509Crl {
 
   @Override
   public String toString() {
-    return "TODO " + x509.toString(); // TODO
+    return x509.toString();
   }
 
 }

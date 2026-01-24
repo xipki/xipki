@@ -125,7 +125,6 @@ public class P11Slot implements Closeable {
     for (Map.Entry<Long, CkMechanismInfo> entry
         : supportedMechanisms.entrySet()) {
       long mech = entry.getKey();
-      // TODO
       if (mechanismFilter.isMechanismPermitted(slotId, mech, pkcs11Module)) {
         mechanisms.put(mech, entry.getValue());
       } else {
@@ -466,7 +465,7 @@ public class P11Slot implements Closeable {
     Args.notNull(content, "content");
     assertMechSupported(mechanism, CKF_SIGN);
     CkMechanism mech = (params == null) ? new CkMechanism(mechanism)
-                      : params.toMechanism(mechanism, extraParams);
+                          : params.toMechanism(mechanism, extraParams);
     return token.sign(mech, keyHandle, content);
   }
 
@@ -502,39 +501,7 @@ public class P11Slot implements Closeable {
   }
 
   private P11Key toIdentity(PKCS11Key pkcs11Key) throws TokenException {
-    PKCS11KeyId keyId = pkcs11Key.id();
-    P11Key p11Identity = new P11Key(this, pkcs11Key);
-
-    PKCS11KeyId.KeyIdType type = keyId.getType();
-    long keyType = keyId.getKeyType();
-
-    if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2 ||
-        keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
-      byte[] ecParams = pkcs11Key.ecParams();
-      if (ecParams == null && keyId.getPublicKeyHandle() != null) {
-        if (type == PKCS11KeyId.KeyIdType.KEYPAIR
-            || type == PKCS11KeyId.KeyIdType.PRIVATE_KEY) {
-          // try the public key
-          ecParams = token.getAttrValues(keyId.getPublicKeyHandle(),
-              new AttributeTypes().ecParams()).ecParams();
-        }
-      }
-
-      if (ecParams == null) {
-        throw new TokenException("CKA_EC_PARAMS is not present");
-      }
-
-      try {
-        p11Identity.setEcParams(EcCurveEnum.ofEncodedOid(ecParams));
-      } catch (RuntimeException e) {
-        throw new TokenException("unknown EC curve " + Hex.encode(ecParams));
-      }
-    } else if (keyType == CKK_ML_DSA || keyType == CKK_ML_KEM
-        || keyType == CKK_SLH_DSA) {
-      p11Identity.setParameterSet(pkcs11Key.pqcVariant());
-    }
-
-    return p11Identity;
+    return new P11Key(this, pkcs11Key);
   }
 
   public PublicKey getPublicKey(long handle) throws TokenException {

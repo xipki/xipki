@@ -131,7 +131,6 @@ public class X509Cert {
         OIDs.Extn.subjectAlternativeName.getId());
     this.san = bytes == null ? null
         : ASN1OctetString.getInstance(bytes).getOctets();
-    // TODO
   }
 
   public X509Cert(X509CertificateHolder cert) {

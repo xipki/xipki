@@ -22,6 +22,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotId;
+import org.xipki.security.pkcs11.composite.P11CompositeKey;
 import org.xipki.security.shell.SecurityActions.SecurityAction;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.shell.IllegalCmdParamException;
@@ -67,12 +68,16 @@ public class P11Actions {
 
       P11Slot slot = getSlot();
       NewKeyControl control = getControl();
+      if (keySpec.isComposite()) {
+        if (control.getId() != null) {
+          throw new IllegalCmdParamException(
+              "id is not allowed for composite keypair");
+        }
+      }
 
       PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
           .token(true)
           .generateId(true)
-          .id(control.getId())
-          .label(control.getLabel())
           .extractable(control.getExtractable())
           .sensitive(control.getSensitive());
 
@@ -84,6 +89,10 @@ public class P11Actions {
           spec.signVerify(true);
         } else if (keySpec.isMontgomeryEC() || keySpec.isMlkem()) {
           spec.decryptEncrypt(true);
+        } else if (keySpec.isCompositeMLDSA()) {
+          spec.signVerify(true);
+        } else if (keySpec.isCompositeMLKEM()) {
+          spec.deEncapsulate(true);
         } else {
           spec.signVerify(true);
         }
@@ -119,7 +128,37 @@ public class P11Actions {
         }
       }
 
-      finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
+      //.id(control.getId())
+      //.label(control.getLabel());
+      if (keySpec.isComposite()) {
+        String coreLabel;
+        if (StringUtil.startsWithIgnoreCase(label,
+              P11CompositeKey.COMPOSITE_LABEL_PREFIX)) {
+          coreLabel = label.substring(
+              P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        } else if (StringUtil.startsWithIgnoreCase(label,
+                P11CompositeKey.COMP_PQC_LABEL_PREFIX)) {
+            coreLabel = label.substring(
+                P11CompositeKey.COMP_PQC_LABEL_PREFIX.length());
+        } else if (StringUtil.startsWithIgnoreCase(label,
+                P11CompositeKey.COMP_TRAD_LABEL_PREFIX)) {
+            coreLabel = label.substring(
+                P11CompositeKey.COMP_TRAD_LABEL_PREFIX.length());
+        } else {
+          coreLabel = label;
+        }
+
+        PKCS11KeyPairSpec pqcSpec = spec.copy().label(
+            P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
+        finalize(" PQC key of " + keyspecStr,
+            slot.generateKeyPair(keySpec.getCompositePqcVariant(), pqcSpec));
+
+        spec.label(P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
+        finalize("Trad key of " + keyspecStr,
+            slot.generateKeyPair(keySpec.getCompositeTradVariant(), spec));
+      } else {
+        finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
+      }
       return null;
     }
 
@@ -131,7 +170,8 @@ public class P11Actions {
   public static class DeleteKeyP11 extends P11SecurityAction {
 
     @Option(name = "--id", description =
-        "id (hex) of the private key in the PKCS#11 device\n" +
+        "id (hex) of the private key in the PKCS#11 device, \n" +
+        "not allowed for composite key\n" +
         "either keyId or keyLabel must be specified")
     protected String id;
 
@@ -146,10 +186,34 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
+      boolean composite = false;
+      if (label != null) {
+        composite = StringUtil.startsWithIgnoreCase(label,
+                      P11CompositeKey.COMPOSITE_LABEL_PREFIX);
+      }
+
+      if (composite) {
+        if (id != null) {
+          throw new IllegalCmdParamException(
+              "id shall not be specified for composite key");
+        }
+        String coreLabel = label.substring(
+                            P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        doDeleteKey(null, P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
+        doDeleteKey(null, P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
+      } else {
+        doDeleteKey(id, label);
+      }
+      return null;
+    }
+
+    private void doDeleteKey(String id, String label)
+        throws XiSecurityException, TokenException,
+               IllegalCmdParamException, IOException {
       PKCS11KeyId identity = getIdentity(id, label);
       if (identity == null) {
         println("unknown identity");
-        return null;
+        return;
       }
 
       if (force || confirm(
@@ -163,9 +227,7 @@ public class P11Actions {
           println("error deleting identity " + identity);
         }
       }
-      return null;
     }
-
   } // class DeleteKeyP11
 
   @Command(scope = "xi", name = "object-exists-p11",

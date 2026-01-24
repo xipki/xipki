@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -769,7 +770,6 @@ public class CsrActions {
           .setParallelism(1)
           .setKeystore("file:" + p12File);
 
-      // TODO
       SubjectPublicKeyInfo pkInfo = null;
       try {
         pkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry(
@@ -782,6 +782,14 @@ public class CsrActions {
         KemEncapKey kemEncapkey = getKemEncapkey(pkInfo);
         conf.setAlgo(SignAlgo.KEM_GMAC_256);
         conf.setKemEncapKey(kemEncapkey);
+      } else if (keySpec != null && keySpec.isCompositeMLDSA()) {
+        try {
+          SignAlgo signAlgo = SignAlgo.getInstance(
+                                keySpec.getAlgorithmIdentifier());
+          conf.setAlgo(signAlgo);
+        } catch (NoSuchAlgorithmException e) {
+          throw new RuntimeException(e);
+        }
       } else {
         if (rsaPss != null && rsaPss) {
           conf.setMode(SignAlgoMode.RSAPSS);

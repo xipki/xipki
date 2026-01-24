@@ -54,7 +54,6 @@ public class CkDate extends CkType {
     return indent + "CK_DATE: " + year + month + day;
   }
 
-
   @Override
   public int hashCode() {
     // 961 = 31^2

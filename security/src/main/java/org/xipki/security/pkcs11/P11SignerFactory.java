@@ -14,9 +14,12 @@ import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs11.composite.CompositeSigAlgoSuite;
+import org.xipki.security.pkcs11.composite.P11CompositeKey;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.util.misc.StringUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -61,6 +64,24 @@ public class P11SignerFactory implements SignerFactory {
   @Override
   public boolean canCreateSigner(String type) {
     return types.contains(type.toLowerCase());
+  }
+
+  private P11Key getKey(P11Slot slot, byte[] keyId, String keyLabel)
+      throws ObjectCreationException {
+    String str2 = (keyId != null) ? "id " + Hex.encode(keyId)
+        : "label " + keyLabel;
+    P11Key key;
+    try {
+      key = slot.getKey(keyId, keyLabel);
+    } catch (TokenException e) {
+      throw new ObjectCreationException("error finding identity with "
+          + str2 + ": " + e.getMessage(), e);
+    }
+
+    if (key == null) {
+      throw new ObjectCreationException("unknown identity with " + str2);
+    }
+    return key;
   }
 
   @Override
@@ -117,24 +138,37 @@ public class P11SignerFactory implements SignerFactory {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
 
-    String str2 = (keyId != null) ? "id " + Hex.encode(keyId)
-        : "label " + keyLabel;
-    P11Key key;
-    try {
-      key = slot.getKey(keyId, keyLabel);
-    } catch (TokenException e) {
-      throw new ObjectCreationException("error finding identity with "
-          + str2 + ": " + e.getMessage(), e);
-    }
-
-    if (key == null) {
-      throw new ObjectCreationException("unknown identity with " + str2);
+    // check whether it is a composite key
+    boolean composite = false;
+    if (keyLabel != null) {
+      composite = StringUtil.startsWithIgnoreCase(keyLabel,
+                    P11CompositeKey.COMPOSITE_LABEL_PREFIX);
     }
 
     try {
       SignAlgo algo = conf.getAlgo();
-      if (algo == null) {
-        algo = SignAlgo.getInstance(key, conf);
+
+      P11Key key = null;
+      P11CompositeKey compositeKey = null;
+      if (composite) {
+        String coreLabel = keyLabel.substring(
+                            P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        P11Key pqcKey = getKey(slot, null,
+                        P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
+        P11Key tradKey = getKey(slot, null,
+                        P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
+        CompositeSigAlgoSuite algoSuite =
+            algo == null ? null : algo.compositeSigAlgoSuite();
+        compositeKey = new P11CompositeKey(pqcKey, tradKey, algoSuite);
+        if (algo == null) {
+          algo = SignAlgo.getInstance(
+                  compositeKey.getAlgoSuite().algId());
+        }
+      } else {
+        key = getKey(slot, keyId, keyLabel);
+        if (algo == null) {
+          algo = SignAlgo.getInstance(key, conf);
+        }
       }
 
       List<XiContentSigner> signers = new ArrayList<>(parallelism);
@@ -144,8 +178,14 @@ public class P11SignerFactory implements SignerFactory {
       }
 
       for (int i = 0; i < parallelism; i++) {
-        XiContentSigner signer = P11ContentSigner.newInstance(key, algo,
-            securityFactory.getRandom4Sign(), publicKey);
+        XiContentSigner signer;
+        if (compositeKey != null) {
+          signer = P11CompositeContentSigner.newInstance(compositeKey, algo,
+                    securityFactory.getRandom4Sign(), publicKey);
+        } else {
+          signer = P11ContentSigner.newInstance(key, algo,
+                    securityFactory.getRandom4Sign(), publicKey);
+        }
 
         signers.add(signer);
       }
@@ -156,10 +196,12 @@ public class P11SignerFactory implements SignerFactory {
       if (certificateChain != null) {
         concurrentSigner.setCertificateChain(certificateChain);
       } else {
-        concurrentSigner.setPublicKey(key.getPublicKey());
+        concurrentSigner.setPublicKey(
+            key != null ? key.getPublicKey() : compositeKey.getPublicKey());
       }
 
       if (algo.isMac()) {
+        assert key != null;
         byte[] sha1HashOfKey = key.digestSecretKey(PKCS11T.CKM_SHA_1);
         concurrentSigner.setSha1DigestOfMacKey(sha1HashOfKey);
       }

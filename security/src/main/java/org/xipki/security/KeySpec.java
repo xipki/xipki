@@ -49,7 +49,71 @@ public enum KeySpec {
   // PQC ML-KEM (Kyber)
   MLKEM512 ("ML-KEM-512",  PKCS11KeyPairType.MLKEM512),
   MLKEM768 ("ML-KEM-768",  PKCS11KeyPairType.MLKEM768),
-  MLKEM1024("ML-KEM-1024", PKCS11KeyPairType.MLKEM1024);
+  MLKEM1024("ML-KEM-1024", PKCS11KeyPairType.MLKEM1024),
+
+  // Composite MLDSA + Trad key
+  MLDSA44_RSA2048_PSS_SHA256(MLDSA44, RSA2048,
+      OIDs.Composite.id_MLDSA44_RSA2048_PSS_SHA256),
+  MLDSA44_RSA2048_PKCS15_SHA256(MLDSA44, RSA2048,
+      OIDs.Composite.id_MLDSA44_RSA2048_PKCS15_SHA256),
+  MLDSA44_ED25519_SHA512(MLDSA44, ED25519,
+      OIDs.Composite.id_MLDSA44_Ed25519_SHA512),
+  MLDSA44_ECDSA_P256_SHA256(MLDSA44, SECP256R1,
+      OIDs.Composite.id_MLDSA44_ECDSA_P256_SHA256),
+  MLDSA65_RSA3072_PSS_SHA512(MLDSA65, RSA3072,
+      OIDs.Composite.id_MLDSA65_RSA3072_PSS_SHA512),
+  MLDSA65_RSA3072_PKCS15_SHA512(MLDSA65, RSA3072,
+      OIDs.Composite.id_MLDSA65_RSA3072_PKCS15_SHA512),
+  MLDSA65_RSA4096_PSS_SHA512(MLDSA65, RSA4096,
+      OIDs.Composite.id_MLDSA65_RSA4096_PSS_SHA512),
+  MLDSA65_RSA4096_PKCS15_SHA512(MLDSA65, RSA4096,
+      OIDs.Composite.id_MLDSA65_RSA4096_PKCS15_SHA512),
+  MLDSA65_ECDSA_P256_SHA512(MLDSA65, SECP256R1,
+      OIDs.Composite.id_MLDSA65_ECDSA_P256_SHA512),
+  MLDSA65_ECDSA_P384_SHA512(MLDSA65, SECP384R1,
+      OIDs.Composite.id_MLDSA65_ECDSA_P384_SHA512),
+  MLDSA65_ECDSA_BRAINPOOLP256R1_SHA512(MLDSA65, BRAINPOOLP256R1,
+      OIDs.Composite.id_MLDSA65_ECDSA_brainpoolP256r1_SHA512),
+  MLDSA65_ED25519_SHA512(MLDSA65, ED25519,
+      OIDs.Composite.id_MLDSA65_Ed25519_SHA512),
+  MLDSA87_ECDSA_P384_SHA512(MLDSA87, SECP384R1,
+      OIDs.Composite.id_MLDSA87_ECDSA_P384_SHA512),
+  MLDSA87_ECDSA_BRAINPOOLP384R1_SHA512(MLDSA87, BRAINPOOLP384R1,
+      OIDs.Composite.id_MLDSA87_ECDSA_brainpoolP384r1_SHA512),
+  MLDSA87_ED448_SHAKE256(MLDSA87, ED448,
+      OIDs.Composite.id_MLDSA87_Ed448_SHAKE256),
+  MLDSA87_RSA3072_PSS_SHA512(MLDSA87, RSA3072,
+      OIDs.Composite.id_MLDSA87_RSA3072_PSS_SHA512),
+  MLDSA87_RSA4096_PSS_SHA512(MLDSA87, RSA4096,
+      OIDs.Composite.id_MLDSA87_RSA4096_PSS_SHA512),
+  MLDSA87_ECDSA_P521_SHA512(MLDSA87, SECP521R1,
+      OIDs.Composite.id_MLDSA87_ECDSA_P521_SHA512),
+
+  // Composite KEM + Trad key
+  MLKEM768_RSA2048_SHA3_256(MLKEM768, RSA2048,
+      OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256),
+  MLKEM768_RSA3072_SHA3_256(MLKEM768, RSA3072,
+      OIDs.Composite.id_MLKEM768_RSA3072_SHA3_256),
+  MLKEM768_RSA4096_SHA3_256(MLKEM768, RSA4096,
+      OIDs.Composite.id_MLKEM768_RSA4096_SHA3_256),
+  MLKEM768_X25519_SHA3_256(MLKEM768, X25519,
+      OIDs.Composite.id_MLKEM768_X25519_SHA3_256),
+  MLKEM768_ECDH_P256_SHA3_256(MLKEM768, SECP256R1,
+      OIDs.Composite.id_MLKEM768_ECDH_P256_SHA3_256),
+  MLKEM768_ECDH_P384_SHA3_256(MLKEM768, SECP384R1,
+      OIDs.Composite.id_MLKEM768_ECDH_P384_SHA3_256),
+  MLKEM768_ECDH_BP256_SHA3_256(MLKEM768, BRAINPOOLP256R1,
+      OIDs.Composite.id_MLKEM768_ECDH_brainpoolP256r1_SHA3_256),
+  MLKEM1024_RSA3072_SHA3_256(MLKEM1024, RSA3072,
+      OIDs.Composite.id_MLKEM1024_RSA3072_SHA3_256),
+  MLKEM1024_ECDH_P384_SHA3_256(MLKEM1024, SECP384R1,
+      OIDs.Composite.id_MLKEM1024_ECDH_P384_SHA3_256),
+  MLKEM1024_ECDH_BP384_SHA3_256(MLKEM1024, BRAINPOOLP384R1,
+      OIDs.Composite.id_MLKEM1024_ECDH_brainpoolP384r1_SHA3_256),
+  MLKEM1024_X448_SHA3_256(MLKEM1024, X448,
+      OIDs.Composite.id_MLKEM1024_X448_SHA3_256),
+  MLKEM1024_ECDH_P521_SHA3_256(MLKEM1024, SECP521R1,
+      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256);
 
   private final String text;
 
@@ -57,7 +121,22 @@ public enum KeySpec {
 
   private final PKCS11KeyPairType type;
 
+  private final KeySpec compositePqcVariant;
+
+  private final KeySpec compositeTradVariant;
+
+  KeySpec(KeySpec compositePqcVariant,
+          KeySpec compositeTradVariant, ASN1ObjectIdentifier oid) {
+    this.text = name().replace('_', '-');
+    this.compositePqcVariant  = compositePqcVariant;
+    this.compositeTradVariant = compositeTradVariant;
+    this.algId = new AlgorithmIdentifier(oid);
+    this.type = null;
+  }
+
   KeySpec(String text, PKCS11KeyPairType type) {
+    this.compositePqcVariant  = null;
+    this.compositeTradVariant = null;
     this.text = text;
     this.type = type;
     if (type instanceof PKCS11KeyPairType.RSA) {
@@ -97,7 +176,7 @@ public enum KeySpec {
   }
 
   public boolean isRSA() {
-    return type.getKeyType() == PKCS11T.CKK_RSA;
+    return type instanceof PKCS11KeyPairType.RSA;
   }
 
   public Integer getRSAKeyBitSize() {
@@ -127,6 +206,30 @@ public enum KeySpec {
 
   public boolean isMlkem() {
     return type instanceof PKCS11KeyPairType.MLKEM;
+  }
+
+  public boolean isCompositeMLDSA() {
+    String name = name();
+    if (name.startsWith("MLDSA")) {
+      return name.startsWith("MLDSA44_") ||
+          name.startsWith("MLDSA65_") ||
+          name.startsWith("MLDSA87_");
+    }
+    return false;
+  }
+
+  public boolean isCompositeMLKEM() {
+    String name = name();
+    if (name.startsWith("MLKEM")) {
+      return name.startsWith("MLKEM512_") ||
+          name.startsWith("MLKEM768_") ||
+          name.startsWith("MLKEM1024_");
+    }
+    return false;
+  }
+
+  public boolean isComposite() {
+    return isCompositeMLDSA() ||isCompositeMLKEM();
   }
 
   public EcCurveEnum getEcCurve() {
@@ -175,6 +278,14 @@ public enum KeySpec {
 
   public PKCS11KeyPairType getType() {
     return type;
+  }
+
+  public KeySpec getCompositePqcVariant() {
+    return compositePqcVariant;
+  }
+
+  public KeySpec getCompositeTradVariant() {
+    return compositeTradVariant;
   }
 
   public static KeySpec ofPublicKey(SubjectPublicKeyInfo keyInfo) {
@@ -258,12 +369,12 @@ public enum KeySpec {
   public static KeySpec ofKeySpec(String name) throws NoSuchAlgorithmException {
     name = name.trim().toUpperCase(Locale.ROOT);
     String name2 = name.replace('_', '-');
-    String name3 = name2.replaceAll("-", "")
-        .replace("/", "");
+    String name3 = name2.replaceAll("-", "").replace("/", "");
 
     for (KeySpec m : KeySpec.values()) {
-      if (m.name().equals(name3) || m.text.equals(name)
-          || m.text.equals(name2) || m.text.equals(name3)) {
+      String n = m.name();
+      if (     n.equals(name) || n.equals(name2) || n.equals(name3) ||
+          m.text.equals(name) || m.text.equals(name2) || m.text.equals(name3)) {
         return m;
       }
     }

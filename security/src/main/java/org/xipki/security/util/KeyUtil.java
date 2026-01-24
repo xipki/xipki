@@ -296,15 +296,20 @@ public class KeyUtil {
         }
         return kpGen.generateKeyPair();
       }
-      default: {
-        throw new IllegalStateException("unknown keyspec " + keySpec);
-      }
     }
+
+    if (keySpec.isCompositeMLDSA()) {
+      String oid = keySpec.getAlgorithmIdentifier().getAlgorithm().getId();
+      KeyPairGenerator kpGen = getKeyPairGenerator(oid);
+      return kpGen.generateKeyPair();
+    }
+
+    throw new IllegalStateException("unknown keyspec " + keySpec);
   }
 
   public static KeyPairWithSubjectPublicKeyInfo generateKeypair2(
       KeySpec keySpec, SecureRandom random) throws Exception {
-    KeyPair keypair = KeyUtil.generateKeypair(keySpec, random);
+    KeyPair keypair = generateKeypair(keySpec, random);
 
     switch (keySpec) {
       case RSA2048:
@@ -353,10 +358,11 @@ public class KeyUtil {
         return new KeyPairWithSubjectPublicKeyInfo(keypair,
             subjectPublicKeyInfo);
       }
-      default: {
-        throw new IllegalStateException("unknown keyspec " + keySpec);
-      }
     }
+
+    SubjectPublicKeyInfo subjectPublicKeyInfo =
+        SubjectPublicKeyInfo.getInstance(keypair.getPublic().getEncoded());
+    return new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo);
   }
 
   public static KeyStoreWrapper generateKeypair3(
@@ -811,6 +817,8 @@ public class KeyUtil {
         algo = SignAlgo.ML_DSA_65;
       } else if (keySpec == KeySpec.MLDSA87) {
         algo = SignAlgo.ML_DSA_87;
+      } else if (keySpec.isCompositeMLDSA()) {
+        algo = SignAlgo.getInstance(keySpec.getAlgorithmIdentifier());
       } else {
         throw new IllegalArgumentException("unknown key-spec " + keySpec);
       }

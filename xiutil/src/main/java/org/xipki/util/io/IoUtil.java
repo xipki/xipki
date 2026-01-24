@@ -422,4 +422,19 @@ public class IoUtil {
     }
   }
 
+  public static byte[] concatenate(byte[]... bytesList) {
+    int len = 0;
+    for (byte[] bytes : bytesList) {
+      len += bytes.length;
+    }
+
+    byte[] ret = new byte[len];
+    int off = 0;
+    for (byte[] bytes : bytesList) {
+      System.arraycopy(bytes, 0, ret, off, bytes.length);
+      off += bytes.length;
+    }
+    return ret;
+  }
+
 }

@@ -5,8 +5,12 @@ package org.xipki.pkcs11.xihsm.objects;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.jcajce.spec.ContextParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.pkcs11.wrapper.PKCS11T;
+import org.xipki.pkcs11.wrapper.params.CkParams;
+import org.xipki.pkcs11.wrapper.params.NullParams;
+import org.xipki.pkcs11.wrapper.params.SIGN_ADDITIONAL_CONTEXT;
 import org.xipki.pkcs11.xihsm.LoginState;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiAttribute;
@@ -23,6 +27,7 @@ import org.xipki.util.codec.Args;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.Signature;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.List;
 
 /**
@@ -99,11 +104,24 @@ public class XiMLDSAPrivateKey extends XiPrivateKey {
           "Invalid mechanism " + PKCS11T.ckmCodeToName(ckm));
     }
 
-    HsmUtil.assertNullParameter(mechanism);
+    byte[] context = null;
+    CkParams params = mechanism.getParameter();
+    if (params != null && !params.equals(NullParams.INSTANCE)) {
+      if (!(params instanceof SIGN_ADDITIONAL_CONTEXT)) {
+        throw new HsmException(PKCS11T.CKR_MECHANISM_PARAM_INVALID,
+            "Mechanism.parameters is not a CK_SIGN_ADDITIONAL_CONTEXT");
+      }
+
+      SIGN_ADDITIONAL_CONTEXT sac = (SIGN_ADDITIONAL_CONTEXT) params;
+      context = sac.context();
+    }
 
     try {
       Signature sig = Signature.getInstance("ML-DSA", "BC");
       sig.initSign(jceKey);
+      if (context != null) {
+        sig.setParameter(new ContextParameterSpec(context));
+      }
       sig.update(data);
       try {
         return sig.sign();

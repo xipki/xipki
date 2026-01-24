@@ -242,7 +242,6 @@ public class SecurityFactoryImpl implements SecurityFactory {
       }
 
       byte[] signatureValue = signer.sign(dummyContent);
-
       verifier.initVerify(signer.getPublicKey());
       verifier.update(dummyContent);
       boolean valid = verifier.verify(signatureValue);

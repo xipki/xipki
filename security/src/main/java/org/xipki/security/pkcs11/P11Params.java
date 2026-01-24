@@ -7,7 +7,9 @@ import org.xipki.pkcs11.wrapper.ExtraParams;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.params.ByteArrayParams;
 import org.xipki.pkcs11.wrapper.params.CkParams;
+import org.xipki.pkcs11.wrapper.params.EDDSA_PARAMS;
 import org.xipki.pkcs11.wrapper.params.RSA_PKCS_PSS_PARAMS;
+import org.xipki.pkcs11.wrapper.params.SIGN_ADDITIONAL_CONTEXT;
 import org.xipki.pkcs11.wrapper.type.CkMechanism;
 import org.xipki.security.HashAlgo;
 
@@ -32,6 +34,13 @@ public interface P11Params {
     } else if (this instanceof P11Params.P11ByteArrayParams) {
       paramObj = new ByteArrayParams(
           ((P11Params.P11ByteArrayParams) this).getBytes());
+    } else if (this instanceof P11Params.P11EddsaParams) {
+      P11Params.P11EddsaParams eddsaParams = (P11Params.P11EddsaParams) this;
+      paramObj = new EDDSA_PARAMS(eddsaParams.prehash, eddsaParams.context);
+    } else if (this instanceof P11Params.P11SignAdditionalContext) {
+      P11Params.P11SignAdditionalContext sad =
+          (P11Params.P11SignAdditionalContext) this;
+      paramObj = new SIGN_ADDITIONAL_CONTEXT(sad.hedgeVariant, sad.context);
     } else {
       throw new TokenException(
           "unknown P11Parameters " + getClass().getName());
@@ -122,6 +131,50 @@ public interface P11Params {
       return saltLength;
     }
 
+  }
+
+  class P11EddsaParams implements P11Params {
+
+    private final boolean prehash;
+
+    private final byte[] context;
+
+    public P11EddsaParams(boolean prehash, byte[] context) {
+      this.prehash = prehash;
+      this.context = context;
+    }
+
+    public boolean prehash() {
+      return prehash;
+    }
+
+    public byte[] context() {
+      return context;
+    }
+  }
+
+  class P11SignAdditionalContext implements P11Params {
+
+    private final long hedgeVariant;
+
+    private final byte[] context;
+
+    public P11SignAdditionalContext(byte[] context) {
+      this(CKH_HEDGE_PREFERRED, context);
+    }
+
+    public P11SignAdditionalContext(long hedgeVariant, byte[] context) {
+      this.hedgeVariant = hedgeVariant;
+      this.context = context;
+    }
+
+    public long hedgeVariant() {
+      return hedgeVariant;
+    }
+
+    public byte[] context() {
+      return context;
+    }
   }
 
 }

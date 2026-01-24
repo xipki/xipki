@@ -106,8 +106,7 @@ public class RSAPKCSSignRawDataTest {
           generateKeypair(PKCS11KeyPairType.RSA_2048, inToken);
       long generatedPrivateKey = generatedKeyPair.getHandle();
 
-      int[] dataLens = {//TODO 1057,
-          10570, 105700};
+      int[] dataLens = {1057, 10570, 105700};
       for (int dataLen : dataLens) {
         LOG.info("##################################################");
         LOG.info("signing data");

@@ -210,8 +210,11 @@ public class P12ContentSignerBuilder {
     return signAlgo.isRSAPkcs1SigAlgo() ? "SunRsaSign"
         // Currently, the provider SunEC is much slower (5x) than BC,
         // so we do not use the Signature variant.
-        : signAlgo.isECDSASigAlgo()     ? null
-        : signAlgo.isEDDSASigAlgo() || signAlgo.isMLDSASigAlgo() ? "BC" : null;
+        : signAlgo.isECDSASigAlgo()   ? null
+        : signAlgo.isEDDSASigAlgo()   ? "BC"
+        : signAlgo.isMLDSASigAlgo()   ? "BC"
+        : signAlgo.isCompositeMLDSA() ? "BC"
+        : null;
   }
 
   private Signature createSignature(

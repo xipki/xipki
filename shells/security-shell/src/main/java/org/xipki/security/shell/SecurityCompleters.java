@@ -33,7 +33,7 @@ public class SecurityCompleters {
       String[] names = new String[keySpecs.length];
       int i = 0;
       for (KeySpec keySpec : keySpecs) {
-        names[i++] = keySpec.name();
+        names[i++] = keySpec.name().replace('_', '-');
       }
       setTokens(names);
     }

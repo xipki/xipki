@@ -15,6 +15,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.attrs.AttributeTypes;
 import org.xipki.pkcs11.wrapper.attrs.Template;
+import org.xipki.security.KeySpec;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
@@ -41,17 +42,73 @@ public class P11Key {
 
   private final PKCS11Key key;
 
-  private EcCurveEnum ecParams;
+  private final EcCurveEnum ecParams;
 
-  private Long parameterSet;
+  private final KeySpec keySpec;
 
   private boolean publicKeyInitialized;
 
   private PublicKey publicKey;
 
-  public P11Key(P11Slot slot, PKCS11Key key) {
+  public P11Key(P11Slot slot, PKCS11Key key) throws TokenException {
     this.slot = Args.notNull(slot, "slot");
     this.key = Args.notNull(key, "key");
+
+    KeySpec keySpec = null;
+    EcCurveEnum curve = null;
+
+    PKCS11KeyId keyId = key.id();
+    PKCS11KeyId.KeyIdType type = keyId.getType();
+    long keyType = keyId.getKeyType();
+
+    if (key.rsaModulus() != null) {
+      int bitLen = key.rsaModulus().bitLength();
+      keySpec = KeySpec.ofRSA(bitLen);
+    } else if (keyType == CKK_VENDOR_SM2) {
+      curve = EcCurveEnum.SM2P256V1;
+      keySpec = KeySpec.SM2P256V1;
+    } else if (keyType == CKK_EC ||
+        keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+      byte[] ecParams = key.ecParams();
+      if (ecParams == null && keyId.getPublicKeyHandle() != null) {
+        if (type == PKCS11KeyId.KeyIdType.KEYPAIR
+            || type == PKCS11KeyId.KeyIdType.PRIVATE_KEY) {
+          // try the public key
+          ecParams = slot.getAttrValues(keyId.getPublicKeyHandle(),
+              new AttributeTypes().ecParams()).ecParams();
+        }
+      }
+
+      if (ecParams != null) {
+        curve = EcCurveEnum.ofEncodedOid(ecParams);
+        keySpec = KeySpec.ofEcCurve(curve);
+      }
+    } else if (keyType == CKK_ML_DSA) {
+      Long pqcVariant = key.pqcVariant();
+      if (pqcVariant != null) {
+        if (pqcVariant == CKP_ML_DSA_44) {
+          keySpec = KeySpec.MLDSA44;
+        } else if (pqcVariant == CKP_ML_DSA_65) {
+          keySpec = KeySpec.MLDSA65;
+        } else if (pqcVariant == CKP_ML_DSA_87) {
+          keySpec = KeySpec.MLDSA87;
+        }
+      }
+    } else if (keyType == CKK_ML_KEM) {
+      Long pqcVariant = key.pqcVariant();
+      if (pqcVariant != null) {
+        if (pqcVariant == CKP_ML_KEM_512) {
+          keySpec = KeySpec.MLKEM512;
+        } else if (pqcVariant == CKP_ML_KEM_768) {
+          keySpec = KeySpec.MLKEM768;
+        } else if (pqcVariant == CKP_ML_KEM_1024) {
+          keySpec = KeySpec.MLKEM1024;
+        }
+      }
+    }
+
+    this.keySpec = keySpec;
+    this.ecParams = curve;
   }
 
   public void destroy() throws TokenException {
@@ -63,20 +120,12 @@ public class P11Key {
     return b != null && b;
   }
 
-  public Long getParameterSet() {
-    return parameterSet;
-  }
-
-  public void setParameterSet(Long parameterSet) {
-    this.parameterSet = parameterSet;
-  }
-
   public EcCurveEnum getEcParams() {
     return ecParams;
   }
 
-  public void setEcParams(EcCurveEnum ecParams) {
-    this.ecParams = ecParams;
+  public KeySpec getKeySpec() {
+    return keySpec;
   }
 
   /**
