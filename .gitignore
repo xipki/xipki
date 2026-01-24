@@ -1,4 +1,7 @@
 xipkcs11/src/main/c/**/release/**
+xipkcs11/src/main/c/unix/macos/amd64/**
+xipkcs11/src/main/c/unix/macos/arm64/**
+xipkcs11/src/main/c/unix/macos/universal/**
 
 .pmd
 
