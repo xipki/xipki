@@ -128,8 +128,6 @@ public class P11Actions {
         }
       }
 
-      //.id(control.getId())
-      //.label(control.getLabel());
       if (keySpec.isComposite()) {
         String coreLabel;
         if (StringUtil.startsWithIgnoreCase(label,
@@ -157,6 +155,7 @@ public class P11Actions {
         finalize("Trad key of " + keyspecStr,
             slot.generateKeyPair(keySpec.getCompositeTradVariant(), spec));
       } else {
+        spec.id(control.getId()).label(label);
         finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
       }
       return null;

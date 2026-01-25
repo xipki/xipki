@@ -177,11 +177,8 @@ public class FillKeypool implements AutoCloseable {
 
       for (KeySpec keyspec : keyspecs) {
         int kid = keyspecToIdMap.get(keyspec);
-        System.out.println(keyspec.getText() + ":");
         List<KeyInfoPair> preKeys = preKeysMap.get(keyspec);
 
-        System.out.println("\t" + (preKeys != null ? "loading " : "generating ")
-              + numKeypairs + " keypairs");
         long start = Clock.systemUTC().millis();
 
         for (int i = 0; i < numKeypairs; i++) {
@@ -218,8 +215,9 @@ public class FillKeypool implements AutoCloseable {
         } // end for
 
         long duration = Clock.systemUTC().millis() - start;
-        System.out.println("\t" + (preKeys != null ? "loaded " : "generated ")
-            + numKeypairs + " keypairs, took " + duration + " ms");
+        System.out.println(keyspec.getText() + ":" +
+            (preKeys != null ? "loaded " : "generated ") +
+            numKeypairs + " keypairs, took " + duration + " ms");
       } // end for
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

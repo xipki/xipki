@@ -61,7 +61,7 @@ ca:profile-add \
 ## Generate selfsigned rootca
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
-  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=rootca1"
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}rootca1"
 } else {
   CA_SIGNER_CONF = "algo=$CA_SIGALG,keystore=file:output/rootca1.p12,password=CHANGEIT"
 }
@@ -127,7 +127,7 @@ ca:careq-add \
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT \
-    --label subca1 \
+    --label ${CA_P11_LABEL_PREFIX}subca1 \
     --outform $OUTFORM \
     --out output/subca1.csr \
     --subject "CN=subca1,O=myorg,C=DE"
@@ -158,7 +158,7 @@ if { $TOKEN_TYPE equals "PKCS12" } then {
 ## Generate keys and CSR for subcawithcrl1
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 REPLACEME-RSAPSS \
-    --slot $SLOT --label subcawithcrl1 \
+    --slot $SLOT --label ${CA_P11_LABEL_PREFIX}subcawithcrl1 \
     --outform $OUTFORM \
     --out output/subcawithcrl1.csr \
     --subject "CN=subcawithcrl1, O=myorg, C=DE" \
@@ -208,7 +208,7 @@ if { $TOKEN_TYPE equals "PKCS12" } then {
 if { $TOKEN_TYPE equals "PKCS11" } then {
   xi:csr-p11 REPLACEME-RSAPSS \
     --slot $SLOT \
-    --label ocsp99 \
+    --label ${CA_P11_LABEL_PREFIX}ocsp99 \
     --outform $OUTFORM \
     --out output/ocsp99.csr \
     --subject "CN=ocsp99,2.5.4.97=VATDE-CHANGEIT56789,O=myorg,C=DE"
@@ -246,7 +246,7 @@ echo "#################################################################"
 ## Add CA
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
-  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subca1"
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subca1"
 } else {
   CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
 }
@@ -316,7 +316,7 @@ echo "#################################################################"
 ## Add CA
 
 if { $TOKEN_TYPE equals "PKCS11" } then {
-  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=subcawithcrl1"
+  CA_SIGNER_CONF = "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subcawithcrl1"
 } else {
   CA_SIGNER_CONF = "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$CA_SIGALG"
 }

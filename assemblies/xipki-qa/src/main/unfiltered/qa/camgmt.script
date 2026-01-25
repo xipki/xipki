@@ -270,7 +270,7 @@ if { "$printUsage" equals "true" } then {
   # The CA named rootca2 exists. No new CA with the same name is allowed
 
   if { $TOKEN_TYPE equals "PKCS11" } then {
-    CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=rootca1"
+    CA_SIGNER_CONF_RCA = "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}rootca1"
   } else {
     CA_SIGNER_CONF_RCA = "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"
   }

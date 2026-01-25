@@ -703,8 +703,8 @@ public class KeyUtil {
       try {
         return builder.build(keyParam);
       } catch (OperatorCreationException ex) {
-        throw new InvalidKeyException("could not build ContentVerifierProvider: "
-            + ex.getMessage(), ex);
+        throw new InvalidKeyException(
+            "could not build ContentVerifierProvider: " + ex.getMessage(), ex);
       }
     }
 

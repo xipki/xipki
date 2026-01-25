@@ -39,6 +39,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
     CA_KEYSPEC = $keyspec
     CA_SIGALG  = $sigalg
     CA_RSAPSS  = $rsapss
+    CA_P11_LABEL_PREFIX = $p11composite
 
     if { "$KEYSPEC" equals "" } then {
       keyspec = $CA_KEYSPEC

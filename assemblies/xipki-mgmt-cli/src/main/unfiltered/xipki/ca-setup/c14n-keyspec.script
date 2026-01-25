@@ -1,4 +1,5 @@
-RSAPSS = ""
+rsapss = ""
+p11composite = ""
 
 keyspec = $(xi:uppercase "$keyspec")
 
@@ -11,15 +12,15 @@ if { "$keyspec" equals "RSA2048" } then {
 } elif { "$keyspec" equals "RSA2048/PSS" } then {
   sigalg = SHA256WITHRSAANDMGF1
   keyspec = RSA2048
-  RSAPSS = "--RSA-PSS"
+  rsapss = "--RSA-PSS"
 } elif { "$keyspec" equals "RSA3072/PSS" } then {
   sigalg = SHA384WITHRSAANDMGF1
   keyspec = RSA3072
-  RSAPSS = "--RSA-PSS"
+  rsapss = "--RSA-PSS"
 } elif { "$keyspec" equals "RSA4096/PSS" } then {
   sigalg = SHA384WITHRSAANDMGF1
   keyspec = RSA4096
-  RSAPSS = "--RSA-PSS"
+  rsapss = "--RSA-PSS"
 } elif { "$keyspec" equals "ED25519" } then {
   sigalg = ED25519
 } elif { "$keyspec" equals "ED448" } then {
@@ -44,8 +45,9 @@ if { "$keyspec" equals "RSA2048" } then {
   sigalg = SHA512WITHECDSA
 } elif { $([ FRP256V1 ] contains $keyspec) } then {
   sigalg = SHA256WITHECDSA
-} elif { $([ MLDSA44 MLDSA65 MLDSA87 \
-             MLDSA44-RSA2048-PSS-SHA256           \
+} elif { $([ MLDSA44 MLDSA65 MLDSA87 ] contains $keyspec) } then {
+  sigalg  = $keyspec
+} elif { $([ MLDSA44-RSA2048-PSS-SHA256           \
              MLDSA44-RSA2048-PKCS15-SHA256        \
              MLDSA44-ED25519-SHA512               \
              MLDSA44-ECDSA-P256-SHA256            \
@@ -64,6 +66,7 @@ if { "$keyspec" equals "RSA2048" } then {
              MLDSA87-RSA4096-PSS-SHA512           \
              MLDSA87-ECDSA-P521-SHA512 ] contains $keyspec) } then {
   sigalg  = $keyspec
+  p11composite = "COMPOSITE:"
 } elif { $([ MLKEM512 MLKEM768 MLKEM1024 ] contains $keyspec) } then {
   sigalg = ""
 } elif { $([ X25519 X448 ] contains $keyspec) } then {

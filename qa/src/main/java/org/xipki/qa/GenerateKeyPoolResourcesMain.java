@@ -1,3 +1,5 @@
+// Copyright (c) 2013-2026 xipki. All rights reserved.
+// License Apache License 2.0
 package org.xipki.qa;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -12,6 +14,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.Security;
 
+/**
+ * Generate keys to be store in src/main/resources/keypool.
+ *
+ * @author Lijun Liao (xipki)
+ */
 public class GenerateKeyPoolResourcesMain {
 
   public static void main(String[] args) {
