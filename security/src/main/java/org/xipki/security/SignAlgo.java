@@ -781,6 +781,8 @@ public enum SignAlgo {
             " is not allowed for composite ML-DSA key with OID " +
             algId.getAlgorithm());
       }
+    } else {
+      algo = allowedSignAlgo;
     }
 
     return algo;

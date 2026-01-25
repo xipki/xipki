@@ -10,7 +10,7 @@
 			"index":0
 		}],
 		"nativeLibraries":[{
-			"path": "xihsm:file:vendor=utimaco,tenant=utimaco"
+			"path": "xihsm:file:vendor=xihsm,tenant=tenant1"
 		}],
 		"passwordSets":[{
 			"passwords":[

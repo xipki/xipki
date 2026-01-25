@@ -1,4 +1,4 @@
-list = [tls-rsa tls-ec tls-edwards tls-montgomery tls-sm2 tls-mldsa tls-mlkem]
+list = [tls-rsa tls-ec tls-edwards tls-montgomery tls-sm2 tls-mldsa tls-mlkem tls-compsig]
 
 CUR_TIME = $(date '+%Y%m%d-%H%M%S')
 

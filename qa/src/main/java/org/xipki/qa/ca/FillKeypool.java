@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Fill the keypool with keypairs.
@@ -142,49 +143,51 @@ public class FillKeypool implements AutoCloseable {
       int id = 1;
 
       // loading the RSA pre-generated keypairs
-      KeySpec[] rsaKeyspecs = new KeySpec[]{KeySpec.RSA2048,
-          KeySpec.RSA3072, KeySpec.RSA4096};
-      Map<KeySpec, List<byte[]>> rsaKeysMap = new HashMap<>();
-      for (KeySpec keyspec : rsaKeyspecs) {
-        String fn = "/keypool/" +
-            keyspec.getText().replace('-', '_') + ".txt";
+      Map<KeySpec, List<KeyInfoPair>> preKeysMap = new HashMap<>();
+      for (KeySpec keyspec : KeySpec.values()) {
+        String fn = "/keypool/" + keyspec.name() + ".txt";
 
         try (InputStream in = FillKeypool.class.getResourceAsStream(fn)) {
-          if (in != null) {
-            BufferedReader reader =
-                new BufferedReader(new InputStreamReader(in));
-            List<byte[]> keys = new ArrayList<>(100);
-            rsaKeysMap.put(keyspec, keys);
-            String line;
-            while ((line = reader.readLine()) != null) {
-              if (StringUtil.isNotBlank(line)) {
-                keys.add(Base64.decodeFast(line));
-              }
+          if (in == null) {
+            continue;
+          }
+
+          BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+          List<KeyInfoPair> keys = new ArrayList<>(10);
+          preKeysMap.put(keyspec, keys);
+          String line;
+          while ((line = reader.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty() || line.startsWith("#")) {
+              continue;
             }
+
+            StringTokenizer tokenizer = new StringTokenizer(line, ":");
+            String b64Sk = tokenizer.nextToken();
+            String b64Pk = tokenizer.nextToken();
+            byte[] skBytes = Base64.decodeFast(b64Sk);
+            byte[] pkBytes = Base64.decodeFast(b64Pk);
+            PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(skBytes);
+            SubjectPublicKeyInfo pkInfo =
+                SubjectPublicKeyInfo.getInstance(pkBytes);
+            keys.add(new KeyInfoPair(pkInfo, skInfo));
           }
         }
       }
 
       for (KeySpec keyspec : keyspecs) {
         int kid = keyspecToIdMap.get(keyspec);
-
         System.out.println(keyspec.getText() + ":");
-        boolean rsa = keyspec.isRSA();
+        List<KeyInfoPair> preKeys = preKeysMap.get(keyspec);
 
-        List<byte[]> rsaKeys = null;
-        if (rsa) {
-          rsaKeys = rsaKeysMap.get(keyspec);
-        }
-
-        System.out.println("\t" + (rsaKeys != null ? "loading " : "generating ")
+        System.out.println("\t" + (preKeys != null ? "loading " : "generating ")
               + numKeypairs + " keypairs");
         long start = Clock.systemUTC().millis();
 
         for (int i = 0; i < numKeypairs; i++) {
           KeyInfoPair keyInfoPair;
-          if (rsa && rsaKeys != null) {
-            byte[] bytes = rsaKeys.get(i % rsaKeys.size());
-            keyInfoPair = toRsaKeyInfoPair(PrivateKeyInfo.getInstance(bytes));
+          if (preKeys != null) {
+            keyInfoPair = preKeys.get(i % preKeys.size());
           } else {
             KeyPair kp = KeyUtil.generateKeypair(keyspec, rnd);
             keyInfoPair = new KeyInfoPair(kp);
@@ -213,8 +216,9 @@ public class FillKeypool implements AutoCloseable {
             ps.executeBatch();
           }
         } // end for
+
         long duration = Clock.systemUTC().millis() - start;
-        System.out.println("\t" + (rsa ? "loaded " : "generated ")
+        System.out.println("\t" + (preKeys != null ? "loaded " : "generated ")
             + numKeypairs + " keypairs, took " + duration + " ms");
       } // end for
     } catch (SQLException ex) {

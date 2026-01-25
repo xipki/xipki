@@ -51,10 +51,9 @@ import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiEdDSAContentVerifierProvider;
 import org.xipki.security.bc.XiKEMContentVerifierProvider;
-import org.xipki.security.bc.XiMLDSASigContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
+import org.xipki.security.bc.XiSignatureContentVerifierProvider;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
@@ -684,34 +683,8 @@ public class KeyUtil {
 
     keyAlg = keyAlg.replace("-", "");
 
-    switch (keyAlg) {
-      case "ED25519":
-      case "ED448":
-        return new XiEdDSAContentVerifierProvider(publicKey);
-      case "X25519":
-      case "X448":
-        if (ownerKeyAndCert == null) {
-          throw new InvalidKeyException(
-              "ownerKeyAndCert is required but absent");
-        }
-        return new XiXDHContentVerifierProvider(publicKey, ownerKeyAndCert);
-      case "MLDSA44":
-      case "MLDSA65":
-      case "MLDSA87":
-        return new XiMLDSASigContentVerifierProvider(publicKey);
-      case "MLKEM512":
-      case "MLKEM768":
-      case "MLKEM1024":
-        if (ownerMasterKey == null) {
-          throw new InvalidKeyException(
-              "ownerMasterKey is required but absent");
-        }
-        return new XiKEMContentVerifierProvider(publicKey, ownerMasterKey);
-    }
-
     BcContentVerifierProviderBuilder builder =
         VERIFIER_PROVIDER_BUILDER.get(keyAlg);
-
     if (builder == null) {
       switch (keyAlg) {
         case "RSA":
@@ -720,20 +693,39 @@ public class KeyUtil {
         case "EC":
         case "ECDSA":
           builder = new XiECContentVerifierProviderBuilder();
-          break;
-        default:
-          throw new InvalidKeyException(
-              "unknown key algorithm of the public key " + keyAlg);
       }
-      VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
     }
 
-    AsymmetricKeyParameter keyParam = KeyUtil.getPublicKeyParameter(publicKey);
-    try {
-      return builder.build(keyParam);
-    } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: "
-          + ex.getMessage(), ex);
+    if (builder != null) {
+      VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
+      AsymmetricKeyParameter keyParam =
+          KeyUtil.getPublicKeyParameter(publicKey);
+      try {
+        return builder.build(keyParam);
+      } catch (OperatorCreationException ex) {
+        throw new InvalidKeyException("could not build ContentVerifierProvider: "
+            + ex.getMessage(), ex);
+      }
+    }
+
+    switch (keyAlg) {
+      case "X25519":
+      case "X448":
+        if (ownerKeyAndCert == null) {
+          throw new InvalidKeyException(
+              "ownerKeyAndCert is required but absent");
+        }
+        return new XiXDHContentVerifierProvider(publicKey, ownerKeyAndCert);
+      case "MLKEM512":
+      case "MLKEM768":
+      case "MLKEM1024":
+        if (ownerMasterKey == null) {
+          throw new InvalidKeyException(
+              "ownerMasterKey is required but absent");
+        }
+        return new XiKEMContentVerifierProvider(publicKey, ownerMasterKey);
+      default:
+        return new XiSignatureContentVerifierProvider(publicKey);
     }
   } // method getContentVerifierProvider
 

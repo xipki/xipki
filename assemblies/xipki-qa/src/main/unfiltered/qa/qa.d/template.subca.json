@@ -74,6 +74,7 @@
 			"tls-montgomery",
 			"tls-mldsa",
 			"tls-mlkem",
+            "tls-compsig",
 			"tls-sm2"
 		],
 		"publishers":[

@@ -11,6 +11,7 @@ xi:copy-dir qa/p12/shared output
 xi:copy-dir qa/p12/${KEYSPEC} output
 
 # OCSP uses the same key type as the CA
+# TODO: add prefix "COMPOSITE:" to labels
 list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
 
 if { "$TOKEN_TYPE" equals "PKCS11" } then {

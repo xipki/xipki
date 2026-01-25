@@ -90,6 +90,7 @@ public enum KeySpec {
       OIDs.Composite.id_MLDSA87_ECDSA_P521_SHA512),
 
   // Composite KEM + Trad key
+  /*
   MLKEM768_RSA2048_SHA3_256(MLKEM768, RSA2048,
       OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256),
   MLKEM768_RSA3072_SHA3_256(MLKEM768, RSA3072,
@@ -113,7 +114,9 @@ public enum KeySpec {
   MLKEM1024_X448_SHA3_256(MLKEM1024, X448,
       OIDs.Composite.id_MLKEM1024_X448_SHA3_256),
   MLKEM1024_ECDH_P521_SHA3_256(MLKEM1024, SECP521R1,
-      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256);
+      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256)
+   */
+  ;
 
   private final String text;
 

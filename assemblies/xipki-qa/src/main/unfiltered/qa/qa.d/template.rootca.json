@@ -158,6 +158,12 @@
 		"conf":{
 			"file":"${profiles.dir}/certprofile-tls-mlkem.json"
 		}
+    },{
+   		"name":"tls-compsig",
+   		"type":"xijson",
+   		"conf":{
+   			"file":"${profiles.dir}/certprofile-tls-compsig.json"
+   		}
 	},{
 		"name":"tls-sm2",
 		"type":"xijson",
