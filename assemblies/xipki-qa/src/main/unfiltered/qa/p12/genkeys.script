@@ -20,8 +20,8 @@ list = [ multiple-ous1 multiple-ous2 qc1 \
 each ($list) {
   filename = $it
 
-  KEYSPECs = [ ML-DSA-44 ML-DSA-65 ML-DSA-87 ED25519 ED448    \
-             ML-KEM-512 ML-KEM-768 ML-KEM-1024 X25519 X448    \
+  KEYSPECs = [ MLDSA44 MLDSA65 MLDSA87 ED25519 ED448    \
+             MLKEM512 MLKEM768 MLKEM1024 X25519 X448    \
              RSA2048 RSA3072 RSA4096                          \
              SECP256R1 SECP384R1 SECP521R1 SM2P256V1 FRP256V1 \
              BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1  \
@@ -73,7 +73,7 @@ list = [ ocsp1 ocsp2 cross1 ]
 each ($list) {
   filename = $it
 
-  KEYSPECs = [ ML-DSA-44 ML-DSA-65 ML-DSA-87 ED25519 ED448    \
+  KEYSPECs = [ MLDSA44 MLDSA65 MLDSA87 ED25519 ED448    \
              RSA2048 RSA3072 RSA4096                          \
              SECP256R1 SECP384R1 SECP521R1 SM2P256V1 FRP256V1 \
              BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1  \
@@ -100,10 +100,10 @@ each ($list) {
     xi:keypair-p12 --keyspec ${KEYSPEC} --password CHANGEIT --out p12/${KEYSPEC}/${filename}.p12
   }
 
-  xi:keypair-p12 --keyspec ML-DSA-44 --password CHANGEIT --out p12/ML-KEM-512/${filename}.p12
-  xi:keypair-p12 --keyspec ML-DSA-65 --password CHANGEIT --out p12/ML-KEM-768/${filename}.p12
-  xi:keypair-p12 --keyspec ML-DSA-87 --password CHANGEIT --out p12/ML-KEM-1024/${filename}.p12
-  xi:keypair-p12 --keyspec ED25519   --password CHANGEIT --out p12/X25519/${filename}.p12
-  xi:keypair-p12 --keyspec ED448     --password CHANGEIT --out p12/X448/${filename}.p12
+  xi:keypair-p12 --keyspec MLDSA44  --password CHANGEIT --out p12/MLKEM512/${filename}.p12
+  xi:keypair-p12 --keyspec MLDSA65  --password CHANGEIT --out p12/MLKEM768/${filename}.p12
+  xi:keypair-p12 --keyspec MLDSA87  --password CHANGEIT --out p12/MLKEM1024/${filename}.p12
+  xi:keypair-p12 --keyspec ED25519  --password CHANGEIT --out p12/X25519/${filename}.p12
+  xi:keypair-p12 --keyspec ED448    --password CHANGEIT --out p12/X448/${filename}.p12
 
 }

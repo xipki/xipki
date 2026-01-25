@@ -182,11 +182,11 @@ public final class P12SignSpeed extends BenchmarkExecutor {
           return KeySpec.ED25519;
         case ED448:
           return KeySpec.ED448;
-        case ML_DSA_44:
+        case MLDSA44:
           return KeySpec.MLDSA44;
-        case ML_DSA_65:
+        case MLDSA65:
           return KeySpec.MLDSA65;
-        case ML_DSA_87:
+        case MLDSA87:
           return KeySpec.MLDSA87;
         default:
           return null;

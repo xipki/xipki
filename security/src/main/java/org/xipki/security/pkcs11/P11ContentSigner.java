@@ -108,9 +108,9 @@ abstract class P11ContentSigner implements XiContentSigner {
       Long variant = identity.getKey().pqcVariant();
       boolean match = false;
       if (variant != null) {
-        match = (signAlgo == ML_DSA_44) ? variant == CKP_ML_DSA_44
-              : (signAlgo == ML_DSA_65) ? variant == CKP_ML_DSA_65
-              : signAlgo == ML_DSA_87 && variant == CKP_ML_DSA_87;
+        match = (signAlgo == MLDSA44) ? variant == CKP_ML_DSA_44
+              : (signAlgo == MLDSA65) ? variant == CKP_ML_DSA_65
+              :  signAlgo == MLDSA87 && variant == CKP_ML_DSA_87;
       }
 
       if (!match) {

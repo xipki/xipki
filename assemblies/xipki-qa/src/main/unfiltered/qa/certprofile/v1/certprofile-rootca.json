@@ -26,7 +26,7 @@
 		// Edwards
 		"Ed25519","Ed448",
 		// MLDSA
-		"ML-DSA-44","ML-DSA-65","ML-DSA-87"
+		"MLDSA44","MLDSA65","MLDSA87"
 	],
 	"keyAlgorithms":[{
 		"algorithms":[{
@@ -62,17 +62,17 @@
 	},{
 		"algorithms":[{
 			"oid":"2.16.840.1.101.3.4.3.17",
-			"description":"ML-DSA-44"
+			"description":"MLDSA44"
 		}]
 	},{
 		"algorithms":[{
 			"oid":"2.16.840.1.101.3.4.3.18",
-			"description":"ML-DSA-65"
+			"description":"MLDSA65"
 		}]
 	},{
 		"algorithms":[{
 			"oid":"2.16.840.1.101.3.4.3.19",
-			"description":"ML-DSA-87"
+			"description":"MLDSA87"
 		}]
 	}],
 	"subject":{

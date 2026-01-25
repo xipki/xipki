@@ -55,9 +55,9 @@ public enum SignSpec {
 
   ED448(SignAlgo.ED448),
 
-  ML_DSA_44(SignAlgo.ML_DSA_44),
-  ML_DSA_65(SignAlgo.ML_DSA_65),
-  ML_DSA_87(SignAlgo.ML_DSA_87);
+  ML_DSA_44(SignAlgo.MLDSA44),
+  ML_DSA_65(SignAlgo.MLDSA65),
+  ML_DSA_87(SignAlgo.MLDSA87);
 
   private final SignAlgo algo;
 
@@ -104,9 +104,9 @@ public enum SignSpec {
       // SM2
       case SM2_SM3:         return SignSpec.SM2_SM3;
       // ML-DSA
-      case ML_DSA_44:       return SignSpec.ML_DSA_44;
-      case ML_DSA_65:       return SignSpec.ML_DSA_65;
-      case ML_DSA_87:       return SignSpec.ML_DSA_87;
+      case MLDSA44:       return SignSpec.ML_DSA_44;
+      case MLDSA65:       return SignSpec.ML_DSA_65;
+      case MLDSA87:       return SignSpec.ML_DSA_87;
       default: return null;
     }
   }

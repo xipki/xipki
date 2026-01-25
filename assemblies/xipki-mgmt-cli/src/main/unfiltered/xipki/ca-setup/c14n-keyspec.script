@@ -44,16 +44,8 @@ if { "$keyspec" equals "RSA2048" } then {
   sigalg = SHA512WITHECDSA
 } elif { $([ FRP256V1 ] contains $keyspec) } then {
   sigalg = SHA256WITHECDSA
-} elif { $([ MLDSA44 ML-DSA-44 ] contains $keyspec) } then {
-  sigalg = ML-DSA-44
-  keyspec = ML-DSA-44
-} elif { $([ MLDSA65 ML-DSA-65 ] contains $keyspec) } then {
-  sigalg = ML-DSA-65
-  keyspec = ML-DSA-65
-} elif { $([ MLDSA87 ML-DSA-87 ] contains $keyspec) } then {
-  sigalg = ML-DSA-87
-  keyspec = ML-DSA-87
-} elif { $([ MLDSA44-RSA2048-PSS-SHA256           \
+} elif { $([ MLDSA44 MLDSA65 MLDSA87 \
+             MLDSA44-RSA2048-PSS-SHA256           \
              MLDSA44-RSA2048-PKCS15-SHA256        \
              MLDSA44-ED25519-SHA512               \
              MLDSA44-ECDSA-P256-SHA256            \
@@ -72,16 +64,8 @@ if { "$keyspec" equals "RSA2048" } then {
              MLDSA87-RSA4096-PSS-SHA512           \
              MLDSA87-ECDSA-P521-SHA512 ] contains $keyspec) } then {
   sigalg  = $keyspec
-  keyspec = $keyspec
-} elif { $([ MLKEM512 ML-KEM-512 ] contains $keyspec) } then {
+} elif { $([ MLKEM512 MLKEM768 MLKEM1024 ] contains $keyspec) } then {
   sigalg = ""
-  keyspec = ML-KEM-512
-} elif { $([ MLKEM768 ML-KEM-768 ] contains $keyspec) } then {
-  sigalg = ""
-  keyspec = ML-KEM-768
-} elif { $([ MLKEM1024 ML-KEM-1024 ] contains $keyspec) } then {
-  sigalg = ""
-  keyspec = ML-KEM-1024
 } elif { $([ X25519 X448 ] contains $keyspec) } then {
   sigalg = ""
 } else {

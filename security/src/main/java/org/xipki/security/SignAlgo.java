@@ -168,11 +168,11 @@ public enum SignAlgo {
       OIDs.Xipki.id_alg_dhPop_x448, SHA512, false),
 
   // MLDSA
-  ML_DSA_44("ML-DSA-44", 0x60,
+  MLDSA44("ML-DSA-44", 0x60,
       OIDs.Algo.id_ml_dsa_44, null, false),
-  ML_DSA_65("ML-DSA-65", 0x61,
+  MLDSA65("ML-DSA-65", 0x61,
       OIDs.Algo.id_ml_dsa_65, null, false),
-  ML_DSA_87("ML-DSA-87", 0x62,
+  MLDSA87("ML-DSA-87", 0x62,
       OIDs.Algo.id_ml_dsa_87, null, false),
 
   // KEM: decrypt the ciphertext using HPKE to get the shared secret key, using
@@ -449,7 +449,7 @@ public enum SignAlgo {
   } // method isRSAPSSMGF1SigAlgo
 
   public boolean isMLDSASigAlgo() {
-    return this == ML_DSA_44 || this == ML_DSA_65 || this == ML_DSA_87;
+    return this == MLDSA44 || this == MLDSA65 || this == MLDSA87;
   } // method isRSASigAlgo
 
   public boolean isCompositeMLDSA() {
@@ -731,22 +731,22 @@ public enum SignAlgo {
       throws NoSuchAlgorithmException {
     if (hashAlgo != null) {
       throw new NoSuchAlgorithmException(
-          "ML-DSA does not allow any hash algorithm");
+          "MLDSA does not allow any hash algorithm");
     }
     SignAlgo allowedSignAlgo =
-        "ML-DSA-44".equalsIgnoreCase(paramSpec) ? ML_DSA_44
-            : "ML-DSA-65".equalsIgnoreCase(paramSpec) ? ML_DSA_65
-            : "ML-DSA-87".equalsIgnoreCase(paramSpec) ? ML_DSA_87
+        "ML-DSA-44".equalsIgnoreCase(paramSpec) ? MLDSA44
+            : "ML-DSA-65".equalsIgnoreCase(paramSpec) ? MLDSA65
+            : "ML-DSA-87".equalsIgnoreCase(paramSpec) ? MLDSA87
             : null;
     if (allowedSignAlgo == null) {
       throw new NoSuchAlgorithmException(
-          "unknown ML-DSA paramSpec " + paramSpec);
+          "unknown MLDSA paramSpec " + paramSpec);
     }
 
     if (algo != null) {
       if (algo != allowedSignAlgo) {
         throw new NoSuchAlgorithmException("Algo " + algo +
-            " is not allowed for ML-DSA key with paramSpec " + paramSpec);
+            " is not allowed for MLDSA key with paramSpec " + paramSpec);
       }
     }
 
@@ -758,7 +758,7 @@ public enum SignAlgo {
       throws NoSuchAlgorithmException {
     if (hashAlgo != null) {
       throw new NoSuchAlgorithmException(
-          "Composite ML-DSA  does not allow any hash algorithm");
+          "Composite MLDSA does not allow any hash algorithm");
     }
 
     AlgorithmIdentifier algId;
@@ -778,7 +778,7 @@ public enum SignAlgo {
     if (algo != null) {
       if (algo != allowedSignAlgo) {
         throw new NoSuchAlgorithmException("Algo " + algo +
-            " is not allowed for composite ML-DSA key with OID " +
+            " is not allowed for composite MLDSA key with OID " +
             algId.getAlgorithm());
       }
     } else {

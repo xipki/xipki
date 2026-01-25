@@ -212,7 +212,8 @@ public class P12Actions {
       String keyAlgName = cert.getPublicKey().getAlgorithm();
 
       if (StringUtil.orEqualsIgnoreCase(keyAlgName, "X25519", "X448", "XDH",
-          "ML-KEM-512", "ML-KEM-768", "ML-KEM-1024")) {
+          "MLKEM512", "ML-KEM-512", "MLKEM768", "ML-KEM-768",
+          "MLKEM1024", "ML-KEM-1024")) {
         // cannot be checked via creating dummy signature, just compare the
         // public keys
         char[] pwd = password.toCharArray();

@@ -804,11 +804,11 @@ public class KeyUtil {
           }
         };
       } else if (keySpec == KeySpec.MLDSA44) {
-        algo = SignAlgo.ML_DSA_44;
+        algo = SignAlgo.MLDSA44;
       } else if (keySpec == KeySpec.MLDSA65) {
-        algo = SignAlgo.ML_DSA_65;
+        algo = SignAlgo.MLDSA65;
       } else if (keySpec == KeySpec.MLDSA87) {
-        algo = SignAlgo.ML_DSA_87;
+        algo = SignAlgo.MLDSA87;
       } else if (keySpec.isCompositeMLDSA()) {
         algo = SignAlgo.getInstance(keySpec.getAlgorithmIdentifier());
       } else {

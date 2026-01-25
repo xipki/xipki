@@ -8,8 +8,8 @@
   "maxSize": 8400,
   "validity": "5y",
   "notBeforeTime": "current",
-  "keypairGeneration": "ML-KEM-512",
-  "keyAlgorithms": ["ML-KEM-512","ML-KEM-768","ML-KEM-1024"],
+  "keypairGeneration": "MLKEM512",
+  "keyAlgorithms": ["MLKEM512","MLKEM768","MLKEM1024"],
   "subject": [{
     "type": "country",
     "minOccurs": 0

@@ -10,8 +10,7 @@
   "keypairGeneration": "SM2P256V1",
   "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
     "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1","X25519","X448","ML-KEM-512","ML-KEM-768",
-    "ML-KEM-1024"],
+    "SM2P256V1","FRP256V1","X25519","X448","MLKEM512","MLKEM768","MLKEM1024"],
   "subject": [{
       "type": "country",
       "minOccurs": 0

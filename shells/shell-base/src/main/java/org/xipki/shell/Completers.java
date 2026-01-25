@@ -149,7 +149,7 @@ public class Completers {
           "SM3WITHSM2",
           "SHAKE128WITHECDSA",      "SHAKE256WITHECDSA",
           "ED25519", "ED448",
-          "ML-DSA-44", "ML-DSA-65", "ML-DSA-87",
+          "MLDSA44", "MLDSA65", "MLDSA87",
           "MLDSA44-RSA2048-PSS-SHA256",
           "MLDSA44-RSA2048-PKCS15-SHA256",
           "MLDSA44-Ed25519-SHA512",

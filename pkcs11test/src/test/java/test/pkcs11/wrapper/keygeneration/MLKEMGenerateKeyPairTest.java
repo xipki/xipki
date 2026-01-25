@@ -21,7 +21,7 @@ import test.pkcs11.wrapper.TestHSMs;
 import java.util.Random;
 
 /**
- * This demo program generates an ML-KEM key-pair on the token.
+ * This demo program generates an MLKEM key-pair on the token.
  *
  * @author Lijun Liao (xipki)
  */
@@ -89,21 +89,21 @@ public class MLKEMGenerateKeyPairTest {
     @Test
     public void generateMlkem512() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-KEM-512 key-pair... ");
+      LOG.info("Generating new MLKEM512 key-pair... ");
       generateMlkemKeypair(PKCS11KeyPairType.MLKEM512);
     }
 
     @Test
     public void generateMlkem768() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-KEM-768 key-pair... ");
+      LOG.info("Generating new MLKEM768 key-pair... ");
       generateMlkemKeypair(PKCS11KeyPairType.MLKEM768);
     }
 
     @Test
     public void generateMlkem1024() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-KEM-1024 key-pair... ");
+      LOG.info("Generating new MLKEM1024 key-pair... ");
       generateMlkemKeypair(PKCS11KeyPairType.MLKEM1024);
     }
 
@@ -137,7 +137,7 @@ public class MLKEMGenerateKeyPairTest {
         long mlkemVariant = attrs.parameterSet();
 
         LOG.info("Public Key: {}", Functions.toHex(pkValue));
-        LOG.info("Public Key (ML-KEM Variant): {}",
+        LOG.info("Public Key (MLKEM Variant): {}",
             PKCS11T.getStdMlkemName(mlkemVariant));
 
         // now we try to search for the generated keys

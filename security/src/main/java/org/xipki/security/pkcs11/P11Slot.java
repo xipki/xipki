@@ -783,18 +783,18 @@ public class P11Slot implements Closeable {
         } else if (keyType == CKK_ML_DSA) {
           Long variant = token.getAttrValues(handle,
               new AttributeTypes().parameterSet()).parameterSet();
-          keySpec = (variant == null) ? "ML-DSA-NOT-PRESENT"
+          keySpec = (variant == null) ? "MLDSA-NOT-PRESENT"
               : PKCS11T.getStdMldsaName(variant);
           if (keySpec == null) {
-            keySpec = "ML-DSA-UNKNOWN-" + variant;
+            keySpec = "MLDSA-UNKNOWN-" + variant;
           }
         } else if (keyType == CKK_ML_KEM) {
           Long variant = token.getAttrValues(handle,
               new AttributeTypes().parameterSet()).parameterSet();
-          keySpec = (variant == null) ? "ML-KEM-NOT-PRESENT"
+          keySpec = (variant == null) ? "MLKEM-NOT-PRESENT"
               : PKCS11T.getStdMlkemName(variant);
           if (keySpec == null) {
-            keySpec = "ML-KEM-UNKNOWN-" + variant;
+            keySpec = "MLKEM-UNKNOWN-" + variant;
           }
         } else {
           keySpec = ckkCodeToName(keyType).substring(4);

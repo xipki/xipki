@@ -13,9 +13,9 @@ import org.xipki.security.SignAlgo;
  */
 public enum MldsaVariant {
 
-  mldsa44(SignAlgo.ML_DSA_44, KeySpec.MLDSA44),
-  mldsa65(SignAlgo.ML_DSA_65, KeySpec.MLDSA65),
-  mldsa87(SignAlgo.ML_DSA_87, KeySpec.MLDSA87);
+  mldsa44(SignAlgo.MLDSA44, KeySpec.MLDSA44),
+  mldsa65(SignAlgo.MLDSA65, KeySpec.MLDSA65),
+  mldsa87(SignAlgo.MLDSA87, KeySpec.MLDSA87);
 
   private final SignAlgo signAlgo;
   private final KeySpec keySpec;

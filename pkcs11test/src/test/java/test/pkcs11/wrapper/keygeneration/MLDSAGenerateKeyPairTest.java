@@ -21,7 +21,7 @@ import test.pkcs11.wrapper.TestHSMs;
 import java.util.Random;
 
 /**
- * This demo program generates an ML-DSA key-pair on the token.
+ * This demo program generates an MLDSA key-pair on the token.
  *
  * @author Lijun Liao (xipki)
  */
@@ -89,21 +89,21 @@ public class MLDSAGenerateKeyPairTest {
     @Test
     public void generateMldsa44() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-DSA-44 key-pair... ");
+      LOG.info("Generating new MLDSA44 key-pair... ");
       generateMldsaKeypair(PKCS11KeyPairType.MLDSA44);
     }
 
     @Test
     public void generateMldsa65() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-DSA-65 key-pair... ");
+      LOG.info("Generating new MLDSA65 key-pair... ");
       generateMldsaKeypair(PKCS11KeyPairType.MLDSA65);
     }
 
     @Test
     public void generateMldsa87() throws Exception {
       LOG.info("##################################################");
-      LOG.info("Generating new ML-DSA-87 key-pair... ");
+      LOG.info("Generating new MLDSA87 key-pair... ");
       generateMldsaKeypair(PKCS11KeyPairType.MLDSA87);
     }
 
