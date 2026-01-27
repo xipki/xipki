@@ -3,7 +3,6 @@
 
 package org.xipki.security;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
@@ -11,6 +10,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
 import org.xipki.security.pkcs11.P11SystemConf;
 import org.xipki.security.pkcs12.P12SignerFactory;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.conf.InvalidConfException;
@@ -159,7 +159,7 @@ public class Securities implements Closeable {
   public void init(SecurityConf conf) throws IOException, InvalidConfException {
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     } else {
       LOG.info("BouncyCastleProvider already added");
     }

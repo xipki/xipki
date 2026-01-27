@@ -25,7 +25,6 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.PemEncoder;
 import org.xipki.util.extra.misc.PemEncoder.PemLabel;
 import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
 import org.xipki.util.password.PasswordResolverException;
 
 import java.io.File;
@@ -209,11 +208,9 @@ public class P12Actions {
 
     private void assertMatch(KeyStore ks, X509Cert cert, String password)
         throws Exception {
-      String keyAlgName = cert.getPublicKey().getAlgorithm();
-
-      if (StringUtil.orEqualsIgnoreCase(keyAlgName, "X25519", "X448", "XDH",
-          "MLKEM512", "ML-KEM-512", "MLKEM768", "ML-KEM-768",
-          "MLKEM1024", "ML-KEM-1024")) {
+      KeySpec keySpec = KeySpec.ofPublicKey(cert.getSubjectPublicKeyInfo());
+      if (keySpec.isMontgomeryEC() || keySpec.isMlkem() ||
+          keySpec.isCompositeMLKEM()) {
         // cannot be checked via creating dummy signature, just compare the
         // public keys
         char[] pwd = password.toCharArray();
@@ -247,14 +244,20 @@ public class P12Actions {
     @Completion(SecurityCompleters.KeySpecCompleter.class)
     private String keyspecStr;
 
+    @Option(name = "--unsigned", description =
+        "whether to use empty signature in the certificate stored in keystore")
+    @Completion(SecurityCompleters.KeySpecCompleter.class)
+    private Boolean unsigned;
+
     @Override
     protected Object execute0() throws Exception {
       KeySpec keySpec = KeySpec.ofKeySpec(keyspecStr);
-
       KeystoreGenerationParameters keyGenParams = getKeyGenParameters();
+      if (unsigned != null) {
+        keyGenParams.setUnsigned(unsigned);
+      }
       KeyStoreWrapper keypair = KeyUtil.generateKeypair3(keySpec, keyGenParams);
       saveKey(keypair);
-
       return null;
     }
 

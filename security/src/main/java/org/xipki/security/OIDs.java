@@ -163,8 +163,8 @@ public class OIDs {
     public static final ASN1ObjectIdentifier id_alg_dhPop_x448 =
         initOid(id_xipki_alg.branch("2"), "xipki-alg-dhPop-x448");
 
-    public static final ASN1ObjectIdentifier id_alg_sig_KEM_GMAC_256 =
-        initOid(id_xipki_alg.branch("3"), "alg-sig-KEM-GMAC-256");
+    public static final ASN1ObjectIdentifier id_alg_KEM_HMAC_SHA256 =
+        initOid(id_xipki_alg.branch("3"), "xipki-alg-KEM-HMAC-SHA256");
 
   } // class Xipki
 
@@ -985,6 +985,9 @@ public class OIDs {
   }
 
   public static final class Algo {
+
+    public static final ASN1ObjectIdentifier id_alg_unsigned = initOid(
+        "1.3.6.1.5.5.7.6.36", "id-alg-unsigned");
 
     public static final ASN1ObjectIdentifier id_rsaEncryption = initOid(
         "1.2.840.113549.1.1.1", "id-rsaEncryption");

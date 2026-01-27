@@ -3,7 +3,6 @@
 package org.xipki.qa;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.security.KeySpec;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.security.util.KeyUtil;
@@ -22,12 +21,16 @@ import java.security.Security;
 public class GenerateKeyPoolResourcesMain {
 
   public static void main(String[] args) {
-    Security.addProvider(new BouncyCastleProvider());
+    Security.addProvider(KeyUtil.newBouncyCastleProvider());
     int n = 10;
 
     SecureRandom rnd = new SecureRandom();
     for (KeySpec keySpec : KeySpec.values()) {
       if (!keySpec.name().contains("RSA")) {
+        continue;
+      }
+
+      if (!keySpec.isCompositeMLKEM()) { // TODO
         continue;
       }
 

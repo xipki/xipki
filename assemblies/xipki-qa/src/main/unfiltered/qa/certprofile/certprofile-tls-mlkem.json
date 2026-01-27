@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "details": "certprofile tls",
+    "details": "certprofile tls with MLKEM keys",
     "category": "A"
   },
   "certLevel": "EndEntity",

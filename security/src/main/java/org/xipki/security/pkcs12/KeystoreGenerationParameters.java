@@ -20,6 +20,8 @@ public class KeystoreGenerationParameters {
 
   private SecureRandom random;
 
+  private Boolean unsigned;
+
   public KeystoreGenerationParameters(char[] password) {
     this.password = Args.notNull(password, "password");
   }
@@ -34,6 +36,14 @@ public class KeystoreGenerationParameters {
 
   public char[] getPassword() {
     return password;
+  }
+
+  public Boolean getUnsigned() {
+    return unsigned;
+  }
+
+  public void setUnsigned(Boolean unsigned) {
+    this.unsigned = unsigned;
   }
 
 }

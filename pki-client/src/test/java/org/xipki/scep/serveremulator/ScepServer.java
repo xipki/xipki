@@ -5,10 +5,10 @@ package org.xipki.scep.serveremulator;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.scep.client.test.MyUtil;
 import org.xipki.security.X509Cert;
 import org.xipki.security.scep.message.CaCaps;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
@@ -76,7 +76,7 @@ public class ScepServer {
     }
 
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
 
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");

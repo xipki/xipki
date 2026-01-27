@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile tls with montmomery 25519 curves"
+    "details": "certprofile with montmomery 25519 curves"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,

@@ -5,7 +5,6 @@ package org.xipki.security.test;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.CtLog;
@@ -44,7 +43,7 @@ public class CtLogVerifyTest {
 
   @Test
   public void testVerify() throws Exception {
-    Security.addProvider(new BouncyCastleProvider());
+    Security.addProvider(KeyUtil.newBouncyCastleProvider());
     byte[] keyBytes = read(pubkeyFile);
 
     SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(

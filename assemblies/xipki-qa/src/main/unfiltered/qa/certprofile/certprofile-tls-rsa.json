@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile tls"
+    "details": "certprofile tls with RSA key"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,

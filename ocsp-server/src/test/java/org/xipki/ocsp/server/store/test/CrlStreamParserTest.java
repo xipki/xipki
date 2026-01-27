@@ -4,12 +4,12 @@
 package org.xipki.ocsp.server.store.test;
 
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.ocsp.server.store.CrlStreamParser;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCertsIterator;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public class CrlStreamParserTest {
   @BeforeClass
   public static void init() {
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
 
   }

@@ -20,7 +20,6 @@ import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientId;
 import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientInfoGenerator;
 import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -54,7 +53,7 @@ public class CmsEnveloperTest {
   @BeforeClass
   public static void init() {
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
   }
 

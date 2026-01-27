@@ -4,6 +4,8 @@
 package org.xipki.security;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.security.encap.KEMUtil;
+import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
@@ -24,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,7 +42,7 @@ public class CsrControl {
 
   private final Map<String, SecretKeyWithAlias> kemMasterKeys;
 
-  public final List<X509Cert> peerCerts;
+  private final List<X509Cert> peerCerts;
 
   public CsrControl() {
     this.defaultKemMasterKey = null;
@@ -110,17 +113,14 @@ public class CsrControl {
     return peerCerts;
   }
 
-  public KemEncapKey generateKemEncapKey(SubjectPublicKeyInfo publicKey)
+  public KemEncapKey generateKemEncapKey(
+      SubjectPublicKeyInfo publicKey, SecureRandom rnd)
       throws XiSecurityException {
     if (defaultKemMasterKey == null) {
       return null;
     }
 
-    try {
-      return KeyUtil.generateKemEncapKey(publicKey, defaultKemMasterKey);
-    } catch (GeneralSecurityException e) {
-      throw new XiSecurityException(e);
-    }
+    return KEMUtil.generateKemEncapKey(publicKey, defaultKemMasterKey, rnd);
   }
 
   public static class CsrControlConf {

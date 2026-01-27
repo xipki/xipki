@@ -164,6 +164,12 @@
    		"conf":{
    			"file":"${profiles.dir}/certprofile-tls-compsig.json"
    		}
+    },{
+   		"name":"tls-compkem",
+   		"type":"xijson",
+   		"conf":{
+   			"file":"${profiles.dir}/certprofile-tls-compkem.json"
+   		}
 	},{
 		"name":"tls-sm2",
 		"type":"xijson",

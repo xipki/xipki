@@ -47,7 +47,7 @@ public class SignerConf {
 
   private final ConfPairs confPairs;
 
-  private KemEncapKey kemEncapKey;
+  private CreateSignerCallback callback;
 
   private List<X509Cert> peerCertificates;
 
@@ -65,7 +65,7 @@ public class SignerConf {
 
   public SignerConf copy() {
     SignerConf copy = new SignerConf(confPairs);
-    copy.kemEncapKey = kemEncapKey;
+    copy.callback = callback;
     copy.peerCertificates = peerCertificates;
     return copy;
   }
@@ -217,12 +217,12 @@ public class SignerConf {
     this.peerCertificates = peerCertificates;
   }
 
-  public KemEncapKey getKemEncapKey() {
-    return kemEncapKey;
+  public CreateSignerCallback getCallback() {
+    return callback == null ? CreateSignerCallback.DEFAULT : callback;
   }
 
-  public void setKemEncapKey(KemEncapKey kemEncapKey) {
-    this.kemEncapKey = kemEncapKey;
+  public void setCallback(CreateSignerCallback callback) {
+    this.callback = callback;
   }
 
   @Override

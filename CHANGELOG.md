@@ -6,7 +6,13 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: 202y/mm/dd
 - All components:
   - Added support of issuing certificate with ML-DSA signature.
+  - Added support of issuing certificate with composite ML-DSA signature 
+    (specified in draft-ietf-lamps-pq-composite-sigs).
   - Added support of issuing certificate with ML-DSA, and ML-KEM public keys
+  - Added support of issuing certificate with composite MLDSA public keys
+    (specified in draft-ietf-lamps-pq-composite-sigs)
+  - Added support of issuing certificate with composite MLKEM public keys
+    (specified in draft-ietf-lamps-pq-composite-kem)
   - Changed (simplified) the format of certificate profiles (v2). The old 
     certificate profiles (v1) can still be used.
   - Use own JSON and CBOR parser and writer

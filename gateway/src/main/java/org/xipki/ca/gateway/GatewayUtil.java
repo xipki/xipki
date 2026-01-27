@@ -96,7 +96,7 @@ public class GatewayUtil {
       if (kaKeyAndCert == null) {
         return false;
       }
-    } else if (OIDs.Xipki.id_alg_sig_KEM_GMAC_256.equals(algOid)) {
+    } else if (OIDs.Xipki.id_alg_KEM_HMAC_SHA256.equals(algOid)) {
       ASN1Sequence seq = ASN1Sequence.getInstance(
           csr.getSignature().getBytes());
 

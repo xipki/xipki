@@ -17,8 +17,8 @@ ca:dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 list = [ cross subca subca-complex ocsp scep multiple-ous \
   qc ee-complex smime smime-legacy tls tls-enc tls-c max-time
   fixed-partial-subject constant-ext \
-  tls-rsa tls-ec tls-edwards tls-montgomery tls-mldsa tls-mlkem tls-compsig \
-  tls-sm2 tls-sm2-enc]
+  tls-rsa tls-ec tls-edwards tls-montgomery tls-mldsa tls-mlkem \
+  tls-compsig tls-compkem tls-sm2 tls-sm2-enc]
 
 each ($list) {
   ca:profile-add --name ${it} \
@@ -293,7 +293,8 @@ ca:caprofile-add \
   --profile tls-mldsa \
   --profile tls-mlkem \
   --profile tls-sm2 \
-  --profile tls-compsig
+  --profile tls-compsig \
+  --profile tls-compkem
 
 ## Add publisher
 ca:capub-add \

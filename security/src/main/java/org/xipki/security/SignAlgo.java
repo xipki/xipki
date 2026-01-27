@@ -18,8 +18,8 @@ import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.MLDSAKey;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.pkcs11.wrapper.PKCS11T;
-import org.xipki.security.pkcs11.composite.CompositeSigAlgoSuite;
-import org.xipki.security.pkcs11.composite.P11CompositeKey;
+import org.xipki.security.composite.CompositeSigSuite;
+import org.xipki.security.pkcs11.P11CompositeKey;
 import org.xipki.security.pkcs11.P11Key;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
@@ -178,63 +178,63 @@ public enum SignAlgo {
   // KEM: decrypt the ciphertext using HPKE to get the shared secret key, using
   // it to compute the MAC value. The jceName KEM-AEW-GMAC is just a dummy
   // value.
-  KEM_GMAC_256("KEM-GMAC-256", 0x84,
-      OIDs.Xipki.id_alg_sig_KEM_GMAC_256, null, false),
+  KEM_HMAC_SHA256("KEM-HMAC-SHA256", 0x84,
+      OIDs.Xipki.id_alg_KEM_HMAC_SHA256, null, false),
 
   // composite algorithms
-  MLDSA44_RSA2048_PSS_SHA256("MLDSA44-RSA2048-PSS-SHA256", 0x85,
-      CompositeSigAlgoSuite.MLDSA44_RSA2048_PSS_SHA256),
+  MLDSA44_RSA2048_PSS_SHA256("MLDSA44-RSA2048-PSS-SHA256",
+      0x85, CompositeSigSuite.MLDSA44_RSA2048_PSS_SHA256),
 
-  MLDSA44_RSA2048_PKCS15_SHA256("MLDSA44-RSA2048-PKCS15-SHA256", 0x86,
-      CompositeSigAlgoSuite.MLDSA44_RSA2048_PKCS15_SHA256),
+  MLDSA44_RSA2048_PKCS15_SHA256("MLDSA44-RSA2048-PKCS15-SHA256",
+      0x86, CompositeSigSuite.MLDSA44_RSA2048_PKCS15_SHA256),
 
-  MLDSA44_Ed25519_SHA512("MLDSA44-Ed25519-SHA512", 0x87,
-      CompositeSigAlgoSuite.MLDSA44_Ed25519_SHA512),
+  MLDSA44_Ed25519_SHA512("MLDSA44-Ed25519-SHA512",
+      0x87, CompositeSigSuite.MLDSA44_Ed25519_SHA512),
 
-  MLDSA44_ECDSA_P256_SHA256("MLDSA44-ECDSA-P256-SHA256", 0x88,
-      CompositeSigAlgoSuite.MLDSA44_ECDSA_P256_SHA256),
+  MLDSA44_ECDSA_P256_SHA256("MLDSA44-ECDSA-P256-SHA256",
+      0x88, CompositeSigSuite.MLDSA44_ECDSA_P256_SHA256),
 
-  MLDSA65_RSA3072_PSS_SHA512("MLDSA65-RSA3072-PSS-SHA512", 0x89,
-      CompositeSigAlgoSuite.MLDSA65_RSA3072_PSS_SHA512),
+  MLDSA65_RSA3072_PSS_SHA512("MLDSA65-RSA3072-PSS-SHA512",
+      0x89, CompositeSigSuite.MLDSA65_RSA3072_PSS_SHA512),
 
-  MLDSA65_RSA3072_PKCS15_SHA512("MLDSA65-RSA3072-PKCS15-SHA512", 0x8a,
-      CompositeSigAlgoSuite.MLDSA65_RSA3072_PKCS15_SHA512),
+  MLDSA65_RSA3072_PKCS15_SHA512("MLDSA65-RSA3072-PKCS15-SHA512",
+      0x8a, CompositeSigSuite.MLDSA65_RSA3072_PKCS15_SHA512),
 
-  MLDSA65_RSA4096_PSS_SHA512("MLDSA65-RSA4096-PSS-SHA512", 0x8b,
-      CompositeSigAlgoSuite.MLDSA65_RSA4096_PSS_SHA512),
+  MLDSA65_RSA4096_PSS_SHA512("MLDSA65-RSA4096-PSS-SHA512",
+      0x8b, CompositeSigSuite.MLDSA65_RSA4096_PSS_SHA512),
 
-  MLDSA65_RSA4096_PKCS15_SHA512("MLDSA65-RSA4096-PKCS15-SHA512", 0x8c,
-      CompositeSigAlgoSuite.MLDSA65_RSA4096_PKCS15_SHA512),
+  MLDSA65_RSA4096_PKCS15_SHA512("MLDSA65-RSA4096-PKCS15-SHA512",
+      0x8c, CompositeSigSuite.MLDSA65_RSA4096_PKCS15_SHA512),
 
-  MLDSA65_ECDSA_P256_SHA512("MLDSA65-ECDSA-P256-SHA512", 0x8d,
-      CompositeSigAlgoSuite.MLDSA65_ECDSA_P256_SHA512),
+  MLDSA65_ECDSA_P256_SHA512("MLDSA65-ECDSA-P256-SHA512",
+      0x8d, CompositeSigSuite.MLDSA65_ECDSA_P256_SHA512),
 
-  MLDSA65_ECDSA_P384_SHA512("MLDSA65-ECDSA-P384-SHA512", 0x8e,
-       CompositeSigAlgoSuite.MLDSA65_ECDSA_P384_SHA512),
+  MLDSA65_ECDSA_P384_SHA512("MLDSA65-ECDSA-P384-SHA512",
+      0x8e, CompositeSigSuite.MLDSA65_ECDSA_P384_SHA512),
 
-  MLDSA65_ECDSA_BP256_SHA512("MLDSA65-ECDSA-brainpoolP256r1-SHA512", 0x8f,
-       CompositeSigAlgoSuite.MLDSA65_ECDSA_BP256_SHA512),
+  MLDSA65_ECDSA_BRAINPOOLP256R1_SHA512("MLDSA65-ECDSA-brainpoolP256r1-SHA512",
+      0x8f, CompositeSigSuite.MLDSA65_ECDSA_BP256_SHA512),
 
-  MLDSA65_Ed25519_SHA512("MLDSA65-Ed25519-SHA512", 0x90,
-       CompositeSigAlgoSuite.MLDSA65_Ed25519_SHA512),
+  MLDSA65_Ed25519_SHA512("MLDSA65-Ed25519-SHA512",
+      0x90, CompositeSigSuite.MLDSA65_Ed25519_SHA512),
 
-  MLDSA87_ECDSA_P384_SHA512("MLDSA87-ECDSA-P384-SHA512", 0x91,
-       CompositeSigAlgoSuite.MLDSA87_ECDSA_P384_SHA512),
+  MLDSA87_ECDSA_P384_SHA512("MLDSA87-ECDSA-P384-SHA512",
+      0x91,       CompositeSigSuite.MLDSA87_ECDSA_P384_SHA512),
 
-  MLDSA87_ECDSA_BP384_SHA512("MLDSA87-ECDSA-brainpoolP384r1-SHA512", 0x92,
-       CompositeSigAlgoSuite.MLDSA87_ECDSA_BP384_SHA512),
+  MLDSA87_ECDSA_BRAINPOOLP384R1_SHA512("MLDSA87-ECDSA-brainpoolP384r1-SHA512",
+      0x92, CompositeSigSuite.MLDSA87_ECDSA_BP384_SHA512),
 
-  MLDSA87_Ed448_SHAKE256("MLDSA87-Ed448-SHAKE256", 0x93,
-       CompositeSigAlgoSuite.MLDSA87_Ed448_SHAKE256),
+  MLDSA87_Ed448_SHAKE256("MLDSA87-Ed448-SHAKE256",
+      0x93, CompositeSigSuite.MLDSA87_Ed448_SHAKE256),
 
-  MLDSA87_RSA3072_PSS_SHA512("MLDSA87-RSA3072-PSS-SHA512", 0x94,
-       CompositeSigAlgoSuite.MLDSA87_RSA3072_PSS_SHA512),
+  MLDSA87_RSA3072_PSS_SHA512("MLDSA87-RSA3072-PSS-SHA512",
+      0x94, CompositeSigSuite.MLDSA87_RSA3072_PSS_SHA512),
 
-  MLDSA87_RSA4096_PSS_SHA512("MLDSA87-RSA4096-PSS-SHA512", 0x95,
-       CompositeSigAlgoSuite.MLDSA87_RSA4096_PSS_SHA512),
+  MLDSA87_RSA4096_PSS_SHA512("MLDSA87-RSA4096-PSS-SHA512",
+      0x95, CompositeSigSuite.MLDSA87_RSA4096_PSS_SHA512),
 
-  MLDSA87_ECDSA_P521_SHA512("MLDSA87-ECDSA-P521-SHA512", 0x96,
-       CompositeSigAlgoSuite.MLDSA87_ECDSA_P521_SHA512)
+  MLDSA87_ECDSA_P521_SHA512("MLDSA87-ECDSA-P521-SHA512",
+      0x96, CompositeSigSuite.MLDSA87_ECDSA_P521_SHA512)
   ;
 
   private static final int TRAILER_FIELD_BC = 1;
@@ -254,7 +254,7 @@ public enum SignAlgo {
 
   private final HashAlgo hashAlgo;
 
-  private final CompositeSigAlgoSuite compositeSigAlgoSuite;
+  private final CompositeSigSuite compositeSigAlgoSuite;
 
   static {
     for (SignAlgo type : SignAlgo.values()) {
@@ -355,7 +355,7 @@ public enum SignAlgo {
   }
 
   // Composite Signature
-  SignAlgo(String jceName, int code, CompositeSigAlgoSuite algoSuite) {
+  SignAlgo(String jceName, int code, CompositeSigSuite algoSuite) {
     this.code     = (byte) Args.range(code, "code", 0, 255);
     this.jceName  = jceName;
     this.algId    = algoSuite.algId();
@@ -368,7 +368,7 @@ public enum SignAlgo {
     return hashAlgo;
   }
 
-  public CompositeSigAlgoSuite compositeSigAlgoSuite() {
+  public CompositeSigSuite compositeSigAlgoSuite() {
     return compositeSigAlgoSuite;
   }
 
@@ -386,10 +386,6 @@ public enum SignAlgo {
 
   public AlgorithmIdentifier getAlgorithmIdentifier() {
     return algId;
-  }
-
-  public CompositeSigAlgoSuite getCompositeSigAlgoSuite() {
-    return compositeSigAlgoSuite;
   }
 
   public Signature newSignature() throws NoSuchAlgorithmException {
@@ -464,10 +460,10 @@ public enum SignAlgo {
       case MLDSA65_RSA4096_PKCS15_SHA512:
       case MLDSA65_ECDSA_P256_SHA512:
       case MLDSA65_ECDSA_P384_SHA512:
-      case MLDSA65_ECDSA_BP256_SHA512:
+      case MLDSA65_ECDSA_BRAINPOOLP256R1_SHA512:
       case MLDSA65_Ed25519_SHA512:
       case MLDSA87_ECDSA_P384_SHA512:
-      case MLDSA87_ECDSA_BP384_SHA512:
+      case MLDSA87_ECDSA_BRAINPOOLP384R1_SHA512:
       case MLDSA87_Ed448_SHAKE256:
       case MLDSA87_RSA3072_PSS_SHA512:
       case MLDSA87_RSA4096_PSS_SHA512:
@@ -570,6 +566,12 @@ public enum SignAlgo {
     return getInstance0(p11Key, signerConf);
   }
 
+  public static SignAlgo getInstance(
+      P11CompositeKey p11Key, SignerConf signerConf)
+      throws NoSuchAlgorithmException {
+    return getInstance0(p11Key, signerConf);
+  }
+
   public static SignAlgo getInstance(Key key)
       throws NoSuchAlgorithmException {
     return getInstance0(key, null);
@@ -648,20 +650,38 @@ public enum SignAlgo {
         }
 
         return checkMLDSASignAlgo(algo, hashAlgo, paramSpec);
+      } else if (keyType == PKCS11T.CKK_ML_KEM) {
+        if (algo != null && algo != SignAlgo.KEM_HMAC_SHA256) {
+          throw new NoSuchAlgorithmException(algo + " != KEM_HMAC_SHA256");
+        }
+        return SignAlgo.KEM_HMAC_SHA256;
       } else {
         throw new NoSuchAlgorithmException("Unknown key type "
             + PKCS11T.ckkCodeToName(keyType));
       }
     } else if (key instanceof P11CompositeKey) {
       P11CompositeKey p11Key = (P11CompositeKey) key;
-      CompositeSigAlgoSuite algoSuite = p11Key.getAlgoSuite();
-      if (algo != null) {
-        if (algo.compositeSigAlgoSuite != algoSuite) {
-          throw new NoSuchAlgorithmException("compositeSigAlgoSuite unmatach");
+      CompositeSigSuite algoSuite = p11Key.getSigAlgoSuite();
+      if (p11Key.getSigAlgoSuite() != null) {
+        if (algo != null) {
+          if (algo.compositeSigAlgoSuite != algoSuite) {
+            throw new NoSuchAlgorithmException("compositeSigAlgoSuite unmatch");
+          }
+        } else {
+          algo = SignAlgo.getSignAlgo(algoSuite);
         }
         return algo;
+      } else if (signerConf != null) {
+        KeySpec keySpec = p11Key.getKemAlgoSuite().keySpec();
+        try {
+          return signerConf.getCallback().getSignAlgo(
+                  keySpec, signerConf.getMode());
+        } catch (InvalidConfException e) {
+          throw new NoSuchAlgorithmException(e);
+        }
       } else {
-        return SignAlgo.getSignAlgo(algoSuite);
+        throw new NoSuchAlgorithmException(
+            "could not detect SignAlgo for P11CompositeKey");
       }
     } else {
       throw new NoSuchAlgorithmException(
@@ -873,7 +893,7 @@ public enum SignAlgo {
     }
   } // method getECDSASigAlgo
 
-  private static SignAlgo getSignAlgo(CompositeSigAlgoSuite algoSuite)
+  private static SignAlgo getSignAlgo(CompositeSigSuite algoSuite)
       throws NoSuchAlgorithmException {
     Args.notNull(algoSuite, "algoSuite");
     for (SignAlgo algo : SignAlgo.values()) {

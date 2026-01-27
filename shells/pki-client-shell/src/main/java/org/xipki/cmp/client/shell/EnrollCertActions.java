@@ -46,6 +46,8 @@ import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.cmp.client.PkiErrorException;
 import org.xipki.security.*;
+import org.xipki.security.encap.KemEncapKey;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -386,12 +388,14 @@ public class EnrollCertActions {
             .setParallelism(1)
             .setKeystore("file:" + p12File);
 
-        SubjectPublicKeyInfo pkInfo = null;
+        SubjectPublicKeyInfo tmpPkInfo = null;
         try {
-          pkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry(
+          tmpPkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry(
               "PKCS12", p12File, password);
         } catch (Exception e) {
         }
+
+        SubjectPublicKeyInfo pkInfo = tmpPkInfo;
 
         SignAlgoMode mode = getSignAlgoMode();
         if (mode != null) {
@@ -401,16 +405,28 @@ public class EnrollCertActions {
         KeySpec keySpec = pkInfo == null ? null : KeySpec.ofPublicKey(pkInfo);
 
         if (keySpec != null) {
-          if (keySpec.isMlkem()) {
-            KemEncapKey kemEncapKey;
-            try {
-              kemEncapKey = client.generateKemEncapKey(caName, pkInfo, null);
-            } catch (PkiErrorException e) {
-              throw new CmpClientException(
-                  "error generating KemEncapKey: " + e.getMessage());
-            }
-            sc.setAlgo(SignAlgo.KEM_GMAC_256);
-            sc.setKemEncapKey(kemEncapKey);
+          if (keySpec.isMlkem() || keySpec.isCompositeMLKEM()) {
+            CreateSignerCallback callback = new CreateSignerCallback() {
+              @Override
+              public KemEncapKey generateKemEncapKey(
+                  SecurityFactory securityFactory,
+                  SubjectPublicKeyInfo publicKeyInfo)
+                  throws XiSecurityException {
+                try {
+                  return client.generateKemEncapKey(caName, pkInfo, null);
+                } catch (CmpClientException | PkiErrorException e) {
+                  throw new XiSecurityException(
+                      "error generating KemEncapKey: " + e.getMessage());
+                }
+              }
+
+              @Override
+              public SignAlgo getSignAlgo(KeySpec keyspec, SignAlgoMode mode) {
+                return SignAlgo.KEM_HMAC_SHA256;
+              }
+            };
+
+            sc.setCallback(callback);
           } else if (keySpec.isMontgomeryEC()) {
             List<X509Cert> peerCerts = client.getDhPopPeerCertificates();
             if (CollectionUtil.isNotEmpty(peerCerts)) {

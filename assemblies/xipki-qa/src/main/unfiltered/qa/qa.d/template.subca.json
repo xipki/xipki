@@ -75,6 +75,7 @@
 			"tls-mldsa",
 			"tls-mlkem",
             "tls-compsig",
+            "tls-compkem",
 			"tls-sm2"
 		],
 		"publishers":[

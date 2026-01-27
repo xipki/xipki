@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.xipki.security.*;
+import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.BadInputException;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
@@ -50,7 +51,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -84,11 +84,6 @@ public class CsrActions {
     @Option(name = "--subject-info-access", aliases = "--sia",
         multiValued = true, description = "subjectInfoAccess")
     protected List<String> subjectInfoAccesses;
-
-    @Option(name = "--peer-cert", description =
-        "Peer certificate file, only for the Diffie-Hellman keys")
-    @Completion(FileCompleter.class)
-    private String peerCertFile;
 
     @Option(name = "--cert", description =
         "Certificate file, from which subject and extensions will be " +
@@ -586,7 +581,8 @@ public class CsrActions {
     protected KemEncapKey getKemEncapkey(SubjectPublicKeyInfo myPublicKey)
         throws ObjectCreationException {
       try {
-        return securityFactory.getCsrControl().generateKemEncapKey(myPublicKey);
+        return securityFactory.getCsrControl().generateKemEncapKey(
+            myPublicKey, securityFactory.getRandom4Sign());
       } catch (XiSecurityException ex) {
         throw new ObjectCreationException(
             "error computing EncapKey: " + ex.getMessage(), ex);
@@ -672,7 +668,7 @@ public class CsrActions {
       return getSigner(moduleName, slotIndex, id, label, mode, securityFactory);
     }
 
-    static ConcurrentContentSigner getSigner(
+    ConcurrentContentSigner getSigner(
         String moduleName, String slotIndex, String id, String label,
         SignAlgoMode mode, SecurityFactory securityFactory) throws Exception {
       byte[] idBytes = null;
@@ -685,9 +681,10 @@ public class CsrActions {
       return securityFactory.createSigner("PKCS11", conf, (X509Cert) null);
     }
 
-    private static SignerConf getPkcs11SignerConf(
+    private SignerConf getPkcs11SignerConf(
         String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
-        int parallelism, HashAlgo hashAlgo, SignAlgoMode mode) {
+        int parallelism, HashAlgo hashAlgo, SignAlgoMode mode)
+            throws ObjectCreationException {
       Args.positive(parallelism, "parallelism");
 
       if (keyId == null && keyLabel == null) {
@@ -720,7 +717,12 @@ public class CsrActions {
         conf.putPair("hash", hashAlgo.getJceName());
       }
 
-      return new SignerConf(conf);
+      SignerConf signerConf = new SignerConf(conf);
+      if (rsaPss != null && rsaPss) {
+        signerConf.setMode(SignAlgoMode.RSAPSS);
+      }
+      signerConf.setPeerCertificates(getPeerCertificates());
+      return signerConf;
     }
 
   }
@@ -769,37 +771,11 @@ public class CsrActions {
           .setPassword(new String(pwd))
           .setParallelism(1)
           .setKeystore("file:" + p12File);
-
-      SubjectPublicKeyInfo pkInfo = null;
-      try {
-        pkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry(
-            "PKCS12", p12File, getPassword());
-      } catch (Exception e) {
-      }
-      KeySpec keySpec = pkInfo == null ? null : KeySpec.ofPublicKey(pkInfo);
-
-      if (keySpec != null && keySpec.isMlkem()) {
-        KemEncapKey kemEncapkey = getKemEncapkey(pkInfo);
-        conf.setAlgo(SignAlgo.KEM_GMAC_256);
-        conf.setKemEncapKey(kemEncapkey);
-      } else if (keySpec != null && keySpec.isCompositeMLDSA()) {
-        try {
-          SignAlgo signAlgo = SignAlgo.getInstance(
-                                keySpec.getAlgorithmIdentifier());
-          conf.setAlgo(signAlgo);
-        } catch (NoSuchAlgorithmException e) {
-          throw new RuntimeException(e);
-        }
-      } else {
-        if (rsaPss != null && rsaPss) {
-          conf.setMode(SignAlgoMode.RSAPSS);
-        }
-
-        if (keySpec != null && keySpec.isMontgomeryEC()) {
-          conf.setPeerCertificates(getPeerCertificates());
-        }
+      if (rsaPss != null && rsaPss) {
+        conf.setMode(SignAlgoMode.RSAPSS);
       }
 
+      conf.setPeerCertificates(getPeerCertificates());
       return securityFactory.createSigner("PKCS12", conf,
           (X509Cert) null);
     }
@@ -835,7 +811,7 @@ public class CsrActions {
       ASN1ObjectIdentifier sigAlgOid =
           csr.getSignatureAlgorithm().getAlgorithm();
 
-      boolean isKemMac = OIDs.Xipki.id_alg_sig_KEM_GMAC_256.equals(sigAlgOid);
+      boolean isKemMac = OIDs.Xipki.id_alg_KEM_HMAC_SHA256.equals(sigAlgOid);
 
       boolean isXdh =
           OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid) ||

@@ -42,7 +42,19 @@ each ($list) {
              MLDSA87-ED448-SHAKE256               \
              MLDSA87-RSA3072-PSS-SHA512           \
              MLDSA87-RSA4096-PSS-SHA512           \
-             MLDSA87-ECDSA-P521-SHA512 ]; each ($KEYSPECs) {
+             MLDSA87-ECDSA-P521-SHA512            \
+             MLKEM768-RSA2048-SHA3-256               \
+             MLKEM768-RSA3072-SHA3-256               \
+             MLKEM768-RSA4096-SHA3-256               \
+             MLKEM768-X25519-SHA3-256                \
+             MLKEM768-ECDH-P256-SHA3-256             \
+             MLKEM768-ECDH-P384-SHA3-256             \
+             MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256  \
+             MLKEM1024-RSA3072-SHA3-256              \
+             MLKEM1024-ECDH-P384-SHA3-256            \
+             MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256 \
+             MLKEM1024-X448-SHA3-256                 \
+             MLKEM1024-ECDH-P521-SHA3-256 ]; each ($KEYSPECs) {
     KEYSPEC = $it
 
     xi:keypair-p12 --keyspec ${KEYSPEC} --password CHANGEIT --out p12/${KEYSPEC}/${filename}.p12
@@ -100,10 +112,32 @@ each ($list) {
     xi:keypair-p12 --keyspec ${KEYSPEC} --password CHANGEIT --out p12/${KEYSPEC}/${filename}.p12
   }
 
-  xi:keypair-p12 --keyspec MLDSA44  --password CHANGEIT --out p12/MLKEM512/${filename}.p12
-  xi:keypair-p12 --keyspec MLDSA65  --password CHANGEIT --out p12/MLKEM768/${filename}.p12
-  xi:keypair-p12 --keyspec MLDSA87  --password CHANGEIT --out p12/MLKEM1024/${filename}.p12
-  xi:keypair-p12 --keyspec ED25519  --password CHANGEIT --out p12/X25519/${filename}.p12
-  xi:keypair-p12 --keyspec ED448    --password CHANGEIT --out p12/X448/${filename}.p12
+  xi:keypair-p12 --keyspec ED25519 --password CHANGEIT --out p12/X25519/${filename}.p12
+  xi:keypair-p12 --keyspec ED448   --password CHANGEIT --out p12/X448/${filename}.p12
+  xi:keypair-p12 --keyspec MLDSA44 --password CHANGEIT --out p12/MLKEM512/${filename}.p12
+
+  KEYSPECs = [ MLKEM768                                \
+               MLKEM768-RSA2048-SHA3-256               \
+               MLKEM768-RSA3072-SHA3-256               \
+               MLKEM768-RSA4096-SHA3-256               \
+               MLKEM768-X25519-SHA3-256                \
+               MLKEM768-ECDH-P256-SHA3-256             \
+               MLKEM768-ECDH-P384-SHA3-256             \
+               MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256 ]; each ($KEYSPECs) {
+    KEYSPEC = $it
+
+    xi:keypair-p12 --keyspec MLDSA65  --password CHANGEIT --out p12/${KEYSPEC}/${filename}.p12
+  }
+
+  KEYSPECs = [ MLKEM1024                               \
+               MLKEM1024-RSA3072-SHA3-256              \
+               MLKEM1024-ECDH-P384-SHA3-256            \
+               MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256 \
+               MLKEM1024-X448-SHA3-256                 \
+               MLKEM1024-ECDH-P521-SHA3-256 ]; each ($KEYSPECs) {
+    KEYSPEC = $it
+
+    xi:keypair-p12 --keyspec MLDSA87  --password CHANGEIT --out p12/${KEYSPEC}/${filename}.p12
+  }
 
 }

@@ -6,9 +6,8 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
+import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.composite.CompositeSigAlgoSuite;
-import org.xipki.security.pkcs11.composite.P11CompositeKey;
 import org.xipki.util.codec.Args;
 import org.xipki.util.io.IoUtil;
 
@@ -36,14 +35,14 @@ public class P11CompositeContentSigner implements XiContentSigner {
 
   private final P11ContentSigner tradSigner;
 
-  private final CompositeSigAlgoSuite algoSuite;
+  private final CompositeSigSuite algoSuite;
 
   private final byte[] encodedAlgorithmIdentifier;
 
   private final byte[] context;
 
   private P11CompositeContentSigner(
-      P11CompositeKey identity, CompositeSigAlgoSuite algoSuite,
+      P11CompositeKey identity, CompositeSigSuite algoSuite,
       byte[] context, SecureRandom rnd)
       throws XiSecurityException {
     this.context = context == null ? null : context.clone();

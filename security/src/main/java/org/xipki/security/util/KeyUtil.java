@@ -19,20 +19,19 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
-import org.bouncycastle.crypto.macs.KMAC;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.params.Ed448PublicKeyParameters;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.X25519PublicKeyParameters;
 import org.bouncycastle.crypto.params.X448PublicKeyParameters;
 import org.bouncycastle.crypto.signers.PSSSigner;
 import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.MLDSAPrivateKey;
+import org.bouncycastle.jcajce.interfaces.MLKEMPrivateKey;
+import org.bouncycastle.jcajce.interfaces.MLKEMPublicKey;
 import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.jcajce.spec.KTSParameterSpec;
 import org.bouncycastle.jcajce.spec.MLDSAParameterSpec;
 import org.bouncycastle.jcajce.spec.MLKEMParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -45,7 +44,6 @@ import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.KemEncapKey;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
@@ -54,7 +52,11 @@ import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiKEMContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiSignatureContentVerifierProvider;
+import org.xipki.security.bc.XiUnsignedSigner;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
+import org.xipki.security.bc.compositekem.CompositeKemKeyInfoConverter;
+import org.xipki.security.bc.compositekem.CompositeMLKEMPrivateKey;
+import org.xipki.security.bc.compositekem.CompositeMLKEMPublicKey;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
@@ -63,21 +65,17 @@ import org.xipki.security.pkcs12.P12ContentSignerBuilder;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.codec.asn1.Asn1Util;
-import org.xipki.util.extra.misc.NopOutputStream;
 import org.xipki.util.extra.misc.RandomUtil;
 import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
@@ -128,6 +126,19 @@ public class KeyUtil {
   private KeyUtil() {
   }
 
+  public static BouncyCastleProvider newBouncyCastleProvider() {
+    BouncyCastleProvider bc = new BouncyCastleProvider();
+    for (KeySpec keySpec : KeySpec.values()) {
+      if (!keySpec.isCompositeMLKEM()) {
+        continue;
+      }
+
+      bc.addKeyInfoConverter(keySpec.getAlgorithmIdentifier().getAlgorithm(),
+          new CompositeKemKeyInfoConverter());
+    }
+    return bc;
+  }
+
   public static byte[] getSM2Z(byte[] userID, BigInteger pubPointX,
                                BigInteger pubPointY) {
     SM3Digest digest = new SM3Digest();
@@ -159,23 +170,6 @@ public class KeyUtil {
 
   public static boolean isSm2primev1Curve(BigInteger curveOrder) {
     return bnSm2primev1Order.equals(curveOrder);
-  }
-
-  public static byte[] kmacDerive(
-      SecretKey ikm, int keyByteSize, byte[] info, byte[] data) {
-    return kmacDerive(ikm.getEncoded(), keyByteSize, info, data);
-  }
-
-  public static byte[] kmacDerive(
-      byte[] ikm, int keyByteSize, byte[] info, byte[] data) {
-    KMAC kmac = new KMAC(256, info);
-    KeyParameter keyParameter = new KeyParameter(ikm, 0, ikm.length);
-    kmac.init(keyParameter);
-    kmac.update(data, 0, data.length);
-
-    byte[] outKey = new byte[keyByteSize];
-    kmac.doFinal(outKey, 0, keyByteSize);
-    return outKey;
   }
 
   public static KeyStore getInKeyStore(String storeType)
@@ -301,6 +295,17 @@ public class KeyUtil {
       String oid = keySpec.getAlgorithmIdentifier().getAlgorithm().getId();
       KeyPairGenerator kpGen = getKeyPairGenerator(oid);
       return kpGen.generateKeyPair();
+    } else if (keySpec.isCompositeMLKEM()) {
+      // TODO: use the BC impl once supported
+      KeyPair pqcKeyPair =
+          generateKeypair(keySpec.getCompositePqcVariant(), random);
+      KeyPair tradKeyPair =
+          generateKeypair(keySpec.getCompositeTradVariant(), random);
+      CompositeMLKEMPrivateKey sk = new CompositeMLKEMPrivateKey(
+          (MLKEMPrivateKey) pqcKeyPair.getPrivate(), tradKeyPair.getPrivate());
+      CompositeMLKEMPublicKey pk = new CompositeMLKEMPublicKey(
+          (MLKEMPublicKey) pqcKeyPair.getPublic(), tradKeyPair.getPublic());
+      return new KeyPair(pk, sk);
     }
 
     throw new IllegalStateException("unknown keyspec " + keySpec);
@@ -309,59 +314,9 @@ public class KeyUtil {
   public static KeyPairWithSubjectPublicKeyInfo generateKeypair2(
       KeySpec keySpec, SecureRandom random) throws Exception {
     KeyPair keypair = generateKeypair(keySpec, random);
-
-    switch (keySpec) {
-      case RSA2048:
-      case RSA3072:
-      case RSA4096: {
-        java.security.interfaces.RSAPublicKey rsaPubKey =
-            (java.security.interfaces.RSAPublicKey) keypair.getPublic();
-
-        SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
-            keySpec.getAlgorithmIdentifier(),
-            new org.bouncycastle.asn1.pkcs.RSAPublicKey(rsaPubKey.getModulus(),
-                rsaPubKey.getPublicExponent()));
-        return new KeyPairWithSubjectPublicKeyInfo(keypair, spki);
-      }
-      case ED25519:
-      case ED448:
-      case X25519:
-      case X448:
-      case MLDSA44:
-      case MLDSA65:
-      case MLDSA87:
-      case MLKEM512:
-      case MLKEM768:
-      case MLKEM1024: {
-        SubjectPublicKeyInfo subjectPublicKeyInfo =
-            KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-        return new KeyPairWithSubjectPublicKeyInfo(keypair,
-            subjectPublicKeyInfo);
-      }
-      case SECP256R1:
-      case SECP384R1:
-      case SECP521R1:
-      case BRAINPOOLP256R1:
-      case BRAINPOOLP384R1:
-      case BRAINPOOLP512R1:
-      case SM2P256V1:
-      case FRP256V1: {
-        ECPublicKey pub = (ECPublicKey) keypair.getPublic();
-        int fieldBitSize = pub.getParams().getCurve().getField().getFieldSize();
-        byte[] keyData = KeyUtil.getUncompressedEncodedECPoint(
-            pub.getW(), fieldBitSize);
-
-        SubjectPublicKeyInfo subjectPublicKeyInfo =
-            new SubjectPublicKeyInfo(keySpec.getAlgorithmIdentifier(),
-                keyData);
-        return new KeyPairWithSubjectPublicKeyInfo(keypair,
-            subjectPublicKeyInfo);
-      }
-    }
-
-    SubjectPublicKeyInfo subjectPublicKeyInfo =
-        SubjectPublicKeyInfo.getInstance(keypair.getPublic().getEncoded());
-    return new KeyPairWithSubjectPublicKeyInfo(keypair, subjectPublicKeyInfo);
+    SubjectPublicKeyInfo pkInfo =
+        KeyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+    return new KeyPairWithSubjectPublicKeyInfo(keypair, pkInfo);
   }
 
   public static KeyStoreWrapper generateKeypair3(
@@ -377,8 +332,13 @@ public class KeyUtil {
     String dnStr = "CN=DUMMY";
     X500Name subjectDn = new X500Name(dnStr);
     SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
-    ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate(),
-        kp.getKeypair().getPublic(), params.getRandom());
+    ContentSigner contentSigner;
+    if (params.getUnsigned() != null && params.getUnsigned()) {
+      contentSigner = XiUnsignedSigner.INSTANCE;
+    } else {
+      contentSigner = getContentSigner(kp.getKeypair().getPrivate(),
+          kp.getKeypair().getPublic(), params.getRandom(), true);
+    }
 
     // Generate keystore
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
@@ -629,35 +589,6 @@ public class KeyUtil {
     }
   }
 
-  public static KemEncapKey generateKemEncapKey(
-      SubjectPublicKeyInfo spki, SecretKeyWithAlias masterKey)
-      throws GeneralSecurityException {
-    ASN1ObjectIdentifier algOid = spki.getAlgorithm().getAlgorithm();
-    if (!(OIDs.Algo.id_ml_kem_512.equals(algOid) ||
-        OIDs.Algo.id_ml_kem_768.equals(algOid) ||
-        OIDs.Algo.id_ml_kem_1024.equals(algOid))) {
-      throw new IllegalArgumentException(
-          "The given public key (spki) is not an MLKEM key.");
-    }
-
-    byte[] rawPkData = spki.getPublicKeyData().getOctets();
-
-    // derive the shared secret
-    byte[] secret = kmacDerive(masterKey.getSecretKey(), 32,
-        "XIPKI-KEM".getBytes(StandardCharsets.US_ASCII), rawPkData);
-
-    // Encapsulate the secret
-    PublicKey publicKey = KeyUtil.getPublicKey(spki);
-    Cipher wrapper = Cipher.getInstance("MLKEM", "BC");
-    KTSParameterSpec spec = new KTSParameterSpec.Builder("AES-KWP", 256)
-        .withNoKdf().build();
-    wrapper.init(Cipher.WRAP_MODE, publicKey, spec);
-    byte[] wrapped = wrapper.wrap(new SecretKeySpec(secret, "GENERAL"));
-
-    return new KemEncapKey(masterKey.getAlias(), KemEncapKey.ALG_AES_KWP_256,
-        wrapped);
-  }
-
   public static Signer createPSSRSASigner(SignAlgo sigAlgo)
       throws XiSecurityException {
     if (!Args.notNull(sigAlgo, "sigAlgo").isRSAPSSSigAlgo()) {
@@ -724,13 +655,31 @@ public class KeyUtil {
               "ownerMasterKey is required but absent");
         }
         return new XiKEMContentVerifierProvider(publicKey, ownerMasterKey);
-      default:
-        return new XiSignatureContentVerifierProvider(publicKey);
     }
+
+    KeySpec keySpec = KeySpec.ofAlgorithmIdentifier(
+        SubjectPublicKeyInfo.getInstance(publicKey.getEncoded())
+            .getAlgorithm());
+    if (keySpec != null && keySpec.isCompositeMLKEM()) {
+      if (ownerMasterKey == null) {
+        throw new InvalidKeyException(
+            "ownerMasterKey is required but absent");
+      }
+      return new XiKEMContentVerifierProvider(publicKey, ownerMasterKey);
+    }
+
+    return new XiSignatureContentVerifierProvider(publicKey);
   } // method getContentVerifierProvider
 
   public static ContentSigner getContentSigner(
       PrivateKey key, PublicKey publicKey, SecureRandom random)
+      throws Exception {
+    return getContentSigner(key, publicKey, random, false);
+  }
+
+  public static ContentSigner getContentSigner(
+      PrivateKey key, PublicKey publicKey, SecureRandom random,
+      boolean allowUnsigned)
       throws Exception {
     SignAlgo algo;
     if (key instanceof RSAPrivateKey) {
@@ -759,50 +708,8 @@ public class KeyUtil {
             + spki.getAlgorithm().getAlgorithm());
       }
 
-      if (keySpec.isMontgomeryEC()) {
-        // Just dummy: signature created by the signKey cannot be verified
-        // by the public key.
-        SignAlgo signAlgo = (keySpec == KeySpec.X25519)
-            ? SignAlgo.ED25519 : SignAlgo.ED448;
-
-        return new ContentSigner() {
-          @Override
-          public AlgorithmIdentifier getAlgorithmIdentifier() {
-            return signAlgo.getAlgorithmIdentifier();
-          }
-
-          @Override
-          public OutputStream getOutputStream() {
-            return new NopOutputStream();
-          }
-
-          @Override
-          public byte[] getSignature() {
-            return new byte[(keySpec == KeySpec.X25519) ? 64 : 114];
-          }
-        };
-      } else if (keySpec.isEdwardsEC()) {
+      if (keySpec.isEdwardsEC()) {
         algo = (keySpec == KeySpec.ED25519) ? SignAlgo.ED25519 : SignAlgo.ED448;
-      } else if (keySpec == KeySpec.MLKEM512
-          || keySpec == KeySpec.MLKEM768
-          || keySpec == KeySpec.MLKEM1024) {
-        // just return dummy signer
-        return new ContentSigner() {
-          @Override
-          public AlgorithmIdentifier getAlgorithmIdentifier() {
-            return new AlgorithmIdentifier(new ASN1ObjectIdentifier("1.2.3.4"));
-          }
-
-          @Override
-          public OutputStream getOutputStream() {
-            return new NopOutputStream();
-          }
-
-          @Override
-          public byte[] getSignature() {
-            return new byte[64];
-          }
-        };
       } else if (keySpec == KeySpec.MLDSA44) {
         algo = SignAlgo.MLDSA44;
       } else if (keySpec == KeySpec.MLDSA65) {
@@ -811,6 +718,9 @@ public class KeyUtil {
         algo = SignAlgo.MLDSA87;
       } else if (keySpec.isCompositeMLDSA()) {
         algo = SignAlgo.getInstance(keySpec.getAlgorithmIdentifier());
+      } else if (allowUnsigned & (keySpec.isMontgomeryEC() ||
+          keySpec.isMlkem() || keySpec.isCompositeMLKEM())) {
+        return XiUnsignedSigner.INSTANCE;
       } else {
         throw new IllegalArgumentException("unknown key-spec " + keySpec);
       }

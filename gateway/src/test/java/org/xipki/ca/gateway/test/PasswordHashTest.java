@@ -3,11 +3,11 @@
 
 package org.xipki.ca.gateway.test;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xipki.ca.gateway.PasswordHash;
+import org.xipki.security.util.KeyUtil;
 
 import java.security.Security;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ public class PasswordHashTest {
   @Before
   public void addBouncyCastleProvider() {
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
   }
 

@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "details": "certprofile tls with composite MLKEM keys",
+    "category": "A"
+  },
+  "certLevel": "EndEntity",
+  "certDomain": "RFC5280",
+  "maxSize": 8400,
+  "validity": "5y",
+  "notBeforeTime": "current",
+  "keypairGeneration": "MLKEM768-ECDH-P256-SHA3-256",
+  "keyAlgorithms": [
+    "MLKEM768-RSA2048-SHA3-256",
+    "MLKEM768-RSA3072-SHA3-256",
+    "MLKEM768-RSA4096-SHA3-256",
+    "MLKEM768-X25519-SHA3-256",
+    "MLKEM768-ECDH-P256-SHA3-256",
+    "MLKEM768-ECDH-P384-SHA3-256",
+    "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
+    "MLKEM1024-RSA3072-SHA3-256",
+    "MLKEM1024-ECDH-P384-SHA3-256",
+    "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
+    "MLKEM1024-X448-SHA3-256",
+    "MLKEM1024-ECDH-P521-SHA3-256"
+  ],
+  "subject": [{
+    "type": "country",
+    "minOccurs": 0
+  },{
+    "type": "organization",
+    "minOccurs": 0
+  },{
+    "type": "organizationalUnit",
+    "minOccurs": 0
+  },{
+    "type": "serialNumber",
+    "minOccurs": 0
+  },{
+    "type": "commonName",
+    "regex": ":FQDN",
+    "toSAN": "DNSName"
+  }],
+  "extensions": [{
+    "type": "SubjectKeyIdentifier",
+    "required": true
+  },{
+    "type": "CRLDistributionPoints"
+  },{
+    "type": "FreshestCRL"
+  },{
+    "type": "SubjectAlternativeName",
+    "required": true,
+    "inRequest": "optional",
+    "subjectAltName": {
+      "modes": ["DNSName","IPAddress"]
+    }
+  },{
+    "type": "BasicConstraints",
+    "critical": true,
+    "required": true
+  },{
+    "type": "AuthorityInfoAccess",
+    "required": true,
+    "authorityInfoAccess": {
+      "includeCaIssuers": true,
+      "includeOcsp": true
+    }
+  },{
+    "type": "AuthorityKeyIdentifier",
+    "required": true
+  },{
+    "type": "KeyUsage",
+    "critical": true,
+    "required": true,
+    "inRequest": "optional",
+    "keyUsage": {
+      "usages": [{
+        "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
+      }]
+    }
+  },{
+    "type": "ExtendedKeyUsage",
+    "required": true,
+    "inRequest": "optional",
+    "extendedKeyUsage": {
+      "required": ["serverAuth"],
+      "optional": ["clientAuth"]
+    }
+  }]
+}

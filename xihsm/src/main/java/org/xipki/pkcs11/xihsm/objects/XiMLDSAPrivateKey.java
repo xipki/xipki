@@ -18,7 +18,6 @@ import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 import org.xipki.pkcs11.xihsm.attr.XiTemplateChecker;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
-import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.pkcs11.xihsm.util.XiConstants;
@@ -27,7 +26,6 @@ import org.xipki.util.codec.Args;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.security.Signature;
-import java.security.spec.AlgorithmParameterSpec;
 import java.util.List;
 
 /**

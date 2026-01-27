@@ -6,6 +6,7 @@ package org.xipki.security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.util.KeyUtil;
 
 import java.io.Closeable;
 import java.security.Security;
@@ -32,7 +33,7 @@ public class Providers implements Closeable {
   private void addBcProvider() {
     if (Security.getProvider("BC") == null) {
       LOG.info("add BouncyCastleProvider");
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     } else {
       LOG.info("BouncyCastleProvider already added");
     }

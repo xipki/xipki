@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile tls with montmomery 448 curves"
+    "details": "certprofile tls with montgomery 448 curves"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,

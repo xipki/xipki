@@ -45,7 +45,6 @@ import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.KemEncapKey;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -56,10 +55,12 @@ import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.security.cmp.ProtectionResult;
 import org.xipki.security.cmp.ProtectionVerificationResult;
+import org.xipki.security.encap.KEMUtil;
+import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.EcCurveEnum;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -76,7 +77,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -846,7 +846,7 @@ public abstract class BaseCmpResponder {
       }
 
       SecretKey ownerMasterKey = null;
-      if (SignAlgo.KEM_GMAC_256 == popAlg) {
+      if (SignAlgo.KEM_HMAC_SHA256 == popAlg) {
         ASN1Sequence seq = ASN1Sequence.getInstance(
             popSign.getSignature().getOctets());
 
@@ -1061,8 +1061,8 @@ public abstract class BaseCmpResponder {
       SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(bytes);
       KemEncapKey encapKey;
       try {
-        encapKey = KeyUtil.generateKemEncapKey(spki, masterKey);
-      } catch (GeneralSecurityException e) {
+        encapKey = KEMUtil.generateKemEncapKey(spki, masterKey, random);
+      } catch (XiSecurityException e) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "error generating KEM encap key");
       }

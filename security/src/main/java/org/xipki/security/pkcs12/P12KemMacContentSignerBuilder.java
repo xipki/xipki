@@ -7,26 +7,27 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.jcajce.interfaces.MLKEMPrivateKey;
-import org.bouncycastle.jcajce.spec.KTSParameterSpec;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.ConcurrentContentSigner;
 import org.xipki.security.DfltConcurrentContentSigner;
-import org.xipki.security.KemEncapKey;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.XiContentSigner;
+import org.xipki.security.bc.compositekem.CompositeMLKEMPublicKey;
+import org.xipki.security.encap.KEMUtil;
+import org.xipki.security.encap.KemEncapKey;
+import org.xipki.security.encap.KemEncapsulation;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Args;
 
-import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,48 +57,47 @@ public class P12KemMacContentSignerBuilder {
     Args.notNull(encapKey, "encapKey");
 
     // decrypt the kemCiphertext
-    if (keypairWithCert.getKey() instanceof MLKEMPrivateKey) {
-      try {
-        Cipher unwrapper = Cipher.getInstance("ML-KEM", "BC");
-        KTSParameterSpec spec;
-        if (encapKey.getAlg() == KemEncapKey.ALG_AES_KWP_256) {
-          spec = new KTSParameterSpec.Builder("AES-KWP", 256)
-              .withNoKdf().build();
-        } else {
-          throw new XiSecurityException(
-              "unknown wrap mechanism " + encapKey.getAlg());
-        }
-
-        unwrapper.init(Cipher.UNWRAP_MODE, keypairWithCert.getKey(), spec);
-        macKey = (SecretKey) unwrapper.unwrap(encapKey.getEncapKey(),
-            "AES", Cipher.SECRET_KEY);
-
-        utf8Id = new DERUTF8String(encapKey.getId());
-
-        byte[] nonce = new byte[AESGmacContentSigner.nonceLen];
-        int tagByteLen = AESGmacContentSigner.tagByteLen;
-        GCMParameters params = new GCMParameters(nonce, tagByteLen);
-        try {
-          this.sigAlgId = new AlgorithmIdentifier(
-              OIDs.Xipki.id_alg_sig_KEM_GMAC_256);
-          this.encodedSigAlgId = sigAlgId.getEncoded();
-        } catch (IOException ex) {
-          throw new XiSecurityException("could not encode AlgorithmIdentifier",
-              ex);
-        }
-      } catch (GeneralSecurityException ex) {
-        throw new XiSecurityException("could not decrypt the kemCiphertext",
-            ex);
+    byte algCode = encapKey.getEncapulation().getAlg();
+    byte[] macKeyValue;
+    if (algCode == KemEncapsulation.ALG_KMAC_MLKEM_HMAC) {
+      macKeyValue = KEMUtil.mlkemDecryptSecret(
+          keypairWithCert.getKey(), encapKey.getEncapulation());
+    } else if (algCode == KemEncapsulation.ALG_KMAC_COMPOSITE_MLKEM_HMAC) {
+      PublicKey publicKey = keypairWithCert.getPublicKey();
+      byte[] publicKeyData;
+      if (publicKey instanceof CompositeMLKEMPublicKey) {
+        publicKeyData = ((CompositeMLKEMPublicKey) publicKey).getKeyValue();
+      } else if (publicKey != null) {
+        publicKeyData = SubjectPublicKeyInfo.getInstance(
+            publicKey.getEncoded()).getPublicKeyData().getOctets();
+      } else {
+        publicKeyData = keypairWithCert.getCertificateChain()[0]
+            .getSubjectPublicKeyInfo().getPublicKeyData().getOctets();
       }
+
+      macKeyValue = KEMUtil.compositeMlKemDecryptSecret(
+        keypairWithCert.getKey(), publicKeyData,
+        encapKey.getEncapulation());
     } else {
-      throw new XiSecurityException("unknown key");
+      throw new XiSecurityException("unknown wrap mechanism " + algCode);
+    }
+
+    this.macKey = new SecretKeySpec(macKeyValue, "HMAC-SHA256");
+    this.utf8Id = new DERUTF8String(encapKey.getId());
+
+    try {
+      this.sigAlgId = new AlgorithmIdentifier(
+          OIDs.Xipki.id_alg_KEM_HMAC_SHA256);
+      this.encodedSigAlgId = sigAlgId.getEncoded();
+    } catch (IOException ex) {
+      throw new XiSecurityException("error encoding AlgorithmIdentifier", ex);
     }
   }
 
   public ConcurrentContentSigner createSigner(
       SignAlgo signAlgo, int parallelism) throws XiSecurityException {
     Args.notNull(signAlgo, "signAlgo");
-    if (signAlgo != SignAlgo.KEM_GMAC_256) {
+    if (signAlgo != SignAlgo.KEM_HMAC_SHA256) {
       throw new XiSecurityException("unknown signAlgo " + signAlgo);
     }
 
@@ -128,8 +128,8 @@ public class P12KemMacContentSignerBuilder {
 
   private XiContentSigner buildContentSigner() throws XiSecurityException {
 
-    AESGmacContentSigner macSigner =
-        new AESGmacContentSigner(SignAlgo.GMAC_AES256, macKey);
+    HmacContentSigner macSigner =
+        new HmacContentSigner(SignAlgo.HMAC_SHA256, macKey);
 
     return new XiContentSigner() {
       @Override
@@ -152,7 +152,6 @@ public class P12KemMacContentSignerBuilder {
        * <pre>
        * SEQUENCE ::= {
        *   id         UTF8String,
-       *   gcmParams  GCMParameters,
        *   signature  OCTET STRING
        * }
        * </pre>
@@ -161,10 +160,8 @@ public class P12KemMacContentSignerBuilder {
       @Override
       public byte[] getSignature() {
         byte[] rawSignature = macSigner.getSignature();
-        GCMParameters gcmParams = (GCMParameters)
-            macSigner.getAlgorithmIdentifier().getParameters();
         try {
-          return new DERSequence(new ASN1Encodable[]{utf8Id, gcmParams,
+          return new DERSequence(new ASN1Encodable[]{utf8Id,
               new DEROctetString(rawSignature)}).getEncoded();
         } catch (IOException e) {
           throw new IllegalStateException("error encoding the DER signature");

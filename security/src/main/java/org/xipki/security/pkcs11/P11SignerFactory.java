@@ -13,9 +13,8 @@ import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.XiContentSigner;
+import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.composite.CompositeSigAlgoSuite;
-import org.xipki.security.pkcs11.composite.P11CompositeKey;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.exception.ObjectCreationException;
@@ -157,12 +156,11 @@ public class P11SignerFactory implements SignerFactory {
                         P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
         P11Key tradKey = getKey(slot, null,
                         P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
-        CompositeSigAlgoSuite algoSuite =
+        CompositeSigSuite algoSuite =
             algo == null ? null : algo.compositeSigAlgoSuite();
         compositeKey = new P11CompositeKey(pqcKey, tradKey, algoSuite);
         if (algo == null) {
-          algo = SignAlgo.getInstance(
-                  compositeKey.getAlgoSuite().algId());
+          algo = SignAlgo.getInstance(compositeKey, conf);
         }
       } else {
         key = getKey(slot, keyId, keyLabel);

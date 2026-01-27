@@ -99,15 +99,19 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
   - Public key types of certificates: RSA, EC, Ed25519, Ed448, SM2, X25519, X448,
-    ML-DSA-44, ML-DSA-65, ML-DSA-87, ML-KEM-512, ML-KEM-768, ML-KEM-1024
+    ML-DSA-44, ML-DSA-65, ML-DSA-87, ML-KEM-512, ML-KEM-768, ML-KEM-1024,
+    composite MLDSA (in draft-ietf-lamps-pq-composite-sigs),
+    composite MLKEM (in draft-ietf-lamps-pq-composite-kem)
   - Signature algorithms of certificates
-    - ML-DSA-44, ML-DSA-65, ML-DSA-87 
+    - ML-DSA-44, ML-DSA-65, ML-DSA-87,
+    - Composite MLDSA (in draft-ietf-lamps-pq-composite-sigs),
     - ECDSA with hash algorithms: SHA-1, SHA-2, SHA-3, and SHAKE
     - Ed25519, Ed448
     - RSA PKCS1v1.5 with hash algorithms: SHA-1, SHA-2, and SHA-3
     - RSA PSS with hash algorithms: SHA-1, SHA-2, and SHA-3, and SHAKE
     - SM3withSM2
-  - Native support of X.509 extensions (other extensions can be supported by configuring it as blob)
+  - Native support of X.509 extensions (other extensions can be supported by 
+    configuring it as blob)
     - RFC 3739
       - BiometricInfo
       - QCStatements (also in eIDAS standard EN 319 412)
@@ -136,7 +140,8 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
     - Support of database cluster
     - Multiple software instances (all can be in active mode) for the same CA
     - Native support of management of CA via embedded OSGi commands
-    - API to manage CA. This allows one to implement proprietary CLI, e.g. Website, to manage CA.
+    - API to manage CA. This allows one to implement proprietary CLI, e.g.
+      Website, to manage CA.
     - Database tool (export and import CA database) simplifies the switch of
       databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
     - All configuration of CA except those of databases is saved in database
@@ -162,7 +167,8 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 
 ### Mgmt CLI (Management Client)
   - Configuring CA
-  - Generating keypairs of RSA, EC, Ed25519, Ed448, X25519, X448, ML-DSA, and ML-KEM in token
+  - Generating keypairs of RSA, EC, Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM, 
+    and composite-MLDSA in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)

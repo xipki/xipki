@@ -4,8 +4,10 @@
 package org.xipki.security.pkcs12;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jcajce.interfaces.XDHPublicKey;
 import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
@@ -25,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.List;
 import java.util.Objects;
@@ -87,7 +88,6 @@ public class P12SignerFactory implements SignerFactory {
 
     try (InputStream keystoreStream = getInputStream(keystore)) {
       SignAlgo sigAlgo = conf.getAlgo();
-
       if (sigAlgo != null && sigAlgo.isMac()) {
         P12MacContentSignerBuilder signerBuilder =
             new P12MacContentSignerBuilder(type, keystoreStream,
@@ -96,33 +96,39 @@ public class P12SignerFactory implements SignerFactory {
       } else {
         KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(type,
             keystoreStream, password, keyLabel, password, certificateChain);
+        if (sigAlgo == null) {
+          SubjectPublicKeyInfo pkInfo = keypairWithCert
+              .getCertificateChain()[0].getSubjectPublicKeyInfo();
+          sigAlgo = conf.getCallback().getSignAlgo(
+                      KeySpec.ofPublicKey(pkInfo), conf.getMode());
+          conf.setAlgo(sigAlgo);
+        }
+
         PublicKey publicKey = keypairWithCert.getPublicKey();
+
         if (publicKey instanceof XDHPublicKey) {
           P12XdhMacContentSignerBuilder signerBuilder =
               getP12XdhMacContentSignerBuilder(conf, keypairWithCert);
           return signerBuilder.createSigner(parallelism);
         }
 
-        if (SignAlgo.KEM_GMAC_256 == sigAlgo) {
+        if (SignAlgo.KEM_HMAC_SHA256 == sigAlgo) {
+          SubjectPublicKeyInfo publicKeyInfo = keypairWithCert
+              .getCertificateChain()[0].getSubjectPublicKeyInfo();
           P12KemMacContentSignerBuilder signerBuilder =
-              new P12KemMacContentSignerBuilder(
-                  keypairWithCert, conf.getKemEncapKey());
+              new P12KemMacContentSignerBuilder(keypairWithCert,
+                  conf.getCallback().generateKemEncapKey(
+                      securityFactory, publicKeyInfo));
           return signerBuilder.createSigner(sigAlgo, parallelism);
         } else {
           P12ContentSignerBuilder signerBuilder =
               new P12ContentSignerBuilder(keypairWithCert);
 
-          if (sigAlgo == null) {
-            PublicKey pubKey = signerBuilder.getCertificate().getPublicKey();
-            sigAlgo = SignAlgo.getInstance(pubKey, conf);
-          }
-
           return signerBuilder.createSigner(sigAlgo, parallelism,
               securityFactory.getRandom4Sign());
         }
       }
-    } catch (NoSuchAlgorithmException | XiSecurityException
-             | IOException | InvalidConfException ex) {
+    } catch (XiSecurityException | IOException | InvalidConfException ex) {
       throw new ObjectCreationException(String.format(
           "%s: %s", ex.getClass().getName(), ex.getMessage()));
     }

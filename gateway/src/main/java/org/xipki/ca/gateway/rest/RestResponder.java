@@ -32,10 +32,10 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.X509Cert;
 import org.xipki.security.auth.Requestor;
 import org.xipki.security.auth.RequestorAuthenticator;
+import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
@@ -1084,7 +1084,8 @@ public class RestResponder {
 
     byte[] respBytes;
     try {
-      respBytes = KeyUtil.generateKemEncapKey(spki, mk).getEncoded();
+      respBytes = KEMUtil.generateKemEncapKey(spki, mk,
+                    securityFactory.getRandom4Sign()).getEncoded();
     } catch (Exception e) {
       String message = "error generating KEM encap key";
       LOG.warn(message);

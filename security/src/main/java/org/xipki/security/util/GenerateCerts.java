@@ -14,7 +14,6 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.IPAddress;
 import org.bouncycastle.util.io.pem.PemObject;
@@ -485,7 +484,7 @@ public class GenerateCerts {
   private static void generateKeyCerts(String confFile, String targetDirPath)
       throws Exception {
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
 
     File targetDir = new File(targetDirPath);

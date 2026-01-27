@@ -16,7 +16,6 @@ import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

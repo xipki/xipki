@@ -3,7 +3,6 @@
 
 package org.xipki.security.pkcs12.test;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.ConcurrentContentSigner;
@@ -11,6 +10,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public abstract class Pkcs12SignVerifyTest {
 
   protected Pkcs12SignVerifyTest() {
     if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
+      Security.addProvider(KeyUtil.newBouncyCastleProvider());
     }
   }
 

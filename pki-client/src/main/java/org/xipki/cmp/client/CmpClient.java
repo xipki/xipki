@@ -6,8 +6,8 @@ package org.xipki.cmp.client;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.xipki.security.KemEncapKey;
 import org.xipki.security.X509Cert;
+import org.xipki.security.encap.KemEncapKey;
 import org.xipki.util.extra.misc.ReqRespDebug;
 
 import java.io.Closeable;
