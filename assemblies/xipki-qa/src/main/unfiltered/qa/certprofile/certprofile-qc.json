@@ -93,7 +93,19 @@
           {
             "required": ["contentCommitment"]
           },{
-            "appliesTo": ["X25519","X448","MLKEM512","MLKEM768","MLKEM1024"],
+            "appliesTo": ["X25519","X448","MLKEM512","MLKEM768","MLKEM1024",
+                  "MLKEM768-RSA2048-SHA3-256",
+                  "MLKEM768-RSA3072-SHA3-256",
+                  "MLKEM768-RSA4096-SHA3-256",
+                  "MLKEM768-X25519-SHA3-256",
+                  "MLKEM768-ECDH-P256-SHA3-256",
+                  "MLKEM768-ECDH-P384-SHA3-256",
+                  "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
+                  "MLKEM1024-RSA3072-SHA3-256",
+                  "MLKEM1024-ECDH-P384-SHA3-256",
+                  "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
+                  "MLKEM1024-X448-SHA3-256",
+                  "MLKEM1024-ECDH-P521-SHA3-256"],
             "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
           }
         ]
