@@ -9,7 +9,7 @@
     <version>6.6.0-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
-  <artifactId>xicodec</artifactId>
+  <artifactId>codec</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>

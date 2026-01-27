@@ -85,8 +85,8 @@ fi
 LIB_DIR=$WDIR/system
 XDIR=${WDIR}/xipki
 
-CP="$CP:$LIB_DIR/org/xipki/xicodec/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/xiutil/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/codec/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
 CP="$CP:$LIB_DIR/org/xipki/util-extra/${project.version}/*"
 CP="$CP:$XDIR/lib/*"
 

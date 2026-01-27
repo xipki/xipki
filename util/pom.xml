@@ -9,7 +9,7 @@
     <version>6.6.0-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
-  <artifactId>xiutil</artifactId>
+  <artifactId>util</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <DynamicImport-Package>*</DynamicImport-Package>
@@ -19,7 +19,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xicodec</artifactId>
+      <artifactId>codec</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

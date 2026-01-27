@@ -168,7 +168,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 ### Mgmt CLI (Management Client)
   - Configuring CA
   - Generating keypairs of RSA, EC, Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM, 
-    and composite-MLDSA in token
+    composite-MLDSA and composite-MLKEM in token
   - Deleting keypairs and certificates from token
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)

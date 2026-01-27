@@ -23,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xipkcs11</artifactId>
+      <artifactId>pkcs11</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

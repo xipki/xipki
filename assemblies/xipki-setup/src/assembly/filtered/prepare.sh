@@ -14,9 +14,9 @@ LIB_DIR=$WDIR/xipki-cli/system
 
 CP="$LIB_DIR/org/xipki/security/${project.version}/*"
 CP="$CP:$LIB_DIR/org/xipki/util-extra/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/xicodec/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/xiutil/${project.version}/*"
-CP="$CP:$LIB_DIR/org/xipki/xipkcs11/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/codec/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/util/${project.version}/*"
+CP="$CP:$LIB_DIR/org/xipki/pkcs11/${project.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcprov-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcpkix-jdk18on/${bc.version}/*"
 CP="$CP:$LIB_DIR/org/bouncycastle/bcutil-jdk18on/${bc.version}/*"

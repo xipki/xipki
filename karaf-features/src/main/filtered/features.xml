@@ -9,9 +9,9 @@
     <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/xipkcs11/${project.version}</bundle>
-    <bundle>mvn:org.xipki/xicodec/${project.version}</bundle>
-    <bundle>mvn:org.xipki/xiutil/${project.version}</bundle>
+    <bundle>mvn:org.xipki/pkcs11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/codec/${project.version}</bundle>
+    <bundle>mvn:org.xipki/util/${project.version}</bundle>
     <bundle>mvn:org.xipki/xihsm/${project.version}</bundle>
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki/util-extra/${project.version}</bundle>

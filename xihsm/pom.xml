@@ -14,12 +14,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xipkcs11</artifactId>
+      <artifactId>pkcs11</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>xiutil</artifactId>
+      <artifactId>util</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

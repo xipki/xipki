@@ -50,9 +50,9 @@
   </properties>
   <modules>
     <!-- Base components -->
-    <module>xicodec</module>
-    <module>xipkcs11</module>
-    <module>xiutil</module>
+    <module>codec</module>
+    <module>pkcs11</module>
+    <module>util</module>
     <module>xihsm</module>
     <module>pkcs11test</module>
     <module>util-extra</module>
