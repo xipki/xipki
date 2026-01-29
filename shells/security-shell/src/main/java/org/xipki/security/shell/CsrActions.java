@@ -177,13 +177,8 @@ public class CsrActions {
      */
     protected abstract ConcurrentContentSigner getSigner() throws Exception;
 
-    protected List<X509Cert> getPeerCertificates()
-        throws ObjectCreationException {
-      try {
-        return securityFactory.getCsrControl().getPeerCerts();
-      } catch (XiSecurityException e) {
-        throw new ObjectCreationException(e);
-      }
+    protected List<X509Cert> getPeerCertificates() {
+      return securityFactory.getCsrControl().getPeerCerts();
     } // method getPeerCertificates
 
     @Override

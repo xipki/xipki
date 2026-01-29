@@ -239,7 +239,7 @@ public class Hex {
                             byte[] data, int offset, int len,
                             String sep, int numBytesPerLin, String indent) {
     Args.notNegative(offset, "offset");
-    Args.positive(len, "len");
+    Args.notNegative(len, "len");
     Args.positive(numBytesPerLin, "numBytesPerLin");
 
     char[] digits = uppercase ? UPPER_DIGITS : DIGITS;

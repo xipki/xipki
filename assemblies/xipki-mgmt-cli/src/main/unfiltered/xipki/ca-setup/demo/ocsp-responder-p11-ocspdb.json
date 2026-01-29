@@ -54,7 +54,24 @@
 	"signers": [{
 		"name":"signer1",
 		"algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED448",
-          "SM3withSM2","MLDSA44","MLDSA65","MLDSA87"],
+          "SM3withSM2","MLDSA44","MLDSA65","MLDSA87",
+          "MLDSA44-RSA2048-PSS-SHA256",
+          "MLDSA44-ED25519-SHA512",
+          "MLDSA44-ECDSA-P256-SHA256",
+          "MLDSA65-RSA3072-PSS-SHA512",
+          "MLDSA65-RSA4096-PSS-SHA512",
+          "MLDSA65-RSA4096-PKCS15-SHA512",
+          "MLDSA65-ECDSA-P256-SHA512",
+          "MLDSA65-ECDSA-P384-SHA512",
+          "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
+          "MLDSA65-ED25519-SHA512",
+          "MLDSA87-ECDSA-P384-SHA512",
+          "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
+          "MLDSA87-ED448-SHAKE256",
+          "MLDSA87-RSA3072-PSS-SHA512",
+          "MLDSA87-RSA4096-PSS-SHA512",
+          "MLDSA87-ECDSA-P521-SHA512"
+        ],
 		"caCerts":[],
 		// For PKCS#12: only need to configure the key (certificate is in the p12 file)
 		//

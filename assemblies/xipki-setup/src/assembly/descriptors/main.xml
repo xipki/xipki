@@ -9,18 +9,50 @@
   <fileSets>
     <fileSet>
       <directory>${project.build.directory}/t</directory>
-       <includes>
-         <include>*.sh</include>
-       </includes>
-       <outputDirectory>.</outputDirectory>
-       <fileMode>0755</fileMode>
-       <directoryMode>0755</directoryMode>
-       <lineEnding>unix</lineEnding>
-     </fileSet>
+      <includes>
+        <include>**/*.sh</include>
+        <include>xipki-cli/bin/client</include>
+        <include>xipki-cli/bin/instance</include>
+        <include>xipki-cli/bin/karaf</include>
+        <include>xipki-cli/bin/setenv</include>
+        <include>xipki-cli/bin/shell</include>
+        <include>xipki-cli/bin/start</include>
+        <include>xipki-cli/bin/status</include>
+        <include>xipki-cli/bin/stop</include>
+        <include>xipki-mgmt-cli/bin/client</include>
+        <include>xipki-mgmt-cli/bin/instance</include>
+        <include>xipki-mgmt-cli/bin/karaf</include>
+        <include>xipki-mgmt-cli/bin/setenv</include>
+        <include>xipki-mgmt-cli/bin/shell</include>
+        <include>xipki-mgmt-cli/bin/start</include>
+        <include>xipki-mgmt-cli/bin/status</include>
+        <include>xipki-mgmt-cli/bin/stop</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
     <fileSet>
       <directory>${project.build.directory}/t</directory>
       <excludes>
-        <exclude>*.sh</exclude>
+        <exclude>**/*.sh</exclude>
+        <exclude>xipki-cli/bin/client</exclude>
+        <exclude>xipki-cli/bin/instance</exclude>
+        <exclude>xipki-cli/bin/karaf</exclude>
+        <exclude>xipki-cli/bin/setenv</exclude>
+        <exclude>xipki-cli/bin/shell</exclude>
+        <exclude>xipki-cli/bin/start</exclude>
+        <exclude>xipki-cli/bin/status</exclude>
+        <exclude>xipki-cli/bin/stop</exclude>
+        <exclude>xipki-mgmt-cli/bin/client</exclude>
+        <exclude>xipki-mgmt-cli/bin/instance</exclude>
+        <exclude>xipki-mgmt-cli/bin/karaf</exclude>
+        <exclude>xipki-mgmt-cli/bin/setenv</exclude>
+        <exclude>xipki-mgmt-cli/bin/shell</exclude>
+        <exclude>xipki-mgmt-cli/bin/start</exclude>
+        <exclude>xipki-mgmt-cli/bin/status</exclude>
+        <exclude>xipki-mgmt-cli/bin/stop</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>

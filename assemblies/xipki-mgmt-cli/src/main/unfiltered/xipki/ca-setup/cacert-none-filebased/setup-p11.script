@@ -20,6 +20,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
     printUsage = "true"
   } else {
     source xipki/ca-setup/c14n-keyspec.script
+    LABEL = ${p11composite}${LABEL}
     if { "$sigalg" equals "" } then {
       printUsage = true
     }

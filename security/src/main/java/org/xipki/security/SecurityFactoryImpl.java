@@ -124,6 +124,10 @@ public class SecurityFactoryImpl implements SecurityFactory {
   public ConcurrentContentSigner createSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
+    if (getCsrControl() != null && conf.getPeerCertificates() == null) {
+      conf.setPeerCertificates(getCsrControl().getPeerCerts());
+    }
+
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(
         this, type, conf, certificateChain);
     if (!signer.isMac()) {

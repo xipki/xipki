@@ -8,9 +8,7 @@
   "validity": "5y",
   "notBeforeTime": "current",
   "keypairGeneration": "SM2P256V1",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
-    "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1","ED25519","ED448","MLDSA44","MLDSA65","MLDSA87"],
+  "keyAlgorithms": ["SM2P256V1"],
   "subject": [{
       "type": "country",
       "minOccurs": 0

@@ -676,7 +676,7 @@ public class GenerateCerts {
 
         if (keyCertConf.getIssuerName() == null) {
           ContentSigner contentSigner = KeyUtil.getContentSigner(
-              keyPair.getPrivate(), keyPair.getPublic(), random);
+              keyPair.getPrivate(), keyPair.getPublic(), random, true);
 
           keyStoreAndCert = generateSelfSignedCertificate(certType,
               contentSigner, keyPair.getPrivate(), subjectPublicKeyInfo,

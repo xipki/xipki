@@ -7,6 +7,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.XiSecurityException;
 
+import java.security.NoSuchAlgorithmException;
+
 /**
  * @author Lijun Liao (xipki)
  */
@@ -69,7 +71,14 @@ public interface CreateSignerCallback {
           return SignAlgo.DHPOP_X448;
       }
 
-      if (keyspec.isMlkem() || keyspec.isCompositeMLKEM()) {
+      if (keyspec.isCompositeMLDSA()) {
+        try {
+          return SignAlgo.getInstance(
+              keyspec.getAlgorithmIdentifier());
+        } catch (NoSuchAlgorithmException e) {
+          return null;
+        }
+      } else if (keyspec.isMlkem() || keyspec.isCompositeMLKEM()) {
         return SignAlgo.KEM_HMAC_SHA256;
       }
 

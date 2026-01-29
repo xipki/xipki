@@ -36,6 +36,7 @@ import java.security.interfaces.RSAKey;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -188,7 +189,7 @@ public enum SignAlgo {
   MLDSA44_RSA2048_PKCS15_SHA256("MLDSA44-RSA2048-PKCS15-SHA256",
       0x86, CompositeSigSuite.MLDSA44_RSA2048_PKCS15_SHA256),
 
-  MLDSA44_Ed25519_SHA512("MLDSA44-Ed25519-SHA512",
+  MLDSA44_ED25519_SHA512("MLDSA44-Ed25519-SHA512",
       0x87, CompositeSigSuite.MLDSA44_Ed25519_SHA512),
 
   MLDSA44_ECDSA_P256_SHA256("MLDSA44-ECDSA-P256-SHA256",
@@ -215,7 +216,7 @@ public enum SignAlgo {
   MLDSA65_ECDSA_BRAINPOOLP256R1_SHA512("MLDSA65-ECDSA-brainpoolP256r1-SHA512",
       0x8f, CompositeSigSuite.MLDSA65_ECDSA_BP256_SHA512),
 
-  MLDSA65_Ed25519_SHA512("MLDSA65-Ed25519-SHA512",
+  MLDSA65_ED25519_SHA512("MLDSA65-Ed25519-SHA512",
       0x90, CompositeSigSuite.MLDSA65_Ed25519_SHA512),
 
   MLDSA87_ECDSA_P384_SHA512("MLDSA87-ECDSA-P384-SHA512",
@@ -224,7 +225,7 @@ public enum SignAlgo {
   MLDSA87_ECDSA_BRAINPOOLP384R1_SHA512("MLDSA87-ECDSA-brainpoolP384r1-SHA512",
       0x92, CompositeSigSuite.MLDSA87_ECDSA_BP384_SHA512),
 
-  MLDSA87_Ed448_SHAKE256("MLDSA87-Ed448-SHAKE256",
+  MLDSA87_ED448_SHAKE256("MLDSA87-Ed448-SHAKE256",
       0x93, CompositeSigSuite.MLDSA87_Ed448_SHAKE256),
 
   MLDSA87_RSA3072_PSS_SHA512("MLDSA87-RSA3072-PSS-SHA512",
@@ -258,17 +259,26 @@ public enum SignAlgo {
 
   static {
     for (SignAlgo type : SignAlgo.values()) {
+      String upperName = type.name().toUpperCase(Locale.ROOT);
+      map.put(upperName, type);
+      String upperName2 = upperName.replace("_", "-");
+      if (!upperName.equals(upperName2)) {
+        map.put(upperName2, type);
+      }
+
       if (OIDs.Algo.id_RSASSA_PSS.equals(type.oid)) {
         mgf1HashToSigMap.put(type.hashAlgo, type);
       } else {
         map.put(type.oid.getId(), type);
       }
 
+      String jceName = type.getJceName().toUpperCase(Locale.ROOT);
+
       List<String> names = new LinkedList<>();
-      names.add(type.jceName);
-      if (type.jceName.endsWith("RSAANDMGF1")) {
+      names.add(jceName);
+      if (jceName.endsWith("RSAANDMGF1")) {
         // RSAANDMGF1: alias RSAPSS
-        names.add(type.jceName.replace("RSAANDMGF1", "RSAPSS"));
+        names.add(jceName.replace("RSAANDMGF1", "RSAPSS"));
       }
 
       for (String name : names) {
@@ -452,7 +462,7 @@ public enum SignAlgo {
     switch (this) {
       case MLDSA44_RSA2048_PSS_SHA256:
       case MLDSA44_RSA2048_PKCS15_SHA256:
-      case MLDSA44_Ed25519_SHA512:
+      case MLDSA44_ED25519_SHA512:
       case MLDSA44_ECDSA_P256_SHA256:
       case MLDSA65_RSA3072_PSS_SHA512:
       case MLDSA65_RSA3072_PKCS15_SHA512:
@@ -461,10 +471,10 @@ public enum SignAlgo {
       case MLDSA65_ECDSA_P256_SHA512:
       case MLDSA65_ECDSA_P384_SHA512:
       case MLDSA65_ECDSA_BRAINPOOLP256R1_SHA512:
-      case MLDSA65_Ed25519_SHA512:
+      case MLDSA65_ED25519_SHA512:
       case MLDSA87_ECDSA_P384_SHA512:
       case MLDSA87_ECDSA_BRAINPOOLP384R1_SHA512:
-      case MLDSA87_Ed448_SHAKE256:
+      case MLDSA87_ED448_SHAKE256:
       case MLDSA87_RSA3072_PSS_SHA512:
       case MLDSA87_RSA4096_PSS_SHA512:
       case MLDSA87_ECDSA_P521_SHA512:
@@ -550,7 +560,8 @@ public enum SignAlgo {
 
   public static SignAlgo getInstance(String nameOrOid)
       throws NoSuchAlgorithmException {
-    SignAlgo alg = map.get(nameOrOid.toUpperCase().replace("-", ""));
+    String key = nameOrOid.toUpperCase().replace("-", "");
+    SignAlgo alg = map.get(key);
     return Optional.ofNullable(alg).orElseThrow(
         () -> new NoSuchAlgorithmException(
             "Unknown SignAlgo OID/name '" + nameOrOid + "'"));

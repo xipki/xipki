@@ -22,7 +22,7 @@ import java.util.Locale;
  */
 public enum KeySpec {
   // RSA
-  RSA2048("RSA-2048", PKCS11KeyPairType.RSA_2048),
+  RSA2048("RSA-2048", PKCS11KeyPairType.RSA_2048), // TODO: remove '-'
   RSA3072("RSA-3072", PKCS11KeyPairType.RSA_3072),
   RSA4096("RSA-4096", PKCS11KeyPairType.RSA_4096),
   // EC

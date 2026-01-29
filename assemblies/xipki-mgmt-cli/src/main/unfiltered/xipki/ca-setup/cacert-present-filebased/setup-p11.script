@@ -16,6 +16,7 @@ if { "$1" equals "" | "$1" equals "help" } then {
     printUsage = "true"
   } else {
     source xipki/ca-setup/c14n-keyspec.script
+    LABEL = ${p11composite}${LABEL}
     if { "$sigalg" equals "" } then {
       printUsage = true
     }
@@ -46,10 +47,6 @@ if { $printUsage equals "true" } then {
   echo "#################################################################"
 
   CERT_P12 = ${TARGET_DIR}/keycerts/$[ca.name].pem
-
-  echo "#################################################################"
-  echo "#                  Configure ca-conf.json                       #"
-  echo "#################################################################"
 
   xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 

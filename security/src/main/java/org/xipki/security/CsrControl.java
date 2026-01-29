@@ -109,7 +109,7 @@ public class CsrControl {
     }
   }
 
-  public List<X509Cert> getPeerCerts() throws XiSecurityException {
+  public List<X509Cert> getPeerCerts() {
     return peerCerts;
   }
 

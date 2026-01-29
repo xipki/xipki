@@ -29,15 +29,19 @@ if { "$printUsage" equals "true" } then {
   echo "#                 Generate Key, CSR and Certificate             #"
   echo "#################################################################"
 
+  P11_CORE_LABEL = ${P11_LABEL}
+  P11_LABEL = ${p11composite}${P11_LABEL}
+
   xi:keypair-p11 --keyspec ${keyspec} --slot ${SLOT} --label ${P11_LABEL}
 
-  xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} --out ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.csr --subject "${SUBJECT}"
+  xi:csr-p11 --slot ${SLOT} --label ${P11_LABEL} \
+    --out ${OCSP_KEYCERTS_DIR}/${P11_CORE_LABEL}.csr --subject "${SUBJECT}"
 
-  ca:enroll-cert --ca myca1 --csr ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.csr \
-      --out ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.crt --profile ocsp
+  ca:enroll-cert --ca myca1 --csr ${OCSP_KEYCERTS_DIR}/${P11_CORE_LABEL}.csr \
+      --out ${OCSP_KEYCERTS_DIR}/${P11_CORE_LABEL}.crt --profile ocsp
 
   echo "Please"
-  echo "  1. Copy ${OCSP_KEYCERTS_DIR}/${P11_LABEL}.crt to replace"
+  echo "  1. Copy ${OCSP_KEYCERTS_DIR}/${P11_CORE_LABEL}.crt to replace"
   echo "     the folder <OCSP\'s tomcat.dir>/xipki/keycerts/"
   echo "  2. Modify the signers field in <OCSP\'s tomcat.dir>/xipki/etc/ocsp/ocsp-responder.json"
   echo "     - Unncomment the PKCS11 part, and comment the PKCS12 part"

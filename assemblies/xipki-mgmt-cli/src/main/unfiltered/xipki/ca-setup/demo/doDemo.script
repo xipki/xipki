@@ -42,6 +42,7 @@ xi:copy-file --force $CA_TOMCAT_DIR/xipki/etc/ca/database/ocsp-db.properties \
 echo "Delete keys and certificates"
 if { "$tokentype" equals "PKCS11" } then {
   xi:delete-key-p11 --force --slot $SLOT --label $LABEL
+  xi:delete-key-p11 --force --slot $SLOT --label COMPOSITE:$LABEL
 }
 
 xi:rm --force --recursive $CA_KEYCERTS_DIR
@@ -84,6 +85,8 @@ xi:rm --force xipki/ocsp-setup/keycerts/ocsp1.crt \
 
 if { "$tokentype" equals "PKCS11" } then {
   xi:delete-key-p11 --slot 0 --label ocsp1 --force
+  xi:delete-key-p11 --slot 0 --label COMPOSITE:ocsp1 --force
+
   source xipki/ca-setup/setup-ocsp-p11.script $CA_KEYSPEC
   xi:copy-file --force xipki/ocsp-setup/keycerts/ocsp1.crt ${OCSP_TOMCAT_DIR}/xipki/keycerts/
 } else {
@@ -129,6 +132,10 @@ each ($ocspdbtypes) {
   }
 
   xi:copy-file --force $OCSP_CONF_FILE ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/ocsp-responder.json
+  if { "$tokentype" equals "PKCS11" } then {
+    xi:replace --old "key-label=ocsp1" --new "key-label=${p11composite}ocsp1" \
+               ${OCSP_TOMCAT_DIR}/xipki/etc/ocsp/ocsp-responder.json
+  }
 
   echo "start OCSP server"
   xi:exec "${OCSP_TOMCAT_DIR}/bin/shutdown.sh"

@@ -39,8 +39,7 @@ void
 void
 
 ## How to Configure Password
-In all XiPKI components (including Tomcat's TLS configuration), you may configure the password
-using the following methods:  
+In all XiPKI components, you may configure the password using the following methods:  
 (In the following examples, assume the password is "CHANGEIT", the master password is "qwert")
 
 - In plaintext, e.g. `password=CHANGEIT`
