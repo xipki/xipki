@@ -4,6 +4,7 @@ package org.xipki.pkcs11.xihsm.mgr;
 
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 
@@ -43,7 +44,7 @@ public class TenantInfo {
   }
 
   public static TenantInfo decode(byte[] encoded) throws HsmException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       decoder.readArrayLength(2);
       int version = decoder.readInt();
       if (version != 1) {

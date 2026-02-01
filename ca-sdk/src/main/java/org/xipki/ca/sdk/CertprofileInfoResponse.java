@@ -6,6 +6,7 @@ package org.xipki.ca.sdk;
 import org.xipki.security.KeySpec;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -60,7 +61,7 @@ public class CertprofileInfoResponse extends SdkResponse {
 
   public static CertprofileInfoResponse decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoResponse", decoder, 3);
 
       String[] requiredTypes = decoder.readTextStrings();

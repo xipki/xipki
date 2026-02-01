@@ -6,6 +6,7 @@ package org.xipki.ca.sdk;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 import org.xipki.util.extra.type.EmbedCertsMode;
@@ -105,7 +106,7 @@ public class EnrollCertsRequest extends SdkRequest {
 
   public static EnrollCertsRequest decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("EnrollCertsRequest", decoder, 6);
       EnrollCertsRequest ret = new EnrollCertsRequest();
       ret.setTransactionId(decoder.readTextString());

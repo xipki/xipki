@@ -6,19 +6,14 @@
  */
 package org.xipki.util.codec.cbor;
 
-import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,67 +23,9 @@ import static org.xipki.util.codec.cbor.CborConstants.*;
 /**
  * Provides a decoder capable of handling CBOR encoded data from a {@link InputStream}.
  */
-public class CborDecoder implements AutoCloseable {
+public abstract class CborDecoder implements AutoCloseable {
 
   private static final BigInteger U = new BigInteger("10000000000000000", 16);
-
-  private final byte[] m_is;
-
-  private final int startPosition;
-
-  private final int maxPosition; // exclusive
-
-  private int position;
-
-  /**
-   * Creates a new {@link CborDecoder} instance.
-   *
-   * @param is the actual input stream to read the CBOR-encoded data from, cannot be <code>null</code>.
-   */
-  public CborDecoder(InputStream is) throws IOException {
-    this(Args.notNull(is, "is").readAllBytes());
-  }
-
-  /**
-   * Creates a new {@link CborDecoder} instance.
-   * @param bytes the encoded cbor message.
-   */
-  public CborDecoder(byte[] bytes) {
-    m_is = Args.notNull(bytes, "bytes");
-    position = 0;
-    startPosition = 0;
-    maxPosition = bytes.length;
-  }
-
-  /**
-   * Creates a new {@link CborDecoder} instance.
-   * @param bytes the encoded cbor message.
-   * @param offset offset of bytes for the cbor message.
-   * @param len length of the bytes for the cbor message.
-   */
-  public CborDecoder(byte[] bytes, int offset, int len) throws IOException {
-    Args.notNull(bytes, "bytes");
-    Args.min(offset, "offset", 0);
-    if (offset + len > bytes.length) {
-      throw new IOException("bytes too short");
-    }
-    this.m_is = bytes;
-    this.position = offset;
-    this.startPosition = offset;
-    this.maxPosition = offset + len;
-  }
-
-  public int streamOffset() {
-    return position;
-  }
-
-  public byte[] remainingBytes() {
-    return Arrays.copyOfRange(m_is, position, maxPosition);
-  }
-
-  public void writeConsumedBytes(OutputStream os) throws IOException {
-    os.write(m_is, startPosition, position - startPosition);
-  }
 
   private static void fail(String msg, Object... args) throws CodecException {
     throw new CodecException(String.format(msg, args));
@@ -109,13 +46,7 @@ public class CborDecoder implements AutoCloseable {
    * @return the upcoming type in the stream, or <code>null</code> in case of an end-of-stream.
    * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
    */
-  public CborType peekType() throws CodecException {
-    if (position >= maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    return CborType.valueOf(0xFF & m_is[position]);
-  }
+  public abstract CborType peekType() throws CodecException;
 
   /**
    * Peeks in the input stream for the upcoming type.
@@ -123,18 +54,7 @@ public class CborDecoder implements AutoCloseable {
    * @return the upcoming type in the stream, or <code>null</code> in case of an end-of-stream.
    * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
    */
-  public CborType[] peekTypes(int num) throws CodecException {
-    if (position + num - 1 >= maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    CborType[] ret = new CborType[num];
-    for (int i = 0; i < num; i++) {
-      ret[i] = CborType.valueOf(0xFF & m_is[position + i]);
-    }
-
-    return ret;
-  }
+  public abstract CborType[] peekTypes(int num) throws CodecException;
 
   /**
    * Peeks in the input stream for the upcoming types.
@@ -143,17 +63,7 @@ public class CborDecoder implements AutoCloseable {
    * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
    */
   public CborType[] peek2Types() throws CodecException {
-    if (position >= maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    if (position + 1 >= maxPosition) {
-      throw new IndexOutOfBoundsException(position + 1);
-    }
-
-    return new CborType[] {
-        CborType.valueOf(0xFF & m_is[position]),
-        CborType.valueOf(0xFF & m_is[position + 1])};
+    return peekTypes(2);
   }
 
   /**
@@ -161,16 +71,9 @@ public class CborDecoder implements AutoCloseable {
    * @return the read byte.
    * @throws CodecException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
    */
-  public int read1Byte() throws CodecException {
-    if (position >= maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-    return m_is[position++];
-  }
+  public abstract int read1Byte() throws CodecException;
 
-  boolean hasMoreBytes() {
-    return position < maxPosition;
-  }
+  public abstract int streamOffset();
 
   /**
    * Prolog to reading an array value in CBOR format.
@@ -545,27 +448,7 @@ public class CborDecoder implements AutoCloseable {
    * @throws CodecException in case of CBOR decoding problem or I/O problems reading
    *         the CBOR-encoded value from the underlying input stream.
    */
-  public String readTextString() throws CodecException {
-    if (skipNull()) {
-      return null;
-    }
-
-    long len = readMajorTypeWithSize(TYPE_TEXT_STRING);
-    if (len < 0) {
-      fail("Infinite-length text strings not supported!");
-    }
-    if (len > Integer.MAX_VALUE) {
-      fail("String length too long!");
-    }
-
-    if (position + len > maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    String str = new String(m_is, position, (int) len, StandardCharsets.UTF_8);
-    position += (int) len;
-    return str;
-  }
+  public abstract String readTextString() throws CodecException;
 
   /**
    * Prolog to reading a UTF-8 encoded string value in CBOR format.
@@ -700,14 +583,7 @@ public class CborDecoder implements AutoCloseable {
    * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
    * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
    */
-  protected int readUInt16() throws CodecException {
-    if (position + 2 > maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    return (m_is[position++] & 0xFF) << 8
-        | (m_is[position++] & 0xFF);
-  }
+  protected abstract int readUInt16() throws CodecException;
 
   /**
    * Reads an unsigned 32-bit integer value
@@ -715,16 +591,7 @@ public class CborDecoder implements AutoCloseable {
    * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
    * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
    */
-  protected long readUInt32() throws CodecException {
-    if (position + 4 > maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    return ((m_is[position++] & 0xFFL) << 24
-        | (m_is[position++] & 0xFFL) << 16
-        | (m_is[position++] & 0xFFL) << 8
-        | (m_is[position++] & 0xFFL)) & 0xffffffffL;
-  }
+  protected abstract long readUInt32() throws CodecException;
 
   /**
    * Reads an unsigned 64-bit integer value
@@ -732,20 +599,7 @@ public class CborDecoder implements AutoCloseable {
    * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
    * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
    */
-  protected long readUInt64() throws CodecException {
-    if (position + 8 > maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    return (m_is[position++] & 0xFFL) << 56
-        | (m_is[position++] & 0xFFL) << 48
-        | (m_is[position++] & 0xFFL) << 40
-        | (m_is[position++] & 0xFFL) << 32
-        | (m_is[position++] & 0xFFL) << 24
-        | (m_is[position++] & 0xFFL) << 16
-        | (m_is[position++] & 0xFFL) << 8
-        | (m_is[position++] & 0xFFL);
-  }
+  protected abstract long readUInt64() throws CodecException;
 
   /**
    * Reads an unsigned 8-bit integer value
@@ -753,13 +607,7 @@ public class CborDecoder implements AutoCloseable {
    * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
    * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
    */
-  protected int readUInt8() throws CodecException {
-    if (position >= maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-
-    return m_is[position++] & 0xff;
-  }
+  protected abstract int readUInt8() throws CodecException;
 
   /**
    * Reads an unsigned integer with a given length-indicator.
@@ -779,14 +627,7 @@ public class CborDecoder implements AutoCloseable {
     return readUInt(length, false /* breakAllowed */);
   }
 
-  private byte[] readExactly(int len) throws CodecException {
-    if (position + len > maxPosition) {
-      throw new CodecException("bytes too short");
-    }
-    byte[] ret = Arrays.copyOfRange(m_is, position, position + len);
-    position += len;
-    return ret;
-  }
+  protected abstract byte[] readExactly(int len) throws CodecException;
 
   // added by Lijun Liao (xipki)
 
@@ -1142,17 +983,6 @@ public class CborDecoder implements AutoCloseable {
 
   @Override
   public void close() {
-  }
-
-  public static Object readObject(byte[] encoded) throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)){
-      Object next = decoder.readNext();
-      if (decoder.hasMoreBytes()) {
-        throw new CodecException("encoded contains more than 1 object.");
-      } else {
-        return next;
-      }
-    }
   }
 
 }

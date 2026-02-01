@@ -8,6 +8,7 @@ import org.xipki.pkcs11.wrapper.attrs.Attribute;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 
@@ -284,7 +285,7 @@ public class XiTemplate {
 
   public static XiTemplate decode(byte[] encoded) throws HsmException {
     try {
-      CborDecoder decoder = new CborDecoder(encoded);
+      CborDecoder decoder = new ByteArrayCborDecoder(encoded);
       int size = decoder.readArrayLength();
       List<XiAttribute> attrs = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {

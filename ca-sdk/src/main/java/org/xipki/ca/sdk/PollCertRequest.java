@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -44,7 +45,7 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   public static PollCertRequest decode(byte[] encoded) throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("PollCertRequest", decoder, 5);
       return new PollCertRequest(
           decoder.readByteString(),

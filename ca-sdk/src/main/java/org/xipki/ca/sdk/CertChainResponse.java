@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -32,7 +33,7 @@ public class CertChainResponse extends SdkResponse {
 
   public static CertChainResponse decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CertChainResponse", decoder, 1);
       return new CertChainResponse(decoder.readByteStrings());
     } catch (RuntimeException ex) {

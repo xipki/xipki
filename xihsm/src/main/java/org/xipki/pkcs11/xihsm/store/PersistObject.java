@@ -11,6 +11,7 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncodable;
 import org.xipki.util.codec.cbor.CborEncoder;
@@ -146,7 +147,7 @@ public class PersistObject implements CborEncodable {
 
   public static PersistObject decode(byte[] encoded)
       throws CodecException {
-    return decode(new CborDecoder(encoded));
+    return decode(new ByteArrayCborDecoder(encoded));
   }
 
   public static PersistObject decode(CborDecoder decoder)

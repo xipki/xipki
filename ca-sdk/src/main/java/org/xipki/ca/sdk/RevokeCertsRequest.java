@@ -5,6 +5,7 @@ package org.xipki.ca.sdk;
 
 import org.xipki.security.CrlReason;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -38,7 +39,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
 
   public static RevokeCertsRequest decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("RevokeCertsRequest", decoder, 4);
       return new RevokeCertsRequest(
           decoder.readByteString(),

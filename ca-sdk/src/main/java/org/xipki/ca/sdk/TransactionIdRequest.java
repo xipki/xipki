@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -31,7 +32,7 @@ public class TransactionIdRequest extends SdkRequest {
 
   public static TransactionIdRequest decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("TransactionIdRequest", decoder, 1);
       return new TransactionIdRequest(decoder.readTextString());
     } catch (RuntimeException ex) {

@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -33,7 +34,7 @@ public class GenCRLRequest extends SdkRequest {
   }
 
   public static GenCRLRequest decode(byte[] encoded) throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("GenCRLRequest", decoder, 1);
       return new GenCRLRequest(decoder.readTextString());
     } catch (RuntimeException ex) {

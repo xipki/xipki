@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -43,7 +44,7 @@ public class GetCertRequest extends SdkRequest {
   }
 
   public static GetCertRequest decode(byte[] encoded) throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("GetCertRequest", decoder, 2);
       return new GetCertRequest(decoder.readBigInt(),
           X500NameType.decode(decoder));

@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -37,8 +38,8 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
 
   public static UnsuspendOrRemoveCertsRequest decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
-      // 3 fields defined in the pararent class.
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
+      // 3 fields defined in the parent class.
       assertArrayStart("UnsuspendOrRemoveRequest", decoder, 3 + 1);
       return new UnsuspendOrRemoveCertsRequest(decoder.readByteString(),
           X500NameType.decode(decoder), decoder.readByteString(),

@@ -46,7 +46,6 @@ public class CanonicalizeCode {
   }
 
   public static void main(String[] args) {
-    args = new String[] {"/Users/liao/source/xipki/xic509/"};
     for (String arg : args) {
       try {
         System.out.println("Canonicalize dir " + arg);

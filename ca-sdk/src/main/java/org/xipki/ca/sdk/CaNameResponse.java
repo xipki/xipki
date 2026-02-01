@@ -4,6 +4,7 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -38,7 +39,7 @@ public class CaNameResponse extends SdkResponse {
   }
 
   public static CaNameResponse decode(byte[] encoded) throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CaNameResponse", decoder, 2);
       return new CaNameResponse(
           decoder.readTextString(), decoder.readTextStrings());

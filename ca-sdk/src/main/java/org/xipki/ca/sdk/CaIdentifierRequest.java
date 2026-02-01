@@ -6,6 +6,7 @@ package org.xipki.ca.sdk;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
@@ -89,7 +90,7 @@ public class CaIdentifierRequest extends SdkRequest{
 
   public static CaIdentifierRequest decode(byte[] encoded)
       throws CodecException {
-    try (CborDecoder decoder = new CborDecoder(encoded)) {
+    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CaIdentifierRequest", decoder, 3);
       return new CaIdentifierRequest(
           decoder.readByteString(), X500NameType.decode(decoder),
