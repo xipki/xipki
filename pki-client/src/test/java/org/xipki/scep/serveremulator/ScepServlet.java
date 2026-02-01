@@ -72,7 +72,7 @@ public class ScepServlet {
     String auditMessage = null;
 
     try {
-      CaCaps caCaps = responder.getCaCaps();
+      CaCaps caCaps = responder.caCaps();
       if (post && !caCaps.supportsPost()) {
         auditMessage = "HTTP POST is not supported";
         sendError(exchange, SC_BAD_REQUEST);
@@ -126,48 +126,48 @@ public class ScepServlet {
           sendError(exchange, SC_BAD_REQUEST);
           return;
         } catch (CaException ex) {
-          ex.printStackTrace();
           auditMessage = "system internal error";
+          LOG.error(auditMessage, ex);
           sendError(exchange, SC_INTERNAL_SERVER_ERROR);
           return;
         }
         byte[] respBytes = ci.getEncoded();
         sendToResponse(exchange, CT_RESPONSE, respBytes);
-      } else if (Operation.GetCACaps.getCode().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
-        byte[] caCapsBytes = responder.getCaCaps().getBytes();
+        byte[] caCapsBytes = responder.caCaps().bytes();
         sendToResponse(exchange, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
-      } else if (Operation.GetCACert.getCode().equalsIgnoreCase(operation)) {
+      } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
         byte[] respBytes;
         String ct;
-        if (responder.getRaEmulator() == null) {
+        if (responder.raEmulator() == null) {
           ct = ScepConstants.CT_X509_CA_CERT;
-          respBytes = responder.getCaEmulator().getCaCertBytes();
+          respBytes = responder.caEmulator().caCertBytes();
         } else {
           CMSSignedDataGenerator cmsSignedDataGen =
               new CMSSignedDataGenerator();
           try {
             cmsSignedDataGen.addCertificate(
-                responder.getCaEmulator().getCaCert().toBcCert());
+                responder.caEmulator().caCert().toBcCert());
             ct = ScepConstants.CT_X509_CA_RA_CERT;
             cmsSignedDataGen.addCertificate(
-                responder.getRaEmulator().getRaCert().toBcCert());
+                responder.raEmulator().raCert().toBcCert());
             CMSSignedData degenerateSignedData =
                 cmsSignedDataGen.generate(new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
           } catch (CMSException ex) {
-            ex.printStackTrace();
             auditMessage = "system internal error";
+            LOG.error(auditMessage, ex);
             sendError(exchange, SC_INTERNAL_SERVER_ERROR);
             return;
           }
         }
 
         sendToResponse(exchange, ct, respBytes);
-      } else if (Operation.GetNextCACert.getCode()
+      } else if (Operation.GetNextCACert.code()
           .equalsIgnoreCase(operation)) {
-        if (responder.getNextCaAndRa() == null) {
+        if (responder.nextCaAndRa() == null) {
           auditMessage = "SCEP operation '" + operation + "' is not permitted";
           sendError(exchange, SC_FORBIDDEN);
           return;
@@ -175,9 +175,9 @@ public class ScepServlet {
 
         try {
           NextCaMessage nextCaMsg = new NextCaMessage();
-          nextCaMsg.setCaCert(responder.getNextCaAndRa().getCaCert());
-          if (responder.getNextCaAndRa().getRaCert() != null) {
-            X509Cert raCert = responder.getNextCaAndRa().getRaCert();
+          nextCaMsg.setCaCert(responder.nextCaAndRa().caCert());
+          if (responder.nextCaAndRa().raCert() != null) {
+            X509Cert raCert = responder.nextCaAndRa().raCert();
             nextCaMsg.setRaCerts(Collections.singletonList(raCert));
           }
 
@@ -186,8 +186,8 @@ public class ScepServlet {
           sendToResponse(exchange, ScepConstants.CT_X509_NEXT_CA_CERT,
               respBytes);
         } catch (Exception ex) {
-          ex.printStackTrace();
           auditMessage = "system internal error";
+          LOG.error(auditMessage, ex);
           sendError(exchange, SC_INTERNAL_SERVER_ERROR);
         }
       } else {

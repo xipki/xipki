@@ -22,7 +22,6 @@ import java.util.List;
  * OCSP request.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class OcspRequest {
@@ -270,15 +269,15 @@ public class OcspRequest {
     return content;
   }
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 
-  public List<CertID> getRequestList() {
+  public List<CertID> requestList() {
     return requestList;
   }
 
-  public List<ExtendedExtension> getExtensions() {
+  public List<ExtendedExtension> extensions() {
     return extensions;
   }
 

@@ -15,9 +15,7 @@ import java.security.Security;
  * Helper class to register providers {@link BouncyCastleProvider}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class Providers implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Providers.class);

@@ -11,7 +11,6 @@ import org.xipki.util.codec.Args;
  * Control of the QC-Statement (in the extension QCStatements).
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class QcStatementOption {
@@ -36,15 +35,15 @@ class QcStatementOption {
         Args.notNull(monetaryValueOption, "monetaryValueOption");
   }
 
-  public QCStatement getStatement() {
+  public QCStatement statement() {
     return statement;
   }
 
-  public ASN1ObjectIdentifier getStatementId() {
+  public ASN1ObjectIdentifier statementId() {
     return statementId;
   }
 
-  public MonetaryValueOption getMonetaryValueOption() {
+  public MonetaryValueOption monetaryValueOption() {
     return monetaryValueOption;
   }
 

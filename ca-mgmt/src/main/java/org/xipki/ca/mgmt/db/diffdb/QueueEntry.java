@@ -10,7 +10,6 @@ import java.util.List;
  * Entry of a queue.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 interface QueueEntry {

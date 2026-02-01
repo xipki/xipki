@@ -133,7 +133,7 @@ public class CaMgmtClient implements CaManager {
   public CaSystemStatus getCaSystemStatus() throws CaMgmtException {
     JsonMap respJson = transmitJson(MgmtAction.getCaSystemStatus, null);
     try {
-      return MgmtResponse.GetCaSystemStatus.parse(respJson).getResult();
+      return MgmtResponse.GetCaSystemStatus.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -169,7 +169,7 @@ public class CaMgmtClient implements CaManager {
   public Map<String, String> getDbSchemas() throws CaMgmtException {
     JsonMap respJson = transmitJson(MgmtAction.getDbSchemas, null);
     try {
-      return MgmtResponse.GetDbSchemas.parse(respJson).getResult();
+      return MgmtResponse.GetDbSchemas.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -218,7 +218,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     JsonMap respJson = transmitJson(MgmtAction.getAliasesForCa, req);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -229,7 +229,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(aliasName);
     JsonMap respJson = transmitJson(MgmtAction.getCaNameForAlias, req);
     try {
-      return MgmtResponse.StringResponse.parse(respJson).getResult();
+      return MgmtResponse.StringResponse.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -288,7 +288,7 @@ public class CaMgmtClient implements CaManager {
   private Set<String> getNames(MgmtAction action) throws CaMgmtException {
     JsonMap respJson = transmitJson(action, null);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -304,7 +304,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     JsonMap respJson = transmitJson(MgmtAction.getCaCerts, req);
     try {
-      String str = MgmtResponse.StringResponse.parse(respJson).getResult();
+      String str = MgmtResponse.StringResponse.parse(respJson).result();
       return X509Util.parseCerts(str.getBytes(StandardCharsets.UTF_8));
     } catch (IOException | CodecException | CertificateException ex) {
       throw new CaMgmtException(ex);
@@ -316,7 +316,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     JsonMap respJson = transmitJson(MgmtAction.getCa, req);
     try {
-      return MgmtResponse.GetCa.parse(respJson).getResult();
+      return MgmtResponse.GetCa.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -368,7 +368,7 @@ public class CaMgmtClient implements CaManager {
 
     Set<String> list;
     try {
-      list = MgmtResponse.StringSet.parse(respJson).getResult();
+      list = MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -390,7 +390,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     JsonMap respJson = transmitJson(MgmtAction.getRequestorsForCa, req);
     try {
-      return MgmtResponse.GetRequestorsForCa.parse(respJson).getResult();
+      return MgmtResponse.GetRequestorsForCa.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -401,7 +401,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     JsonMap respJson = transmitJson(MgmtAction.getRequestor, req);
     try {
-      return MgmtResponse.GetRequestor.parse(respJson).getResult();
+      return MgmtResponse.GetRequestor.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -448,7 +448,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     JsonMap respJson = transmitJson(MgmtAction.getKeypairGen, req);
     try {
-      return MgmtResponse.GetKeypairGen.parse(respJson).getResult();
+      return MgmtResponse.GetKeypairGen.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -481,7 +481,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(profileName);
     JsonMap respJson = transmitJson(MgmtAction.getCertprofile, req);
     try {
-      return MgmtResponse.GetCertprofile.parse(respJson).getResult();
+      return MgmtResponse.GetCertprofile.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -523,7 +523,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(name);
     JsonMap respJson = transmitJson(MgmtAction.getSigner, req);
     try {
-      return MgmtResponse.GetSigner.parse(respJson).getResult();
+      return MgmtResponse.GetSigner.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -552,7 +552,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(caName);
     JsonMap respJson = transmitJson(MgmtAction.getPublisherNamesForCa, req);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -564,7 +564,7 @@ public class CaMgmtClient implements CaManager {
     MgmtRequest.Name req = new MgmtRequest.Name(publisherName);
     JsonMap respJson = transmitJson(MgmtAction.getPublisher, req);
     try {
-      return MgmtResponse.GetPublisher.parse(respJson).getResult();
+      return MgmtResponse.GetPublisher.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -633,7 +633,7 @@ public class CaMgmtClient implements CaManager {
 
     JsonMap respJson = transmitJson(MgmtAction.generateCrossCertificate, req);
     try {
-      return parseCert(MgmtResponse.ByteArray.parse(respJson).getResult());
+      return parseCert(MgmtResponse.ByteArray.parse(respJson).result());
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -648,7 +648,7 @@ public class CaMgmtClient implements CaManager {
 
     JsonMap respJson = transmitJson(MgmtAction.generateCertificate, req);
     try {
-      return parseCert(MgmtResponse.ByteArray.parse(respJson).getResult());
+      return parseCert(MgmtResponse.ByteArray.parse(respJson).result());
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -666,7 +666,7 @@ public class CaMgmtClient implements CaManager {
     try {
       MgmtResponse.KeyCertBytes resp =
           MgmtResponse.KeyCertBytes.parse(respJson);
-    return new KeyCertBytesPair(resp.getKey(), resp.getCert());
+    return new KeyCertBytesPair(resp.key(), resp.cert());
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -685,7 +685,7 @@ public class CaMgmtClient implements CaManager {
 
     JsonMap respJson = transmitJson(MgmtAction.generateRootCa, req);
     try {
-      return parseCert(MgmtResponse.ByteArray.parse(respJson).getResult());
+      return parseCert(MgmtResponse.ByteArray.parse(respJson).result());
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -764,7 +764,7 @@ public class CaMgmtClient implements CaManager {
     JsonMap respJson = transmitJson(MgmtAction.exportConf, req);
     try {
       MgmtResponse.ByteArray resp = MgmtResponse.ByteArray.parse(respJson);
-      return new ByteArrayInputStream(resp.getResult());
+      return new ByteArrayInputStream(resp.result());
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -791,7 +791,7 @@ public class CaMgmtClient implements CaManager {
 
     JsonMap respJson = transmitJson(MgmtAction.listCertificates, req);
     try {
-      return MgmtResponse.ListCertificates.parse(respJson).getResult();
+      return MgmtResponse.ListCertificates.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -801,7 +801,7 @@ public class CaMgmtClient implements CaManager {
   public Set<String> getSupportedSignerTypes() throws CaMgmtException {
     JsonMap respJson = transmitJson(MgmtAction.getSupportedSignerTypes, null);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -812,7 +812,7 @@ public class CaMgmtClient implements CaManager {
     JsonMap respJson = transmitJson(
         MgmtAction.getSupportedCertprofileTypes, null);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -823,7 +823,7 @@ public class CaMgmtClient implements CaManager {
     JsonMap respJson = transmitJson(
         MgmtAction.getSupportedPublisherTypes, null);
     try {
-      return MgmtResponse.StringSet.parse(respJson).getResult();
+      return MgmtResponse.StringSet.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -837,7 +837,7 @@ public class CaMgmtClient implements CaManager {
         new MgmtRequest.TokenInfoP11(module, slotIndex, verbose);
     JsonMap respJson = transmitJson(MgmtAction.tokenInfoP11, req);
     try {
-      return MgmtResponse.StringResponse.parse(respJson).getResult();
+      return MgmtResponse.StringResponse.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }
@@ -860,7 +860,7 @@ public class CaMgmtClient implements CaManager {
     }
 
     try {
-      return X509Util.parseCrl(resp.getResult());
+      return X509Util.parseCrl(resp.result());
     } catch (CRLException ex) {
       throw new CaMgmtException("could not parse X.509 CRL", ex);
     }

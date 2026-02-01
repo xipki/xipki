@@ -42,7 +42,6 @@ import java.util.Set;
  * CertProfile with identifier.
  *
  * @author Lijun Liao
- *
  */
 
 public class CertprofileUtil {
@@ -50,10 +49,10 @@ public class CertprofileUtil {
   public static SubjectInfo getSubject(
       Certprofile certprofile, X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
-    SubjectInfo subjectInfo = certprofile.getSubject(requestedSubject);
+    SubjectInfo subjectInfo = certprofile.subject(requestedSubject);
 
-    if (certprofile.getCertDomain() == CertDomain.CABForumBR) {
-      checkCABForumBR(certprofile, subjectInfo.getGrantedSubject());
+    if (certprofile.certDomain() == CertDomain.CABForumBR) {
+      checkCABForumBR(certprofile, subjectInfo.grantedSubject());
     }
 
     // check the country
@@ -66,7 +65,7 @@ public class CertprofileUtil {
     ASN1ObjectIdentifier errorOid = null;
     String errorCountry = null;
     for (ASN1ObjectIdentifier oid : countryOids) {
-      X500Name gs = subjectInfo.getGrantedSubject();
+      X500Name gs = subjectInfo.grantedSubject();
       RDN[] countryRdns = gs.getRDNs(oid);
       if (countryRdns != null) {
         for (RDN rdn : countryRdns) {
@@ -99,9 +98,9 @@ public class CertprofileUtil {
 
   private static void checkCABForumBR(Certprofile certprofile, X500Name subject)
       throws BadCertTemplateException {
-    if (certprofile.getCertLevel() == CertLevel.EndEntity) {
+    if (certprofile.certLevel() == CertLevel.EndEntity) {
       // extract the policyIdentifier
-      CertificatePolicies policies = certprofile.getCertificatePolicies();
+      CertificatePolicies policies = certprofile.certificatePolicies();
       ASN1ObjectIdentifier policyId = null;
       if (policies != null) {
         for (PolicyInformation m : policies.getPolicyInformation()) {
@@ -290,8 +289,8 @@ public class CertprofileUtil {
         continue;
       }
 
-      if (reqX509.hasUsages(k.getKeyUsage().getBcUsage())) {
-        usages.add(k.getKeyUsage());
+      if (reqX509.hasUsages(k.keyUsage().bcUsage())) {
+        usages.add(k.keyUsage());
       }
     }
   } // method addRequestedKeyusage
@@ -314,8 +313,8 @@ public class CertprofileUtil {
       }
 
       if (reqKeyUsage.hasKeyPurposeId(
-          KeyPurposeId.getInstance(k.getExtKeyUsage()))) {
-        usages.add(k.getExtKeyUsage());
+          KeyPurposeId.getInstance(k.extKeyUsage()))) {
+        usages.add(k.extKeyUsage());
       }
     }
   } // method addRequestedExtKeyusage
@@ -388,7 +387,7 @@ public class CertprofileUtil {
   } // method toString
 
   private static String getExtensionIDDesc(ASN1ObjectIdentifier oid) {
-    return ExtensionID.ofOid(oid).getMainAlias();
+    return ExtensionID.ofOid(oid).mainAlias();
   }
 
 }

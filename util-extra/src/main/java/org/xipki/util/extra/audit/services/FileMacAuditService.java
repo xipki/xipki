@@ -32,7 +32,6 @@ import java.util.StringTokenizer;
  * File-based MAC protected audit service.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class FileMacAuditService extends MacAuditService {

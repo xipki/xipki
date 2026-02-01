@@ -25,7 +25,6 @@ import java.util.Set;
  * Secure panel to enter password.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class SecurePasswordInputPanel extends Panel {

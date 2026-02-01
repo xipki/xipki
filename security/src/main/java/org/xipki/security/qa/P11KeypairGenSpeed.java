@@ -14,9 +14,7 @@ import org.xipki.util.codec.Args;
  * Speed test of PKCS#11 keypair generation.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public final class P11KeypairGenSpeed extends BenchmarkExecutor {
 
   class Tester implements Runnable {

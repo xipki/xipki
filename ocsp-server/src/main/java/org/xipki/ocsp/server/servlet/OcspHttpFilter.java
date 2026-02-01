@@ -57,11 +57,11 @@ public class OcspHttpFilter implements XiHttpFilter {
     LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
-    securities.init(conf.getSecurity());
+    securities.init(conf.security());
 
     OcspServer ocspServer = new OcspServer();
-    ocspServer.setSecurityFactory(securities.getSecurityFactory());
-    ocspServer.setConfFile(conf.getServerConf());
+    ocspServer.setSecurityFactory(securities.securityFactory());
+    ocspServer.setConfFile(conf.serverConf());
 
     try {
       ocspServer.init(true);

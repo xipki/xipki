@@ -38,7 +38,7 @@ public class CertReqMeta implements JsonEncodable {
     this.subject = subject;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
@@ -46,7 +46,7 @@ public class CertReqMeta implements JsonEncodable {
     this.notBefore = notBefore;
   }
 
-  public Instant getNotAfter() {
+  public Instant notAfter() {
     return notAfter;
   }
 
@@ -54,7 +54,7 @@ public class CertReqMeta implements JsonEncodable {
     this.notAfter = notAfter;
   }
 
-  public String getCa() {
+  public String ca() {
     return ca;
   }
 
@@ -62,7 +62,7 @@ public class CertReqMeta implements JsonEncodable {
     this.ca = ca;
   }
 
-  public String getCertProfile() {
+  public String certProfile() {
     return certProfile;
   }
 
@@ -70,7 +70,7 @@ public class CertReqMeta implements JsonEncodable {
     this.certProfile = certProfile;
   }
 
-  public String getSubject() {
+  public String subject() {
     return subject;
   }
 

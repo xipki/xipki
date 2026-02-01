@@ -36,7 +36,6 @@ import java.util.zip.ZipOutputStream;
  * Database exporter of OCSP CertStore.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class OcspCertstoreDbExporter extends DbPorter {
@@ -76,9 +75,9 @@ class OcspCertstoreDbExporter extends DbPorter {
     Path path = Paths.get(baseDir, FILENAME_OCSP_CERTSTORE);
     if (resume) {
       certstore = OcspCertstore.parse(JsonParser.parseMap(path, false));
-      if (certstore.getVersion() > VERSION_V2) {
+      if (certstore.version() > VERSION_V2) {
         throw new Exception("could not continue with Certstore greater than " +
-            VERSION_V2 + ": " + certstore.getVersion());
+            VERSION_V2 + ": " + certstore.version());
       }
     } else {
       certstore = new OcspCertstore(VERSION_V2);
@@ -119,7 +118,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       throws DataAccessException, IOException {
     System.out.print("    exporting table ISSUER ... ");
     boolean succ = false;
-    List<OcspCertstore.Issuer> issuers = certstore.getIssuers();
+    List<OcspCertstore.Issuer> issuers = certstore.issuers();
     final String sql = "SELECT ID,CERT,REV_INFO,CRL_ID FROM ISSUER";
 
     PreparedStatement stmt = null;
@@ -156,7 +155,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       throws DataAccessException {
     System.out.print("    exporting table CRL_INFO ... ");
     boolean succ = false;
-    List<OcspCertstore.CrlInfo> crlInfos = certstore.getCrlInfos();
+    List<OcspCertstore.CrlInfo> crlInfos = certstore.crlInfos();
     final String sql = "SELECT ID,NAME,INFO FROM CRL_INFO";
 
     PreparedStatement stmt = null;
@@ -185,7 +184,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
   private Exception exportCert(OcspCertstore certstore, File processLogFile) {
     try {
-      IoUtil.mkdirs(new File(baseDir, OcspDbEntryType.CERT.getDirName()));
+      IoUtil.mkdirs(new File(baseDir, OcspDbEntryType.CERT.dirName()));
     } catch (IOException ex) {
       LOG.error("IO Exception", ex);
       return ex;
@@ -195,7 +194,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     try {
       certsFileOs = Files.newOutputStream(
-          Paths.get(baseDir, OcspDbEntryType.CERT.getDirName() + ".mf"),
+          Paths.get(baseDir, OcspDbEntryType.CERT.dirName() + ".mf"),
           StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportCert0(certstore, processLogFile, certsFileOs);
       return null;
@@ -214,7 +213,7 @@ class OcspCertstoreDbExporter extends DbPorter {
   private void exportCert0(OcspCertstore certstore, File processLogFile,
                            OutputStream certsFileOs)
       throws Exception {
-    File certsDir = new File(baseDir, OcspDbEntryType.CERT.getDirName());
+    File certsDir = new File(baseDir, OcspDbEntryType.CERT.dirName());
     Long minId = null;
     if (processLogFile.exists()) {
       byte[] content = IoUtil.read(processLogFile);
@@ -236,7 +235,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     final long maxId = max("CERT", "ID");
 
-    int numProcessedBefore = certstore.getCountCerts();
+    int numProcessedBefore = certstore.countCerts();
     final long total = count("CERT") - numProcessedBefore;
     ProcessLog processLog = new ProcessLog(total);
 

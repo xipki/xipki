@@ -17,9 +17,7 @@ import java.util.Set;
  * Specifies utf8Pairs defined in RFC4211.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class CmpUtf8Pairs {
 
   public static final String KEY_NOTBEFORE = "notbefore";

@@ -56,7 +56,7 @@ public class CaCompleters {
     public CaCrlReasonCompleter() {
       List<String> enums = new LinkedList<>();
       for (CrlReason reason : CaActions.CaRevoke.PERMITTED_REASONS) {
-        enums.add(reason.getDescription());
+        enums.add(reason.description());
       }
       setTokens(enums);
     }
@@ -109,7 +109,7 @@ public class CaCompleters {
     public CertListSortByCompleter() {
       List<String> enums = new LinkedList<>();
       for (CertListOrderBy sort : CertListOrderBy.values()) {
-        enums.add(sort.getText());
+        enums.add(sort.text());
       }
       setTokens(enums);
     }
@@ -259,7 +259,7 @@ public class CaCompleters {
           continue;
         }
 
-        X509Cert cert = caEntry.getCert();
+        X509Cert cert = caEntry.cert();
         if (cert.isSelfSigned()) {
           ret.add(name);
         }

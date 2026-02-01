@@ -47,7 +47,6 @@ import java.util.Iterator;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class CmsEnveloperTest {
 
   @BeforeClass
@@ -147,7 +146,7 @@ public class CmsEnveloperTest {
     byte[] data = Hex.decode("1234567890abcdef");
 
     RSAESOAEPparams rsaOaepParams = new RSAESOAEPparams(
-        hashAlgo.getAlgorithmIdentifier(),
+        hashAlgo.algorithmIdentifier(),
         RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION,
         RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM);
 

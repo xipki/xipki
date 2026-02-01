@@ -11,12 +11,11 @@ import java.time.ZoneOffset;
  * The anchor class of ASN.1 types defined in this package.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public abstract class ASN1Type {
 
-  public abstract int getEncodedLength();
+  public abstract int encodedLength();
 
   public abstract int write(byte[] out, int offset);
 

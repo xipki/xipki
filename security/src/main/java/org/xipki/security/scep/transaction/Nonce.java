@@ -32,8 +32,8 @@ public class Nonce {
     this(bytes, true);
   }
 
-  public byte[] getBytes() {
-    return Arrays.copyOf(bytes, bytes.length);
+  public byte[] bytes() {
+    return bytes.clone();
   }
 
   public static Nonce randomNonce() {

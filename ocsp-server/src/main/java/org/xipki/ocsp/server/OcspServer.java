@@ -81,7 +81,6 @@ import static org.xipki.ocsp.server.OcspServerUtil.removeExtension;
  * Implementation of {@link OcspServer}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspServer implements Closeable {
@@ -158,7 +157,7 @@ public class OcspServer implements Closeable {
       }
       OCSPResponse resp = new OCSPResponse(
           new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(
-              status.getStatus()), null);
+              status.status()), null);
       byte[] encoded;
       try {
         encoded = resp.getEncoded();
@@ -172,7 +171,7 @@ public class OcspServer implements Closeable {
 
     ExtendedExtension ext = new ExtendedExtension(
         OID.ID_PKIX_OCSP_EXTENDEDREVOKE, false, DERNullBytes);
-    byte[] encoded = new byte[ext.getEncodedLength()];
+    byte[] encoded = new byte[ext.encodedLength()];
     ext.write(encoded, 0);
     extension_pkix_ocsp_extendedRevoke = new WritableOnlyExtension(encoded);
 
@@ -261,8 +260,8 @@ public class OcspServer implements Closeable {
     Set<String> set = new HashSet<>();
 
     // Duplication name check: responder
-    for (OcspServerConf.Responder m : conf.getResponders()) {
-      String name = m.getName();
+    for (OcspServerConf.Responder m : conf.responders()) {
+      String name = m.name();
 
       if (StringUtil.orEqualsIgnoreCase(name, "health", "mgmt")) {
         throw new InvalidConfException(
@@ -292,8 +291,8 @@ public class OcspServer implements Closeable {
 
     // Duplication name check: signer
     set.clear();
-    for (OcspServerConf.Signer m : conf.getSigners()) {
-      String name = m.getName();
+    for (OcspServerConf.Signer m : conf.signers()) {
+      String name = m.name();
       if (set.contains(name)) {
         throw new InvalidConfException(
             "duplicated definition of signer option named '" + name + "'");
@@ -303,8 +302,8 @@ public class OcspServer implements Closeable {
 
     // Duplication name check: requests
     set.clear();
-    for (OcspServerConf.RequestOption m : conf.getRequestOptions()) {
-      String name = m.getName();
+    for (OcspServerConf.RequestOption m : conf.requestOptions()) {
+      String name = m.name();
       if (set.contains(name)) {
         throw new InvalidConfException(
             "duplicated definition of request option named '" + name + "'");
@@ -314,8 +313,8 @@ public class OcspServer implements Closeable {
 
     // Duplication name check: response
     set.clear();
-    for (OcspServerConf.ResponseOption m : conf.getResponseOptions()) {
-      String name = m.getName();
+    for (OcspServerConf.ResponseOption m : conf.responseOptions()) {
+      String name = m.name();
       if (set.contains(name)) {
         throw new InvalidConfException(
             "duplicated definition of response option named '" + name + "'");
@@ -325,8 +324,8 @@ public class OcspServer implements Closeable {
 
     // Duplication name check: store
     set.clear();
-    for (OcspServerConf.Store m : conf.getStores()) {
-      String name = m.getName();
+    for (OcspServerConf.Store m : conf.stores()) {
+      String name = m.name();
       if (set.contains(name)) {
         throw new InvalidConfException(
             "duplicated definition of store named '" + name + "'");
@@ -336,9 +335,9 @@ public class OcspServer implements Closeable {
 
     // Duplication name check: datasource
     set.clear();
-    if (conf.getDatasources() != null) {
-      for (DataSourceConf m : conf.getDatasources()) {
-        String name = m.getName();
+    if (conf.datasources() != null) {
+      for (DataSourceConf m : conf.datasources()) {
+        String name = m.name();
         if (set.contains(name)) {
           throw new InvalidConfException(
               "duplicated definition of datasource named '" + name + "'");
@@ -350,12 +349,12 @@ public class OcspServer implements Closeable {
     // assert that one directory will not be used duplicated by the source of
     // type 'crl'
     Set<String> crlsDirs = new HashSet<>();
-    for (OcspServerConf.Store m : conf.getStores()) {
-      Source source = m.getSource();
-      if ("crl".equalsIgnoreCase(source.getType())) {
+    for (OcspServerConf.Store m : conf.stores()) {
+      Source source = m.source();
+      if ("crl".equalsIgnoreCase(source.type())) {
         String canonicalPath;
         try {
-          canonicalPath = new File(source.getConf().getNnString("dir"))
+          canonicalPath = new File(source.conf().getNnString("dir"))
               .getCanonicalPath();
         } catch (IOException | CodecException ex) {
           throw new InvalidConfException(
@@ -364,7 +363,7 @@ public class OcspServer implements Closeable {
 
         if (crlsDirs.contains(canonicalPath)) {
           throw new InvalidConfException("duplicated use of dir '" +
-              canonicalPath + "' in store " + m.getName());
+              canonicalPath + "' in store " + m.name());
         } else {
           crlsDirs.add(canonicalPath);
         }
@@ -372,50 +371,50 @@ public class OcspServer implements Closeable {
     }
 
     this.master = conf.isMaster();
-    this.unknownIssuerBehaviour = conf.getUnknownIssuerBehaviour();
+    this.unknownIssuerBehaviour = conf.unknownIssuerBehaviour();
     if (this.unknownIssuerBehaviour == null) {
       this.unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
     }
 
     // Response Cache
-    OcspServerConf.ResponseCache cacheType = conf.getResponseCache();
+    OcspServerConf.ResponseCache cacheType = conf.responseCache();
     if (cacheType != null) {
-      DataSourceConf cacheSourceConf = cacheType.getDatasource();
+      DataSourceConf cacheSourceConf = cacheType.datasource();
       DataSourceWrapper datasource;
-      try (InputStream dsStream = getInputStream(cacheSourceConf.getConf())) {
+      try (InputStream dsStream = getInputStream(cacheSourceConf.conf())) {
         datasource = datasourceFactory.createDataSource(
-            cacheSourceConf.getName(), dsStream);
+            cacheSourceConf.name(), dsStream);
       } catch (IOException ex) {
         throw new InvalidConfException(ex.getMessage(), ex);
       }
       responseCacher = new ResponseCacher(datasource, master,
-          cacheType.getValidity());
+          cacheType.validity());
       responseCacher.init();
     }
 
     //-- initializes the responders
     // signers
-    for (OcspServerConf.Signer m : conf.getSigners()) {
-      signers.put(m.getName(), initSigner(m, securityFactory));
+    for (OcspServerConf.Signer m : conf.signers()) {
+      signers.put(m.name(), initSigner(m, securityFactory));
     }
 
     // requests
-    for (OcspServerConf.RequestOption m : conf.getRequestOptions()) {
-      requestOptions.put(m.getName(), new RequestOption(m));
+    for (OcspServerConf.RequestOption m : conf.requestOptions()) {
+      requestOptions.put(m.name(), new RequestOption(m));
     }
 
     // responses
-    for (OcspServerConf.ResponseOption m : conf.getResponseOptions()) {
-      responseOptions.put(m.getName(), m);
+    for (OcspServerConf.ResponseOption m : conf.responseOptions()) {
+      responseOptions.put(m.name(), m);
     }
 
     // datasources
     Map<String, DataSourceWrapper> datasources = new HashMap<>();
-    if (conf.getDatasources() != null) {
-      for (DataSourceConf m : conf.getDatasources()) {
-        String name = m.getName();
+    if (conf.datasources() != null) {
+      for (DataSourceConf m : conf.datasources()) {
+        String name = m.name();
         DataSourceWrapper datasource;
-        try (InputStream dsStream = getInputStream(m.getConf())) {
+        try (InputStream dsStream = getInputStream(m.conf())) {
           datasource = datasourceFactory.createDataSource(name, dsStream);
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
@@ -428,9 +427,9 @@ public class OcspServer implements Closeable {
     Map<String, ResponderOption> responderOptions = getResponderOptionMap(conf);
 
     // stores
-    for (OcspServerConf.Store m : conf.getStores()) {
+    for (OcspServerConf.Store m : conf.stores()) {
       OcspStore store = newStore(m, datasources);
-      stores.put(m.getName(), store);
+      stores.put(m.name(), store);
     }
 
     // responders
@@ -439,28 +438,28 @@ public class OcspServer implements Closeable {
       ResponderOption option = entry.getValue();
 
       List<OcspStore> statusStores =
-          new ArrayList<>(option.getStoreNames().size());
-      for (String storeName : option.getStoreNames()) {
+          new ArrayList<>(option.storeNames().size());
+      for (String storeName : option.storeNames()) {
         statusStores.add(stores.get(storeName));
       }
 
       OcspServerConf.ResponseOption responseOption =
-          responseOptions.get(option.getResponseOptionName());
-      ResponseSigner signer = signers.get(option.getSignerName());
+          responseOptions.get(option.responseOptionName());
+      ResponseSigner signer = signers.get(option.signerName());
       if (signer.isMacSigner()) {
         if (responseOption.isResponderIdByName()) {
           throw new InvalidConfException("could not use ResponderIdByName " +
-              "for signer " + option.getSignerName());
+              "for signer " + option.signerName());
         }
 
-        if (EmbedCertsMode.NONE != responseOption.getEmbedCertsMode()) {
+        if (EmbedCertsMode.NONE != responseOption.embedCertsMode()) {
           throw new InvalidConfException("could not embed certificate in " +
-              "response for signer " + option.getSignerName());
+              "response for signer " + option.signerName());
         }
       }
 
       Responder responder = new Responder(option,
-          requestOptions.get(option.getRequestOptionName()),
+          requestOptions.get(option.requestOptionName()),
           responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
@@ -471,7 +470,7 @@ public class OcspServer implements Closeable {
       String name = entry.getKey();
       Responder responder = responders.get(name);
       ResponderOption option = entry.getValue();
-      List<String> strs = option.getServletPaths();
+      List<String> strs = option.servletPaths();
       for (String path : strs) {
         tmpList.add(path);
         path2responderMap.put(path, responder);
@@ -489,28 +488,28 @@ public class OcspServer implements Closeable {
       OcspServerConf conf) throws InvalidConfException {
     Map<String, ResponderOption> responderOptions = new HashMap<>();
 
-    for (OcspServerConf.Responder m : conf.getResponders()) {
+    for (OcspServerConf.Responder m : conf.responders()) {
       ResponderOption option = new ResponderOption(m);
 
-      String optName = option.getSignerName();
+      String optName = option.signerName();
       if (!signers.containsKey(optName)) {
         throw new InvalidConfException("no signer named '" +
             optName + "' is defined");
       }
 
-      String reqOptName = option.getRequestOptionName();
+      String reqOptName = option.requestOptionName();
       if (!requestOptions.containsKey(reqOptName)) {
         throw new InvalidConfException("no requestOption named '" +
             reqOptName + "' is defined");
       }
 
-      String respOptName = option.getResponseOptionName();
+      String respOptName = option.responseOptionName();
       if (!responseOptions.containsKey(respOptName)) {
         throw new InvalidConfException("no responseOption named '" +
             respOptName + "' is defined");
       }
 
-      responderOptions.put(m.getName(), option);
+      responderOptions.put(m.name(), option);
     } // end for
     return responderOptions;
   }
@@ -526,14 +525,14 @@ public class OcspServer implements Closeable {
       try {
         store.close();
       } catch (Exception ex) {
-        LogUtil.warn(LOG, ex, "shutdown store " + store.getName());
+        LogUtil.warn(LOG, ex, "shutdown store " + store.name());
       }
     }
   } // method close
 
   public OcspRespWithCacheInfo answer(
       Responder responder, byte[] request, boolean viaGet) {
-    RequestOption reqOpt = responder.getRequestOption();
+    RequestOption reqOpt = responder.requestOption();
 
     int version;
     try {
@@ -550,8 +549,8 @@ public class OcspServer implements Closeable {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
     }
 
-    ResponseSigner signer = responder.getSigner();
-    OcspServerConf.ResponseOption repOpt = responder.getResponseOption();
+    ResponseSigner signer = responder.signer();
+    OcspServerConf.ResponseOption repOpt = responder.responseOption();
 
     try {
       Object reqOrErrorResp = checkSignature(request, reqOpt);
@@ -562,11 +561,11 @@ public class OcspServer implements Closeable {
 
       OcspRequest req = (OcspRequest) reqOrErrorResp;
 
-      List<CertID> requestList = req.getRequestList();
+      List<CertID> requestList = req.requestList();
       int requestsSize = requestList.size();
-      if (requestsSize > reqOpt.getMaxRequestListCount()) {
+      if (requestsSize > reqOpt.maxRequestListCount()) {
         String message = requestsSize + " entries in RequestList, but maximal "
-            + reqOpt.getMaxRequestListCount() + " is allowed";
+            + reqOpt.maxRequestListCount() + " is allowed";
         LOG.warn(message);
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
       }
@@ -574,7 +573,7 @@ public class OcspServer implements Closeable {
       OcspRespControl repControl = new OcspRespControl();
       repControl.canCacheInfo = true;
 
-      List<ExtendedExtension> reqExtensions = req.getExtensions();
+      List<ExtendedExtension> reqExtensions = req.extensions();
       List<Extension> respExtensions = new LinkedList<>();
 
       ExtendedExtension ocspRespExtn = removeExtension(reqExtensions,
@@ -584,7 +583,7 @@ public class OcspServer implements Closeable {
             encodedAcceptableResponses_Basic);
         if (!containsBasic) {
           // we need to parse the extension
-          byte[] extnValue = new byte[ocspRespExtn.getExtnValueLength()];
+          byte[] extnValue = new byte[ocspRespExtn.extnValueLength()];
           ocspRespExtn.writeExtnValue(extnValue, 0);
           ASN1Sequence seq = ASN1Sequence.getInstance(extnValue);
           final int size = seq.size();
@@ -609,18 +608,18 @@ public class OcspServer implements Closeable {
           OID.ID_PKIX_OCSP_NONCE);
 
       if (nonceExtn != null) {
-        if (reqOpt.getNonceOccurrence() == QuadrupleState.forbidden) {
+        if (reqOpt.nonceOccurrence() == QuadrupleState.forbidden) {
           LOG.warn("nonce forbidden, but is present in the request");
           return unsuccesfulOCSPRespMap.get(
               OcspResponseStatus.malformedRequest);
         }
 
-        if (reqOpt.getNonceOccurrence() == QuadrupleState.ignore) {
+        if (reqOpt.nonceOccurrence() == QuadrupleState.ignore) {
           nonceExtn = null;
         } else {
-          int len = nonceExtn.getExtnValueLength();
-          int min = reqOpt.getNonceMinLen();
-          int max = reqOpt.getNonceMaxLen();
+          int len = nonceExtn.extnValueLength();
+          int min = reqOpt.nonceMinLen();
+          int max = reqOpt.nonceMaxLen();
 
           if (len < min || len > max) {
             LOG.warn("length of nonce {} not within [{},{}]", len, min, max);
@@ -636,7 +635,7 @@ public class OcspServer implements Closeable {
           }
         }
       } else {
-        if (reqOpt.getNonceOccurrence() == QuadrupleState.required) {
+        if (reqOpt.nonceOccurrence() == QuadrupleState.required) {
           LOG.warn("nonce required, but is not present in the request");
           return unsuccesfulOCSPRespMap.get(
               OcspResponseStatus.malformedRequest);
@@ -644,13 +643,13 @@ public class OcspServer implements Closeable {
       }
 
       ConcurrentContentSigner concurrentSigner = null;
-      if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
+      if (responder.responderOption().mode() != OcspMode.RFC2560) {
         ExtendedExtension extn = removeExtension(reqExtensions,
             OID.ID_PKIX_OCSP_PREFSIGALGS);
         if (extn != null) {
           List<AlgorithmIdentifier> prefSigAlgs;
           try (ASN1InputStream asn1Stream =
-                   new ASN1InputStream(extn.getExtnValueStream())) {
+                   new ASN1InputStream(extn.extnValueStream())) {
             ASN1Sequence seq =
                 ASN1Sequence.getInstance(asn1Stream.readObject());
             final int size = seq.size();
@@ -678,7 +677,7 @@ public class OcspServer implements Closeable {
             List<OID> oids = new LinkedList<>();
             for (ExtendedExtension m : reqExtensions) {
               if (m.isCritical()) {
-                oids.add(m.getExtnType());
+                oids.add(m.extnType());
               }
             }
             LOG.warn("could not process critical request extensions: {}", oids);
@@ -702,31 +701,31 @@ public class OcspServer implements Closeable {
       if (canCacheDb) {
         // try to find the cached response
         CertID certId = requestList.get(0);
-        HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
+        HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
         if (!reqOpt.allows(reqHashAlgo)) {
           LOG.warn("CertID.hashAlgorithm {} not allowed",
               reqHashAlgo != null ? reqHashAlgo
-                  : certId.getIssuer().hashAlgorithmOID());
+                  : certId.issuer().hashAlgorithmOID());
           return unsuccesfulOCSPRespMap.get(
               OcspResponseStatus.malformedRequest);
         }
 
         cacheDbSigAlg = concurrentSigner.getAlgorithm();
 
-        cacheDbIssuer = responseCacher.getIssuer(certId.getIssuer());
-        cacheDbSerialNumber = certId.getSerialNumber();
+        cacheDbIssuer = responseCacher.getIssuer(certId.issuer());
+        cacheDbSerialNumber = certId.serialNumber();
 
         if (cacheDbIssuer != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-              cacheDbIssuer.getId(), cacheDbSerialNumber, cacheDbSigAlg);
+              cacheDbIssuer.id(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
             return cachedResp;
           }
         } else if (master) {
           // store the issuer certificate in cache database.
           X509Cert issuerCert = null;
-          for (OcspStore store : responder.getStores()) {
-            issuerCert = store.getIssuerCert(certId.getIssuer());
+          for (OcspStore store : responder.stores()) {
+            issuerCert = store.getIssuerCert(certId.issuer());
             if (issuerCert != null) {
               break;
             }
@@ -770,12 +769,12 @@ public class OcspServer implements Closeable {
         builder.setResponseExtensions(new Extensions(respExtensions));
       }
 
-      EmbedCertsMode certsMode = repOpt.getEmbedCertsMode();
+      EmbedCertsMode certsMode = repOpt.embedCertsMode();
       TaggedCertSequence certsInResp =
-            (certsMode == EmbedCertsMode.SIGNER) ? signer.getSequenceOfCert()
+            (certsMode == EmbedCertsMode.SIGNER) ? signer.sequenceOfCert()
           : (certsMode == EmbedCertsMode.NONE)   ? null
           // certsMode == EmbedCertsMode.SIGNER_AND_CA
-          : signer.getSequenceOfCertChain();
+          : signer.sequenceOfCertChain();
 
       Instant producedAt = Instant.now();
       byte[] encodeOcspResponse;
@@ -794,7 +793,7 @@ public class OcspServer implements Closeable {
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result
         // in DDoS of storage
-        responseCacher.storeOcspResponse(cacheDbIssuer.getId(),
+        responseCacher.storeOcspResponse(cacheDbIssuer.id(),
             cacheDbSerialNumber, producedAtSeconds, repControl.cacheNextUpdate,
             cacheDbSigAlg, encodeOcspResponse);
       }
@@ -818,7 +817,7 @@ public class OcspServer implements Closeable {
       AtomicBoolean unknownAsRevoked, CertID certId, OCSPRespBuilder builder,
       Responder responder, RequestOption reqOpt,
       OcspServerConf.ResponseOption repOpt, OcspRespControl repControl) {
-    HashAlgo reqHashAlgo = certId.getIssuer().hashAlgorithm();
+    HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
     if (!reqOpt.allows(reqHashAlgo)) {
       LOG.warn("CertID.hashAlgorithm {} not allowed", reqHashAlgo);
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
@@ -827,24 +826,24 @@ public class OcspServer implements Closeable {
     CertStatusInfo certStatusInfo = null;
     boolean exceptionOccurs = false;
 
-    BigInteger serial = certId.getSerialNumber();
+    BigInteger serial = certId.serialNumber();
 
-    RequestIssuer reqIssuer = certId.getIssuer();
+    RequestIssuer reqIssuer = certId.issuer();
     Instant now = Instant.now();
-    for (OcspStore store : responder.getStores()) {
+    for (OcspStore store : responder.stores()) {
       if (!store.knowsIssuer(reqIssuer)) {
         continue;
       }
 
       try {
-        certStatusInfo = store.getCertStatus(now, certId.getIssuer(), serial,
+        certStatusInfo = store.getCertStatus(now, certId.issuer(), serial,
             repOpt.isIncludeCerthash(), repOpt.isIncludeInvalidityDate(),
-            responder.getResponderOption().isInheritCaRevocation());
+            responder.responderOption().isInheritCaRevocation());
 
         if (certStatusInfo != null) {
-          CertStatus status = certStatusInfo.getCertStatus();
+          CertStatus status = certStatusInfo.certStatus();
           if (status == CertStatus.UNKNOWN || status == CertStatus.IGNORE) {
-            switch (store.getUnknownCertBehaviour()) {
+            switch (store.unknownCertBehaviour()) {
               case good:
                 if (status == CertStatus.UNKNOWN) {
                   certStatusInfo.setCertStatus(CertStatus.GOOD);
@@ -872,7 +871,7 @@ public class OcspServer implements Closeable {
       } catch (OcspStoreException ex) {
         exceptionOccurs = true;
         LogUtil.error(LOG, ex,
-            "getCertStatus() of CertStatusStore " + store.getName());
+            "getCertStatus() of CertStatusStore " + store.name());
       }
     }
 
@@ -904,17 +903,17 @@ public class OcspServer implements Closeable {
 
     // certStatusInfo may not be null in any case, since at least one store is
     // configured
-    Instant thisUpdate = certStatusInfo.getThisUpdate();
+    Instant thisUpdate = certStatusInfo.thisUpdate();
     if (thisUpdate == null) {
       thisUpdate = Instant.now();
     }
 
-    Instant nextUpdate = certStatusInfo.getNextUpdate();
+    Instant nextUpdate = certStatusInfo.nextUpdate();
 
     List<Extension> extensions = new LinkedList<>();
     unknownAsRevoked.set(false);
     byte[] certStatus;
-    switch (certStatusInfo.getCertStatus()) {
+    switch (certStatusInfo.certStatus()) {
       case GOOD:
         certStatus = bytes_certstatus_good;
         break;
@@ -925,7 +924,7 @@ public class OcspServer implements Closeable {
       case UNKNOWN:
       case IGNORE:
         repControl.canCacheInfo = false;
-        if (responder.getResponderOption().getMode() == OcspMode.RFC2560) {
+        if (responder.responderOption().mode() == OcspMode.RFC2560) {
           certStatus = bytes_certstatus_unknown;
         } else { // (ocspMode == OCSPMode.RFC6960)
           unknownAsRevoked.set(true);
@@ -933,36 +932,36 @@ public class OcspServer implements Closeable {
         }
         break;
       case REVOKED:
-        CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
+        CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
         certStatus = ResponseTemplate.getEncodeRevokedInfo(
-            repOpt.isIncludeRevReason() ? revInfo.getReason() : null,
-            revInfo.getRevocationTime());
+            repOpt.isIncludeRevReason() ? revInfo.reason() : null,
+            revInfo.revocationTime());
 
-        Instant invalidityDate = revInfo.getInvalidityTime();
+        Instant invalidityDate = revInfo.invalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
-            && !invalidityDate.equals(revInfo.getRevocationTime())) {
+            && !invalidityDate.equals(revInfo.revocationTime())) {
           extensions.add(ResponseTemplate.getInvalidityDateExtension(
               invalidityDate));
         }
         break;
       default:
         throw new IllegalStateException("unknown CertificateStatus:"
-            + certStatusInfo.getCertStatus());
+            + certStatusInfo.certStatus());
     } // end switch
 
-    if (responder.getResponderOption().getMode() != OcspMode.RFC2560) {
+    if (responder.responderOption().mode() != OcspMode.RFC2560) {
       repControl.includeExtendedRevokeExtension = true;
     }
 
-    byte[] certHash = certStatusInfo.getCertHash();
+    byte[] certHash = certStatusInfo.certHash();
     if (certHash != null) {
       extensions.add(ResponseTemplate.getCertHashExtension(
-          certStatusInfo.getCertHashAlgo(), certHash));
+          certStatusInfo.certHashAlgo(), certHash));
     }
 
-    if (certStatusInfo.getArchiveCutOff() != null) {
+    if (certStatusInfo.archiveCutOff() != null) {
       extensions.add(ResponseTemplate.getArchiveOffExtension(
-          certStatusInfo.getArchiveCutOff()));
+          certStatusInfo.archiveCutOff()));
     }
 
     if (LOG.isDebugEnabled()) {
@@ -975,8 +974,8 @@ public class OcspServer implements Closeable {
           : "revoked";
 
       String msg = StringUtil.concatObjectsCap(250,
-          "issuer: ", certId.getIssuer(),
-          ", serialNumber: ", LogUtil.formatCsn(certId.getSerialNumber()),
+          "issuer: ", certId.issuer(),
+          ", serialNumber: ", LogUtil.formatCsn(certId.serialNumber()),
           ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
           ", nextUpdate: ", nextUpdate);
       if (certHash == null) {
@@ -1002,14 +1001,14 @@ public class OcspServer implements Closeable {
   } // method processCertReq
 
   public boolean healthCheck(Responder responder) {
-    for (OcspStore store : responder.getStores()) {
+    for (OcspStore store : responder.stores()) {
       boolean storeHealthy = store.isHealthy();
       if (!storeHealthy) {
         return false;
       }
     }
 
-    return responder.getSigner().isHealthy();
+    return responder.signer().isHealthy();
   } // method healthCheck
 
   private Object checkSignature(byte[] request, RequestOption requestOption)
@@ -1081,10 +1080,10 @@ public class OcspServer implements Closeable {
 
   private static InputStream getInputStream(FileOrValue conf)
       throws IOException {
-    return (conf.getFile() != null)
+    return (conf.file() != null)
         ? Files.newInputStream(Paths.get(
-            IoUtil.expandFilepath(conf.getFile(), true)))
-        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.getValue()));
+            IoUtil.expandFilepath(conf.file(), true)))
+        : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.value()));
   }
 
 }

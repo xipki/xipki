@@ -17,7 +17,7 @@ public class InhibitAnyPolicy implements JsonEncodable {
 
   private final int skipCerts;
 
-  public int getSkipCerts() {
+  public int skipCerts() {
     return skipCerts;
   }
 

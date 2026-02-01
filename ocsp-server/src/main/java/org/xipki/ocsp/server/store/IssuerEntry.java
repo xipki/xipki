@@ -23,7 +23,6 @@ import java.util.Map;
  * Issuer entry.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class IssuerEntry {
@@ -44,7 +43,7 @@ public class IssuerEntry {
       throws CertificateEncodingException {
     this.id = id;
     this.cert = Args.notNull(cert, "cert");
-    this.notBefore = cert.getNotBefore();
+    this.notBefore = cert.notBefore();
     this.issuerHashMap = getIssuerHashAndKeys(cert.getEncoded());
   }
 
@@ -63,7 +62,7 @@ public class IssuerEntry {
 
     Map<HashAlgo, byte[]> hashes = new HashMap<>();
     for (HashAlgo ha : HashAlgo.values()) {
-      int hlen = ha.getLength();
+      int hlen = ha.length();
       byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
       int offset = 0;
       nameAndKeyHash[offset++] = 0x04;
@@ -80,7 +79,7 @@ public class IssuerEntry {
     return hashes;
   } // method getIssuerHashAndKeys
 
-  public int getId() {
+  public int id() {
     return id;
   }
 
@@ -95,8 +94,8 @@ public class IssuerEntry {
       return false;
     }
 
-    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
-        reqIssuer.getNameHashFrom(), issuerHash.length);
+    return CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
+        reqIssuer.nameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Instant revocationTime) {
@@ -104,11 +103,11 @@ public class IssuerEntry {
         Args.notNull(revocationTime, "revocationTime"), null);
   }
 
-  public CertRevocationInfo getRevocationInfo() {
+  public CertRevocationInfo revocationInfo() {
     return revocationInfo;
   }
 
-  public int getCrlId() {
+  public int crlId() {
     return crlId;
   }
 
@@ -116,11 +115,11 @@ public class IssuerEntry {
     this.crlId = crlId;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 

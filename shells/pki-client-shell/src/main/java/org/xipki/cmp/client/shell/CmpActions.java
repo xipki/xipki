@@ -168,7 +168,7 @@ public class CmpActions {
       for (int i = 0; i < n; i++) {
         ReqRespPair reqResp = debug.get(i);
         if (saveReq) {
-          byte[] bytes = reqResp.getRequest();
+          byte[] bytes = reqResp.request();
           if (bytes != null) {
             String fn = (n == 1) ? reqout : appendIndex(reqout, i);
             try {
@@ -180,7 +180,7 @@ public class CmpActions {
         }
 
         if (saveResp) {
-          byte[] bytes = reqResp.getResponse();
+          byte[] bytes = reqResp.response();
           if (bytes != null) {
             String fn = (n == 1) ? respout : appendIndex(respout, i);
             try {

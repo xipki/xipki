@@ -13,7 +13,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CaNameSignersConf {
@@ -32,7 +31,7 @@ public class CaNameSignersConf {
     return default_;
   }
 
-  public List<CaNameSignerConf> getSigners() {
+  public List<CaNameSignerConf> signers() {
     return signers;
   }
 

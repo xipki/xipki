@@ -44,11 +44,11 @@ public class CaEntry extends MgmtEntry {
       this.conf = conf;
     }
 
-    public SignAlgo getAlgo() {
+    public SignAlgo algo() {
       return algo;
     }
 
-    public String getConf() {
+    public String conf() {
       return conf;
     }
 
@@ -85,7 +85,7 @@ public class CaEntry extends MgmtEntry {
     this.signerConf = signerConf;
   }
 
-  public BaseCaInfo getBase() {
+  public BaseCaInfo base() {
     return base;
   }
 
@@ -120,18 +120,18 @@ public class CaEntry extends MgmtEntry {
       } catch (NoSuchAlgorithmException ex) {
         throw new XiSecurityException(ex.getMessage(), ex);
       }
-      pairs.putPair("algo", signAlgo.getJceName());
+      pairs.putPair("algo", signAlgo.jceName());
       signerConfs.add(new CaSignerConf(signAlgo, pairs.getEncoded()));
     }
 
     return signerConfs;
   } // method splitCaSignerConfs
 
-  public NameId getIdent() {
+  public NameId ident() {
     return ident;
   }
 
-  public String getSignerConf() {
+  public String signerConf() {
     return signerConf;
   }
 
@@ -161,8 +161,8 @@ public class CaEntry extends MgmtEntry {
     }
 
     return StringUtil.concatObjectsCap(1500,
-        "id:                   ", ident.getId(),
-        "\nname:                 ", ident.getName(),
+        "id:                   ", ident.id(),
+        "\nname:                 ", ident.name(),
         "\nsigner conf:          ", (signerConf == null ? "-"
             : SignerEntry.signerConfToString(signerConf, verbose,
                 ignoreSensitiveInfo)),
@@ -207,21 +207,21 @@ public class CaEntry extends MgmtEntry {
             "CA certificate does not have keyusage keyCertSign");
       }
       this.cert = cert;
-      this.pathLenConstraint = cert.getBasicConstraints();
+      this.pathLenConstraint = cert.basicConstraints();
       if (this.pathLenConstraint < 0) {
         throw new CaMgmtException("given certificate is not a CA certificate");
       }
-      this.subject = cert.getSubjectText();
+      this.subject = cert.subjectText();
       byte[] encodedCert = cert.getEncoded();
       this.hexSha1OfCert = HashAlgo.SHA1.hexHash(encodedCert);
     }
   } // method setCert
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 
-  public List<X509Cert> getCertchain() {
+  public List<X509Cert> certchain() {
     return certchain;
   }
 
@@ -244,8 +244,8 @@ public class CaEntry extends MgmtEntry {
   @Override
   public JsonMap toCodec() {
     JsonMap ret = new JsonMap();
-    ret.put("id", ident.getId());
-    ret.put("name", ident.getName());
+    ret.put("id", ident.id());
+    ret.put("name", ident.name());
 
     base.toJson(ret);
 

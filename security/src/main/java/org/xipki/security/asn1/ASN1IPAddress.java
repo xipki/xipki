@@ -30,7 +30,7 @@ public class ASN1IPAddress extends ASN1Object {
     this.value = Args.notNull(bitString, "bitString");
   }
 
-  public ASN1BitString getValue() {
+  public ASN1BitString value() {
     return value;
   }
 

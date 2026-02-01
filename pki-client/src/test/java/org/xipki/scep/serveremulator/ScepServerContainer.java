@@ -49,7 +49,7 @@ public class ScepServerContainer {
     server = HttpServer.create(new InetSocketAddress(port), 0);
 
     for (ScepServer m : scepServers) {
-      server.createContext("/" + m.getName() + "/pkiclient.exe",
+      server.createContext("/" + m.name() + "/pkiclient.exe",
           new MyHandler(m.getServlet()));
     }
 

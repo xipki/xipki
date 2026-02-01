@@ -60,11 +60,11 @@ public class CaProfileEntry {
     }
   }
 
-  public String getProfileName() {
+  public String profileName() {
     return profileName;
   }
 
-  public List<String> getProfileAliases() {
+  public List<String> profileAliases() {
     return profileAliases;
   }
 
@@ -79,7 +79,7 @@ public class CaProfileEntry {
       return other.profileName;
     }
 
-    for (String alias : other.getProfileAliases()) {
+    for (String alias : other.profileAliases()) {
       if (containsNameOrAlias(alias)) {
         return alias;
       }

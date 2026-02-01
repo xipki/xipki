@@ -14,7 +14,6 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class CaIdentifierRequest extends SdkRequest{
 
@@ -35,15 +34,15 @@ public class CaIdentifierRequest extends SdkRequest{
     this.authorityKeyIdentifier = authorityKeyIdentifier;
   }
 
-  public byte[] getIssuerCertSha1Fp() {
+  public byte[] issuerCertSha1Fp() {
     return issuerCertSha1Fp;
   }
 
-  public X500NameType getIssuer() {
+  public X500NameType issuer() {
     return issuer;
   }
 
-  public byte[] getAuthorityKeyIdentifier() {
+  public byte[] authorityKeyIdentifier() {
     return authorityKeyIdentifier;
   }
 

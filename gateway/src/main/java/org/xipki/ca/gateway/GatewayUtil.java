@@ -31,7 +31,6 @@ import org.xipki.util.extra.misc.LogUtil;
 /**
  * Gateway Utilities.
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class GatewayUtil {
 
@@ -40,7 +39,7 @@ public class GatewayUtil {
       return;
     }
 
-    if (event.getStatus() == AuditStatus.FAILED) {
+    if (event.status() == AuditStatus.FAILED) {
       if (log.isWarnEnabled()) {
         log.warn(event.toTextMessage());
       }
@@ -56,7 +55,7 @@ public class GatewayUtil {
       return;
     }
 
-    if (event.getLevel() == AuditLevel.WARN) {
+    if (event.level() == AuditLevel.WARN) {
       if (log.isWarnEnabled()) {
         log.warn(event.toTextMessage());
       }
@@ -91,7 +90,7 @@ public class GatewayUtil {
       EcCurveEnum curve = EcCurveEnum.ofOid(keyOid);
       assert curve != null;
       kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(),
-          isn.getSerialNumber().getValue(), curve.getMainAlias());
+          isn.getSerialNumber().getValue(), curve.mainAlias());
 
       if (kaKeyAndCert == null) {
         return false;
@@ -101,15 +100,15 @@ public class GatewayUtil {
           csr.getSignature().getBytes());
 
       String id = ((ASN1UTF8String) seq.getObjectAt(0)).getString();
-      kemMasterKey = popControl.getKemMasterKey(id);
+      kemMasterKey = popControl.kemMasterKey(id);
       if (kemMasterKey == null) {
         return false;
       }
     }
 
     return securityFactory.verifyPop(csr,
-        popControl.getPopAlgoValidator(), kaKeyAndCert,
-        (kemMasterKey == null) ? null : kemMasterKey.getSecretKey());
+        popControl.popAlgoValidator(), kaKeyAndCert,
+        (kemMasterKey == null) ? null : kemMasterKey.secretKey());
   } // method verifyCsr
 
   public static void auditLogPciEvent(

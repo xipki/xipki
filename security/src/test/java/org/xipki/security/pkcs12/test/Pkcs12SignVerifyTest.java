@@ -26,7 +26,6 @@ import java.security.Signature;
  * verification of PKCS#12 token.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public abstract class Pkcs12SignVerifyTest {
 
@@ -89,8 +88,8 @@ public abstract class Pkcs12SignVerifyTest {
   protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
       throws Exception {
     Signature signature = Signature.getInstance(
-        getSignatureAlgorithm().getJceName());
-    signature.initVerify(cert.getPublicKey());
+        getSignatureAlgorithm().jceName());
+    signature.initVerify(cert.publicKey());
     signature.update(data);
     return signature.verify(signatureValue);
   }

@@ -22,9 +22,7 @@ import java.security.NoSuchAlgorithmException;
  * algorithms RSAPSS.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
-
 public class XiRSAContentVerifierProviderBuilder
     extends BcRSAContentVerifierProviderBuilder {
   private static final DigestAlgorithmIdentifierFinder digestAlgorithmFinder

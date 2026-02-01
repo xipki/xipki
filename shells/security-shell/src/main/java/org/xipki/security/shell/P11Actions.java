@@ -69,7 +69,7 @@ public class P11Actions {
       P11Slot slot = getSlot();
       NewKeyControl control = getControl();
       if (keySpec.isComposite()) {
-        if (control.getId() != null) {
+        if (control.id() != null) {
           throw new IllegalCmdParamException(
               "id is not allowed for composite keypair");
         }
@@ -78,10 +78,10 @@ public class P11Actions {
       PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
           .token(true)
           .generateId(true)
-          .extractable(control.getExtractable())
-          .sensitive(control.getSensitive());
+          .extractable(control.extractable())
+          .sensitive(control.sensitive());
 
-      Set<NewKeyControl.P11KeyUsage> usages = control.getUsages();
+      Set<NewKeyControl.P11KeyUsage> usages = control.usages();
       if (usages == null) {
         if (keySpec.isRSA() || keySpec.isWeierstrassEC()) {
           spec.signVerify(true).decryptEncrypt(true).signVerifyRecover(true);
@@ -149,13 +149,13 @@ public class P11Actions {
         PKCS11KeyPairSpec pqcSpec = spec.copy().label(
             P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
         finalize(" PQC key of " + keyspecStr,
-            slot.generateKeyPair(keySpec.getCompositePqcVariant(), pqcSpec));
+            slot.generateKeyPair(keySpec.compositePqcVariant(), pqcSpec));
 
         spec.label(P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
         finalize("Trad key of " + keyspecStr,
-            slot.generateKeyPair(keySpec.getCompositeTradVariant(), spec));
+            slot.generateKeyPair(keySpec.compositeTradVariant(), spec));
       } else {
-        spec.id(control.getId()).label(label);
+        spec.id(control.id()).label(label);
         finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
       }
       return null;
@@ -285,12 +285,12 @@ public class P11Actions {
       PKCS11SecretKeySpec spec = new PKCS11SecretKeySpec()
           .token(true)
           .keyType(keyType)
-          .id(control.getId())
-          .label(control.getLabel())
-          .extractable(control.getExtractable())
-          .sensitive(control.getSensitive());
+          .id(control.id())
+          .label(control.label())
+          .extractable(control.extractable())
+          .sensitive(control.sensitive());
 
-      Set<NewKeyControl.P11KeyUsage> usages = control.getUsages();
+      Set<NewKeyControl.P11KeyUsage> usages = control.usages();
 
       if (usages == null) {
         if (keyType == PKCS11T.CKK_GENERIC_SECRET
@@ -530,7 +530,7 @@ public class P11Actions {
         }
 
         byte[] keyValue = new byte[keysize / 8];
-        securityFactory.getRandom4Key().nextBytes(keyValue);
+        securityFactory.random4Key().nextBytes(keyValue);
 
         spec.keyType(p11KeyType);
         PKCS11KeyId objId = slot.importSecretKey(keyValue, spec);
@@ -701,9 +701,9 @@ public class P11Actions {
       }
 
       println("module: " + moduleName);
-      println(module.getDescription());
+      println(module.description());
 
-      List<P11SlotId> slots = module.getSlotIds();
+      List<P11SlotId> slots = module.slotIds();
       if (slotIndex == null) {
         output(slots);
         return null;
@@ -731,7 +731,7 @@ public class P11Actions {
       }
 
       for (P11SlotId slotId : slots) {
-        println("\tslot[" + slotId.getIndex() + "]: " + slotId.getId());
+        println("\tslot[" + slotId.index() + "]: " + slotId.id());
       }
     }
 

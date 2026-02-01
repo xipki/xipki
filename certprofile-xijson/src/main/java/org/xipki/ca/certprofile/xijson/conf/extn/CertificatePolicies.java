@@ -43,7 +43,7 @@ public class CertificatePolicies implements JsonEncodable {
   }
 
   public List<CertificatePolicyInformationType>
-      getCertificatePolicyInformations() {
+      certificatePolicyInformations() {
     return certificatePolicyInformations;
   }
 
@@ -56,14 +56,14 @@ public class CertificatePolicies implements JsonEncodable {
 
     int idx = 0;
     for (CertificatePolicyInformation policyInfo : policyInfos) {
-      List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+      List<CertificatePolicyQualifier> qualifiers = policyInfo.qualifiers();
       ASN1Sequence policyQualifiers = CollectionUtil.isEmpty(qualifiers)
           ? null : createX509PolicyQualifiers(qualifiers);
-      CertificatePolicyID policyOid = policyInfo.getCertPolicyId();
+      CertificatePolicyID policyOid = policyInfo.certPolicyId();
 
       infos[idx++] = (policyQualifiers == null)
-          ? new PolicyInformation(policyOid.getOid())
-          : new PolicyInformation(policyOid.getOid(), policyQualifiers);
+          ? new PolicyInformation(policyOid.oid())
+          : new PolicyInformation(policyOid.oid(), policyQualifiers);
     }
 
     return new org.bouncycastle.asn1.x509.CertificatePolicies(infos);
@@ -74,10 +74,10 @@ public class CertificatePolicies implements JsonEncodable {
     ASN1EncodableVector qualifierInfos = new ASN1EncodableVector();
     for (CertificatePolicyQualifier qualifier : qualifiers) {
       PolicyQualifierInfo qualifierInfo;
-      if (qualifier.getCpsUri() != null) {
-        qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
-      } else if (qualifier.getUserNotice() != null) {
-        UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+      if (qualifier.cpsUri() != null) {
+        qualifierInfo = new PolicyQualifierInfo(qualifier.cpsUri());
+      } else if (qualifier.userNotice() != null) {
+        UserNotice userNotice = new UserNotice(null, qualifier.userNotice());
         qualifierInfo = new PolicyQualifierInfo(
             PolicyQualifierId.id_qt_unotice, userNotice);
       } else {
@@ -95,7 +95,7 @@ public class CertificatePolicies implements JsonEncodable {
 
   private List<CertificatePolicyInformation> toPolicyInfos() {
     List<CertificatePolicyInformationType> policyPairs =
-        getCertificatePolicyInformations();
+        certificatePolicyInformations();
     List<CertificatePolicyInformation> ret =
         new ArrayList<>(policyPairs.size());
 
@@ -104,7 +104,7 @@ public class CertificatePolicies implements JsonEncodable {
       if (CollectionUtil.isNotEmpty(policyPair.policyQualifiers)) {
         qualifiers = new ArrayList<>(policyPair.policyQualifiers.size());
         for (PolicyQualifier m : policyPair.policyQualifiers) {
-          if (m.getType() == PolicyQualifierType.cpsUri) {
+          if (m.type() == PolicyQualifierType.cpsUri) {
             qualifiers.add(
                 CertificatePolicyQualifier.getInstanceForCpsUri(m.value));
           } else {
@@ -115,7 +115,7 @@ public class CertificatePolicies implements JsonEncodable {
       }
 
       ret.add(new CertificatePolicyInformation(
-          policyPair.getPolicyIdentifier(), qualifiers));
+          policyPair.policyIdentifier(), qualifiers));
     }
 
     return ret;
@@ -153,11 +153,11 @@ public class CertificatePolicies implements JsonEncodable {
       this.value = Args.notBlank(value, "value");
     }
 
-    public PolicyQualifierType getType() {
+    public PolicyQualifierType type() {
       return type;
     }
 
-    public String getValue() {
+    public String value() {
       return value;
     }
 
@@ -202,11 +202,11 @@ public class CertificatePolicies implements JsonEncodable {
       this.policyQualifiers = policyQualifiers;
     }
 
-    public CertificatePolicyID getPolicyIdentifier() {
+    public CertificatePolicyID policyIdentifier() {
       return policyIdentifier;
     }
 
-    public List<PolicyQualifier> getPolicyQualifiers() {
+    public List<PolicyQualifier> policyQualifiers() {
       return policyQualifiers == null || policyQualifiers.isEmpty()
           ? null : policyQualifiers;
     }
@@ -214,7 +214,7 @@ public class CertificatePolicies implements JsonEncodable {
     @Override
     public JsonMap toCodec() {
       JsonMap ret = new JsonMap().put(
-          "policyIdentifier", policyIdentifier.getMainAlias());
+          "policyIdentifier", policyIdentifier.mainAlias());
       if (CollectionUtil.isNotEmpty(policyQualifiers)) {
         ret.putEncodables("policyQualifiers", policyQualifiers);
       }

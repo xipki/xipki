@@ -61,7 +61,7 @@ public class XiPKCS11 extends PKCS11 {
       }
       return payload;
     } catch (PKCS11Exception e) {
-      new JniResp.JniErrResp(e.getErrorCode()).writeTo(arch(), resp);
+      new JniResp.JniErrResp(e.errorCode()).writeTo(arch(), resp);
       return null;
     }
   }

@@ -19,7 +19,6 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignSpec;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -43,7 +42,6 @@ import java.util.Set;
  * Root configuration of the xijson v1 Certprofile.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class V1XijsonCertprofileType {
@@ -138,10 +136,10 @@ public class V1XijsonCertprofileType {
 
     Set<String> extnTypes = new HashSet<>();
     for (V1ExtensionType m : extensions) {
-      String type = m.getType().getOid();
+      String type = m.type().getOid();
       if (!extnTypes.add(type)) {
         throw new IllegalArgumentException(
-            "duplicated definition of extension " + m.getType().getOid());
+            "duplicated definition of extension " + m.type().getOid());
       }
     }
   }
@@ -228,7 +226,7 @@ public class V1XijsonCertprofileType {
       boolean isRsa = false;
       boolean isWeierstraussEC = false;
 
-      for (DescribableOid doid : t.getAlgorithms()) {
+      for (DescribableOid doid : t.algorithms()) {
         ASN1ObjectIdentifier oid = doid.oid();
 
         if (OIDs.Algo.id_rsaEncryption.equals(oid)) {
@@ -260,16 +258,16 @@ public class V1XijsonCertprofileType {
         }
       }
 
-      V1KeyParametersType keyParams = t.getParameters();
+      V1KeyParametersType keyParams = t.parameters();
 
       if (isRsa) {
         V1KeyParametersType.RsaParametersType params =
-            (keyParams == null) ? null : keyParams.getRsa();
+            (keyParams == null) ? null : keyParams.rsa();
 
-        if (params == null || params.getModulus() == null) {
+        if (params == null || params.modulus() == null) {
           addKeySpec(v2, KeySpec.RSA2048, KeySpec.RSA3072, KeySpec.RSA4096);
         } else {
-          List<Integer> modulusSizes = params.getModulus();
+          List<Integer> modulusSizes = params.modulus();
 
           if (modulusSizes.remove((Integer) 2048)) {
             addKeySpec(v2, KeySpec.RSA2048);
@@ -289,16 +287,16 @@ public class V1XijsonCertprofileType {
         }
       } else if (isWeierstraussEC) {
         V1KeyParametersType.EcParametersType params =
-            (keyParams == null) ? null : keyParams.getEc();
+            (keyParams == null) ? null : keyParams.ec();
 
-        if (params == null || params.getCurves() == null
-            || params.getCurves().isEmpty()) {
+        if (params == null || params.curves() == null
+            || params.curves().isEmpty()) {
           addKeySpec(v2, KeySpec.SECP256R1, KeySpec.SECP384R1,
               KeySpec.SECP521R1, KeySpec.BRAINPOOLP256R1,
               KeySpec.BRAINPOOLP384R1, KeySpec.BRAINPOOLP512R1,
               KeySpec.SM2P256V1, KeySpec.FRP256V1);
         } else {
-          for (DescribableOid curveOid : params.getCurves()) {
+          for (DescribableOid curveOid : params.curves()) {
             EcCurveEnum curveEnum = EcCurveEnum.ofOid(curveOid.oid());
             if (curveEnum == null) {
               LOG.warn("ignore unknown EC curve {}", curveOid.oid());
@@ -418,16 +416,15 @@ public class V1XijsonCertprofileType {
     return list;
   }
 
-  private List<SignSpec> getSignatureAlgorithms() {
-    List<SignSpec> v2 = new ArrayList<>(signatureAlgorithms.size());
+  private List<SignAlgo> getSignatureAlgorithms() {
+    List<SignAlgo> v2 = new ArrayList<>(signatureAlgorithms.size());
 
     for (String a : signatureAlgorithms) {
-      SignSpec sc;
+      SignAlgo sc;
       try {
-        SignAlgo signAlgo = SignAlgo.getInstance(a);
-        sc = SignSpec.ofSignSpec(signAlgo);
+        sc = SignAlgo.getInstance(a);
         if (sc == null) {
-          LOG.warn("ignore unknown SignSpec '{}'", a);
+          LOG.warn("ignore unknown SignAlgo '{}'", a);
         }
       } catch (NoSuchAlgorithmException e) {
         LOG.warn("ignore unknown signature algorithm '{}'", a);
@@ -462,13 +459,13 @@ public class V1XijsonCertprofileType {
     if (keyAlgorithms != null) {
       List<KeyUsage> keyUsages = null;
       for (V1ExtensionType ext : extensions) {
-        if (!ext.getType().getOid().equals(OIDs.Extn.keyUsage.getId())) {
+        if (!ext.type().getOid().equals(OIDs.Extn.keyUsage.getId())) {
           continue;
         }
 
         keyUsages = new LinkedList<>();
-        for (V1KeyUsages.Usage usage : ext.getKeyUsage().getUsages()) {
-          keyUsages.add(KeyUsage.getKeyUsage(usage.getValue()));
+        for (V1KeyUsages.Usage usage : ext.keyUsage().usages()) {
+          keyUsages.add(KeyUsage.getKeyUsage(usage.value()));
         }
       }
 
@@ -481,22 +478,22 @@ public class V1XijsonCertprofileType {
     }
 
     // subject
-    v2.setKeepExtensionsOrder(subject.getKeepRdnOrder());
+    v2.setKeepExtensionsOrder(subject.keepRdnOrder());
     List<RdnType> rdns = new ArrayList<>(10);
     v2.setSubject(rdns);
 
-    for (V1Subject.V1RdnType v1Rdn : subject.getRdns()) {
+    for (V1Subject.V1RdnType v1Rdn : subject.rdns()) {
       RdnType attr = v1Rdn.toV2();
       rdns.add(attr);
     }
 
     if (subjectToSubjectAltNames != null) {
       for (V1SubjectToSubjectAltNameType c : subjectToSubjectAltNames) {
-        ASN1ObjectIdentifier oid = c.getSource().oid();
+        ASN1ObjectIdentifier oid = c.source().oid();
 
         RdnType rdn = null;
         for (RdnType m : rdns) {
-          if (oid.equals(m.getType().getOid())) {
+          if (oid.equals(m.type().oid())) {
             rdn = m;
             break;
           }
@@ -506,7 +503,7 @@ public class V1XijsonCertprofileType {
           rdn = new RdnType(AttributeType.ofOid(oid), null, 0, 0);
           rdns.add(rdn);
         }
-        rdn.setToSAN(c.getTarget());
+        rdn.setToSAN(c.target());
       }
     }
 
@@ -515,7 +512,7 @@ public class V1XijsonCertprofileType {
     v2.setExtensions(extensionTypes);
 
     for (V1ExtensionType v1 : extensions) {
-      extensionTypes.add(v1.toV2(v2.getKeyAlgorithms()));
+      extensionTypes.add(v1.toV2(v2.keyAlgorithms()));
     }
 
     return v2;

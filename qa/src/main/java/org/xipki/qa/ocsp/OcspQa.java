@@ -33,7 +33,7 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -52,7 +52,6 @@ import java.util.Map;
  * OCSP QA.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspQa {
@@ -197,8 +196,8 @@ public class OcspQa {
               basicResp.getSignatureAlgorithmID());
 
           if (signAlgo != expectedSigalgo) {
-            issue.setFailureMessage("is '" + signAlgo.getJceName() +
-                "', but expected '" + expectedSigalgo.getJceName() + "'");
+            issue.setFailureMessage("is '" + signAlgo.jceName() +
+                "', but expected '" + expectedSigalgo.jceName() + "'");
           }
         } catch (NoSuchAlgorithmException ex) {
           issue.setFailureMessage("could not extract the signature algorithm");
@@ -274,7 +273,7 @@ public class OcspQa {
           try {
             jceRespSigner = new X509Cert(respSigner);
             if (X509Util.issues(respIssuer, jceRespSigner)) {
-              jceRespSigner.verify(respIssuer.getPublicKey());
+              jceRespSigner.verify(respIssuer.publicKey());
             } else {
               issue.setFailureMessage("responder signer is not trusted");
             }
@@ -379,7 +378,7 @@ public class OcspQa {
       if (revStatus.hasRevocationReason()) {
         int reason = revStatus.getRevocationReason();
         if (extendedRevoke
-            && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+            && reason == CrlReason.CERTIFICATE_HOLD.code()
             && revTimeSec == 0) {
           status = OcspCertStatus.unknown;
           revTimeSec = null;

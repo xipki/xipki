@@ -28,7 +28,6 @@ import java.util.Map;
  * CA configuration types.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class CaConfType {
 
@@ -69,7 +68,7 @@ public class CaConfType {
 
     private List<Ca> cas;
 
-    public String getBasedir() {
+    public String basedir() {
       return basedir;
     }
 
@@ -77,14 +76,14 @@ public class CaConfType {
       this.basedir = basedir;
     }
 
-    public Map<String, String> getDbSchemas() {
+    public Map<String, String> dbSchemas() {
       if (dbSchemas == null) {
         dbSchemas = new HashMap<>();
       }
       return dbSchemas;
     }
 
-    public Map<String, String> getProperties() {
+    public Map<String, String> properties() {
       return properties;
     }
 
@@ -96,7 +95,7 @@ public class CaConfType {
       this.dbSchemas = dbSchemas;
     }
 
-    public List<Signer> getSigners() {
+    public List<Signer> signers() {
       if (signers == null) {
         signers = new LinkedList<>();
       }
@@ -107,7 +106,7 @@ public class CaConfType {
       this.signers = signers;
     }
 
-    public List<Requestor> getRequestors() {
+    public List<Requestor> requestors() {
       if (requestors == null) {
         requestors = new LinkedList<>();
       }
@@ -118,7 +117,7 @@ public class CaConfType {
       this.requestors = requestors;
     }
 
-    public List<NameTypeConf> getPublishers() {
+    public List<NameTypeConf> publishers() {
       if (publishers == null) {
         publishers = new LinkedList<>();
       }
@@ -129,7 +128,7 @@ public class CaConfType {
       this.publishers = publishers;
     }
 
-    public List<NameTypeConf> getProfiles() {
+    public List<NameTypeConf> profiles() {
       if (profiles == null) {
         profiles = new LinkedList<>();
       }
@@ -140,7 +139,7 @@ public class CaConfType {
       this.profiles = profiles;
     }
 
-    public List<NameTypeConf> getKeypairGens() {
+    public List<NameTypeConf> keypairGens() {
       if (keypairGens == null) {
         keypairGens = new LinkedList<>();
       }
@@ -151,7 +150,7 @@ public class CaConfType {
       this.keypairGens = keypairGens;
     }
 
-    public List<Ca> getCas() {
+    public List<Ca> cas() {
       if (cas == null) {
         cas = new LinkedList<>();
       }
@@ -296,15 +295,15 @@ public class CaConfType {
       this.profiles = profiles;
     }
 
-    public String getRequestorName() {
+    public String requestorName() {
       return requestorName;
     }
 
-    public Permissions getPermissions() {
+    public Permissions permissions() {
       return permissions;
     }
 
-    public List<String> getProfiles() {
+    public List<String> profiles() {
       return profiles;
     }
 
@@ -367,19 +366,19 @@ public class CaConfType {
       this.genSelfIssued = null;
     }
 
-    public BaseCaInfo getBase() {
+    public BaseCaInfo base() {
       return base;
     }
 
-    public GenSelfIssued getGenSelfIssued() {
+    public GenSelfIssued genSelfIssued() {
       return genSelfIssued;
     }
 
-    public FileOrValue getSignerConf() {
+    public FileOrValue signerConf() {
       return signerConf;
     }
 
-    public FileOrBinary getCert() {
+    public FileOrBinary cert() {
       return cert;
     }
 
@@ -452,7 +451,7 @@ public class CaConfType {
       this.id = id;
     }
 
-    public Integer getId() {
+    public Integer id() {
       return id;
     }
 
@@ -460,7 +459,7 @@ public class CaConfType {
       this.id = id;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -519,23 +518,23 @@ public class CaConfType {
       }
     }
 
-    public CaInfo getCaInfo() {
+    public CaInfo caInfo() {
       return caInfo;
     }
 
-    public List<String> getAliases() {
+    public List<String> aliases() {
       return aliases;
     }
 
-    public List<String> getProfiles() {
+    public List<String> profiles() {
       return profiles;
     }
 
-    public List<CaHasRequestor> getRequestors() {
+    public List<CaHasRequestor> requestors() {
       return requestors;
     }
 
-    public List<String> getPublishers() {
+    public List<String> publishers() {
       return publishers;
     }
 
@@ -606,11 +605,11 @@ public class CaConfType {
       this.subject = Args.notBlank(subject, "subject");
     }
 
-    public String getSubject() {
+    public String subject() {
       return subject;
     }
 
-    public String getProfile() {
+    public String profile() {
       return profile;
     }
 
@@ -618,7 +617,7 @@ public class CaConfType {
       this.profile = profile;
     }
 
-    public String getSerialNumber() {
+    public String serialNumber() {
       return serialNumber;
     }
 
@@ -626,15 +625,15 @@ public class CaConfType {
       this.serialNumber = serialNumber;
     }
 
-    public String getNotBefore() {
+    public String notBefore() {
       return notBefore;
     }
 
-    public void setNotBefore(String notBefore) {
+    public void notBefore(String notBefore) {
       this.notBefore = notBefore;
     }
 
-    public String getNotAfter() {
+    public String notAfter() {
       return notAfter;
     }
 
@@ -657,7 +656,7 @@ public class CaConfType {
       GenSelfIssued ret = new GenSelfIssued(json.getNnString("subject"));
       ret.setProfile(json.getString("profile"));
       ret.setSerialNumber(json.getString("serialNumber"));
-      ret.setNotBefore(json.getString("notBefore"));
+      ret.notBefore(json.getString("notBefore"));
       ret.setNotAfter(json.getString("notAfter"));
       return ret;
     }
@@ -677,11 +676,11 @@ public class CaConfType {
       this.conf = conf;
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
-    public FileOrValue getConf() {
+    public FileOrValue conf() {
       return conf;
     }
 
@@ -729,15 +728,15 @@ public class CaConfType {
       this.conf = null;
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
-    public FileOrValue getConf() {
+    public FileOrValue conf() {
       return conf;
     }
 
-    public FileOrBinary getBinaryConf() {
+    public FileOrBinary binaryConf() {
       return binaryConf;
     }
 
@@ -783,7 +782,7 @@ public class CaConfType {
       this.cert = cert;
     }
 
-    public FileOrBinary getCert() {
+    public FileOrBinary cert() {
       return cert;
     }
 

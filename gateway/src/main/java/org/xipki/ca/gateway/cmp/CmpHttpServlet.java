@@ -34,7 +34,6 @@ import java.util.Map;
  * CMP servlet.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CmpHttpServlet {
@@ -144,10 +143,10 @@ public class CmpHttpServlet {
       int httpStatus = HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
       if (th instanceof HttpRespAuditException) {
         HttpRespAuditException hae = (HttpRespAuditException) th;
-        httpStatus = hae.getHttpStatus();
-        auditStatus = hae.getAuditStatus();
-        auditLevel = hae.getAuditLevel();
-        auditMessage = hae.getAuditMessage();
+        httpStatus = hae.httpStatus();
+        auditStatus = hae.auditStatus();
+        auditLevel = hae.auditLevel();
+        auditMessage = hae.auditMessage();
       } else {
         auditLevel = AuditLevel.ERROR;
         auditStatus = AuditStatus.FAILED;

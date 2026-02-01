@@ -49,7 +49,7 @@ if { "$printUsage" equals "true" } then {
   echo "    CA-keyspec:      RSA2048, RSA3072, RSA4096, RSA2048/PSS, RSA3072/PSS, RSA4096/PSS,"
   echo "                     SECP256R1, SECP384R1, SECP521R1, SM2P256V1, FRP256V1,"
   echo "                     BRAINPOOLP256R1, BRAINPOOLP384R1, BRAINPOOLP512R1,"
-  echo "                     MLDSA44, MLDSA65, MLDSA87"
+  echo "                     MLDSA44, MLDSA65, MLDSA87, ...<composite key specs>"
 } else {
   source xipki/ca-setup/demo/doDemo.script
 }

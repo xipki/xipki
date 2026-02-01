@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile TLS (CA/Browser Forum BR, Organization Validiated)"
+    "details": "certprofile TLS (CA/Browser Forum BR, Organization Validated)"
   },
   "certLevel": "EndEntity",
   "certDomain": "CABForumBR",
@@ -9,9 +9,11 @@
   "validity": "397d",
   "notBeforeTime": "current",
   "keypairGeneration": "InheritCA",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
-    "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1"],
+  "signatureAlgorithms": ["SHA256WITHRSA","SHA384WITHRSA","SHA512WITHRSA","SHA256WITHECDSA",
+    "SHA384WITHECDSA","SHA512WITHECDSA","SHA256WITHRSAANDMGF1","SHA384WITHRSAANDMGF1",
+    "SHA512WITHRSAANDMGF1"],
+  "keyAlgorithms": ["RSA2048","RSA3072","RSA4096","SECP256R1","SECP384R1",
+    "SECP521R1"],
   "subject": [{
       "type": "country"
     },{
@@ -30,7 +32,6 @@
       "minOccurs": 0
     },{
       "type": "commonName",
-      "toSAN": "DNSName",
       "regex": ":FQDN"
     }
   ],
@@ -42,7 +43,7 @@
     },{
       "type": "SubjectAlternativeName",
       "required": true,
-      "inRequest": "optional",
+      "inRequest": "required",
       "subjectAltName": {
         "modes": ["IPAddress","DNSName"]
       }
@@ -67,7 +68,7 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["digitalSignature","keyEncipherment","dataEncipherment"]
+            "required": ["dataEncipherment","keyEncipherment","digitalSignature"]
           }
         ]
       }

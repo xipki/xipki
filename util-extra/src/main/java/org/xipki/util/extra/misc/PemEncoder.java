@@ -74,7 +74,7 @@ public class PemEncoder {
           "\r\n-----END " + type + "-----\r\n");
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 

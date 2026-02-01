@@ -26,7 +26,6 @@ import java.io.IOException;
  * EST servlet.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class EstHttpServlet {
@@ -66,7 +65,7 @@ public class EstHttpServlet {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       requestBytes = viaPost ? IoUtil.readAllBytes(req.getInputStream()) : null;
       httpResp = responder.service(path, requestBytes, req, event);
-      if (event.getStatus() == null) {
+      if (event.status() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }
       return httpResp;
@@ -78,7 +77,7 @@ public class EstHttpServlet {
     } finally {
       LogUtil.logReqResp("EST Gateway", LOG, logReqResp, viaPost,
           req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.getBody());
+          httpResp == null ? null : httpResp.body());
 
       event.finish();
       auditService.logEvent(event);

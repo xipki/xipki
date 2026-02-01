@@ -73,7 +73,7 @@ public class AcmeChallenge implements JsonEncodable {
     return chall;
   }
 
-  public AcmeAuthz getAuthz() {
+  public AcmeAuthz authz() {
     return authz;
   }
 
@@ -81,11 +81,11 @@ public class AcmeChallenge implements JsonEncodable {
     this.authz = authz;
   }
 
-  public int getSubId() {
+  public int subId() {
     return subId;
   }
 
-  public Instant getValidated() {
+  public Instant validated() {
     return validated;
   }
 
@@ -94,15 +94,15 @@ public class AcmeChallenge implements JsonEncodable {
     this.validated = validated;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getToken() {
+  public String token() {
     return token;
   }
 
-  public ChallengeStatus getStatus() {
+  public ChallengeStatus status() {
     return status;
   }
 
@@ -111,7 +111,7 @@ public class AcmeChallenge implements JsonEncodable {
     this.status = status;
   }
 
-  public String getExpectedAuthorization() {
+  public String expectedAuthorization() {
     return expectedAuthorization;
   }
 

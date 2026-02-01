@@ -41,7 +41,7 @@ public class ScepControl {
     return sendSignerCert;
   }
 
-  public String getSecret() {
+  public String secret() {
     return secret;
   }
 

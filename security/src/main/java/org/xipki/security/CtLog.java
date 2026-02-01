@@ -72,15 +72,15 @@ public class CtLog {
       this.signature = Args.notNull(signature, "signature");
     }
 
-    public SignatureAndHashAlgorithm getAlgorithm() {
+    public SignatureAndHashAlgorithm algorithm() {
       return algorithm;
     }
 
-    public byte[] getSignature() {
+    public byte[] signature() {
       return Arrays.copyOf(signature, signature.length);
     }
 
-    public Object getSignatureObject() {
+    public Object signatureObject() {
       if (algorithm.signature == SignatureAlgorithm.ecdsa
           || algorithm.signature == SignatureAlgorithm.dsa ) {
         ASN1Sequence seq = ASN1Sequence.getInstance(signature);
@@ -203,7 +203,7 @@ public class CtLog {
       this.code = code;
     }
 
-    public byte getCode() {
+    public byte code() {
       return code;
     }
 
@@ -229,7 +229,7 @@ public class CtLog {
       this.code = code;
     }
 
-    public byte getCode() {
+    public byte code() {
       return code;
     }
 
@@ -269,16 +269,16 @@ public class CtLog {
       this.signature = Args.notNull(signature, "signature");
     }
 
-    public HashAlgorithm getHash() {
+    public HashAlgorithm hash() {
       return hash;
     }
 
-    public SignatureAlgorithm getSignature() {
+    public SignatureAlgorithm signature() {
       return signature;
     }
 
     public byte[] getEncoded() {
-      return new byte[] {hash.getCode(), signature.getCode()};
+      return new byte[] {hash.code(), signature.code()};
     }
 
   } // class SignatureAndHashAlgorithm
@@ -378,24 +378,24 @@ public class CtLog {
       this.digitallySigned = Args.notNull(digitallySigned, "digitallySigned");
     }
 
-    public int getVersion() {
+    public int version() {
       return version;
     }
 
-    public byte[] getLogId() {
+    public byte[] logId() {
       return Arrays.copyOf(logId, logId.length);
     }
 
-    public long getTimestamp() {
+    public long timestamp() {
       return timestamp;
     }
 
-    public byte[] getExtensions() {
+    public byte[] extensions() {
       return extensions.length == 0 ? extensions
           : Arrays.copyOf(extensions, extensions.length);
     }
 
-    public DigitallySigned getDigitallySigned() {
+    public DigitallySigned digitallySigned() {
       return digitallySigned;
     }
 
@@ -451,7 +451,7 @@ public class CtLog {
       this.sctList = Args.notNull(sctList, "sctList");
     }
 
-    public SerializedSCT getSctList() {
+    public SerializedSCT sctList() {
       return sctList;
     }
 
@@ -561,12 +561,12 @@ public class CtLog {
   }
 
   public static Object getSignatureObject(DigitallySigned digitallySigned) {
-    SignatureAndHashAlgorithm algorithm = digitallySigned.getAlgorithm();
-    SignatureAlgorithm signature = algorithm.getSignature();
+    SignatureAndHashAlgorithm algorithm = digitallySigned.algorithm();
+    SignatureAlgorithm signature = algorithm.signature();
     if (signature == CtLog.SignatureAlgorithm.ecdsa ||
         signature == CtLog.SignatureAlgorithm.dsa ) {
       ASN1Sequence seq = ASN1Sequence.getInstance(
-          digitallySigned.getSignature());
+          digitallySigned.signature());
 
       return new BigInteger[]{
           ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
@@ -590,7 +590,7 @@ public class CtLog {
       this.chain = Args.notNull(chain, "chain");
     }
 
-    public List<byte[]> getChain() {
+    public List<byte[]> chain() {
       return chain;
     }
 
@@ -627,23 +627,23 @@ public class CtLog {
       this.signature = Args.notNull(signature, "signature");
     }
 
-    public byte getSct_version() {
+    public byte sct_version() {
       return sct_version;
     }
 
-    public byte[] getId() {
+    public byte[] id() {
       return id;
     }
 
-    public long getTimestamp() {
+    public long timestamp() {
       return timestamp;
     }
 
-    public byte[] getExtensions() {
+    public byte[] extensions() {
       return extensions;
     }
 
-    public byte[] getSignature() {
+    public byte[] signature() {
       return signature;
     }
 

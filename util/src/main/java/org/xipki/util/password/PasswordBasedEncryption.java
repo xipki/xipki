@@ -19,7 +19,6 @@ import java.util.Optional;
  * Password based encryption utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class PasswordBasedEncryption {
@@ -120,12 +119,12 @@ public class PasswordBasedEncryption {
 
   public static byte[] decryptBlob(char[] password, PBECipherBlob blob)
       throws GeneralSecurityException {
-    int algoCode = blob.getAlgo();
+    int algoCode = blob.algo();
     PBEAlgo algo = Optional.ofNullable(PBEAlgo.forCode(algoCode))
         .orElseThrow(() -> new GeneralSecurityException(
             "unknown algorithm code " + algoCode));
-    return decrypt(algo, blob.getCipherText(),
-        password, blob.getIterations(), blob.getSalt());
+    return decrypt(algo, blob.cipherText(),
+        password, blob.iterations(), blob.salt());
   }
 
   public static byte[] decrypt(

@@ -44,9 +44,7 @@ import java.util.Optional;
  * CMP utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class CmpUtil {
 
   private static final Map<Integer, String> STATUS_TEXT_MAP = new HashMap<>();
@@ -167,7 +165,7 @@ public class CmpUtil {
       X500Name x500Name = Optional.ofNullable(signer.getCertificate())
           .orElseThrow(() -> new IllegalArgumentException(
               "signer without certificate is not allowed"))
-          .getSubject();
+          .subject();
       tmpSignerName = new GeneralName(x500Name);
     }
 

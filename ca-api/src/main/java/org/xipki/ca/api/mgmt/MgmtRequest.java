@@ -39,11 +39,11 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.value = value;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getValue() {
+    public String value() {
       return value;
     }
 
@@ -67,7 +67,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final String aliasName;
 
-    public String getAliasName() {
+    public String aliasName() {
       return aliasName;
     }
 
@@ -100,7 +100,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.caEntry = Args.notNull(caEntry, "caEntry");
     }
 
-    public CaEntry getCaEntry() {
+    public CaEntry caEntry() {
       return caEntry;
     }
 
@@ -125,7 +125,7 @@ public abstract class MgmtRequest extends MgmtMessage {
           "certprofileEntry");
     }
 
-    public CertprofileEntry getCertprofileEntry() {
+    public CertprofileEntry certprofileEntry() {
       return certprofileEntry;
     }
 
@@ -152,7 +152,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.profileName = Args.notBlank(profileName, "profileName");
     }
 
-    public String getProfileName() {
+    public String profileName() {
       return profileName;
     }
 
@@ -181,7 +181,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.entry = Args.notNull(entry, "entry");
     }
 
-    public KeypairGenEntry getEntry() {
+    public KeypairGenEntry entry() {
       return entry;
     }
 
@@ -207,7 +207,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.publisherEntry = Args.notNull(publisherEntry, "publisherEntry");
     }
 
-    public PublisherEntry getPublisherEntry() {
+    public PublisherEntry publisherEntry() {
       return publisherEntry;
     }
 
@@ -234,7 +234,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.publisherName = Args.notBlank(publisherName, "publisherName");
     }
 
-    public String getPublisherName() {
+    public String publisherName() {
       return publisherName;
     }
 
@@ -261,7 +261,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.requestorEntry = Args.notNull(requestorEntry, "requestorEntry");
     }
 
-    public RequestorEntry getRequestorEntry() {
+    public RequestorEntry requestorEntry() {
       return requestorEntry;
     }
 
@@ -288,7 +288,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.requestor = Args.notNull(requestor, "requestor");
     }
 
-    public CaHasRequestorEntry getRequestor() {
+    public CaHasRequestorEntry requestor() {
       return requestor;
     }
 
@@ -315,7 +315,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.signerEntry = Args.notNull(signerEntry, "signerEntry");
     }
 
-    public SignerEntry getSignerEntry() {
+    public SignerEntry signerEntry() {
       return signerEntry;
     }
 
@@ -335,13 +335,13 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   public abstract static class CaNameRequest extends MgmtRequest {
 
-    protected String caName;
+    protected final String caName;
 
     protected CaNameRequest(String caName) {
       this.caName = Args.notBlank(caName, "caName");
     }
 
-    public String getCaName() {
+    public String caName() {
       return caName;
     }
 
@@ -359,7 +359,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.changeCaEntry = Args.notNull(changeCaEntry, "changeCaEntry");
     }
 
-    public ChangeCaEntry getChangeCaEntry() {
+    public ChangeCaEntry changeCaEntry() {
       return changeCaEntry;
     }
 
@@ -387,7 +387,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private String base64Cert;
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -395,7 +395,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.name = Args.notBlank(name, "name");
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
@@ -403,7 +403,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.type = type;
     }
 
-    public String getConf() {
+    public String conf() {
       return conf;
     }
 
@@ -411,7 +411,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.conf = conf;
     }
 
-    public String getBase64Cert() {
+    public String base64Cert() {
       return base64Cert;
     }
 
@@ -453,15 +453,15 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.conf = conf;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
-    public String getConf() {
+    public String conf() {
       return conf;
     }
 
@@ -490,7 +490,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.caNames = caNames;
     }
 
-    public List<String> getCaNames() {
+    public List<String> caNames() {
       return caNames;
     }
 
@@ -524,15 +524,15 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.notAfter = notAfter;
     }
 
-    public String getProfileName() {
+    public String profileName() {
       return profileName;
     }
 
-    public Instant getNotBefore() {
+    public Instant notBefore() {
       return notBefore;
     }
 
-    public Instant getNotAfter() {
+    public Instant notAfter() {
       return notAfter;
     }
 
@@ -556,7 +556,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.encodedCsr = Args.notNull(encodedCsr, "encodedCsr");
     }
 
-    public byte[] getEncodedCsr() {
+    public byte[] encodedCsr() {
       return encodedCsr;
     }
 
@@ -589,7 +589,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.subject = Args.notBlank(subject, "subject");
     }
 
-    public String getSubject() {
+    public String subject() {
       return subject;
     }
 
@@ -633,23 +633,23 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.notAfter = notAfter;
     }
 
-    public String getProfileName() {
+    public String profileName() {
       return profileName;
     }
 
-    public byte[] getEncodedCsr() {
+    public byte[] encodedCsr() {
       return encodedCsr;
     }
 
-    public byte[] getEncodedTargetCert() {
+    public byte[] encodedTargetCert() {
       return encodedTargetCert;
     }
 
-    public Instant getNotBefore() {
+    public Instant notBefore() {
       return notBefore;
     }
 
-    public Instant getNotAfter() {
+    public Instant notAfter() {
       return notAfter;
     }
 
@@ -699,19 +699,19 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.subject = Args.notBlank(subject, "subject");
     }
 
-    public CaEntry getCaEntry() {
+    public CaEntry caEntry() {
       return caEntry;
     }
 
-    public String getProfileName() {
+    public String profileName() {
       return profileName;
     }
 
-    public String getSubject() {
+    public String subject() {
       return subject;
     }
 
-    public String getSerialNumber() {
+    public String serialNumber() {
       return serialNumber;
     }
 
@@ -719,7 +719,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-    public Instant getNotBefore() {
+    public Instant notBefore() {
       return notBefore;
     }
 
@@ -727,7 +727,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.notBefore = notBefore;
     }
 
-    public Instant getNotAfter() {
+    public Instant notAfter() {
       return notAfter;
     }
 
@@ -775,11 +775,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final BigInteger serialNumber;
 
-    public String getCaName() {
+    public String caName() {
       return caName;
     }
 
-    public byte[] getEncodedIssuerDn() {
+    public byte[] encodedIssuerDn() {
       return encodedIssuerDn;
     }
 
@@ -795,7 +795,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = serialNumber;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
@@ -830,7 +830,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.crlNumber = crlNumber;
     }
 
-    public BigInteger getCrlNumber() {
+    public BigInteger crlNumber() {
       return crlNumber;
     }
 
@@ -865,7 +865,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       super(caName);
     }
 
-    public byte[] getEncodedSubjectDnPattern() {
+    public byte[] encodedSubjectDnPattern() {
       return encodedSubjectDnPattern;
     }
 
@@ -873,7 +873,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.encodedSubjectDnPattern = encodedSubjectDnPattern;
     }
 
-    public Instant getValidFrom() {
+    public Instant validFrom() {
       return validFrom;
     }
 
@@ -881,7 +881,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.validFrom = validFrom;
     }
 
-    public Instant getValidTo() {
+    public Instant validTo() {
       return validTo;
     }
 
@@ -889,7 +889,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.validTo = validTo;
     }
 
-    public CertListOrderBy getOrderBy() {
+    public CertListOrderBy orderBy() {
       return orderBy;
     }
 
@@ -897,7 +897,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.orderBy = orderBy;
     }
 
-    public int getNumEntries() {
+    public int numEntries() {
       return numEntries;
     }
 
@@ -913,7 +913,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       ret.put("validFrom", validFrom);
       ret.put("validTo", validTo);
       if (orderBy != null) {
-        ret.put("orderBy", orderBy.getText());
+        ret.put("orderBy", orderBy.text());
       }
       ret.put("numEntries", numEntries);
       return ret;
@@ -943,7 +943,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.confBytes = Args.notNull(confBytes, "confBytes");
     }
 
-    public byte[] getConfBytes() {
+    public byte[] confBytes() {
       return confBytes;
     }
 
@@ -968,7 +968,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.name = name;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -994,7 +994,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
@@ -1017,7 +1017,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final String entityName;
 
-    public String getEntityName() {
+    public String entityName() {
       return entityName;
     }
 
@@ -1055,11 +1055,11 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.numThreads = Args.positive(numThreads, "numThreads");
     }
 
-    public List<String> getPublisherNames() {
+    public List<String> publisherNames() {
       return publisherNames;
     }
 
-    public int getNumThreads() {
+    public int numThreads() {
       return numThreads;
     }
 
@@ -1090,7 +1090,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.revocationInfo = revocationInfo;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo revocationInfo() {
       return revocationInfo;
     }
 
@@ -1129,15 +1129,15 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.invalidityTime = invalidityTime;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
-    public CrlReason getReason() {
+    public CrlReason reason() {
       return reason;
     }
 
-    public Instant getInvalidityTime() {
+    public Instant invalidityTime() {
       return invalidityTime;
     }
 
@@ -1174,7 +1174,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
@@ -1213,11 +1213,11 @@ public abstract class MgmtRequest extends MgmtMessage {
       return verbose;
     }
 
-    public String getModuleName() {
+    public String moduleName() {
       return moduleName;
     }
 
-    public Integer getSlotIndex() {
+    public Integer slotIndex() {
       return slotIndex;
     }
 

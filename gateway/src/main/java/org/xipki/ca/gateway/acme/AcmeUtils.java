@@ -116,7 +116,7 @@ final class AcmeUtils {
 
       String curveName = jwk.get("crv");
       EcCurveEnum curve = EcCurveEnum.ofAlias(curveName);
-      if (curve == null || !curveOid2.equals(curve.getOid())) {
+      if (curve == null || !curveOid2.equals(curve.oid())) {
         return false;
       }
 
@@ -132,7 +132,7 @@ final class AcmeUtils {
   private static byte[] buildECPublicKeyData(
     EcCurveEnum curve, byte[] x, byte[] y)
     throws InvalidKeySpecException {
-    int fieldSize = curve.getFieldByteSize();
+    int fieldSize = curve.fieldByteSize();
     byte[] res = new byte[1 + 2 * fieldSize];
     res[0] = 0x04;
     // x

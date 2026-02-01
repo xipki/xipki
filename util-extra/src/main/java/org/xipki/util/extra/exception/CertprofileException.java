@@ -7,7 +7,6 @@ package org.xipki.util.extra.exception;
  * Exception related to Certprofile.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertprofileException extends Exception {

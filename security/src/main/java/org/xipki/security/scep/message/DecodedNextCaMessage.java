@@ -65,7 +65,7 @@ public class DecodedNextCaMessage {
   public DecodedNextCaMessage() {
   }
 
-  public AuthorityCertStore getAuthorityCertStore() {
+  public AuthorityCertStore authorityCertStore() {
     return authorityCertStore;
   }
 
@@ -73,7 +73,7 @@ public class DecodedNextCaMessage {
     this.authorityCertStore = authorityCertStore;
   }
 
-  public X509Cert getSignatureCert() {
+  public X509Cert signatureCert() {
     return signatureCert;
   }
 
@@ -81,7 +81,7 @@ public class DecodedNextCaMessage {
     this.signatureCert = signatureCert;
   }
 
-  public HashAlgo getDigestAlgorithm() {
+  public HashAlgo digestAlgorithm() {
     return digestAlgorithm;
   }
 
@@ -97,7 +97,7 @@ public class DecodedNextCaMessage {
     this.signatureValid = signatureValid;
   }
 
-  public String getFailureMessage() {
+  public String failureMessage() {
     return failureMessage;
   }
 
@@ -105,7 +105,7 @@ public class DecodedNextCaMessage {
     this.failureMessage = failureMessage;
   }
 
-  public Instant getSigningTime() {
+  public Instant signingTime() {
     return signingTime;
   }
 
@@ -172,7 +172,7 @@ public class DecodedNextCaMessage {
         SignAlgo signAlgo = SignAlgo.getInstance(
             signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
 
-        if (digestAlgo != signAlgo.getHashAlgo()) {
+        if (digestAlgo != signAlgo.hashAlgo()) {
           ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm do " +
               "not use the same digestAlgorithm");
           return ret;
@@ -243,7 +243,7 @@ public class DecodedNextCaMessage {
     X509Cert caCert = null;
     List<X509Cert> raCerts = new LinkedList<>();
     for (X509Cert cert : certs) {
-      if (cert.getBasicConstraints() > -1) {
+      if (cert.basicConstraints() > -1) {
         if (caCert != null) {
           final String msg = "multiple CA certificates is returned, " +
               "but exactly 1 is expected";

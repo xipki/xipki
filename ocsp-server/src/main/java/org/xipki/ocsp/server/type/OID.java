@@ -13,7 +13,6 @@ import java.io.IOException;
  * OID enums.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public enum OID {
@@ -39,11 +38,11 @@ public enum OID {
     }
   }
 
-  public String getId() {
+  public String id() {
     return id;
   }
 
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encoded.length;
   }
 

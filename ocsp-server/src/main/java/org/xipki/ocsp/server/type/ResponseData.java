@@ -10,7 +10,6 @@ import java.util.List;
  * ASN.1 ResponseData.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class ResponseData extends ASN1Type {
@@ -44,7 +43,7 @@ public class ResponseData extends ASN1Type {
     if (version != 0) {
       len += 5;
     }
-    len += responderId.getEncodedLength();
+    len += responderId.encodedLength();
 
     // producedAt
     len += 17;
@@ -52,13 +51,13 @@ public class ResponseData extends ASN1Type {
     // responses
     int responsesBodyLen = 0;
     for (SingleResponse sr : responses) {
-      responsesBodyLen += sr.getEncodedLength();
+      responsesBodyLen += sr.encodedLength();
     }
     len += getLen(responsesBodyLen);
 
     // extensions
     if (extensions != null) {
-      len += getLen(extensions.getEncodedLength()); // explicit tag
+      len += getLen(extensions.encodedLength()); // explicit tag
     }
 
     this.bodyLength = len;
@@ -66,7 +65,7 @@ public class ResponseData extends ASN1Type {
   } // constructor
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 
@@ -88,7 +87,7 @@ public class ResponseData extends ASN1Type {
     // responses
     int responsesBodyLen = 0;
     for (SingleResponse sr : responses) {
-      responsesBodyLen += sr.getEncodedLength();
+      responsesBodyLen += sr.encodedLength();
     }
     idx += writeHeader((byte) 0x30, responsesBodyLen, out, idx);
     for (SingleResponse sr : responses) {
@@ -96,7 +95,7 @@ public class ResponseData extends ASN1Type {
     }
 
     if (extensions != null) {
-      idx += writeHeader((byte) 0xa1, extensions.getEncodedLength(), out, idx);
+      idx += writeHeader((byte) 0xa1, extensions.encodedLength(), out, idx);
       idx += extensions.write(out, idx);
     }
 

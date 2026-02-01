@@ -43,14 +43,14 @@ public class CompositeMLKEMPublicKey implements PublicKey {
 
     byte[] mlkemPk = Arrays.copyOfRange(keyValue, 0, mlkemVariant.pkSize());
     SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
-        mlkemVariant.keySpec().getAlgorithmIdentifier(), mlkemPk);
+        mlkemVariant.keySpec().algorithmIdentifier(), mlkemPk);
     this.mlkemKey = (MLKEMPublicKey)
         BouncyCastleProvider.getPublicKey(pkInfo);
 
     int off = mlkemVariant.pkSize();
     byte[] tradPk  = Arrays.copyOfRange(keyValue, off, keyValue.length);
     pkInfo = new SubjectPublicKeyInfo(
-        suite.tradVariant().keySpec().getAlgorithmIdentifier(), tradPk);
+        suite.tradVariant().keySpec().algorithmIdentifier(), tradPk);
     this.tradKey = BouncyCastleProvider.getPublicKey(pkInfo);
   }
 
@@ -101,16 +101,16 @@ public class CompositeMLKEMPublicKey implements PublicKey {
         tradPkInfo.getPublicKeyData().getOctets());
   }
 
-  public MLKEMPublicKey getMlkemKey() {
+  public MLKEMPublicKey mlkemKey() {
     return mlkemKey;
   }
 
-  public PublicKey getTradKey() {
+  public PublicKey tradKey() {
     return tradKey;
   }
 
-  public byte[] getKeyValue() {
-    return keyValue.clone();
+  public byte[] keyValue() {
+    return keyValue;
   }
 
   @Override

@@ -38,15 +38,15 @@ public class ScepHttpResponse {
         new ByteArrayInputStream(contentBytes));
   }
 
-  public String getContentType() {
+  public String contentType() {
     return contentType;
   }
 
-  public int getContentLength() {
+  public int contentLength() {
     return contentLength;
   }
 
-  public String getContentEncoding() {
+  public String contentEncoding() {
     return contentEncoding;
   }
 
@@ -54,11 +54,11 @@ public class ScepHttpResponse {
     this.contentEncoding = contentEncoding;
   }
 
-  public InputStream getContent() {
+  public InputStream content() {
     return content;
   }
 
-  public byte[] getContentBytes() throws ScepClientException {
+  public byte[] contentBytes() throws ScepClientException {
     if (content == null) {
       return null;
     }

@@ -35,9 +35,7 @@ import java.util.List;
  * Builder of PKCS#12 KEM MAC signers.
  *
  * @author Lijun Liao (xipki)
- *
  */
-
 public class P12KemMacContentSignerBuilder {
 
   private final KeypairWithCert keypairWithCert;
@@ -57,33 +55,33 @@ public class P12KemMacContentSignerBuilder {
     Args.notNull(encapKey, "encapKey");
 
     // decrypt the kemCiphertext
-    byte algCode = encapKey.getEncapulation().getAlg();
+    byte algCode = encapKey.encapulation().alg();
     byte[] macKeyValue;
     if (algCode == KemEncapsulation.ALG_KMAC_MLKEM_HMAC) {
       macKeyValue = KEMUtil.mlkemDecryptSecret(
-          keypairWithCert.getKey(), encapKey.getEncapulation());
+          keypairWithCert.getKey(), encapKey.encapulation());
     } else if (algCode == KemEncapsulation.ALG_KMAC_COMPOSITE_MLKEM_HMAC) {
-      PublicKey publicKey = keypairWithCert.getPublicKey();
+      PublicKey publicKey = keypairWithCert.publicKey();
       byte[] publicKeyData;
       if (publicKey instanceof CompositeMLKEMPublicKey) {
-        publicKeyData = ((CompositeMLKEMPublicKey) publicKey).getKeyValue();
+        publicKeyData = ((CompositeMLKEMPublicKey) publicKey).keyValue();
       } else if (publicKey != null) {
         publicKeyData = SubjectPublicKeyInfo.getInstance(
             publicKey.getEncoded()).getPublicKeyData().getOctets();
       } else {
-        publicKeyData = keypairWithCert.getCertificateChain()[0]
-            .getSubjectPublicKeyInfo().getPublicKeyData().getOctets();
+        publicKeyData = keypairWithCert.certificateChain()[0]
+            .subjectPublicKeyInfo().getPublicKeyData().getOctets();
       }
 
       macKeyValue = KEMUtil.compositeMlKemDecryptSecret(
         keypairWithCert.getKey(), publicKeyData,
-        encapKey.getEncapulation());
+        encapKey.encapulation());
     } else {
       throw new XiSecurityException("unknown wrap mechanism " + algCode);
     }
 
     this.macKey = new SecretKeySpec(macKeyValue, "HMAC-SHA256");
-    this.utf8Id = new DERUTF8String(encapKey.getId());
+    this.utf8Id = new DERUTF8String(encapKey.id());
 
     try {
       this.sigAlgId = new AlgorithmIdentifier(
@@ -118,9 +116,9 @@ public class P12KemMacContentSignerBuilder {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
 
-    if (keypairWithCert.getCertificateChain() != null) {
+    if (keypairWithCert.certificateChain() != null) {
       concurrentSigner.setCertificateChain(
-          keypairWithCert.getCertificateChain());
+          keypairWithCert.certificateChain());
     }
 
     return concurrentSigner;

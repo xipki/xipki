@@ -10,7 +10,6 @@ import org.xipki.util.password.PasswordResolverException;
  * A demo PasswordCallback which just pass-through the password.
  *
  * @author Lijun Liao (xipki)
- * @since 6.2.0
  */
 public class PassThroughPasswordCallback implements PasswordCallback {
 

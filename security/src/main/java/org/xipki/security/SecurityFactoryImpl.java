@@ -35,9 +35,7 @@ import java.util.Set;
  * An implementation of {@link SecurityFactory}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class SecurityFactoryImpl implements SecurityFactory {
 
   private static final Logger LOG =
@@ -64,8 +62,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   @Override
-  public Set<String> getSupportedSignerTypes() {
-    return signerFactoryRegister.getSupportedSignerTypes();
+  public Set<String> supportedSignerTypes() {
+    return signerFactoryRegister.supportedSignerTypes();
   }
 
   public boolean isStrongRandom4KeyEnabled() {
@@ -85,7 +83,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   @Override
-  public CsrControl getCsrControl() {
+  public CsrControl csrControl() {
     if (csrControl == null) {
       Path confFilePath = null;
       // ignore if file does not exist or is not configured.
@@ -124,8 +122,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
   public ConcurrentContentSigner createSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
-    if (getCsrControl() != null && conf.getPeerCertificates() == null) {
-      conf.setPeerCertificates(getCsrControl().getPeerCerts());
+    if (csrControl() != null && conf.peerCertificates() == null) {
+      conf.setPeerCertificates(csrControl().peerCerts());
     }
 
     ConcurrentContentSigner signer = signerFactoryRegister.newSigner(
@@ -167,7 +165,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
     if (!algoValidator.isAlgorithmPermitted(algId)) {
       String algoName;
       try {
-        algoName = SignAlgo.getInstance(algId).getJceName();
+        algoName = SignAlgo.getInstance(algId).jceName();
       } catch (Exception ex) {
         algoName = algId.getAlgorithm().getId();
       }
@@ -190,7 +188,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
   } // method verifyPop
 
   @Override
-  public int getDfltSignerParallelism() {
+  public int dfltSignerParallelism() {
     return defaultSignerParallelism;
   }
 
@@ -205,12 +203,12 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   @Override
-  public SecureRandom getRandom4Key() {
+  public SecureRandom random4Key() {
     return getSecureRandom(strongRandom4KeyEnabled);
   }
 
   @Override
-  public SecureRandom getRandom4Sign() {
+  public SecureRandom random4Sign() {
     return getSecureRandom(strongRandom4SignEnabled);
   }
 
@@ -240,9 +238,9 @@ public class SecurityFactoryImpl implements SecurityFactory {
       byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       Signature verifier;
       try {
-        verifier = Signature.getInstance(signatureAlgo.getJceName(), "BC");
+        verifier = Signature.getInstance(signatureAlgo.jceName(), "BC");
       } catch (NoSuchAlgorithmException ex) {
-        verifier = Signature.getInstance(signatureAlgo.getJceName());
+        verifier = Signature.getInstance(signatureAlgo.jceName());
       }
 
       byte[] signatureValue = signer.sign(dummyContent);
@@ -255,15 +253,15 @@ public class SecurityFactoryImpl implements SecurityFactory {
         StringBuilder sb = new StringBuilder()
             .append("private key and public key does not match, key type='")
             .append(signerType).append("'; ");
-        String pwd = copy.getPassword();
+        String pwd = copy.password();
         if (pwd != null) {
           copy.setPassword("****");
         }
         copy.setAlgo(signatureAlgo);
-        sb.append("conf='").append(copy.getConf());
+        sb.append("conf='").append(copy.conf());
         X509Cert cert = signer.getCertificate();
         if (cert != null) {
-          sb.append("', certificate subject='").append(cert.getSubjectText())
+          sb.append("', certificate subject='").append(cert.subjectText())
               .append("'");
         }
 

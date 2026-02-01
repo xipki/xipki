@@ -12,7 +12,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class PollCertRequest extends CaIdentifierRequest {
@@ -29,11 +28,11 @@ public class PollCertRequest extends CaIdentifierRequest {
     this.entries = entries;
   }
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
-  public Entry[] getEntries() {
+  public Entry[] entries() {
     return entries;
   }
 
@@ -73,11 +72,11 @@ public class PollCertRequest extends CaIdentifierRequest {
       this.subject = subject;
     }
 
-    public BigInteger getId() {
+    public BigInteger id() {
       return id;
     }
 
-    public X500NameType getSubject() {
+    public X500NameType subject() {
       return subject;
     }
 

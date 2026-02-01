@@ -29,7 +29,7 @@ public class DescribableInt extends V1Describable {
    *
    * @return the value of the value property.
    */
-  public int getValue() {
+  public int value() {
     return value;
   }
 

@@ -27,7 +27,6 @@ import java.util.Map.Entry;
  * Response signer.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class ResponseSigner {
@@ -74,7 +73,7 @@ class ResponseSigner {
       int len = tmpCertChain.length;
       if (len > 1) {
         X509Cert cert = tmpCertChain[len - 1];
-        if (cert.getIssuer().equals(cert.getSubject())) {
+        if (cert.issuer().equals(cert.subject())) {
           len--;
         }
       }
@@ -155,19 +154,19 @@ class ResponseSigner {
     return byName ? responderIdByName :  responderIdByKey;
   }
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 
-  public X509Cert[] getCertChain() {
+  public X509Cert[] certChain() {
     return certChain;
   }
 
-  public TaggedCertSequence getSequenceOfCert() {
+  public TaggedCertSequence sequenceOfCert() {
     return sequenceOfCert;
   }
 
-  public TaggedCertSequence getSequenceOfCertChain() {
+  public TaggedCertSequence sequenceOfCertChain() {
     return sequenceOfCertChain;
   }
 

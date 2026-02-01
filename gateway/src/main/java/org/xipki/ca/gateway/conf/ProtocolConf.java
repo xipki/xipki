@@ -10,7 +10,6 @@ import org.xipki.util.codec.json.JsonMap;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ProtocolConf {
@@ -28,15 +27,15 @@ public class ProtocolConf {
     this.sdkClient = sdkClient;
   }
 
-  public Boolean getLogReqResp() {
+  public Boolean logReqResp() {
     return logReqResp;
   }
 
-  public PopControlConf getPop() {
+  public PopControlConf pop() {
     return pop;
   }
 
-  public SdkClientConf getSdkClient() {
+  public SdkClientConf sdkClient() {
     return sdkClient;
   }
 

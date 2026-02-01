@@ -27,7 +27,6 @@ import java.util.Set;
  * Actions to manage Keypair generation entries.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class KeypairGenActions {
 

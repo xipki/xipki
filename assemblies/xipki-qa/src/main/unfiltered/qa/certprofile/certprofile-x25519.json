@@ -1,16 +1,18 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile with montmomery 25519 curves"
+    "details": "certprofile tls with montmomery 25519 curves"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,
   "validity": "2y",
   "notBeforeTime": "current",
   "keypairGeneration": "X25519",
+  "signatureAlgorithms": ["ED25519","ED448"],
   "keyAlgorithms": ["X25519"],
   "subject": [{
-      "type": "country"
+      "type": "country",
+      "minOccurs": 0
     },{
       "type": "organization",
       "minOccurs": 0

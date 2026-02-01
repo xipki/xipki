@@ -7,9 +7,7 @@ package org.xipki.security.exception;
  * Exception that indicates bad input.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class BadInputException extends Exception {
 
   public BadInputException(String message) {

@@ -46,11 +46,11 @@ public class ConstantExtnValue implements JsonEncodable {
     this.value = Base64.encodeToString(Args.notNull(value, "value"));
   }
 
-  public Type getType() {
+  public Type type() {
     return type;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 

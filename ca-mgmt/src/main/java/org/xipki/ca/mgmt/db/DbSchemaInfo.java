@@ -20,7 +20,6 @@ import java.util.Set;
  * Database Schema Information. It contains the content of the table DBSCHEMA.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class DbSchemaInfo {

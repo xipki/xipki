@@ -36,7 +36,6 @@ import java.util.List;
  *s
  * @author Lijun Liao (xipki)
  */
-
 public class P12XdhMacContentSignerBuilder {
 
   private static class XdhMacContentSigner extends HmacContentSigner {
@@ -49,7 +48,7 @@ public class P12XdhMacContentSignerBuilder {
                                 IssuerAndSerialNumber peerIssuerAndSerial)
         throws XiSecurityException {
       super(signAlgo, signingKey);
-      this.hashLen = signAlgo.getHashAlgo().getLength();
+      this.hashLen = signAlgo.hashAlgo().length();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
       if (peerIssuerAndSerial != null) {
@@ -118,9 +117,9 @@ public class P12XdhMacContentSignerBuilder {
       KeypairWithCert keypairWithCert, X509Cert peerCert)
       throws XiSecurityException {
     this.publicKey = Args.notNull(keypairWithCert, "keypairWithCert")
-        .getPublicKey();
+        .publicKey();
 
-    this.certificateChain = keypairWithCert.getCertificateChain();
+    this.certificateChain = keypairWithCert.certificateChain();
     init(keypairWithCert.getKey(), Args.notNull(peerCert, "peerCert"));
   }
 
@@ -137,7 +136,7 @@ public class P12XdhMacContentSignerBuilder {
           "unsupported key.getAlgorithm(): " + algorithm);
     }
 
-    PublicKey peerPubKey = peerCert.getPublicKey();
+    PublicKey peerPubKey = peerCert.publicKey();
     if (!algorithm.equals(peerPubKey.getAlgorithm())) {
       throw new IllegalArgumentException("peerCert and key does not match");
     }
@@ -160,17 +159,17 @@ public class P12XdhMacContentSignerBuilder {
 
     try {
       // LeadingInfo := Subject Distinguished Name from certificate
-      leadingInfo = peerCert.getSubject().getEncoded();
+      leadingInfo = peerCert.subject().getEncoded();
       // TrailingInfo ::= Issuer Distinguished Name from certificate
-      trailingInfo = peerCert.getIssuer().getEncoded();
+      trailingInfo = peerCert.issuer().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("error encoding certificate", ex);
     }
 
-    byte[] k = this.algo.getHashAlgo().hash(leadingInfo, zz, trailingInfo);
-    this.key = new SecretKeySpec(k, algo.getJceName());
+    byte[] k = this.algo.hashAlgo().hash(leadingInfo, zz, trailingInfo);
+    this.key = new SecretKeySpec(k, algo.jceName());
     this.peerIssuerAndSerial = new IssuerAndSerialNumber(
-        X500Name.getInstance(trailingInfo), peerCert.getSerialNumber());
+        X500Name.getInstance(trailingInfo), peerCert.serialNumber());
   } // method init
 
   public ConcurrentContentSigner createSigner(int parallelism)

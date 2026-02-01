@@ -21,8 +21,6 @@ import java.io.IOException;
  * PKCS#11 {@link P11KeypairGenerator}.
  *
  * @author Lijun Liao
- *
- *
  */
 public class P11KeypairGenerator extends KeypairGenerator {
 

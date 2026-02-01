@@ -37,11 +37,11 @@ public interface Curl {
       this.statusCode = statusCode;
     }
 
-    public int getStatusCode() {
+    public int statusCode() {
       return statusCode;
     }
 
-    public String getContentType() {
+    public String contentType() {
       return contentType;
     }
 
@@ -49,7 +49,7 @@ public interface Curl {
       this.contentType = contentType;
     }
 
-    public int getContentLength() {
+    public int contentLength() {
       return contentLength;
     }
 
@@ -57,7 +57,7 @@ public interface Curl {
       this.contentLength = contentLength;
     }
 
-    public byte[] getContent() {
+    public byte[] content() {
       return content;
     }
 
@@ -66,7 +66,7 @@ public interface Curl {
       this.contentLength = content == null ? 0 : content.length;
     }
 
-    public byte[] getErrorContent() {
+    public byte[] errorContent() {
       return errorContent;
     }
 

@@ -21,9 +21,7 @@ import java.util.Set;
  * algorithms are contained in a static collection.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
-
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
   private static final Logger LOG = LoggerFactory.getLogger(
@@ -38,7 +36,7 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
   static {
     List<SignAlgo> secureAlgos = new ArrayList<>(SignAlgo.values().length);
     for (SignAlgo m : SignAlgo.values()) {
-      if (m.getHashAlgo() != HashAlgo.SHA1) {
+      if (m.hashAlgo() != HashAlgo.SHA1) {
         secureAlgos.add(m);
       }
     }
@@ -78,16 +76,16 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     this.algos = Set.copyOf(algos);
     Set<String> names = new HashSet<>();
     for (SignAlgo m : algos) {
-      names.add(m.getJceName());
+      names.add(m.jceName());
     }
     this.algoNames = Collections.unmodifiableSet(names);
   }
 
-  public Set<SignAlgo> getAlgos() {
+  public Set<SignAlgo> algos() {
     return algos;
   }
 
-  public Set<String> getAlgoNames() {
+  public Set<String> algoNames() {
     return algoNames;
   }
 

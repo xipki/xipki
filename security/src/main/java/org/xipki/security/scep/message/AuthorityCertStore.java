@@ -28,15 +28,15 @@ public class AuthorityCertStore {
     this.encryptionCert = encryptionCert;
   }
 
-  public X509Cert getSignatureCert() {
+  public X509Cert signatureCert() {
     return signatureCert;
   }
 
-  public X509Cert getEncryptionCert() {
+  public X509Cert encryptionCert() {
     return encryptionCert;
   }
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 

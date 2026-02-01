@@ -22,7 +22,7 @@ public class CCCSimpleExtensionSchema implements JsonEncodable {
     this.version = version;
   }
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 

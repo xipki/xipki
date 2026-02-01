@@ -29,7 +29,7 @@ public class QcStatements implements JsonEncodable {
     this.qcStatements = Args.notEmpty(qcStatements, "qcStatements");
   }
 
-  public List<QcStatementType> getQcStatements() {
+  public List<QcStatementType> qcStatements() {
     return qcStatements;
   }
 
@@ -58,11 +58,11 @@ public class QcStatements implements JsonEncodable {
       this.max = Args.min(max, "max", min);
     }
 
-    public int getMin() {
+    public int min() {
       return min;
     }
 
-    public int getMax() {
+    public int max() {
       return max;
     }
 
@@ -111,19 +111,19 @@ public class QcStatements implements JsonEncodable {
       this.pdsLocations = pdsLocations;
     }
 
-    public ConstantExtnValue getConstant() {
+    public ConstantExtnValue constant() {
       return constant;
     }
 
-    public Integer getQcRetentionPeriod() {
+    public Integer qcRetentionPeriod() {
       return qcRetentionPeriod;
     }
 
-    public QcEuLimitValueType getQcEuLimitValue() {
+    public QcEuLimitValueType qcEuLimitValue() {
       return qcEuLimitValue;
     }
 
-    public List<PdsLocationType> getPdsLocations() {
+    public List<PdsLocationType> pdsLocations() {
       return pdsLocations;
     }
 
@@ -173,18 +173,18 @@ public class QcStatements implements JsonEncodable {
       this.statementValue = statementValue;
     }
 
-    public QCStatementID getStatementId() {
+    public QCStatementID statementId() {
       return statementId;
     }
 
-    public QcStatementValueType getStatementValue() {
+    public QcStatementValueType statementValue() {
       return statementValue;
     }
 
     @Override
     public JsonMap toCodec() {
       return new JsonMap()
-          .put("statementId", statementId.getMainAlias())
+          .put("statementId", statementId.mainAlias())
           .put("statementValue", statementValue);
     }
 
@@ -210,11 +210,11 @@ public class QcStatements implements JsonEncodable {
       this.language = Args.notBlank(language, "language");
     }
 
-    public String getUrl() {
+    public String url() {
       return url;
     }
 
-    public String getLanguage() {
+    public String language() {
       return language;
     }
 
@@ -247,15 +247,15 @@ public class QcStatements implements JsonEncodable {
       this.exponent = Args.notNull(exponent, "exponent");
     }
 
-    public String getCurrency() {
+    public String currency() {
       return currency;
     }
 
-    public Range2Type getAmount() {
+    public Range2Type amount() {
       return amount;
     }
 
-    public Range2Type getExponent() {
+    public Range2Type exponent() {
       return exponent;
     }
 

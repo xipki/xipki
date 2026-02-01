@@ -71,8 +71,8 @@ public class ScepActions {
       CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
 
       ScepClient client = getScepClient();
-      X509Cert caCert = client.getAuthorityCertStore().getCaCert();
-      X500Name caSubject = caCert.getSubject();
+      X509Cert caCert = client.authorityCertStore().caCert();
+      X500Name caSubject = caCert.subject();
 
       EnrolmentResponse resp = client.scepCertPoll(getIdentityKey(),
                                 getIdentityCert(), csr, caSubject);
@@ -82,7 +82,7 @@ public class ScepActions {
         throw new CmdFailure("server returned 'pending'");
       }
 
-      List<X509Cert> certs = resp.getCertificates();
+      List<X509Cert> certs = resp.certificates();
       if (certs == null || certs.isEmpty()) {
         throw new CmdFailure("received no certificate from server");
       }
@@ -231,7 +231,7 @@ public class ScepActions {
         throw new CmdFailure("server returned 'pending'");
       }
 
-      X509Cert cert = resp.getCertificates().get(0);
+      X509Cert cert = resp.certificates().get(0);
       saveVerbose("saved enrolled certificate to file", outputFile,
           encodeCert(cert.getEncoded(), outform));
       return null;
@@ -271,7 +271,7 @@ public class ScepActions {
 
       ScepClient client = new ScepClient(tmpCaId, caCertValidator, curl);
       client.init();
-      X509Cert caCert = client.getCaCert();
+      X509Cert caCert = client.caCert();
       if (caCert == null) {
         throw new CmdFailure("received no CA certficate from server");
       }
@@ -306,8 +306,8 @@ public class ScepActions {
     protected Object execute0() throws Exception {
       ScepClient client = getScepClient();
       BigInteger serial = toBigInt(serialNumber);
-      X509Cert caCert = client.getAuthorityCertStore().getCaCert();
-      X500Name caSubject = caCert.getSubject();
+      X509Cert caCert = client.authorityCertStore().caCert();
+      X500Name caSubject = caCert.subject();
       List<X509Cert> certs = client.scepGetCert(getIdentityKey(),
           getIdentityCert(), caSubject, serial);
       if (certs == null || certs.isEmpty()) {
@@ -343,7 +343,7 @@ public class ScepActions {
     protected Object execute0() throws Exception {
       X509Cert cert = X509Util.parseCert(new File(certFile));
       X509CRLHolder crl = getScepClient().scepGetCrl(getIdentityKey(),
-          getIdentityCert(), cert.getIssuer(), cert.getSerialNumber());
+          getIdentityCert(), cert.issuer(), cert.serialNumber());
       if (crl == null) {
         throw new CmdFailure("received no CRL from server");
       }

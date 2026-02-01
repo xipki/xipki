@@ -90,7 +90,7 @@ public class JsonInputStream {
     return false;
   }
 
-  public int getPosition() {
+  public int position() {
     return position;
   }
 

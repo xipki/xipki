@@ -96,8 +96,8 @@ public class UnRevokeCertActions {
 
         for (int i = 0; i < reqInfo.ids.size(); i++) {
           RevokeCertRequest.Entry entry = new RevokeCertRequest.Entry(
-              reqInfo.ids.get(i), caCert.getSubject(),
-              reqInfo.serialNumbers.get(i), crlReason.getCode(),
+              reqInfo.ids.get(i), caCert.subject(),
+              reqInfo.serialNumbers.get(i), crlReason.code(),
               invalidityDate);
           req.addRequestEntry(entry);
         }
@@ -133,7 +133,7 @@ public class UnRevokeCertActions {
 
         for (int i = 0; i < reqInfo.ids.size(); i++) {
           UnsuspendCertRequest.Entry entry = new UnsuspendCertRequest.Entry(
-              reqInfo.ids.get(i), caCert.getSubject(),
+              reqInfo.ids.get(i), caCert.subject(),
               reqInfo.serialNumbers.get(i));
           req.addRequestEntry(entry);
         }
@@ -194,7 +194,7 @@ public class UnRevokeCertActions {
           assertIssuedByCa(cert, caCert, certFile);
           ids.add(Integer.toString(id++));
           sources.add(certFile);
-          serialNumbers.add(cert.getSerialNumber());
+          serialNumbers.add(cert.serialNumber());
         }
       }
 
@@ -230,9 +230,9 @@ public class UnRevokeCertActions {
         } else {
           processedIndex.add(index);
           String source = reqInfo.sources.get(index);
-          if (certIdOrError.getValue().getError() != null) {
+          if (certIdOrError.getValue().error() != null) {
             failed = true;
-            PkiStatusInfo error = certIdOrError.getValue().getError();
+            PkiStatusInfo error = certIdOrError.getValue().error();
             println((revoke ? "revoking" : "unsuspending") + " certificate "
                 + source + " failed: " + error);
           } else {

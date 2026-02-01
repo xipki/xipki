@@ -20,7 +20,7 @@ public class KeySingleUsage {
     this.required = required;
   }
 
-  public KeyUsage getKeyUsage() {
+  public KeyUsage keyUsage() {
     return keyUsage;
   }
 

@@ -13,7 +13,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class OldCertInfo extends SdkEncodable {
@@ -54,15 +53,15 @@ public class OldCertInfo extends SdkEncodable {
     return reusePublicKey;
   }
 
-  public ByIssuerAndSerial getIsn() {
+  public ByIssuerAndSerial isn() {
     return isn;
   }
 
-  public BySubject getSubject() {
+  public BySubject subject() {
     return subject;
   }
 
-  public BySha1FpAndSerial getFsn() {
+  public BySha1FpAndSerial fsn() {
     return fsn;
   }
 
@@ -120,11 +119,11 @@ public class OldCertInfo extends SdkEncodable {
       this.serialNumber = serialNumber;
     }
 
-    public X500NameType getIssuer() {
+    public X500NameType issuer() {
       return issuer;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
@@ -164,11 +163,11 @@ public class OldCertInfo extends SdkEncodable {
       this.serialNumber = serialNumber;
     }
 
-    public byte[] getCaCertSha1() {
+    public byte[] caCertSha1() {
       return caCertSha1;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
@@ -205,11 +204,11 @@ public class OldCertInfo extends SdkEncodable {
       this.san = san;
     }
 
-    public byte[] getSubject() {
+    public byte[] subject() {
       return subject;
     }
 
-    public byte[] getSan() {
+    public byte[] san() {
       return san;
     }
 

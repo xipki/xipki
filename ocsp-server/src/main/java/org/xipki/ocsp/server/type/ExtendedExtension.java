@@ -18,7 +18,6 @@ import java.util.Arrays;
  * ASN.1 extension that can be read and written.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class ExtendedExtension extends Extension {
@@ -43,7 +42,7 @@ public class ExtendedExtension extends Extension {
   private final int extnValueLength;
 
   public ExtendedExtension(OID extnType, boolean critical, byte[] extnValue) {
-    int bodyLen = extnType.getEncodedLength();
+    int bodyLen = extnType.encodedLength();
     if (critical) {
       bodyLen += 3;
     }
@@ -120,13 +119,13 @@ public class ExtendedExtension extends Extension {
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 
   public static int getEncodedLength(
       OID extnType, boolean critical, int extnValueLength) {
-    int bodyLen = extnType.getEncodedLength();
+    int bodyLen = extnType.encodedLength();
     if (critical) {
       bodyLen += 3;
     }
@@ -138,15 +137,15 @@ public class ExtendedExtension extends Extension {
     return critical;
   }
 
-  public OID getExtnType() {
+  public OID extnType() {
     return extnType;
   }
 
-  public int getExtnValueLength() {
+  public int extnValueLength() {
     return extnValueLength;
   }
 
-  public InputStream getExtnValueStream() {
+  public InputStream extnValueStream() {
     return new ByteArrayInputStream(encoded, extnValueFrom, extnValueLength);
   }
 

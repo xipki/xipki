@@ -45,7 +45,6 @@ import java.util.StringTokenizer;
 /**
  * Fill the keypool with keypairs.
  *
- * @since 6.0.0
  * @author Lijun Liao (xipki)
  */
 
@@ -127,7 +126,7 @@ public class FillKeypool implements AutoCloseable {
       for (KeySpec keyspec : keyspecs) {
         int kid = keyspecToIdMap.get(keyspec);
         ps.setInt(1, kid);
-        ps.setString(2, keyspec.getText());
+        ps.setString(2, keyspec.text());
         ps.addBatch();
       }
       ps.executeBatch();
@@ -214,7 +213,7 @@ public class FillKeypool implements AutoCloseable {
         } // end for
 
         long duration = Clock.systemUTC().millis() - start;
-        System.out.println(keyspec.getText() + ":" +
+        System.out.println(keyspec.text() + ": " +
             (preKeys != null ? "loaded " : "generated ") +
             numKeypairs + " keypairs, took " + duration + " ms");
       } // end for

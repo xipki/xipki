@@ -39,7 +39,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * XiPKI OCSP database query executor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class OcspStoreQueryExecutor {
@@ -203,7 +202,7 @@ class OcspStoreQueryExecutor {
     boolean revoked = (revInfo != null);
     int issuerId = getIssuerId(issuer);
 
-    BigInteger serialNumber = certificate.getCert().getSerialNumber();
+    BigInteger serialNumber = certificate.cert().serialNumber();
     Long certRegisteredId = getCertId(issuerId, serialNumber);
 
     if (!publishGoodCerts && !revoked && certRegisteredId != null) {
@@ -217,13 +216,13 @@ class OcspStoreQueryExecutor {
 
     final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
-    long certId = certificate.getCertId();
-    byte[] encodedCert = certificate.getCert().getEncoded();
+    long certId = certificate.certId();
+    byte[] encodedCert = certificate.cert().getEncoded();
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
-    X509Cert cert = certificate.getCert();
+    X509Cert cert = certificate.cert();
     String cuttedSubject = X509Util.cutText(
-        certificate.getCert().getSubjectText(), maxX500nameLen);
+        certificate.cert().subjectText(), maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -233,23 +232,23 @@ class OcspStoreQueryExecutor {
       ps.setLong(idx++, certId);
       ps.setLong(idx++, Instant.now().getEpochSecond()); // currentTimeSeconds
       ps.setString(idx++, serialNumber.toString(16));
-      ps.setLong(idx++, cert.getNotBefore().getEpochSecond());
-      ps.setLong(idx++, cert.getNotAfter().getEpochSecond());
+      ps.setLong(idx++, cert.notBefore().getEpochSecond());
+      ps.setLong(idx++, cert.notAfter().getEpochSecond());
       setBoolean(ps, idx++, revoked);
       ps.setInt(idx++, issuerId);
       ps.setString(idx++, certHash);
       ps.setString(idx++, cuttedSubject);
 
       if (revoked) {
-        long revTime = revInfo.getRevocationTime().getEpochSecond();
+        long revTime = revInfo.revocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
-        if (revInfo.getInvalidityTime() != null) {
-          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
+        if (revInfo.invalidityTime() != null) {
+          ps.setLong(idx++, revInfo.invalidityTime().getEpochSecond());
         } else {
           ps.setNull(idx++, Types.BIGINT);
         }
-        int reasonCode = (revInfo.getReason() == null)
-            ? 0 : revInfo.getReason().getCode();
+        int reasonCode = (revInfo.reason() == null)
+            ? 0 : revInfo.reason().code();
         ps.setInt(idx, reasonCode);
       }
 
@@ -262,7 +261,7 @@ class OcspStoreQueryExecutor {
         if (th instanceof SQLException) {
           SQLException ex = (SQLException) th;
           LOG.error("datasource {} could not add certificate with id {}: {}",
-              datasource.getName(), certId, th.getMessage());
+              datasource.name(), certId, th.getMessage());
           throw datasource.translate(sql, ex);
         } else {
           throw new OperationException(ErrorCode.SYSTEM_FAILURE, th);
@@ -290,14 +289,14 @@ class OcspStoreQueryExecutor {
       ps.setLong(idx++, Instant.now().getEpochSecond()); // currentTimeSeconds
       setBoolean(ps, idx++, revoked);
       if (revoked) {
-        long revTime = revInfo.getRevocationTime().getEpochSecond();
+        long revTime = revInfo.revocationTime().getEpochSecond();
         ps.setLong(idx++, revTime);
-        if (revInfo.getInvalidityTime() != null) {
-          ps.setLong(idx++, revInfo.getInvalidityTime().getEpochSecond());
+        if (revInfo.invalidityTime() != null) {
+          ps.setLong(idx++, revInfo.invalidityTime().getEpochSecond());
         } else {
           ps.setNull(idx++, Types.INTEGER);
         }
-        ps.setInt(idx++, revInfo.getReason().getCode());
+        ps.setInt(idx++, revInfo.reason().code());
       } else {
         ps.setNull(idx++, Types.INTEGER); // rev_time
         ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
@@ -328,7 +327,7 @@ class OcspStoreQueryExecutor {
       return;
     }
 
-    BigInteger serialNumber = cert.getCert().getSerialNumber();
+    BigInteger serialNumber = cert.cert().serialNumber();
     Long certRegisteredId = getCertId(issuerId, serialNumber);
 
     if (certRegisteredId == null) {
@@ -386,7 +385,7 @@ class OcspStoreQueryExecutor {
 
     try {
       ps.setInt(1, issuerId);
-      ps.setString(2, cert.getCert().getSerialNumber().toString(16));
+      ps.setString(2, cert.cert().serialNumber().toString(16));
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
@@ -459,12 +458,12 @@ class OcspStoreQueryExecutor {
 
     try {
       String b64Cert = Base64.encodeToString(encodedCert);
-      String subject = issuerCert.getSubjectText();
+      String subject = issuerCert.subjectText();
       int idx = 1;
       ps.setInt(idx++, id);
       ps.setString(idx++, subject);
-      ps.setLong(idx++, issuerCert.getNotBefore().getEpochSecond());
-      ps.setLong(idx++, issuerCert.getNotAfter().getEpochSecond());
+      ps.setLong(idx++, issuerCert.notBefore().getEpochSecond());
+      ps.setLong(idx++, issuerCert.notAfter().getEpochSecond());
       ps.setString(idx++, sha1FpCert);
       ps.setString(idx, b64Cert);
 

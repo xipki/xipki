@@ -16,7 +16,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CertprofileInfoResponse extends SdkResponse {
@@ -35,15 +34,15 @@ public class CertprofileInfoResponse extends SdkResponse {
     this.keyTypes = Args.notNull(keyTypes, "keyTypes");
   }
 
-  public String[] getRequiredExtensionTypes() {
+  public String[] requiredExtensionTypes() {
     return requiredExtensionTypes;
   }
 
-  public String[] getOptionalExtensionTypes() {
+  public String[] optionalExtensionTypes() {
     return optionalExtensionTypes;
   }
 
-  public KeySpec[] getKeyTypes() {
+  public KeySpec[] keyTypes() {
     return keyTypes;
   }
 

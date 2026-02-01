@@ -23,7 +23,6 @@ import java.util.List;
  * Manages the keypair generation.
  *
  * @author Lijun Liao (xipki)
- * @since  6.0.0
  */
 
 class KeypairGenManager {
@@ -46,10 +45,10 @@ class KeypairGenManager {
   void close() {
     for (KeypairGenEntryWrapper entry : manager.keypairGens.values()) {
       try {
-        entry.getGenerator().close();
+        entry.generator().close();
       } catch (IOException e) {
         LogUtil.warn(LOG, e, "error closing keypair generator "
-            + entry.getDbEntry().getName());
+            + entry.dbEntry().name());
       }
     }
   }
@@ -77,7 +76,7 @@ class KeypairGenManager {
     }
 
     for (KeypairGenEntry entry : entries) {
-      String name = entry.getName();
+      String name = entry.name();
       manager.keypairGenDbEntries.put(name, entry);
 
       try {
@@ -94,14 +93,14 @@ class KeypairGenManager {
 
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
     if ("software".equalsIgnoreCase(
-        Args.notNull(keypairGenEntry, "keypairGenEntry").getName())) {
+        Args.notNull(keypairGenEntry, "keypairGenEntry").name())) {
       throw new CaMgmtException(
           "Adding keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
 
-    String name = keypairGenEntry.getName();
+    String name = keypairGenEntry.name();
     CaManagerImpl.checkName(name, "keypair generation name");
     if (manager.keypairGenDbEntries.containsKey(name)) {
       throw new CaMgmtException(StringUtil.concat(
@@ -126,16 +125,16 @@ class KeypairGenManager {
 
     for (String caName : manager.caInfos.keySet()) {
       CaInfo caInfo = manager.caInfos.get(caName);
-      List<String> names = caInfo.getKeypairGenNames();
+      List<String> names = caInfo.keypairGenNames();
       if (names != null && names.contains(name)) {
-        ChangeCaEntry changeCaEntry = new ChangeCaEntry(caInfo.getIdent());
+        ChangeCaEntry changeCaEntry = new ChangeCaEntry(caInfo.ident());
         List<String> newNames = new ArrayList<>(names);
         newNames.remove(name);
         changeCaEntry.setKeypairGenNames(newNames);
         manager.caConfStore.changeCa(changeCaEntry,
-            caInfo.getCaEntry().getBase(), manager.securityFactory);
+            caInfo.caEntry().base(), manager.securityFactory);
 
-        caInfo.getKeypairGenNames().remove(name);
+        caInfo.keypairGenNames().remove(name);
       }
     }
 
@@ -163,7 +162,7 @@ class KeypairGenManager {
     manager.keypairGens.remove(name);
     manager.keypairGenDbEntries.remove(name);
 
-    manager.keypairGenDbEntries.put(name, newKeypairGen.getDbEntry());
+    manager.keypairGenDbEntries.put(name, newKeypairGen.dbEntry());
     manager.keypairGens.put(name, newKeypairGen);
   } // method changeKeypairGen
 

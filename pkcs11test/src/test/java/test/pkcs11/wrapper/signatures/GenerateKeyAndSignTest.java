@@ -83,13 +83,13 @@ public class GenerateKeyAndSignTest {
   private static abstract class Base extends SignatureTestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       LOG.info("##################################################");
       LOG.info("Generating new {} bit RSA key-pair...", 1024);
 
       final boolean inToken = false;
       PKCS11KeyId generatedKeyPair = generateKeypair(
-          PKCS11KeyPairType.RSA_1024, inToken);
+          PKCS11KeyPairType.RSA1024, inToken);
       long generatedRSAPublicKey = generatedKeyPair.getPublicKeyHandle();
       long generatedRSAPrivateKey = generatedKeyPair.getHandle();
       // no we may work with the keys...

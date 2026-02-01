@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * OCSP benchmark.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspBenchmark extends BenchmarkExecutor {

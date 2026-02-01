@@ -16,7 +16,6 @@ import java.util.List;
  * CMP request to revoke certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class RevokeCertRequest {
@@ -41,15 +40,15 @@ public class RevokeCertRequest {
       this.invalidityDate = invalidityDate;
     }
 
-    public int getReason() {
+    public int reason() {
       return reason;
     }
 
-    public Instant getInvalidityDate() {
+    public Instant invalidityDate() {
       return invalidityDate;
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
+    public byte[] authorityKeyIdentifier() {
       return authorityKeyIdentifier;
     }
 
@@ -64,7 +63,7 @@ public class RevokeCertRequest {
   public boolean addRequestEntry(Entry requestEntry) {
     Args.notNull(requestEntry, "requestEntry");
     for (Entry re : requestEntries) {
-      if (re.getId().equals(requestEntry.getId())) {
+      if (re.id().equals(requestEntry.id())) {
         return false;
       }
     }
@@ -73,7 +72,7 @@ public class RevokeCertRequest {
     return true;
   }
 
-  public List<Entry> getRequestEntries() {
+  public List<Entry> requestEntries() {
     return Collections.unmodifiableList(requestEntries);
   }
 

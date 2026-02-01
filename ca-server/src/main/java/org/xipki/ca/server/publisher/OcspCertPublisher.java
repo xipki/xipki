@@ -28,7 +28,6 @@ import java.security.NoSuchAlgorithmException;
  * Publish certificates to XiPKI OCSP database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspCertPublisher extends CertPublisher {
@@ -79,7 +78,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.addIssuer(issuer);
       return true;
     } catch (Exception ex) {
-      logAndAudit(issuer.getSubjectText(), issuer, null, ex,
+      logAndAudit(issuer.subjectText(), issuer, null, ex,
           "could not publish issuer");
       return false;
     }
@@ -87,14 +86,14 @@ public class OcspCertPublisher extends CertPublisher {
 
   @Override
   public boolean certificateAdded(CertificateInfo certInfo) {
-    X509Cert caCert = certInfo.getIssuerCert();
-    CertWithDbId cert = certInfo.getCert();
+    X509Cert caCert = certInfo.issuerCert();
+    CertWithDbId cert = certInfo.cert();
 
     try {
-      queryExecutor.addCert(caCert, cert, certInfo.getRevocationInfo());
+      queryExecutor.addCert(caCert, cert, certInfo.revocationInfo());
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(),
           ex, "could not save certificate");
       return false;
     }
@@ -107,7 +106,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCert(caCert, cert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(),
           ex, "could not publish revoked certificate");
       return false;
     }
@@ -119,7 +118,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getSubjectText(), cert.getCert(), cert.getCertId(),
+      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(),
           ex, "could not publish unrevocation of certificate");
       return false;
     }
@@ -127,8 +126,8 @@ public class OcspCertPublisher extends CertPublisher {
 
   private void logAndAudit(String issuer, X509Cert cert, Long certId,
                            Exception ex, String messagePrefix) {
-    String subjectText = cert.getSubjectText();
-    String serialText = cert.getSerialNumberHex();
+    String subjectText = cert.subjectText();
+    String serialText = cert.serialNumberHex();
 
     LOG.error("{} (issuser='{}': subject='{}', serialNumber={}). Message: {}",
         messagePrefix, issuer, subjectText, serialText, ex.getMessage());
@@ -163,7 +162,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCa(caCert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
+      logAndAudit(caCert.issuerText(), caCert, null, ex,
           "could not publish revocation of CA");
       return false;
     }
@@ -175,7 +174,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCa(caCert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.getIssuerText(), caCert, null, ex,
+      logAndAudit(caCert.issuerText(), caCert, null, ex,
           "could not publish unrevocation of CA");
       return false;
     }
@@ -187,7 +186,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.removeCert(issuerCert, cert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(issuerCert.getIssuerText(), issuerCert, null, ex,
+      logAndAudit(issuerCert.issuerText(), issuerCert, null, ex,
           "could not publish removal of certificate");
       return false;
     }

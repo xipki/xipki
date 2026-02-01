@@ -21,7 +21,6 @@ import java.io.Closeable;
  * CertPublisher with identifier.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class IdentifiedCertPublisher implements Closeable {
@@ -38,7 +37,7 @@ public class IdentifiedCertPublisher implements Closeable {
 
   public void initialize(DataSourceMap datasourceConfs)
       throws CertPublisherException {
-    certPublisher.initialize(entry.getConf(), datasourceConfs);
+    certPublisher.initialize(entry.conf(), datasourceConfs);
   }
 
   public boolean caAdded(X509Cert caCert) {
@@ -59,12 +58,12 @@ public class IdentifiedCertPublisher implements Closeable {
     return certPublisher.crlAdded(caCert, crl);
   }
 
-  public PublisherEntry getDbEntry() {
+  public PublisherEntry dbEntry() {
     return entry;
   }
 
-  public NameId getIdent() {
-    return entry.getIdent();
+  public NameId ident() {
+    return entry.ident();
   }
 
   public boolean isHealthy() {

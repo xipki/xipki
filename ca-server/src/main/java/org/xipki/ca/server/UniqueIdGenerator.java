@@ -22,8 +22,6 @@ import java.util.function.IntBinaryOperator;
  *
  * <p>Idea is borrowed from http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram
  * @author Lijun Liao (xipki)
- * @since 2.0.0
- *
  */
 
 public class UniqueIdGenerator {

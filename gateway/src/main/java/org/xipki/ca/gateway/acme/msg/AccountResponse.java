@@ -36,23 +36,23 @@ public class AccountResponse implements JsonEncodable {
     this.orders = orders;
   }
 
-  public AccountStatus getStatus() {
+  public AccountStatus status() {
     return status;
   }
 
-  public List<String> getContact() {
+  public List<String> contact() {
     return contact;
   }
 
-  public JoseMessage getExternalAccountBinding() {
+  public JoseMessage externalAccountBinding() {
     return externalAccountBinding;
   }
 
-  public Boolean getTermsOfServiceAgreed() {
+  public Boolean termsOfServiceAgreed() {
     return termsOfServiceAgreed;
   }
 
-  public String getOrders() {
+  public String orders() {
     return orders;
   }
 

@@ -39,12 +39,12 @@ public abstract class X509CaModule {
 
   public X509CaModule(CaInfo caInfo) {
     this.caInfo = Args.notNull(caInfo, "caInfo");
-    this.caIdent = caInfo.getIdent();
-    this.caCert = caInfo.getCert();
+    this.caIdent = caInfo.ident();
+    this.caCert = caInfo.cert();
     this.encodedCaCertChain = new ArrayList<>(2);
     this.encodedCaCertChain.add(caCert.getEncoded());
-    if (caInfo.getCertchain() != null) {
-      for (X509Cert c : caInfo.getCertchain()) {
+    if (caInfo.certchain() != null) {
+      for (X509Cert c : caInfo.certchain()) {
         this.encodedCaCertChain.add(c.getEncoded());
       }
     }
@@ -58,11 +58,11 @@ public abstract class X509CaModule {
       String eventType, RequestorInfo requestor) {
     Args.notNull(eventType, "eventType");
     AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
-    event.setEventData(CaAuditConstants.NAME_ca, caIdent.getName());
+    event.setEventData(CaAuditConstants.NAME_ca, caIdent.name());
     event.setEventType(eventType);
     if (requestor != null) {
       event.setEventData(CaAuditConstants.NAME_requestor,
-          requestor.getIdent().getName());
+          requestor.ident().name());
     }
     return event;
   }
@@ -81,7 +81,7 @@ public abstract class X509CaModule {
 
   protected boolean verifySignature(X509Cert cert) {
     try {
-      Args.notNull(cert, "cert").verify(caCert.getPublicKey());
+      Args.notNull(cert, "cert").verify(caCert.publicKey());
       return true;
     } catch (Exception ex) {
       LOG.debug("{} while verifying signature: {}",

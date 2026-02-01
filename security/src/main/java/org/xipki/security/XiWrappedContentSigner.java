@@ -15,7 +15,6 @@ import java.io.OutputStream;
  * An implementation of {@link XiContentSigner}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class XiWrappedContentSigner implements XiContentSigner {

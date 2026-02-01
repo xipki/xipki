@@ -10,7 +10,6 @@ import org.bouncycastle.operator.ContentSigner;
  * {@link #getEncodedAlgorithmIdentifier()}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public interface XiContentSigner extends ContentSigner {

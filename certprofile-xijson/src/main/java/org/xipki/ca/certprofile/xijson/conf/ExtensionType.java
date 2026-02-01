@@ -9,7 +9,7 @@ import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 /**
  * Extension configuration.
@@ -88,7 +88,7 @@ public class ExtensionType implements JsonEncodable {
     this.required  = (required != null && required);
   }
 
-  public ExtensionID getType() {
+  public ExtensionID type() {
     return type;
   }
 
@@ -104,11 +104,11 @@ public class ExtensionType implements JsonEncodable {
     this.inRequest = (inRequest == null) ? TripleState.forbidden : inRequest;
   }
 
-  public TripleState getInRequest() {
+  public TripleState inRequest() {
     return inRequest;
   }
 
-  public AuthorityInfoAccess getAuthorityInfoAccess() {
+  public AuthorityInfoAccess authorityInfoAccess() {
     return authorityInfoAccess;
   }
 
@@ -116,7 +116,7 @@ public class ExtensionType implements JsonEncodable {
     this.authorityInfoAccess = authorityInfoAccess;
   }
 
-  public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
+  public SubjectKeyIdentifierControl subjectKeyIdentifier() {
     return subjectKeyIdentifier;
   }
 
@@ -125,7 +125,7 @@ public class ExtensionType implements JsonEncodable {
     this.subjectKeyIdentifier = subjectKeyIdentifier;
   }
 
-  public BasicConstraints getBasicConstraints() {
+  public BasicConstraints basicConstraints() {
     return basicConstraints;
   }
 
@@ -133,7 +133,7 @@ public class ExtensionType implements JsonEncodable {
     this.basicConstraints = basicConstraints;
   }
 
-  public BiometricInfo getBiometricInfo() {
+  public BiometricInfo biometricInfo() {
     return biometricInfo;
   }
 
@@ -141,7 +141,7 @@ public class ExtensionType implements JsonEncodable {
     this.biometricInfo = biometricInfo;
   }
 
-  public CertificatePolicies getCertificatePolicies() {
+  public CertificatePolicies certificatePolicies() {
     return certificatePolicies;
   }
 
@@ -149,7 +149,7 @@ public class ExtensionType implements JsonEncodable {
     this.certificatePolicies = certificatePolicies;
   }
 
-  public ConstantExtnValue getConstant() {
+  public ConstantExtnValue constant() {
     return constant;
   }
 
@@ -157,7 +157,7 @@ public class ExtensionType implements JsonEncodable {
     this.constant = constant;
   }
 
-  public ExtendedKeyUsage getExtendedKeyUsage() {
+  public ExtendedKeyUsage extendedKeyUsage() {
     return extendedKeyUsage;
   }
 
@@ -165,7 +165,7 @@ public class ExtensionType implements JsonEncodable {
     this.extendedKeyUsage = extendedKeyUsage;
   }
 
-  public InhibitAnyPolicy getInhibitAnyPolicy() {
+  public InhibitAnyPolicy inhibitAnyPolicy() {
     return inhibitAnyPolicy;
   }
 
@@ -173,7 +173,7 @@ public class ExtensionType implements JsonEncodable {
     this.inhibitAnyPolicy = inhibitAnyPolicy;
   }
 
-  public KeyUsage getKeyUsage() {
+  public KeyUsage keyUsage() {
     return keyUsage;
   }
 
@@ -181,7 +181,7 @@ public class ExtensionType implements JsonEncodable {
     this.keyUsage = keyUsage;
   }
 
-  public NameConstraints getNameConstraints() {
+  public NameConstraints nameConstraints() {
     return nameConstraints;
   }
 
@@ -189,7 +189,7 @@ public class ExtensionType implements JsonEncodable {
     this.nameConstraints = nameConstraints;
   }
 
-  public PolicyMappings getPolicyMappings() {
+  public PolicyMappings policyMappings() {
     return policyMappings;
   }
 
@@ -197,7 +197,7 @@ public class ExtensionType implements JsonEncodable {
     this.policyMappings = policyMappings;
   }
 
-  public PolicyConstraints getPolicyConstraints() {
+  public PolicyConstraints policyConstraints() {
     return policyConstraints;
   }
 
@@ -205,7 +205,7 @@ public class ExtensionType implements JsonEncodable {
     this.policyConstraints = policyConstraints;
   }
 
-  public PrivateKeyUsagePeriod getPrivateKeyUsagePeriod() {
+  public PrivateKeyUsagePeriod privateKeyUsagePeriod() {
     return privateKeyUsagePeriod;
   }
 
@@ -214,7 +214,7 @@ public class ExtensionType implements JsonEncodable {
     this.privateKeyUsagePeriod = privateKeyUsagePeriod;
   }
 
-  public QcStatements getQcStatements() {
+  public QcStatements qcStatements() {
     return qcStatements;
   }
 
@@ -222,7 +222,7 @@ public class ExtensionType implements JsonEncodable {
     this.qcStatements = qcStatements;
   }
 
-  public SmimeCapabilities getSmimeCapabilities() {
+  public SmimeCapabilities smimeCapabilities() {
     return smimeCapabilities;
   }
 
@@ -230,7 +230,7 @@ public class ExtensionType implements JsonEncodable {
     this.smimeCapabilities = smimeCapabilities;
   }
 
-  public GeneralNameType getSubjectAltName() {
+  public GeneralNameType subjectAltName() {
     return subjectAltName;
   }
 
@@ -238,7 +238,7 @@ public class ExtensionType implements JsonEncodable {
     this.subjectAltName = subjectAltName;
   }
 
-  public SubjectInfoAccess getSubjectInfoAccess() {
+  public SubjectInfoAccess subjectInfoAccess() {
     return subjectInfoAccess;
   }
 
@@ -246,7 +246,7 @@ public class ExtensionType implements JsonEncodable {
     this.subjectInfoAccess = subjectInfoAccess;
   }
 
-  public TlsFeature getTlsFeature() {
+  public TlsFeature tlsFeature() {
     return tlsFeature;
   }
 
@@ -254,7 +254,7 @@ public class ExtensionType implements JsonEncodable {
     this.tlsFeature = tlsFeature;
   }
 
-  public CCCSimpleExtensionSchema getCccExtensionSchema() {
+  public CCCSimpleExtensionSchema cccExtensionSchema() {
     return cccExtensionSchema;
   }
 
@@ -263,7 +263,7 @@ public class ExtensionType implements JsonEncodable {
     this.cccExtensionSchema = cccExtensionSchema;
   }
 
-  public CCCInstanceCAExtensionSchema getCccInstanceCAExtensionSchema() {
+  public CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema() {
     return cccInstanceCAExtensionSchema;
   }
 
@@ -276,7 +276,7 @@ public class ExtensionType implements JsonEncodable {
   public JsonMap toCodec() {
     JsonMap ret = new JsonMap();
 
-    ret.put("type", type.getMainAlias());
+    ret.put("type", type.mainAlias());
     // do not encode default value
     ret.put("required", required ? true : null) ;
     // do not encode default value

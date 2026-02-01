@@ -36,7 +36,6 @@ import java.util.List;
  * Anchor class for all actions. All actions should derive from this one.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 public abstract class XiAction implements Action {

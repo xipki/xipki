@@ -35,15 +35,15 @@ public class Asn1ECPrivateKey {
     this.publicKey = publicKey;
   }
 
-  public byte[] getPrivateKey() {
+  public byte[] privateKey() {
     return privateKey;
   }
 
-  public String getNamedCurve() {
+  public String namedCurve() {
     return namedCurve;
   }
 
-  public byte[] getPublicKey() {
+  public byte[] publicKey() {
     return publicKey;
   }
 

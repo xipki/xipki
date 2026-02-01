@@ -60,7 +60,7 @@ public class AcmeDataSource {
 
   private static final String SQL_DELETE_NOT_FINISHED_ORDER =
       "DELETE FROM ORDER2 WHERE " +
-      "STATUS != " + OrderStatus.valid.getCode() + " AND EXPIRES<?";
+      "STATUS != " + OrderStatus.valid.code() + " AND EXPIRES<?";
 
   private static final String SQL_SELECT_ORDER_ID =
       "SELECT ID FROM ORDER2 WHERE ACCOUNT=?";
@@ -110,7 +110,7 @@ public class AcmeDataSource {
   } // method prepareStatement
 
   public void addNewAccount(AcmeAccount account) throws AcmeSystemException {
-    if (account.getId() == 0) {
+    if (account.id() == 0) {
       throw new AcmeSystemException("account.id not set");
     }
 
@@ -120,13 +120,13 @@ public class AcmeDataSource {
     // ID,STATUS,JWK_SHA256,DATA
     try {
       int index = 1;
-      ps.setLong(index++, account.getId());
+      ps.setLong(index++, account.id());
       ps.setLong(index++, Instant.now().getEpochSecond());
-      ps.setInt(index++, account.getStatus().getCode());
+      ps.setInt(index++, account.status().code());
       ps.setString(index++, account.getJwkSha256());
-      ps.setString(index, toJson(account.getData()));
+      ps.setString(index, toJson(account.data()));
       ps.executeUpdate();
-      LOG.info("Database: added account {}", account.getId());
+      LOG.info("Database: added account {}", account.id());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -169,16 +169,16 @@ public class AcmeDataSource {
 
   public void updateAccount(AcmeAccount oldAccount, AcmeAccount newAccount)
       throws AcmeSystemException {
-    if (oldAccount.getId() != newAccount.getId()) {
+    if (oldAccount.id() != newAccount.id()) {
       throw new IllegalArgumentException(
           "oldAccount and newAccount does not have the same id");
     }
 
     boolean updateJwkFp =
         oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
-    boolean updateStatus = oldAccount.getStatus() != newAccount.getStatus();
-    String oldData = toJson(oldAccount.getData());
-    String newData = toJson(newAccount.getData());
+    boolean updateStatus = oldAccount.status() != newAccount.status();
+    String oldData = toJson(oldAccount.data());
+    String newData = toJson(newAccount.data());
     boolean updateData = !oldData.equals(newData);
 
     if (!(updateJwkFp || updateStatus || updateData)) {
@@ -200,7 +200,7 @@ public class AcmeDataSource {
     }
 
     sb.deleteCharAt(sb.length() - 1);
-    sb.append(" WHERE ID=").append(oldAccount.getId());
+    sb.append(" WHERE ID=").append(oldAccount.id());
 
     String sql = sb.toString();
     PreparedStatement ps = prepareStatement(sql);
@@ -209,7 +209,7 @@ public class AcmeDataSource {
       ps.setLong(index++, Instant.now().getEpochSecond());
 
       if (updateStatus) {
-        ps.setInt(index++, newAccount.getStatus().getCode());
+        ps.setInt(index++, newAccount.status().code());
       }
 
       if (updateJwkFp) {
@@ -221,7 +221,7 @@ public class AcmeDataSource {
       }
 
       ps.executeUpdate();
-      LOG.info("Database: added account {}", oldAccount.getId());
+      LOG.info("Database: added account {}", oldAccount.id());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } finally {
@@ -286,13 +286,13 @@ public class AcmeDataSource {
       order.updateStatus();
 
       int index = 1;
-      ps.setLong(index++, order.getId());
+      ps.setLong(index++, order.id());
       ps.setLong(index++, Instant.now().getEpochSecond());
-      ps.setLong(index++, order.getAccountId());
-      ps.setInt(index++, order.getStatus().getCode());
-      ps.setLong(index++, order.getExpires().getEpochSecond());
+      ps.setLong(index++, order.accountId());
+      ps.setInt(index++, order.status().code());
+      ps.setLong(index++, order.expires().getEpochSecond());
 
-      byte[] certBytes = order.getCert();
+      byte[] certBytes = order.cert();
       if (certBytes == null) {
         ps.setNull(index++, Types.BIGINT);
       } else {
@@ -300,18 +300,18 @@ public class AcmeDataSource {
       }
       ps.setString(index++, order.getCertSha256());
 
-      if (order.getCertReqMeta() == null) {
+      if (order.certReqMeta() == null) {
         ps.setNull(index, Types.VARCHAR);
       } else {
-        ps.setString(index, toJson(order.getCertReqMeta()));
+        ps.setString(index, toJson(order.certReqMeta()));
       }
       index++;
 
       Base64.Encoder encoder = Base64.getUrlNoPaddingEncoder();
-      if (order.getCsr() == null) {
+      if (order.csr() == null) {
         ps.setNull(index, Types.VARCHAR);
       } else {
-        ps.setString(index, encoder.encodeToString(order.getCsr()));
+        ps.setString(index, encoder.encodeToString(order.csr()));
       }
       index++;
 
@@ -325,7 +325,7 @@ public class AcmeDataSource {
       ps.setString(index, order.getEncodedAuthzs());
 
       ps.executeUpdate();
-      LOG.info("Database: added order {}", order.getId());
+      LOG.info("Database: added order {}", order.id());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } catch (CodecException ex) {
@@ -337,12 +337,12 @@ public class AcmeDataSource {
 
   public void updateOrder(AcmeOrder oldOrder, AcmeOrder newOrder)
       throws AcmeSystemException {
-    if (oldOrder.getId() != newOrder.getId()) {
+    if (oldOrder.id() != newOrder.id()) {
       throw new IllegalArgumentException(
           "oldOrder and newOrder does not have the same id");
     }
 
-    if (oldOrder.getAccountId() != newOrder.getAccountId()) {
+    if (oldOrder.accountId() != newOrder.accountId()) {
       throw new IllegalArgumentException(
           "oldOrder and newOrder does not have the same account");
     }
@@ -350,17 +350,17 @@ public class AcmeDataSource {
     newOrder.updateStatus();
 
     // ACCOUNT_ID,STATUS,EXPIRES,CSR,AUTHZS
-    boolean updateStatus = oldOrder.getStatus() != newOrder.getStatus();
-    boolean updateExpires = !CompareUtil.equals(oldOrder.getExpires(),
-                              newOrder.getExpires());
-    boolean updateAuthzs  = !CompareUtil.equals(oldOrder.getAuthzs(),
-                              newOrder.getAuthzs());
-    boolean updateCertReqMeta = !CompareUtil.equals(oldOrder.getCertReqMeta(),
-                                  newOrder.getCertReqMeta());
+    boolean updateStatus = oldOrder.status() != newOrder.status();
+    boolean updateExpires = !CompareUtil.equals(oldOrder.expires(),
+                              newOrder.expires());
+    boolean updateAuthzs  = !CompareUtil.equals(oldOrder.authzs(),
+                              newOrder.authzs());
+    boolean updateCertReqMeta = !CompareUtil.equals(oldOrder.certReqMeta(),
+                                  newOrder.certReqMeta());
     // we do not read cert from database to save the bandwidth
-    boolean updateCsr = newOrder.getCsr() != null;
+    boolean updateCsr = newOrder.csr() != null;
     // we do not read cert from database to save the bandwidth
-    boolean updateCert = newOrder.getCert() != null;
+    boolean updateCert = newOrder.cert() != null;
 
     if (!(updateStatus || updateExpires || updateAuthzs
           || updateCertReqMeta || updateCsr || updateCert)) {
@@ -394,7 +394,7 @@ public class AcmeDataSource {
     }
 
     sb.deleteCharAt(sb.length() - 1);
-    sb.append(" WHERE ID=").append(oldOrder.getId());
+    sb.append(" WHERE ID=").append(oldOrder.id());
 
     String sql = sb.toString();
     PreparedStatement ps = prepareStatement(sql);
@@ -402,15 +402,15 @@ public class AcmeDataSource {
       int index = 1;
       ps.setLong(index++, Instant.now().getEpochSecond());
       if (updateStatus) {
-        ps.setInt(index++, newOrder.getStatus().getCode());
+        ps.setInt(index++, newOrder.status().code());
       }
 
       if (updateExpires) {
-        ps.setLong(index++, newOrder.getExpires().getEpochSecond());
+        ps.setLong(index++, newOrder.expires().getEpochSecond());
       }
 
       if (updateAuthzs) {
-        if (newOrder.getAuthzs() == null) {
+        if (newOrder.authzs() == null) {
           ps.setNull(index, Types.VARCHAR);
         } else {
           ps.setString(index, newOrder.getEncodedAuthzs());
@@ -419,21 +419,21 @@ public class AcmeDataSource {
       }
 
       if (updateCertReqMeta) {
-        if (newOrder.getCertReqMeta() == null) {
+        if (newOrder.certReqMeta() == null) {
           ps.setNull(index, Types.VARCHAR);
         } else {
-          ps.setString(index, toJson(newOrder.getCertReqMeta()));
+          ps.setString(index, toJson(newOrder.certReqMeta()));
         }
         index++;
       }
 
       if (updateCsr) {
         ps.setString(index++,
-            Base64.getUrlNoPaddingEncoder().encodeToString(newOrder.getCsr()));
+            Base64.getUrlNoPaddingEncoder().encodeToString(newOrder.csr()));
       }
 
       if (updateCert) {
-        byte[] certBytes = newOrder.getCert();
+        byte[] certBytes = newOrder.cert();
         ps.setLong(index++, X509Util.extractCertNotAfter(certBytes));
         ps.setString(index++, newOrder.getCertSha256());
         ps.setString(index,
@@ -441,7 +441,7 @@ public class AcmeDataSource {
       }
 
       ps.executeUpdate();
-      LOG.info("Database: updated order {}", oldOrder.getId());
+      LOG.info("Database: updated order {}", oldOrder.id());
     } catch (SQLException ex) {
       throw new AcmeSystemException(dataSource.translate(sql, ex));
     } catch (CodecException ex) {
@@ -529,12 +529,12 @@ public class AcmeDataSource {
 
   public AcmeAuthz getAuthz(byte[] authzId) throws AcmeSystemException {
     AuthzId id = new AuthzId(authzId);
-    AcmeOrder order = getOrder(id.getOrderId());
+    AcmeOrder order = getOrder(id.orderId());
     if (order == null) {
       return null;
     }
 
-    return order.getAuthz(id.getSubId());
+    return order.getAuthz(id.subId());
   }
 
   public List<Long> getOrderIds(long accountId) throws AcmeSystemException {
@@ -567,7 +567,7 @@ public class AcmeDataSource {
     PreparedStatement ps = prepareStatement(sql);
     ResultSet rs = null;
     try {
-      ps.setInt(1, OrderStatus.pending.getCode());
+      ps.setInt(1, OrderStatus.pending.code());
       rs = ps.executeQuery();
 
       List<ChallId> ids =  new LinkedList<>();
@@ -593,7 +593,7 @@ public class AcmeDataSource {
     PreparedStatement ps = prepareStatement(sql);
     ResultSet rs = null;
     try {
-      ps.setInt(1, OrderStatus.processing.getCode());
+      ps.setInt(1, OrderStatus.processing.code());
       rs = ps.executeQuery();
 
       List<Long> ids =  new LinkedList<>();
@@ -654,13 +654,13 @@ public class AcmeDataSource {
   private static void addChallengesToValidate(
       List<ChallId> res, long orderId, List<AcmeAuthz> authzs) {
     for (AcmeAuthz authz : authzs) {
-      if (authz.getStatus() != AuthzStatus.pending) {
+      if (authz.status() != AuthzStatus.pending) {
         continue;
       }
 
-      for (AcmeChallenge challenge : authz.getChallenges()) {
-        if (challenge.getStatus() == ChallengeStatus.processing) {
-          res.add(new ChallId(orderId, authz.getSubId(), challenge.getSubId()));
+      for (AcmeChallenge challenge : authz.challenges()) {
+        if (challenge.status() == ChallengeStatus.processing) {
+          res.add(new ChallId(orderId, authz.subId(), challenge.subId()));
           break;
         }
       }

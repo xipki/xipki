@@ -22,7 +22,6 @@ import java.util.Arrays;
  * PKCS#11 {@link XiContentSigner} for composite signers.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class P11CompositeContentSigner implements XiContentSigner {
 
@@ -58,10 +57,10 @@ public class P11CompositeContentSigner implements XiContentSigner {
 
     this.pqcSigner = P11ContentSigner.newInstance(
         identity.pqcKey(), algoSuite.mldsaVariant().signAlgo(),
-        rnd, identity.pqcKey().getPublicKey(), algoSuite.label());
+        rnd, identity.pqcKey().publicKey(), algoSuite.label());
     this.tradSigner = P11ContentSigner.newInstance(
         identity.tradKey(), algoSuite.tradVariant().signAlgo(),
-        rnd, identity.tradKey().getPublicKey());
+        rnd, identity.tradKey().publicKey());
   }
 
   @Override

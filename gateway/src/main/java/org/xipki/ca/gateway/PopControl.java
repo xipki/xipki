@@ -64,23 +64,23 @@ public class PopControl {
 
   public PopControl(PopControlConf conf) throws InvalidConfException {
     // pop signature algorithms
-    if (conf.getSigAlgos() == null) {
+    if (conf.sigAlgos() == null) {
       this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
     } else {
       try {
         this.popAlgoValidator = CollectionAlgorithmValidator
-            .buildAlgorithmValidator(conf.getSigAlgos());
+            .buildAlgorithmValidator(conf.sigAlgos());
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid signature algorithm", ex);
       }
     }
 
     // Diffie-Hellman based POP
-    if (conf.getDh() == null) {
+    if (conf.dh() == null) {
       dhCerts = null;
     } else {
       try {
-        Object[] res = loadKeyStore(conf.getDh());
+        Object[] res = loadKeyStore(conf.dh());
         char[] password = (char[]) res[0];
         KeyStore ks = (KeyStore) res[1];
 
@@ -113,12 +113,12 @@ public class PopControl {
       }
     }
 
-    if (conf.getKem() == null) {
+    if (conf.kem() == null) {
       return;
     }
 
     try {
-      Object[] res = loadKeyStore(conf.getKem());
+      Object[] res = loadKeyStore(conf.kem());
       char[] password = (char[]) res[0];
       KeyStore ks = (KeyStore) res[1];
 
@@ -148,29 +148,29 @@ public class PopControl {
   } // constructor
 
   private Object[] loadKeyStore(KeystoreConf conf) throws InvalidConfException {
-    if (StringUtil.isBlank(conf.getType())) {
+    if (StringUtil.isBlank(conf.type())) {
       throw new InvalidConfException("keystore type is not defined in conf");
     }
 
-    if (conf.getKeystore() == null) {
+    if (conf.keystore() == null) {
       throw new InvalidConfException("keystore is not defined in conf");
     }
 
-    if (StringUtil.isBlank(conf.getPassword())) {
+    if (StringUtil.isBlank(conf.password())) {
       throw new InvalidConfException(
           "keystore password is not defined in conf");
     }
 
     char[] password;
     try {
-      password = Passwords.resolvePassword(conf.getPassword());
+      password = Passwords.resolvePassword(conf.password());
     } catch (PasswordResolverException ex) {
       throw new InvalidConfException("error resolving password");
     }
 
     try (InputStream is = new ByteArrayInputStream(
-        conf.getKeystore().readContent())) {
-      KeyStore ks = KeyUtil.getInKeyStore(conf.getType());
+        conf.keystore().readContent())) {
+      KeyStore ks = KeyUtil.getInKeyStore(conf.type());
       ks.load(is, password);
       return new Object[]{password, ks};
     } catch (IOException | KeyStoreException | NoSuchAlgorithmException
@@ -193,7 +193,7 @@ public class PopControl {
     }
   }
 
-  public X509Cert[] getDhCertificates() {
+  public X509Cert[] dhCertificates() {
     return (dhCerts == null || dhCerts.length == 0) ? null
         : Arrays.copyOf(dhCerts, dhCerts.length);
   }
@@ -205,8 +205,8 @@ public class PopControl {
     }
 
     for (DHSigStaticKeyCertPair m : dhKeyAndCerts) {
-      if (m.getIssuer().equals(issuer) && m.getSerialNumber().equals(serial)
-          && m.getPrivateKey().getAlgorithm().equalsIgnoreCase(keyAlgorithm)) {
+      if (m.issuer().equals(issuer) && m.serialNumber().equals(serial)
+          && m.privateKey().getAlgorithm().equalsIgnoreCase(keyAlgorithm)) {
         return m;
       }
     }
@@ -214,15 +214,15 @@ public class PopControl {
     return null;
   } // method getKeyCertPair
 
-  public SecretKeyWithAlias getKemMasterKey(String id) {
+  public SecretKeyWithAlias kemMasterKey(String id) {
     return kemMasterSecretKeys.get(id);
   }
 
-  public SecretKeyWithAlias getDefaultKemMasterKey() {
+  public SecretKeyWithAlias defaultKemMasterKey() {
     return defaultKemMasterSecretKeys;
   }
 
-  public AlgorithmValidator getPopAlgoValidator() {
+  public AlgorithmValidator popAlgoValidator() {
     return popAlgoValidator;
   }
 

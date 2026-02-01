@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * Audit event data.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class AuditEventData {
@@ -32,11 +31,11 @@ public class AuditEventData {
     this.value += "," + additionalValue;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 

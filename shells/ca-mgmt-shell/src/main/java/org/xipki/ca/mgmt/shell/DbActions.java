@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  * Actions to operate on databases directly.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class DbActions {
 
@@ -369,7 +368,7 @@ public class DbActions {
       props.setProperty("minimumIdle", "1");
       try (DataSourceWrapper dataSource = new DataSourceFactory()
           .createDataSource("default", props)) {
-        DatabaseType dbType = dataSource.getDatabaseType();
+        DatabaseType dbType = dataSource.databaseType();
         String type;
         switch (dbType) {
           case H2:

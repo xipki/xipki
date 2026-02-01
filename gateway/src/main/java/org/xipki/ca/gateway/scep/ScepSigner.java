@@ -14,7 +14,6 @@ import java.security.interfaces.RSAPublicKey;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ScepSigner {
@@ -32,7 +31,7 @@ public class ScepSigner {
           "Unsupported signer type: the signing key is not a PrivateKey");
     }
 
-    if (!(signer.getCertificate().getPublicKey() instanceof RSAPublicKey)) {
+    if (!(signer.getCertificate().publicKey() instanceof RSAPublicKey)) {
       throw new IllegalArgumentException(
           "The SCEP responder key is not RSA key");
     }
@@ -50,15 +49,15 @@ public class ScepSigner {
     this.decryptor = decryptor;
   }
 
-  public PrivateKey getKey() {
+  public PrivateKey key() {
     return key;
   }
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 
-  public EnvelopedDataDecryptor getDecryptor() {
+  public EnvelopedDataDecryptor decryptor() {
     return decryptor;
   }
 

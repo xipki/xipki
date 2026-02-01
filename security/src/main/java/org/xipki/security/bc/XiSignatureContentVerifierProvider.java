@@ -24,9 +24,7 @@ import java.security.SignatureException;
  * {@link Signature}-based {@link ContentVerifierProvider}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
-
 public class XiSignatureContentVerifierProvider
     implements ContentVerifierProvider {
 
@@ -44,7 +42,7 @@ public class XiSignatureContentVerifierProvider
         AlgorithmIdentifier algId, PublicKey verifyKey) {
       this.algId = algId;
       try {
-        this.algorithm = SignAlgo.getInstance(algId).getJceName();
+        this.algorithm = SignAlgo.getInstance(algId).jceName();
       } catch (NoSuchAlgorithmException e) {
         throw new RuntimeException("unknown algorithm " +
             algId.getAlgorithm().getId() + ": " + e.getMessage(), e);

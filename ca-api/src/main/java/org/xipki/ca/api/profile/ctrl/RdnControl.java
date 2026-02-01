@@ -51,27 +51,27 @@ public class RdnControl {
     this.maxOccurs = maxOccurs;
   }
 
-  public int getMinOccurs() {
+  public int minOccurs() {
     return minOccurs;
   }
 
-  public int getMaxOccurs() {
+  public int maxOccurs() {
     return maxOccurs;
   }
 
-  public ASN1ObjectIdentifier getType() {
+  public ASN1ObjectIdentifier type() {
     return type;
   }
 
-  public StringType getStringType() {
+  public StringType stringType() {
     return stringType;
   }
 
-  public TextVadidator getPattern() {
+  public TextVadidator pattern() {
     return pattern;
   }
 
-  public Range getStringLengthRange() {
+  public Range stringLengthRange() {
     return stringLengthRange;
   }
 
@@ -87,7 +87,7 @@ public class RdnControl {
     this.pattern = pattern;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 
@@ -95,7 +95,7 @@ public class RdnControl {
     this.value = value;
   }
 
-  public GeneralNameTag getToSAN() {
+  public GeneralNameTag toSAN() {
     return toSAN;
   }
 

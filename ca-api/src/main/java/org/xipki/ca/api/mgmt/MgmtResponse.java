@@ -42,7 +42,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-    public Map<String, String> getResult() {
+    public Map<String, String> result() {
       return result;
     }
 
@@ -74,11 +74,11 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.cert = cert;
     }
 
-    public byte[] getKey() {
+    public byte[] key() {
       return key;
     }
 
-    public byte[] getCert() {
+    public byte[] cert() {
       return cert;
     }
 
@@ -105,7 +105,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = result;
     }
 
-    public byte[] getResult() {
+    public byte[] result() {
       return result;
     }
 
@@ -130,7 +130,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public CaEntry getResult() {
+    public CaEntry result() {
       return result;
     }
 
@@ -155,7 +155,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public CaSystemStatus getResult() {
+    public CaSystemStatus result() {
       return result;
     }
 
@@ -181,7 +181,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public CertprofileEntry getResult() {
+    public CertprofileEntry result() {
       return result;
     }
 
@@ -214,15 +214,15 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.certprofile = certprofile;
     }
 
-    public X509Cert getCert() {
+    public X509Cert cert() {
       return cert;
     }
 
-    public CertRevocationInfo getRevInfo() {
+    public CertRevocationInfo revInfo() {
       return revInfo;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
       return certprofile;
     }
 
@@ -280,7 +280,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public KeypairGenEntry getResult() {
+    public KeypairGenEntry result() {
       return result;
     }
 
@@ -306,7 +306,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public PublisherEntry getResult() {
+    public PublisherEntry result() {
       return result;
     }
 
@@ -332,7 +332,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public RequestorEntry getResult() {
+    public RequestorEntry result() {
       return result;
     }
 
@@ -358,7 +358,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public Set<CaHasRequestorEntry> getResult() {
+    public Set<CaHasRequestorEntry> result() {
       return result;
     }
 
@@ -394,7 +394,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public SignerEntry getResult() {
+    public SignerEntry result() {
       return result;
     }
 
@@ -419,7 +419,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public List<CertListInfo> getResult() {
+    public List<CertListInfo> result() {
       return result;
     }
 
@@ -449,7 +449,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public String getResult() {
+    public String result() {
       return result;
     }
 
@@ -474,7 +474,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       this.result = Args.notNull(result, "result");
     }
 
-    public Set<String> getResult() {
+    public Set<String> result() {
       return result;
     }
 

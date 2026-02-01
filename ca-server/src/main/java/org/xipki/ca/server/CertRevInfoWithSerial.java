@@ -13,7 +13,6 @@ import java.time.Instant;
  * Certificate revocation information with serial number and database table id.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertRevInfoWithSerial
@@ -44,15 +43,15 @@ public class CertRevInfoWithSerial
         invalidityTime);
   } // method constructor
 
-  public BigInteger getSerial() {
+  public BigInteger serial() {
     return serial;
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
-  public CrlReason getReason() {
+  public CrlReason reason() {
     return reason;
   }
 
@@ -60,7 +59,7 @@ public class CertRevInfoWithSerial
    * Gets the revocation time.
    * @return revocation time, never be null
    */
-  public Instant getRevocationTime() {
+  public Instant revocationTime() {
     if (revocationTime == null) {
       revocationTime = Instant.now();
     }
@@ -71,7 +70,7 @@ public class CertRevInfoWithSerial
    * Get the invalidity time.
    * @return invalidity time, may be null
    */
-  public Instant getInvalidityTime() {
+  public Instant invalidityTime() {
     return invalidityTime;
   }
 

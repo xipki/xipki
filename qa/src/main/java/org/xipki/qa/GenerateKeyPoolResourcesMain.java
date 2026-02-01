@@ -39,8 +39,8 @@ public class GenerateKeyPoolResourcesMain {
         for (int i = 0; i < n; i++) {
           KeyPairWithSubjectPublicKeyInfo kp2 =
               KeyUtil.generateKeypair2(keySpec, rnd);
-          byte[] encodedSk = kp2.getKeypair().getPrivate().getEncoded();
-          byte[] encodedPk = kp2.getSubjectPublicKeyInfo().getEncoded();
+          byte[] encodedSk = kp2.keypair().getPrivate().getEncoded();
+          byte[] encodedPk = kp2.subjectPublicKeyInfo().getEncoded();
           PrivateKeyInfo.getInstance(encodedSk);
           sb.append(Base64.encodeToString(encodedSk)).append(":")
               .append(Base64.encodeToString(encodedPk)).append("\n");

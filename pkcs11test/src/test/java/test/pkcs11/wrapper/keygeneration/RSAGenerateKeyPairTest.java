@@ -98,7 +98,7 @@ public class RSAGenerateKeyPairTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws Exception {
+    public void execTest() throws Exception {
       LOG.info("##################################################");
       LOG.info("Generating new 2048 bit RSA key-pair... ");
 
@@ -122,7 +122,7 @@ public class RSAGenerateKeyPairTest {
       // set the general attributes for the public key
       PKCS11KeyPairSpec template = new PKCS11KeyPairSpec()
           .token(true).id(id).sensitive(true).private_(true)
-          .keyPairType(PKCS11KeyPairType.RSA_2048);
+          .keyPairType(PKCS11KeyPairType.RSA2048);
       assertCanGenerate(template);
 
       // set the attributes in a way netscape does, this should work with most

@@ -1,88 +1,77 @@
 {
-	"protocols": {
-		"acme": $[gateway.acme.enabled],
-		"cmp": $[gateway.cmp.enabled],
-		"est": $[gateway.est.enabled],
-		"rest": $[gateway.rest.enabled],
-		"scep": $[gateway.scep.enabled]
-	},
-	// To activate the logging of requests and responses, set writer.level to DEBUG
-	// in the file META-INF/classes/log4j2.properties.
-	"logReqResp":true,
-	// valid values are NO, APACHE, NGINX, GENERAL
-	//"reverseProxyMode":"GENERAL",
-	"pop":{
-		"sigAlgos":[
-			"SHA256withRSA", "SHA384withRSA", "SHA512withRSA",
-			"SHA256withRSAANDMGF1", "SHA384withRSAANDMGF1", "SHA512withRSAANDMGF1",
-			"SHA256withECDSA", "SHA384withECDSA", "SHA512withECDSA",
-			"SM3withSM2", "ED25519", "ED448",
-			"DHPOP-X25519", "DHPOP-X448", "KEM-HMAC-SHA256",
-			"MLDSA44", "MLDSA65", "MLDSA87",
-			"MLDSA44-RSA2048-PSS-SHA256",
-			"MLDSA44-RSA2048-PKCS15-SHA256",
-			"MLDSA44-ED25519-SHA512",
-			"MLDSA44-ECDSA-P256-SHA256",
-			"MLDSA65-RSA3072-PSS-SHA512",
-			"MLDSA65-RSA3072-PKCS15-SHA512",
-			"MLDSA65-RSA4096-PSS-SHA512",
-			"MLDSA65-RSA4096-PKCS15-SHA512",
-			"MLDSA65-ECDSA-P256-SHA512",
-			"MLDSA65-ECDSA-P384-SHA512",
-			"MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-			"MLDSA65-ED25519-SHA512",
-			"MLDSA87-ECDSA-P384-SHA512",
-			"MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-			"MLDSA87-ED448-SHAKE256",
-			"MLDSA87-RSA3072-PSS-SHA512",
-			"MLDSA87-RSA4096-PSS-SHA512",
-			"MLDSA87-ECDSA-P521-SHA512"
-		],
-		"kem":{
-			"type":"JCEKS",
-			"password":"$[kem-pop.keyPassword]",
-			"keystore":{
-				"file":"keycerts/kem-pop.jceks"
-			}
-		},
-		"dh":{
-			"type":"pkcs12",
-			"password":"$[dh-pop.keyPassword]",
-			"keystore":{
-				"file":"keycerts/dh-pop.p12"
-			}
-		}
-	},
-	"sdkClient":{
-		"serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
-		"ssl":{
-			"storeType":"pkcs12",
-			"keystorePassword":"$[ra.sdk.keyPassword]",
-			"keystore":{
-				"file":"keycerts/ra-sdk-client.p12"
-			},
-			"trustanchors": [{
-				"file":"keycerts/ca-server-cert.pem"
-			}],
-			// valid values: 'default' for standard verification, 'no_op' for no-operation, or
-			// 'java:'<class implements javax.net.ssl.HostnameVerifier>
-			"hostnameVerifier":"default"
-		}
-	},
-	"audit":{
-		"type":"embed",
-		"conf": {
-			"file": "${sys:catalina.home}/logs/gateway-audit.log"
-		}
-	},
-	"security":{
-		"keyStrongrandomEnabled":false,
-		"signStrongrandomEnabled":false,
-		"defaultSignerParallelism":10,
-		// pkcs11Conf if signes.signer.type is pkcs11
-		//"pkcs11Conf":{
-		//	"file":"security/pkcs11.json"
-		//},
-		"signerFactories":[]
-	}
+  "protocols": {
+    "acme": $[gateway.acme.enabled],
+    "cmp": $[gateway.cmp.enabled],
+    "est": $[gateway.est.enabled],
+    "rest": $[gateway.rest.enabled],
+    "scep": $[gateway.scep.enabled]
+  },
+  // To activate the logging of requests and responses, set writer.level to DEBUG
+  // in the file META-INF/classes/log4j2.properties.
+  "logReqResp":true,
+  // valid values are NO, APACHE, NGINX, GENERAL
+  //"reverseProxyMode":"GENERAL",
+  "pop":{
+    "sigAlgos":[
+      "SHA256withRSA", "SHA384withRSA", "SHA512withRSA",
+      "SHA256withRSAANDMGF1", "SHA384withRSAANDMGF1", "SHA512withRSAANDMGF1",
+      "SHA256withECDSA", "SHA384withECDSA", "SHA512withECDSA",
+      "SM3withSM2", "ED25519", "ED448",
+      "DHPOP-X25519", "DHPOP-X448", "KEM-HMAC-SHA256",
+      "MLDSA44", "MLDSA65", "MLDSA87",
+      "MLDSA44-RSA2048", "MLDSA44-RSA2048-PKCS15",
+      "MLDSA44-ED25519", "MLDSA44-P256",
+      "MLDSA65-RSA3072", "MLDSA65-RSA3072-PKCS15", "MLDSA65-RSA4096",
+      "MLDSA65-RSA4096-PKCS15", "MLDSA65-P256", "MLDSA65-P384",
+      "MLDSA65-BRAINPOOLP256R1", "MLDSA65-ED25519",
+      "MLDSA87-P384", "MLDSA87-BRAINPOOLP384R1", "MLDSA87-ED448",
+      "MLDSA87-RSA3072", "MLDSA87-RSA4096", "MLDSA87-P521"
+    ],
+    "kem":{
+      "type":"JCEKS",
+      "password":"$[kem-pop.keyPassword]",
+      "keystore":{
+        "file":"keycerts/kem-pop.jceks"
+      }
+    },
+    "dh":{
+      "type":"pkcs12",
+      "password":"$[dh-pop.keyPassword]",
+      "keystore":{
+        "file":"keycerts/dh-pop.p12"
+      }
+    }
+  },
+  "sdkClient":{
+    "serverUrl":"https://$[ca.host]:$[ca.https.port]/ca/ra/",
+    "ssl":{
+      "storeType":"pkcs12",
+      "keystorePassword":"$[ra.sdk.keyPassword]",
+      "keystore":{
+        "file":"keycerts/ra-sdk-client.p12"
+      },
+      "trustanchors": [{
+        "file":"keycerts/ca-server-cert.pem"
+      }],
+      // valid values: 'default' for standard verification, 'no_op' for no-operation, or
+      // 'java:'<class implements javax.net.ssl.HostnameVerifier>
+      "hostnameVerifier":"default"
+    }
+  },
+  "audit":{
+    "type":"embed",
+    "conf": {
+      "file": "${sys:catalina.home}/logs/gateway-audit.log"
+    }
+  },
+  "security":{
+    "keyStrongrandomEnabled":false,
+    "signStrongrandomEnabled":false,
+    "defaultSignerParallelism":10,
+    // pkcs11Conf if signes.signer.type is pkcs11
+    //"pkcs11Conf":{
+    //  "file":"security/pkcs11.json"
+    //},
+    "signerFactories":[]
+  }
 }

@@ -13,9 +13,7 @@ import java.util.Arrays;
  * RFC 6960.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class IssuerHash {
   private final HashAlgo hashAlgo;
 
@@ -29,7 +27,7 @@ public class IssuerHash {
     this.issuerNameHash = Args.notNull(issuerNameHash, "issuerNameHash");
     this.issuerKeyHash = Args.notNull(issuerKeyHash, "issuerKeyHash");
 
-    final int len = hashAlgo.getLength();
+    final int len = hashAlgo.length();
     Args.range(issuerNameHash.length, "issuerNameHash.length", len, len);
     Args.range(issuerKeyHash.length, "issuerKeyHash.length", len, len);
   }
@@ -37,22 +35,22 @@ public class IssuerHash {
   public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert) throws IOException {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
     byte[] encodedName = Args.notNull(issuerCert, "issuerCert")
-        .getSubject().getEncoded();
-    byte[] encodedKey  = issuerCert.getSubjectPublicKeyInfo()
+        .subject().getEncoded();
+    byte[] encodedKey  = issuerCert.subjectPublicKeyInfo()
         .getPublicKeyData().getBytes();
     this.issuerNameHash = hashAlgo.hash(encodedName);
     this.issuerKeyHash  = hashAlgo.hash(encodedKey);
   }
 
-  public HashAlgo getHashAlgo() {
+  public HashAlgo hashAlgo() {
     return hashAlgo;
   }
 
-  public byte[] getIssuerNameHash() {
+  public byte[] issuerNameHash() {
     return Arrays.copyOf(issuerNameHash, issuerNameHash.length);
   }
 
-  public byte[] getIssuerKeyHash() {
+  public byte[] issuerKeyHash() {
     return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
   }
 

@@ -178,7 +178,7 @@ public class CsrActions {
     protected abstract ConcurrentContentSigner getSigner() throws Exception;
 
     protected List<X509Cert> getPeerCertificates() {
-      return securityFactory.getCsrControl().getPeerCerts();
+      return securityFactory.csrControl().peerCerts();
     } // method getPeerCertificates
 
     @Override
@@ -193,7 +193,7 @@ public class CsrActions {
       SubjectPublicKeyInfo subjectPublicKeyInfo =
           (signer.getCertificate() == null)
               ? KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey())
-              : signer.getCertificate().getSubjectPublicKeyInfo();
+              : signer.getCertificate().subjectPublicKeyInfo();
 
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
@@ -289,7 +289,7 @@ public class CsrActions {
           tmpSourceDataUri = new DERIA5String(biometricUri);
         }
         BiometricData biometricData = new BiometricData(tmpBiometricType,
-            ha.getAlgorithmIdentifier(),
+            ha.algorithmIdentifier(),
             new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
 
         extensions.add(new Extension(OIDs.Extn.biometricInfo, false,
@@ -392,7 +392,7 @@ public class CsrActions {
           if (signerCert == null) {
             throw new IllegalCmdParamException("subject must be set");
           }
-          newSubjectDn = signerCert.getSubject();
+          newSubjectDn = signerCert.subject();
         }
       } else {
         newSubjectDn = getSubject(subject);
@@ -576,8 +576,8 @@ public class CsrActions {
     protected KemEncapKey getKemEncapkey(SubjectPublicKeyInfo myPublicKey)
         throws ObjectCreationException {
       try {
-        return securityFactory.getCsrControl().generateKemEncapKey(
-            myPublicKey, securityFactory.getRandom4Sign());
+        return securityFactory.csrControl().generateKemEncapKey(
+            myPublicKey, securityFactory.random4Sign());
       } catch (XiSecurityException ex) {
         throw new ObjectCreationException(
             "error computing EncapKey: " + ex.getMessage(), ex);
@@ -621,7 +621,7 @@ public class CsrActions {
       ConfPairs conf = new ConfPairs()
           .putPair("parallelism", Integer.toString(parallelism))
           .putPair("alias", alias)
-          .putPair("algo", signAlgo.getJceName());
+          .putPair("algo", signAlgo.jceName());
       return new SignerConf(conf);
     }
 
@@ -709,7 +709,7 @@ public class CsrActions {
       }
 
       if (hashAlgo != null) {
-        conf.putPair("hash", hashAlgo.getJceName());
+        conf.putPair("hash", hashAlgo.jceName());
       }
 
       SignerConf signerConf = new SignerConf(conf);
@@ -879,7 +879,7 @@ public class CsrActions {
           peerKeyAndCert, peerMasterKey);
       SignAlgo signAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
       println("The POP is " + (bo ? "" : "in") + "valid (signature algorithm "
-          + signAlgo.getJceName() + ").");
+          + signAlgo.jceName() + ").");
       return null;
     }
 

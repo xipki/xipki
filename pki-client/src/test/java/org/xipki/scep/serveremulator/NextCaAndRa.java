@@ -23,11 +23,11 @@ public class NextCaAndRa {
     this.raCert = raCert;
   }
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
-  public X509Cert getRaCert() {
+  public X509Cert raCert() {
     return raCert;
   }
 

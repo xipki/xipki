@@ -28,7 +28,6 @@ import java.util.Set;
  * Actions to manage publishers.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class PublisherActions {
 
@@ -195,11 +194,11 @@ public class PublisherActions {
           .orElseThrow(() -> new IllegalCmdParamException(
               "no publisher named " + name + " is defined"));
 
-      if (StringUtil.isBlank(entry.getConf())) {
+      if (StringUtil.isBlank(entry.conf())) {
         println("publisher does not have conf");
       } else {
         saveVerbose("saved publisher configuration to", confFile,
-            StringUtil.toUtf8Bytes(entry.getConf()));
+            StringUtil.toUtf8Bytes(entry.conf()));
       }
       return null;
     } // method execute0

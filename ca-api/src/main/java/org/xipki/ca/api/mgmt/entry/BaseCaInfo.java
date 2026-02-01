@@ -79,7 +79,7 @@ public class BaseCaInfo {
     this.permissions = Args.notNull(permissions, "permissions");
   }
 
-  public final CaUris getCaUris() {
+  public final CaUris caUris() {
     return caUris;
   }
 
@@ -87,7 +87,7 @@ public class BaseCaInfo {
     this.caUris = caUris;
   }
 
-  public final String getCrlSignerName() {
+  public final String crlSignerName() {
     return crlSignerName;
   }
 
@@ -95,7 +95,7 @@ public class BaseCaInfo {
     this.crlSignerName = StringUtil.lowercase(crlSignerName);
   }
 
-  public final int getExpirationPeriod() {
+  public final int expirationPeriod() {
     return expirationPeriod;
   }
 
@@ -103,7 +103,7 @@ public class BaseCaInfo {
     this.expirationPeriod = expirationPeriod;
   }
 
-  public int getKeepExpiredCertDays() {
+  public int keepExpiredCertDays() {
     return keepExpiredCertDays;
   }
 
@@ -111,7 +111,7 @@ public class BaseCaInfo {
     this.keepExpiredCertDays = keepExpiredCertDays;
   }
 
-  public final List<String> getKeypairGenNames() {
+  public final List<String> keypairGenNames() {
     return keypairGenNames;
   }
 
@@ -123,7 +123,7 @@ public class BaseCaInfo {
     this.maxValidity = maxValidity;
   }
 
-  public final long getNextCrlNo() {
+  public final long nextCrlNo() {
     return nextCrlNo;
   }
 
@@ -131,11 +131,11 @@ public class BaseCaInfo {
     this.nextCrlNo = nextCrlNo;
   }
 
-  public final Validity getMaxValidity() {
+  public final Validity maxValidity() {
     return maxValidity;
   }
 
-  public final int getNumCrls() {
+  public final int numCrls() {
     return numCrls;
   }
 
@@ -143,7 +143,7 @@ public class BaseCaInfo {
     this.numCrls = numCrls;
   }
 
-  public final CertRevocationInfo getRevocationInfo() {
+  public final CertRevocationInfo revocationInfo() {
     return revocationInfo;
   }
 
@@ -167,11 +167,11 @@ public class BaseCaInfo {
     this.saveKeypair = saveKeypair;
   }
 
-  public final String getSignerType() {
+  public final String signerType() {
     return signerType;
   }
 
-  public final int getSnSize() {
+  public final int snSize() {
     return snSize;
   }
 
@@ -181,7 +181,7 @@ public class BaseCaInfo {
     } else this.snSize = Math.max(snSize, CaManager.MIN_SERIALNUMBER_SIZE);
   }
 
-  public final CaStatus getStatus() {
+  public final CaStatus status() {
     return status;
   }
 
@@ -189,7 +189,7 @@ public class BaseCaInfo {
     this.status = Args.notNull(status, "status");
   }
 
-  public final ValidityMode getValidityMode() {
+  public final ValidityMode validityMode() {
     return validityMode;
   }
 
@@ -197,11 +197,11 @@ public class BaseCaInfo {
     this.validityMode = validityMode;
   }
 
-  public Permissions getPermissions() {
+  public Permissions permissions() {
     return permissions;
   }
 
-  public final CrlControl getCrlControl() {
+  public final CrlControl crlControl() {
     return crlControl;
   }
 
@@ -209,7 +209,7 @@ public class BaseCaInfo {
     this.crlControl = crlControl;
   }
 
-  public final CtlogControl getCtlogControl() {
+  public final CtlogControl ctlogControl() {
     return ctlogControl;
   }
 
@@ -217,7 +217,7 @@ public class BaseCaInfo {
     this.ctlogControl = ctlogControl;
   }
 
-  public final RevokeSuspendedControl getRevokeSuspendedControl() {
+  public final RevokeSuspendedControl revokeSuspendedControl() {
     return revokeSuspendedControl;
   }
 
@@ -226,7 +226,7 @@ public class BaseCaInfo {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public final ConfPairs getExtraControl() {
+  public final ConfPairs extraControl() {
     return extraControl;
   }
 
@@ -278,13 +278,13 @@ public class BaseCaInfo {
     String revInfoText = "";
     if (revocationInfo != null) {
       revInfoText = StringUtil.concatObjectsCap(30,
-          "\n\treason: ", revocationInfo.getReason().getDescription(),
-          "\n\trevoked at ", revocationInfo.getRevocationTime());
+          "\n\treason: ", revocationInfo.reason().description(),
+          "\n\trevoked at ", revocationInfo.revocationTime());
     }
 
     return StringUtil.concatObjectsCap(1500,
         "\nsigner type:          ", signerType,
-        "\nstatus:               ", (status == null ? "-" : status.getStatus()),
+        "\nstatus:               ", (status == null ? "-" : status.status()),
         "\nmax. validity:        ", maxValidity,
         "\nexpiration period:    ", expirationPeriod, "d",
         "\nCRL signer name:      ",
@@ -302,7 +302,7 @@ public class BaseCaInfo {
         "\nnext CRL number:      ", nextCrlNo,
         "\nKeyPair generators:   ",
             (keypairGenNames == null ? "-" : keypairGenNames),
-        "\n", getCaUris(),
+        "\n", caUris(),
         "\nCRL control:\n", (crlControl == null ? "  -"
             : crlControl.toString(verbose)),
         "\nCTLog control:\n", (ctlogControl == null ? "  -"

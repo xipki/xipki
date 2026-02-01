@@ -42,19 +42,19 @@ public class CompositeSigTest {
       throws Exception {
     System.out.println("===== BEGIN testing " + algo + " =====");
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance(
-        algo.getJceName(), "BC");
+        algo.jceName(), "BC");
     KeyPair kp = kpGen.generateKeyPair();
 
     SignAlgo signAlgo = SignAlgo.getInstance(kp.getPrivate());
     Assert.assertEquals(algo, signAlgo);
 
-    Signature sig = Signature.getInstance(algo.getJceName(), "BC");
+    Signature sig = Signature.getInstance(algo.jceName(), "BC");
     sig.initSign(kp.getPrivate(), rnd);
 
     String keyAlgo = kp.getPrivate().getAlgorithm();
-    if (!keyAlgo.equals(algo.getJceName())) {
+    if (!keyAlgo.equals(algo.jceName())) {
       System.out.println(keyAlgo);
-      System.out.println(algo.getJceName());
+      System.out.println(algo.jceName());
     }
     sig.update(m);
     byte[] sigValue = sig.sign();

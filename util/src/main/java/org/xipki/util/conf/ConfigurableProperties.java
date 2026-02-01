@@ -19,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * for the Java system property.
  *
  * @author Lijun Liao (xipki)
- * @since 6.3.1
  */
 public class ConfigurableProperties {
 

@@ -6,6 +6,7 @@ package org.xipki.ca.certprofile.test;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.security.KeySpec;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class BuilderUtil {
       switch (allowedKeyMode) {
         case EC:
         case EC_SECP:
+        case ALL_SIGN:
+        case ALL_ENC:
+        case ALL:
           keyType = KeySpec.SECP256R1;
           break;
         case RSA:
@@ -54,6 +58,12 @@ public class BuilderUtil {
         case MLKEM:
           keyType = KeySpec.MLKEM512;
           break;
+        case COMPSIG:
+          keyType = KeySpec.MLDSA44_P256;
+          break;
+        case COMPKEM:
+          keyType = KeySpec.MLKEM768_P256;
+          break;
         default:
           throw new IllegalStateException(
               "unknown AllowedKeyMode " + allowedKeyMode);
@@ -73,65 +83,87 @@ public class BuilderUtil {
 
     List<KeySpec> list = new LinkedList<>();
     for (AllowKeyMode keyMode : allowKeyModes) {
-      switch (keyMode) {
-        case RSA:
-          list.add(KeySpec.RSA2048);
-          list.add(KeySpec.RSA3072);
-          list.add(KeySpec.RSA4096);
-          break;
-        case SM2:
-          list.add(KeySpec.SM2P256V1);
-          break;
-        case EC:
-          list.add(KeySpec.SECP256R1);
-          list.add(KeySpec.SECP384R1);
-          list.add(KeySpec.SECP521R1);
-          list.add(KeySpec.BRAINPOOLP256R1);
-          list.add(KeySpec.BRAINPOOLP384R1);
-          list.add(KeySpec.BRAINPOOLP512R1);
-          list.add(KeySpec.SM2P256V1);
-          list.add(KeySpec.FRP256V1);
-          break;
-        case EC_SECP:
-          list.add(KeySpec.SECP256R1);
-          list.add(KeySpec.SECP384R1);
-          list.add(KeySpec.SECP521R1);
-          break;
-        case XDH:
-          list.add(KeySpec.X25519);
-          list.add(KeySpec.X448);
-          break;
-        case X25519:
-          list.add(KeySpec.X25519);
-          break;
-        case X448:
-          list.add(KeySpec.X448);
-          break;
-        case EDDSA:
-          list.add(KeySpec.ED25519);
-          list.add(KeySpec.ED448);
-          break;
-        case ED25519:
-          list.add(KeySpec.ED25519);
-          break;
-        case ED448:
-          list.add(KeySpec.ED448);
-          break;
-        case MLDSA:
-          list.add(KeySpec.MLDSA44);
-          list.add(KeySpec.MLDSA65);
-          list.add(KeySpec.MLDSA87);
-          break;
-        case MLKEM:
-          list.add(KeySpec.MLKEM512);
-          list.add(KeySpec.MLKEM768);
-          list.add(KeySpec.MLKEM1024);
-          break;
-      }
+      list.addAll(createKeyAlgorithmTypes0(keyMode));
     }
-
     return list;
+  }
 
+  private static List<KeySpec> createKeyAlgorithmTypes0(AllowKeyMode keyMode) {
+    List<KeySpec> list = new ArrayList<>();
+    switch (keyMode) {
+      case RSA:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isRSA()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      case SM2:
+        list.add(KeySpec.SM2P256V1);
+        break;
+      case EC:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isWeierstrassEC()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      case EC_SECP:
+        list.add(KeySpec.SECP256R1);
+        list.add(KeySpec.SECP384R1);
+        list.add(KeySpec.SECP521R1);
+        break;
+      case X25519:
+        list.add(KeySpec.X25519);
+        break;
+      case X448:
+        list.add(KeySpec.X448);
+        break;
+      case ED25519:
+        list.add(KeySpec.ED25519);
+        break;
+      case ED448:
+        list.add(KeySpec.ED448);
+        break;
+      case MLDSA:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isMldsa()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      case MLKEM:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isMlkem()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      case COMPSIG:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isCompositeMLDSA()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      case COMPKEM:
+        for (KeySpec keySpec : KeySpec.values()) {
+          if (keySpec.isCompositeMLKEM()) {
+            list.add(keySpec);
+          }
+        }
+        break;
+      default:
+        List<AllowKeyMode> implies = keyMode.implies();
+        if (implies != null && !implies.isEmpty()) {
+          for (AllowKeyMode km : implies) {
+            list.addAll(createKeyAlgorithmTypes0(km));
+          }
+        } else {
+          throw new IllegalArgumentException("unknown keySpec " + keyMode);
+        }
+    }
+    return list;
   }
 
 }

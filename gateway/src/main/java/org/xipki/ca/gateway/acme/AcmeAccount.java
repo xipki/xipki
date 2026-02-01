@@ -46,7 +46,7 @@ public class AcmeAccount {
       this.termsOfServiceAgreed = termsOfServiceAgreed;
     }
 
-    public Map<String, String> getJwk() {
+    public Map<String, String> jwk() {
       return jwk;
     }
 
@@ -54,7 +54,7 @@ public class AcmeAccount {
       this.jwk = jwk;
     }
 
-    public List<String> getContact() {
+    public List<String> contact() {
       return contact;
     }
 
@@ -62,7 +62,7 @@ public class AcmeAccount {
       this.contact = contact;
     }
 
-    public JoseMessage getExternalAccountBinding() {
+    public JoseMessage externalAccountBinding() {
       return externalAccountBinding;
     }
 
@@ -70,7 +70,7 @@ public class AcmeAccount {
       this.externalAccountBinding = externalAccountBinding;
     }
 
-    public Boolean getTermsOfServiceAgreed() {
+    public Boolean termsOfServiceAgreed() {
       return termsOfServiceAgreed;
     }
 
@@ -133,7 +133,7 @@ public class AcmeAccount {
     return jwk != null && jwk.equals(data.jwk);
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
@@ -165,7 +165,7 @@ public class AcmeAccount {
     this.data.jwk = jwk;
   }
 
-  public AccountStatus getStatus() {
+  public AccountStatus status() {
     return status;
   }
 
@@ -174,7 +174,7 @@ public class AcmeAccount {
     this.status = status;
   }
 
-  public Data getData() {
+  public Data data() {
     return data;
   }
 
@@ -182,7 +182,7 @@ public class AcmeAccount {
     this.data = data;
   }
 
-  public List<String> getContact() {
+  public List<String> contact() {
     return data.contact;
   }
 
@@ -191,7 +191,7 @@ public class AcmeAccount {
     this.data.contact = contact;
   }
 
-  public JoseMessage getExternalAccountBinding() {
+  public JoseMessage externalAccountBinding() {
     return data.externalAccountBinding;
   }
 
@@ -200,7 +200,7 @@ public class AcmeAccount {
     this.data.externalAccountBinding = externalAccountBinding;
   }
 
-  public Boolean getTermsOfServiceAgreed() {
+  public Boolean termsOfServiceAgreed() {
     return data.termsOfServiceAgreed;
   }
 

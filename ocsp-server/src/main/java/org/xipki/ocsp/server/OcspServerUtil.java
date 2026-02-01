@@ -47,7 +47,6 @@ import java.util.Set;
  * Utility functions for {@link OcspServer}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspServerUtil {
@@ -69,16 +68,16 @@ public class OcspServerUtil {
     X509Cert[] explicitCertificateChain = null;
 
     X509Cert explicitResponderCert = null;
-    if (signerType.getCert() != null) {
-      explicitResponderCert = parseCert(signerType.getCert());
+    if (signerType.cert() != null) {
+      explicitResponderCert = parseCert(signerType.cert());
     }
 
     if (explicitResponderCert != null) {
       Set<X509Cert> caCerts = null;
-      if (signerType.getCaCerts() != null) {
+      if (signerType.caCerts() != null) {
         caCerts = new HashSet<>();
 
-        for (FileOrBinary certConf : signerType.getCaCerts()) {
+        for (FileOrBinary certConf : signerType.caCerts()) {
           caCerts.add(parseCert(certConf));
         }
       }
@@ -87,10 +86,10 @@ public class OcspServerUtil {
           explicitResponderCert, caCerts);
     }
 
-    String responderSignerType = signerType.getType();
-    String responderKeyConf = signerType.getKey();
+    String responderSignerType = signerType.type();
+    String responderKeyConf = signerType.key();
 
-    List<String> sigAlgos = signerType.getAlgorithms();
+    List<String> sigAlgos = signerType.algorithms();
     if (CollectionUtil.isEmpty(sigAlgos)) {
       sigAlgos = Collections.singletonList("");
     }
@@ -98,7 +97,7 @@ public class OcspServerUtil {
     List<ConcurrentContentSigner> singleSigners =
         new ArrayList<>(sigAlgos.size());
 
-    String name = signerType.getName();
+    String name = signerType.name();
     List<String> succSigAlgos = new LinkedList<>();
     List<String> failSigAlgos = new LinkedList<>();
 
@@ -157,7 +156,7 @@ public class OcspServerUtil {
       throws InvalidConfException {
     OcspStore store;
     try {
-      String type = conf.getSource().getType();
+      String type = conf.source().type();
       if (type != null) {
         type = type.trim().toLowerCase();
       }
@@ -174,7 +173,7 @@ public class OcspServerUtil {
         store = new EjbcaCertStatusStore();
       } else if (type.startsWith("java:")) {
         // "java:".length() = 5
-        String className = conf.getSource().getType().substring(5).trim();
+        String className = conf.source().type().substring(5).trim();
         store = ReflectiveUtil.newInstance(className,
             OcspServerUtil.class.getClassLoader());
       } else {
@@ -182,41 +181,41 @@ public class OcspServerUtil {
       }
     } catch (ObjectCreationException ex) {
       throw new InvalidConfException("ObjectCreationException of store "
-          + conf.getName() + ":" + ex.getMessage(), ex);
+          + conf.name() + ":" + ex.getMessage(), ex);
     }
 
-    store.setName(conf.getName());
-    Integer interval = conf.getRetentionInterval();
+    store.setName(conf.name());
+    Integer interval = conf.retentionInterval();
     int retentionInterval = (interval == null) ? -1 : interval;
     store.setRetentionInterval(retentionInterval);
-    store.setUnknownCertBehaviour(conf.getUnknownCertBehaviour());
+    store.setUnknownCertBehaviour(conf.unknownCertBehaviour());
 
     store.setIncludeArchiveCutoff(
-        getBoolean(conf.getIncludeArchiveCutoff(), true));
+        getBoolean(conf.includeArchiveCutoff(), true));
     store.setIncludeCrlId(
-        getBoolean(conf.getIncludeCrlId(), true));
+        getBoolean(conf.includeCrlId(), true));
     store.setIgnoreExpiredCert(
-        getBoolean(conf.getIgnoreExpiredCert(), true));
+        getBoolean(conf.ignoreExpiredCert(), true));
     store.setIgnoreNotYetValidCert(
-        getBoolean(conf.getIgnoreNotYetValidCert(), true));
+        getBoolean(conf.ignoreNotYetValidCert(), true));
 
-    Validity minPeriod = (conf.getMinNextUpdatePeriod() == null)
-            ? null : Validity.getInstance(conf.getMinNextUpdatePeriod());
-    Validity maxPeriod = (conf.getMaxNextUpdatePeriod() == null)
-            ? null : Validity.getInstance(conf.getMaxNextUpdatePeriod());
+    Validity minPeriod = (conf.minNextUpdatePeriod() == null)
+            ? null : Validity.getInstance(conf.minNextUpdatePeriod());
+    Validity maxPeriod = (conf.maxNextUpdatePeriod() == null)
+            ? null : Validity.getInstance(conf.maxNextUpdatePeriod());
     store.setNextUpdatePeriodLimit(minPeriod, maxPeriod);
 
-    if ("NEVER".equalsIgnoreCase(conf.getUpdateInterval())) {
+    if ("NEVER".equalsIgnoreCase(conf.updateInterval())) {
       store.setUpdateInterval(null);
     } else {
-      String str = conf.getUpdateInterval();
+      String str = conf.updateInterval();
       Validity updateInterval = StringUtil.isBlank(str)
           ? new Validity(5, Validity.Unit.MINUTE)
           : Validity.getInstance(str);
       store.setUpdateInterval(updateInterval);
     }
 
-    String datasourceName = conf.getSource().getDatasource();
+    String datasourceName = conf.source().datasource();
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {
       datasource = Optional.ofNullable(datasources.get(datasourceName))
@@ -224,11 +223,11 @@ public class OcspServerUtil {
               "datasource named '" + datasourceName + "' not defined"));
     }
     try {
-      JsonMap sourceConf = conf.getSource().getConf();
+      JsonMap sourceConf = conf.source().conf();
       store.init(sourceConf, datasource);
     } catch (OcspStoreException ex) {
       throw new InvalidConfException("CertStatusStoreException of store "
-          + conf.getName() + ":" + ex.getMessage(), ex);
+          + conf.name() + ":" + ex.getMessage(), ex);
     }
 
     return store;
@@ -239,21 +238,21 @@ public class OcspServerUtil {
       Instant referenceTime) {
     X509Cert target = certsInReq[0];
 
-    Set<X509Cert> trustanchors = requestOption.getTrustanchors();
+    Set<X509Cert> trustanchors = requestOption.trustanchors();
     Set<X509Cert> certstore = new HashSet<>(trustanchors);
 
-    Set<X509Cert> configuredCerts = requestOption.getCerts();
+    Set<X509Cert> configuredCerts = requestOption.certs();
     if (CollectionUtil.isNotEmpty(configuredCerts)) {
-      certstore.addAll(requestOption.getCerts());
+      certstore.addAll(requestOption.certs());
     }
 
     X509Cert[] certpath = X509Util.buildCertPath(target, certstore);
-    CertPathValidationModel model = requestOption.getCertpathValidationModel();
+    CertPathValidationModel model = requestOption.certpathValidationModel();
 
     if (model == null || model == CertPathValidationModel.PKIX) {
       for (X509Cert m : certpath) {
-        if (m.getNotBefore().isAfter(referenceTime)
-            || m.getNotAfter().isBefore(referenceTime)) {
+        if (m.notBefore().isAfter(referenceTime)
+            || m.notAfter().isBefore(referenceTime)) {
           return false;
         }
       }
@@ -286,8 +285,8 @@ public class OcspServerUtil {
       return X509Util.parseCert(certConf.readContent());
     } catch (IOException | CertificateException ex) {
       String msg = "could not parse certificate";
-      if (certConf.getFile() != null) {
-        msg += " from file " + certConf.getFile();
+      if (certConf.file() != null) {
+        msg += " from file " + certConf.file();
       }
       throw new InvalidConfException(msg);
     }
@@ -303,7 +302,7 @@ public class OcspServerUtil {
       List<ExtendedExtension> extensions, OID extnType) {
     ExtendedExtension extn = null;
     for (ExtendedExtension m : extensions) {
-      if (extnType == m.getExtnType()) {
+      if (extnType == m.extnType()) {
         extn = m;
         break;
       }

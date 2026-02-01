@@ -48,16 +48,16 @@ public class ASN1IPAddressFamily extends ASN1Object {
     this.ipAddressChoice = IPAddressChoice.getInstance(seq.getObjectAt(1));
   }
 
-  public ASN1OctetString getAddressFamily() {
+  public ASN1OctetString addressFamily() {
     return addressFamily;
   }
 
-  public int getAfi() {
+  public int afi() {
     byte[] bytes = addressFamily.getOctets();
-    return new IPAddressFamily(bytes).getAfi();
+    return new IPAddressFamily(bytes).afi();
   }
 
-  public IPAddressChoice getIpAddressChoice() {
+  public IPAddressChoice ipAddressChoice() {
     return ipAddressChoice;
   }
 

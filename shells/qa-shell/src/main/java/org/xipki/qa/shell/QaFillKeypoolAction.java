@@ -16,7 +16,6 @@ import org.xipki.util.datasource.DataSourceFactory;
 /**
  * Shell to fill the keypool with keypairs.
  *
- * @since 6.0.0
  * @author Lijun Liao (xipki)
  */
 

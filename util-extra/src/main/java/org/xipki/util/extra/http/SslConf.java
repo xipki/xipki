@@ -41,27 +41,27 @@ public class SslConf {
     this.hostnameVerifier = hostnameVerifier;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getStoreType() {
+  public String storeType() {
     return storeType;
   }
 
-  public FileOrBinary getKeystore() {
+  public FileOrBinary keystore() {
     return keystore;
   }
 
-  public String getKeystorePassword() {
+  public String keystorePassword() {
     return keystorePassword;
   }
 
-  public FileOrBinary[] getTrustanchors() {
+  public FileOrBinary[] trustanchors() {
     return trustanchors;
   }
 
-  public String getHostnameVerifier() {
+  public String hostnameVerifier() {
     return hostnameVerifier;
   }
 

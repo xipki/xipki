@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * Object with id.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class IdentifiedObject {
@@ -20,7 +19,7 @@ public class IdentifiedObject {
     this.id = Args.notBlank(id, "id");
   }
 
-  public String getId() {
+  public String id() {
     return id;
   }
 

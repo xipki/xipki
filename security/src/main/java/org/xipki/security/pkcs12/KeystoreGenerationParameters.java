@@ -11,9 +11,7 @@ import java.security.SecureRandom;
  * Parameters for the keystore generation.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
-
 public class KeystoreGenerationParameters {
 
   private final char[] password;
@@ -26,7 +24,7 @@ public class KeystoreGenerationParameters {
     this.password = Args.notNull(password, "password");
   }
 
-  public SecureRandom getRandom() {
+  public SecureRandom random() {
     return random;
   }
 
@@ -34,11 +32,11 @@ public class KeystoreGenerationParameters {
     this.random = random;
   }
 
-  public char[] getPassword() {
+  public char[] password() {
     return password;
   }
 
-  public Boolean getUnsigned() {
+  public Boolean unsigned() {
     return unsigned;
   }
 

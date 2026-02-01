@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * Audit level.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public enum AuditLevel {
@@ -27,7 +26,7 @@ public enum AuditLevel {
     this.text = text;
   }
 
-  public int getValue() {
+  public int value() {
     return value;
   }
 
@@ -43,14 +42,14 @@ public enum AuditLevel {
 
   public static AuditLevel forValue(int value) {
     for (AuditLevel v : values()) {
-      if (v.getValue() == value) {
+      if (v.value() == value) {
         return v;
       }
     }
     throw new IllegalArgumentException("invalid AuditLevel code " + value);
   }
 
-  public String getText() {
+  public String text() {
     return text;
   }
 

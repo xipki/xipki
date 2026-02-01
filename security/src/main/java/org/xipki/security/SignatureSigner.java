@@ -20,9 +20,7 @@ import java.util.Arrays;
  * {@link XiContentSigner} based on {@link Signature}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class SignatureSigner implements XiContentSigner {
 
   private class SignatureStream extends OutputStream {
@@ -72,7 +70,7 @@ public class SignatureSigner implements XiContentSigner {
 
   public SignatureSigner(SignAlgo sigAlgo, Signature signer, PrivateKey key)
       throws XiSecurityException {
-    this(sigAlgo.getAlgorithmIdentifier(), signer, key);
+    this(sigAlgo.algorithmIdentifier(), signer, key);
   }
 
   public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer,

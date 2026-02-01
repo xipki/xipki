@@ -16,7 +16,6 @@ import java.util.List;
  * CMP request to enroll certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class EnrollCertRequest {
@@ -61,15 +60,15 @@ public class EnrollCertRequest {
       this.pop = pop;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
       return certprofile;
     }
 
-    public CertRequest getCertReq() {
+    public CertRequest certReq() {
       return certReq;
     }
 
-    public ProofOfPossession getPop() {
+    public ProofOfPossession pop() {
       return pop;
     }
 
@@ -83,19 +82,19 @@ public class EnrollCertRequest {
     this.type = Args.notNull(type, "type");
   }
 
-  public EnrollType getType() {
+  public EnrollType type() {
     return type;
   }
 
   public boolean addRequestEntry(Entry requestEntry) {
-    String id = Args.notNull(requestEntry, "requestEntry").getId();
-    ASN1Integer certReqId = requestEntry.getCertReq().getCertReqId();
+    String id = Args.notNull(requestEntry, "requestEntry").id();
+    ASN1Integer certReqId = requestEntry.certReq().getCertReqId();
     for (Entry re : requestEntries) {
-      if (re.getId().equals(id)) {
+      if (re.id().equals(id)) {
         return false;
       }
 
-      if (re.getCertReq().getCertReqId().equals(certReqId)) {
+      if (re.certReq().getCertReqId().equals(certReqId)) {
         return false;
       }
     }
@@ -104,7 +103,7 @@ public class EnrollCertRequest {
     return true;
   }
 
-  public List<Entry> getRequestEntries() {
+  public List<Entry> requestEntries() {
     return Collections.unmodifiableList(requestEntries);
   }
 

@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * The Mac protected audit service.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public abstract class MacAuditService implements AuditService {
@@ -270,12 +269,12 @@ public abstract class MacAuditService implements AuditService {
 
   @Override
   public void logEvent(AuditEvent event) {
-    log(AuditService.AUDIT_EVENT, event.getLevel(), event.toTextMessage());
+    log(AuditService.AUDIT_EVENT, event.level(), event.toTextMessage());
   }
 
   @Override
   public void logEvent(PciAuditEvent event) {
-    log(AuditService.PCI_AUDIT_EVENT, event.getLevel(), event.toTextMessage());
+    log(AuditService.PCI_AUDIT_EVENT, event.level(), event.toTextMessage());
   }
 
   private synchronized void log(
@@ -283,7 +282,7 @@ public abstract class MacAuditService implements AuditService {
     Instant date = Instant.now();
     long previousId = id.get();
     long thisId = id.incrementAndGet();
-    String levelText = level.getText();
+    String levelText = level.text();
 
     String payload = buildMacPayload(date, thisId, eventType, levelText,
                       previousId, previousTag, message);

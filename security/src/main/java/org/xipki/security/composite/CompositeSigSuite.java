@@ -169,4 +169,5 @@ public enum CompositeSigSuite {
   public byte[] label() {
     return label;
   }
+
 }

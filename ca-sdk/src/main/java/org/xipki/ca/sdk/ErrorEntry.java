@@ -11,7 +11,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ErrorEntry extends SdkEncodable {
@@ -21,7 +20,7 @@ public class ErrorEntry extends SdkEncodable {
   private final String message;
 
   public ErrorEntry(ErrorCode code, String message) {
-    this.code = code.getCode();
+    this.code = code.code();
     this.message = message;
   }
 
@@ -30,11 +29,11 @@ public class ErrorEntry extends SdkEncodable {
     this.message = message;
   }
 
-  public int getCode() {
+  public int code() {
     return code;
   }
 
-  public String getMessage() {
+  public String message() {
     return message;
   }
 

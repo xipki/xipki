@@ -92,14 +92,14 @@ public class CtlogControl implements JsonEncodable {
   }
 
   public String getConf() {
-    return getConfPairs().getEncoded();
+    return confPairs().getEncoded();
   }
 
-  public ConfPairs getConfPairs() {
+  public ConfPairs confPairs() {
     return confPairs;
   }
 
-  public String getSslContextName() {
+  public String sslContextName() {
     return sslContextName;
   }
 
@@ -107,7 +107,7 @@ public class CtlogControl implements JsonEncodable {
     this.sslContextName = sslContextName;
   }
 
-  public List<String> getServers() {
+  public List<String> servers() {
     return servers;
   }
 
@@ -156,7 +156,7 @@ public class CtlogControl implements JsonEncodable {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap(getConfPairs().asMap());
+    return new JsonMap(confPairs().asMap());
   }
 
   private static boolean getBoolean(

@@ -89,7 +89,7 @@ public class Sm2GenerateKeyPairTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       LOG.info("##################################################");
       LOG.info("Generating new EC (curve sm2p256v1) key-pair... ");
 

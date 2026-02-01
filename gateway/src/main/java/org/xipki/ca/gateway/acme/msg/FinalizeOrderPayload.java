@@ -19,7 +19,7 @@ public class FinalizeOrderPayload implements JsonEncodable {
     this.csr = csr;
   }
 
-  public String getCsr() {
+  public String csr() {
     return csr;
   }
 

@@ -52,7 +52,7 @@ public class XiTemplate {
   }
 
   public XiAttribute add(XiAttribute attr) {
-    XiAttribute oldAttr = remove(attr.getType());
+    XiAttribute oldAttr = remove(attr.type());
     attributes.add(attr);
     return oldAttr;
   }
@@ -65,7 +65,7 @@ public class XiTemplate {
     long[] types = new long[attributes.size()];
     int index = 0;
     for (XiAttribute attr : attributes) {
-      types[index++] = attr.getType();
+      types[index++] = attr.type();
     }
     return types;
   }
@@ -74,7 +74,7 @@ public class XiTemplate {
     String[] types = new String[attributes.size()];
     int index = 0;
     for (XiAttribute attr : attributes) {
-      types[index++] = PKCS11T.ckaCodeToName(attr.getType());
+      types[index++] = PKCS11T.ckaCodeToName(attr.type());
     }
     return types;
   }
@@ -90,7 +90,7 @@ public class XiTemplate {
 
   public XiAttribute getAttribute(long type) {
     for (XiAttribute attr : attributes) {
-      if (type == attr.getType()) {
+      if (type == attr.type()) {
         return attr;
       }
     }
@@ -164,7 +164,7 @@ public class XiTemplate {
   public XiAttribute remove(long attrType) {
     XiAttribute attr = null;
     for (XiAttribute i : attributes) {
-      if (attrType == i.getType()) {
+      if (attrType == i.type()) {
         attr = i;
         break;
       }
@@ -299,7 +299,7 @@ public class XiTemplate {
 
   public boolean match(XiTemplate criteria) {
     for (XiAttribute cattr : criteria.attributes) {
-      XiAttribute attr = getAttribute(cattr.getType());
+      XiAttribute attr = getAttribute(cattr.type());
       if (!cattr.equals(attr)) {
         return false;
       }

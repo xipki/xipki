@@ -26,11 +26,11 @@ import java.util.Set;
 
 public class SingleKeyUsages implements JsonEncodable {
 
-  private final List<KeySpec> appliesTo;
+  private List<KeySpec> appliesTo;
 
-  private final List<KeyUsage> required;
+  private List<KeyUsage> required;
 
-  private final List<KeyUsage> optional;
+  private List<KeyUsage> optional;
 
   public SingleKeyUsages(List<KeySpec> appliesTo, List<KeyUsage> required,
                          List<KeyUsage> optional) {
@@ -44,15 +44,27 @@ public class SingleKeyUsages implements JsonEncodable {
     this.optional = optional;
   }
 
-  public List<KeyUsage> getRequired() {
+  public void setRequired(List<KeyUsage> required) {
+    this.required = required;
+  }
+
+  public List<KeyUsage> required() {
     return required;
   }
 
-  public List<KeySpec> getAppliesTo() {
+  public void setAppliesTo(List<KeySpec> appliesTo) {
+    this.appliesTo = appliesTo;
+  }
+
+  public List<KeySpec> appliesTo() {
     return appliesTo;
   }
 
-  public List<KeyUsage> getOptional() {
+  public void setOptional(List<KeyUsage> optional) {
+    this.optional = optional;
+  }
+
+  public List<KeyUsage> optional() {
     return optional;
   }
 

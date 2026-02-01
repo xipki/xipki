@@ -10,7 +10,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class TransactionIdRequest extends SdkRequest {
@@ -21,7 +20,7 @@ public class TransactionIdRequest extends SdkRequest {
     this.tid = tid;
   }
 
-  public String getTid() {
+  public String tid() {
     return tid;
   }
 

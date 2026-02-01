@@ -7,7 +7,6 @@ package org.xipki.ocsp.api;
  * OCSP store exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspStoreException extends Exception {

@@ -14,7 +14,6 @@ import org.xipki.util.misc.StringUtil;
  * Name and Identifier.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class NameId implements JsonEncodable {
@@ -28,7 +27,7 @@ public class NameId implements JsonEncodable {
     this.name = Args.toNonBlankLower(name, "name");
   }
 
-  public Integer getId() {
+  public Integer id() {
     return id;
   }
 
@@ -36,7 +35,7 @@ public class NameId implements JsonEncodable {
     this.id = id;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 

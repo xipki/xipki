@@ -61,7 +61,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Abstract class of OCSP requestor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class AbstractOcspRequestor implements OcspRequestor {
@@ -100,7 +99,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       byte[] request, URL responderUrl, RequestOptions requestOptions)
       throws IOException;
 
-  public String getConfFile() {
+  public String confFile() {
     return confFile;
   }
 
@@ -144,9 +143,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     OcspRequestorConf conf = parse(configFile);
-    String signerType = conf.getSignerType();
-    String signerConf = conf.getSignerConf();
-    FileOrBinary signerCert = conf.getSignerCert();
+    String signerType = conf.signerType();
+    String signerConf = conf.signerConf();
+    FileOrBinary signerCert = conf.signerCert();
 
     if (StringUtil.isBlank(signerType)) {
       throw new OcspRequestorException("signerType is not configured");
@@ -167,7 +166,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
 
     try {
-      signer = getSecurityFactory().createSigner(signerType,
+      signer = securityFactory().createSigner(signerType,
           new SignerConf(signerConf), cert);
     } catch (Exception ex) {
       throw new OcspRequestorException("could not create signer: "
@@ -219,7 +218,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       throw new IllegalArgumentException("cert and issuerCert do not match");
     }
 
-    return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()},
+    return ask(issuerCert, new BigInteger[]{cert.serialNumber()},
             responderUrl, requestOptions, debug);
   }
 
@@ -238,7 +237,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         throw new IllegalArgumentException("cert at index " + i
             + " and issuerCert do not match");
       }
-      serialNumbers[i] = cert.getSerialNumber();
+      serialNumbers[i] = cert.serialNumber();
     }
 
     return ask(issuerCert, serialNumbers, responderUrl, requestOptions, debug);
@@ -263,7 +262,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     byte[] nonce = null;
     if (Args.notNull(requestOptions, "requestOptions").isUseNonce()) {
-      nonce = nextNonce(requestOptions.getNonceLen());
+      nonce = nextNonce(requestOptions.nonceLen());
     }
 
     OCSPRequest ocspReq = buildRequest(issuerCert, serialNumbers,
@@ -420,9 +419,9 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   private OCSPRequest buildRequest(
       X509Cert caCert, BigInteger[] serialNumbers, byte[] nonce,
       RequestOptions requestOptions) throws OcspRequestorException {
-    HashAlgo hashAlgo = requestOptions.getHashAlgorithm();
+    HashAlgo hashAlgo = requestOptions.hashAlgorithm();
     List<SignAlgo> prefSigAlgs =
-        requestOptions.getPreferredSignatureAlgorithms();
+        requestOptions.preferredSignatureAlgorithms();
 
     XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
     List<Extension> extensions = new LinkedList<>();
@@ -434,7 +433,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     if (prefSigAlgs != null && !prefSigAlgs.isEmpty()) {
       ASN1EncodableVector vec = new ASN1EncodableVector();
       for (SignAlgo algId : prefSigAlgs) {
-        vec.add(new DERSequence(algId.getAlgorithmIdentifier()));
+        vec.add(new DERSequence(algId.algorithmIdentifier()));
       }
 
       ASN1Sequence extnValue = new DERSequence(vec);
@@ -455,7 +454,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
     try {
       DEROctetString issuerNameHash = new DEROctetString(
-          hashAlgo.hash(caCert.getSubject().getEncoded()));
+          hashAlgo.hash(caCert.subject().getEncoded()));
 
       TBSCertificate tbsCert =
           caCert.toBcCert().toASN1Structure().getTBSCertificate();
@@ -463,7 +462,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           tbsCert.getSubjectPublicKeyInfo().getPublicKeyData().getOctets()));
 
       for (BigInteger serialNumber : serialNumbers) {
-        CertID certId = new CertID(hashAlgo.getAlgorithmIdentifier(),
+        CertID certId = new CertID(hashAlgo.algorithmIdentifier(),
             issuerNameHash, issuerKeyHash, new ASN1Integer(serialNumber));
 
         reqBuilder.addRequest(certId);
@@ -472,7 +471,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       if (requestOptions.isSignRequest()) {
         ConcurrentContentSigner signer = signer();
 
-        reqBuilder.setRequestorName(signer.getCertificate().getSubject());
+        reqBuilder.setRequestorName(signer.getCertificate().subject());
         X509Cert[] certChain0 = signer.getCertificateChain();
         Certificate[] certChain = new Certificate[certChain0.length];
         for (int i = 0; i < certChain.length; i++) {
@@ -506,7 +505,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     return nonce;
   }
 
-  public SecurityFactory getSecurityFactory() {
+  public SecurityFactory securityFactory() {
     return securityFactory;
   }
 

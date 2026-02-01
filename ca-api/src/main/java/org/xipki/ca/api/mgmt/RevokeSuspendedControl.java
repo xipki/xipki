@@ -24,7 +24,6 @@ import org.xipki.util.misc.StringUtil;
  * where duration is of format &lt;n&gt;h, &lt;n&gt;d, &lt;n&gt;y.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class RevokeSuspendedControl implements JsonEncodable {
@@ -91,11 +90,11 @@ public class RevokeSuspendedControl implements JsonEncodable {
     return enabled;
   }
 
-  public CrlReason getTargetReason() {
+  public CrlReason targetReason() {
     return targetReason;
   }
 
-  public Validity getUnchangedSince() {
+  public Validity unchangedSince() {
     return unchangedSince;
   }
 
@@ -122,7 +121,7 @@ public class RevokeSuspendedControl implements JsonEncodable {
   public ConfPairs getConfPairs() {
     return new ConfPairs()
         .putPair(KEY_ENABLED, Boolean.toString(enabled))
-        .putPair(KEY_REVOCATION_REASON, targetReason.getDescription())
+        .putPair(KEY_REVOCATION_REASON, targetReason.description())
         .putPair(KEY_UNCHANGED_SINCE, unchangedSince.toString());
   }
 

@@ -174,7 +174,7 @@ public class XiAttribute {
         : new DateAttribute(type, dateValue.toCkDate());
   }
 
-  public long getType() {
+  public long type() {
     return type;
   }
 

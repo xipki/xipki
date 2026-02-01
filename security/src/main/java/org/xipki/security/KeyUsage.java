@@ -9,9 +9,7 @@ import org.xipki.util.codec.Args;
  * Certificate key usage enum.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public enum KeyUsage {
 
   digitalSignature(0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
@@ -42,11 +40,11 @@ public enum KeyUsage {
     }
   }
 
-  public int getBit() {
+  public int bit() {
     return bit;
   }
 
-  public int getBcUsage() {
+  public int bcUsage() {
     return bcUsage;
   }
 

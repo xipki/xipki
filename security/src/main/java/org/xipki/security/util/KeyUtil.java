@@ -98,9 +98,7 @@ import java.util.Optional;
  * Key utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class KeyUtil {
 
   private static final BigInteger bnSm2primev1Order = new BigInteger(
@@ -133,7 +131,7 @@ public class KeyUtil {
         continue;
       }
 
-      bc.addKeyInfoConverter(keySpec.getAlgorithmIdentifier().getAlgorithm(),
+      bc.addKeyInfoConverter(keySpec.algorithmIdentifier().getAlgorithm(),
           new CompositeKemKeyInfoConverter());
     }
     return bc;
@@ -204,8 +202,8 @@ public class KeyUtil {
       case RSA3072:
       case RSA4096: {
         KeyPairGenerator kpGen = getKeyPairGenerator("RSA");
-        assert keySpec.getRSAKeyBitSize() != null;
-        int keyBitSize = keySpec.getRSAKeyBitSize();
+        assert keySpec.RSAKeyBitSize() != null;
+        int keyBitSize = keySpec.RSAKeyBitSize();
         if (random == null) {
           kpGen.initialize(keyBitSize);
         } else {
@@ -277,10 +275,10 @@ public class KeyUtil {
       case BRAINPOOLP512R1:
       case SM2P256V1:
       case FRP256V1: {
-        EcCurveEnum curve = keySpec.getEcCurve();
+        EcCurveEnum curve = keySpec.ecCurve();
         assert curve != null;
         ECGenParameterSpec spec =
-            new ECGenParameterSpec(curve.getOid().getId());
+            new ECGenParameterSpec(curve.oid().getId());
         KeyPairGenerator kpGen = getKeyPairGenerator("EC");
         if (random == null) {
           kpGen.initialize(spec);
@@ -292,15 +290,15 @@ public class KeyUtil {
     }
 
     if (keySpec.isCompositeMLDSA()) {
-      String oid = keySpec.getAlgorithmIdentifier().getAlgorithm().getId();
+      String oid = keySpec.algorithmIdentifier().getAlgorithm().getId();
       KeyPairGenerator kpGen = getKeyPairGenerator(oid);
       return kpGen.generateKeyPair();
     } else if (keySpec.isCompositeMLKEM()) {
       // TODO: use the BC impl once supported
       KeyPair pqcKeyPair =
-          generateKeypair(keySpec.getCompositePqcVariant(), random);
+          generateKeypair(keySpec.compositePqcVariant(), random);
       KeyPair tradKeyPair =
-          generateKeypair(keySpec.getCompositeTradVariant(), random);
+          generateKeypair(keySpec.compositeTradVariant(), random);
       CompositeMLKEMPrivateKey sk = new CompositeMLKEMPrivateKey(
           (MLKEMPrivateKey) pqcKeyPair.getPrivate(), tradKeyPair.getPrivate());
       CompositeMLKEMPublicKey pk = new CompositeMLKEMPublicKey(
@@ -323,7 +321,7 @@ public class KeyUtil {
       KeySpec keySpec, KeystoreGenerationParameters params)
       throws Exception {
     KeyPairWithSubjectPublicKeyInfo kp =
-        generateKeypair2(keySpec, params.getRandom());
+        generateKeypair2(keySpec, params.random());
 
     // 10 minutes past
     Instant notBefore = Instant.now().minus(10, ChronoUnit.MINUTES);
@@ -331,13 +329,13 @@ public class KeyUtil {
 
     String dnStr = "CN=DUMMY";
     X500Name subjectDn = new X500Name(dnStr);
-    SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
+    SubjectPublicKeyInfo subjectPublicKeyInfo = kp.subjectPublicKeyInfo();
     ContentSigner contentSigner;
-    if (params.getUnsigned() != null && params.getUnsigned()) {
+    if (params.unsigned() != null && params.unsigned()) {
       contentSigner = XiUnsignedSigner.INSTANCE;
     } else {
-      contentSigner = getContentSigner(kp.getKeypair().getPrivate(),
-          kp.getKeypair().getPublic(), params.getRandom(), true);
+      contentSigner = getContentSigner(kp.keypair().getPrivate(),
+          kp.keypair().getPublic(), params.random(), true);
     }
 
     // Generate keystore
@@ -346,7 +344,7 @@ public class KeyUtil {
         subjectDn, subjectPublicKeyInfo);
 
     byte[] encodedSpki =
-        kp.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+        kp.subjectPublicKeyInfo().getPublicKeyData().getBytes();
 
     byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
     certGenerator.addExtension(OIDs.Extn.subjectKeyIdentifier, false,
@@ -362,22 +360,22 @@ public class KeyUtil {
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
     KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
-    ks.load(null, params.getPassword());
+    ks.load(null, params.password());
 
-    ks.setKeyEntry("main", kp.getKeypair().getPrivate(),
-        params.getPassword(),
+    ks.setKeyEntry("main", kp.keypair().getPrivate(),
+        params.password(),
         new java.security.cert.Certificate[]{cert.toJceCert()});
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {
-      ks.store(ksStream, params.getPassword());
+      ks.store(ksStream, params.password());
     } finally {
       ksStream.flush();
     }
 
     KeyStoreWrapper result = new KeyStoreWrapper(ksStream.toByteArray());
     result.setKeystoreObject(ks);
-    result.setSubjectPublicKeyInfo(kp.getSubjectPublicKeyInfo());
+    result.setSubjectPublicKeyInfo(kp.subjectPublicKeyInfo());
     return result;
   } // method generateKeypair3
 
@@ -389,7 +387,7 @@ public class KeyUtil {
           ") must be multiple of 8");
     }
 
-    SecureRandom random = params.getRandom();
+    SecureRandom random = params.random();
     byte[] keyValue;
     if (random == null) {
       keyValue = RandomUtil.nextBytes(keyBitLen / 8);
@@ -401,13 +399,13 @@ public class KeyUtil {
     SecretKey secretKey = new SecretKeySpec(keyValue, algorithm);
 
     KeyStore ks = KeyUtil.getOutKeyStore("JCEKS");
-    ks.load(null, params.getPassword());
+    ks.load(null, params.password());
 
-    ks.setKeyEntry("main", secretKey, params.getPassword(), null);
+    ks.setKeyEntry("main", secretKey, params.password(), null);
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {
-      ks.store(ksStream, params.getPassword());
+      ks.store(ksStream, params.password());
     } finally {
       ksStream.flush();
     }
@@ -540,7 +538,7 @@ public class KeyUtil {
       EcCurveEnum curve, byte[] encodedPoint)
       throws InvalidKeySpecException {
     return (ECPublicKey) getPublicKey(
-        new SubjectPublicKeyInfo(curve.getAlgId(), encodedPoint));
+        new SubjectPublicKeyInfo(curve.algId(), encodedPoint));
   }
 
   public static ASN1ObjectIdentifier detectCurveOid(ECParameterSpec paramSpec) {
@@ -595,9 +593,9 @@ public class KeyUtil {
       throw new XiSecurityException(sigAlgo + " is not an RSAPSS algorithm");
     }
 
-    HashAlgo hashAlgo = sigAlgo.getHashAlgo();
+    HashAlgo hashAlgo = sigAlgo.hashAlgo();
     return new PSSSigner(new RSABlindedEngine(), hashAlgo.createDigest(),
-        hashAlgo.createDigest(), hashAlgo.getLength(),
+        hashAlgo.createDigest(), hashAlgo.length(),
         org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT);
   } // method createPSSRSASigner
 
@@ -717,7 +715,7 @@ public class KeyUtil {
       } else if (keySpec == KeySpec.MLDSA87) {
         algo = SignAlgo.MLDSA87;
       } else if (keySpec.isCompositeMLDSA()) {
-        algo = SignAlgo.getInstance(keySpec.getAlgorithmIdentifier());
+        algo = SignAlgo.getInstance(keySpec.algorithmIdentifier());
       } else if (allowUnsigned & (keySpec.isMontgomeryEC() ||
           keySpec.isMlkem() || keySpec.isCompositeMLKEM())) {
         return XiUnsignedSigner.INSTANCE;

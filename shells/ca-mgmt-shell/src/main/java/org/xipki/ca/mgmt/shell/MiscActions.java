@@ -26,7 +26,6 @@ import java.util.List;
  * Misc actions to manage CA.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class MiscActions {
 

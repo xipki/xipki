@@ -13,7 +13,6 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class GetCRLRequest extends SdkRequest {
@@ -40,15 +39,15 @@ public class GetCRLRequest extends SdkRequest {
     this.crlDp = crlDp;
   }
 
-  public BigInteger getCrlNumber() {
+  public BigInteger crlNumber() {
     return crlNumber;
   }
 
-  public Instant getThisUpdate() {
+  public Instant thisUpdate() {
     return thisUpdate;
   }
 
-  public String getCrlDp() {
+  public String crlDp() {
     return crlDp;
   }
 

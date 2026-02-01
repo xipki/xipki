@@ -21,7 +21,7 @@ public class OcspRequestorConf {
 
   private FileOrBinary signerCert;
 
-  public String getSignerType() {
+  public String signerType() {
     return signerType;
   }
 
@@ -29,7 +29,7 @@ public class OcspRequestorConf {
     this.signerType = signerType;
   }
 
-  public String getSignerConf() {
+  public String signerConf() {
     return signerConf;
   }
 
@@ -37,7 +37,7 @@ public class OcspRequestorConf {
     this.signerConf = signerConf;
   }
 
-  public FileOrBinary getSignerCert() {
+  public FileOrBinary signerCert() {
     return signerCert;
   }
 

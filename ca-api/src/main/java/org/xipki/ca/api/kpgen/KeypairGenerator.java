@@ -22,7 +22,6 @@ import java.util.Set;
  * Keypair generator.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public abstract class KeypairGenerator implements Closeable {
@@ -34,7 +33,7 @@ public abstract class KeypairGenerator implements Closeable {
 
   protected final Set<KeySpec> keyspecs = new HashSet<>();
 
-  public String getName() {
+  public String name() {
     return name;
   }
 

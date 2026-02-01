@@ -21,13 +21,13 @@ echo "| This script demonstrates the setup of CAs with all the combinations:  |"
 echo "|          CA-key-spec x caconf-store-type x token-type                 |"
 echo "|  - CA-key-spec:       MLDSA44, ED25519, RSA2048, RSA2048/PSS,         |"
 echo "|               :       SM2P256V1, FRP256V1, BRAINPOOLP256R1,           |"
-echo "|               :       MLDSA44-ECDSA-P256-SHA256                       |"
+echo "|               :       MLDSA44-P256                                    |"
 echo "|  - caconf-store-type: FILE                                            |"
 echo "|  - token-type:        PKCS11, PKCS12                                  |"
 echo "+-----------------------------------------------------------------------+"
 
 ca_keyspecs = [ MLDSA44 ED25519 RSA2048 RSA2048/PSS SM2P256V1 \
-                FRP256V1 BRAINPOOLP256R1 MLDSA44-ECDSA-P256-SHA256 ]
+                FRP256V1 BRAINPOOLP256R1 MLDSA44-P256 ]
 storetypes  = [ FILE ]
 tokentypes  = [ PKCS11 PKCS12 ]
 source xipki/ca-setup/demo/doDemo-group.script
@@ -39,15 +39,14 @@ echo "|  - CA-key-spec:       MLDSA65, MLDSA87, ED448,                        |"
 echo "|               :       RSA3072, RSA3072/PSS, RSA4096, RSA4096/PSS,     |"
 echo "|               :       SECP384R1, SECP521R1,                           |"
 echo "|               :       BRAINPOOLP384R1, BRAINPOOLP512R1                |"
-echo "|               :       MLDSA65-ECDSA-P256-SHA512,                      |"
-echo "|               :       MLDSA87-ECDSA-P521-SHA512,                      |"
+echo "|               :       MLDSA65-P256, MLDSA87-P521                      |"
 echo "|  - caconf-store-type: FILE                                            |"
 echo "|  - token-type:        PKCS11                                          |"
 echo "+-----------------------------------------------------------------------+"
 
 ca_keyspecs = [ MLDSA65 MLDSA87 ED448 RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
                 SECP384R1 SECP521R1 BRAINPOOLP384R1 BRAINPOOLP512R1 \
-                MLDSA65-ECDSA-P256-SHA512 MLDSA87-ECDSA-P521-SHA512 ]
+                MLDSA65-P256 MLDSA87-P521 ]
 storetypes  = [ FILE ]
 tokentypes  = [ PKCS11 ]
 source xipki/ca-setup/demo/doDemo-group.script

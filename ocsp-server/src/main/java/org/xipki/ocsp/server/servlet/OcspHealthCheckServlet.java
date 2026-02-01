@@ -22,7 +22,6 @@ import java.util.Map;
  * HTTP health check servlet of the OCSP server.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 class OcspHealthCheckServlet {
@@ -59,7 +58,7 @@ class OcspHealthCheckServlet {
             headers, null);
       }
 
-      boolean healthy = server.healthCheck(responderAndPath.getResponder());
+      boolean healthy = server.healthCheck(responderAndPath.responder());
       int status = healthy ? HttpStatusCode.SC_OK
           : HttpStatusCode.SC_INTERNAL_SERVER_ERROR;
       return new HttpResponse(status, null, headers, null);

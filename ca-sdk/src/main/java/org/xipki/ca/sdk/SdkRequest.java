@@ -6,7 +6,6 @@ package org.xipki.ca.sdk;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public abstract class SdkRequest extends SdkEncodable {

@@ -24,7 +24,6 @@ import java.util.Set;
  * OCSP request option.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class RequestOption {
@@ -74,12 +73,12 @@ public class RequestOption {
     validateSignature = conf.isValidateSignature();
 
     // Request nonce
-    OcspServerConf.Nonce nonceConf = conf.getNonce();
-    nonceOccurrence = conf.getNonce().getOccurrence();
+    OcspServerConf.Nonce nonceConf = conf.nonce();
+    nonceOccurrence = conf.nonce().occurrence();
 
-    nonceMinLen = nonceConf.getMinLen() != null ? nonceConf.getMinLen() : 4;
+    nonceMinLen = nonceConf.minLen() != null ? nonceConf.minLen() : 4;
 
-    nonceMaxLen = nonceConf.getMaxLen() != null ? nonceConf.getMaxLen() : 96;
+    nonceMaxLen = nonceConf.maxLen() != null ? nonceConf.maxLen() : 96;
 
     if (nonceMinLen < 0) {
       throw new InvalidConfException(
@@ -90,13 +89,13 @@ public class RequestOption {
       throw new InvalidConfException("nonceMinLen > nonceMaxLen");
     }
 
-    maxRequestListCount = conf.getMaxRequestListCount();
+    maxRequestListCount = conf.maxRequestListCount();
     if (maxRequestListCount < 1) {
       throw new InvalidConfException(
           "invalid maxRequestListCount " + maxRequestListCount);
     }
 
-    maxRequestSize = conf.getMaxRequestSize();
+    maxRequestSize = conf.maxRequestSize();
     if (maxRequestSize < 100) {
       throw new InvalidConfException(
           "invalid maxRequestSize " + maxRequestSize);
@@ -105,7 +104,7 @@ public class RequestOption {
     // Request versions
 
     versions = new HashSet<>();
-    for (String m : conf.getVersions()) {
+    for (String m : conf.versions()) {
       if ("v1".equalsIgnoreCase(m)) {
         versions.add(0);
       } else {
@@ -116,10 +115,10 @@ public class RequestOption {
 
     // Request hash algorithms
     hashAlgos = new HashSet<>();
-    if (conf.getHashAlgorithms().isEmpty()) {
+    if (conf.hashAlgorithms().isEmpty()) {
       hashAlgos.addAll(SUPPORTED_HASH_ALGORITHMS);
     } else {
-      for (String token : conf.getHashAlgorithms()) {
+      for (String token : conf.hashAlgorithms()) {
         HashAlgo algo;
         try {
           algo = HashAlgo.getInstance(token);
@@ -138,7 +137,7 @@ public class RequestOption {
 
     // certpath validation
     OcspServerConf.CertpathValidation certpathConf =
-        conf.getCertpathValidation();
+        conf.certpathValidation();
     if (certpathConf == null) {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
@@ -149,10 +148,10 @@ public class RequestOption {
       return;
     }
 
-    certpathValidationModel = certpathConf.getValidationModel();
+    certpathValidationModel = certpathConf.validationModel();
 
     try {
-      Set<X509Cert> tmpCerts = getCerts(certpathConf.getTrustanchors());
+      Set<X509Cert> tmpCerts = getCerts(certpathConf.trustanchors());
       trustanchors = new HashSet<>(tmpCerts.size());
       trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
@@ -160,7 +159,7 @@ public class RequestOption {
           + ex.getMessage(), ex);
     }
 
-    OcspServerConf.CertCollection certsType = certpathConf.getCerts();
+    OcspServerConf.CertCollection certsType = certpathConf.certs();
     try {
       certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
@@ -169,7 +168,7 @@ public class RequestOption {
     }
   } // constructor
 
-  public Set<HashAlgo> getHashAlgos() {
+  public Set<HashAlgo> hashAlgos() {
     return hashAlgos;
   }
 
@@ -185,23 +184,23 @@ public class RequestOption {
     return supportsHttpGet;
   }
 
-  public QuadrupleState getNonceOccurrence() {
+  public QuadrupleState nonceOccurrence() {
     return nonceOccurrence;
   }
 
-  public int getMaxRequestListCount() {
+  public int maxRequestListCount() {
     return maxRequestListCount;
   }
 
-  public int getMaxRequestSize() {
+  public int maxRequestSize() {
     return maxRequestSize;
   }
 
-  public int getNonceMinLen() {
+  public int nonceMinLen() {
     return nonceMinLen;
   }
 
-  public int getNonceMaxLen() {
+  public int nonceMaxLen() {
     return nonceMaxLen;
   }
 
@@ -209,11 +208,11 @@ public class RequestOption {
     return hashAlgo != null && hashAlgos.contains(hashAlgo);
   }
 
-  public CertPathValidationModel getCertpathValidationModel() {
+  public CertPathValidationModel certpathValidationModel() {
     return certpathValidationModel;
   }
 
-  public Set<X509Cert> getTrustanchors() {
+  public Set<X509Cert> trustanchors() {
     return trustanchors;
   }
 
@@ -221,7 +220,7 @@ public class RequestOption {
     return versions == null || versions.contains(version);
   }
 
-  public Set<X509Cert> getCerts() {
+  public Set<X509Cert> certs() {
     return certs;
   }
 
@@ -230,12 +229,12 @@ public class RequestOption {
     Args.notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 
-    if (conf.getCerts() != null) {
-      for (FileOrBinary fn : conf.getCerts()) {
+    if (conf.certs() != null) {
+      for (FileOrBinary fn : conf.certs()) {
         tmpCerts.add(X509Util.parseCert(fn.readContent()));
       }
-    } else if (conf.getDir() != null) {
-      File dir = new File(conf.getDir());
+    } else if (conf.dir() != null) {
+      File dir = new File(conf.dir());
       File[] files = dir.listFiles();
       if (files != null) {
         for (File file : files) {

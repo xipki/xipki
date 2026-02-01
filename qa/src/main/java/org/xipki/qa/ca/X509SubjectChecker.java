@@ -34,7 +34,6 @@ import java.util.Set;
  * Subject checker.
  *
  * @author Lijun Liao
- *
  */
 
 public class X509SubjectChecker {
@@ -51,7 +50,7 @@ public class X509SubjectChecker {
     Args.notNull(requestedSubject, "requestedSubject");
 
     // collect subject attribute types to check
-    Set<ASN1ObjectIdentifier> oids = new HashSet<>(subjectControl.getTypes());
+    Set<ASN1ObjectIdentifier> oids = new HashSet<>(subjectControl.types());
 
     Collections.addAll(oids, subject.getAttributeTypes());
 
@@ -76,8 +75,8 @@ public class X509SubjectChecker {
       X500Name requestedSubject) throws BadCertTemplateException {
     // control
     RdnControl rdnControl = subjectControl.getControl(type);
-    int minOccurs = (rdnControl == null) ? 0 : rdnControl.getMinOccurs();
-    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.getMaxOccurs();
+    int minOccurs = (rdnControl == null) ? 0 : rdnControl.minOccurs();
+    int maxOccurs = (rdnControl == null) ? 0 : rdnControl.maxOccurs();
 
     RDN[] rdns = subject.getRDNs(type);
     int rdnsSize = (rdns == null) ? 0 : rdns.length;
@@ -91,7 +90,7 @@ public class X509SubjectChecker {
     List<String> requestedCoreAtvTextValues = new LinkedList<>();
 
     RDN[] requestedRdns = requestedSubject.getRDNs(type);
-    if (rdnControl == null || rdnControl.getValue() == null) {
+    if (rdnControl == null || rdnControl.value() == null) {
       if (requestedRdns != null && requestedRdns.length > 0) {
         for (RDN requestedRdn : requestedRdns) {
           AttributeTypeAndValue firstAtv = requestedRdn.getFirst();
@@ -99,11 +98,11 @@ public class X509SubjectChecker {
               getRdnTextValue(firstAtv.getType(), firstAtv.getValue());
           requestedCoreAtvTextValues.add(textValue);
         }
-      } else if (rdnControl != null && rdnControl.getValue() != null) {
-        requestedCoreAtvTextValues.add(rdnControl.getValue());
+      } else if (rdnControl != null && rdnControl.value() != null) {
+        requestedCoreAtvTextValues.add(rdnControl.value());
       }
     } else {
-      requestedCoreAtvTextValues.add(rdnControl.getValue());
+      requestedCoreAtvTextValues.add(rdnControl.value());
     }
 
     if (rdnsSize == 0) {
@@ -117,7 +116,7 @@ public class X509SubjectChecker {
     StringBuilder failureMsg = new StringBuilder();
 
     // check the encoding
-    StringType stringType = rdnControl.getStringType();
+    StringType stringType = rdnControl.stringType();
 
     for (int i = 0; i < rdns.length; i++) {
       RDN rdn = rdns[i];
@@ -156,7 +155,7 @@ public class X509SubjectChecker {
     }
 
     if (rdnControl != null) {
-      TextVadidator pattern = rdnControl.getPattern();
+      TextVadidator pattern = rdnControl.pattern();
       if (pattern != null) {
         boolean matches = pattern.isValid(atvTextValue);
         if (!matches) {

@@ -22,11 +22,11 @@ public class RevokeCertPayload implements JsonEncodable {
     this.certificate = certificate;
   }
 
-  public Integer getReason() {
+  public Integer reason() {
     return reason;
   }
 
-  public String getCertificate() {
+  public String certificate() {
     return certificate;
   }
 

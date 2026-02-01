@@ -89,7 +89,7 @@ public class GetInfoTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       PKCS11Module pkcs11Module = getModule();
       CkInfo moduleInfo = pkcs11Module.getInfo();
       LOG.info("##################################################");

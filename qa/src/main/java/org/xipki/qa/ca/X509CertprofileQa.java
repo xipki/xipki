@@ -43,7 +43,6 @@ import java.util.List;
  * QA for Certprofile.
  *
  * @author Lijun Liao
- *
  */
 
 public class X509CertprofileQa implements CertprofileQa {
@@ -78,9 +77,9 @@ public class X509CertprofileQa implements CertprofileQa {
       certprofile = new XijsonCertprofile();
       certprofile.initialize(conf);
 
-      this.publicKeyControl = certprofile.getPublicKeyControl();
+      this.publicKeyControl = certprofile.publicKeyControl();
       this.subjectChecker = new X509SubjectChecker(
-          certprofile.getSubjectControl());
+          certprofile.subjectControl());
       this.extensionsChecker = new X509ExtensionsChecker(conf, certprofile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
@@ -107,7 +106,7 @@ public class X509CertprofileQa implements CertprofileQa {
 
     certBytes = X509Util.toDerEncoded(certBytes);
 
-    Integer maxSize = certprofile.getMaxSize();
+    Integer maxSize = certprofile.maxSize();
     if (maxSize != 0) {
       int size = certBytes.length;
       if (size > maxSize) {
@@ -146,7 +145,7 @@ public class X509CertprofileQa implements CertprofileQa {
     }
 
     // signatureAlgorithm
-    List<SignAlgo> signatureAlgorithms = certprofile.getSignatureAlgorithms();
+    List<SignAlgo> signatureAlgorithms = certprofile.signatureAlgorithms();
     if (CollectionUtil.isNotEmpty(signatureAlgorithms)) {
       issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
       resultIssues.add(issue);
@@ -168,7 +167,7 @@ public class X509CertprofileQa implements CertprofileQa {
           }
 
           if (!issue.isFailed()) {
-            if (!sigAlgId.equals(signAlgo.getAlgorithmIdentifier())) {
+            if (!sigAlgId.equals(signAlgo.algorithmIdentifier())) {
               issue.setFailureMessage("signatureAlgorithm has invalid content");
             }
           }
@@ -189,18 +188,18 @@ public class X509CertprofileQa implements CertprofileQa {
         "notAfter encoding");
     checkTime(tbsCert.getStartDate(), issue);
 
-    if (certprofile.getNotBeforeOption().getMidNightTimeZone() != null) {
+    if (certprofile.notBeforeOption().midNightTimeZone() != null) {
       issue = new ValidationIssue("X509.NOTBEFORE",
           "notBefore midnight");
       resultIssues.add(issue);
-      ZonedDateTime cal = ZonedDateTime.ofInstant(cert.getNotBefore(),
+      ZonedDateTime cal = ZonedDateTime.ofInstant(cert.notBefore(),
           ZoneOffset.UTC);
 
       int minute = cal.getMinute();
       int second = cal.getSecond();
 
       if (minute != 0 || second != 0) {
-        issue.setFailureMessage(" '" + cert.getNotBefore() +
+        issue.setFailureMessage(" '" + cert.notBefore() +
             "' is not midnight time");
       }
     }
@@ -209,19 +208,19 @@ public class X509CertprofileQa implements CertprofileQa {
     issue = new ValidationIssue("X509.VALIDITY", "cert validity");
     resultIssues.add(issue);
 
-    if (cert.getNotAfter().isBefore(cert.getNotBefore())) {
+    if (cert.notAfter().isBefore(cert.notBefore())) {
       issue.setFailureMessage("notAfter may not be before notBefore");
-    } else if (cert.getNotBefore().isBefore(issuerInfo.getCaNotBefore())) {
+    } else if (cert.notBefore().isBefore(issuerInfo.getCaNotBefore())) {
       issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
       if (certprofile.hasNoWellDefinedExpirationDate()) {
         if (MAX_CERT_TIME.getEpochSecond()
-            != cert.getNotAfter().getEpochSecond()) {
+            != cert.notAfter().getEpochSecond()) {
           issue.setFailureMessage("cert notAfter != 99991231235959Z");
         }
       } else {
-        Validity validity = certprofile.getValidity();
-        Instant expectedNotAfter = validity.add(cert.getNotBefore());
+        Validity validity = certprofile.validity();
+        Instant expectedNotAfter = validity.add(cert.notBefore());
         if (expectedNotAfter.isAfter(MAX_CERT_TIME)) {
           expectedNotAfter = MAX_CERT_TIME;
         }
@@ -231,7 +230,7 @@ public class X509CertprofileQa implements CertprofileQa {
           expectedNotAfter = issuerInfo.getCaNotAfter();
         }
 
-        if (Math.abs(expectedNotAfter.getEpochSecond() - cert.getNotAfter()
+        if (Math.abs(expectedNotAfter.getEpochSecond() - cert.notAfter()
             .getEpochSecond()) > 60) {
           issue.setFailureMessage("cert validity is not within " + validity);
         }
@@ -247,10 +246,10 @@ public class X509CertprofileQa implements CertprofileQa {
         "whether certificate is signed by CA");
     resultIssues.add(issue);
     try {
-      cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
+      cert.verify(issuerInfo.getCert().publicKey(), "BC");
     } catch (NoSuchAlgorithmException ex) {
       try {
-        cert.verify(issuerInfo.getCert().getPublicKey());
+        cert.verify(issuerInfo.getCert().publicKey());
       } catch (Exception ex1) {
         issue.setFailureMessage("invalid signature");
       }
@@ -261,7 +260,7 @@ public class X509CertprofileQa implements CertprofileQa {
     // issuer
     issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
     resultIssues.add(issue);
-    if (!cert.getIssuer().equals(issuerInfo.getCert().getSubject())) {
+    if (!cert.issuer().equals(issuerInfo.getCert().subject())) {
       issue.setFailureMessage("issue in certificate does not equal the " +
           "subject of CA certificate");
     }

@@ -7,7 +7,6 @@ package org.xipki.ca.sdk;
  * REST API constants.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class SdkConstants {

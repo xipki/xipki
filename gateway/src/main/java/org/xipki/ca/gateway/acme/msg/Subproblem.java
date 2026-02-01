@@ -26,11 +26,11 @@ public class Subproblem implements JsonEncodable {
     this.identifier = identifier;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public Identifier getIdentifier() {
+  public Identifier identifier() {
     return identifier;
   }
 

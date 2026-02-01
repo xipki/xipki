@@ -7,7 +7,6 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 public class CodecException extends Exception {
 
@@ -56,7 +55,7 @@ public class CodecException extends Exception {
       this.key = key;
     }
 
-    public String getKey() {
+    public String key() {
       return key;
     }
   }

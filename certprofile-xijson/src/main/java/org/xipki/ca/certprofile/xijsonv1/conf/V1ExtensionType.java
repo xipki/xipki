@@ -21,7 +21,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.util.Collection;
 
@@ -29,7 +29,6 @@ import java.util.Collection;
  * Extension configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class V1ExtensionType {
@@ -106,17 +105,17 @@ public class V1ExtensionType {
     this.required = required;
   }
 
-  public DescribableOid getType() {
+  public DescribableOid type() {
     return type;
   }
 
   // do not encode the default value.
-  public Boolean getCritical() {
+  public Boolean critical() {
     return critical;
   }
 
   // do not encode the default value.
-  public Boolean getRequired() {
+  public Boolean required() {
     return required;
   }
 
@@ -160,7 +159,7 @@ public class V1ExtensionType {
     this.certificatePolicies = certificatePolicies;
   }
 
-  public V1ConstantExtnValue getConstant() {
+  public V1ConstantExtnValue constant() {
     return constant;
   }
 
@@ -182,7 +181,7 @@ public class V1ExtensionType {
     this.inhibitAnyPolicy = inhibitAnyPolicy;
   }
 
-  public V1KeyUsages getKeyUsage() {
+  public V1KeyUsages keyUsage() {
     return keyUsage;
   }
 

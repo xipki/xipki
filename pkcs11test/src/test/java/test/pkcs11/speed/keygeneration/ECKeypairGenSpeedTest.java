@@ -34,7 +34,7 @@ public class ECKeypairGenSpeedTest extends TestBase {
     @Override
     protected PKCS11KeyPairSpec getMinimalKeyPairTemplate() {
       return new PKCS11KeyPairSpec().token(false)
-          .keyPairType(PKCS11KeyPairType.EC_P256);
+          .keyPairType(PKCS11KeyPairType.P256);
     }
 
   }
@@ -47,7 +47,7 @@ public class ECKeypairGenSpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws PKCS11Exception {
+  public void execTest() throws PKCS11Exception {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(mechanism) +

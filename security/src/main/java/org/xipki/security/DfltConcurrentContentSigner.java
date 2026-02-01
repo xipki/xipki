@@ -28,9 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * An implementation of {@link ConcurrentContentSigner}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
 
   private static final Logger LOG = LoggerFactory.getLogger(
@@ -169,7 +167,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
 
     this.certificateChain = certificateChain;
-    setPublicKey(certificateChain[0].getPublicKey());
+    setPublicKey(certificateChain[0].publicKey());
   }
 
   @Override

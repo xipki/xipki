@@ -40,11 +40,11 @@ public class IPAddressRange extends ASN1Object {
     this.max = ASN1IPAddress.getInstance(seq.getObjectAt(1));
   }
 
-  public ASN1IPAddress getMin() {
+  public ASN1IPAddress min() {
     return min;
   }
 
-  public ASN1IPAddress getMax() {
+  public ASN1IPAddress max() {
     return max;
   }
 

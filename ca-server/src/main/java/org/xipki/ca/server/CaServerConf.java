@@ -17,7 +17,6 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import org.xipki.util.extra.http.SslContextConf;
 import org.xipki.util.io.FileOrBinary;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +70,7 @@ public class CaServerConf {
       return enabled;
     }
 
-    public List<FileOrBinary> getCerts() {
+    public List<FileOrBinary> certs() {
       return certs;
     }
 
@@ -91,7 +90,7 @@ public class CaServerConf {
       this.keydir = Args.notBlank(keydir, "keydir");
     }
 
-    public String getKeydir() {
+    public String keydir() {
       return keydir;
     }
 
@@ -155,7 +154,7 @@ public class CaServerConf {
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
   public static CaServerConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+      throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
       return parse(JsonParser.parseMap(Paths.get(fileName), true));
@@ -249,43 +248,43 @@ public class CaServerConf {
     return logReqResp;
   }
 
-  public String getReverseProxyMode() {
+  public String reverseProxyMode() {
     return reverseProxyMode;
   }
 
-  public int getShardId() {
+  public int shardId() {
     return shardId;
   }
 
-  public List<String> getCaConfFiles() {
+  public List<String> caConfFiles() {
     return caConfFiles;
   }
 
-  public List<DataSourceConf> getDatasources() {
+  public List<DataSourceConf> datasources() {
     return datasources;
   }
 
-  public AuditConf getAudit() {
+  public AuditConf audit() {
     return audit == null ? AuditConf.DEFAULT : audit;
   }
 
-  public SecurityConf getSecurity() {
+  public SecurityConf security() {
     return security == null ? SecurityConf.DEFAULT : security;
   }
 
-  public RemoteMgmt getRemoteMgmt() {
+  public RemoteMgmt remoteMgmt() {
     return remoteMgmt;
   }
 
-  public List<String> getCertprofileFactories() {
+  public List<String> certprofileFactories() {
     return certprofileFactories;
   }
 
-  public List<String> getKeypairGeneratorFactories() {
+  public List<String> keypairGeneratorFactories() {
     return keypairGeneratorFactories;
   }
 
-  public CtLogConf getCtLog() {
+  public CtLogConf ctLog() {
     return ctLog;
   }
 
@@ -319,7 +318,7 @@ public class CaServerConf {
 
     boolean withCaconfDb = false;
     for (DataSourceConf dsConf : datasources) {
-      if ("caconf".equals(dsConf.getName())) {
+      if ("caconf".equals(dsConf.name())) {
         withCaconfDb = true;
         break;
       }

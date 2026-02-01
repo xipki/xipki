@@ -17,9 +17,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  * An implementation of {@link SignerFactoryRegister}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG =
@@ -32,7 +30,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
   }
 
   @Override
-  public Set<String> getSupportedSignerTypes() {
+  public Set<String> supportedSignerTypes() {
     Set<String> types = new HashSet<>();
     for (SignerFactory service : factories) {
       types.addAll(service.getSupportedSignerTypes());

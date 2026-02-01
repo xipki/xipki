@@ -11,7 +11,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
  * Response containing the CRL.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CrlResponse extends SdkResponse {
@@ -22,7 +21,7 @@ public class CrlResponse extends SdkResponse {
     this.crl = crl;
   }
 
-  public byte[] getCrl() {
+  public byte[] crl() {
     return crl;
   }
 

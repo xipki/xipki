@@ -32,7 +32,7 @@ public class CaCertstore implements JsonEncodable {
 
   private List<IdName> profiles;
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 
@@ -40,7 +40,7 @@ public class CaCertstore implements JsonEncodable {
     this.version = version;
   }
 
-  public int getCountCrls() {
+  public int countCrls() {
     return countCrls;
   }
 
@@ -48,7 +48,7 @@ public class CaCertstore implements JsonEncodable {
     this.countCrls = countCrls;
   }
 
-  public int getCountCerts() {
+  public int countCerts() {
     return countCerts;
   }
 
@@ -56,7 +56,7 @@ public class CaCertstore implements JsonEncodable {
     this.countCerts = countCerts;
   }
 
-  public List<Ca> getCas() {
+  public List<Ca> cas() {
     return cas;
   }
 
@@ -64,7 +64,7 @@ public class CaCertstore implements JsonEncodable {
     this.cas = cas;
   }
 
-  public List<IdName> getRequestors() {
+  public List<IdName> requestors() {
     return requestors;
   }
 
@@ -72,7 +72,7 @@ public class CaCertstore implements JsonEncodable {
     this.requestors = requestors;
   }
 
-  public List<IdName> getProfiles() {
+  public List<IdName> profiles() {
     return profiles;
   }
 
@@ -205,11 +205,11 @@ public class CaCertstore implements JsonEncodable {
       this.rev = 1;
     }
 
-    public String getFile() {
+    public String file() {
       return file;
     }
 
-    public String getPrivateKeyFile() {
+    public String privateKeyFile() {
       return privateKeyFile;
     }
 
@@ -217,19 +217,19 @@ public class CaCertstore implements JsonEncodable {
       this.privateKeyFile = privateKeyFile;
     }
 
-    public int getCaId() {
+    public int caId() {
       return caId;
     }
 
-    public String getSn() {
+    public String sn() {
       return sn;
     }
 
-    public int getPid() {
+    public int pid() {
       return pid;
     }
 
-    public int getRid() {
+    public int rid() {
       return rid;
     }
 
@@ -237,27 +237,27 @@ public class CaCertstore implements JsonEncodable {
       return ee;
     }
 
-    public long getUpdate() {
+    public long update() {
       return update;
     }
 
-    public int getRev() {
+    public int rev() {
       return rev;
     }
 
-    public Integer getRr() {
+    public Integer rr() {
       return rr;
     }
 
-    public Long getRt() {
+    public Long rt() {
       return rt;
     }
 
-    public Long getRit() {
+    public Long rit() {
       return rit;
     }
 
-    public String getTid() {
+    public String tid() {
       return tid;
     }
 
@@ -265,7 +265,7 @@ public class CaCertstore implements JsonEncodable {
       this.tid = tid;
     }
 
-    public Long getFpRs() {
+    public Long fpRs() {
       return fpRs;
     }
 
@@ -273,11 +273,11 @@ public class CaCertstore implements JsonEncodable {
       this.fpRs = fpRs;
     }
 
-    public int getCrlScope() {
+    public int crlScope() {
       return crlScope;
     }
 
-    public String getRs() {
+    public String rs() {
       return rs;
     }
 
@@ -325,7 +325,7 @@ public class CaCertstore implements JsonEncodable {
       this.certs = Args.notNull(certs, "certs");
     }
 
-    public List<Cert> getCerts() {
+    public List<Cert> certs() {
       return certs;
     }
 
@@ -369,19 +369,19 @@ public class CaCertstore implements JsonEncodable {
       this.crlScope = crlScope;
     }
 
-    public Integer getCaId() {
+    public Integer caId() {
       return caId;
     }
 
-    public String getCrlNo() {
+    public String crlNo() {
       return crlNo;
     }
 
-    public Integer getCrlScope() {
+    public Integer crlScope() {
       return crlScope;
     }
 
-    public String getFile() {
+    public String file() {
       return file;
     }
 
@@ -409,7 +409,7 @@ public class CaCertstore implements JsonEncodable {
       this.crls = Args.notNull(crls, "crls");
     }
 
-    public List<Crl> getCrls() {
+    public List<Crl> crls() {
       return crls;
     }
 
@@ -444,11 +444,11 @@ public class CaCertstore implements JsonEncodable {
       this.name = Args.notNull(name, "name");
     }
 
-    public int getId() {
+    public int id() {
       return id;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -489,11 +489,11 @@ public class CaCertstore implements JsonEncodable {
       this.revInfo = revInfo;
     }
 
-    public byte[] getCert() {
+    public byte[] cert() {
       return cert;
     }
 
-    public String getRevInfo() {
+    public String revInfo() {
       return revInfo;
     }
 

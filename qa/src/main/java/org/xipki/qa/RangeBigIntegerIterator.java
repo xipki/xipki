@@ -14,7 +14,6 @@ import java.util.List;
  * {@link BigIntegerRange}s.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class RangeBigIntegerIterator implements Iterator<BigInteger> {

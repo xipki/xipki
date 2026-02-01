@@ -20,7 +20,6 @@ import java.util.List;
  * CMP responder.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 abstract class Responder {
@@ -31,7 +30,7 @@ abstract class Responder {
     this.name = new GeneralName(Args.notNull(name, "name"));
   }
 
-  GeneralName getName() {
+  GeneralName name() {
     return name;
   }
 
@@ -75,7 +74,7 @@ abstract class Responder {
     private final AlgorithmValidator sigAlgoValidator;
 
     SignatureCmpResponder(X509Cert cert, AlgorithmValidator sigAlgoValidator) {
-      super(Args.notNull(cert, "cert").getSubject());
+      super(Args.notNull(cert, "cert").subject());
       this.cert = cert;
       this.sigAlgoValidator = Args.notNull(sigAlgoValidator,
           "sigAlgoValidator");

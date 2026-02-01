@@ -82,7 +82,6 @@ import static org.bouncycastle.asn1.cmp.PKIStatus.rejection;
  * CMP responder.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CmpResponder extends BaseCmpResponder {
@@ -403,7 +402,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
     }
 
-    if (event.getStatus() == null || event.getStatus() != AuditStatus.FAILED) {
+    if (event.status() == null || event.status() != AuditStatus.FAILED) {
       PKIStatusInfo statusObj = certResp.getResponse()[0].getStatus();
       int status = statusObj.getStatus().intValue();
       if (status != GRANTED
@@ -432,20 +431,20 @@ public class CmpResponder extends BaseCmpResponder {
     sdkReq.setExplicitConfirm(cmpControl.isConfirmCert());
     sdkReq.setGroupEnroll(groupEnroll);
     sdkReq.setConfirmWaitTimeMs(
-        (int) cmpControl.getConfirmWaitTime().toMillis());
-    sdkReq.setCaCertMode(cmpControl.getCaCertsMode());
+        (int) cmpControl.confirmWaitTime().toMillis());
+    sdkReq.setCaCertMode(cmpControl.caCertsMode());
     sdkReq.setTransactionId(hexTid);
     sdkReq.setEntries(templates);
 
     for (EnrollCertsRequest.Entry m : templates) {
-      event.addEventData(CaAuditConstants.NAME_certprofile, m.getCertprofile());
+      event.addEventData(CaAuditConstants.NAME_certprofile, m.certprofile());
       X500Name subject = null;
-      if (m.getSubject() != null) {
-        subject = m.getSubject().toX500Name();
-      } else if (m.getP10req() != null) {
+      if (m.subject() != null) {
+        subject = m.subject().toX500Name();
+      } else if (m.p10req() != null) {
         CertificationRequest csr;
         try {
-          csr = GatewayUtil.parseCsrInRequest(m.getP10req());
+          csr = GatewayUtil.parseCsrInRequest(m.p10req());
         } catch (OperationException e) {
           throw new SdkErrorResponseException(ErrorCode.BAD_REQUEST,
               "error parsing PKCS#10 request");
@@ -466,23 +465,23 @@ public class CmpResponder extends BaseCmpResponder {
           : sdk.enrollCerts(caName, sdkReq);
     }
 
-    EnrollOrPollCertsResponse.Entry[] rentries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] rentries = resp.entries();
     CertResponse[] certResponses = new CertResponse[rentries.length];
     for (int i = 0; i < rentries.length; i++) {
       EnrollOrPollCertsResponse.Entry respEntry = rentries[i];
-      ErrorEntry error = respEntry.getError();
+      ErrorEntry error = respEntry.error();
       if (error != null) {
-        certResponses[i] = new CertResponse(new ASN1Integer(respEntry.getId()),
-            buildPKIStatusInfo(error.getCode(), error.getMessage()));
+        certResponses[i] = new CertResponse(new ASN1Integer(respEntry.id()),
+            buildPKIStatusInfo(error.code(), error.message()));
       } else {
         certResponses[i] = postProcessCertInfo(
-            new ASN1Integer(respEntry.getId()), requestor,
-            respEntry.getCert(), respEntry.getPrivateKey());
+            new ASN1Integer(respEntry.id()), requestor,
+            respEntry.cert(), respEntry.privateKey());
       }
     }
 
     CMPCertificate[] caPubs = null;
-    byte[][] extraCerts = resp.getExtraCerts();
+    byte[][] extraCerts = resp.extraCerts();
     if (extraCerts != null && extraCerts.length > 0) {
       caPubs = new CMPCertificate[extraCerts.length];
       for (int i = 0; i < extraCerts.length; i++) {
@@ -559,14 +558,14 @@ public class CmpResponder extends BaseCmpResponder {
         if (ext != null) {
           AuthorityKeyIdentifier tAki =
               AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
-          if (tAki.getKeyIdentifier() == null) {
+          if (tAki.getKeyIdentifierOctets() == null) {
             return buildErrorMsgPkiBody(rejection, badCertTemplate,
                 "issuer's AKI not present");
           }
 
           if (aki == null) {
-            aki = tAki.getKeyIdentifier();
-          } else if (!Arrays.equals(aki, tAki.getKeyIdentifier())) {
+            aki = tAki.getKeyIdentifierOctets();
+          } else if (!Arrays.equals(aki, tAki.getKeyIdentifierOctets())) {
             return buildErrorMsgPkiBody(rejection, badCertTemplate,
                 "not all AKIs are of the same");
           }
@@ -622,24 +621,24 @@ public class CmpResponder extends BaseCmpResponder {
           null, issuerType, aki,
           revokeEntries.toArray(new RevokeCertsRequest.Entry[0]));
       RevokeCertsResponse resp = sdk.revokeCerts(req);
-      respEntries = resp.getEntries();
+      respEntries = resp.entries();
     } else {
       UnsuspendOrRemoveCertsRequest req = new UnsuspendOrRemoveCertsRequest(
           null, issuerType, aki,
           unrevokeEntries.toArray(new BigInteger[0]));
       UnSuspendOrRemoveCertsResponse resp = sdk.unsuspendCerts(req);
-      respEntries = resp.getEntries();
+      respEntries = resp.entries();
     }
 
     GeneralName caGn = new GeneralName(issuer);
     RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
     for (SingleCertSerialEntry m : respEntries) {
-      ErrorEntry error = m.getError();
+      ErrorEntry error = m.error();
 
       PKIStatusInfo status = error == null ? new PKIStatusInfo(granted)
-          : buildPKIStatusInfo(error.getCode(), error.getMessage());
+          : buildPKIStatusInfo(error.code(), error.message());
 
-      repContentBuilder.add(status, new CertId(caGn, m.getSerialNumber()));
+      repContentBuilder.add(status, new CertId(caGn, m.serialNumber()));
     }
 
     return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
@@ -696,7 +695,7 @@ public class CmpResponder extends BaseCmpResponder {
       dfltCertprofileName = dfltCertprofileName.toLowerCase(Locale.ROOT);
     }
 
-    Duration confirmWaitTime = cmpControl.getConfirmWaitTime();
+    Duration confirmWaitTime = cmpControl.confirmWaitTime();
 
     PKIBody respBody;
 
@@ -800,7 +799,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     for (RevDetails revDetails : revContent) {
       Extensions crlDetails = revDetails.getCrlEntryDetails();
-      int reasonCode = CrlReason.UNSPECIFIED.getCode();
+      int reasonCode = CrlReason.UNSPECIFIED.code();
       if (crlDetails != null) {
         ASN1ObjectIdentifier extId = OIDs.Extn.reasonCode;
         ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
@@ -828,7 +827,7 @@ public class CmpResponder extends BaseCmpResponder {
             "invalid CRLReason " + reasonCode);
       }
 
-      if (reasonCode == CrlReason.REMOVE_FROM_CRL.getCode()) {
+      if (reasonCode == CrlReason.REMOVE_FROM_CRL.code()) {
         if (requiredPermission == null) {
           event.addEventType(TYPE_rr_unrevoke);
           requiredPermission = Requestor.Permission.UNSUSPEND_CERT;

@@ -34,7 +34,6 @@ import static org.xipki.util.misc.StringUtil.startsWithIgnoreCase;
  * A wrapper of {@link HikariDataSource}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class DataSourceWrapper implements Closeable {
@@ -407,15 +406,15 @@ public abstract class DataSourceWrapper implements Closeable {
     this.cacheSeqNameSqls = new LruCache<>(100);
   }
 
-  public final String getName() {
+  public final String name() {
     return name;
   }
 
-  public final DatabaseType getDatabaseType() {
+  public final DatabaseType databaseType() {
     return this.databaseType;
   }
 
-  public final int getMaximumPoolSize() {
+  public final int maximumPoolSize() {
     return service.getMaximumPoolSize();
   }
 

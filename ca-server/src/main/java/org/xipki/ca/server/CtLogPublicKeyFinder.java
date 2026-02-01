@@ -38,7 +38,7 @@ public class CtLogPublicKeyFinder {
   private final boolean withPublicKeys;
 
   public CtLogPublicKeyFinder(CtLogConf conf) throws IOException {
-    String keydirName = conf.getKeydir();
+    String keydirName = conf.keydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
       keydirName = IoUtil.expandFilepath(keydirName, true);

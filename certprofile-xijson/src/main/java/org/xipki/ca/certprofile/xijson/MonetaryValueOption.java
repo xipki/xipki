@@ -11,7 +11,6 @@ import org.xipki.util.codec.Args;
  * Control of the MonetaryValue (in the extension QCStatements).
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class MonetaryValueOption {
@@ -36,19 +35,19 @@ class MonetaryValueOption {
         : Integer.toString(currency.getNumeric());
   }
 
-  public Iso4217CurrencyCode getCurrency() {
+  public Iso4217CurrencyCode currency() {
     return currency;
   }
 
-  public QcStatements.Range2Type getAmountRange() {
+  public QcStatements.Range2Type amountRange() {
     return amountRange;
   }
 
-  public QcStatements.Range2Type getExponentRange() {
+  public QcStatements.Range2Type exponentRange() {
     return exponentRange;
   }
 
-  public String getCurrencyString() {
+  public String currencyString() {
     return currencyString;
   }
 

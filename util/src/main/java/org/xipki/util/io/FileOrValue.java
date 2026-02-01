@@ -45,7 +45,7 @@ public class FileOrValue implements JsonEncodable {
     this.value = null;
   }
 
-  public String getFile() {
+  public String file() {
     return file;
   }
 
@@ -54,7 +54,7 @@ public class FileOrValue implements JsonEncodable {
     this.file = null;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 

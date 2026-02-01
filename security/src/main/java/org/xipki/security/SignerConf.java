@@ -17,9 +17,7 @@ import java.util.List;
  * Configuration of {@link ConcurrentContentSigner}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class SignerConf {
 
   public static final String name_hash = "hash";
@@ -71,19 +69,19 @@ public class SignerConf {
   }
 
   public SignerConf setHash(HashAlgo hashAlgo) {
-    return putPair(name_hash, hashAlgo.getJceName());
+    return putPair(name_hash, hashAlgo.jceName());
   }
 
-  public HashAlgo getHash() throws NoSuchAlgorithmException {
+  public HashAlgo hash() throws NoSuchAlgorithmException {
     String str = value(name_algo);
     return str == null ? null : HashAlgo.getInstance(str);
   }
 
   public SignerConf setAlgo(SignAlgo signAlgo) {
-    return putPair(name_algo, signAlgo.getJceName());
+    return putPair(name_algo, signAlgo.jceName());
   }
 
-  public SignAlgo getAlgo() throws InvalidConfException {
+  public SignAlgo algo() throws InvalidConfException {
     String str = value(name_algo);
     try {
       return str == null ? null : SignAlgo.getInstance(str);
@@ -96,7 +94,7 @@ public class SignerConf {
     return putPair(name_mode, mode.name());
   }
 
-  public SignAlgoMode getMode() throws InvalidConfException {
+  public SignAlgoMode mode() throws InvalidConfException {
     String str = value(name_mode);
     try {
       return str == null ? null : SignAlgoMode.getInstance(str);
@@ -109,7 +107,7 @@ public class SignerConf {
     return putPair(name_password, Args.notBlank(password, "password"));
   }
 
-  public String getPassword() {
+  public String password() {
     return value(name_password);
   }
 
@@ -118,7 +116,7 @@ public class SignerConf {
         Args.notBlank(keystore, "keystore"));
   }
 
-  public String getKeystore() {
+  public String keystore() {
     return value(name_keystore);
   }
 
@@ -127,7 +125,7 @@ public class SignerConf {
         Args.positive(parallelism, "parallelism")));
   }
 
-  public Integer getParallelism() throws InvalidConfException {
+  public Integer parallelism() throws InvalidConfException {
     String str = value(name_parallelism);
     if (str == null) {
       return null;
@@ -151,7 +149,7 @@ public class SignerConf {
     return putPair(name_module, Args.notBlank(module, "module"));
   }
 
-  public String getModule() {
+  public String module() {
     return value(name_module);
   }
 
@@ -160,7 +158,7 @@ public class SignerConf {
         Args.notNegative(slot, "slot")));
   }
 
-  public Integer getSlot() {
+  public Integer slot() {
     String str = value(name_slot);
     return str == null ? null : Integer.parseInt(str);
   }
@@ -169,7 +167,7 @@ public class SignerConf {
     return putPair(name_slotId, Long.toString(slotId));
   }
 
-  public Long getSlotId() {
+  public Long slotId() {
     String str = value(name_slotId);
     return str == null ? null : Long.parseLong(str);
   }
@@ -178,7 +176,7 @@ public class SignerConf {
     return putPair(name_keyId, Hex.encode(keyId));
   }
 
-  public byte[] getKeyId() {
+  public byte[] keyId() {
     String str = value(name_keyId);
     return str == null ? null : Hex.decode(str);
   }
@@ -187,7 +185,7 @@ public class SignerConf {
     return putPair(name_keyLabel, Args.notBlank(keyLabel, "keyLabel"));
   }
 
-  public String getKeyLabel() {
+  public String keyLabel() {
     return value(name_keyLabel);
   }
 
@@ -205,11 +203,11 @@ public class SignerConf {
     return confPairs.value(name);
   }
 
-  public ConfPairs getConf() {
+  public ConfPairs conf() {
     return confPairs;
   }
 
-  public List<X509Cert> getPeerCertificates() {
+  public List<X509Cert> peerCertificates() {
     return peerCertificates;
   }
 
@@ -217,7 +215,7 @@ public class SignerConf {
     this.peerCertificates = peerCertificates;
   }
 
-  public CreateSignerCallback getCallback() {
+  public CreateSignerCallback callback() {
     return callback == null ? CreateSignerCallback.DEFAULT : callback;
   }
 

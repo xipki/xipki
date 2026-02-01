@@ -31,7 +31,6 @@ import java.util.Set;
  * Actions to manage requestors.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class RequestorActions {
 

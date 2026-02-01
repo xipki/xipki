@@ -86,7 +86,6 @@ import static org.xipki.util.extra.audit.AuditStatus.FAILED;
  * REST API responder.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 public class RestResponder {
@@ -110,19 +109,19 @@ public class RestResponder {
       this.auditStatus = Args.notNull(auditStatus, "auditStatus");
     }
 
-    public int getHttpStatus() {
+    public int httpStatus() {
       return httpStatus;
     }
 
-    public String getAuditMessage() {
+    public String auditMessage() {
       return auditMessage;
     }
 
-    public AuditLevel getAuditLevel() {
+    public AuditLevel auditLevel() {
       return auditLevel;
     }
 
-    public AuditStatus getAuditStatus() {
+    public AuditStatus auditStatus() {
       return auditStatus;
     }
 
@@ -292,8 +291,8 @@ public class RestResponder {
           return new HttpResponse(HttpStatusCode.SC_NOT_FOUND);
         }
 
-        caName = caProfileConf.getCa();
-        certProfile = caProfileConf.getCertprofile();
+        caName = caProfileConf.ca();
+        certProfile = caProfileConf.certprofile();
       } else if (tokens.length == 2) {
         // URL: host:port/rest/<alias or CA-name>/<command>
         command = tokens[1];
@@ -305,8 +304,8 @@ public class RestResponder {
           certProfile = httpRetriever.getParameter(PARAM_profile);
         } else {
           // URL: host:port/rest/<alias>/<command>
-          caName = caProfileConf.getCa();
-          certProfile = caProfileConf.getCertprofile();
+          caName = caProfileConf.ca();
+          certProfile = caProfileConf.certprofile();
         }
       } else {
         caName = null;
@@ -365,7 +364,7 @@ public class RestResponder {
         case CMD_crl:
           return toHttpResponse(getCrl(caName, httpRetriever));
         case CMD_dh_pop_certs: {
-          X509Cert[] certs = popControl.getDhCertificates();
+          X509Cert[] certs = popControl.dhCertificates();
           return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
               StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certs))));
         }
@@ -420,7 +419,7 @@ public class RestResponder {
                 NOT_PERMITTED, "no requestor specified"));
       }
 
-      event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
+      event.addEventData(CaAuditConstants.NAME_requestor, requestor.name());
 
       HttpRespContent respContent;
 
@@ -453,11 +452,11 @@ public class RestResponder {
 
       return toHttpResponse(respContent);
     } catch (OperationException ex) {
-      ErrorCode code = ex.getErrorCode();
+      ErrorCode code = ex.errorCode();
       if (LOG.isWarnEnabled()) {
         String msg = StringUtil.concat(
             "generate certificate, OperationException: code=",
-            code.name(), ", message=", ex.getErrorMessage());
+            code.name(), ", message=", ex.errorMessage());
         LogUtil.warn(LOG, ex, msg);
       }
 
@@ -515,7 +514,7 @@ public class RestResponder {
 
       auditMessage = code.name();
       if (code != DATABASE_FAILURE && code != SYSTEM_FAILURE) {
-        auditMessage += ": " + ex.getErrorMessage();
+        auditMessage += ": " + ex.errorMessage();
       }
 
       Map<String, String> headers = new HashMap<>();
@@ -526,10 +525,10 @@ public class RestResponder {
       }
       return new HttpResponse(sc, null, headers, null);
     } catch (HttpRespAuditException ex) {
-      auditStatus = ex.getAuditStatus();
-      auditLevel = ex.getAuditLevel();
-      auditMessage = ex.getAuditMessage();
-      return new HttpResponse(ex.getHttpStatus(), null, null, null);
+      auditStatus = ex.auditStatus();
+      auditLevel = ex.auditLevel();
+      auditMessage = ex.auditMessage();
+      return new HttpResponse(ex.httpStatus(), null, null, null);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -558,8 +557,8 @@ public class RestResponder {
       return new HttpResponse(HttpStatusCode.SC_OK, null, headers, null);
     }
 
-    return new HttpResponse(HttpStatusCode.SC_OK, respContent.getContentType(),
-        headers, respContent.isBase64(), respContent.getContent());
+    return new HttpResponse(HttpStatusCode.SC_OK, respContent.contentType(),
+        headers, respContent.isBase64(), respContent.content());
   }
 
   private HttpRespContent enrollCerts(
@@ -667,8 +666,8 @@ public class RestResponder {
 
     assert subject != null;
     template.setSubject(new X500NameType(subject));
-    template.notBefore(notBefore);
-    template.notAfter(notAfter);
+    template.setNotBefore(notBefore);
+    template.setNotAfter(notAfter);
     if (rekey) {
       BigInteger certSerialNo;
       byte[] caSha1;
@@ -731,8 +730,8 @@ public class RestResponder {
       template.setCertReqId(certIdEnc);
       template.setCertprofile(profileEnc);
       template.setSubject(new X500NameType(subject));
-      template.notBefore(notBefore);
-      template.notAfter(notAfter);
+      template.setNotBefore(notBefore);
+      template.setNotAfter(notAfter);
 
       event.addEventData(CaAuditConstants.NAME_certprofile, profileEnc);
       event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -761,24 +760,24 @@ public class RestResponder {
     checkResponse(templates.size(), sdkResp);
 
     EnrollOrPollCertsResponse.Entry entry =
-        getEntry(sdkResp.getEntries(), certId);
+        getEntry(sdkResp.entries(), certId);
     if (!(caGenKeyPair || twin)) {
-      return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
+      return HttpRespContent.ofOk(CT_pkix_cert, entry.cert());
     }
 
     try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
       if (caGenKeyPair) {
-        bo.write(PemEncoder.encode(entry.getPrivateKey(),
+        bo.write(PemEncoder.encode(entry.privateKey(),
             PemLabel.PRIVATE_KEY));
       }
 
-      bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
+      bo.write(PemEncoder.encode(entry.cert(), PemLabel.CERTIFICATE));
 
       if (twin) {
-        entry = getEntry(sdkResp.getEntries(), certIdEnc);
-        bo.write(PemEncoder.encode(entry.getPrivateKey(),
+        entry = getEntry(sdkResp.entries(), certIdEnc);
+        bo.write(PemEncoder.encode(entry.privateKey(),
             PemLabel.PRIVATE_KEY));
-        bo.write(PemEncoder.encode(entry.getCert(), PemLabel.CERTIFICATE));
+        bo.write(PemEncoder.encode(entry.cert(), PemLabel.CERTIFICATE));
       }
       bo.flush();
 
@@ -825,13 +824,13 @@ public class RestResponder {
         }
 
         String type = pemObject.getType();
-        if (PemLabel.CERTIFICATE_REQUEST.getType().equals(type)) {
+        if (PemLabel.CERTIFICATE_REQUEST.type().equals(type)) {
           if (csrBytes != null) {
             throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
                 "duplicated PEM CSRs", INFO, FAILED);
           }
           csrBytes = pemObject.getContent();
-        } else if (PemLabel.CERTIFICATE.getType().equals(type)) {
+        } else if (PemLabel.CERTIFICATE.type().equals(type)) {
           if (targetCertBytes != null) {
             throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
                 "duplicated PEM certificates", INFO, FAILED);
@@ -882,8 +881,8 @@ public class RestResponder {
     template.setCertReqId(certId);
     template.setCertprofile(profile);
     template.setSubject(new X500NameType(subject));
-    template.notBefore(notBefore);
-    template.notAfter(notAfter);
+    template.setNotBefore(notBefore);
+    template.setNotAfter(notAfter);
 
     event.addEventData(CaAuditConstants.NAME_certprofile, profile);
     event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -918,20 +917,20 @@ public class RestResponder {
     checkResponse(templates.length, sdkResp);
 
     EnrollOrPollCertsResponse.Entry entry =
-        getEntry(sdkResp.getEntries(), certId);
-    return HttpRespContent.ofOk(CT_pkix_cert, entry.getCert());
+        getEntry(sdkResp.entries(), certId);
+    return HttpRespContent.ofOk(CT_pkix_cert, entry.cert());
   }
 
   private static void checkResponse(
       int expectedSize, EnrollOrPollCertsResponse resp)
       throws HttpRespAuditException {
-    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
     if (entries != null) {
       for (EnrollOrPollCertsResponse.Entry entry : entries) {
-        if (entry.getError() != null) {
+        if (entry.error() != null) {
           throw new HttpRespAuditException(
               HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-              entry.getError().toString(), INFO, FAILED);
+              entry.error().toString(), INFO, FAILED);
         }
       }
     }
@@ -964,7 +963,7 @@ public class RestResponder {
       EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
     for (EnrollOrPollCertsResponse.Entry m : entries) {
-      if (certReqId.equals(m.getId())) {
+      if (certReqId.equals(m.id())) {
         return m;
       }
     }
@@ -1023,7 +1022,7 @@ public class RestResponder {
 
       if (reason == CrlReason.REMOVE_FROM_CRL) {
         throw new OperationException(ErrorCode.BAD_REQUEST,
-            "reason " + CrlReason.REMOVE_FROM_CRL.getDescription() +
+            "reason " + CrlReason.REMOVE_FROM_CRL.description() +
             " is not allowed!");
       }
       event.addEventData(CaAuditConstants.NAME_reason, reason);
@@ -1073,7 +1072,7 @@ public class RestResponder {
   private HttpRespContent generateKemEncapKey(byte[] request)
       throws HttpRespAuditException {
     SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(request);
-    SecretKeyWithAlias mk = popControl.getDefaultKemMasterKey();
+    SecretKeyWithAlias mk = popControl.defaultKemMasterKey();
     if (mk == null) {
       String message =
           "could not find master key to generate the KEM encap key";
@@ -1085,7 +1084,7 @@ public class RestResponder {
     byte[] respBytes;
     try {
       respBytes = KEMUtil.generateKemEncapKey(spki, mk,
-                    securityFactory.getRandom4Sign()).getEncoded();
+                    securityFactory.random4Sign()).getEncoded();
     } catch (Exception e) {
       String message = "error generating KEM encap key";
       LOG.warn(message);

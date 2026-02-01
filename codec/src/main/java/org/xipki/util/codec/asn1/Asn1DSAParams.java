@@ -32,15 +32,15 @@ public class Asn1DSAParams {
     this.g = Args.notNull(g, "g");
   }
 
-  public byte[] getP() {
+  public byte[] p() {
     return p;
   }
 
-  public byte[] getQ() {
+  public byte[] q() {
     return q;
   }
 
-  public byte[] getG() {
+  public byte[] g() {
     return g;
   }
 

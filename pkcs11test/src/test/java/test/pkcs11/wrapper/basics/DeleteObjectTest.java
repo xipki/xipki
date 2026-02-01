@@ -82,7 +82,7 @@ public class DeleteObjectTest {
   private abstract static class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       // create a new object to be deleted later
       PKCS11SecretKeySpec secKeyTemplate =
           newSecretKey(CKK_AES).token(true).valueLen(16);

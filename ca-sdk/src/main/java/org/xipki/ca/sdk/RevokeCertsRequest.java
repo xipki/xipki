@@ -14,7 +14,6 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class RevokeCertsRequest extends CaIdentifierRequest {
@@ -27,7 +26,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
     this.entries = entries;
   }
 
-  public Entry[] getEntries() {
+  public Entry[] entries() {
     return entries;
   }
 
@@ -73,15 +72,15 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
       this.invalidityTime = invalidityTime;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
-    public CrlReason getReason() {
+    public CrlReason reason() {
       return reason;
     }
 
-    public Instant getInvalidityTime() {
+    public Instant invalidityTime() {
       return invalidityTime;
     }
 

@@ -7,7 +7,6 @@ package org.xipki.ca.mgmt.db.diffdb;
  * Database type.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 enum DbType {

@@ -22,11 +22,11 @@ public class HourMinute {
         this.minute = Args.range(minute, "minute", 0, 59);
     }
 
-    public int getHour() {
+    public int hour() {
         return hour;
     }
 
-    public int getMinute() {
+    public int minute() {
         return minute;
     }
 

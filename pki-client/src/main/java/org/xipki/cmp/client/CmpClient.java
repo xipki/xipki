@@ -20,7 +20,6 @@ import java.util.Map;
  * CMP client interface.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface CmpClient extends Closeable {
@@ -281,7 +280,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  List<X509Cert> getDhPopPeerCertificates() throws CmpClientException;
+  List<X509Cert> dhPopPeerCertificates() throws CmpClientException;
 
   /**
    * Returns the KEM encap key for the given public key, will be used for the

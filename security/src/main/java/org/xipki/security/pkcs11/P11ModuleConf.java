@@ -29,7 +29,6 @@ import java.util.Set;
  * Configuration of a PKCS#11 module.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class P11ModuleConf {
 
@@ -50,13 +49,13 @@ public class P11ModuleConf {
 
     boolean match(P11SlotId slotId) {
       if (index != null) {
-        if (index != slotId.getIndex()) {
+        if (index != slotId.index()) {
           return false;
         }
       }
 
       if (id != null) {
-        return id == slotId.getId();
+        return id == slotId.id();
       }
 
       return true;
@@ -305,28 +304,28 @@ public class P11ModuleConf {
       P11SystemConf.ModuleConf moduleType,
       List<P11SystemConf.MechanismSetConf> mechanismSets)
       throws InvalidConfException {
-    this.name = Args.notNull(moduleType, "moduleType").getName();
+    this.name = Args.notNull(moduleType, "moduleType").name();
     this.readOnly = moduleType.isReadonly();
 
-    this.userType = moduleType.getUser().toUpperCase();
-    this.userName = (moduleType.getUserName() == null) ? null
-        : moduleType.getUserName();
+    this.userType = moduleType.user().toUpperCase();
+    this.userName = (moduleType.userName() == null) ? null
+        : moduleType.userName();
 
-    this.maxMessageSize = moduleType.getMaxMessageSize();
+    this.maxMessageSize = moduleType.maxMessageSize();
     if (maxMessageSize < 256) {
       throw new InvalidConfException(
           "invalid maxMessageSize (< 256): " + maxMessageSize);
     }
 
-    this.numSessions = moduleType.getNumSessions();
-    this.newSessionTimeout = moduleType.getNewSessionTimeout();
+    this.numSessions = moduleType.numSessions();
+    this.newSessionTimeout = moduleType.newSessionTimeout();
 
     Map<String, P11SystemConf.MechanismSetConf> mechanismSetsMap =
         new HashMap<>();
     // parse mechanismSets
     if (mechanismSets != null) {
       for (P11SystemConf.MechanismSetConf m : mechanismSets) {
-        String name = m.getName();
+        String name = m.name();
         if (mechanismSetsMap.containsKey(name)) {
           throw new InvalidConfException(
               "Duplication mechanismSets named " + name);
@@ -340,11 +339,11 @@ public class P11ModuleConf {
     mechanismFilter = new P11MechanismFilter();
 
     List<P11SystemConf.MechanismFilterConf> mechFilters =
-        moduleType.getMechanismFilters();
+        moduleType.mechanismFilters();
     if (CollectionUtil.isNotEmpty(mechFilters)) {
       for (P11SystemConf.MechanismFilterConf filterType : mechFilters) {
-        Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.getSlots());
-        String mechanismSetName = filterType.getMechanismSet();
+        Set<P11SlotIdFilter> slots = getSlotIdFilters(filterType.slots());
+        String mechanismSetName = filterType.mechanismSet();
 
         P11SystemConf.MechanismSetConf mechanismSet =
             mechanismSetsMap.get(mechanismSetName);
@@ -352,8 +351,8 @@ public class P11ModuleConf {
           throw new InvalidConfException("MechanismSet '" +
               mechanismSetName + "' is not defined");
         } else {
-          mechanismFilter.addEntry(slots, mechanismSet.getMechanisms(),
-              mechanismSet.getExcludeMechanisms());
+          mechanismFilter.addEntry(slots, mechanismSet.mechanisms(),
+              mechanismSet.excludeMechanisms());
         }
       }
     }
@@ -361,25 +360,25 @@ public class P11ModuleConf {
     // Password retriever
     passwordRetriever = new P11PasswordsRetriever();
     List<P11SystemConf.PasswordSetConf> passwordsList =
-        moduleType.getPasswordSets();
+        moduleType.passwordSets();
     if (CollectionUtil.isNotEmpty(passwordsList)) {
       for (P11SystemConf.PasswordSetConf passwordType : passwordsList) {
-        Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.getSlots());
+        Set<P11SlotIdFilter> slots = getSlotIdFilters(passwordType.slots());
         passwordRetriever.addPasswordEntry(slots,
-            new ArrayList<>(passwordType.getPasswords()));
+            new ArrayList<>(passwordType.passwords()));
       }
     }
 
-    includeSlots = getSlotIdFilters(moduleType.getIncludeSlots());
-    excludeSlots = getSlotIdFilters(moduleType.getExcludeSlots());
+    includeSlots = getSlotIdFilters(moduleType.includeSlots());
+    excludeSlots = getSlotIdFilters(moduleType.excludeSlots());
 
     final String osName = System.getProperty("os.name").toLowerCase();
 
     P11SystemConf.NativeLibraryConf matchLibrary =
         getNativeLibrary(moduleType, osName);
 
-    this.nativeLibrary = matchLibrary.getPath();
-    this.nativeLibraryProperties = matchLibrary.getProperties();
+    this.nativeLibrary = matchLibrary.path();
+    this.nativeLibraryProperties = matchLibrary.properties();
   } // constructor
 
   private static P11SystemConf.NativeLibraryConf getNativeLibrary(
@@ -387,8 +386,8 @@ public class P11ModuleConf {
           throws InvalidConfException {
     P11SystemConf.NativeLibraryConf matchLibrary = null;
     for (P11SystemConf.NativeLibraryConf library
-        : moduleType.getNativeLibraries()) {
-      List<String> osNames = library.getOperationSystems();
+        : moduleType.nativeLibraries()) {
+      List<String> osNames = library.operationSystems();
       if (CollectionUtil.isEmpty(osNames)) {
         matchLibrary = library;
       } else {
@@ -408,19 +407,19 @@ public class P11ModuleConf {
     return matchLibrary;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getNativeLibrary() {
+  public String nativeLibrary() {
     return nativeLibrary;
   }
 
-  public Map<String, String> getNativeLibraryProperties() {
+  public Map<String, String> nativeLibraryProperties() {
     return nativeLibraryProperties;
   }
 
-  public int getMaxMessageSize() {
+  public int maxMessageSize() {
     return maxMessageSize;
   }
 
@@ -428,23 +427,23 @@ public class P11ModuleConf {
     return readOnly;
   }
 
-  public String getUserType() {
+  public String userType() {
     return userType;
   }
 
-  public String getUserName() {
+  public String userName() {
     return userName;
   }
 
-  public P11PasswordsRetriever getPasswordRetriever() {
+  public P11PasswordsRetriever passwordRetriever() {
     return passwordRetriever;
   }
 
-  public Integer getNumSessions() {
+  public Integer numSessions() {
     return numSessions;
   }
 
-  public Integer getNewSessionTimeout() {
+  public Integer newSessionTimeout() {
     return newSessionTimeout;
   }
 
@@ -480,7 +479,7 @@ public class P11ModuleConf {
     return true;
   } // method isSlotIncluded
 
-  public P11MechanismFilter getP11MechanismFilter() {
+  public P11MechanismFilter p11MechanismFilter() {
     return mechanismFilter;
   }
 
@@ -493,8 +492,8 @@ public class P11ModuleConf {
     Set<P11SlotIdFilter> filters = new HashSet<>();
     for (P11SystemConf.SlotConf slotType : slotTypes) {
       Long slotId = null;
-      if (slotType.getId() != null) {
-        String str = slotType.getId().trim();
+      if (slotType.id() != null) {
+        String str = slotType.id().trim();
         try {
           boolean hex = StringUtil.startsWithIgnoreCase(str, "0X");
           slotId = Long.parseLong(
@@ -505,7 +504,7 @@ public class P11ModuleConf {
           throw new InvalidConfException(message);
         }
       }
-      filters.add(new P11SlotIdFilter(slotType.getIndex(), slotId));
+      filters.add(new P11SlotIdFilter(slotType.index(), slotId));
     }
 
     return filters;

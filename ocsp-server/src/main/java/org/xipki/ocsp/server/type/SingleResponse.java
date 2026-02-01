@@ -9,7 +9,6 @@ import java.time.Instant;
  * ASN.1 SingleResponse.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class SingleResponse extends ASN1Type {
@@ -36,7 +35,7 @@ public class SingleResponse extends ASN1Type {
     this.nextUpdate = nextUpdate;
     this.extensions = extensions;
 
-    int len = certId.getEncodedLength();
+    int len = certId.encodedLength();
     len += certStatus.length;
     len += 17; // thisUpdate
     if (nextUpdate != null) {
@@ -45,7 +44,7 @@ public class SingleResponse extends ASN1Type {
     }
 
     if (extensions != null) {
-      len += getLen(extensions.getEncodedLength()); // explicit tag
+      len += getLen(extensions.encodedLength()); // explicit tag
     }
 
     this.bodyLength = len;
@@ -53,7 +52,7 @@ public class SingleResponse extends ASN1Type {
   } // constructor
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 
@@ -70,7 +69,7 @@ public class SingleResponse extends ASN1Type {
     }
 
     if (extensions != null) {
-      idx += writeHeader((byte) 0xa1, extensions.getEncodedLength(), out, idx);
+      idx += writeHeader((byte) 0xa1, extensions.encodedLength(), out, idx);
       idx += extensions.write(out, idx);
     }
     return idx - offset;

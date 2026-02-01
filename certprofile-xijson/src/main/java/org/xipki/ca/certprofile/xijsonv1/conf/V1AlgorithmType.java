@@ -14,7 +14,6 @@ import java.util.List;
  * Configuration of the signature algorithm of certificate.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class V1AlgorithmType {
@@ -29,11 +28,11 @@ public class V1AlgorithmType {
     this.parameters = parameters;
   }
 
-  public List<DescribableOid> getAlgorithms() {
+  public List<DescribableOid> algorithms() {
     return algorithms;
   }
 
-  public V1KeyParametersType getParameters() {
+  public V1KeyParametersType parameters() {
     return parameters;
   }
 

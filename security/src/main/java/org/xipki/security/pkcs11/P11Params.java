@@ -18,9 +18,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.*;
  * PKCS#11 params.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public interface P11Params {
 
   default CkMechanism toMechanism(long mechanism, ExtraParams extraParams)
@@ -29,11 +27,11 @@ public interface P11Params {
     if (this instanceof P11Params.P11RSAPkcsPssParams) {
       P11Params.P11RSAPkcsPssParams param =
           (P11Params.P11RSAPkcsPssParams) this;
-      paramObj = new RSA_PKCS_PSS_PARAMS(param.getHashAlgorithm(),
-          param.getMaskGenerationFunction(), param.getSaltLength());
+      paramObj = new RSA_PKCS_PSS_PARAMS(param.hashAlgorithm(),
+          param.maskGenerationFunction(), param.saltLength());
     } else if (this instanceof P11Params.P11ByteArrayParams) {
       paramObj = new ByteArrayParams(
-          ((P11Params.P11ByteArrayParams) this).getBytes());
+          ((P11Params.P11ByteArrayParams) this).bytes());
     } else if (this instanceof P11Params.P11EddsaParams) {
       P11Params.P11EddsaParams eddsaParams = (P11Params.P11EddsaParams) this;
       paramObj = new EDDSA_PARAMS(eddsaParams.prehash, eddsaParams.context);
@@ -59,7 +57,7 @@ public interface P11Params {
       this.bytes = bytes;
     }
 
-    public byte[] getBytes() {
+    public byte[] bytes() {
       return bytes;
     }
 
@@ -74,7 +72,7 @@ public interface P11Params {
     private final int saltLength;
 
     public P11RSAPkcsPssParams(HashAlgo hashAlgo) {
-      this.saltLength = hashAlgo.getLength();
+      this.saltLength = hashAlgo.length();
 
       switch (hashAlgo) {
         case SHA1:
@@ -119,15 +117,15 @@ public interface P11Params {
       }
     }
 
-    public long getHashAlgorithm() {
+    public long hashAlgorithm() {
       return hashAlgorithm;
     }
 
-    public long getMaskGenerationFunction() {
+    public long maskGenerationFunction() {
       return maskGenerationFunction;
     }
 
-    public int getSaltLength() {
+    public int saltLength() {
       return saltLength;
     }
 

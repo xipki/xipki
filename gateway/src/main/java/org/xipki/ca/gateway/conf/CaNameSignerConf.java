@@ -11,7 +11,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CaNameSignerConf {
@@ -25,11 +24,11 @@ public class CaNameSignerConf {
     this.signer = signer;
   }
 
-  public List<String> getNames() {
+  public List<String> names() {
     return names;
   }
 
-  public SignerConf getSigner() {
+  public SignerConf signer() {
     return signer;
   }
 

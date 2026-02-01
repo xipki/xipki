@@ -9,8 +9,6 @@ import java.security.SecureRandom;
  * Random utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
- *
  */
 
 public class RandomUtil {

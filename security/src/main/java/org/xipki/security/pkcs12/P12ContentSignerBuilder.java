@@ -49,9 +49,7 @@ import java.util.List;
  * Builder of signer based PKCS#12 keystore.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P12ContentSignerBuilder {
 
   private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
@@ -59,8 +57,8 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private RSAContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.getAlgorithmIdentifier(),
-          signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      super(signAlgo.algorithmIdentifier(),
+          signAlgo.hashAlgo().algorithmIdentifier());
       this.signAlgo = signAlgo;
     }
 
@@ -88,8 +86,8 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private ECDSAContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.getAlgorithmIdentifier(),
-          signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      super(signAlgo.algorithmIdentifier(),
+          signAlgo.hashAlgo().algorithmIdentifier());
       this.signAlgo = signAlgo;
     }
 
@@ -98,7 +96,7 @@ public class P12ContentSignerBuilder {
         throws OperatorCreationException {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
 
-      Digest dig = signAlgo.getHashAlgo().createDigest();
+      Digest dig = signAlgo.hashAlgo().createDigest();
       return new DSADigestSigner(new ECDSASigner(), dig);
     }
 
@@ -109,8 +107,8 @@ public class P12ContentSignerBuilder {
     private final SignAlgo signAlgo;
 
     private SM2ContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.getAlgorithmIdentifier(),
-          signAlgo.getHashAlgo().getAlgorithmIdentifier());
+      super(signAlgo.algorithmIdentifier(),
+          signAlgo.hashAlgo().algorithmIdentifier());
       this.signAlgo = signAlgo;
     }
 
@@ -118,7 +116,7 @@ public class P12ContentSignerBuilder {
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      return new SM2Signer(signAlgo.getHashAlgo().createDigest());
+      return new SM2Signer(signAlgo.hashAlgo().createDigest());
     }
 
   } // class SM2ContentSignerBuilder
@@ -137,20 +135,20 @@ public class P12ContentSignerBuilder {
 
   public P12ContentSignerBuilder(KeypairWithCert keypairWithCert) {
     this.key = Args.notNull(keypairWithCert, "keypairWithCert").getKey();
-    this.publicKey = keypairWithCert.getPublicKey();
-    this.certificateChain = keypairWithCert.getCertificateChain();
+    this.publicKey = keypairWithCert.publicKey();
+    this.certificateChain = keypairWithCert.certificateChain();
   }
 
-  public X509Cert getCertificate() {
+  public X509Cert certificate() {
     return (certificateChain != null && certificateChain.length > 0)
         ? certificateChain[0] : null;
   }
 
-  public X509Cert[] getCertificateChain() {
+  public X509Cert[] certificateChain() {
     return certificateChain;
   }
 
-  public PrivateKey getKey() {
+  public PrivateKey key() {
     return key;
   }
 
@@ -222,7 +220,7 @@ public class P12ContentSignerBuilder {
       throws NoSuchAlgorithmException, NoSuchProviderException,
       InvalidKeyException, SignatureException {
     Signature signature =
-        Signature.getInstance(signAlgo.getJceName(), provName);
+        Signature.getInstance(signAlgo.jceName(), provName);
     signature.initSign(key);
     if (test) {
       signature.update(new byte[]{1, 2, 3, 4});

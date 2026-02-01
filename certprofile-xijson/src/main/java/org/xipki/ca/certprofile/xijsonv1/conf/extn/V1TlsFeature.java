@@ -29,7 +29,7 @@ public class V1TlsFeature {
   public TlsFeature toV2() {
     List<Integer> list = new ArrayList<>();
     for (DescribableInt feature : features) {
-      list.add(feature.getValue());
+      list.add(feature.value());
     }
 
     return new TlsFeature(list);

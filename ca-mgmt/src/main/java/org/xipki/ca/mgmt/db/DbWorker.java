@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Worker for database export / import.
  *
  * @author Lijun Liao (xipki)
- * @since 5.3.15
  */
 
 public abstract class DbWorker implements Runnable {

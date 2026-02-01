@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Benchmark executor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class BenchmarkExecutor {
@@ -180,7 +179,7 @@ public abstract class BenchmarkExecutor {
     }
   }
 
-  public int getThreads() {
+  public int threads() {
     return threads;
   }
 

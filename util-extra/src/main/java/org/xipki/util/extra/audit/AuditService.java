@@ -10,7 +10,6 @@ import org.xipki.util.conf.InvalidConfException;
  * Audit service interface.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface AuditService {

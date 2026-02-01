@@ -26,11 +26,11 @@ public class KeyPairWithSubjectPublicKeyInfo {
     this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
   }
 
-  public KeyPair getKeypair() {
+  public KeyPair keypair() {
     return keypair;
   }
 
-  public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+  public SubjectPublicKeyInfo subjectPublicKeyInfo() {
     return subjectPublicKeyInfo;
   }
 

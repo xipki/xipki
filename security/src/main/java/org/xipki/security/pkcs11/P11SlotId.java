@@ -9,9 +9,7 @@ import org.xipki.util.misc.StringUtil;
 /**
  * Identifier of a {@link P11Slot}.
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11SlotId {
 
   private final int index;
@@ -23,11 +21,11 @@ public class P11SlotId {
     this.id = Args.notNegative(id, "id");
   }
 
-  public int getIndex() {
+  public int index() {
     return index;
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 

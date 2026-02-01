@@ -147,7 +147,7 @@ class PKCS11Session {
   }
 
   PKCS11Key getKey(PKCS11KeyId keyId) throws TokenException {
-    PKCS11KeyId.KeyIdType type = keyId.getType();
+    PKCS11KeyId.KeyIdType type = keyId.type();
     long keyType = keyId.getKeyType();
 
     AttributeTypes ckaTypes = new AttributeTypes();

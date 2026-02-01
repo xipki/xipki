@@ -12,16 +12,14 @@ import java.util.Set;
  * {@link ConcurrentContentSigner}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public interface SignerFactoryRegister {
 
   /**
    * Retrieves the types of supported signers.
    * @return lower-case types of supported signers, never {@code null}.
    */
-  Set<String> getSupportedSignerTypes();
+  Set<String> supportedSignerTypes();
 
   /**
    * Creates a new {@link ConcurrentContentSigner}.

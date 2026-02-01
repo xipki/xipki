@@ -7,7 +7,6 @@ package org.xipki.util.password;
  * Password resolver interface.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface PasswordResolver {

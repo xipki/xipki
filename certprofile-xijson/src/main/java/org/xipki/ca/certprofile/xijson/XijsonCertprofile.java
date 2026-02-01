@@ -37,7 +37,6 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignSpec;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -48,7 +47,7 @@ import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.misc.LogUtil;
 import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 
@@ -56,7 +55,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -69,7 +67,6 @@ import java.util.Set;
  * Certprofile configured in JSON.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class XijsonCertprofile extends Certprofile {
@@ -124,12 +121,12 @@ public class XijsonCertprofile extends Certprofile {
   }
 
   @Override
-  public PublicKeyControl getPublicKeyControl() {
+  public PublicKeyControl publicKeyControl() {
     return publicKeyControl;
   }
 
   @Override
-  public Set<KeySingleUsage> getKeyUsage(KeySpec keySpec) {
+  public Set<KeySingleUsage> keyUsage(KeySpec keySpec) {
     return extensions.getKeyUsage(keySpec);
   }
 
@@ -171,45 +168,40 @@ public class XijsonCertprofile extends Certprofile {
 
   private void initialize0(XijsonCertprofileType conf)
       throws CertprofileException {
-    if (conf.getSignatureAlgorithms() != null) {
-      List<SignSpec> algoNames = conf.getSignatureAlgorithms();
-      List<SignAlgo> list = new ArrayList<>(algoNames.size());
-      for (SignSpec algoName : algoNames) {
-        list.add(algoName.getAlgo());
-      }
-
-      if (list.isEmpty()) {
+    if (conf.signatureAlgorithms() != null) {
+      List<SignAlgo> algoNames = conf.signatureAlgorithms();
+      if (algoNames.isEmpty()) {
         throw new CertprofileException("none of the signature algorithms " +
-            "is supported: " + conf.getSignatureAlgorithms());
+            "is supported: " + conf.signatureAlgorithms());
       }
 
-      this.signatureAlgorithms = Collections.unmodifiableList(list);
+      this.signatureAlgorithms = List.copyOf(algoNames);
     }
 
-    this.maxSize = conf.getMaxSize();
+    this.maxSize = conf.maxSize();
 
-    if ("99991231235959Z".equalsIgnoreCase(conf.getValidity())
-        || "UNDEFINED".equalsIgnoreCase(conf.getValidity())) {
+    if ("99991231235959Z".equalsIgnoreCase(conf.validity())
+        || "UNDEFINED".equalsIgnoreCase(conf.validity())) {
       this.hasNoWellDefinedExpirationDate = true;
       this.validity = null;
     } else {
       this.hasNoWellDefinedExpirationDate = false;
-      this.validity = Validity.getInstance(conf.getValidity());
+      this.validity = Validity.getInstance(conf.validity());
     }
-    this.notAfterMode = conf.getNotAfterMode();
-    this.certLevel = conf.getCertLevel();
+    this.notAfterMode = conf.notAfterMode();
+    this.certLevel = conf.certLevel();
     if (this.certLevel == null) {
       throw new CertprofileException("invalid CertLevel");
     }
 
-    this.certDomain = conf.getCertDomain() == null ? CertDomain.RFC5280
-        : conf.getCertDomain();
+    this.certDomain = conf.certDomain() == null ? CertDomain.RFC5280
+        : conf.certDomain();
 
     // KeypairGenControl
-    KeypairGenControl kg = conf.getKeypairGeneration();
+    KeypairGenControl kg = conf.keypairGeneration();
     this.keypairGenControl = (kg == null) ? KeypairGenControl.FORBIDDEN : kg;
 
-    String str = conf.getNotBeforeTime().toLowerCase().trim();
+    String str = conf.notBeforeTime().toLowerCase().trim();
     Long offsetSeconds = null;
     ZoneId midnightTimeZone = null;
     if (str.startsWith("midnight")) {
@@ -266,15 +258,15 @@ public class XijsonCertprofile extends Certprofile {
         : NotBeforeOption.getMidNightOption(midnightTimeZone);
 
     // KeyAlgorithms
-    this.publicKeyControl = new PublicKeyControl(conf.getKeyAlgorithms());
+    this.publicKeyControl = new PublicKeyControl(conf.keyAlgorithms());
 
     // Subject
     List<RdnControl> subjectDnControls = new LinkedList<>();
-    for (RdnType rdn : conf.getSubject()) {
+    for (RdnType rdn : conf.subject()) {
       subjectDnControls.add(rdn.toRdnControl());
     }
 
-    Boolean b = conf.getKeepSubjectOrder();
+    Boolean b = conf.keepSubjectOrder();
     this.subjectControl = new SubjectControl(subjectDnControls, b != null && b);
 
     // Extensions
@@ -287,13 +279,13 @@ public class XijsonCertprofile extends Certprofile {
   }
 
   @Override
-  public Validity getValidity() {
+  public Validity validity() {
     return validity;
   }
 
   @Override
-  public ValidityMode getNotAfterMode() {
-    return notAfterMode != null ? notAfterMode : super.getNotAfterMode();
+  public ValidityMode notAfterMode() {
+    return notAfterMode != null ? notAfterMode : super.notAfterMode();
   }
 
   @Override
@@ -310,7 +302,7 @@ public class XijsonCertprofile extends Certprofile {
             OIDs.oidToDisplayName(type)));
       }
 
-      if (control.getValue() != null) {
+      if (control.value() != null) {
         throw new BadCertTemplateException(String.format(
             "subject DN of type %s is not allowed in the request",
             OIDs.oidToDisplayName(type)));
@@ -319,30 +311,30 @@ public class XijsonCertprofile extends Certprofile {
       RDN[] rdns = requestedSubject.getRDNs(type);
       int numRdns = (rdns == null) ? 0 : rdns.length;
 
-      if (control.getToSAN() == null) {
-        if (numRdns > control.getMaxOccurs()
-            || numRdns < control.getMinOccurs()) {
+      if (control.toSAN() == null) {
+        if (numRdns > control.maxOccurs()
+            || numRdns < control.minOccurs()) {
           throw new BadCertTemplateException(String.format(
               "occurrence of subject DN of type %s not within the allowed " +
               "range. %d is not within [%d, %d]", OIDs.oidToDisplayName(type),
-              numRdns, control.getMinOccurs(), control.getMaxOccurs()));
+              numRdns, control.minOccurs(), control.maxOccurs()));
         }
       }
     }
 
-    for (ASN1ObjectIdentifier m : subjectControl.getTypes()) {
+    for (ASN1ObjectIdentifier m : subjectControl.types()) {
       RdnControl occurrence = subjectControl.getControl(m);
-      if (occurrence.getValue() != null) {
+      if (occurrence.value() != null) {
         continue;
       }
 
-      if (occurrence.getMinOccurs() == 0) {
+      if (occurrence.minOccurs() == 0) {
         continue;
       }
 
       boolean present = false;
       for (ASN1ObjectIdentifier type : types) {
-        if (occurrence.getType().equals(type)) {
+        if (occurrence.type().equals(type)) {
           present = true;
           break;
         }
@@ -351,13 +343,13 @@ public class XijsonCertprofile extends Certprofile {
       if (!present) {
         throw new BadCertTemplateException(String.format(
             "required subject DN of type %s is not present",
-            OIDs.oidToDisplayName(occurrence.getType())));
+            OIDs.oidToDisplayName(occurrence.type())));
       }
     }
   } // method verifySubjectDnOccurrence
 
   private boolean isCritical(ASN1ObjectIdentifier type) {
-    ExtensionControl control = getExtensionsControl().getControl(type);
+    ExtensionControl control = extensionsControl().getControl(type);
     return control != null && control.isCritical();
   }
 
@@ -393,7 +385,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // Policy Mappings
     ASN1ObjectIdentifier type = OIDs.Extn.policyMappings;
-    ExtensionValue policyMappings = extensions.getPolicyMappings();
+    ExtensionValue policyMappings = extensions.policyMappings();
     if (policyMappings != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, policyMappings);
@@ -410,8 +402,8 @@ public class XijsonCertprofile extends Certprofile {
 
       GeneralNames genNames =
           XijsonExtensions.createRequestedSubjectAltNames(
-              requestedSubject, sanExtnValue, getSubjectAltNameModes(),
-              extensions.getSubjectToSubjectAltNameModes());
+              requestedSubject, sanExtnValue, subjectAltNameModes(),
+              extensions.subjectToSubjectAltNameModes());
 
       if (genNames != null) {
         ExtensionValue value = new ExtensionValue(isCritical(type), genNames);
@@ -428,7 +420,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // Name Constraints
     type = OIDs.Extn.nameConstraints;
-    ExtensionValue nameConstraints = extensions.getNameConstraints();
+    ExtensionValue nameConstraints = extensions.nameConstraints();
     if (nameConstraints != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, nameConstraints);
@@ -437,7 +429,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // PolicyConstrains
     type = OIDs.Extn.policyConstraints;
-    ExtensionValue policyConstraints = extensions.getPolicyConstraints();
+    ExtensionValue policyConstraints = extensions.policyConstraints();
     if (policyConstraints != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, policyConstraints);
@@ -452,7 +444,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // Inhibit anyPolicy
     type = OIDs.Extn.inhibitAnyPolicy;
-    ExtensionValue inhibitAnyPolicy = extensions.getInhibitAnyPolicy();
+    ExtensionValue inhibitAnyPolicy = extensions.inhibitAnyPolicy();
     if (inhibitAnyPolicy != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, inhibitAnyPolicy);
@@ -475,7 +467,7 @@ public class XijsonCertprofile extends Certprofile {
     type = OIDs.Extn.privateKeyUsagePeriod;
     if (tmpExtnTypes.contains(type)) {
       Instant tmpNotAfter;
-      Validity privateKeyUsagePeriod = extensions.getPrivateKeyUsagePeriod();
+      Validity privateKeyUsagePeriod = extensions.privateKeyUsagePeriod();
       if (privateKeyUsagePeriod == null) {
         tmpNotAfter = notAfter;
       } else {
@@ -498,9 +490,9 @@ public class XijsonCertprofile extends Certprofile {
 
     // QCStatements
     type = OIDs.Extn.qCStatements;
-    ExtensionValue qcStatments = extensions.getQcStatements();
+    ExtensionValue qcStatments = extensions.qcStatements();
     List<QcStatementOption> qcStatementsOption =
-        extensions.getQcStatementsOption();
+        extensions.qcStatementsOption();
     if (tmpExtnTypes.contains(type) &&
         (qcStatments != null || qcStatementsOption != null)) {
       if (qcStatments != null) {
@@ -537,13 +529,13 @@ public class XijsonCertprofile extends Certprofile {
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         for (QcStatementOption m : qcStatementsOption) {
-          if (m.getStatement() != null) {
-            vec.add(m.getStatement());
+          if (m.statement() != null) {
+            vec.add(m.statement());
             continue;
           }
 
-          MonetaryValueOption monetaryOption = m.getMonetaryValueOption();
-          String currencyS = monetaryOption.getCurrencyString();
+          MonetaryValueOption monetaryOption = m.monetaryValueOption();
+          String currencyS = monetaryOption.currencyString();
           int[] limit = qcEuLimits.get(currencyS);
           if (limit == null) {
             throw new BadCertTemplateException("no EuLimitValue is " +
@@ -551,24 +543,24 @@ public class XijsonCertprofile extends Certprofile {
           }
 
           int amount = limit[0];
-          QcStatements.Range2Type range = monetaryOption.getAmountRange();
-          if (amount < range.getMin() || amount > range.getMax()) {
+          QcStatements.Range2Type range = monetaryOption.amountRange();
+          if (amount < range.min() || amount > range.max()) {
             throw new BadCertTemplateException("amount for currency '" +
-                currencyS + "' is not within [" + range.getMin() +
-                ", " + range.getMax() + "]");
+                currencyS + "' is not within [" + range.min() +
+                ", " + range.max() + "]");
           }
 
           int exponent = limit[1];
-          range = monetaryOption.getExponentRange();
-          if (exponent < range.getMin() || exponent > range.getMax()) {
+          range = monetaryOption.exponentRange();
+          if (exponent < range.min() || exponent > range.max()) {
             throw new BadCertTemplateException("exponent for currency '" +
-                currencyS + "' is not within [" + range.getMin() + ", " +
-                range.getMax() + "]");
+                currencyS + "' is not within [" + range.min() + ", " +
+                range.max() + "]");
           }
 
           MonetaryValue monetaryVale =
-              new MonetaryValue(monetaryOption.getCurrency(), amount, exponent);
-          vec.add(new QCStatement(m.getStatementId(), monetaryVale));
+              new MonetaryValue(monetaryOption.currency(), amount, exponent);
+          vec.add(new QCStatement(m.statementId(), monetaryVale));
         }
 
         ExtensionValue extValue = new ExtensionValue(isCritical(type),
@@ -582,7 +574,7 @@ public class XijsonCertprofile extends Certprofile {
     type = OIDs.Extn.biometricInfo;
     Extension extension = (requestedExtensions == null) ? null
         : requestedExtensions.get(type);
-    BiometricInfo biometricInfo = extensions.getBiometricInfo();
+    BiometricInfo biometricInfo = extensions.biometricInfo();
     if (tmpExtnTypes.contains(type)
         && biometricInfo != null
         && extension != null) {
@@ -620,7 +612,7 @@ public class XijsonCertprofile extends Certprofile {
               "].hashAlgorithm is not permitted");
         }
 
-        int expHashValueSize = hashAlgo.getLength();
+        int expHashValueSize = hashAlgo.length();
         byte[] hashValue = bd.getBiometricDataHash().getOctets();
         if (hashValue.length != expHashValueSize) {
           throw new BadCertTemplateException("biometricInfo[" + i +
@@ -628,7 +620,7 @@ public class XijsonCertprofile extends Certprofile {
         }
 
         ASN1IA5String sourceDataUri = bd.getSourceDataUriIA5();
-        TripleState occurrence = biometricInfo.getIncludeSourceDataUri();
+        TripleState occurrence = biometricInfo.includeSourceDataUri();
         if (occurrence == TripleState.forbidden) {
           sourceDataUri = null;
         } else if (occurrence == TripleState.required) {
@@ -639,7 +631,7 @@ public class XijsonCertprofile extends Certprofile {
         }
 
         BiometricData newBiometricData = new BiometricData(
-            bdType, hashAlgo.getAlgorithmIdentifier(),
+            bdType, hashAlgo.algorithmIdentifier(),
             new DEROctetString(hashValue), sourceDataUri);
         vec.add(newBiometricData);
       }
@@ -652,7 +644,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // TlsFeature
     type = OIDs.Extn.id_pe_tlsfeature;
-    ExtensionValue tlsFeature = extensions.getTlsFeature();
+    ExtensionValue tlsFeature = extensions.tlsFeature();
     if (tlsFeature != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, tlsFeature);
@@ -661,7 +653,7 @@ public class XijsonCertprofile extends Certprofile {
 
     // SMIME
     type = OIDs.Extn.id_smimeCapabilities;
-    ExtensionValue smimeCapabilities = extensions.getSmimeCapabilities();
+    ExtensionValue smimeCapabilities = extensions.smimeCapabilities();
     if (smimeCapabilities != null) {
       if (tmpExtnTypes.remove(type)) {
         values.addExtension(type, smimeCapabilities);
@@ -669,14 +661,14 @@ public class XijsonCertprofile extends Certprofile {
     }
 
     // CCC
-    type = extensions.getCccExtensionSchemaType();
+    type = extensions.cccExtensionSchemaType();
     if (type != null && tmpExtnTypes.remove(type)) {
-      values.addExtension(type, extensions.getCccExtensionSchemaValue());
+      values.addExtension(type, extensions.cccExtensionSchemaValue());
     }
 
     // constant extensions
     Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions =
-        extensions.getConstantExtensions();
+        extensions.constantExtensions();
     if (constantExtensions != null) {
       for (Entry<ASN1ObjectIdentifier, ExtensionValue> entry
           : constantExtensions.entrySet()) {
@@ -695,68 +687,68 @@ public class XijsonCertprofile extends Certprofile {
     return values;
   } // method getExtensions
 
-  public Map<ASN1ObjectIdentifier, ExtensionValue> getConstantExtensions() {
-    return extensions.getConstantExtensions();
+  public Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions() {
+    return extensions.constantExtensions();
   }
 
   @Override
-  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
-    return extensions.getExtendedKeyusages();
+  public Set<ExtKeyUsageControl> extendedKeyUsages() {
+    return extensions.extendedKeyusages();
   }
 
   @Override
-  public CertLevel getCertLevel() {
+  public CertLevel certLevel() {
     return certLevel;
   }
 
   @Override
-  public CertDomain getCertDomain() {
+  public CertDomain certDomain() {
     return certDomain;
   }
 
   @Override
-  public KeypairGenControl getKeypairGenControl() {
+  public KeypairGenControl keypairGenControl() {
     return keypairGenControl;
   }
 
   @Override
-  public Integer getPathLenBasicConstraint() {
-    return extensions.getPathLen();
+  public Integer pathLenBasicConstraint() {
+    return extensions.pathLen();
   }
 
   @Override
-  public AuthorityInfoAccessControl getAiaControl() {
-    return extensions.getAiaControl();
+  public AuthorityInfoAccessControl aiaControl() {
+    return extensions.aiaControl();
   }
 
   @Override
-  public ExtensionsControl getExtensionsControl() {
-    return extensions.getExtensionControls();
+  public ExtensionsControl extensionsControl() {
+    return extensions.extensionControls();
   }
 
   @Override
-  public int getMaxCertSize() {
-    return (maxSize == null) ? super.getMaxCertSize() : maxSize;
+  public int maxCertSize() {
+    return (maxSize == null) ? super.maxCertSize() : maxSize;
   }
 
   @Override
-  public SubjectControl getSubjectControl() {
+  public SubjectControl subjectControl() {
     return subjectControl;
   }
 
-  public NotBeforeOption getNotBeforeOption() {
+  public NotBeforeOption notBeforeOption() {
     return notBeforeOption;
   }
 
   @Override
-  public Instant getNotBefore(Instant requestedNotBefore) {
+  public Instant notBefore(Instant requestedNotBefore) {
     return notBeforeOption.getNotBefore(requestedNotBefore);
   }
 
   @Override
   public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>>
-      getSubjectInfoAccessModes() {
-    return extensions.getSubjectInfoAccessModes();
+      subjectInfoAccessModes() {
+    return extensions.subjectInfoAccessModes();
   }
 
   public XijsonExtensions extensions() {
@@ -764,27 +756,27 @@ public class XijsonCertprofile extends Certprofile {
   }
 
   @Override
-  public List<SignAlgo> getSignatureAlgorithms() {
+  public List<SignAlgo> signatureAlgorithms() {
     return signatureAlgorithms;
   }
 
   @Override
-  public Set<GeneralNameTag> getSubjectAltNameModes() {
-    return extensions.getSubjectAltNameModes();
+  public Set<GeneralNameTag> subjectAltNameModes() {
+    return extensions.subjectAltNameModes();
   }
 
-  public Integer getMaxSize() {
+  public Integer maxSize() {
     return maxSize;
   }
 
   @Override
-  public SubjectKeyIdentifierControl getSubjectKeyIdentifierControl() {
-    return extensions.getSubjectKeyIdentifier();
+  public SubjectKeyIdentifierControl subjectKeyIdentifierControl() {
+    return extensions.subjectKeyIdentifier();
   }
 
   @Override
-  public CertificatePolicies getCertificatePolicies() {
-    return extensions.getCertificatePolicies();
+  public CertificatePolicies certificatePolicies() {
+    return extensions.certificatePolicies();
   }
 
 }

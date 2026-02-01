@@ -13,7 +13,6 @@ import java.util.Set;
  * Gateway's CA-Profiles.
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 public class CaProfilesControl {
 
@@ -35,7 +34,7 @@ public class CaProfilesControl {
 
     Set<String> names = new HashSet<>();
     for (CaProfileConf entry : this.caProfiles) {
-      String name = entry.getName();
+      String name = entry.name();
       checkName(name, "caProfile name");
       if (names.contains(name)) {
         throw new InvalidConfException("caProfile " + name + " duplicated");
@@ -47,7 +46,7 @@ public class CaProfilesControl {
 
   public CaProfileConf getCaProfile(String name) {
     for (CaProfileConf conf : caProfiles) {
-      if (conf.getName().equalsIgnoreCase(name)) {
+      if (conf.name().equalsIgnoreCase(name)) {
         return conf;
       }
     }

@@ -361,7 +361,7 @@ public class XiSession {
     }
 
     for (XiAttribute sAttr : source.getAttributes()) {
-      XiAttribute tAttr = target.getAttribute(sAttr.getType());
+      XiAttribute tAttr = target.getAttribute(sAttr.type());
       if (tAttr == null) {
         target.add(sAttr);
       } else if (!tAttr.equals(sAttr)) {

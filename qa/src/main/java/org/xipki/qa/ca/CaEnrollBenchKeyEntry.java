@@ -13,7 +13,6 @@ import java.security.SecureRandom;
  * SubjectPublicKeyInfo entry for benchmark enrollment test.
  *
  * @author Lijun Liao
- *
  */
 
 public class CaEnrollBenchKeyEntry {
@@ -34,7 +33,7 @@ public class CaEnrollBenchKeyEntry {
     }
 
     this.spki = KeyUtil.generateKeypair2(keySpec, this.random)
-                  .getSubjectPublicKeyInfo();
+                  .subjectPublicKeyInfo();
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
@@ -42,7 +41,7 @@ public class CaEnrollBenchKeyEntry {
       return spki;
     }
 
-    return KeyUtil.generateKeypair2(keySpec, random).getSubjectPublicKeyInfo();
+    return KeyUtil.generateKeypair2(keySpec, random).subjectPublicKeyInfo();
   }
 
 }

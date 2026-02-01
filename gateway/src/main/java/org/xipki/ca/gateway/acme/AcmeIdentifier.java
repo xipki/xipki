@@ -25,11 +25,11 @@ public class AcmeIdentifier implements JsonEncodable {
     this.value = Args.notNull(value, "value");
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 

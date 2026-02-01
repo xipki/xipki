@@ -15,7 +15,6 @@ import java.security.SecureRandom;
  * Test for {@link PKCS1Util}.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class PKCS1UtilTest {
 
@@ -24,7 +23,7 @@ public class PKCS1UtilTest {
     HashAlgo ha = HashAlgo.SHA256;
     byte[] mHash = ha.hash("hello world".getBytes());
     int modulusBits = 2048;
-    int sLen = ha.getLength();
+    int sLen = ha.length();
     byte[] em = PKCS1Util.EMSA_PSS_ENCODE(ha, mHash, ha, sLen,
         modulusBits, new SecureRandom());
     boolean valid = PKCS1Util.EMSA_PSS_DECODE(ha, mHash, em, sLen, modulusBits);
@@ -36,7 +35,7 @@ public class PKCS1UtilTest {
     HashAlgo ha = HashAlgo.SHAKE128;
     byte[] mHash = ha.hash("hello world".getBytes());
     int modulusBits = 2048;
-    int sLen = ha.getLength();
+    int sLen = ha.length();
     byte[] em = PKCS1Util.EMSA_PSS_ENCODE(ha, mHash, ha, sLen,
         modulusBits, new SecureRandom());
     boolean valid = PKCS1Util.EMSA_PSS_DECODE(ha, mHash, em, sLen, modulusBits);

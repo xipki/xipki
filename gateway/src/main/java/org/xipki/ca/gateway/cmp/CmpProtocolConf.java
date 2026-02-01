@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CmpProtocolConf extends ProtocolConf {
@@ -41,15 +40,15 @@ public class CmpProtocolConf extends ProtocolConf {
     this.signers = signers;
   }
 
-  public CmpControlConf getCmp() {
+  public CmpControlConf cmp() {
     return cmp;
   }
 
-  public String getAuthenticator() {
+  public String authenticator() {
     return authenticator;
   }
 
-  public CaNameSignersConf getSigners() {
+  public CaNameSignersConf signers() {
     return signers;
   }
 
@@ -65,8 +64,8 @@ public class CmpProtocolConf extends ProtocolConf {
     CaNameSignersConf signers = (map == null) ? null
         : CaNameSignersConf.parse(map);
 
-    return new CmpProtocolConf(pConf.getLogReqResp(),
-        pConf.getPop(), pConf.getSdkClient(), cmp,
+    return new CmpProtocolConf(pConf.logReqResp(),
+        pConf.pop(), pConf.sdkClient(), cmp,
         json.getString("authenticator"), signers);
   }
 

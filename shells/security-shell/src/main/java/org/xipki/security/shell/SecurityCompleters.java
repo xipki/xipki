@@ -113,7 +113,7 @@ public class SecurityCompleters {
 
     static {
       for (SignAlgo m : SignAlgo.values()) {
-        algos.add(m.getJceName());
+        algos.add(m.jceName());
       }
     }
 
@@ -128,7 +128,7 @@ public class SecurityCompleters {
     public AllSigAlgCompleter() {
       List<String> algos = new LinkedList<>();
       for (SignAlgo a : SignAlgo.values()) {
-        algos.add(a.getJceName());
+        algos.add(a.jceName());
       }
       setTokens(algos);
     }

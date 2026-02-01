@@ -10,9 +10,7 @@ import org.xipki.util.codec.Args;
  * PKI message with verification result.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class VerifiedPkiMessage {
 
   private final GeneralPKIMessage pkiMessage;
@@ -27,11 +25,11 @@ public class VerifiedPkiMessage {
     return pkiMessage.hasProtection();
   }
 
-  public GeneralPKIMessage getPkiMessage() {
+  public GeneralPKIMessage pkiMessage() {
     return pkiMessage;
   }
 
-  public ProtectionVerificationResult getProtectionVerificationResult() {
+  public ProtectionVerificationResult protectionVerificationResult() {
     return protectionVerificationResult;
   }
 

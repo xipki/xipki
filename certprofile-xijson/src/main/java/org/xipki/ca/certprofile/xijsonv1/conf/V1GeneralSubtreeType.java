@@ -17,7 +17,6 @@ import java.util.List;
  * Configuration of GeneralSubtree.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class V1GeneralSubtreeType {

@@ -28,7 +28,7 @@ public enum GeneralNameTag {
     this.tag = tag;
   }
 
-  public int getTag() {
+  public int tag() {
     return tag;
   }
 
@@ -57,7 +57,7 @@ public enum GeneralNameTag {
           return m;
       }
 
-      if (Integer.toString(m.getTag()).equals(name)) {
+      if (Integer.toString(m.tag()).equals(name)) {
         return m;
       }
     }

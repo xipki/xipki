@@ -62,7 +62,6 @@ import static org.xipki.util.codec.Args.notEmpty;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class GenerateCerts {
 
   private static class Conf {
@@ -123,10 +122,10 @@ public class GenerateCerts {
         }
         keyCertNames.add(name);
 
-        if (m.getIssuerName() != null) {
-          if (!caKeyCertNames.contains(m.getIssuerName())) {
+        if (m.issuerName() != null) {
+          if (!caKeyCertNames.contains(m.issuerName())) {
             throw new IllegalArgumentException(
-                "Unknown issuer '" + m.getIssuerName() + "'");
+                "Unknown issuer '" + m.issuerName() + "'");
           }
         }
       }
@@ -281,7 +280,7 @@ public class GenerateCerts {
       this.entries = notEmpty(entries, "entries");
     }
 
-    public String getIssuerName() {
+    public String issuerName() {
       return issuerName;
     }
 
@@ -369,11 +368,11 @@ public class GenerateCerts {
       this.alias = Args.notBlank(alias, "alias");
     }
 
-    public String getKeyType() {
+    public String keyType() {
       return keyType;
     }
 
-    public String getAlias() {
+    public String alias() {
       return alias;
     }
 
@@ -437,15 +436,15 @@ public class GenerateCerts {
       return ret;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getPassword() {
+    public String password() {
       return password;
     }
 
-    public List<SecretKeyEntry> getKeys() {
+    public List<SecretKeyEntry> keys() {
       return keys;
     }
 
@@ -511,7 +510,7 @@ public class GenerateCerts {
         char[] password = skConf.password.toCharArray();
         KeyStore ks = KeyUtil.getOutKeyStore("JCEKS");
         ks.load(null, null);
-        for (SecretKeyEntry entry : skConf.getKeys()) {
+        for (SecretKeyEntry entry : skConf.keys()) {
           SecretKey key = generateSecretKey(entry.keyType);
           ks.setKeyEntry(entry.alias, key, password, null);
         }
@@ -554,9 +553,9 @@ public class GenerateCerts {
           KeyUtil.generateKeypair2(keySpec, null);
 
       SubjectPublicKeyInfo subjectPublicKeyInfo =
-          keyPairInfo.getSubjectPublicKeyInfo();
+          keyPairInfo.subjectPublicKeyInfo();
 
-      KeyPair keyPair = keyPairInfo.getKeypair();
+      KeyPair keyPair = keyPairInfo.keypair();
 
       char[] password = keyCertConf.p12Password.toCharArray();
       KeystoreGenerationParameters genParams =
@@ -583,10 +582,10 @@ public class GenerateCerts {
               "unknown CA " + keyCertConf.issuerName);
         }
         ContentSigner contentSigner = KeyUtil.getContentSigner(
-            caKeyCertPair.getKey(), caKeyCertPair.getCert().getPublicKey(),
+            caKeyCertPair.key(), caKeyCertPair.cert().publicKey(),
             random);
         keyStoreAndCert = generateCertificate(certType, contentSigner,
-            caKeyCertPair.getCert(), keyPair.getPrivate(),
+            caKeyCertPair.cert(), keyPair.getPrivate(),
             subjectPublicKeyInfo, genParams, subject, validity);
       }
 
@@ -665,8 +664,8 @@ public class GenerateCerts {
             KeyUtil.generateKeypair2(keySpec, null);
 
         SubjectPublicKeyInfo subjectPublicKeyInfo =
-            keyPairInfo.getSubjectPublicKeyInfo();
-        KeyPair keyPair = keyPairInfo.getKeypair();
+            keyPairInfo.subjectPublicKeyInfo();
+        KeyPair keyPair = keyPairInfo.keypair();
 
         Validity validity = Validity.getInstance(entry.validity);
         X500Name subject = new X500Name(entry.subject);
@@ -674,7 +673,7 @@ public class GenerateCerts {
 
         KeyStoreAndCert keyStoreAndCert;
 
-        if (keyCertConf.getIssuerName() == null) {
+        if (keyCertConf.issuerName() == null) {
           ContentSigner contentSigner = KeyUtil.getContentSigner(
               keyPair.getPrivate(), keyPair.getPublic(), random, true);
 
@@ -683,22 +682,22 @@ public class GenerateCerts {
               genParams, subject, validity);
         } else {
           KeyWithCert caKeyCertPair =
-              caKeyAndCertPairMap.get(keyCertConf.getIssuerName());
+              caKeyAndCertPairMap.get(keyCertConf.issuerName());
           if (caKeyCertPair == null) {
             throw new InvalidConfException(
-                "unknown CA " + keyCertConf.getIssuerName());
+                "unknown CA " + keyCertConf.issuerName());
           }
           ContentSigner contentSigner =
-              KeyUtil.getContentSigner(caKeyCertPair.getKey(),
-              caKeyCertPair.getCert().getPublicKey(), random);
+              KeyUtil.getContentSigner(caKeyCertPair.key(),
+              caKeyCertPair.cert().publicKey(), random);
           keyStoreAndCert = generateCertificate(certType, contentSigner,
-              caKeyCertPair.getCert(), keyPair.getPrivate(),
+              caKeyCertPair.cert(), keyPair.getPrivate(),
               subjectPublicKeyInfo, genParams, subject, validity);
         }
 
         X509Cert cert = keyStoreAndCert.cert;
         thisCerts[index] = cert;
-        thisKeys[index] = keyPairInfo.getKeypair().getPrivate();
+        thisKeys[index] = keyPairInfo.keypair().getPrivate();
         index++;
       }
 
@@ -812,11 +811,11 @@ public class GenerateCerts {
       serialNumber = BigInteger.ONE;
       issuer = subject;
     } else {
-      if (notAfter.isAfter(issuerCert.getNotAfter())) {
-        notAfter = issuerCert.getNotAfter();
+      if (notAfter.isAfter(issuerCert.notAfter())) {
+        notAfter = issuerCert.notAfter();
       }
       serialNumber = new BigInteger(72, random);
-      issuer = issuerCert.getSubject();
+      issuer = issuerCert.subject();
     }
 
     // Generate keystore
@@ -826,7 +825,7 @@ public class GenerateCerts {
 
     if (issuerCert != null) {
       certGenerator.addExtension(OIDs.Extn.authorityKeyIdentifier, false,
-          new AuthorityKeyIdentifier(issuerCert.getSubjectKeyId()));
+          new AuthorityKeyIdentifier(issuerCert.subjectKeyId()));
     }
 
     byte[] encodedSpki = subjectPublicKeyInfo.getPublicKeyData().getBytes();
@@ -879,19 +878,19 @@ public class GenerateCerts {
         new X509Cert(certGenerator.build(signer)), privateKey);
 
     KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
-    ks.load(null, params.getPassword());
+    ks.load(null, params.password());
 
-    ks.setKeyEntry("main", privateKey, params.getPassword(),
-        new java.security.cert.Certificate[]{identity.getCert().toJceCert()});
+    ks.setKeyEntry("main", privateKey, params.password(),
+        new java.security.cert.Certificate[]{identity.cert().toJceCert()});
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {
-      ks.store(ksStream, params.getPassword());
+      ks.store(ksStream, params.password());
     } finally {
       ksStream.flush();
     }
 
-    return new KeyStoreAndCert(ksStream.toByteArray(), identity.getCert());
+    return new KeyStoreAndCert(ksStream.toByteArray(), identity.cert());
   }
 
   private static SecretKey generateSecretKey(String keyType) throws Exception {
@@ -925,11 +924,11 @@ public class GenerateCerts {
       this.cert = cert;
     }
 
-    public X509Cert getCert() {
+    public X509Cert cert() {
       return cert;
     }
 
-    public PrivateKey getKey() {
+    public PrivateKey key() {
       return key;
     }
   }

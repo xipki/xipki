@@ -89,7 +89,7 @@ public class ECGenerateKeyPairTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       LOG.info("##################################################");
       LOG.info("Generating new EC (curve secp256r1) key-pair... ");
 
@@ -113,7 +113,7 @@ public class ECGenerateKeyPairTest {
       // OID: 1.2.840.10045.3.1.7 (secp256r1, alias NIST P-256)
       PKCS11KeyPairSpec template = new PKCS11KeyPairSpec()
           .id(id).token(true).sensitive(true).private_(true)
-          .keyPairType(PKCS11KeyPairType.EC_P256);
+          .keyPairType(PKCS11KeyPairType.P256);
 
       // set the attributes in a way netscape does, this should work with most
       // tokens

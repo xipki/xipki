@@ -30,9 +30,7 @@ import java.security.cert.X509Certificate;
  *   <li>SSL_CLIENT_CERT</li>
  * </ul>
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
-
 public class TlsHelper {
 
   private static class Reference {

@@ -1,12 +1,12 @@
 {
-	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
-	"caProfiles": [{
-		"name": "default",
-		"ca": "subca",
-		"certprofile": "tls"
-	},{
-		"name": "myalias",
-		"ca": "subca",
-		"certprofile": "tls"
-	}]
+  "authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
+  "caProfiles": [{
+    "name": "default",
+    "ca": "subca",
+    "certprofile": "tls"
+  },{
+    "name": "myalias",
+    "ca": "subca",
+    "certprofile": "tls"
+  }]
 }

@@ -24,11 +24,11 @@ public class NewKeyControl {
 
   private Set<P11KeyUsage> usages;
 
-  public byte[] getId() {
+  public byte[] id() {
     return id;
   }
 
-  public String getLabel() {
+  public String label() {
     return label;
   }
 
@@ -41,7 +41,7 @@ public class NewKeyControl {
     this.label = Args.notBlank(label, "label");
   }
 
-  public Boolean getExtractable() {
+  public Boolean extractable() {
     return extractable;
   }
 
@@ -49,7 +49,7 @@ public class NewKeyControl {
     this.extractable = extractable;
   }
 
-  public Boolean getSensitive() {
+  public Boolean sensitive() {
     return sensitive;
   }
 
@@ -57,7 +57,7 @@ public class NewKeyControl {
     this.sensitive = sensitive;
   }
 
-  public Set<P11KeyUsage> getUsages() {
+  public Set<P11KeyUsage> usages() {
     return usages;
   }
 

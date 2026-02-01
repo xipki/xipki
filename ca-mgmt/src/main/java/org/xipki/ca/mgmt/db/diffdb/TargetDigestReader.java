@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class TargetDigestReader implements Closeable {
@@ -79,10 +78,10 @@ class TargetDigestReader implements Closeable {
         }
 
         try {
-          Map<BigInteger, DigestEntry> refCerts = bundle.getCerts();
+          Map<BigInteger, DigestEntry> refCerts = bundle.certs();
           Map<BigInteger, DigestEntry> resp = query(bundle);
 
-          List<BigInteger> serialNumbers = bundle.getSerialNumbers();
+          List<BigInteger> serialNumbers = bundle.serialNumbers();
           int size = serialNumbers.size();
 
           for (BigInteger serialNumber : serialNumbers) {
@@ -121,10 +120,10 @@ class TargetDigestReader implements Closeable {
 
     private Map<BigInteger, DigestEntry> query(CertsBundle bundle)
         throws DataAccessException {
-      List<BigInteger> serialNumbers = bundle.getSerialNumbers();
+      List<BigInteger> serialNumbers = bundle.serialNumbers();
       int size = serialNumbers.size();
 
-      return (datasource.getDatabaseType().supportsInArray()
+      return (datasource.databaseType().supportsInArray()
           && size == numPerSelect)
         ? getCertsViaInArraySelect(inArraySelectStmt, serialNumbers)
         : getCertsViaSingleSelect(singleSelectStmt, serialNumbers);

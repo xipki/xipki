@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class RefDigestReader implements Closeable {
@@ -173,7 +172,7 @@ class RefDigestReader implements Closeable {
     this.caCert = Args.notNull(caCert, "caCert");
     this.stopMe = Args.notNull(stopMe, "stopMe");
     this.totalAccount = totalAccount;
-    this.caSubjectName = caCert.getSubjectText();
+    this.caSubjectName = caCert.subjectText();
     this.lastProcessedId = minId - 1;
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
@@ -218,7 +217,7 @@ class RefDigestReader implements Closeable {
 
   } // method init
 
-  public int getCaId() {
+  public int caId() {
     return caId;
   }
 
@@ -274,15 +273,15 @@ class RefDigestReader implements Closeable {
     }
   } // method getInstance
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
-  public String getCaSubjectName() {
+  public String caSubjectName() {
     return caSubjectName;
   }
 
-  public int getTotalAccount() {
+  public int totalAccount() {
     return totalAccount;
   }
 
@@ -317,9 +316,9 @@ class RefDigestReader implements Closeable {
     List<BigInteger> serialNumbers = new LinkedList<>();
     Map<BigInteger, DigestEntry> certsMap = new HashMap<>();
     for (IdentifiedDigestEntry m : certSet.getEntries()) {
-      BigInteger sn = m.getContent().getSerialNumber();
+      BigInteger sn = m.content().serialNumber();
       serialNumbers.add(sn);
-      certsMap.put(sn, m.getContent());
+      certsMap.put(sn, m.content());
     }
 
     return new CertsBundle(certsMap, serialNumbers);

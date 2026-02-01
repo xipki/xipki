@@ -10,7 +10,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 
 public class CaNameResponse extends SdkResponse {
@@ -24,11 +23,11 @@ public class CaNameResponse extends SdkResponse {
     this.aliases = aliases;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String[] getAliases() {
+  public String[] aliases() {
     return aliases;
   }
 

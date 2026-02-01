@@ -16,7 +16,6 @@ import org.xipki.util.codec.Args;
  * Entry for benchmark enrollment test.
  *
  * @author Lijun Liao
- *
  */
 
 public class CaEnrollBenchEntry {

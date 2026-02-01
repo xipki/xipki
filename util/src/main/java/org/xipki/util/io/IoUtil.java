@@ -35,7 +35,6 @@ import java.util.List;
  * IO utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class IoUtil {

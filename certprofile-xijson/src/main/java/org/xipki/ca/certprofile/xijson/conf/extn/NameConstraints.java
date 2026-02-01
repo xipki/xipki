@@ -41,11 +41,11 @@ public class NameConstraints implements JsonEncodable {
     this.excludedSubtrees  = excludedSubtrees;
   }
 
-  public List<GeneralSubtreeType> getPermittedSubtrees() {
+  public List<GeneralSubtreeType> permittedSubtrees() {
     return permittedSubtrees;
   }
 
-  public List<GeneralSubtreeType> getExcludedSubtrees() {
+  public List<GeneralSubtreeType> excludedSubtrees() {
     return excludedSubtrees;
   }
 
@@ -75,18 +75,18 @@ public class NameConstraints implements JsonEncodable {
       GeneralSubtreeType type) {
     GeneralSubtreeType baseType = Args.notNull(type, "type");
     GeneralName base;
-    if (baseType.getDirectoryName() != null) {
+    if (baseType.directoryName() != null) {
       base = new GeneralName(X509Util.reverse(
-          new X500Name(baseType.getDirectoryName())));
-    } else if (baseType.getDnsName() != null) {
-      base = new GeneralName(GeneralName.dNSName, baseType.getDnsName());
-    } else if (baseType.getIpAddress() != null) {
-      base = new GeneralName(GeneralName.iPAddress, baseType.getIpAddress());
-    } else if (baseType.getRfc822Name() != null) {
-      base = new GeneralName(GeneralName.rfc822Name, baseType.getRfc822Name());
-    } else if (baseType.getUri() != null) {
+          new X500Name(baseType.directoryName())));
+    } else if (baseType.dnsName() != null) {
+      base = new GeneralName(GeneralName.dNSName, baseType.dnsName());
+    } else if (baseType.ipAddress() != null) {
+      base = new GeneralName(GeneralName.iPAddress, baseType.ipAddress());
+    } else if (baseType.rfc822Name() != null) {
+      base = new GeneralName(GeneralName.rfc822Name, baseType.rfc822Name());
+    } else if (baseType.uri() != null) {
       base = new GeneralName(GeneralName.uniformResourceIdentifier,
-          baseType.getUri());
+          baseType.uri());
     } else {
       throw new IllegalStateException(
           "should not reach here, unknown child of GeneralSubtreeType");

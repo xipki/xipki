@@ -60,11 +60,11 @@ public class RdnType implements JsonEncodable {
     }
   }
 
-  public AttributeType getType() {
+  public AttributeType type() {
     return type;
   }
 
-  public Boolean getPrintableString() {
+  public Boolean printableString() {
     return printableString;
   }
 
@@ -72,7 +72,7 @@ public class RdnType implements JsonEncodable {
     this.printableString = printableString;
   }
 
-  public String getRegex() {
+  public String regex() {
     return regex;
   }
 
@@ -80,15 +80,15 @@ public class RdnType implements JsonEncodable {
     this.regex = regex;
   }
 
-  public int getMinOccurs() {
+  public int minOccurs() {
     return minOccurs;
   }
 
-  public int getMaxOccurs() {
+  public int maxOccurs() {
     return maxOccurs;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 
@@ -104,13 +104,13 @@ public class RdnType implements JsonEncodable {
     this.toSAN = toSAN;
   }
 
-  public GeneralNameTag getToSAN() {
+  public GeneralNameTag toSAN() {
     return toSAN;
   }
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().put("type", type.getMainAlias())
+    return new JsonMap().put("type", type.mainAlias())
         .put("minOccurs", (minOccurs == 1 ? null : minOccurs))
         .put("maxOccurs", (maxOccurs == 1 ? null : maxOccurs))
         .put("value", value).putEnum("toSAN", toSAN)
@@ -131,9 +131,9 @@ public class RdnType implements JsonEncodable {
   public RdnControl toRdnControl() throws CertprofileException {
     RdnControl ret;
     if (value == null) {
-        ret = new RdnControl(type.getOid(), minOccurs, maxOccurs);
+        ret = new RdnControl(type.oid(), minOccurs, maxOccurs);
     } else {
-        ret = new RdnControl(type.getOid(), value);
+        ret = new RdnControl(type.oid(), value);
     }
 
     if (regex != null) {

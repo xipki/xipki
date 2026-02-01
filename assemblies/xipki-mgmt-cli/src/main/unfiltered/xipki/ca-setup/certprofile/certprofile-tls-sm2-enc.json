@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile SM2 tls encryption"
+    "details": "certprofile tls enc"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,
@@ -62,15 +62,17 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["dataEncipherment"]
+            "required": ["dataEncipherment","keyEncipherment"]
           }
         ]
       }
     },{
       "type": "ExtendedKeyUsage",
       "required": true,
+      "inRequest": "optional",
       "extendedKeyUsage": {
-        "required": ["serverAuth"]
+        "required": ["serverAuth"],
+        "optional": ["clientAuth"]
       }
     }
   ]

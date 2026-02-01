@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * DigestEntry with the id and caId in database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class IdentifiedDigestEntry {
@@ -25,11 +24,11 @@ class IdentifiedDigestEntry {
     this.id = id;
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
-  public DigestEntry getContent() {
+  public DigestEntry content() {
     return content;
   }
 
@@ -37,7 +36,7 @@ class IdentifiedDigestEntry {
     this.caId = caId;
   }
 
-  public Integer getCaId() {
+  public Integer caId() {
     return caId;
   }
 

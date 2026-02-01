@@ -9,7 +9,6 @@ import org.xipki.util.codec.Base64;
  * Test for {@link Base64} with Base64-URL letters.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class Base64UrlTest extends AbstractBase64Test {
 

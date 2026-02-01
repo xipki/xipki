@@ -483,17 +483,6 @@ public class XiPKCS11Module {
     return new XiMechanism(vendor, newMech, ckm);
   }
 
-  private void checkCkaSensitive(long objClass, Boolean sensitive)
-      throws HsmException {
-    if (!(objClass == CKO_PRIVATE_KEY || objClass == CKO_SECRET_KEY)) {
-      return;
-    }
-
-    if (!(sensitive != null && !sensitive)) {
-      return;
-    }
-  }
-
   private XiTemplate vendorToGenericCka2(
       FunctionEnum functionEnum, Template ckAttrs, Long objClass)
       throws HsmException {
@@ -507,9 +496,6 @@ public class XiPKCS11Module {
     if (objClass == null) {
       return attrs;
     }
-
-    // CKA_SENSITIVE
-    checkCkaSensitive(objClass, attrs.getBool(CKA_SENSITIVE));
 
     return attrs;
   }

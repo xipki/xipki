@@ -7,9 +7,7 @@ package org.xipki.security;
  * TLS feature extension type. See RFC 7633 for details.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class TlsExtensionType implements Comparable<TlsExtensionType> {
 
   public static final TlsExtensionType SERVER_NAME =
@@ -33,11 +31,11 @@ public class TlsExtensionType implements Comparable<TlsExtensionType> {
     this.name = name;
   }
 
-  public int getCode() {
+  public int code() {
     return code;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 

@@ -20,7 +20,7 @@ public abstract class IdentifiedDbObject implements JsonEncodable {
     this.id = id;
   }
 
-  public Long getId() {
+  public Long id() {
     return id;
   }
 

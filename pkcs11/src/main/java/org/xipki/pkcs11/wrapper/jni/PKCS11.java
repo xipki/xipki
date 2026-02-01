@@ -1199,7 +1199,7 @@ public abstract class PKCS11 {
     this.moduleId = 0;
   }
 
-  protected JniResult query(QueryParams params) throws PKCS11Exception {
+  JniResult query(QueryParams params) throws PKCS11Exception {
     Arch arch = arch();
     long ckm = 0;
 

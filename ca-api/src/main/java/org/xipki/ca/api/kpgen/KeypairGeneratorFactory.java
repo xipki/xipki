@@ -12,7 +12,6 @@ import java.util.Set;
  * Factory to create {@link KeypairGenerator}.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public interface KeypairGeneratorFactory {

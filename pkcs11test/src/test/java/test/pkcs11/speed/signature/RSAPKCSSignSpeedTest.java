@@ -53,11 +53,11 @@ public class RSAPKCSSignSpeedTest extends TestBase {
   private static final long signMechanism = CKM_RSA_PKCS;
 
   private PKCS11KeyPairSpec getMinimalKeyPairTemplate0() {
-    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA_2048);
+    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA2048);
   }
 
   @Test
-  public void main() throws TokenException {
+  public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +

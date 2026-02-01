@@ -51,7 +51,7 @@ public class IPAddressChoice extends ASN1Object {
     return addressesOrRanges == null;
   }
 
-  public List<IPAddressOrRange> getAddressesOrRanges() {
+  public List<IPAddressOrRange> addressesOrRanges() {
     return addressesOrRanges;
   }
 

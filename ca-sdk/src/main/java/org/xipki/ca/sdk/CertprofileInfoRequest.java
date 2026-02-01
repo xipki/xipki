@@ -10,7 +10,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CertprofileInfoRequest extends SdkRequest {
@@ -21,7 +20,7 @@ public class CertprofileInfoRequest extends SdkRequest {
     this.profile = profile;
   }
 
-  public String getProfile() {
+  public String profile() {
     return profile;
   }
 

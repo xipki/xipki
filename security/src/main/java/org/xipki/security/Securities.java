@@ -31,7 +31,6 @@ import java.util.List;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class Securities implements Closeable {
 
   public static class SecurityConf {
@@ -71,7 +70,7 @@ public class Securities implements Closeable {
       this.signStrongrandomEnabled = signStrongrandomEnabled;
     }
 
-    public int getDefaultSignerParallelism() {
+    public int defaultSignerParallelism() {
       return defaultSignerParallelism;
     }
 
@@ -79,7 +78,7 @@ public class Securities implements Closeable {
       this.defaultSignerParallelism = defaultSignerParallelism;
     }
 
-    public FileOrValue getPkcs11Conf() {
+    public FileOrValue pkcs11Conf() {
       return pkcs11Conf;
     }
 
@@ -92,7 +91,7 @@ public class Securities implements Closeable {
       LOG.warn("ignored password configuration");
     }
 
-    public List<String> getSignerFactories() {
+    public List<String> signerFactories() {
       return signerFactories;
     }
 
@@ -144,11 +143,11 @@ public class Securities implements Closeable {
   public Securities() {
   }
 
-  public SecurityFactory getSecurityFactory() {
+  public SecurityFactory securityFactory() {
     return securityFactory;
   }
 
-  public P11CryptServiceFactory getP11CryptServiceFactory() {
+  public P11CryptServiceFactory p11CryptServiceFactory() {
     return p11CryptServiceFactory;
   }
 
@@ -197,7 +196,7 @@ public class Securities implements Closeable {
     securityFactory.setStrongRandom4KeyEnabled(
         conf.isKeyStrongrandomEnabled());
     securityFactory.setDefaultSignerParallelism(
-        conf.getDefaultSignerParallelism());
+        conf.defaultSignerParallelism());
 
     //----- Factories
     SignerFactoryRegisterImpl signerFactoryRegister =
@@ -210,13 +209,13 @@ public class Securities implements Closeable {
     signerFactoryRegister.registFactory(p12SignerFactory);
 
     // PKCS#11
-    if (conf.getPkcs11Conf() != null) {
-      initSecurityPkcs11(conf.getPkcs11Conf(), signerFactoryRegister);
+    if (conf.pkcs11Conf() != null) {
+      initSecurityPkcs11(conf.pkcs11Conf(), signerFactoryRegister);
     }
 
     // register additional SignerFactories
-    if (CollectionUtil.isNotEmpty(conf.getSignerFactories())) {
-      for (String className : conf.getSignerFactories()) {
+    if (CollectionUtil.isNotEmpty(conf.signerFactories())) {
+      for (String className : conf.signerFactories()) {
         SignerFactory factory;
         try {
           factory = ReflectiveUtil.newInstance(className);

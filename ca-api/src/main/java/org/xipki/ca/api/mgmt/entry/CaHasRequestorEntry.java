@@ -40,15 +40,15 @@ public class CaHasRequestorEntry extends MgmtEntry {
     }
   }
 
-  public Permissions getPermissions() {
+  public Permissions permissions() {
     return permissions;
   }
 
-  public NameId getRequestorIdent() {
+  public NameId requestorIdent() {
     return requestorIdent;
   }
 
-  public List<String> getProfiles() {
+  public List<String> profiles() {
     return profiles;
   }
 

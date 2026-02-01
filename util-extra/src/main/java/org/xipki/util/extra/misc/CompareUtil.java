@@ -9,7 +9,6 @@ import java.util.Arrays;
  * Utility class for the comparison.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CompareUtil {

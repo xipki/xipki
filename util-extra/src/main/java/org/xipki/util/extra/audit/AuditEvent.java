@@ -16,7 +16,6 @@ import java.util.List;
  * Audit event.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class AuditEvent {
@@ -60,7 +59,7 @@ public class AuditEvent {
     this.duration = null;
   }
 
-  public AuditLevel getLevel() {
+  public AuditLevel level() {
     return (status == AuditStatus.FAILED && AuditLevel.INFO == level)
         ? AuditLevel.WARN : level;
   }
@@ -74,15 +73,15 @@ public class AuditEvent {
     this.status = status;
   }
 
-  public String getApplicationName() {
+  public String applicationName() {
     return applicationName;
   }
 
-  public Instant getTimestamp() {
+  public Instant timestamp() {
     return timestamp;
   }
 
-  public List<AuditEventData> getEventDatas() {
+  public List<AuditEventData> eventDatas() {
     return Collections.unmodifiableList(eventDatas);
   }
 
@@ -103,7 +102,7 @@ public class AuditEvent {
     int idx = -1;
     for (int i = 0; i < eventDatas.size(); i++) {
       final AuditEventData ed = eventDatas.get(i);
-      if (ed.getName().equals(name)) {
+      if (ed.name().equals(name)) {
         idx = i;
         break;
       }
@@ -125,7 +124,7 @@ public class AuditEvent {
     int idx = -1;
     for (int i = 0; i < eventDatas.size(); i++) {
       final AuditEventData ed = eventDatas.get(i);
-      if (ed.getName().equals(eventData.getName())) {
+      if (ed.name().equals(eventData.name())) {
         idx = i;
         break;
       }
@@ -136,7 +135,7 @@ public class AuditEvent {
       return eventData;
     } else {
       final AuditEventData existing = eventDatas.get(idx);
-      existing.addValue(eventData.getValue());
+      existing.addValue(eventData.value());
       return existing;
     }
   } // method addEventData
@@ -146,7 +145,7 @@ public class AuditEvent {
 
     boolean removed = false;
     for (final AuditEventData ed : eventDatas) {
-      if (ed.getName().equals(eventDataName)) {
+      if (ed.name().equals(eventDataName)) {
         eventDatas.remove(ed);
         removed = true;
         break;
@@ -156,7 +155,7 @@ public class AuditEvent {
     return removed;
   }
 
-  public AuditStatus getStatus() {
+  public AuditStatus status() {
     return status;
   }
 
@@ -171,7 +170,7 @@ public class AuditEvent {
     this.duration = Duration.between(timestamp, Instant.now());
   }
 
-  public Duration getDuration() {
+  public Duration duration() {
     return duration;
   }
 
@@ -180,25 +179,25 @@ public class AuditEvent {
 
     sb.append(applicationName);
 
-    AuditStatus status = getStatus();
+    AuditStatus status = status();
     if (status == null) {
       status = AuditStatus.UNDEFINED;
     }
     sb.append(";\tstatus: ").append(status.name());
-    List<AuditEventData> eventDataArray = getEventDatas();
+    List<AuditEventData> eventDataArray = eventDatas();
 
-    Duration duration = getDuration();
+    Duration duration = duration();
     if (duration != null) {
       sb.append("\tduration: ").append(duration.toMillis());
     }
 
     if ((eventDataArray != null) && (!eventDataArray.isEmpty())) {
       for (AuditEventData m : eventDataArray) {
-        if ("duration".equalsIgnoreCase(m.getName())) {
+        if ("duration".equalsIgnoreCase(m.name())) {
           continue;
         }
 
-        sb.append("\t").append(m.getName()).append(": ").append(m.getValue());
+        sb.append("\t").append(m.name()).append(": ").append(m.value());
       }
     }
 
@@ -206,7 +205,7 @@ public class AuditEvent {
   }
 
   public void log(Logger log) {
-    AuditLevel level = getLevel();
+    AuditLevel level = level();
     if (level == AuditLevel.ERROR) {
       log.error(toTextMessage());
     } else if (level == AuditLevel.WARN) {

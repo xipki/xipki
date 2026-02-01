@@ -13,7 +13,6 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonBuilder;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
@@ -49,7 +48,6 @@ import java.util.zip.ZipOutputStream;
  * Database exporter of CA CertStore.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CaCertstoreDbExporter extends DbPorter {
@@ -83,9 +81,9 @@ class CaCertstoreDbExporter extends DbPorter {
       JsonMap json = JsonParser.parseMap(path, false);
       certstore = CaCertstore.parse(json);
 
-      if (certstore.getVersion() > VERSION_V2) {
+      if (certstore.version() > VERSION_V2) {
         throw new Exception("could not continue with CertStore greater than "
-            + VERSION_V2 + ": " + certstore.getVersion());
+            + VERSION_V2 + ": " + certstore.version());
       }
     } else {
       certstore = new CaCertstore();
@@ -206,9 +204,9 @@ class CaCertstoreDbExporter extends DbPorter {
   private Exception exportEntries(
       CaDbEntryType type, CaCertstore certstore,
       File processLogFile, Long idProcessedInLastProcess) {
-    String tablesText = "table " + type.getTableName();
+    String tablesText = "table " + type.tableName();
 
-    File dir = new File(baseDir, type.getDirName());
+    File dir = new File(baseDir, type.dirName());
     try {
       IoUtil.mkdirs(dir);
     } catch (IOException ex) {
@@ -219,7 +217,7 @@ class CaCertstoreDbExporter extends DbPorter {
     OutputStream entriesFileOs = null;
     try {
       entriesFileOs = Files.newOutputStream(
-          Paths.get(baseDir, type.getDirName() + ".mf"),
+          Paths.get(baseDir, type.dirName() + ".mf"),
           StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportEntries(type, certstore, processLogFile, entriesFileOs,
           idProcessedInLastProcess);
@@ -243,17 +241,17 @@ class CaCertstoreDbExporter extends DbPorter {
       OutputStream filenameListOs, Long idProcessedInLastProcess)
       throws Exception {
     int numEntriesPerSelect = Math.max(1,
-        Math.round(type.getSqlBatchFactor() * numCertsPerSelect));
+        Math.round(type.sqlBatchFactor() * numCertsPerSelect));
     int numEntriesPerZip = Math.max(1,
-        Math.round(type.getSqlBatchFactor() * numCertsInBundle));
-    File entriesDir = new File(baseDir, type.getDirName());
-    String tableName = type.getTableName();
+        Math.round(type.sqlBatchFactor() * numCertsInBundle));
+    File entriesDir = new File(baseDir, type.dirName());
+    String tableName = type.tableName();
 
     int numProcessedBefore;
     String coreSql;
 
     if (type == CaDbEntryType.CERT) {
-      numProcessedBefore = certstore.getCountCerts();
+      numProcessedBefore = certstore.countCerts();
       String columns = "ID,SN,CA_ID,PID,RID,TID,EE,LUPDATE,REV,RR,RT," +
           "RIT,FP_RS,REQ_SUBJECT,CRL_SCOPE,CERT";
       if (dbSchemaVersion >= 7) {
@@ -261,7 +259,7 @@ class CaCertstoreDbExporter extends DbPorter {
       }
       coreSql = columns + " FROM CERT WHERE ID>=?";
     } else if (type == CaDbEntryType.CRL) {
-      numProcessedBefore = certstore.getCountCrls();
+      numProcessedBefore = certstore.countCrls();
       coreSql = "ID,CA_ID,CRL_SCOPE,CRL FROM CRL WHERE ID>=?";
     } else {
       throw new IllegalStateException("unknown CaDbEntryType " + type);
@@ -271,7 +269,7 @@ class CaCertstoreDbExporter extends DbPorter {
         ? idProcessedInLastProcess + 1
         : min(tableName, "ID");
 
-    String tablesText = "table " + type.getTableName();
+    String tablesText = "table " + type.tableName();
     System.out.println("exporting " + tablesText + " from ID " + minId);
 
     final long maxId = max(tableName, "ID");
@@ -287,7 +285,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     int sum = 0;
     File currentEntriesZipFile = new File(baseDir, "tmp-" +
-        type.getDirName() + "-" + Clock.systemUTC().millis() + ".zip");
+        type.dirName() + "-" + Clock.systemUTC().millis() + ".zip");
     ZipOutputStream currentEntriesZip =
         getZipOutputStream(currentEntriesZipFile);
 
@@ -408,7 +406,7 @@ class CaCertstoreDbExporter extends DbPorter {
                   : new CRLException(ex.getMessage(), ex);
             }
 
-            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.getExtensions(),
+            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.extensions(),
                 Extension.cRLNumber);
             if (extnValue == null) {
               LOG.warn("CRL without CRL number, ignore it");
@@ -442,7 +440,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
           if (numEntriesInCurrentFile == numEntriesPerZip) {
             String currentEntriesFilename =
-                buildFilename(type.getDirName() + "_", ".zip",
+                buildFilename(type.dirName() + "_", ".zip",
                     minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
             finalizeZip(currentEntriesZip, "overview.json",
                 entriesInCurrentFile);
@@ -462,7 +460,7 @@ class CaCertstoreDbExporter extends DbPorter {
             minIdOfCurrentFile = -1;
             maxIdOfCurrentFile = -1;
             currentEntriesZipFile = new File(baseDir,
-                "tmp-" + type.getDirName() + "-" +
+                "tmp-" + type.dirName() + "-" +
                     Clock.systemUTC().millis() + ".zip");
             currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
           }
@@ -481,7 +479,7 @@ class CaCertstoreDbExporter extends DbPorter {
             entriesInCurrentFile);
 
         String currentEntriesFilename = buildFilename(
-            type.getDirName() + "_", ".zip", minIdOfCurrentFile,
+            type.dirName() + "_", ".zip", minIdOfCurrentFile,
             maxIdOfCurrentFile, maxId);
         IoUtil.renameTo(currentEntriesZipFile,
             new File(entriesDir, currentEntriesFilename));
@@ -509,7 +507,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
   private void finalizeZip(ZipOutputStream zipOutStream, String filename,
                            JsonEncodable container)
-      throws IOException, CodecException {
+      throws IOException {
     ZipEntry certZipEntry = new ZipEntry(filename);
     zipOutStream.putNextEntry(certZipEntry);
     try {

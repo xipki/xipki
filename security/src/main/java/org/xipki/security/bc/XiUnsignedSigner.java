@@ -13,11 +13,12 @@ import java.io.OutputStream;
 /**
  * This signer implements the alg-unsigned algorithm, and returns new byte[0]
  * as signature value.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiUnsignedSigner implements ContentSigner {
 
-  public static XiUnsignedSigner INSTANCE = new XiUnsignedSigner();
+  public static final XiUnsignedSigner INSTANCE = new XiUnsignedSigner();
 
   private static final AlgorithmIdentifier algId =
       new AlgorithmIdentifier(OIDs.Algo.id_alg_unsigned);

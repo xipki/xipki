@@ -25,7 +25,6 @@ import java.io.IOException;
  * ACME servlet.
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 
 public class AcmeHttpServlet {
@@ -42,7 +41,7 @@ public class AcmeHttpServlet {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  AcmeResponder getResponder() {
+  AcmeResponder responder() {
     return responder;
   }
 
@@ -65,7 +64,7 @@ public class AcmeHttpServlet {
     try {
       requestBytes = viaPost ? IoUtil.readAllBytes(req.getInputStream()) : null;
       httpResp = responder.service(req, requestBytes, event);
-      if (event.getStatus() == null) {
+      if (event.status() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }
       return httpResp;
@@ -77,7 +76,7 @@ public class AcmeHttpServlet {
     } finally {
       LogUtil.logTextReqResp("ACME Gateway", LOG, logReqResp, viaPost,
           req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.getBody());
+          httpResp == null ? null : httpResp.body());
 
       event.finish();
       auditService.logEvent(event);

@@ -9,9 +9,7 @@ import org.xipki.util.codec.Args;
  * Protection verification result with the requestor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class ProtectionVerificationResult {
 
   private final Object requestor;
@@ -24,11 +22,11 @@ public class ProtectionVerificationResult {
     this.protectionResult = Args.notNull(protectionResult, "protectionResult");
   }
 
-  public Object getRequestor() {
+  public Object requestor() {
     return requestor;
   }
 
-  public ProtectionResult getProtectionResult() {
+  public ProtectionResult protectionResult() {
     return protectionResult;
   }
 

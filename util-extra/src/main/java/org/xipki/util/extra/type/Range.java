@@ -9,9 +9,7 @@ import org.xipki.util.codec.Args;
  * Range with optional min and max values.
  *
  * @author Lijun Liao (xipki)
- *
  */
-
 public class Range {
 
   private int min;
@@ -28,11 +26,11 @@ public class Range {
     this.max = max;
   }
 
-  public int getMin() {
+  public int min() {
     return min;
   }
 
-  public int getMax() {
+  public int max() {
     return max;
   }
 

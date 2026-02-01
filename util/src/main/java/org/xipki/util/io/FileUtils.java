@@ -17,7 +17,6 @@ import java.util.List;
  * File utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class FileUtils {
@@ -65,7 +64,6 @@ public class FileUtils {
    * @param file - the file to check
    * @return true if the file is a Symbolic Link
    * @throws IOException if an IO error occurs while checking the file
-   * @since 2.0.0
    */
   private static boolean isSymlink(File file) throws IOException {
     Args.notNull(file, "file");

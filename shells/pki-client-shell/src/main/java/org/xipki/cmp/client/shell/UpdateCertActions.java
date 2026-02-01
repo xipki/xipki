@@ -108,10 +108,10 @@ public class UpdateCertActions {
       X509Cert cert = null;
       PrivateKeyInfo privateKeyInfo = null;
       if (result != null) {
-        String id = result.getAllIds().iterator().next();
+        String id = result.allIds().iterator().next();
         CertifiedKeyPairOrError certOrError = result.getCertOrError(id);
-        cert = certOrError.getCertificate();
-        privateKeyInfo = certOrError.getPrivateKeyInfo();
+        cert = certOrError.certificate();
+        privateKeyInfo = certOrError.privateKeyInfo();
       }
 
       if (cert == null) {
@@ -342,7 +342,7 @@ public class UpdateCertActions {
 
       X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
       CertId oldCertId = new CertId(new GeneralName(
-          oldCert.getIssuer()), oldCert.getSerialNumber());
+          oldCert.issuer()), oldCert.serialNumber());
       Controls controls = new Controls(new AttributeTypeAndValue(
           OIDs.CMP.regCtrl_oldCertID, oldCertId));
       CertRequest certReq = new CertRequest(1,
@@ -403,7 +403,7 @@ public class UpdateCertActions {
 
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return embedsPulibcKey
-          ? getSigner().getCertificate().getSubjectPublicKeyInfo()
+          ? getSigner().getCertificate().subjectPublicKeyInfo()
           : null;
     } // method getPublicKey
 
@@ -434,8 +434,8 @@ public class UpdateCertActions {
 
       X509Cert cert = null;
       if (result != null) {
-        String id = result.getAllIds().iterator().next();
-        cert = result.getCertOrError(id).getCertificate();
+        String id = result.allIds().iterator().next();
+        cert = result.getCertOrError(id).certificate();
       }
 
       if (cert == null) {

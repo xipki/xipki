@@ -1,29 +1,20 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile tls"
+    "details": "certprofile tls enc"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,
   "validity": "5y",
   "notBeforeTime": "current",
   "keypairGeneration": "SECP256R1",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
-    "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1","X25519","X448","MLKEM512","MLKEM768","MLKEM1024",
-    "MLKEM768-RSA2048-SHA3-256",
-    "MLKEM768-RSA3072-SHA3-256",
-    "MLKEM768-RSA4096-SHA3-256",
-    "MLKEM768-X25519-SHA3-256",
-    "MLKEM768-ECDH-P256-SHA3-256",
-    "MLKEM768-ECDH-P384-SHA3-256",
-    "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-    "MLKEM1024-RSA3072-SHA3-256",
-    "MLKEM1024-ECDH-P384-SHA3-256",
-    "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-    "MLKEM1024-X448-SHA3-256",
-    "MLKEM1024-ECDH-P521-SHA3-256"
-  ],
+  "keyAlgorithms": ["SECP256R1","SECP384R1","SECP521R1","BRAINPOOLP256R1",
+    "BRAINPOOLP384R1","BRAINPOOLP512R1","SM2P256V1","FRP256V1","RSA2048",
+    "RSA3072","RSA4096","X25519","X448","SM2P256V1","MLKEM512","MLKEM768",
+    "MLKEM1024","MLKEM768-RSA2048","MLKEM768-RSA3072","MLKEM768-RSA4096",
+    "MLKEM768-X25519","MLKEM768-P256","MLKEM768-P384","MLKEM768-BRAINPOOLP256R1",
+    "MLKEM1024-RSA3072","MLKEM1024-P384","MLKEM1024-BRAINPOOLP384R1",
+    "MLKEM1024-X448","MLKEM1024-P521"],
   "subject": [{
       "type": "country",
       "minOccurs": 0
@@ -77,23 +68,7 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["keyEncipherment","dataEncipherment"]
-          },{
-            "appliesTo": ["X25519","X448","MLKEM512","MLKEM768","MLKEM1024",
-              "MLKEM768-RSA2048-SHA3-256",
-              "MLKEM768-RSA3072-SHA3-256",
-              "MLKEM768-RSA4096-SHA3-256",
-              "MLKEM768-X25519-SHA3-256",
-              "MLKEM768-ECDH-P256-SHA3-256",
-              "MLKEM768-ECDH-P384-SHA3-256",
-              "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-              "MLKEM1024-RSA3072-SHA3-256",
-              "MLKEM1024-ECDH-P384-SHA3-256",
-              "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-              "MLKEM1024-X448-SHA3-256",
-              "MLKEM1024-ECDH-P521-SHA3-256"
-            ],
-            "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
+            "required": ["dataEncipherment","keyEncipherment"]
           }
         ]
       }

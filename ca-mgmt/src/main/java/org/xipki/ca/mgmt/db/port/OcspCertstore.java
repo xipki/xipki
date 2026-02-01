@@ -60,35 +60,35 @@ public class OcspCertstore implements JsonEncodable {
       this.crlId = crlId;
     }
 
-    public String getHash() {
+    public String hash() {
       return hash;
     }
 
-    public int getIid() {
+    public int iid() {
       return iid;
     }
 
-    public long getNafter() {
+    public long nafter() {
       return nafter;
     }
 
-    public long getNbefore() {
+    public long nbefore() {
       return nbefore;
     }
 
-    public String getSn() {
+    public String sn() {
       return sn;
     }
 
-    public String getSubject() {
+    public String subject() {
       return subject;
     }
 
-    public long getUpdate() {
+    public long update() {
       return update;
     }
 
-    public Integer getCrlId() {
+    public Integer crlId() {
       return crlId;
     }
 
@@ -104,15 +104,15 @@ public class OcspCertstore implements JsonEncodable {
       this.rit = revocationInvalidityTime;
     }
 
-    public Long getRit() {
+    public Long rit() {
       return rit;
     }
 
-    public Integer getRr() {
+    public Integer rr() {
       return rr;
     }
 
-    public Long getRt() {
+    public Long rt() {
       return rt;
     }
 
@@ -156,12 +156,12 @@ public class OcspCertstore implements JsonEncodable {
       this.certs = Args.notNull(certs, "certs");
     }
 
-    public List<Cert> getCerts() {
+    public List<Cert> certs() {
       return certs;
     }
 
     public void add(Cert cert) {
-      getCerts().add(cert);
+      certs().add(cert);
     }
 
     @Override
@@ -197,19 +197,19 @@ public class OcspCertstore implements JsonEncodable {
       this.crlId = crlId;
     }
 
-    public int getId() {
+    public int id() {
       return id;
     }
 
-    public String getCertFile() {
+    public String certFile() {
       return certFile;
     }
 
-    public String getRevInfo() {
+    public String revInfo() {
       return revInfo;
     }
 
-    public Integer getCrlId() {
+    public Integer crlId() {
       return crlId;
     }
 
@@ -241,15 +241,15 @@ public class OcspCertstore implements JsonEncodable {
       this.info = Args.notBlank(info, "info");
     }
 
-    public int getId() {
+    public int id() {
       return id;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getInfo() {
+    public String info() {
       return info;
     }
 
@@ -290,23 +290,23 @@ public class OcspCertstore implements JsonEncodable {
     this.crlInfos = new LinkedList<>();
   }
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 
-  public int getCountCerts() {
+  public int countCerts() {
     return countCerts;
   }
 
-  public String getCerthashAlgo() {
+  public String certhashAlgo() {
     return certhashAlgo;
   }
 
-  public List<Issuer> getIssuers() {
+  public List<Issuer> issuers() {
     return issuers;
   }
 
-  public List<CrlInfo> getCrlInfos() {
+  public List<CrlInfo> crlInfos() {
     return crlInfos;
   }
 

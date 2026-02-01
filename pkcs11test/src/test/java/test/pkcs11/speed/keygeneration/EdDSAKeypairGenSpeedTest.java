@@ -46,7 +46,7 @@ public class EdDSAKeypairGenSpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws PKCS11Exception {
+  public void execTest() throws PKCS11Exception {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(mechanism) +

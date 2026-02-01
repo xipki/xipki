@@ -46,7 +46,7 @@ public class ASIdentifierChoice extends ASN1Object {
     }
   }
 
-  public List<ASIdOrRange> getAsIdsOrRanges() {
+  public List<ASIdOrRange> asIdsOrRanges() {
     return asIdsOrRanges;
   }
 

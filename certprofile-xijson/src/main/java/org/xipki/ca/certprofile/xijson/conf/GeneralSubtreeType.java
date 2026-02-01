@@ -32,7 +32,7 @@ public class GeneralSubtreeType implements JsonEncodable {
 
   private String ipAddress;
 
-  public String getRfc822Name() {
+  public String rfc822Name() {
     return rfc822Name;
   }
 
@@ -45,7 +45,7 @@ public class GeneralSubtreeType implements JsonEncodable {
     return ret;
   }
 
-  public String getDnsName() {
+  public String dnsName() {
     return dnsName;
   }
 
@@ -55,7 +55,7 @@ public class GeneralSubtreeType implements JsonEncodable {
     return ret;
   }
 
-  public String getDirectoryName() {
+  public String directoryName() {
     return directoryName;
   }
 
@@ -65,7 +65,7 @@ public class GeneralSubtreeType implements JsonEncodable {
     return ret;
   }
 
-  public String getUri() {
+  public String uri() {
     return uri;
   }
 
@@ -75,7 +75,7 @@ public class GeneralSubtreeType implements JsonEncodable {
     return ret;
   }
 
-  public String getIpAddress() {
+  public String ipAddress() {
     return ipAddress;
   }
 

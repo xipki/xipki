@@ -23,11 +23,11 @@ public class AcmeChallenge2 implements JsonEncodable {
     this.identifier = Args.notNull(identifier, "identifier");
   }
 
-  public AcmeChallenge getChallenge() {
+  public AcmeChallenge challenge() {
     return challenge;
   }
 
-  public AcmeIdentifier getIdentifier() {
+  public AcmeIdentifier identifier() {
     return identifier;
   }
 

@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit;
  * Control of the certificate's NotBefore field.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class NotBeforeOption {
 
@@ -64,11 +63,11 @@ public class NotBeforeOption {
         .toInstant();
   } // method setToMidnight
 
-  public ZoneId getMidNightTimeZone() {
+  public ZoneId midNightTimeZone() {
     return midNightTimeZone;
   }
 
-  public Long getOffsetSeconds() {
+  public Long offsetSeconds() {
     return offsetSeconds;
   }
 

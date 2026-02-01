@@ -28,11 +28,11 @@ public class DataSourceConf {
     this.conf = Args.notNull(conf, "conf");
   }
 
-  public FileOrValue getConf() {
+  public FileOrValue conf() {
     return conf;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 

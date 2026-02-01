@@ -53,7 +53,6 @@ import java.util.zip.ZipOutputStream;
  * Util class of CA.
  *
  * @author Lijun Liao
- *
  */
 
 public class CaUtil {
@@ -97,10 +96,10 @@ public class CaUtil {
     }
 
     if (control.isKeepOrder()) {
-      for (ASN1ObjectIdentifier type : control.getTypes()) {
+      for (ASN1ObjectIdentifier type : control.types()) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
         if (value != null) {
-          certBuilder.addExtension(type, value.isCritical(), value.getValue());
+          certBuilder.addExtension(type, value.isCritical(), value.value());
         }
       }
 
@@ -112,7 +111,7 @@ public class CaUtil {
     for (ASN1ObjectIdentifier type : SORTED_EXTENSIONS) {
       ExtensionValue value = extensionValues.removeExtensionValue(type);
       if (value != null) {
-        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+        certBuilder.addExtension(type, value.isCritical(), value.value());
       }
     }
 
@@ -123,7 +122,7 @@ public class CaUtil {
         : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (type.getId().startsWith(id_ce_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
-        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+        certBuilder.addExtension(type, value.isCritical(), value.value());
       }
     }
 
@@ -132,7 +131,7 @@ public class CaUtil {
         : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (!type.getId().startsWith(id_pen_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
-        certBuilder.addExtension(type, value.isCritical(), value.getValue());
+        certBuilder.addExtension(type, value.isCritical(), value.value());
       }
     }
 
@@ -140,7 +139,7 @@ public class CaUtil {
     for (ASN1ObjectIdentifier type
         : new HashSet<>(extensionValues.getExtensionTypes())) {
       ExtensionValue value = extensionValues.removeExtensionValue(type);
-      certBuilder.addExtension(type, value.isCritical(), value.getValue());
+      certBuilder.addExtension(type, value.isCritical(), value.value());
     }
   }
 
@@ -264,7 +263,7 @@ public class CaUtil {
     String algo = pairs.value("algo");
     if (algo != null) {
       try {
-        algo = SignAlgo.getInstance(algo).getJceName();
+        algo = SignAlgo.getInstance(algo).jceName();
       } catch (NoSuchAlgorithmException ex) {
         throw new CaMgmtException(ex);
       }

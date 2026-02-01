@@ -7,7 +7,6 @@ package org.xipki.util.conf;
  * Invalid configuration exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class InvalidConfException extends Exception {
 

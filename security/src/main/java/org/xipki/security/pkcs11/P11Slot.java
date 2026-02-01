@@ -55,9 +55,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.*;
  * PKCS#11 slot.
  *
  * @author Lijun Liao
- *
  */
-
 public class P11Slot implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Slot.class);
@@ -86,7 +84,7 @@ public class P11Slot implements Closeable {
     this.slotId = Args.notNull(slotId, "slotId");
     this.readOnly = token.isReadOnly();
 
-    if (slotId.getId() != token.getTokenId()) {
+    if (slotId.id() != token.getTokenId()) {
       throw new IllegalArgumentException("slotId != token.getTokenId");
     }
 
@@ -168,7 +166,7 @@ public class P11Slot implements Closeable {
     }
   }
 
-  public Map<Long, CkMechanismInfo> getMechanisms() {
+  public Map<Long, CkMechanismInfo> mechanisms() {
     return Collections.unmodifiableMap(mechanisms);
   }
 
@@ -183,11 +181,11 @@ public class P11Slot implements Closeable {
         " is not supported by PKCS11 slot " + slotId);
   }
 
-  public String getModuleName() {
+  public String moduleName() {
     return moduleName;
   }
 
-  public P11SlotId getSlotId() {
+  public P11SlotId slotId() {
     return slotId;
   }
 
@@ -286,7 +284,7 @@ public class P11Slot implements Closeable {
   public PKCS11KeyId generateKeyPair(KeySpec keySpec, PKCS11KeyPairSpec spec)
       throws TokenException {
     assertKeyPairGenerationAlgoSupported(keySpec);
-    spec.keyPairType(keySpec.getType());
+    spec.keyPairType(keySpec.type());
     return token.generateKeyPair(spec);
   }
 
@@ -305,7 +303,7 @@ public class P11Slot implements Closeable {
     try {
       assertKeyPairGenerationAlgoSupported(keySpec);
       PKCS11KeyPairSpec template = new PKCS11KeyPairSpec()
-          .keyPairType(keySpec.getType())
+          .keyPairType(keySpec.type())
           .sensitive(false).extractable(true).token(false);
       keypair = token.generateKeyPair(template);
 
@@ -329,7 +327,7 @@ public class P11Slot implements Closeable {
         byte[] privValue = token.getAttrValues(keypair.getHandle(),
             new AttributeTypes().value()).value();
 
-        AlgorithmIdentifier algId = keySpec.getAlgorithmIdentifier();
+        AlgorithmIdentifier algId = keySpec.algorithmIdentifier();
 
         PrivateKeyInfo priKeyInfo;
         if (keySpec.isEdwardsEC() || keySpec.isMontgomeryEC()) {
@@ -340,7 +338,7 @@ public class P11Slot implements Closeable {
             throw new TokenException("EcPoint does not start with 0x04");
           }
 
-          Integer orderByteLen = keySpec.getEcCurveFieldByteSize();
+          Integer orderByteLen = keySpec.ecCurveFieldByteSize();
           assert orderByteLen != null;
           priKeyInfo = new PrivateKeyInfo(algId,
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderByteLen * 8,
@@ -371,7 +369,7 @@ public class P11Slot implements Closeable {
             CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
       }
     } else {
-      CkMechanism mech = keySpec.getType().getGenerateMechanism();
+      CkMechanism mech = keySpec.type().getGenerateMechanism();
       assertMechSupported(mech.getMechanism(), CKF_GENERATE_KEY_PAIR);
     }
   }
@@ -491,7 +489,7 @@ public class P11Slot implements Closeable {
       return null;
     }
 
-    PKCS11KeyId.KeyIdType type = ret.getType();
+    PKCS11KeyId.KeyIdType type = ret.type();
     if (type == PKCS11KeyId.KeyIdType.PUBLIC_KEY) {
       throw new TokenException("could not find private key or secret key for "
           + getDescription(keyId, keyLabel));

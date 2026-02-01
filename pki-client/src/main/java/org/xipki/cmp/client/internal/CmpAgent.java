@@ -129,7 +129,6 @@ import java.util.Random;
  * CMP agent to communicate with CA.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CmpAgent {
@@ -211,9 +210,9 @@ class CmpAgent {
 
     if (requestor instanceof Requestor.SignatureCmpRequestor) {
       ConcurrentContentSigner signer =
-          ((Requestor.SignatureCmpRequestor) requestor).getSigner();
+          ((Requestor.SignatureCmpRequestor) requestor).signer();
       try {
-        return CmpUtil.addProtection(request, signer, requestor.getName(),
+        return CmpUtil.addProtection(request, signer, requestor.name(),
             sendRequestorCert);
       } catch (CMPException | NoIdleSignerException ex) {
         throw new CmpClientException("could not sign the request", ex);
@@ -223,9 +222,9 @@ class CmpAgent {
           (Requestor.PbmMacCmpRequestor) requestor;
 
       try {
-        return CmpUtil.addProtection(request, pbmRequestor.getPassword(),
-            pbmRequestor.getParameter(), requestor.getName(),
-            pbmRequestor.getSenderKID());
+        return CmpUtil.addProtection(request, pbmRequestor.password(),
+            pbmRequestor.parameter(), requestor.name(),
+            pbmRequestor.senderKID());
       } catch (CMPException ex) {
         throw new CmpClientException("could not sign the request", ex);
       }
@@ -242,7 +241,7 @@ class CmpAgent {
     GeneralPKIMessage response = send(caName, tmpRequest, debug);
 
     GeneralName rec = response.getHeader().getRecipient();
-    if (!requestor.getName().equals(rec)) {
+    if (!requestor.name().equals(rec)) {
       LOG.warn("tid={}: unknown CMP requestor '{}'", tid, rec);
     }
 
@@ -292,13 +291,13 @@ class CmpAgent {
       throw new CmpClientException("TRANSPORT_ERROR", ex);
     }
 
-    byte[] encodedResp = resp.getContent();
-    if (reqResp != null && debug.saveResponse() && resp.getContent() != null) {
+    byte[] encodedResp = resp.content();
+    if (reqResp != null && debug.saveResponse() && resp.content() != null) {
       reqResp.setResponse(encodedResp);
     }
 
     if (!resp.isOK()) {
-      String msg = "received HTTP status code " + resp.getStatusCode();
+      String msg = "received HTTP status code " + resp.statusCode();
       LOG.warn(msg);
       throw new CmpClientException(msg);
     }
@@ -365,10 +364,10 @@ class CmpAgent {
       }
     }
 
-    GeneralName sender = requestor != null ? requestor.getName()
+    GeneralName sender = requestor != null ? requestor.name()
         : new GeneralName(new X500Name(new RDN[0]));
 
-    GeneralName recipient = responder != null ? responder.getName()
+    GeneralName recipient = responder != null ? responder.name()
         : new GeneralName(new X500Name(new RDN[0]));
 
     PKIHeaderBuilder hdrBuilder =
@@ -478,7 +477,7 @@ class CmpAgent {
           new PKMACBuilder(new JcePKMACValuesCalculator());
 
       boolean macValid = protectedMsg.verify(pkMacBuilder,
-                          macRequestor.getPassword());
+                          macRequestor.password());
       return new ProtectionVerificationResult(requestor,
           macValid ? ProtectionResult.MAC_VALID : ProtectionResult.MAC_INVALID);
     } else {
@@ -497,7 +496,7 @@ class CmpAgent {
       } else {
         X500Name msgSender = X500Name.getInstance(header.getSender().getName());
         authorizedResponder =
-            sigResponder.getCert().getSubject().equals(msgSender);
+            sigResponder.getCert().subject().equals(msgSender);
       }
 
       if (!authorizedResponder) {
@@ -528,7 +527,7 @@ class CmpAgent {
           .isAlgorithmPermitted(protectionAlgo)) {
         LOG.warn(
             "tid={}: response protected by untrusted protection algorithm '{}'",
-            tid, protectionAlgo.getJceName());
+            tid, protectionAlgo.jceName());
         return new ProtectionVerificationResult(null,
             ProtectionResult.SIGNATURE_INVALID);
       }
@@ -618,7 +617,7 @@ class CmpAgent {
 
     VerifiedPkiMessage response =
         signAndSend(caName, requestor, responder, reqMessage, debug);
-    return parse(response, request.getRequestEntries());
+    return parse(response, request.requestEntries());
   } // method revokeCertificate
 
   RevokeCertResponse unrevokeCertificate(
@@ -627,12 +626,12 @@ class CmpAgent {
     Responder responder = getResponder(requestor);
     PKIMessage reqMessage = buildUnrevokeCertRequest(requestor, responder,
         Args.notNull(request, "request"),
-        CrlReason.REMOVE_FROM_CRL.getCode());
+        CrlReason.REMOVE_FROM_CRL.code());
 
     VerifiedPkiMessage response = signAndSend(caName, requestor,
         responder, reqMessage, debug);
 
-    return parse(response, request.getRequestEntries());
+    return parse(response, request.requestEntries());
   } // method unrevokeCertificate
 
   EnrollCertResponse requestCertificate(
@@ -644,7 +643,7 @@ class CmpAgent {
         Args.notNull(csr, "csr"), notBefore, notAfter);
 
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
-    reqIdIdMap.put(MINUS_ONE, csr.getId());
+    reqIdIdMap.put(MINUS_ONE, csr.id());
     return requestCertificate0(caName, requestor, responder, request,
         reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
   } // method requestCertificate
@@ -657,15 +656,15 @@ class CmpAgent {
     PKIMessage request = buildPkiMessage(requestor, responder,
         Args.notNull(req, "req"));
     Map<BigInteger, String> reqIdIdMap = new HashMap<>();
-    List<EnrollCertRequest.Entry> reqEntries = req.getRequestEntries();
+    List<EnrollCertRequest.Entry> reqEntries = req.requestEntries();
 
     for (EnrollCertRequest.Entry reqEntry : reqEntries) {
-      reqIdIdMap.put(reqEntry.getCertReq().getCertReqId().getValue(),
-          reqEntry.getId());
+      reqIdIdMap.put(reqEntry.certReq().getCertReqId().getValue(),
+          reqEntry.id());
     }
 
     int exptectedBodyType;
-    switch (req.getType()) {
+    switch (req.type()) {
       case INIT_REQ:
         exptectedBodyType = PKIBody.TYPE_INIT_REP;
         break;
@@ -680,7 +679,7 @@ class CmpAgent {
         break;
       default:
         throw new IllegalStateException(
-            "unknown EnrollCertRequest.Type " + req.getType());
+            "unknown EnrollCertRequest.Type " + req.type());
     }
 
     return requestCertificate0(caName, requestor, responder,
@@ -696,7 +695,7 @@ class CmpAgent {
         reqMessage, debug);
     checkProtection(response);
 
-    PKIBody respBody = response.getPkiMessage().getBody();
+    PKIBody respBody = response.pkiMessage().getBody();
     final int bodyType = respBody.getType();
 
     if (PKIBody.TYPE_ERROR == bodyType) {
@@ -726,7 +725,7 @@ class CmpAgent {
     }
 
     CertificateConfirmationContentBuilder certConfirmBuilder = null;
-    if (!CmpUtil.isImplicitConfirm(response.getPkiMessage().getHeader())) {
+    if (!CmpUtil.isImplicitConfirm(response.pkiMessage().getHeader())) {
       certConfirmBuilder = new CertificateConfirmationContentBuilder();
     }
     boolean requireConfirm = false;
@@ -775,7 +774,7 @@ class CmpAgent {
           try {
             if (requestor instanceof Requestor.SignatureCmpRequestor) {
               ConcurrentContentSigner requestSigner =
-                  ((Requestor.SignatureCmpRequestor) requestor).getSigner();
+                  ((Requestor.SignatureCmpRequestor) requestor).signer();
 
               if (!(requestSigner.getSigningKey() instanceof PrivateKey)) {
                 throw new XiSecurityException(
@@ -786,7 +785,7 @@ class CmpAgent {
                   (PrivateKey) requestSigner.getSigningKey());
             } else {
               decryptedValue = decrypt(cvk.getPrivateKey(),
-                  ((Requestor.PbmMacCmpRequestor) requestor).getPassword());
+                  ((Requestor.PbmMacCmpRequestor) requestor).password());
             }
           } catch (XiSecurityException ex) {
             result.addResultEntry(new ResultEntry.Error(thisId,
@@ -831,7 +830,7 @@ class CmpAgent {
     }
 
     PKIMessage confirmRequest = buildCertConfirmRequest(requestor, responder,
-        response.getPkiMessage().getHeader().getTransactionID(),
+        response.pkiMessage().getHeader().getTransactionID(),
         certConfirmBuilder);
 
     response = signAndSend(caName, requestor, responder, confirmRequest, debug);
@@ -863,25 +862,25 @@ class CmpAgent {
       throws CmpClientException {
     PKIHeader header = buildPkiHeader(requestor, responder);
 
-    List<RevokeCertRequest.Entry> requestEntries = request.getRequestEntries();
+    List<RevokeCertRequest.Entry> requestEntries = request.requestEntries();
     List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
     for (RevokeCertRequest.Entry requestEntry : requestEntries) {
       CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
-      certTempBuilder.setIssuer(requestEntry.getIssuer());
+      certTempBuilder.setIssuer(requestEntry.issuer());
       certTempBuilder.setSerialNumber(
-          new ASN1Integer(requestEntry.getSerialNumber()));
-      byte[] aki = requestEntry.getAuthorityKeyIdentifier();
+          new ASN1Integer(requestEntry.serialNumber()));
+      byte[] aki = requestEntry.authorityKeyIdentifier();
       if (aki != null) {
         Extensions certTempExts = getCertTempExtensions(aki);
         certTempBuilder.setExtensions(certTempExts);
       }
 
-      Instant invalidityDate = requestEntry.getInvalidityDate();
+      Instant invalidityDate = requestEntry.invalidityDate();
       int idx = (invalidityDate == null) ? 1 : 2;
       Extension[] extensions = new Extension[idx];
 
       try {
-        ASN1Enumerated reason = new ASN1Enumerated(requestEntry.getReason());
+        ASN1Enumerated reason = new ASN1Enumerated(requestEntry.reason());
         extensions[0] = new Extension(OIDs.Extn.reasonCode, true,
                         new DEROctetString(reason.getEncoded()));
 
@@ -913,14 +912,14 @@ class CmpAgent {
     PKIHeader header = buildPkiHeader(requestor, responder);
 
     List<UnsuspendCertRequest.Entry> requestEntries =
-        request.getRequestEntries();
+        request.requestEntries();
     List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
     for (UnsuspendCertRequest.Entry requestEntry : requestEntries) {
       CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
-      certTempBuilder.setIssuer(requestEntry.getIssuer());
+      certTempBuilder.setIssuer(requestEntry.issuer());
       certTempBuilder.setSerialNumber(
-          new ASN1Integer(requestEntry.getSerialNumber()));
-      byte[] aki = requestEntry.getAuthorityKeyIdentifier();
+          new ASN1Integer(requestEntry.serialNumber()));
+      byte[] aki = requestEntry.authorityKeyIdentifier();
       if (aki != null) {
         Extensions certTempExts = getCertTempExtensions(aki);
         certTempBuilder.setExtensions(certTempExts);
@@ -966,32 +965,32 @@ class CmpAgent {
     }
 
     InfoTypeAndValue certProfileItv = null;
-    if (csr.getCertprofile() != null) {
+    if (csr.certprofile() != null) {
       certProfileItv = new InfoTypeAndValue(OIDs.CMP.id_it_certProfile,
-          new DERSequence(new DERUTF8String(csr.getCertprofile())));
+          new DERSequence(new DERUTF8String(csr.certprofile())));
     }
 
     PKIHeader header = buildPkiHeader(requestor, responder, implicitConfirm,
         null, utf8Pairs, certProfileItv);
     return new PKIMessage(header,
-        new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.getCsr()));
+        new PKIBody(PKIBody.TYPE_P10_CERT_REQ, csr.csr()));
   } // method buildPkiMessage
 
   private PKIMessage buildPkiMessage(
       Requestor requestor, Responder responder, EnrollCertRequest req) {
-    List<EnrollCertRequest.Entry> reqEntries = req.getRequestEntries();
+    List<EnrollCertRequest.Entry> reqEntries = req.requestEntries();
     CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (int i = 0; i < reqEntries.size(); i++) {
       EnrollCertRequest.Entry reqEntry = reqEntries.get(i);
 
-      if (reqEntry.getCertprofile() != null) {
-        vec.add(new DERUTF8String(reqEntry.getCertprofile()));
+      if (reqEntry.certprofile() != null) {
+        vec.add(new DERUTF8String(reqEntry.certprofile()));
       }
 
-      certReqMsgs[i] = new CertReqMsg(reqEntry.getCertReq(),
-          reqEntry.getPop(), null);
+      certReqMsgs[i] = new CertReqMsg(reqEntry.certReq(),
+          reqEntry.pop(), null);
     }
 
     if (vec.size() != 0 && vec.size() != reqEntries.size()) {
@@ -1006,7 +1005,7 @@ class CmpAgent {
         null, null, certProfile);
 
     int bodyType;
-    switch (req.getType()) {
+    switch (req.type()) {
       case INIT_REQ:
         bodyType = PKIBody.TYPE_INIT_REQ;
         break;
@@ -1021,7 +1020,7 @@ class CmpAgent {
         break;
       default:
         throw new IllegalStateException(
-            "Unknown EnrollCertRequest.Type " + req.getType());
+            "Unknown EnrollCertRequest.Type " + req.type());
     }
 
     return new PKIMessage(header,
@@ -1035,14 +1034,14 @@ class CmpAgent {
     }
 
     ProtectionVerificationResult protectionVerificationResult =
-        response.getProtectionVerificationResult();
+        response.protectionVerificationResult();
 
     boolean valid;
     if (protectionVerificationResult == null) {
       valid = false;
     } else {
       ProtectionResult protectionResult =
-          protectionVerificationResult.getProtectionResult();
+          protectionVerificationResult.protectionResult();
       valid = protectionResult == ProtectionResult.MAC_VALID
           || protectionResult == ProtectionResult.SIGNATURE_VALID;
     }
@@ -1224,7 +1223,7 @@ class CmpAgent {
               AlgorithmIdentifier hashAlgorithm =
                   AlgorithmIdentifier.getInstance(algId.getParameters());
               if (!hashAlgorithm.getAlgorithm().equals(
-                    HashAlgo.SHA1.getOid())) {
+                    HashAlgo.SHA1.oid())) {
                 throw new XiSecurityException(
                     "unsupported KeyDerivationFunction.HashAlgorithm "
                     + hashAlgorithm.getAlgorithm().getId());
@@ -1249,7 +1248,7 @@ class CmpAgent {
                   AlgorithmIdentifier.getInstance(algId.getParameters());
 
               if (!hashAlgorithm.getAlgorithm().equals(
-                    HashAlgo.SHA1.getOid())) {
+                    HashAlgo.SHA1.oid())) {
                 throw new XiSecurityException(
                     "unsupported MessageAuthenticationCode.HashAlgorithm "
                     + hashAlgorithm.getAlgorithm().getId());
@@ -1388,7 +1387,7 @@ class CmpAgent {
       throws CmpClientException, PkiErrorException {
     checkProtection(Args.notNull(response, "response"));
 
-    PKIBody respBody = response.getPkiMessage().getBody();
+    PKIBody respBody = response.pkiMessage().getBody();
     int bodyType = respBody.getType();
 
     if (PKIBody.TYPE_ERROR == bodyType) {
@@ -1429,7 +1428,7 @@ class CmpAgent {
         String statusString = (text == null) ? null
             : text.getStringAtUTF8(0).getString();
 
-        ResultEntry resultEntry = new ResultEntry.Error(re.getId(), status,
+        ResultEntry resultEntry = new ResultEntry.Error(re.id(), status,
             statusInfo.getFailInfo().intValue(), statusString);
         result.addResultEntry(resultEntry);
         continue;
@@ -1438,8 +1437,8 @@ class CmpAgent {
       CertId certId = null;
       if (revCerts != null) {
         for (CertId entry : revCerts) {
-          if (re.getIssuer().equals(entry.getIssuer().getName())
-              && re.getSerialNumber().equals(
+          if (re.issuer().equals(entry.getIssuer().getName())
+              && re.serialNumber().equals(
                     entry.getSerialNumber().getValue())) {
             certId = entry;
             break;
@@ -1450,13 +1449,13 @@ class CmpAgent {
       if (certId == null) {
         LOG.warn("certId is not present in response for (issuer='{}', " +
                 "serialNumber={})",
-            X509Util.x500NameText(re.getIssuer()),
-            LogUtil.formatCsn(re.getSerialNumber()));
-        certId = new CertId(new GeneralName(re.getIssuer()),
-                  re.getSerialNumber());
+            X509Util.x500NameText(re.issuer()),
+            LogUtil.formatCsn(re.serialNumber()));
+        certId = new CertId(new GeneralName(re.issuer()),
+                  re.serialNumber());
       }
 
-      result.addResultEntry(new ResultEntry.RevokeCert(re.getId(), certId));
+      result.addResultEntry(new ResultEntry.RevokeCert(re.id(), certId));
     }
 
     return result;

@@ -25,9 +25,7 @@ import java.security.SecureRandom;
  * Speed test of PKCS#12 signature creation.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public final class P12SignSpeed extends BenchmarkExecutor {
 
   private class Tester implements Runnable {
@@ -72,7 +70,7 @@ public final class P12SignSpeed extends BenchmarkExecutor {
                       SignAlgo signAlgo, KeySpec keySpec, int threads)
       throws Exception {
     super(tokenType + " Sign speed test with signature algorithm "
-        + signAlgo.getJceName() + " and keyspec " + keySpec);
+        + signAlgo.jceName() + " and keyspec " + keySpec);
 
     byte[] keystore = generateKeystore(signAlgo, keySpec);
     Args.notNull(securityFactory, "securityFactory");

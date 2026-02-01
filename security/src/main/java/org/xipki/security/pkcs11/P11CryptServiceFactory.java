@@ -13,9 +13,7 @@ import java.util.Set;
  * Factory to create {@link P11Module}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public interface P11CryptServiceFactory extends Closeable {
 
   String DEFAULT_P11MODULE_NAME = "default";

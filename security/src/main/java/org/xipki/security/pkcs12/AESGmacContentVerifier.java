@@ -23,9 +23,7 @@ import java.util.Arrays;
 /**
  * AES GMAC signer.
  * @author Lijun Liao (xipki)
- *
  */
-
 public class AESGmacContentVerifier implements ContentVerifier {
 
   private class AESGmacOutputStream extends OutputStream {
@@ -94,7 +92,7 @@ public class AESGmacContentVerifier implements ContentVerifier {
 
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return new AlgorithmIdentifier(signAlgo.getOid(),
+    return new AlgorithmIdentifier(signAlgo.oid(),
         new GCMParameters(nonce, tagByteLen));
   }
 

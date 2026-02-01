@@ -31,9 +31,7 @@ import java.util.Optional;
  * PKCS#11 module.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11Module {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Module.class);
@@ -50,7 +48,7 @@ public class P11Module {
       throws TokenException {
     this.conf = Args.notNull(moduleConf, "moduleConf");
 
-    if (CollectionUtil.isNotEmpty(moduleConf.getNativeLibraryProperties())) {
+    if (CollectionUtil.isNotEmpty(moduleConf.nativeLibraryProperties())) {
       throw new TokenException(
           "nativeLibraries[i].properties is present but not allowed.");
     }
@@ -62,7 +60,7 @@ public class P11Module {
       slotList = module.getSlotList(false);
     } catch (Throwable th) {
       final String msg = "could not getSlotList of module " +
-          moduleConf.getName();
+          moduleConf.name();
       LogUtil.error(LOG, th, msg);
       throw new TokenException(msg);
     }
@@ -123,27 +121,27 @@ public class P11Module {
 
       List<String> pwd;
       try {
-        pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
+        pwd = moduleConf.passwordRetriever().getPassword(slotId);
       } catch (PasswordResolverException ex) {
         throw new TokenException(
             "PasswordResolverException: " + ex.getMessage(), ex);
       }
 
       long userType = Optional.ofNullable(module.nameToCode(
-          Category.CKU, getConf().getUserType())).orElseThrow(() ->
-            new TokenException("Unknown user type " + getConf().getUserType()));
+          Category.CKU, conf().userType())).orElseThrow(() ->
+            new TokenException("Unknown user type " + conf().userType()));
 
       PKCS11Token token = new PKCS11Token(slot.getToken(),
-          moduleConf.isReadOnly(), userType, moduleConf.getUserName(),
-          pwd, moduleConf.getNumSessions());
+          moduleConf.isReadOnly(), userType, moduleConf.userName(),
+          pwd, moduleConf.numSessions());
 
-      token.setMaxMessageSize(moduleConf.getMaxMessageSize());
-      if (moduleConf.getNewSessionTimeout() != null) {
-        token.setTimeOutWaitNewSession(moduleConf.getNewSessionTimeout());
+      token.setMaxMessageSize(moduleConf.maxMessageSize());
+      if (moduleConf.newSessionTimeout() != null) {
+        token.setTimeOutWaitNewSession(moduleConf.newSessionTimeout());
       }
 
-      P11Slot p11Slot = new P11Slot(moduleConf.getName(), slotId, token,
-          moduleConf.getP11MechanismFilter());
+      P11Slot p11Slot = new P11Slot(moduleConf.name(), slotId, token,
+          moduleConf.p11MechanismFilter());
 
       slots.add(p11Slot);
     }
@@ -155,16 +153,16 @@ public class P11Module {
     this.slots.clear();
     this.slotIds.clear();
     for (P11Slot slot : slots) {
-      this.slots.put(slot.getSlotId(), slot);
-      this.slotIds.add(slot.getSlotId());
+      this.slots.put(slot.slotId(), slot);
+      this.slotIds.add(slot.slotId());
     }
   }
 
-  public String getName() {
-    return conf.getName();
+  public String name() {
+    return conf.name();
   }
 
-  public P11ModuleConf getConf() {
+  public P11ModuleConf conf() {
     return conf;
   }
 
@@ -182,13 +180,13 @@ public class P11Module {
         .orElseThrow(() -> new TokenException("unknown slot " + slotId));
   }
 
-  public List<P11SlotId> getSlotIds() {
+  public List<P11SlotId> slotIds() {
     return slotIds;
   }
 
   public P11SlotId getSlotIdForIndex(int index) throws TokenException {
     for (P11SlotId id : slotIds) {
-      if (id.getIndex() == index) {
+      if (id.index() == index) {
         return id;
       }
     }
@@ -197,7 +195,7 @@ public class P11Module {
 
   public P11SlotId getSlotIdForId(long id) throws TokenException {
     for (P11SlotId slotId : slotIds) {
-      if (slotId.getId() == id) {
+      if (slotId.id() == id) {
         return slotId;
       }
     }
@@ -206,7 +204,7 @@ public class P11Module {
 
   public static P11Module getInstance(P11ModuleConf moduleConf)
       throws TokenException {
-    String userTypeStr = Args.notNull(moduleConf, "moduleConf").getUserType();
+    String userTypeStr = Args.notNull(moduleConf, "moduleConf").userType();
     Long userType = PKCS11T.ckuNameToCode(userTypeStr);
 
     if (userType != null) {
@@ -216,7 +214,7 @@ public class P11Module {
       }
     }
 
-    String path = moduleConf.getNativeLibrary();
+    String path = moduleConf.nativeLibrary();
     path = IoUtil.expandFilepath(path, false);
 
     PKCS11Module module;
@@ -224,7 +222,7 @@ public class P11Module {
       module = PKCS11Module.getInstance(path);
     } catch (IOException ex) {
       final String msg = "could not load the PKCS#11 module " +
-          moduleConf.getName() + ": " + path;
+          moduleConf.name() + ": " + path;
       LogUtil.error(LOG, ex, msg);
       throw new TokenException(msg, ex);
     }
@@ -233,23 +231,23 @@ public class P11Module {
       module.initialize();
     } catch (PKCS11Exception ex) {
       LogUtil.error(LOG, ex);
-      close(moduleConf.getName(), module);
+      close(moduleConf.name(), module);
       throw ex;
     } catch (Throwable th) {
       LOG.error("unexpected Exception", th);
-      close(moduleConf.getName(), module);
+      close(moduleConf.name(), module);
       throw new TokenException(th.getMessage());
     }
 
     return new P11Module(module, moduleConf);
   } // method getInstance
 
-  public String getDescription() {
-    return module.getDescription();
+  public String description() {
+    return module.description();
   }
 
   public void close() {
-    for (P11SlotId slotId : getSlotIds()) {
+    for (P11SlotId slotId : slotIds()) {
       try {
         getSlot(slotId).close();
       } catch (Throwable th) {
@@ -257,7 +255,7 @@ public class P11Module {
       }
     }
 
-    close(conf.getNativeLibrary(), module);
+    close(conf.nativeLibrary(), module);
   }
 
   private static void close(String modulePath, PKCS11Module module) {

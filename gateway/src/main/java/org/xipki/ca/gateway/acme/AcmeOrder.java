@@ -59,11 +59,11 @@ public class AcmeOrder {
     this.dataSource = Args.notNull(dataSource, "dataSource");
   }
 
-  public long getAccountId() {
+  public long accountId() {
     return accountId;
   }
 
-  public OrderStatus getStatus() {
+  public OrderStatus status() {
     return status;
   }
 
@@ -76,7 +76,7 @@ public class AcmeOrder {
     this.inDb = inDb;
   }
 
-  public CertReqMeta getCertReqMeta() {
+  public CertReqMeta certReqMeta() {
     return certReqMeta;
   }
 
@@ -85,7 +85,7 @@ public class AcmeOrder {
     this.certReqMeta = certReqMeta;
   }
 
-  public byte[] getCert() {
+  public byte[] cert() {
     return cert;
   }
 
@@ -118,7 +118,7 @@ public class AcmeOrder {
     }
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
@@ -126,7 +126,7 @@ public class AcmeOrder {
     return idStr + " (" + id + ")";
   }
 
-  public Instant getExpires() {
+  public Instant expires() {
     return expires;
   }
 
@@ -135,7 +135,7 @@ public class AcmeOrder {
     this.expires = expires;
   }
 
-  public byte[] getCsr() {
+  public byte[] csr() {
     return csr;
   }
 
@@ -144,7 +144,7 @@ public class AcmeOrder {
     this.csr = csr;
   }
 
-  public List<AcmeAuthz> getAuthzs() {
+  public List<AcmeAuthz> authzs() {
     return authzs;
   }
 
@@ -170,9 +170,9 @@ public class AcmeOrder {
     List<String> authzUrls = new ArrayList<>(authzs.size());
     List<Identifier> identifiers = new ArrayList<>(authzs.size());
     for (AcmeAuthz authz : authzs) {
-      AuthzId authzId = new AuthzId(id, authz.getSubId());
+      AuthzId authzId = new AuthzId(id, authz.subId());
       authzUrls.add(baseUrl + "authz/" + authzId.toIdText());
-      identifiers.add(authz.getIdentifier().toIdentifier());
+      identifiers.add(authz.identifier().toIdentifier());
     }
 
     String certUrl = null;
@@ -186,7 +186,7 @@ public class AcmeOrder {
 
   public AcmeAuthz getAuthz(int authzId) {
     for (AcmeAuthz authz : authzs) {
-      if (authz.getSubId() == authzId) {
+      if (authz.subId() == authzId) {
         return authz;
       }
     }
@@ -200,11 +200,11 @@ public class AcmeOrder {
 
     // check the authz
     for (AcmeAuthz authz : authzs) {
-      for (AcmeChallenge chall : authz.getChallenges()) {
-        if (chall.getStatus() == ChallengeStatus.valid) {
+      for (AcmeChallenge chall : authz.challenges()) {
+        if (chall.status() == ChallengeStatus.valid) {
           authz.setStatus(AuthzStatus.valid);
           break;
-        } else if (chall.getStatus() == ChallengeStatus.invalid) {
+        } else if (chall.status() == ChallengeStatus.invalid) {
           authz.setStatus(AuthzStatus.invalid);
           status = OrderStatus.invalid;
           return;
@@ -218,7 +218,7 @@ public class AcmeOrder {
 
     boolean allAuthzsValidated = true;
     for (AcmeAuthz authz : authzs) {
-      if (authz.getStatus() != AuthzStatus.valid) {
+      if (authz.status() != AuthzStatus.valid) {
         allAuthzsValidated = false;
         break;
       }

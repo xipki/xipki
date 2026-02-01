@@ -31,7 +31,6 @@ import java.util.Arrays;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class XiKEMContentVerifierProvider implements ContentVerifierProvider {
 
   private class MyContentVerifier implements ContentVerifier {

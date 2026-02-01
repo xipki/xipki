@@ -33,7 +33,7 @@ public class BatchReplace {
     private Set<String> suffixes;
     private Set<String> dirs;
 
-    public Set<String> getSuffixes() {
+    public Set<String> suffixes() {
       return suffixes;
     }
 
@@ -41,7 +41,7 @@ public class BatchReplace {
       this.suffixes = suffixes;
     }
 
-    public Set<String> getDirs() {
+    public Set<String> dirs() {
       return dirs;
     }
 
@@ -54,7 +54,7 @@ public class BatchReplace {
     private Set<String> dirs;
     private Set<String> files;
 
-    public Set<String> getDirs() {
+    public Set<String> dirs() {
       return dirs;
     }
 
@@ -62,7 +62,7 @@ public class BatchReplace {
       this.dirs = dirs;
     }
 
-    public Set<String> getFiles() {
+    public Set<String> files() {
       return files;
     }
 
@@ -81,11 +81,11 @@ public class BatchReplace {
       this.description = description;
     }
 
-    public String getDescription() {
+    public String description() {
       return description;
     }
 
-    public Includes getIncludes() {
+    public Includes includes() {
       return includes;
     }
 
@@ -93,7 +93,7 @@ public class BatchReplace {
       this.includes = includes;
     }
 
-    public Excludes getExcludes() {
+    public Excludes excludes() {
       return excludes;
     }
 
@@ -101,7 +101,7 @@ public class BatchReplace {
       this.excludes = excludes;
     }
 
-    public Map<String, String> getReplacements() {
+    public Map<String, String> replacements() {
       return replacements;
     }
 

@@ -18,7 +18,6 @@ import java.util.Date;
  * Utility class for the date conversion.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class DateUtil {

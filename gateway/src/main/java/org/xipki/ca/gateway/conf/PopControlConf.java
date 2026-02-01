@@ -13,7 +13,6 @@ import java.util.List;
  * POP (proof-of-possession) control configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class PopControlConf {
 
@@ -30,15 +29,15 @@ public class PopControlConf {
     this.kem = kem;
   }
 
-  public List<String> getSigAlgos() {
+  public List<String> sigAlgos() {
     return this.sigAlgos;
   }
 
-  public KeystoreConf getDh() {
+  public KeystoreConf dh() {
     return this.dh;
   }
 
-  public KeystoreConf getKem() {
+  public KeystoreConf kem() {
     return this.kem;
   }
 

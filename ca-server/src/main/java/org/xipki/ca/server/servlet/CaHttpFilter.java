@@ -71,9 +71,6 @@ public class CaHttpFilter implements XiHttpFilter {
     try {
       conf = CaServerConf.readConfFromFile(
           IoUtil.expandFilepath(DFLT_CFG, true));
-    } catch (IOException ex) {
-      throw new IOException("could not parse configuration file " + DFLT_CFG,
-          ex);
     } catch (InvalidConfException ex) {
       throw new InvalidConfException(
           "could not parse configuration file " + DFLT_CFG, ex);
@@ -82,17 +79,17 @@ public class CaHttpFilter implements XiHttpFilter {
     boolean logReqResp = conf.isLogReqResp();
     LOG.info("logReqResp: {}", logReqResp);
 
-    AuditConf audit = conf.getAudit();
-    String auditType = audit.getType();
+    AuditConf audit = conf.audit();
+    String auditType = audit.type();
     if (StringUtil.isBlank(auditType)) {
       auditType = "embed";
     }
 
     securities = new Securities();
-    securities.init(conf.getSecurity());
+    securities.init(conf.security());
 
-    int shardId = conf.getShardId();
-    ConfPairs auditConf = audit.getConf();
+    int shardId = conf.shardId();
+    ConfPairs auditConf = audit.conf();
     if ("file-mac".equals(auditType) || "database-mac".equals(auditType)) {
       auditConf.putPair("shard-id", Integer.toString(shardId));
     }
@@ -103,17 +100,17 @@ public class CaHttpFilter implements XiHttpFilter {
     }
 
     caManager = new CaManagerImpl();
-    caManager.setSecurityFactory(securities.getSecurityFactory());
-    caManager.setP11CryptServiceFactory(securities.getP11CryptServiceFactory());
+    caManager.setSecurityFactory(securities.securityFactory());
+    caManager.setP11CryptServiceFactory(securities.p11CryptServiceFactory());
 
     // Certprofiles
     caManager.setCertprofileFactoryRegister(
-        initCertprofileFactoryRegister(conf.getCertprofileFactories()));
+        initCertprofileFactoryRegister(conf.certprofileFactories()));
 
     // KeypairGen
     Set<KeypairGeneratorFactory> keypairGeneratorFactories = new HashSet<>();
-    if (conf.getKeypairGeneratorFactories() != null) {
-      for (String className : conf.getKeypairGeneratorFactories()) {
+    if (conf.keypairGeneratorFactories() != null) {
+      for (String className : conf.keypairGeneratorFactories()) {
         try {
           KeypairGeneratorFactory factory =
               ReflectiveUtil.newInstance(className);
@@ -139,17 +136,17 @@ public class CaHttpFilter implements XiHttpFilter {
     LOG.info("ca.noRA: {}", conf.isNoRA());
 
     if (!conf.isNoRA()) {
-      this.responder = new SdkResponder(conf.getReverseProxyMode(), caManager);
+      this.responder = new SdkResponder(conf.reverseProxyMode(), caManager);
       raServlet = new HttpRaServlet(logReqResp, responder);
     }
 
-    RemoteMgmt remoteMgmt = conf.getRemoteMgmt();
+    RemoteMgmt remoteMgmt = conf.remoteMgmt();
     boolean remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
     LOG.info("remote management is {}",
         remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
-      List<FileOrBinary> certFiles = remoteMgmt.getCerts();
+      List<FileOrBinary> certFiles = remoteMgmt.certs();
       if (CollectionUtil.isEmpty(certFiles)) {
         LOG.error("no client certificate is configured, disable the " +
             "remote management");
@@ -167,7 +164,7 @@ public class CaHttpFilter implements XiHttpFilter {
               "disable the remote management");
         } else {
           mgmtServlet = new CaHttpMgmtServlet(caManager,
-              conf.getReverseProxyMode(), certs, logReqResp);
+              conf.reverseProxyMode(), certs, logReqResp);
         }
       }
     }

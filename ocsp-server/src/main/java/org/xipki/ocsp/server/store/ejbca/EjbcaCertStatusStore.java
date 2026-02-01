@@ -52,7 +52,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * OcspStore for the EJBCA database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class EjbcaCertStatusStore extends OcspStore {
@@ -135,7 +134,7 @@ public class EjbcaCertStatusStore extends OcspStore {
                 StringUtil.toUtf8Bytes(b64Cert.trim()));
 
             EjbcaIssuerEntry issuerEntry = new EjbcaIssuerEntry(cert);
-            String sha1Fp = issuerEntry.getId();
+            String sha1Fp = issuerEntry.id();
 
             if (!issuerFilter.includeIssuerWithSha1Fp(sha1Fp)) {
               continue;
@@ -167,7 +166,7 @@ public class EjbcaCertStatusStore extends OcspStore {
 
           // no change in the issuerStore
           Set<String> newIds = newIssuers.keySet();
-          Set<String> ids = (issuerStore != null) ? issuerStore.getIds()
+          Set<String> ids = (issuerStore != null) ? issuerStore.ids()
                             : Collections.emptySet();
 
           boolean issuersUnchanged = (ids.size() == newIds.size())
@@ -195,7 +194,7 @@ public class EjbcaCertStatusStore extends OcspStore {
             StringBuilder sb = new StringBuilder();
             for (Map.Entry<String, EjbcaIssuerEntry> m
                 : newIssuers.entrySet()) {
-              sb.append(overviewString(m.getValue().getCert())).append("\n");
+              sb.append(overviewString(m.getValue().cert())).append("\n");
             }
             if (sb.length() > 1) {
               sb.deleteCharAt(sb.length() - 1);
@@ -263,7 +262,7 @@ public class EjbcaCertStatusStore extends OcspStore {
       PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
-        ps.setString(1, issuer.getId());
+        ps.setString(1, issuer.id());
         // decimal serial number
         ps.setString(2, serialNumber.toString());
         rs = ps.executeQuery();
@@ -333,25 +332,25 @@ public class EjbcaCertStatusStore extends OcspStore {
           Instant date;
           // expired certificate remains in status store forever
           if (retentionInterval < 0) {
-            date = issuer.getNotBefore();
+            date = issuer.notBefore();
           } else {
             Instant t1 = Instant.now()
                 .minus(retentionInterval, ChronoUnit.DAYS);
 
-            date = issuer.getNotBefore().isAfter(t1)
-                ? issuer.getNotBefore() : t1;
+            date = issuer.notBefore().isAfter(t1)
+                ? issuer.notBefore() : t1;
           }
 
           certStatusInfo.setArchiveCutOff(date);
         }
       }
 
-      if ((!inheritCaRevocation) || issuer.getRevocationInfo() == null) {
+      if ((!inheritCaRevocation) || issuer.revocationInfo() == null) {
         return certStatusInfo;
       }
 
-      CertRevocationInfo caRevInfo = issuer.getRevocationInfo();
-      CertStatus certStatus = certStatusInfo.getCertStatus();
+      CertRevocationInfo caRevInfo = issuer.revocationInfo();
+      CertStatus certStatus = certStatusInfo.certStatus();
       boolean replaced = false;
       if (certStatus == CertStatus.GOOD) {
         replaced = true;
@@ -361,21 +360,21 @@ public class EjbcaCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(
-            caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.revocationInfo().revocationTime().isAfter(
+            caRevInfo.revocationTime())) {
           replaced = true;
         }
       }
 
       if (replaced) {
         CertRevocationInfo newRevInfo =
-            (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) ? caRevInfo
+            (caRevInfo.reason() == CrlReason.CA_COMPROMISE) ? caRevInfo
               : new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                  caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+                  caRevInfo.revocationTime(), caRevInfo.invalidityTime());
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
-            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
-            certStatusInfo.getCertprofile());
+            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
+            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
+            certStatusInfo.certprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {
@@ -463,12 +462,12 @@ public class EjbcaCertStatusStore extends OcspStore {
     Set<X509Cert> excludeIssuers = null;
 
     if (caCerts != null) {
-      if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
-        includeIssuers = parseCerts(caCerts.getIncludes());
+      if (CollectionUtil.isNotEmpty(caCerts.includes())) {
+        includeIssuers = parseCerts(caCerts.includes());
       }
 
-      if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
-        excludeIssuers = parseCerts(caCerts.getExcludes());
+      if (CollectionUtil.isNotEmpty(caCerts.excludes())) {
+        excludeIssuers = parseCerts(caCerts.excludes());
       }
     }
 
@@ -516,7 +515,7 @@ public class EjbcaCertStatusStore extends OcspStore {
   @Override
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer.getCert();
+    return (issuer == null) ? null : issuer.cert();
   }
 
   protected boolean isInitialized() {

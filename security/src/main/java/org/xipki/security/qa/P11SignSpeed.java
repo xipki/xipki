@@ -30,9 +30,7 @@ import java.time.Clock;
  * Speed test of PKCS#11 signature creation.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11SignSpeed extends BenchmarkExecutor {
 
   private class Tester implements Runnable {
@@ -74,15 +72,15 @@ public class P11SignSpeed extends BenchmarkExecutor {
                       SignAlgo signAlgo, KeySpec keySpec, int threads)
       throws ObjectCreationException {
     super("PKCS#11 Sign speed test with signature algorithm "
-        + signAlgo.getJceName() + " and keyspec " + keySpec);
+        + signAlgo.jceName() + " and keyspec " + keySpec);
     Args.notNull(securityFactory, "securityFactory");
 
     this.slot = Args.notNull(slot, "slot");
     this.keyId = generateKey(signAlgo, keySpec);
 
-    P11SlotId slotId = slot.getSlotId();
-    SignerConf signerConf = getPkcs11SignerConf(slot.getModuleName(),
-        slotId.getId(), keyId.getId(),
+    P11SlotId slotId = slot.slotId();
+    SignerConf signerConf = getPkcs11SignerConf(slot.moduleName(),
+        slotId.id(), keyId.getId(),
         Args.notNull(signAlgo, "signAlgo"),
         threads + Math.max(2, threads * 5 / 4));
     try {

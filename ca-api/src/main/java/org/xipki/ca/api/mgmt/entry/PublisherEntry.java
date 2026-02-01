@@ -32,15 +32,15 @@ public class PublisherEntry extends MgmtEntry {
     this.conf = conf;
   }
 
-  public NameId getIdent() {
+  public NameId ident() {
     return ident;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 
@@ -55,7 +55,7 @@ public class PublisherEntry extends MgmtEntry {
   @Override
   public String toString() {
     return StringUtil.concatObjectsCap(200,
-        "id:     ", ident.getId(), "\nname:   ", ident.getName(),
+        "id:     ", ident.id(), "\nname:   ", ident.name(),
         "\nfaulty: ", faulty, "\ntype:   ", type, "\nconf:   ", conf);
   }
 

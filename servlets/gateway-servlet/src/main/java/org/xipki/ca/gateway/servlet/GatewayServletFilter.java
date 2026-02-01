@@ -12,7 +12,6 @@ import org.xipki.util.extra.http.XiHttpFilter;
  * ACME Gateway ServletFilter.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class GatewayServletFilter extends ServletFilter {
 

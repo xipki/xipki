@@ -21,7 +21,7 @@ public class OrdersResponse implements JsonEncodable {
     this.orders = orders;
   }
 
-  public List<String> getOrders() {
+  public List<String> orders() {
     return orders;
   }
 

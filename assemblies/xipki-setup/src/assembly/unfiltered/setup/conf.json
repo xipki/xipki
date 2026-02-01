@@ -1,77 +1,77 @@
 {
-	"prefix": "$[",
-	"suffix": "]",
-	"basedir": "..",
-	"sections" : [
-		{
-			"description": "Gateway Supported Protocols",
-			"includes": {
-				"dirs": [
-					"xipki-gateway/tomcat/xipki/etc/"
-				],
-				"suffixes": [
-					"gateway.json"
-				]
-			},
-			"replacements": {
-				"gateway.acme.enabled": "false",
-				"gateway.cmp.enabled": "true",
-				"gateway.est.enabled": "true",
-				"gateway.rest.enabled": "true",
-				"gateway.scep.enabled": "false"
-			}
-		},
-		{
-			"description": "XiPKI Configuration",
-			"includes": {
-				"dirs": [
-					"setup/",
-					"xipki-ca/",
-					"xipki-gateway/",
-					"xipki-ocsp/",
-					"xipki-cli/",
-					"xipki-mgmt-cli/"
-				],
-				"suffixes": [
-					".json", ".xml", ".cfg", ".script", ".properties", ".sh"
-				]
-			},
-			"replacements": {
-				// General
-				"organization": "myorg",
-				// OCSP
-				"ocsp.keyPassword": "changeit-ocsp",
-				"ocsp.shutdown.port": "8005",
-				"ocsp.http.port": "8080",
-				"ocsp.host": "localhost",
-				// CA
-				"ca.https.keyPassword": "changeit-ca",
-				"ca.shutdown.port": "8006",
-				"ca.https.port": "8444",
-				"ca.host": "localhost",
-				"ca.name": "myca1",
-				"ca.alias": "myca",
-				// Gateway
-				"gateway.https.keyPassword": "changeit-gateway",
-				"gateway.shutdown.port": "8007",
-				"gateway.http.port": "8082",
-				"gateway.https.port": "8445",
-				"gateway.host": "localhost",
-				"ra.sdk.keyPassword": "changeit-rasdk",
-				"dh-pop.keyPassword":"changeit-dh",
-				"kem-pop.keyPassword":"changeit-kem",
-				// Gateway.SCEP
-				"scep.keyPassword": "changeit-scep",
-				// CLI
-				"cmp.client.ca.keyPassword": "changeit-cmpclientca",
-				"cmp.client.keyPassword": "changeit-cmpclient",
-				"est.client.ca.keyPassword": "changeit-estclientca",
-				"est.client.keyPassword": "changeit-estclient",
-				"rest.client.ca.keyPassword": "changeit-restclientca",
-				"rest.client.keyPassword": "changeit-restclient",
-				// MGMT CLI
-				"ca.mgmt.client.keyPassword": "changeit-camgmtclient"
-			}
-		}
-	]
+  "prefix": "$[",
+  "suffix": "]",
+  "basedir": "..",
+  "sections" : [
+    {
+      "description": "Gateway Supported Protocols",
+      "includes": {
+        "dirs": [
+          "xipki-gateway/tomcat/xipki/etc/"
+        ],
+        "suffixes": [
+          "gateway.json"
+        ]
+      },
+      "replacements": {
+        "gateway.acme.enabled": "false",
+        "gateway.cmp.enabled": "true",
+        "gateway.est.enabled": "true",
+        "gateway.rest.enabled": "true",
+        "gateway.scep.enabled": "false"
+      }
+    },
+    {
+      "description": "XiPKI Configuration",
+      "includes": {
+        "dirs": [
+          "setup/",
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/",
+          "xipki-cli/",
+          "xipki-mgmt-cli/"
+        ],
+        "suffixes": [
+          ".json", ".xml", ".cfg", ".script", ".properties", ".sh"
+        ]
+      },
+      "replacements": {
+        // General
+        "organization": "myorg",
+        // OCSP
+        "ocsp.keyPassword": "changeit-ocsp",
+        "ocsp.shutdown.port": "8005",
+        "ocsp.http.port": "8080",
+        "ocsp.host": "localhost",
+        // CA
+        "ca.https.keyPassword": "changeit-ca",
+        "ca.shutdown.port": "8006",
+        "ca.https.port": "8444",
+        "ca.host": "localhost",
+        "ca.name": "myca1",
+        "ca.alias": "myca",
+        // Gateway
+        "gateway.https.keyPassword": "changeit-gateway",
+        "gateway.shutdown.port": "8007",
+        "gateway.http.port": "8082",
+        "gateway.https.port": "8445",
+        "gateway.host": "localhost",
+        "ra.sdk.keyPassword": "changeit-rasdk",
+        "dh-pop.keyPassword":"changeit-dh",
+        "kem-pop.keyPassword":"changeit-kem",
+        // Gateway.SCEP
+        "scep.keyPassword": "changeit-scep",
+        // CLI
+        "cmp.client.ca.keyPassword": "changeit-cmpclientca",
+        "cmp.client.keyPassword": "changeit-cmpclient",
+        "est.client.ca.keyPassword": "changeit-estclientca",
+        "est.client.keyPassword": "changeit-estclient",
+        "rest.client.ca.keyPassword": "changeit-restclientca",
+        "rest.client.keyPassword": "changeit-restclient",
+        // MGMT CLI
+        "ca.mgmt.client.keyPassword": "changeit-camgmtclient"
+      }
+    }
+  ]
 }

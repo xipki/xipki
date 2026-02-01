@@ -15,7 +15,6 @@ import java.time.Instant;
  * Certificate template data.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertTemplateData {
@@ -68,11 +67,11 @@ public class CertTemplateData {
     this.forCrossCert = forCrossCert;
   }
 
-  public X500Name getSubject() {
+  public X500Name subject() {
     return subject;
   }
 
-  public SubjectPublicKeyInfo getPublicKeyInfo() {
+  public SubjectPublicKeyInfo publicKeyInfo() {
     return publicKeyInfo;
   }
 
@@ -80,23 +79,23 @@ public class CertTemplateData {
     return serverkeygen;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
-  public Instant getNotAfter() {
+  public Instant notAfter() {
     return notAfter;
   }
 
-  public String getCertprofileName() {
+  public String certprofileName() {
     return certprofileName;
   }
 
-  public Extensions getExtensions() {
+  public Extensions extensions() {
     return extensions;
   }
 
-  public BigInteger getCertReqId() {
+  public BigInteger certReqId() {
     return certReqId;
   }
 

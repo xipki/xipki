@@ -13,7 +13,6 @@ import org.xipki.util.extra.exception.InsufficientPermissionException;
  * Requestor info interface.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface RequestorInfo {
@@ -34,7 +33,7 @@ public interface RequestorInfo {
     }
 
     @Override
-    public NameId getIdent() {
+    public NameId ident() {
       return ident;
     }
 
@@ -71,17 +70,17 @@ public interface RequestorInfo {
       this.cert = Args.notNull(cert, "cert");
     }
 
-    public CaHasRequestorEntry getCaHasRequestor() {
+    public CaHasRequestorEntry caHasRequestor() {
       return caHasRequestor;
     }
 
-    public CertWithDbId getCert() {
+    public CertWithDbId cert() {
       return cert;
     }
 
     @Override
-    public NameId getIdent() {
-      return caHasRequestor.getRequestorIdent();
+    public NameId ident() {
+      return caHasRequestor.requestorIdent();
     }
 
     @Override
@@ -106,7 +105,7 @@ public interface RequestorInfo {
 
   } // method CmpRequestorInfo
 
-  NameId getIdent();
+  NameId ident();
 
   boolean isCertprofilePermitted(String certprofile);
 

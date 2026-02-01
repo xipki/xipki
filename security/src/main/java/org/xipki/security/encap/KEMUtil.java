@@ -33,7 +33,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
 
 /**
@@ -61,13 +60,6 @@ public class KEMUtil {
             pkInfo.getPublicKeyData().getOctets());
   }
 
-  public static MLKEMPublicKeyParameters toPublicParameters(
-      PublicKey publicKey) {
-    SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(
-        publicKey.getEncoded());
-    return toPublicParameters(pkInfo);
-  }
-
   public static MLKEMPrivateKeyParameters toPrivateParameters(
       PrivateKeyInfo skInfo) {
     MLKEMParameters variant = getMLKEMVariant(skInfo.getPrivateKeyAlgorithm());
@@ -91,12 +83,6 @@ public class KEMUtil {
     }
   }
 
-  public static MLKEMPrivateKeyParameters toPrivateParameters(
-      PrivateKey privateKey) {
-    PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
-    return toPrivateParameters(skInfo);
-  }
-
   // macKey          = derive(masterKey, spki)
   // encapKey        = encapsulateKey(spki)
   // encryptedMacKey = enc_aesGcm(encapKey.secret, macKey)
@@ -107,9 +93,9 @@ public class KEMUtil {
     byte[] rawPkData = spki.getPublicKeyData().getOctets();
 
     // derive the MAC key
-    byte[] macKey = kmacDerive(masterKey.getSecretKey(), 32,
+    byte[] macKey = kmacDerive(masterKey.secretKey(), 32,
         "XIPKI-KEM".getBytes(StandardCharsets.US_ASCII), rawPkData);
-    return new KemEncapKey(masterKey.getAlias(),
+    return new KemEncapKey(masterKey.alias(),
         kemEncryptSecret(spki, macKey, rnd));
   }
 
@@ -144,12 +130,12 @@ public class KEMUtil {
     try {
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
       cipher.init(Cipher.ENCRYPT_MODE,
-          new SecretKeySpec(skEncap.getSecret(), "AES"),
+          new SecretKeySpec(skEncap.secret(), "AES"),
           // skEncap.getSecret() is always fresh, so we used here constant IV.
           new GCMParameterSpec(128, new byte[12]));
       byte[] encryptedSecret = cipher.doFinal(secret);
 
-      return new KemEncapsulation(alg, skEncap.getEncap(), encryptedSecret);
+      return new KemEncapsulation(alg, skEncap.encap(), encryptedSecret);
     } catch (GeneralSecurityException e) {
       throw new XiSecurityException(e);
     }
@@ -168,7 +154,7 @@ public class KEMUtil {
         OIDs.Algo.id_ml_kem_1024.equals(algOid)) {
       MLKEMPrivateKeyParameters params = KEMUtil.toPrivateParameters(skInfo);
       MLKEMExtractor extractor = new MLKEMExtractor(params);
-      byte[] decapKey = extractor.extractSecret(kemEncapsulation.getEncapKey());
+      byte[] decapKey = extractor.extractSecret(kemEncapsulation.encapKey());
       return doKemDecryptSecret(decapKey, kemEncapsulation);
     } else {
       throw new IllegalArgumentException(
@@ -184,8 +170,8 @@ public class KEMUtil {
     CompositeKemSuite suite;
 
     if (privateKey instanceof CompositeMLKEMPrivateKey) {
-      suite = ((CompositeMLKEMPrivateKey) privateKey).getSuite();
-      sk = ((CompositeMLKEMPrivateKey) privateKey).getKeyValue();
+      suite = ((CompositeMLKEMPrivateKey) privateKey).suite();
+      sk = ((CompositeMLKEMPrivateKey) privateKey).keyValue();
     } else {
       PrivateKeyInfo skInfo =
           PrivateKeyInfo.getInstance(privateKey.getEncoded());
@@ -199,7 +185,7 @@ public class KEMUtil {
     }
 
     byte[] decapKey = CompositeKemUtil.decap(suite, sk, publicKeyData,
-        kemEncapsulation.getEncapKey());
+        kemEncapsulation.encapKey());
     return doKemDecryptSecret(decapKey, kemEncapsulation);
   }
 
@@ -211,7 +197,7 @@ public class KEMUtil {
       cipher.init(Cipher.DECRYPT_MODE,
           new SecretKeySpec(decapKey, "AES"),
           new GCMParameterSpec(128, new byte[12]));
-    return cipher.doFinal(kemEncapsulation.getEncryptedSecret());
+    return cipher.doFinal(kemEncapsulation.encryptedSecret());
     } catch (GeneralSecurityException e) {
       throw new XiSecurityException(e);
     }

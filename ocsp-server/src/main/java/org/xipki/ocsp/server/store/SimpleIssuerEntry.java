@@ -9,7 +9,6 @@ import java.time.Instant;
  * Simple IssuerEntry containing only the id and RevocationTime.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class SimpleIssuerEntry {
@@ -24,17 +23,17 @@ class SimpleIssuerEntry {
   }
 
   public boolean match(IssuerEntry issuer) {
-    if (id != issuer.getId()) {
+    if (id != issuer.id()) {
       return false;
     }
 
     if (revocationTime == null) {
-      return issuer.getRevocationInfo() == null;
+      return issuer.revocationInfo() == null;
     }
 
-    return issuer.getRevocationInfo() != null
+    return issuer.revocationInfo() != null
         && revocationTime == Instant.ofEpochSecond(
-            issuer.getRevocationInfo().getRevocationTime().getEpochSecond());
+            issuer.revocationInfo().revocationTime().getEpochSecond());
   }
 
 } // class SimpleIssuerEntry

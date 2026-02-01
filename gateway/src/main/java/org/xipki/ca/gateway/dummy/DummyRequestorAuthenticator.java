@@ -15,7 +15,6 @@ import java.util.Map;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class DummyRequestorAuthenticator implements RequestorAuthenticator {
@@ -51,17 +50,17 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public String getName() {
-      return cert.getCommonName();
+    public String name() {
+      return cert.commonName();
     }
 
     @Override
-    public byte[] getKeyId() {
-      return cert.getSubjectKeyId();
+    public byte[] keyId() {
+      return cert.subjectKeyId();
     }
 
     @Override
-    public X509Cert getCert() {
+    public X509Cert cert() {
       return cert;
     }
 
@@ -113,7 +112,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return "passwordrequestor-" + user;
     }
 
@@ -172,7 +171,7 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return "extendedpasswordrequestor-" + user;
     }
 
@@ -187,12 +186,12 @@ public class DummyRequestorAuthenticator implements RequestorAuthenticator {
     }
 
     @Override
-    public byte[] getKeyId() {
+    public byte[] keyId() {
       return keyId;
     }
 
     @Override
-    public char[] getPassword() {
+    public char[] password() {
       return password;
     }
 

@@ -64,11 +64,11 @@ public class HttpRespContent {
     return statusCode == HttpStatusCode.SC_OK;
   }
 
-  public int getStatusCode() {
+  public int statusCode() {
     return statusCode;
   }
 
-  public String getContentType() {
+  public String contentType() {
     return contentType;
   }
 
@@ -76,7 +76,7 @@ public class HttpRespContent {
     return base64;
   }
 
-  public byte[] getContent() {
+  public byte[] content() {
     return content;
   }
 }

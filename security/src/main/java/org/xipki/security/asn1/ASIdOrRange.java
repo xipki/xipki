@@ -33,11 +33,11 @@ public class ASIdOrRange extends ASN1Object {
     this.range = Args.notNull(range, "range");
   }
 
-  public ASN1Integer getId() {
+  public ASN1Integer id() {
     return id;
   }
 
-  public ASRange getRange() {
+  public ASRange range() {
     return range;
   }
 

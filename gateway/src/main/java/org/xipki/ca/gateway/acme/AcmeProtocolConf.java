@@ -20,7 +20,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 public class AcmeProtocolConf extends ProtocolConf {
 
@@ -32,7 +31,7 @@ public class AcmeProtocolConf extends ProtocolConf {
     this.acme = Args.notNull(acme, "acme");
   }
 
-  public Acme getAcme() {
+  public Acme acme() {
     return acme;
   }
 
@@ -43,8 +42,8 @@ public class AcmeProtocolConf extends ProtocolConf {
     Acme acme = Acme.parse(json);
     acme.validate();
 
-    return new AcmeProtocolConf(pConf.getLogReqResp(),
-        pConf.getPop(), pConf.getSdkClient(), acme);
+    return new AcmeProtocolConf(pConf.logReqResp(),
+        pConf.pop(), pConf.sdkClient(), acme);
   }
 
   public static AcmeProtocolConf readConfFromFile(String fileName)
@@ -73,15 +72,15 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.tlsProfile = Args.notBlank(tlsProfile, "tlsProfile");
     }
 
-    public List<String> getKeyTypes() {
+    public List<String> keyTypes() {
       return keyTypes;
     }
 
-    public String getCa() {
+    public String ca() {
       return ca;
     }
 
-    public String getTlsProfile() {
+    public String tlsProfile() {
       return tlsProfile;
     }
 
@@ -123,7 +122,7 @@ public class AcmeProtocolConf extends ProtocolConf {
 
     private List<String> challengeTypes;
 
-    public String getBaseUrl() {
+    public String baseUrl() {
       if (baseUrl != null) {
         if (!baseUrl.endsWith("/")) {
           baseUrl += "/";
@@ -133,7 +132,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       return baseUrl;
     }
 
-    public int getSyncDbSeconds() {
+    public int syncDbSeconds() {
       return syncDbSeconds;
     }
 
@@ -141,7 +140,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.syncDbSeconds = syncDbSeconds;
     }
 
-    public int getCacheSize() {
+    public int cacheSize() {
       return cacheSize;
     }
 
@@ -149,7 +148,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.cacheSize = cacheSize;
     }
 
-    public String getDbConf() {
+    public String dbConf() {
       return dbConf;
     }
 
@@ -157,7 +156,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.dbConf = dbConf;
     }
 
-    public List<CaProfile> getCaProfiles() {
+    public List<CaProfile> caProfiles() {
       return caProfiles;
     }
 
@@ -165,7 +164,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.caProfiles = caProfiles;
     }
 
-    public String getContactVerifier() {
+    public String contactVerifier() {
       return contactVerifier;
     }
 
@@ -173,15 +172,15 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.contactVerifier = contactVerifier;
     }
 
-    public int getNonceNumBytes() {
+    public int nonceNumBytes() {
       return nonceNumBytes;
     }
 
-    public int getTokenNumBytes() {
+    public int tokenNumBytes() {
       return tokenNumBytes;
     }
 
-    public CleanupOrderConf getCleanupOrder() {
+    public CleanupOrderConf cleanupOrder() {
       return cleanupOrder;
     }
 
@@ -201,7 +200,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.baseUrl = baseUrl;
     }
 
-    public String getTermsOfService() {
+    public String termsOfService() {
       return termsOfService;
     }
 
@@ -209,7 +208,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.termsOfService = termsOfService;
     }
 
-    public String getWebsite() {
+    public String website() {
       return website;
     }
 
@@ -217,7 +216,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.website = website;
     }
 
-    public List<String> getCaaIdentities() {
+    public List<String> caaIdentities() {
       return caaIdentities;
     }
 
@@ -225,7 +224,7 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.caaIdentities = caaIdentities;
     }
 
-    public List<String> getChallengeTypes() {
+    public List<String> challengeTypes() {
       return challengeTypes;
     }
 
@@ -318,11 +317,11 @@ public class AcmeProtocolConf extends ProtocolConf {
       this.expiredOrderDays = expiredOrderDays;
     }
 
-    public int getExpiredCertDays() {
+    public int expiredCertDays() {
       return expiredCertDays;
     }
 
-    public int getExpiredOrderDays() {
+    public int expiredOrderDays() {
       return expiredOrderDays;
     }
 

@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * An implementation of {@link CaQaSystemManager}.
  *
  * @author Lijun Liao
- *
  */
 
 public class CaQaSystemManagerImpl implements CaQaSystemManager {

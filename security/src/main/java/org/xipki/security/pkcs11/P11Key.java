@@ -31,9 +31,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.*;
  * PKCS#11 key.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11Key {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11Key.class);
@@ -58,7 +56,7 @@ public class P11Key {
     EcCurveEnum curve = null;
 
     PKCS11KeyId keyId = key.id();
-    PKCS11KeyId.KeyIdType type = keyId.getType();
+    PKCS11KeyId.KeyIdType type = keyId.type();
     long keyType = keyId.getKeyType();
 
     if (key.rsaModulus() != null) {
@@ -120,11 +118,11 @@ public class P11Key {
     return b != null && b;
   }
 
-  public EcCurveEnum getEcParams() {
+  public EcCurveEnum ecParams() {
     return ecParams;
   }
 
-  public KeySpec getKeySpec() {
+  public KeySpec keySpec() {
     return keySpec;
   }
 
@@ -165,7 +163,7 @@ public class P11Key {
   public boolean supportsSign(long mechanism) {
     PKCS11KeyId keyId = key.id();
     return isSign()
-        && (keyId.getType() != PKCS11KeyId.KeyIdType.PUBLIC_KEY)
+        && (keyId.type() != PKCS11KeyId.KeyIdType.PUBLIC_KEY)
         && (keyId.getKeyType() != CKK_EC_MONTGOMERY)
         && slot.supportsMechanism(mechanism, CKF_SIGN);
   }
@@ -190,23 +188,23 @@ public class P11Key {
   }
 
   public boolean supportsDigest(long mechanism) {
-    return key.id().getType() == PKCS11KeyId.KeyIdType.SECRET_KEY
+    return key.id().type() == PKCS11KeyId.KeyIdType.SECRET_KEY
         && slot.supportsMechanism(mechanism, CKF_DIGEST);
   }
 
-  public P11SlotId getSlotId() {
-    return slot.getSlotId();
+  public P11SlotId slotId() {
+    return slot.slotId();
   }
 
-  public PKCS11Key getKey() {
+  public PKCS11Key key() {
     return key;
   }
 
   public boolean isSecretKey() {
-    return key.id().getType() == PKCS11KeyId.KeyIdType.SECRET_KEY;
+    return key.id().type() == PKCS11KeyId.KeyIdType.SECRET_KEY;
   }
 
-  public  PublicKey getPublicKey() {
+  public  PublicKey publicKey() {
     if (isSecretKey()) {
       return null;
     }
@@ -219,7 +217,7 @@ public class P11Key {
       this.publicKey = initPublicKey();
     } catch (Exception e) {
       LogUtil.error(LOG, e, "could not initialize public key for " +
-          "(private) key " + key.id() + " on slot " + slot.getSlotId());
+          "(private) key " + key.id() + " on slot " + slot.slotId());
     } finally {
       publicKeyInitialized = true;
     }
@@ -247,7 +245,7 @@ public class P11Key {
 
       if (keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
         return KeyUtil.getPublicKey(
-            new SubjectPublicKeyInfo(ecParams.getAlgId(), ecPoint));
+            new SubjectPublicKeyInfo(ecParams.algId(), ecPoint));
       } else {
         return KeyUtil.createECPublicKey(ecParams, ecPoint);
       }

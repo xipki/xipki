@@ -26,7 +26,6 @@ import java.util.List;
  * Generator for OCSP response objects.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OCSPRespBuilder {
@@ -78,7 +77,7 @@ public class OCSPRespBuilder {
     ResponseData responseData =
         new ResponseData(0, responderId, producedAt, list, responseExtensions);
 
-    byte[] tbs = new byte[responseData.getEncodedLength()];
+    byte[] tbs = new byte[responseData.encodedLength()];
     responseData.write(tbs, 0);
 
     XiContentSigner signer0 = signer.borrowSigner();
@@ -110,7 +109,7 @@ public class OCSPRespBuilder {
     // BasicOCSPResponse
     int basicResponseBodyLen = tbs.length + sigAlgId.length + signatureLen;
     if (taggedCertSequence != null) {
-      basicResponseBodyLen += taggedCertSequence.getEncodedLength();
+      basicResponseBodyLen += taggedCertSequence.encodedLength();
     }
     int basicResponseLen = getLen(basicResponseBodyLen);
 

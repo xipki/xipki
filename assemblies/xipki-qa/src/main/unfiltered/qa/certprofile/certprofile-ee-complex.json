@@ -8,41 +8,21 @@
   "validity": "5y",
   "notBeforeTime": "midnight",
   "keypairGeneration": "InheritCA",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
+  "keyAlgorithms": ["RSA2048","RSA3072","RSA4096","SECP256R1","SECP384R1",
     "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1","X25519","X448","ED25519","ED448",
-    "MLDSA44","MLDSA65","MLDSA87","MLKEM512","MLKEM768","MLKEM1024",
-    "MLDSA44-RSA2048-PSS-SHA256",
-    "MLDSA44-RSA2048-PKCS15-SHA256",
-    "MLDSA44-ED25519-SHA512",
-    "MLDSA44-ECDSA-P256-SHA256",
-    "MLDSA65-RSA3072-PSS-SHA512",
-    "MLDSA65-RSA3072-PKCS15-SHA512",
-    "MLDSA65-RSA4096-PSS-SHA512",
-    "MLDSA65-RSA4096-PKCS15-SHA512",
-    "MLDSA65-ECDSA-P256-SHA512",
-    "MLDSA65-ECDSA-P384-SHA512",
-    "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-    "MLDSA65-ED25519-SHA512",
-    "MLDSA87-ECDSA-P384-SHA512",
-    "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-    "MLDSA87-ED448-SHAKE256",
-    "MLDSA87-RSA3072-PSS-SHA512",
-    "MLDSA87-RSA4096-PSS-SHA512",
-    "MLDSA87-ECDSA-P521-SHA512",
-    "MLKEM768-RSA2048-SHA3-256",
-    "MLKEM768-RSA3072-SHA3-256",
-    "MLKEM768-RSA4096-SHA3-256",
-    "MLKEM768-X25519-SHA3-256",
-    "MLKEM768-ECDH-P256-SHA3-256",
-    "MLKEM768-ECDH-P384-SHA3-256",
-    "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-    "MLKEM1024-RSA3072-SHA3-256",
-    "MLKEM1024-ECDH-P384-SHA3-256",
-    "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-    "MLKEM1024-X448-SHA3-256",
-    "MLKEM1024-ECDH-P521-SHA3-256"
-  ],
+    "SM2P256V1","FRP256V1","RSA2048","RSA3072","RSA4096","SM2P256V1",
+    "ED25519","ED448","MLDSA44","MLDSA65","MLDSA87","MLDSA44-RSA2048",
+    "MLDSA44-RSA2048-PKCS15","MLDSA44-ED25519","MLDSA44-P256","MLDSA65-RSA3072",
+    "MLDSA65-RSA3072-PKCS15","MLDSA65-RSA4096","MLDSA65-RSA4096-PKCS15",
+    "MLDSA65-P256","MLDSA65-P384","MLDSA65-BRAINPOOLP256R1","MLDSA65-ED25519",
+    "MLDSA87-P384","MLDSA87-BRAINPOOLP384R1","MLDSA87-ED448","MLDSA87-RSA3072",
+    "MLDSA87-RSA4096","MLDSA87-P521","SECP256R1","SECP384R1","SECP521R1",
+    "BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1","SM2P256V1",
+    "FRP256V1","RSA2048","RSA3072","RSA4096","X25519","X448","SM2P256V1",
+    "MLKEM512","MLKEM768","MLKEM1024","MLKEM768-RSA2048","MLKEM768-RSA3072",
+    "MLKEM768-RSA4096","MLKEM768-X25519","MLKEM768-P256","MLKEM768-P384",
+    "MLKEM768-BRAINPOOLP256R1","MLKEM1024-RSA3072","MLKEM1024-P384",
+    "MLKEM1024-BRAINPOOLP384R1","MLKEM1024-X448","MLKEM1024-P521"],
   "subject": [{
       "type": "commonName"
     },{
@@ -56,10 +36,10 @@
       "type": "serialNumber",
       "minOccurs": 0
     },{
-      "type": "dateOfBirth",
+      "type": "postalAddress",
       "minOccurs": 0
     },{
-      "type": "postalAddress",
+      "type": "dateOfBirth",
       "minOccurs": 0
     },{
       "type": "userid"
@@ -98,44 +78,36 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["digitalSignature","keyEncipherment","dataEncipherment"]
-          },{
             "appliesTo": ["ED25519","ED448","MLDSA44","MLDSA65","MLDSA87",
-              "MLDSA44-RSA2048-PSS-SHA256",
-              "MLDSA44-RSA2048-PKCS15-SHA256",
-              "MLDSA44-ED25519-SHA512",
-              "MLDSA44-ECDSA-P256-SHA256",
-              "MLDSA65-RSA3072-PSS-SHA512",
-              "MLDSA65-RSA3072-PKCS15-SHA512",
-              "MLDSA65-RSA4096-PSS-SHA512",
-              "MLDSA65-RSA4096-PKCS15-SHA512",
-              "MLDSA65-ECDSA-P256-SHA512",
-              "MLDSA65-ECDSA-P384-SHA512",
-              "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-              "MLDSA65-ED25519-SHA512",
-              "MLDSA87-ECDSA-P384-SHA512",
-              "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-              "MLDSA87-ED448-SHAKE256",
-              "MLDSA87-RSA3072-PSS-SHA512",
-              "MLDSA87-RSA4096-PSS-SHA512",
-              "MLDSA87-ECDSA-P521-SHA512"
-            ],
+              "MLDSA44-RSA2048","MLDSA44-RSA2048-PKCS15","MLDSA44-ED25519",
+              "MLDSA44-P256","MLDSA65-RSA3072","MLDSA65-RSA3072-PKCS15",
+              "MLDSA65-RSA4096","MLDSA65-RSA4096-PKCS15","MLDSA65-P256",
+              "MLDSA65-P384","MLDSA65-BRAINPOOLP256R1","MLDSA65-ED25519",
+              "MLDSA87-P384","MLDSA87-BRAINPOOLP384R1","MLDSA87-ED448",
+              "MLDSA87-RSA3072","MLDSA87-RSA4096","MLDSA87-P521"],
             "required": ["digitalSignature"]
           },{
-            "appliesTo": ["X25519","X448","MLKEM512","MLKEM768","MLKEM1024",
-                  "MLKEM768-RSA2048-SHA3-256",
-                  "MLKEM768-RSA3072-SHA3-256",
-                  "MLKEM768-RSA4096-SHA3-256",
-                  "MLKEM768-X25519-SHA3-256",
-                  "MLKEM768-ECDH-P256-SHA3-256",
-                  "MLKEM768-ECDH-P384-SHA3-256",
-                  "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-                  "MLKEM1024-RSA3072-SHA3-256",
-                  "MLKEM1024-ECDH-P384-SHA3-256",
-                  "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-                  "MLKEM1024-X448-SHA3-256",
-                  "MLKEM1024-ECDH-P521-SHA3-256"],
-            "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
+            "appliesTo": ["MLKEM512","MLKEM768","MLKEM1024","MLKEM768-RSA2048",
+              "MLKEM768-RSA3072","MLKEM768-RSA4096","MLKEM768-X25519",
+              "MLKEM768-P256","MLKEM768-P384","MLKEM768-BRAINPOOLP256R1",
+              "MLKEM1024-RSA3072","MLKEM1024-P384","MLKEM1024-BRAINPOOLP384R1",
+              "MLKEM1024-X448","MLKEM1024-P521"],
+            "required": ["dataEncipherment","keyEncipherment"]
+          },{
+            "appliesTo": ["RSA2048","RSA3072","RSA4096","RSA2048",
+              "RSA3072","RSA4096","RSA2048","RSA3072","RSA4096"],
+            "required": ["dataEncipherment","keyEncipherment","digitalSignature"]
+          },{
+            "appliesTo": ["X25519","X448"],
+            "required": ["dataEncipherment","keyEncipherment","keyAgreement"]
+          },{
+            "appliesTo": ["SECP256R1","SECP384R1","SECP521R1","BRAINPOOLP256R1",
+              "BRAINPOOLP384R1","BRAINPOOLP512R1","SM2P256V1",
+              "FRP256V1","SM2P256V1","SECP256R1","SECP384R1",
+              "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1",
+              "BRAINPOOLP512R1","SM2P256V1","FRP256V1","SM2P256V1"],
+            "required": ["dataEncipherment","keyEncipherment","digitalSignature",
+              "keyAgreement"]
           }
         ]
       }
@@ -150,76 +122,8 @@
     },{
       "type": "TLSFeature",
       "required": true,
-      "critical": true,
       "tlsFeature": {
         "features": [2,5]
-      }
-    },{
-      "type": "PrivateKeyUsagePeriod",
-      "required": true,
-      "privateKeyUsagePeriod": {
-        "validity": "3y"
-      }
-    },{
-      "type": "QCStatements",
-      "required": true,
-      "inRequest": "optional",
-      "qcStatements": {
-        "qcStatements": [{
-            "statementId": "QcCompliance"
-          },{
-            "statementId": "QcSSCD"
-          },{
-            "statementId": "QcRetentionPeriod",
-            "statementValue": {
-              "qcRetentionPeriod": 10
-            }
-          },{
-            "statementId": "QcLimitValue",
-            "statementValue": {
-              "qcEuLimitValue": {
-                "currency": "EUR",
-                "amount": {
-                  "min": 100,
-                  "max": 200
-                },
-                "exponent": {
-                  "min": 10,
-                  "max": 20
-                }
-              }
-            }
-          },{
-            "statementId": "QcPDS",
-            "statementValue": {
-              "pdsLocations": [{
-                  "url": "http://pki.myorg.org/pds/en",
-                  "language": "en"
-                },{
-                  "url": "http://pki.myorg.org/pds/de",
-                  "language": "de"
-                }
-              ]
-            }
-          },{
-            "statementId": "1.2.3.4.5",
-            "statementValue": {
-              "constant": {
-                "type": "ASN1",
-                "value": "BQA="
-              }
-            }
-          }
-        ]
-      }
-    },{
-      "type": "BiometricInfo",
-      "required": true,
-      "inRequest": "required",
-      "biometricInfo": {
-        "types": ["picture","handwrittenSignature"],
-        "hashAlgorithms": ["SHA256","SHA384"],
-        "includeSourceDataUri": "required"
       }
     },{
       "type": "SubjectAlternativeName",
@@ -227,15 +131,8 @@
       "critical": true,
       "inRequest": "required",
       "subjectAltName": {
-        "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-          "registeredID","directoryName","ediPartyName","uri"]
-      }
-    },{
-      "type": "CCC-Q-VehicleOEMSigCert",
-      "required": true,
-      "critical": true,
-      "cccExtensionSchema": {
-        "version": 1
+        "modes": ["IPAddress","registeredID","rfc822Name","DNSName",
+          "otherName","directoryName","ediPartyName","uri"]
       }
     },{
       "type": "SubjectInfoAccess",
@@ -245,78 +142,78 @@
         "accesses": [{
             "accessMethod": "CARepository",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.1",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.2",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.3",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.4",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.5",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.6",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.7",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.8",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.9",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           },{
             "accessMethod": "2.3.4.10",
             "accessLocation": {
-              "modes": ["otherName","DNSName","IPAddress","rfc822Name",
-                "registeredID","directoryName","ediPartyName",
+              "modes": ["IPAddress","registeredID","rfc822Name",
+                "DNSName","otherName","directoryName","ediPartyName",
                 "uri"]
             }
           }

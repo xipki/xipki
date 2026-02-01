@@ -31,7 +31,6 @@ import java.util.Set;
  * Base Certprofile.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class ProfileUtil {
@@ -45,13 +44,13 @@ public class ProfileUtil {
 
     List<RDN> rdns = new LinkedList<>();
 
-    for (ASN1ObjectIdentifier type : scontrol.getTypes()) {
+    for (ASN1ObjectIdentifier type : scontrol.types()) {
       RdnControl control = scontrol.getControl(type);
-      if (control == null || control.getMaxOccurs() < 1) {
+      if (control == null || control.maxOccurs() < 1) {
         continue;
       }
 
-      String cvalue = control.getValue();
+      String cvalue = control.value();
       RDN[] thisRdns = getRdns(requestedRdns, type);
       int requestedRdnNum = thisRdns == null ? 0 : thisRdns.length;
 
@@ -86,9 +85,9 @@ public class ProfileUtil {
   private static RDN createSubjectRdn(
       ASN1ObjectIdentifier type, ASN1Encodable value, RdnControl option)
       throws BadCertTemplateException {
-    if (AttributeType.postalAddress.getOid().equals(type)) {
+    if (AttributeType.postalAddress.oid().equals(type)) {
       return createPostalAddressRdn(type, value, option);
-    } else if (AttributeType.dateOfBirth.getOid().equals(type)) {
+    } else if (AttributeType.dateOfBirth.oid().equals(type)) {
       return createDateOfBirthRdn(type, value);
     } else {
       String text = X509Util.rdnValueToString(value);
@@ -183,7 +182,7 @@ public class ProfileUtil {
 
       if (modes != null) {
         for (GeneralNameTag m : modes) {
-          if (m.getTag() == tag) {
+          if (m.tag() == tag) {
             mode = m;
             break;
           }
@@ -303,7 +302,7 @@ public class ProfileUtil {
 
     String tmpText = checkText(text, OIDs.oidToDisplayName(type), option);
 
-    StringType stringType = option == null ? null : option.getStringType();
+    StringType stringType = option == null ? null : option.stringType();
 
     if (stringType == null) {
       stringType = isPrintableString(tmpText)
@@ -324,7 +323,7 @@ public class ProfileUtil {
     String tmpText = text.trim();
 
     if (option != null) {
-      TextVadidator pattern = option.getPattern();
+      TextVadidator pattern = option.pattern();
       if (pattern != null && !pattern.isValid(tmpText)) {
         throw new BadCertTemplateException(
             String.format("invalid subject %s '%s' against regex '%s'",
@@ -332,8 +331,8 @@ public class ProfileUtil {
       }
 
       int len = tmpText.length();
-      Range range = option.getStringLengthRange();
-      Integer minLen = (range == null) ? null : range.getMin();
+      Range range = option.stringLengthRange();
+      Integer minLen = (range == null) ? null : range.min();
 
       if (minLen != null && len < minLen) {
         throw new BadCertTemplateException(String.format(
@@ -341,7 +340,7 @@ public class ProfileUtil {
             typeDesc, tmpText, len, minLen));
       }
 
-      Integer maxLen = (range == null) ? null : range.getMax();
+      Integer maxLen = (range == null) ? null : range.max();
 
       if (maxLen != null && len > maxLen) {
         throw new BadCertTemplateException(String.format(

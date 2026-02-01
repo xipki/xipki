@@ -22,7 +22,7 @@ public class SdkErrorResponseException extends Exception {
     this.errorResponse = errorResponse;
   }
 
-  public ErrorResponse getErrorResponse() {
+  public ErrorResponse errorResponse() {
     return errorResponse;
   }
 

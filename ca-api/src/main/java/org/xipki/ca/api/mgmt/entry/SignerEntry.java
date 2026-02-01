@@ -96,11 +96,11 @@ public class SignerEntry extends MgmtEntry {
         : Base64.encodeToString(certificate.getEncoded());
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
@@ -108,7 +108,7 @@ public class SignerEntry extends MgmtEntry {
     this.conf = conf;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 
@@ -124,7 +124,7 @@ public class SignerEntry extends MgmtEntry {
     return base64Cert;
   }
 
-  public X509Cert getCertificate() {
+  public X509Cert certificate() {
     return certificate;
   }
 

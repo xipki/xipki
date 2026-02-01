@@ -7,7 +7,6 @@ package org.xipki.ocsp.server;
  * Triple state enum.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public enum QuadrupleState {

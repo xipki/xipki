@@ -52,15 +52,15 @@ public class ChallId {
     this.idText = Base64.getUrlNoPaddingEncoder().encodeToString(encoded);
   }
 
-  public long getOrderId() {
+  public long orderId() {
     return orderId;
   }
 
-  public int getAuthzId() {
+  public int authzId() {
     return authzId;
   }
 
-  public int getSubId() {
+  public int subId() {
     return subId;
   }
 

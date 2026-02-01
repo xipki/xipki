@@ -17,7 +17,6 @@ import java.util.Set;
  * {@link List}, {@link Map}, and arrays.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CollectionUtil {

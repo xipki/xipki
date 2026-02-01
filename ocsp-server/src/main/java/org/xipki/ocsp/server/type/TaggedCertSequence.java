@@ -7,7 +7,6 @@ package org.xipki.ocsp.server.type;
  * ASN.1 tagged Sequence of certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class TaggedCertSequence extends ASN1Type {
@@ -39,7 +38,7 @@ public class TaggedCertSequence extends ASN1Type {
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLen;
   }
 

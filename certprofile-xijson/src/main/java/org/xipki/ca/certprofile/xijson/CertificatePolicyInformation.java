@@ -14,7 +14,6 @@ import java.util.List;
  * CertificatePolicies).
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class CertificatePolicyInformation {
@@ -30,11 +29,11 @@ public class CertificatePolicyInformation {
     this.qualifiers = CollectionUtil.unmodifiableList(qualifiers);
   }
 
-  public CertificatePolicyID getCertPolicyId() {
+  public CertificatePolicyID certPolicyId() {
     return certPolicyId;
   }
 
-  public List<CertificatePolicyQualifier> getQualifiers() {
+  public List<CertificatePolicyQualifier> qualifiers() {
     return qualifiers;
   }
 

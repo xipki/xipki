@@ -11,16 +11,21 @@ import org.xipki.ca.api.profile.id.AttributeType;
 import org.xipki.ca.api.profile.id.CertificatePolicyID;
 import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
 import org.xipki.ca.api.profile.id.ExtensionID;
+import org.xipki.ca.api.profile.id.QCStatementID;
+import org.xipki.ca.certprofile.xijson.conf.ConstantExtnValue;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.PrivateKeyUsagePeriod;
+import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.OIDs;
 import org.xipki.security.TlsExtensionType;
+import org.xipki.util.codec.Base64;
+import org.xipki.util.codec.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,13 +44,14 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
   public static void main(String[] args) {
     try {
-      certprofileSubCaComplex("qa/certprofile-subca-complex.json");
-      certprofileEeComplex   ("qa/certprofile-ee-complex.json");
-      certprofileMultipleOus ("qa/certprofile-multiple-ous.json");
-      certprofileExtended    ("qa/certprofile-extended.json");
-      certprofileConstantExt ("qa/certprofile-constant-ext.json");
+      certprofileSubCaComplex(qa_dir + "/certprofile-subca-complex.json");
+      certprofileEeComplex   (qa_dir + "/certprofile-ee-complex.json");
+      certprofileMultipleOus (qa_dir + "/certprofile-multiple-ous.json");
+      certprofileExtended    (qa_dir + "/certprofile-extended.json");
+      certprofileConstantExt (qa_dir + "/certprofile-constant-ext.json");
       certprofileFixedPartialSubject(
-          "qa/certprofile-fixed-partial-subject.json");
+          qa_dir + "/certprofile-fixed-partial-subject.json");
+      certprofileQc(qa_dir + "/certprofile-qc.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -54,8 +60,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileSubCaComplex(String destFilename) {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile subca-complex (with most extensions)",
-        CertLevel.SubCA, "8y", KeypairGenMode.INHERITCA,
-        AllowKeyMode.SM2, AllowKeyMode.EC, AllowKeyMode.RSA);
+        CertLevel.SubCA, "8y", KeypairGenMode.INHERITCA, AllowKeyMode.ALL_SIGN);
 
     // Subject
     addRdns(profile,
@@ -66,7 +71,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         rdn  (AttributeType.CN, 1, 1, null));
 
     // Extensions
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
     list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
@@ -87,7 +92,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},
-        null));
+        null, profile.keyAlgorithms()));
 
     // Certificate Policies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
@@ -169,7 +174,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileMultipleOus(String destFilename) {
     XijsonCertprofileType profile = getBaseProfile("certprofile multiple-ous",
         CertLevel.EndEntity, "5y", KeypairGenMode.INHERITCA,
-        AllowKeyMode.RSA, AllowKeyMode.EC, AllowKeyMode.SM2);
+        AllowKeyMode.ALL);
 
     // Subject
     addRdns(profile,
@@ -181,7 +186,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions
     // Extensions - general
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
     list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
@@ -200,7 +205,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.contentCommitment}, null));
+        new KeyUsage[]{KeyUsage.contentCommitment, KeyUsage.digitalSignature,
+            KeyUsage.keyAgreement, KeyUsage.keyEncipherment,
+            KeyUsage.dataEncipherment}, null,
+        profile.keyAlgorithms()));
 
     marshall(profile, destFilename, true);
   } // method certprofileMultipleOus
@@ -208,8 +216,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileEeComplex(String destFilename) {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile ee-complex", CertLevel.EndEntity,
-        "5y", KeypairGenMode.INHERITCA, AllowKeyMode.RSA,
-        AllowKeyMode.EC, AllowKeyMode.SM2);
+        "5y", KeypairGenMode.INHERITCA, AllowKeyMode.RSA, AllowKeyMode.ALL);
     profile.setNotBeforeTime("midnight");
     // Subject
     addRdns(profile,
@@ -219,6 +226,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
         rdn01(AttributeType.OU),
         rdn01(AttributeType.serialNumber),
         rdn01(AttributeType.postalAddress),
+        rdn01(AttributeType.dateOfBirth),
         rdn  (AttributeType.userid),
         rdn  (AttributeType.jurIncorporationCountry),
         rdn  (AttributeType.jurIncorporationLocality),
@@ -226,7 +234,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions
     // Extensions - general
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     // Extensions - controls
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
@@ -247,8 +255,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
+        null, profile.keyAlgorithms()));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extKeyUsage, true, false));
@@ -301,8 +309,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileConstantExt(String destFilename) {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile constant-extension",
-        CertLevel.EndEntity, "5y", KeypairGenMode.INHERITCA,
-        AllowKeyMode.RSA, AllowKeyMode.EC, AllowKeyMode.SM2);
+        CertLevel.EndEntity, "5y", KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
 
     // Subject
     profile.setKeepSubjectOrder(true);
@@ -314,7 +321,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions
     // Extensions - general
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     // Extensions - controls
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
@@ -335,10 +342,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
+        null, profile.keyAlgorithms()));
 
-    // Extensions - extenedKeyUsage
+    // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
         new ExtendedKeyUsageID[]{ExtendedKeyUsageID.serverAuth},
@@ -354,10 +361,10 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile fixed subject O and C",
         CertLevel.EndEntity, "365d", KeypairGenMode.INHERITCA,
-        AllowKeyMode.RSA, AllowKeyMode.EC, AllowKeyMode.SM2);
+        AllowKeyMode.ALL);
 
     // Subject
-    List<RdnType> subject = profile.getSubject();
+    List<RdnType> subject = profile.subject();
 
     subject.add(rdn01(AttributeType.C));
     subject.add(rdn  (AttributeType.O,  null, "fixed myorg.org"));
@@ -366,7 +373,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     subject.add(rdn  (AttributeType.CN));
 
     // Extensions
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
     list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
@@ -386,8 +393,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
+        null, profile.keyAlgorithms()));
 
     marshall(profile, destFilename, true);
   } // method certprofileFixedPartialSubject
@@ -395,8 +402,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
   private static void certprofileExtended(String destFilename) {
     XijsonCertprofileType profile = getBaseProfile("certprofile extended",
         CertLevel.EndEntity, "5y",
-        KeypairGenMode.INHERITCA, AllowKeyMode.RSA, AllowKeyMode.EC,
-        AllowKeyMode.SM2);
+        KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
 
     // Subject
     addRdns(profile,
@@ -410,7 +416,7 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // Extensions - general
 
     // Extensions - controls
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
     list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
     list.add(createExtension(ExtensionID.freshestCRL, false, false));
@@ -435,8 +441,8 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
+        null, profile.keyAlgorithms()));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extKeyUsage, true, false));
@@ -461,4 +467,106 @@ public class ComplexProfileConfDemo extends ProfileConfBuilder {
     // cannot validate due to some additional customized extensions.
     marshall(profile, destFilename, false);
   } // method certprofileExtended
+
+  private static void certprofileQc(String destFilename) {
+    XijsonCertprofileType profile = getBaseProfile("certprofile QC",
+        CertLevel.EndEntity, "1000d",
+        KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
+
+    // Subject
+    addRdns(profile,
+        rdn(AttributeType.country),
+        rdn(AttributeType.O),
+        rdn01(AttributeType.organizationIdentifier),
+        rdn01(AttributeType.OU),
+        rdn01(AttributeType.serialNumber),
+        rdn  (AttributeType.commonName));
+
+    // Extensions
+    // Extensions - general
+
+    // Extensions - controls
+    List<ExtensionType> list = profile.extensions();
+    list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
+    list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
+    list.add(createExtension(ExtensionID.freshestCRL, false, false));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(ExtensionID.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(ExtensionID.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(ExtensionID.authorityKeyIdentifier, true, false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(ExtensionID.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
+        null, profile.keyAlgorithms()));
+
+    // Extensions - extendedKeyUsage
+    list.add(createExtension(ExtensionID.extKeyUsage, true, true));
+    last(list).setExtendedKeyUsage(createExtendedKeyUsage(
+        new ExtendedKeyUsageID[]{ExtendedKeyUsageID.timestamping}, null));
+
+    // Extensions - PrivateKeyUsage
+    list.add(createExtension(ExtensionID.privateKeyUsagePeriod, true, false));
+    last(list).setPrivateKeyUsagePeriod(new PrivateKeyUsagePeriod("3y"));
+
+    // Extensions - QCStatements
+    list.add(createExtension(ExtensionID.qcStatements, true, false));
+    last(list).setInRequest(TripleState.optional);
+
+    List<QcStatements.QcStatementType> types = new LinkedList<>();
+    QcStatements.QcStatementType type = new QcStatements.QcStatementType(
+        QCStatementID.etsi_qcs_QcCompliance, null);
+    types.add(type);
+
+    type = new QcStatements.QcStatementType(
+        QCStatementID.etsi_qcs_QcSSCD, null);
+    types.add(type);
+
+    type = new QcStatements.QcStatementType(
+        QCStatementID.etsi_qcs_QcRetentionPeriod,
+        new QcStatements.QcStatementValueType(null, 10, null, null));
+    types.add(type);
+
+    QcStatements.QcEuLimitValueType limitValue =
+        new QcStatements.QcEuLimitValueType("EUR",
+            new QcStatements.Range2Type(100, 100),
+            new QcStatements.Range2Type(10, 10));
+    type = new QcStatements.QcStatementType(
+        QCStatementID.etsi_qcs_QcLimitValue,
+        new QcStatements.QcStatementValueType(null, null, limitValue, null));
+    types.add(type);
+
+    List<QcStatements.PdsLocationType> locations = new LinkedList<>();
+    locations.add(new QcStatements.PdsLocationType(
+        "http://pki.myorg.org/pds/en", "en"));
+    locations.add(new QcStatements.PdsLocationType(
+        "http://pki.myorg.org/pds/de", "de"));
+    type = new QcStatements.QcStatementType(
+        QCStatementID.etsi_qcs_QcPDS,
+        new QcStatements.QcStatementValueType(
+            null, null, null, locations));
+    types.add(type);
+
+    ConstantExtnValue constValue = new ConstantExtnValue(
+        ConstantExtnValue.Type.ASN1, Base64.decode("BQA="));
+    type = new QcStatements.QcStatementType(
+        QCStatementID.ofOid(new ASN1ObjectIdentifier("1.2.3.4.5")),
+        new QcStatements.QcStatementValueType(constValue, null, null, null));
+    types.add(type);
+
+    QcStatements qcStatements = new QcStatements(types);
+    last(list).setQcStatements(qcStatements);
+
+    // cannot validate due to some additional customized extensions.
+    marshall(profile, destFilename, false);
+  } // method certprofileQc
+
 }

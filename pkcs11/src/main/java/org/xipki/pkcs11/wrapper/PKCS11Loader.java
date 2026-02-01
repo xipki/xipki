@@ -99,7 +99,7 @@ public class PKCS11Loader {
       LOG.info("C_Initialize: flags=0x{}", Functions.toFullHex(flags));
       pkcs11.C_Initialize(flags);
     } catch (PKCS11Exception e) {
-      if (e.getErrorCode() == PKCS11T.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
+      if (e.errorCode() == PKCS11T.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
         LOG.error("pkcs11.C_Initialize with " +
             "CKR_CRYPTOKI_ALREADY_INITIALIZED", e);
       } else {

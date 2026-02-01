@@ -11,7 +11,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
  * Response for the operation revoking certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class RevokeCertsResponse extends SdkResponse {
@@ -22,7 +21,7 @@ public class RevokeCertsResponse extends SdkResponse {
     this.entries = entries;
   }
 
-  public SingleCertSerialEntry[] getEntries() {
+  public SingleCertSerialEntry[] entries() {
     return entries;
   }
 

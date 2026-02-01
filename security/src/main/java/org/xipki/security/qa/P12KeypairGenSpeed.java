@@ -17,9 +17,7 @@ import java.security.SecureRandom;
  * Speed test of PKCS#12 keypair generation.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public final class P12KeypairGenSpeed extends BenchmarkExecutor {
 
   private class Tester implements Runnable {
@@ -28,7 +26,7 @@ public final class P12KeypairGenSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          generateKeypair(securityFactory.getRandom4Key());
+          generateKeypair(securityFactory.random4Key());
           account(1, 0);
         } catch (Exception ex) {
           LOG.error("P12KeyGenSpeed.Tester.run()", ex);

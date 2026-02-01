@@ -10,7 +10,6 @@ import org.xipki.util.codec.Args;
  * Extension value control.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ExtensionValue {
@@ -28,7 +27,7 @@ public class ExtensionValue {
     return critical;
   }
 
-  public ASN1Encodable getValue() {
+  public ASN1Encodable value() {
     return value;
   }
 

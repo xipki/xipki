@@ -7,7 +7,6 @@ package org.xipki.ocsp.server;
  * Responder and ServletPath.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 public class ResponderAndPath {
@@ -21,11 +20,11 @@ public class ResponderAndPath {
     this.responder = responder;
   }
 
-  public String getServletPath() {
+  public String servletPath() {
     return servletPath;
   }
 
-  public Responder getResponder() {
+  public Responder responder() {
     return responder;
   }
 

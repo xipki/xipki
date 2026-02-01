@@ -9,7 +9,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.type.HourMinute;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 
@@ -83,7 +83,6 @@ import java.util.List;
  * </pre>
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CrlControl implements JsonEncodable {
@@ -195,7 +194,7 @@ public class CrlControl implements JsonEncodable {
       ov = new Validity(1, Validity.Unit.DAY);
     }
 
-    if (ov.getValidity() < 1) {
+    if (ov.validity() < 1) {
       // Maximal overlap allowed by CA/Browser Forum's Baseline Requirements
       this.overlap = new Validity(3, Validity.Unit.DAY);
     } else {
@@ -226,7 +225,7 @@ public class CrlControl implements JsonEncodable {
 
     int i = 0;
     while (true) {
-      if (hm.getHour() - (i + 1) * intervalHours < 0) {
+      if (hm.hour() - (i + 1) * intervalHours < 0) {
         break;
       }
 
@@ -234,7 +233,7 @@ public class CrlControl implements JsonEncodable {
     }
 
     this.intervalDayTime = i == 0 ? hm
-        : new HourMinute(hm.getHour() - i * intervalHours, hm.getMinute());
+        : new HourMinute(hm.hour() - i * intervalHours, hm.minute());
 
     validate();
   } // constructor
@@ -278,19 +277,19 @@ public class CrlControl implements JsonEncodable {
         (verbose ? getConf() : ""));
   } // method toString(boolean)
 
-  public int getFullCrlIntervals() {
+  public int fullCrlIntervals() {
     return fullCrlIntervals;
   }
 
-  public int getDeltaCrlIntervals() {
+  public int deltaCrlIntervals() {
     return deltaCrlIntervals;
   }
 
-  public Validity getOverlap() {
+  public Validity overlap() {
     return overlap;
   }
 
-  public HourMinute getIntervalDayTime() {
+  public HourMinute intervalDayTime() {
     return intervalDayTime;
   }
 
@@ -306,11 +305,11 @@ public class CrlControl implements JsonEncodable {
     return includeExpiredCerts;
   }
 
-  public TripleState getInvalidityDateMode() {
+  public TripleState invalidityDateMode() {
     return invalidityDateMode;
   }
 
-  public int getIntervalHours() {
+  public int intervalHours() {
     return intervalHours;
   }
 

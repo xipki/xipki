@@ -16,7 +16,6 @@ import java.util.Map;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class HttpResponse {
@@ -59,19 +58,19 @@ public class HttpResponse {
     return base64;
   }
 
-  public int getStatusCode() {
+  public int statusCode() {
     return statusCode;
   }
 
-  public String getContentType() {
+  public String contentType() {
     return contentType;
   }
 
-  public Map<String, List<String>> getHeaders() {
+  public Map<String, List<String>> headers() {
     return headers;
   }
 
-  public byte[] getBody() {
+  public byte[] body() {
     return body;
   }
   public HttpResponse putHeader(String name, String value) {

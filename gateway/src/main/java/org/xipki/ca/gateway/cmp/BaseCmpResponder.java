@@ -95,7 +95,6 @@ import java.util.Map;
  * Base CMP responder.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public abstract class BaseCmpResponder {
@@ -136,7 +135,7 @@ public abstract class BaseCmpResponder {
   private static final int PVNO_CMP2000 = 2;
 
   private static final AlgorithmIdentifier prf_hmacWithSHA256 =
-      SignAlgo.HMAC_SHA256.getAlgorithmIdentifier();
+      SignAlgo.HMAC_SHA256.algorithmIdentifier();
 
   private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap =
       new HashMap<>(20);
@@ -237,7 +236,7 @@ public abstract class BaseCmpResponder {
 
       X509Cert xc = new X509Cert(c);
       match = senderKID == null
-              || Arrays.equals(xc.getSubjectKeyId(), senderKID);
+              || Arrays.equals(xc.subjectKeyId(), senderKID);
       if (match) {
         return getCertRequestor(xc);
       }
@@ -284,7 +283,7 @@ public abstract class BaseCmpResponder {
       ASN1OctetString tid, GeneralPKIMessage message,
       Map<String, String> parameters, AuditEvent event) {
     event.addEventData(CaAuditConstants.NAME_requestor, requestor == null
-        ? "null" : requestor.getName());
+        ? "null" : requestor.name());
 
     PKIHeader reqHeader = message.getHeader();
 
@@ -362,10 +361,10 @@ public abstract class BaseCmpResponder {
       respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
     } catch (SdkErrorResponseException ex) {
       LogUtil.error(LOG, ex);
-      ErrorResponse errResp = ex.getErrorResponse();
+      ErrorResponse errResp = ex.errorResponse();
       respBody = new PKIBody(PKIBody.TYPE_ERROR,
-          new ErrorMsgContent(buildPKIStatusInfo(errResp.getCode(),
-              errResp.getMessage())));
+          new ErrorMsgContent(buildPKIStatusInfo(errResp.code(),
+              errResp.message())));
     }
 
     if (respBody.getType() == PKIBody.TYPE_ERROR) {
@@ -379,7 +378,7 @@ public abstract class BaseCmpResponder {
       if (statusString != null) {
         event.addEventData(CaAuditConstants.NAME_message, statusString);
       }
-    } else if (event.getStatus() == null) {
+    } else if (event.status() == null) {
       event.setStatus(AuditStatus.SUCCESSFUL);
     }
 
@@ -433,7 +432,7 @@ public abstract class BaseCmpResponder {
       RDN[] rdns = x500Name.getRDNs();
       // consider the empty DN
       if ((rdns != null && rdns.length > 0) // Not an empty DN
-          && !signer.getCertificate().getSubject().equals(x500Name)) {
+          && !signer.getCertificate().subject().equals(x500Name)) {
         LOG.warn("tid={}: I am not the intended recipient, but '{}'",
             tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
@@ -448,7 +447,7 @@ public abstract class BaseCmpResponder {
       }
     } else {
       long messageTimeBiasSeconds =
-          cmpControl.getMessageTimeBias().getSeconds();
+          cmpControl.messageTimeBias().getSeconds();
 
       long msgTime = messageTime.getEpochSecond();
       long currentTime = Instant.now().getEpochSecond();
@@ -478,7 +477,7 @@ public abstract class BaseCmpResponder {
       try {
         ProtectionVerificationResult verificationResult =
             verifyProtection(tidStr, message);
-        ProtectionResult pr = verificationResult.getProtectionResult();
+        ProtectionResult pr = verificationResult.protectionResult();
         switch (pr) {
           case SIGNATURE_VALID:
           case MAC_VALID:
@@ -507,7 +506,7 @@ public abstract class BaseCmpResponder {
                 "should not reach here, unknown ProtectionResult " + pr);
         }
 
-        requestor = (Requestor) verificationResult.getRequestor();
+        requestor = (Requestor) verificationResult.requestor();
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "tid=" + tidStr +
             ": could not verify the signature");
@@ -523,7 +522,7 @@ public abstract class BaseCmpResponder {
         errorStatus = null;
       } else {
         LOG.warn("tid={}: not authorized requestor (TLS client '{}')", tid,
-            tlsClientCert.getSubjectText());
+            tlsClientCert.subjectText());
         errorStatus = "requestor (TLS client certificate) is not authorized";
       }
     } else {
@@ -592,7 +591,7 @@ public abstract class BaseCmpResponder {
       }
       if (!cmpControl.isRequestPbmOwfPermitted(owfAlg)) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.owf: {})",
-            owfAlg.getJceName());
+            owfAlg.jceName());
         return new ProtectionVerificationResult(null,
             ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
@@ -614,7 +613,7 @@ public abstract class BaseCmpResponder {
 
       if (!cmpControl.isRequestPbmMacPermitted(macAlg)) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac: {})",
-            macAlg.getJceName());
+            macAlg.jceName());
         return new ProtectionVerificationResult(null,
             ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
@@ -641,11 +640,11 @@ public abstract class BaseCmpResponder {
       }
 
       boolean macValid = protectedMsg.verify(pkMacBuilder,
-                          requestor.getPassword());
+                          requestor.password());
       return new ProtectionVerificationResult(requestor,
           macValid ? ProtectionResult.MAC_VALID : ProtectionResult.MAC_INVALID);
     } else {
-      if (!cmpControl.getSigAlgoValidator()
+      if (!cmpControl.sigAlgoValidator()
             .isAlgorithmPermitted(protectionAlg)) {
         LOG.warn("SIG_ALGO_FORBIDDEN: {}",
             pkiMessage.getHeader().getProtectionAlg().getAlgorithm().getId());
@@ -659,7 +658,7 @@ public abstract class BaseCmpResponder {
           pkiMessage.toASN1Structure().getExtraCerts());
 
       ContentVerifierProvider verifierProvider = requestor == null ? null
-          : securityFactory.getContentVerifierProvider(requestor.getCert());
+          : securityFactory.getContentVerifierProvider(requestor.cert());
       if (verifierProvider == null) {
         LOG.warn("tid={}: not authorized requestor '{}'",
             tid, header.getSender());
@@ -688,11 +687,11 @@ public abstract class BaseCmpResponder {
 
         PBMParameter parameter = new PBMParameter(
             randomSalt(),
-            cmpControl.getResponsePbmOwf().getAlgorithmIdentifier(),
-            cmpControl.getResponsePbmIterationCount(),
-            cmpControl.getResponsePbmMac().getAlgorithmIdentifier());
-        return CmpUtil.addProtection(pkiMessage, requestor0.getPassword(),
-                  parameter, respSender, requestor0.getKeyId());
+            cmpControl.responsePbmOwf().algorithmIdentifier(),
+            cmpControl.responsePbmIterationCount(),
+            cmpControl.responsePbmMac().algorithmIdentifier());
+        return CmpUtil.addProtection(pkiMessage, requestor0.password(),
+                  parameter, respSender, requestor0.keyId());
       }
     } catch (Exception ex) {
       LogUtil.error(LOG, ex, "could not add protection to the PKI message");
@@ -750,7 +749,7 @@ public abstract class BaseCmpResponder {
   }
 
   protected static int getPKiFailureInfo(OperationException ex) {
-    Integer failureInfo = errorCodeToPkiFailureMap.get(ex.getErrorCode());
+    Integer failureInfo = errorCodeToPkiFailureMap.get(ex.errorCode());
     return failureInfo == null ? PKIFailureInfo.systemFailure : failureInfo;
   }
 
@@ -814,10 +813,10 @@ public abstract class BaseCmpResponder {
       return false;
     }
 
-    AlgorithmValidator algoValidator = popControl.getPopAlgoValidator();
+    AlgorithmValidator algoValidator = popControl.popAlgoValidator();
     if (!algoValidator.isAlgorithmPermitted(popAlg)) {
       LOG.error("POP signature algorithm {} not permitted",
-          popAlg.getJceName());
+          popAlg.jceName());
       return false;
     }
 
@@ -835,7 +834,7 @@ public abstract class BaseCmpResponder {
         assert curve != null;
 
         kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(),
-            isn.getSerialNumber().getValue(), curve.getMainAlias());
+            isn.getSerialNumber().getValue(), curve.mainAlias());
 
         if (kaKeyAndCert == null) {
           LOG.warn("found no DH key and cert matching issuer={} and " +
@@ -851,9 +850,9 @@ public abstract class BaseCmpResponder {
             popSign.getSignature().getOctets());
 
         String id = ((ASN1UTF8String) seq.getObjectAt(0)).getString();
-        SecretKeyWithAlias km = popControl.getKemMasterKey(id);
+        SecretKeyWithAlias km = popControl.kemMasterKey(id);
         if (km != null) {
-          ownerMasterKey = km.getSecretKey();
+          ownerMasterKey = km.secretKey();
         }
       }
 
@@ -891,7 +890,7 @@ public abstract class BaseCmpResponder {
             (Requestor.CertRequestor) requestor;
 
         // use private key of the requestor to encrypt the private key
-        PublicKey reqPub = certRequestor.getCert().getPublicKey();
+        PublicKey reqPub = certRequestor.cert().publicKey();
         CrmfKeyWrapper wrapper;
         if (reqPub instanceof RSAPublicKey) {
           wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
@@ -960,7 +959,7 @@ public abstract class BaseCmpResponder {
             OIDs.Algo.id_PBKDF2.getId());
 
         SecretKey key = keyFact.generateSecret(new PBKDF2KeySpec(
-            passwordRequestor.getPassword(), pbkdfSalt,
+            passwordRequestor.password(), pbkdfSalt,
             iterCount, keysizeBits, prf_hmacWithSHA256));
         key = new SecretKeySpec(key.getEncoded(), "AES");
 
@@ -1049,7 +1048,7 @@ public abstract class BaseCmpResponder {
       itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
     } else { // if (OIDs.Xipki.id_xipki_cmp_kem_encapkey.equals(infoType)) {
       event.addEventType(TYPE_genm_kem_keycap);
-      SecretKeyWithAlias masterKey = popControl.getDefaultKemMasterKey();
+      SecretKeyWithAlias masterKey = popControl.defaultKemMasterKey();
       if (masterKey == null) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "no master key is available");

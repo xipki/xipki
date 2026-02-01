@@ -21,7 +21,6 @@ import java.util.Set;
  * Pending certificate pool.
  *
  * @author Lijun Liao (xipki)
- * @since 5.3.4
  */
 
 class PendingCertificatePool {
@@ -42,7 +41,7 @@ class PendingCertificatePool {
       this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
       this.certHash = HashAlgo.SHA1.hash(
-          certInfo.getCert().getCert().getEncoded());
+          certInfo.cert().cert().getEncoded());
     } // constructor
 
     @Override

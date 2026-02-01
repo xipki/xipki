@@ -45,7 +45,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 
@@ -116,14 +116,14 @@ public class XijsonExtensions {
       throws CertprofileException {
     Args.notNull(subjectControl, "subjectControl");
 
-    Boolean b = conf.getKeepExtensionsOrder();
+    Boolean b = conf.keepExtensionsOrder();
     this.keepOrder = b != null && b;
 
-    List<ExtensionType> extensionsConf = conf.getExtensions();
+    List<ExtensionType> extensionsConf = conf.extensions();
     List<ASN1ObjectIdentifier> extensionIDs =
         new ArrayList<>(extensionsConf.size());
     for (ExtensionType t : extensionsConf) {
-      extensionIDs.add(t.getType().getOid());
+      extensionIDs.add(t.type().oid());
     }
     this.extensionIDs = Collections.unmodifiableList(extensionIDs);
 
@@ -185,7 +185,7 @@ public class XijsonExtensions {
     // SubjectAltNameMode
     initSubjectAlternativeName(extnIds, extensions);
 
-    initSubjectToSubjectAltNames(conf.getSubject());
+    initSubjectToSubjectAltNames(conf.subject());
 
     // SubjectInfoAccess
     initSubjectInfoAccess(extnIds, extensions);
@@ -251,7 +251,7 @@ public class XijsonExtensions {
     if (!extnIds.isEmpty()) {
       for (ASN1ObjectIdentifier extnId : copyOfExtnIds) {
         ExtensionType type = extensions.get(extnId.getId());
-        TripleState state = type.getInRequest();
+        TripleState state = type.inRequest();
         if (state == TripleState.required) {
           extnIds.remove(extnId);
         }
@@ -274,7 +274,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     AuthorityInfoAccess extConf =
-        getExtension(type, extensions).getAuthorityInfoAccess();
+        getExtension(type, extensions).authorityInfoAccess();
     this.aiaControl = (extConf == null)
         ? new AuthorityInfoAccessControl(false, true)
         : new AuthorityInfoAccessControl(extConf.isIncludeCaIssuers(),
@@ -298,7 +298,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     this.subjectKeyIdentifier =
-        getExtension(type, extensions).getSubjectKeyIdentifier();
+        getExtension(type, extensions).subjectKeyIdentifier();
 
     if (subjectKeyIdentifier == null) {
       subjectKeyIdentifier = new SubjectKeyIdentifierControl();
@@ -315,13 +315,13 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     BasicConstraints extConf =
-        getExtension(type, extensions).getBasicConstraints();
+        getExtension(type, extensions).basicConstraints();
     if (extConf == null) {
-      extConf = getExtension(type, extensions).getBasicConstraints();
+      extConf = getExtension(type, extensions).basicConstraints();
     }
 
     if (extConf != null) {
-      this.pathLen = extConf.getPathLen();
+      this.pathLen = extConf.pathLen();
     }
   }
 
@@ -335,7 +335,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
 
-    this.biometricInfo = getExtension(type, extensions).getBiometricInfo();
+    this.biometricInfo = getExtension(type, extensions).biometricInfo();
   }
 
   private void initCertificatePolicies(
@@ -348,7 +348,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies extConf
-        = getExtension(type, extensions).getCertificatePolicies();
+        = getExtension(type, extensions).certificatePolicies();
     if (extConf == null) {
       return;
     }
@@ -366,7 +366,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     ExtendedKeyUsage extConf = getExtension(type, extensions)
-        .getExtendedKeyUsage();
+        .extendedKeyUsage();
     if (extConf != null) {
       this.extendedKeyusages = extConf.toXiExtKeyUsageOptions();
     }
@@ -383,12 +383,12 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     InhibitAnyPolicy extConf = getExtension(type, extensions)
-        .getInhibitAnyPolicy();
+        .inhibitAnyPolicy();
     if (extConf == null) {
       return;
     }
 
-    int skipCerts = extConf.getSkipCerts();
+    int skipCerts = extConf.skipCerts();
     if (skipCerts < 0) {
       throw new CertprofileException(
           "negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
@@ -408,7 +408,7 @@ public class XijsonExtensions {
     }
 
     extnIds.remove(type);
-    KeyUsage extConf = getExtension(type, extensions).getKeyUsage();
+    KeyUsage extConf = getExtension(type, extensions).keyUsage();
     if (extConf != null) {
       this.keyUsage = extConf.toXiKeyUsageOptions();
     }
@@ -424,7 +424,7 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     NameConstraints extConf = getExtension(type, extensions)
-        .getNameConstraints();
+        .nameConstraints();
     if (extConf == null) {
       return;
     }
@@ -445,18 +445,18 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     PolicyConstraints extConf = getExtension(type, extensions)
-        .getPolicyConstraints();
+        .policyConstraints();
     if (extConf == null) {
       return;
     }
 
-    Integer require = extConf.getRequireExplicitPolicy();
+    Integer require = extConf.requireExplicitPolicy();
     if (require != null && require < 0) {
       throw new CertprofileException(
           "negative requireExplicitPolicy is not allowed: " + require);
     }
 
-    Integer inhibit = extConf.getInhibitPolicyMapping();
+    Integer inhibit = extConf.inhibitPolicyMapping();
     if (inhibit != null && inhibit < 0) {
       throw new CertprofileException(
           "negative inhibitPolicyMapping is not allowed: " + inhibit);
@@ -481,9 +481,9 @@ public class XijsonExtensions {
     if (extensionsControl.containsID(type)) {
       extnIds.remove(type);
       PrivateKeyUsagePeriod extConf =
-          getExtension(type, extensions).getPrivateKeyUsagePeriod();
+          getExtension(type, extensions).privateKeyUsagePeriod();
       if (extConf != null) {
-        privateKeyUsagePeriod = Validity.getInstance(extConf.getValidity());
+        privateKeyUsagePeriod = Validity.getInstance(extConf.validity());
       }
     }
   }
@@ -497,7 +497,7 @@ public class XijsonExtensions {
     }
 
     extnIds.remove(type);
-    PolicyMappings extConf = getExtension(type, extensions).getPolicyMappings();
+    PolicyMappings extConf = getExtension(type, extensions).policyMappings();
     if (extConf == null) {
       return;
     }
@@ -517,43 +517,43 @@ public class XijsonExtensions {
     }
 
     extnIds.remove(type);
-    QcStatements extConf = getExtension(type, extensions).getQcStatements();
+    QcStatements extConf = getExtension(type, extensions).qcStatements();
     if (extConf == null) {
       return;
     }
 
     List<QcStatements.QcStatementType> qcStatementTypes =
-        extConf.getQcStatements();
+        extConf.qcStatements();
     this.qcStatementsOption = new ArrayList<>(qcStatementTypes.size());
     Set<String> currencyCodes = new HashSet<>();
     boolean requireInfoFromReq = false;
 
     for (QcStatements.QcStatementType m : qcStatementTypes) {
-      QCStatementID qcStatementId = m.getStatementId();
+      QCStatementID qcStatementId = m.statementId();
 
-      QcStatements.QcStatementValueType statementValue = m.getStatementValue();
+      QcStatements.QcStatementValueType statementValue = m.statementValue();
       QcStatementOption qcStatementOption;
       if (statementValue == null) {
         qcStatementOption = new QcStatementOption(
-            new QCStatement(qcStatementId.getOid()));
-      } else if (statementValue.getQcRetentionPeriod() != null) {
-        QCStatement qcStatement = new QCStatement(qcStatementId.getOid(),
-            new ASN1Integer(statementValue.getQcRetentionPeriod()));
+            new QCStatement(qcStatementId.oid()));
+      } else if (statementValue.qcRetentionPeriod() != null) {
+        QCStatement qcStatement = new QCStatement(qcStatementId.oid(),
+            new ASN1Integer(statementValue.qcRetentionPeriod()));
         qcStatementOption = new QcStatementOption(qcStatement);
-      } else if (statementValue.getConstant() != null) {
+      } else if (statementValue.constant() != null) {
         ASN1Encodable constantStatementValue;
         try {
-          constantStatementValue = statementValue.getConstant().toASN1();
+          constantStatementValue = statementValue.constant().toASN1();
         } catch (IOException ex) {
           throw new CertprofileException(
               "can not parse the constant value of QcStatement");
         }
         qcStatementOption = new QcStatementOption(
-            new QCStatement(qcStatementId.getOid(), constantStatementValue));
-      } else if (statementValue.getQcEuLimitValue() != null) {
+            new QCStatement(qcStatementId.oid(), constantStatementValue));
+      } else if (statementValue.qcEuLimitValue() != null) {
         QcStatements.QcEuLimitValueType euLimitType =
-            statementValue.getQcEuLimitValue();
-        String tmpCurrency = euLimitType.getCurrency().toUpperCase();
+            statementValue.qcEuLimitValue();
+        String tmpCurrency = euLimitType.currency().toUpperCase();
         if (currencyCodes.contains(tmpCurrency)) {
           throw new CertprofileException(
               "Duplicated definition of qcStatements with " +
@@ -564,33 +564,33 @@ public class XijsonExtensions {
             ? new Iso4217CurrencyCode(Integer.parseInt(tmpCurrency))
             : new Iso4217CurrencyCode(tmpCurrency);
 
-        QcStatements.Range2Type r1 = euLimitType.getAmount();
-        QcStatements.Range2Type r2 = euLimitType.getExponent();
-        if (r1.getMin() == r1.getMax() && r2.getMin() == r2.getMax()) {
+        QcStatements.Range2Type r1 = euLimitType.amount();
+        QcStatements.Range2Type r2 = euLimitType.exponent();
+        if (r1.min() == r1.max() && r2.min() == r2.max()) {
           MonetaryValue monetaryValue =
-              new MonetaryValue(currency, r1.getMin(), r2.getMin());
+              new MonetaryValue(currency, r1.min(), r2.min());
           qcStatementOption = new QcStatementOption(
-              new QCStatement(qcStatementId.getOid(), monetaryValue));
+              new QCStatement(qcStatementId.oid(), monetaryValue));
         } else {
-          qcStatementOption = new QcStatementOption(qcStatementId.getOid(),
+          qcStatementOption = new QcStatementOption(qcStatementId.oid(),
               new MonetaryValueOption(currency, r1, r2));
           requireInfoFromReq = true;
         }
         currencyCodes.add(tmpCurrency);
-      } else if (statementValue.getPdsLocations() != null) {
+      } else if (statementValue.pdsLocations() != null) {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         for (QcStatements.PdsLocationType pl
-            : statementValue.getPdsLocations()) {
-          String lang = pl.getLanguage();
+            : statementValue.pdsLocations()) {
+          String lang = pl.language();
           if (lang.length() != 2) {
             throw new CertprofileException("invalid language '" + lang + "'");
           }
 
           vec.add(new DERSequence(new ASN1Encodable[]{
-              new DERIA5String(pl.getUrl()), new DERPrintableString(lang)}));
+              new DERIA5String(pl.url()), new DERPrintableString(lang)}));
         }
         qcStatementOption = new QcStatementOption(new QCStatement(
-            qcStatementId.getOid(), new DERSequence(vec)));
+            qcStatementId.oid(), new DERSequence(vec)));
       } else {
         throw new CertprofileException("unknown value of qcStatment");
       }
@@ -604,10 +604,10 @@ public class XijsonExtensions {
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (QcStatementOption m : qcStatementsOption) {
-      if (m.getStatement() == null) {
+      if (m.statement() == null) {
         throw new IllegalStateException("should not reach here");
       }
-      vec.add(m.getStatement());
+      vec.add(m.statement());
     }
     qcStatements = new ExtensionValue(critical(type), new DERSequence(vec));
     qcStatementsOption = null;
@@ -624,19 +624,19 @@ public class XijsonExtensions {
     extnIds.remove(type);
 
     SmimeCapabilities extConf =
-        getExtension(type, extensions).getSmimeCapabilities();
+        getExtension(type, extensions).smimeCapabilities();
     if (extConf == null) {
       return;
     }
 
-    List<SmimeCapability> list = extConf.getCapabilities();
+    List<SmimeCapability> list = extConf.capabilities();
 
     boolean critical = critical(type);
     ASN1EncodableVector vec = new ASN1EncodableVector();
     for (SmimeCapability m : list) {
-      ASN1ObjectIdentifier oid = m.getCapabilityId();
+      ASN1ObjectIdentifier oid = m.capabilityId();
       ASN1Encodable params = null;
-      Integer capParams = m.getParameter();
+      Integer capParams = m.parameter();
       if (capParams != null) {
         params = new ASN1Integer(capParams);
       }
@@ -656,9 +656,9 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     GeneralNameType extConf = getExtension(type, extensions)
-        .getSubjectAltName();
+        .subjectAltName();
     if (extConf != null) {
-      this.subjectAltNameModes = extConf.getModes();
+      this.subjectAltNameModes = extConf.modes();
     }
   } // method initSubjectAlternativeName
 
@@ -670,7 +670,7 @@ public class XijsonExtensions {
 
     subjectToSubjectAltNameModes = new HashMap<>();
     for (RdnType m : list) {
-      GeneralNameTag targetTag = m.getToSAN();
+      GeneralNameTag targetTag = m.toSAN();
       /*
        * RFC 5280, Section 4.1.2.7 Subject
        *    Conforming implementations generating new certificates with
@@ -683,7 +683,7 @@ public class XijsonExtensions {
        * Make sure that if email address is contained in subject, it must be
        * duplicated in the SubjectAltName extension as rfc822Name.
        */
-      if (m.getType() == AttributeType.emailAddress) {
+      if (m.type() == AttributeType.emailAddress) {
         // we allow targetTag to be null to generate legacy certificates.
         if (targetTag != null && targetTag != GeneralNameTag.rfc822Name) {
           throw new CertprofileException("toSAN != rfc822Name: " + targetTag);
@@ -711,7 +711,7 @@ public class XijsonExtensions {
           throw new CertprofileException("unsupported toSAN tag " + targetTag);
       }
 
-      subjectToSubjectAltNameModes.put(m.getType().getOid(), targetTag);
+      subjectToSubjectAltNameModes.put(m.type().oid(), targetTag);
     }
   } // method initSubjectToSubjectAltNames
 
@@ -725,16 +725,16 @@ public class XijsonExtensions {
 
     extnIds.remove(type);
     SubjectInfoAccess extConf = getExtension(type, extensions)
-        .getSubjectInfoAccess();
+        .subjectInfoAccess();
     if (extConf == null) {
       return;
     }
 
-    List<Access> list = extConf.getAccesses();
+    List<Access> list = extConf.accesses();
     this.subjectInfoAccessModes = new HashMap<>();
     for (Access entry : list) {
-      this.subjectInfoAccessModes.put(entry.getAccessMethod().getOid(),
-          entry.getAccessLocation().getModes());
+      this.subjectInfoAccessModes.put(entry.accessMethod().oid(),
+          entry.accessLocation().modes());
     }
   } // method initSubjectInfoAccess
 
@@ -747,13 +747,13 @@ public class XijsonExtensions {
     }
 
     extnIds.remove(type);
-    TlsFeature extConf = getExtension(type, extensions).getTlsFeature();
+    TlsFeature extConf = getExtension(type, extensions).tlsFeature();
     if (extConf == null) {
       return;
     }
 
-    List<Integer> features = new ArrayList<>(extConf.getFeatures().size());
-    features.addAll(extConf.getFeatures());
+    List<Integer> features = new ArrayList<>(extConf.features().size());
+    features.addAll(extConf.features());
     Collections.sort(features);
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -806,7 +806,7 @@ public class XijsonExtensions {
     }
 
     CCCSimpleExtensionSchema schema = isInstanceCAExtensionSchema
-        ? ex.getCccInstanceCAExtensionSchema() : ex.getCccExtensionSchema();
+        ? ex.cccInstanceCAExtensionSchema() : ex.cccExtensionSchema();
 
     if (schema == null) {
       throw new CertprofileException(
@@ -818,15 +818,15 @@ public class XijsonExtensions {
     this.cccExtensionSchemaType = type;
 
     ASN1EncodableVector vec = new ASN1EncodableVector();
-    vec.add(new ASN1Integer(schema.getVersion()));
+    vec.add(new ASN1Integer(schema.version()));
     if (isInstanceCAExtensionSchema) {
       CCCInstanceCAExtensionSchema schema1 =
           (CCCInstanceCAExtensionSchema) schema;
 
-      byte[] bytes = Pack.longToBigEndian(schema1.getAppletVersion());
+      byte[] bytes = Pack.longToBigEndian(schema1.appletVersion());
       vec.add(new DEROctetString(Arrays.copyOfRange(bytes, 4, 8)));
-      if (schema1.getPlatformInformation() != null) {
-        vec.add(new DEROctetString(schema1.getPlatformInformation()));
+      if (schema1.platformInformation() != null) {
+        vec.add(new DEROctetString(schema1.platformInformation()));
       }
     }
 
@@ -862,7 +862,7 @@ public class XijsonExtensions {
           String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
           if (subjectAltNameModes == null
               || subjectAltNameModes.contains(targetTag)) {
-            list.add(new GeneralName(targetTag.getTag(), text));
+            list.add(new GeneralName(targetTag.tag(), text));
           }
         }
       }
@@ -872,61 +872,61 @@ public class XijsonExtensions {
         : new GeneralNames(list.toArray(new GeneralName[0]));
   }
 
-  public AuthorityInfoAccessControl getAiaControl() {
+  public AuthorityInfoAccessControl aiaControl() {
     return aiaControl;
   }
 
-  public BiometricInfo getBiometricInfo() {
+  public BiometricInfo biometricInfo() {
     return biometricInfo;
   }
 
-  public Validity getPrivateKeyUsagePeriod() {
+  public Validity privateKeyUsagePeriod() {
     return privateKeyUsagePeriod;
   }
 
-  public ExtensionValue getQcStatements() {
+  public ExtensionValue qcStatements() {
     return qcStatements;
   }
 
-  List<QcStatementOption> getQcStatementsOption() {
+  List<QcStatementOption> qcStatementsOption() {
     return qcStatementsOption;
   }
 
-  public Set<GeneralNameTag> getSubjectAltNameModes() {
+  public Set<GeneralNameTag> subjectAltNameModes() {
     return subjectAltNameModes;
   }
 
   public Map<ASN1ObjectIdentifier, GeneralNameTag>
-      getSubjectToSubjectAltNameModes() {
+      subjectToSubjectAltNameModes() {
     return subjectToSubjectAltNameModes;
   }
 
   public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>>
-      getSubjectInfoAccessModes() {
+      subjectInfoAccessModes() {
     return subjectInfoAccessModes;
   }
 
-  public CertificatePolicies getCertificatePolicies() {
+  public CertificatePolicies certificatePolicies() {
     return certificatePolicies;
   }
 
-  public Map<ASN1ObjectIdentifier, ExtensionValue> getConstantExtensions() {
+  public Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions() {
     return constantExtensions;
   }
 
-  public Set<ExtKeyUsageControl> getExtendedKeyusages() {
+  public Set<ExtKeyUsageControl> extendedKeyusages() {
     return extendedKeyusages;
   }
 
-  public ExtensionsControl getExtensionControls() {
+  public ExtensionsControl extensionControls() {
     return extensionsControl;
   }
 
-  public SubjectKeyIdentifierControl getSubjectKeyIdentifier() {
+  public SubjectKeyIdentifierControl subjectKeyIdentifier() {
     return subjectKeyIdentifier;
   }
 
-  public ExtensionValue getInhibitAnyPolicy() {
+  public ExtensionValue inhibitAnyPolicy() {
     return inhibitAnyPolicy;
   }
 
@@ -934,35 +934,35 @@ public class XijsonExtensions {
     return keyUsage == null ? null : keyUsage.getUsages(keySpec);
   }
 
-  public ExtensionValue getNameConstraints() {
+  public ExtensionValue nameConstraints() {
     return nameConstraints;
   }
 
-  public Integer getPathLen() {
+  public Integer pathLen() {
     return pathLen;
   }
 
-  public ExtensionValue getPolicyConstraints() {
+  public ExtensionValue policyConstraints() {
     return policyConstraints;
   }
 
-  public ExtensionValue getPolicyMappings() {
+  public ExtensionValue policyMappings() {
     return policyMappings;
   }
 
-  public ExtensionValue getSmimeCapabilities() {
+  public ExtensionValue smimeCapabilities() {
     return smimeCapabilities;
   }
 
-  public ExtensionValue getTlsFeature() {
+  public ExtensionValue tlsFeature() {
     return tlsFeature;
   }
 
-  public ASN1ObjectIdentifier getCccExtensionSchemaType() {
+  public ASN1ObjectIdentifier cccExtensionSchemaType() {
     return cccExtensionSchemaType;
   }
 
-  public ExtensionValue getCccExtensionSchemaValue() {
+  public ExtensionValue cccExtensionSchemaValue() {
     return cccExtensionSchemaValue;
   }
 
@@ -970,7 +970,7 @@ public class XijsonExtensions {
     return keepOrder;
   }
 
-  public List<ASN1ObjectIdentifier> getExtensionIDs() {
+  public List<ASN1ObjectIdentifier> extensionIDs() {
     return extensionIDs;
   }
 

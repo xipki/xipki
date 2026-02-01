@@ -32,11 +32,11 @@ public class PolicyConstraints implements JsonEncodable {
     this.inhibitPolicyMapping = inhibitPolicyMapping;
   }
 
-  public Integer getRequireExplicitPolicy() {
+  public Integer requireExplicitPolicy() {
     return requireExplicitPolicy;
   }
 
-  public Integer getInhibitPolicyMapping() {
+  public Integer inhibitPolicyMapping() {
     return inhibitPolicyMapping;
   }
 

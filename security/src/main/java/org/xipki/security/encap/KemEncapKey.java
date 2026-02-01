@@ -46,24 +46,24 @@ public class KemEncapKey {
         new KemEncapsulation(alg, encapKey, encryptedSecret));
   }
 
-  public String getId() {
+  public String id() {
     return id;
   }
 
-  public KemEncapsulation getEncapulation() {
+  public KemEncapsulation encapulation() {
     return encapulation;
   }
 
   public byte[] getEncoded() {
     byte[] idBytes = id.getBytes(StandardCharsets.US_ASCII);
-    byte[] encapKey= encapulation.getEncapKey();
-    byte[] encryptedSecret = encapulation.getEncryptedSecret();
+    byte[] encapKey= encapulation.encapKey();
+    byte[] encryptedSecret = encapulation.encryptedSecret();
     int len = 7 + idBytes.length + encapKey.length +
               encryptedSecret.length;
     byte[] encoded = new byte[len];
     AtomicInteger off = new AtomicInteger(0);
     writeBytes(idBytes, encoded, off);
-    encoded[off.getAndIncrement()] = encapulation.getAlg();
+    encoded[off.getAndIncrement()] = encapulation.alg();
     writeBytes(encapKey, encoded, off);
     writeBytes(encryptedSecret, encoded, off);
     return encoded;

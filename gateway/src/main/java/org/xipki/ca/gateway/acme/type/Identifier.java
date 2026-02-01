@@ -23,11 +23,11 @@ public class Identifier implements JsonEncodable {
     this.value = value;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getValue() {
+  public String value() {
     return value;
   }
 

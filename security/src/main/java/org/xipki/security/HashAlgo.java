@@ -31,9 +31,7 @@ import java.util.Optional;
  * Hash algorithm enum.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 //See https://www.itu.int/ITU-T/formal-language/itu-t/x/x509/2019/AlgorithmObjectIdentifiers.html
 public enum HashAlgo {
 
@@ -110,15 +108,15 @@ public enum HashAlgo {
     }
   }
 
-  public int getLength() {
+  public int length() {
     return length;
   }
 
-  public ASN1ObjectIdentifier getOid() {
+  public ASN1ObjectIdentifier oid() {
     return oid;
   }
 
-  public String getJceName() {
+  public String jceName() {
     return jceName;
   }
 
@@ -185,11 +183,11 @@ public enum HashAlgo {
     throw new NoSuchAlgorithmException("Found no HashAlgo for encoded");
   }
 
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
+  public AlgorithmIdentifier algorithmIdentifier() {
     return algId;
   }
 
-  public AlgorithmIdentifier getAlgIdWithNullParams() {
+  public AlgorithmIdentifier algIdWithNullParams() {
     return algIdWithNullParams;
   }
 

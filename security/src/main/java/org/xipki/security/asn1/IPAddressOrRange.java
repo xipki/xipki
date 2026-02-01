@@ -34,11 +34,11 @@ public class IPAddressOrRange extends ASN1Object {
     this.addressRange = Args.notNull(addressRange, "addressRange");
   }
 
-  public ASN1IPAddress getAddressPrefix() {
+  public ASN1IPAddress addressPrefix() {
     return addressPrefix;
   }
 
-  public IPAddressRange getAddressRange() {
+  public IPAddressRange addressRange() {
     return addressRange;
   }
 

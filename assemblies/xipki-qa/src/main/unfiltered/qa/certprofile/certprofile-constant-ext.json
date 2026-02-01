@@ -6,43 +6,23 @@
   "certLevel": "EndEntity",
   "maxSize": 8400,
   "validity": "5y",
-  "notBeforeTime": "midnight",
+  "notBeforeTime": "current",
   "keypairGeneration": "InheritCA",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096","SECP256R1","SECP384R1",
+  "keyAlgorithms": ["SECP256R1","SECP384R1","SECP521R1","BRAINPOOLP256R1",
+    "BRAINPOOLP384R1","BRAINPOOLP512R1","SM2P256V1","FRP256V1","RSA2048",
+    "RSA3072","RSA4096","SM2P256V1","ED25519","ED448","MLDSA44","MLDSA65",
+    "MLDSA87","MLDSA44-RSA2048","MLDSA44-RSA2048-PKCS15","MLDSA44-ED25519",
+    "MLDSA44-P256","MLDSA65-RSA3072","MLDSA65-RSA3072-PKCS15","MLDSA65-RSA4096",
+    "MLDSA65-RSA4096-PKCS15","MLDSA65-P256","MLDSA65-P384","MLDSA65-BRAINPOOLP256R1",
+    "MLDSA65-ED25519","MLDSA87-P384","MLDSA87-BRAINPOOLP384R1","MLDSA87-ED448",
+    "MLDSA87-RSA3072","MLDSA87-RSA4096","MLDSA87-P521","SECP256R1","SECP384R1",
     "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1","BRAINPOOLP512R1",
-    "SM2P256V1","FRP256V1","X25519","X448","ED25519","ED448","MLDSA44",
-    "MLDSA65","MLDSA87","MLKEM512","MLKEM768","MLKEM1024",
-    "MLDSA44-RSA2048-PSS-SHA256",
-    "MLDSA44-RSA2048-PKCS15-SHA256",
-    "MLDSA44-ED25519-SHA512",
-    "MLDSA44-ECDSA-P256-SHA256",
-    "MLDSA65-RSA3072-PSS-SHA512",
-    "MLDSA65-RSA3072-PKCS15-SHA512",
-    "MLDSA65-RSA4096-PSS-SHA512",
-    "MLDSA65-RSA4096-PKCS15-SHA512",
-    "MLDSA65-ECDSA-P256-SHA512",
-    "MLDSA65-ECDSA-P384-SHA512",
-    "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-    "MLDSA65-ED25519-SHA512",
-    "MLDSA87-ECDSA-P384-SHA512",
-    "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-    "MLDSA87-ED448-SHAKE256",
-    "MLDSA87-RSA3072-PSS-SHA512",
-    "MLDSA87-RSA4096-PSS-SHA512",
-    "MLDSA87-ECDSA-P521-SHA512",
-    "MLKEM768-RSA2048-SHA3-256",
-    "MLKEM768-RSA3072-SHA3-256",
-    "MLKEM768-RSA4096-SHA3-256",
-    "MLKEM768-X25519-SHA3-256",
-    "MLKEM768-ECDH-P256-SHA3-256",
-    "MLKEM768-ECDH-P384-SHA3-256",
-    "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-    "MLKEM1024-RSA3072-SHA3-256",
-    "MLKEM1024-ECDH-P384-SHA3-256",
-    "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-    "MLKEM1024-X448-SHA3-256",
-    "MLKEM1024-ECDH-P521-SHA3-256"
-  ],
+    "SM2P256V1","FRP256V1","RSA2048","RSA3072","RSA4096","X25519","X448",
+    "SM2P256V1","MLKEM512","MLKEM768","MLKEM1024","MLKEM768-RSA2048",
+    "MLKEM768-RSA3072","MLKEM768-RSA4096","MLKEM768-X25519","MLKEM768-P256",
+    "MLKEM768-P384","MLKEM768-BRAINPOOLP256R1","MLKEM1024-RSA3072","MLKEM1024-P384",
+    "MLKEM1024-BRAINPOOLP384R1","MLKEM1024-X448","MLKEM1024-P521"],
+  "keepSubjectOrder": true,
   "subject": [{
       "type": "commonName"
     },{
@@ -54,7 +34,6 @@
       "minOccurs": 0
     }
   ],
-  "keepExtensionsOrder": true,
   "extensions": [{
       "type": "SubjectKeyIdentifier",
       "required": true
@@ -82,44 +61,36 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["digitalSignature","keyEncipherment","dataEncipherment"]
-          },{
             "appliesTo": ["ED25519","ED448","MLDSA44","MLDSA65","MLDSA87",
-              "MLDSA44-RSA2048-PSS-SHA256",
-              "MLDSA44-RSA2048-PKCS15-SHA256",
-              "MLDSA44-ED25519-SHA512",
-              "MLDSA44-ECDSA-P256-SHA256",
-              "MLDSA65-RSA3072-PSS-SHA512",
-              "MLDSA65-RSA3072-PKCS15-SHA512",
-              "MLDSA65-RSA4096-PSS-SHA512",
-              "MLDSA65-RSA4096-PKCS15-SHA512",
-              "MLDSA65-ECDSA-P256-SHA512",
-              "MLDSA65-ECDSA-P384-SHA512",
-              "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-              "MLDSA65-ED25519-SHA512",
-              "MLDSA87-ECDSA-P384-SHA512",
-              "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-              "MLDSA87-ED448-SHAKE256",
-              "MLDSA87-RSA3072-PSS-SHA512",
-              "MLDSA87-RSA4096-PSS-SHA512",
-              "MLDSA87-ECDSA-P521-SHA512"
-            ],
+              "MLDSA44-RSA2048","MLDSA44-RSA2048-PKCS15","MLDSA44-ED25519",
+              "MLDSA44-P256","MLDSA65-RSA3072","MLDSA65-RSA3072-PKCS15",
+              "MLDSA65-RSA4096","MLDSA65-RSA4096-PKCS15","MLDSA65-P256",
+              "MLDSA65-P384","MLDSA65-BRAINPOOLP256R1","MLDSA65-ED25519",
+              "MLDSA87-P384","MLDSA87-BRAINPOOLP384R1","MLDSA87-ED448",
+              "MLDSA87-RSA3072","MLDSA87-RSA4096","MLDSA87-P521"],
             "required": ["digitalSignature"]
           },{
-            "appliesTo": ["X25519","X448","MLKEM512","MLKEM768","MLKEM1024",
-                  "MLKEM768-RSA2048-SHA3-256",
-                  "MLKEM768-RSA3072-SHA3-256",
-                  "MLKEM768-RSA4096-SHA3-256",
-                  "MLKEM768-X25519-SHA3-256",
-                  "MLKEM768-ECDH-P256-SHA3-256",
-                  "MLKEM768-ECDH-P384-SHA3-256",
-                  "MLKEM768-ECDH-BRAINPOOLP256R1-SHA3-256",
-                  "MLKEM1024-RSA3072-SHA3-256",
-                  "MLKEM1024-ECDH-P384-SHA3-256",
-                  "MLKEM1024-ECDH-BRAINPOOLP384R1-SHA3-256",
-                  "MLKEM1024-X448-SHA3-256",
-                  "MLKEM1024-ECDH-P521-SHA3-256"],
-            "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
+            "appliesTo": ["MLKEM512","MLKEM768","MLKEM1024","MLKEM768-RSA2048",
+              "MLKEM768-RSA3072","MLKEM768-RSA4096","MLKEM768-X25519",
+              "MLKEM768-P256","MLKEM768-P384","MLKEM768-BRAINPOOLP256R1",
+              "MLKEM1024-RSA3072","MLKEM1024-P384","MLKEM1024-BRAINPOOLP384R1",
+              "MLKEM1024-X448","MLKEM1024-P521"],
+            "required": ["dataEncipherment","keyEncipherment"]
+          },{
+            "appliesTo": ["RSA2048","RSA3072","RSA4096","RSA2048",
+              "RSA3072","RSA4096"],
+            "required": ["dataEncipherment","keyEncipherment","digitalSignature"]
+          },{
+            "appliesTo": ["X25519","X448"],
+            "required": ["dataEncipherment","keyEncipherment","keyAgreement"]
+          },{
+            "appliesTo": ["SECP256R1","SECP384R1","SECP521R1","BRAINPOOLP256R1",
+              "BRAINPOOLP384R1","BRAINPOOLP512R1","SM2P256V1",
+              "FRP256V1","SM2P256V1","SECP256R1","SECP384R1",
+              "SECP521R1","BRAINPOOLP256R1","BRAINPOOLP384R1",
+              "BRAINPOOLP512R1","SM2P256V1","FRP256V1","SM2P256V1"],
+            "required": ["dataEncipherment","keyEncipherment","digitalSignature",
+              "keyAgreement"]
           }
         ]
       }
@@ -132,109 +103,52 @@
         "optional": ["clientAuth"]
       }
     },{
-      "type": "1.2.3.6.1.1",
+      "type": "1.2.3.4.5.6",
       "required": true,
-      "constant": {
-        "type": "BITSTRING",
-        "value": "YWJjZGVm"
-      }
-    },{
-      "type": "1.2.3.6.1.2",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "HhgAQQAgAEIATQBQACAAcwB0AHIAaQBuAGc="
-      }
-    },{
-      "type": "1.2.3.6.1.3",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "AQH/"
-      }
-    },{
-      "type": "1.2.3.6.1.4",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "Fg1BbiBJQTUgc3RyaW5n"
-      }
-    },{
-      "type": "1.2.3.6.1.5",
-      "required": true,
-      "constant": {
-        "type": "INTEGER",
-        "value": "0x1234567890ABCD"
-      }
-    },{
-      "type": "1.2.3.6.1.6",
-      "required": true,
+      "critical": true,
       "constant": {
         "type": "ASN1",
         "value": "BQA="
       }
     },{
-      "type": "1.2.3.6.1.7",
+      "type": "1.2.3.4.5.5",
       "required": true,
+      "critical": true,
       "constant": {
         "type": "OCTETSTRING",
-        "value": "YWJjZGVm"
+        "value": "IiIiIg=="
       }
     },{
-      "type": "1.2.3.6.1.8",
+      "type": "1.2.3.4.5.4",
       "required": true,
+      "critical": true,
       "constant": {
-        "type": "ASN1",
-        "value": "BgNTBAU="
+        "type": "BITSTRING",
+        "value": "EREREQ=="
       }
     },{
-      "type": "1.2.3.6.1.9",
+      "type": "1.2.3.4.5.3",
       "required": true,
-      "constant": {
-        "type": "PRINTABLE",
-        "value": "example printable string"
-      }
-    },{
-      "type": "1.2.3.6.1.11",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "FBBBIHRlbGV0YXggc3RyaW5n"
-      }
-    },{
-      "type": "1.2.3.6.1.12",
-      "required": true,
+      "critical": true,
       "constant": {
         "type": "UTF8",
-        "value": "example UTF8 string"
+        "value": "my UTF8 string"
       }
     },{
-      "type": "1.2.3.6.1.13",
+      "type": "1.2.3.4.5.2",
       "required": true,
+      "critical": true,
       "constant": {
-        "type": "ASN1",
-        "value": "CgEC"
+        "type": "PRINTABLE",
+        "value": "my printable string"
       }
     },{
-      "type": "1.2.3.6.1.14",
+      "type": "InhibitAnyPolicy",
       "required": true,
+      "critical": true,
       "constant": {
-        "type": "ASN1",
-        "value": "GA8yMDIyMTIwMTIxMDIyMlo="
-      }
-    },{
-      "type": "1.2.3.6.1.15",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "Fw0yMjEyMDEyMTAyMjJa"
-      }
-    },{
-      "type": "1.2.3.6.1.16",
-      "required": true,
-      "constant": {
-        "type": "ASN1",
-        "value": "MBsxDDAKBgNVBAMMA2FiYzELMAkGA1UEBhMCREU="
+        "type": "INTEGER",
+        "value": "1"
       }
     }
   ]

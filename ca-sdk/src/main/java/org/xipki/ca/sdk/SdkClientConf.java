@@ -16,7 +16,6 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class SdkClientConf {
@@ -30,11 +29,11 @@ public class SdkClientConf {
     this.ssl = Args.notNull(ssl, "ssl");
   }
 
-  public String getServerUrl() {
+  public String serverUrl() {
     return serverUrl;
   }
 
-  public SslConf getSsl() {
+  public SslConf ssl() {
     return ssl;
   }
 

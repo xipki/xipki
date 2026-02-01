@@ -44,7 +44,7 @@ public class NextCaMessage {
   public NextCaMessage() {
   }
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
@@ -52,7 +52,7 @@ public class NextCaMessage {
     this.caCert = caCert;
   }
 
-  public List<X509Cert> getRaCerts() {
+  public List<X509Cert> raCerts() {
     return raCerts;
   }
 
@@ -113,7 +113,7 @@ public class NextCaMessage {
   private static String getSignatureAlgorithm(
       PrivateKey key, HashAlgo hashAlgo) {
     if ("RSA".equalsIgnoreCase(key.getAlgorithm())) {
-      return hashAlgo.getJceName() + "withRSA";
+      return hashAlgo.jceName() + "withRSA";
     }
     throw new UnsupportedOperationException(
         "getSignatureAlgorithm() for non-RSA is not supported yet.");

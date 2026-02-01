@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Database porter.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class DbPorter extends DbToolBase {
@@ -50,15 +49,15 @@ public class DbPorter extends DbToolBase {
       this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    public String getDirName() {
+    public String dirName() {
       return dirName;
     }
 
-    public String getTableName() {
+    public String tableName() {
       return tableName;
     }
 
-    public float getSqlBatchFactor() {
+    public float sqlBatchFactor() {
       return sqlBatchFactor;
     }
 
@@ -80,15 +79,15 @@ public class DbPorter extends DbToolBase {
       this.sqlBatchFactor = sqlBatchFactor;
     }
 
-    public String getDirName() {
+    public String dirName() {
       return dirName;
     }
 
-    public String getTableName() {
+    public String tableName() {
       return tableName;
     }
 
-    public float getSqlBatchFactor() {
+    public float sqlBatchFactor() {
       return sqlBatchFactor;
     }
 
@@ -250,11 +249,11 @@ public class DbPorter extends DbToolBase {
       return null;
     }
 
-    if (fileOrBinary.getBinary() != null) {
-      return fileOrBinary.getBinary();
+    if (fileOrBinary.binary() != null) {
+      return fileOrBinary.binary();
     }
 
-    return IoUtil.read(new File(baseDir, fileOrBinary.getFile()));
+    return IoUtil.read(new File(baseDir, fileOrBinary.file()));
   } // method readContent
 
   protected String readContent(FileOrValue fileOrValue) throws IOException {
@@ -262,12 +261,12 @@ public class DbPorter extends DbToolBase {
       return null;
     }
 
-    if (fileOrValue.getValue() != null) {
-      return fileOrValue.getValue();
+    if (fileOrValue.value() != null) {
+      return fileOrValue.value();
     }
 
     return StringUtil.toUtf8String(
-        IoUtil.read(new File(baseDir, fileOrValue.getFile())));
+        IoUtil.read(new File(baseDir, fileOrValue.file())));
   } // method readContent
 
   public static void echoToFile(String content, File file) throws IOException {

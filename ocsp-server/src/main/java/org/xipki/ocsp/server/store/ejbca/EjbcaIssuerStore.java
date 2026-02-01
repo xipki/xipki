@@ -16,7 +16,6 @@ import java.util.Set;
  * IssuerStore for the EJBCA database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class EjbcaIssuerStore {
@@ -31,14 +30,14 @@ class EjbcaIssuerStore {
 
     for (EjbcaIssuerEntry entry : entries) {
       for (EjbcaIssuerEntry existingEntry : this.entries) {
-        if (existingEntry.getId().contentEquals(entry.getId())) {
+        if (existingEntry.id().contentEquals(entry.id())) {
           throw new IllegalArgumentException(
-              "issuer with the same id (fingerprint) " + entry.getId()
+              "issuer with the same id (fingerprint) " + entry.id()
               + " already available");
         }
       }
       this.entries.add(entry);
-      idSet.add(entry.getId());
+      idSet.add(entry.id());
     }
 
     this.ids = Collections.unmodifiableSet(idSet);
@@ -48,13 +47,13 @@ class EjbcaIssuerStore {
     return ids.size();
   }
 
-  public Set<String> getIds() {
+  public Set<String> ids() {
     return ids;
   }
 
   public EjbcaIssuerEntry getIssuerForId(String id) {
     for (EjbcaIssuerEntry entry : entries) {
-      if (entry.getId().contentEquals(id)) {
+      if (entry.id().contentEquals(id)) {
         return entry;
       }
     }

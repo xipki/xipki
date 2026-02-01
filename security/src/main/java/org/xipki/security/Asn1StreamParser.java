@@ -19,7 +19,6 @@ import java.time.Instant;
  * ASN.1 stream parser.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class Asn1StreamParser {
 

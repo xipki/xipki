@@ -26,11 +26,11 @@ public class CCCInstanceCAExtensionSchema extends CCCSimpleExtensionSchema {
     1, 0xFFFFFFFFL);
   }
 
-  public long getAppletVersion() {
+  public long appletVersion() {
     return appletVersion;
   }
 
-  public byte[] getPlatformInformation() {
+  public byte[] platformInformation() {
     return platformInformation;
   }
 

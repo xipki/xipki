@@ -28,11 +28,11 @@ public class Asn1RSAPublicKey {
     this.publicExponent = Args.notNull(publicExponent, "publicExponent");
   }
 
-  public byte[] getModulus() {
+  public byte[] modulus() {
     return modulus;
   }
 
-  public byte[] getPublicExponent() {
+  public byte[] publicExponent() {
     return publicExponent;
   }
 

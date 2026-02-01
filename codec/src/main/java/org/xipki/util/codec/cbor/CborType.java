@@ -84,14 +84,14 @@ public class CborType {
   /**
      * @return the additional information of this type, as integer value from [0..31].
      */
-  public int getAdditionalInfo() {
+  public int additionalInfo() {
         return m_additional;
   }
 
   /**
      * @return the major type, as integer value from [0..7].
      */
-  public int getMajorType() {
+  public int majorType() {
         return m_major;
   }
 

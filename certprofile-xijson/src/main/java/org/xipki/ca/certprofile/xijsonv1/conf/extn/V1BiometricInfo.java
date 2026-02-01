@@ -13,7 +13,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonList;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -76,8 +76,8 @@ public class V1BiometricInfo {
 
     List<BiometricInfo.BiometricType> v2Types = new ArrayList<>(types.size());
     for (BiometricType v1Type : types) {
-      if (v1Type.getPredefined() != null) {
-        int value = v1Type.getPredefined().getValue();
+      if (v1Type.predefined() != null) {
+        int value = v1Type.predefined().value();
         if (value == 0) {
           v2Types.add(BiometricInfo.BiometricType.picture);
         } else if (value == 1) {
@@ -105,11 +105,11 @@ public class V1BiometricInfo {
       this.oid = Args.notNull(oid, "oid");
     }
 
-    public DescribableInt getPredefined() {
+    public DescribableInt predefined() {
       return predefined;
     }
 
-    public DescribableOid getOid() {
+    public DescribableOid oid() {
       return oid;
     }
 

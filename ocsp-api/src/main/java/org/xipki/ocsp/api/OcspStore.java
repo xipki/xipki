@@ -18,7 +18,6 @@ import java.time.Instant;
  * Store of certificate status.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class OcspStore implements Closeable {
@@ -103,7 +102,7 @@ public abstract class OcspStore implements Closeable {
       return null;
     }
 
-    Instant nextUpdate = info.getNextUpdate();
+    Instant nextUpdate = info.nextUpdate();
 
     if (minNextUpdatePeriod != null) {
       Instant minNextUpdate = minNextUpdatePeriod.add(time);
@@ -165,11 +164,11 @@ public abstract class OcspStore implements Closeable {
     this.name = Args.notBlank(name, "name");
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public UnknownCertBehaviour getUnknownCertBehaviour() {
+  public UnknownCertBehaviour unknownCertBehaviour() {
     return unknownCertBehaviour;
   }
 
@@ -186,7 +185,7 @@ public abstract class OcspStore implements Closeable {
     this.includeArchiveCutoff = includeArchiveCutoff;
   }
 
-  public int getRetentionInterval() {
+  public int retentionInterval() {
     return retentionInterval;
   }
 
@@ -218,7 +217,7 @@ public abstract class OcspStore implements Closeable {
     this.ignoreNotYetValidCert = ignoreNotYetValidCert;
   }
 
-  public Validity getMinNextUpdatePeriod() {
+  public Validity minNextUpdatePeriod() {
     return minNextUpdatePeriod;
   }
 
@@ -236,11 +235,11 @@ public abstract class OcspStore implements Closeable {
     this.maxNextUpdatePeriod = maxNextUpdatePeriod;
   }
 
-  public Validity getMaxNextUpdatePeriod() {
+  public Validity maxNextUpdatePeriod() {
     return maxNextUpdatePeriod;
   }
 
-  public Validity getUpdateInterval() {
+  public Validity updateInterval() {
     return updateInterval;
   }
 
@@ -249,8 +248,8 @@ public abstract class OcspStore implements Closeable {
   }
 
   protected static String overviewString(X509Cert cert) {
-    return "subject: " + cert.getSubjectText() + ", issuer: " +
-        cert.getIssuerText() + ", serialNo: " + cert.getSerialNumberHex();
+    return "subject: " + cert.subjectText() + ", issuer: " +
+        cert.issuerText() + ", serialNo: " + cert.serialNumberHex();
   }
 
 }

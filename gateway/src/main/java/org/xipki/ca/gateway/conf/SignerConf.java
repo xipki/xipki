@@ -13,7 +13,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class SignerConf {
@@ -30,15 +29,15 @@ public class SignerConf {
     this.certs = certs;
   }
 
-  public List<FileOrBinary> getCerts() {
+  public List<FileOrBinary> certs() {
     return certs;
   }
 
-  public String getType() {
+  public String type() {
       return type;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 

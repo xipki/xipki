@@ -75,7 +75,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
           oldValue.flush();
         } catch (Throwable th) {
           LogUtil.error(LOG, th,
-              "error flushing AcmeAccount " + oldValue.getId());
+              "error flushing AcmeAccount " + oldValue.id());
         }
       }
     }
@@ -105,7 +105,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
           oldValue.flush();
         } catch (Throwable th) {
           LogUtil.error(LOG, th,
-              "error flushing AcmeOrder " + oldValue.getId());
+              "error flushing AcmeOrder " + oldValue.id());
         }
       }
     }
@@ -146,15 +146,15 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
       this.challSubIds = challSubIds;
     }
 
-    public long getOrderId() {
+    public long orderId() {
       return orderId;
     }
 
-    public int[] getAuthzSubIds() {
+    public int[] authzSubIds() {
       return authzSubIds;
     }
 
-    public int[] getChallSubIds() {
+    public int[] challSubIds() {
       return challSubIds;
     }
   }
@@ -205,14 +205,14 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public void addAccount(AcmeAccount account) {
-    accountCache.put(account.getId(), account);
+    accountCache.put(account.id(), account);
     LOG.info("added account {}", account.idText());
   }
 
   public byte[] getCsr(long orderId) throws AcmeSystemException {
     AcmeOrder order = orderCache.get(orderId);
-    if (order != null && order.getCsr() != null) {
-      return order.getCsr();
+    if (order != null && order.csr() != null) {
+      return order.csr();
     } else {
       return dataSource.getCsr(orderId);
     }
@@ -223,7 +223,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     if (account == null) {
       account = dataSource.getAccount(accountId);
       if (account != null) {
-        accountCache.put(account.getId(), account);
+        accountCache.put(account.id(), account);
       }
     }
     return account;
@@ -241,14 +241,14 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
     AcmeAccount account = dataSource.getAccountForJwk(jwk);
     if (account != null) {
-      accountCache.put(account.getId(), account);
+      accountCache.put(account.id(), account);
     }
     return account;
   }
 
   public void addOrder(AcmeOrder order) {
     // set IDs
-    orderCache.put(order.getId(), order);
+    orderCache.put(order.id(), order);
     LOG.info("added order {}", order.idText());
   }
 
@@ -257,7 +257,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     if (order == null) {
       order = dataSource.getOrder(orderId);
       if (order != null) {
-        orderCache.put(order.getId(), order);
+        orderCache.put(order.id(), order);
       }
     }
     return order;
@@ -278,7 +278,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     if (order == null) {
       order = dataSource.getOrderForCertSha256(sha256);
       if (order != null) {
-        orderCache.put(order.getId(), order);
+        orderCache.put(order.id(), order);
       }
     }
 
@@ -287,19 +287,19 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
   public AcmeChallenge2 getChallenge(ChallId challId)
       throws AcmeSystemException {
-    AcmeOrder order = getOrder(challId.getOrderId());
+    AcmeOrder order = getOrder(challId.orderId());
     if (order == null) {
       return null;
     }
 
-    AcmeAuthz authz = order.getAuthz(challId.getAuthzId());
+    AcmeAuthz authz = order.getAuthz(challId.authzId());
     if (authz == null) {
       return null;
     }
 
-    for (AcmeChallenge chall : authz.getChallenges()) {
-      if (chall.getSubId() == challId.getSubId()) {
-        return new AcmeChallenge2(chall, authz.getIdentifier());
+    for (AcmeChallenge chall : authz.challenges()) {
+      if (chall.subId() == challId.subId()) {
+        return new AcmeChallenge2(chall, authz.identifier());
       }
     }
 
@@ -307,19 +307,19 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public AcmeAuthz getAuthz(AuthzId authzId) throws AcmeSystemException {
-    AcmeOrder order = getOrder(authzId.getOrderId());
+    AcmeOrder order = getOrder(authzId.orderId());
     if (order == null) {
       return null;
     }
 
-    return order.getAuthz(authzId.getSubId());
+    return order.getAuthz(authzId.subId());
   }
 
   public List<Long> getOrderIds(long accountId) throws AcmeSystemException {
     List<Long> orderIds = new LinkedList<>();
     // from cache
     for (Map.Entry<Long, AcmeOrder> entry : orderCache.snapshot().entrySet()) {
-      if (entry.getValue().getAccountId() == accountId) {
+      if (entry.getValue().accountId() == accountId) {
         orderIds.add(entry.getKey());
       }
     }
@@ -343,18 +343,18 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
         continue;
       }
 
-      List<AcmeAuthz> authzs = order.getAuthzs();
+      List<AcmeAuthz> authzs = order.authzs();
       if (authzs == null) {
         continue;
       }
 
       for (AcmeAuthz authz : authzs) {
-        for (AcmeChallenge challenge : authz.getChallenges()) {
-          ChallId challId = new ChallId(order.getId(), authz.getSubId(),
-              challenge.getSubId());
-          boolean addMe = challenge.getStatus() == ChallengeStatus.processing
-              && authz.getStatus() == AuthzStatus.pending
-              && order.getStatus() == OrderStatus.pending;
+        for (AcmeChallenge challenge : authz.challenges()) {
+          ChallId challId = new ChallId(order.id(), authz.subId(),
+              challenge.subId());
+          boolean addMe = challenge.status() == ChallengeStatus.processing
+              && authz.status() == AuthzStatus.pending
+              && order.status() == OrderStatus.pending;
 
           if (addMe) {
             ids.add(challId);
@@ -383,7 +383,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
       order.updateStatus();
 
-      if (order.getStatus() == OrderStatus.processing) {
+      if (order.status() == OrderStatus.processing) {
         if (!ids.contains(id)) {
           ids.add(id);
         }
@@ -432,7 +432,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
   public synchronized void flushOrderIfNotCached(AcmeOrder order)
       throws AcmeSystemException {
-    AcmeOrder cachedOrder = orderCache.get(order.getId());
+    AcmeOrder cachedOrder = orderCache.get(order.id());
     if (cachedOrder != order) {
       order.flush();
     }

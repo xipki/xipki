@@ -223,7 +223,7 @@ public class OcspActions {
 
           if (isAttrCert) {
             if (issuerX500Name == null) {
-              issuerX500Name = issuerCert.getSubject();
+              issuerX500Name = issuerCert.subject();
             }
 
             X509AttributeCertificateHolder cert =
@@ -246,7 +246,7 @@ public class OcspActions {
                   + " is not issued by the given issuer");
             }
             ocspUrls = extractOcspUrls(cert);
-            sn = cert.getSerialNumber();
+            sn = cert.serialNumber();
           }
 
           if (isBlank(serverUrl)) {
@@ -318,7 +318,7 @@ public class OcspActions {
       }
 
       IssuerHash issuerHash =
-          new IssuerHash(options.getHashAlgorithm(), issuerCert);
+          new IssuerHash(options.hashAlgorithm(), issuerCert);
 
       OCSPResp response;
       try {
@@ -328,14 +328,14 @@ public class OcspActions {
         if (debug != null && debug.size() > 0) {
           ReqRespPair reqResp = debug.get(0);
           if (saveReq) {
-            byte[] bytes = reqResp.getRequest();
+            byte[] bytes = reqResp.request();
             if (bytes != null) {
               IoUtil.save(reqout, bytes);
             }
           }
 
           if (saveResp) {
-            byte[] bytes = reqResp.getResponse();
+            byte[] bytes = reqResp.response();
             if (bytes != null) {
               IoUtil.save(respout, bytes);
             }
@@ -572,7 +572,7 @@ public class OcspActions {
           X509Cert respSigner2 = new X509Cert(respSigner);
           if (X509Util.issues(respIssuer, respSigner2)) {
             try {
-              respSigner2.verify(respIssuer.getPublicKey());
+              respSigner2.verify(respIssuer.publicKey());
             } catch (SignatureException ex) {
               certValid = false;
             }
@@ -614,12 +614,12 @@ public class OcspActions {
 
           if (revStatus.hasRevocationReason()) {
             int reason = revStatus.getRevocationReason();
-            if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.getCode()
+            if (extendedRevoke && reason == CrlReason.CERTIFICATE_HOLD.code()
                 && revTime.getTime() == 0) {
               status = "unknown (RFC6960)";
             } else {
               status = StringUtil.concatObjects("revoked, reason = ",
-                  CrlReason.forReasonCode(reason).getDescription(),
+                  CrlReason.forReasonCode(reason).description(),
                   ", revocationTime = ", revTime,
                   (invTime == null ? "" : ", invalidityTime = " + invTime));
             }
@@ -691,7 +691,7 @@ public class OcspActions {
           } else {
             String sigAlgoName;
             try {
-              sigAlgoName = SignAlgo.getInstance(sigAlgo).getJceName();
+              sigAlgoName = SignAlgo.getInstance(sigAlgo).jceName();
             } catch (NoSuchAlgorithmException ex) {
               sigAlgoName = "unknown";
             }

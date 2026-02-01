@@ -73,7 +73,7 @@ public class MultiPartOperation {
     }
   }
 
-  public OperationType getType() {
+  public OperationType type() {
     return type;
   }
 

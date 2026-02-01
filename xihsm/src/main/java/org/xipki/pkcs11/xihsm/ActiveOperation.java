@@ -20,7 +20,7 @@ public class ActiveOperation {
   private MultiPartOperation multiActiveOp;
 
   public OperationType getOperationType() {
-    return multiActiveOp != null ? multiActiveOp.getType() : null;
+    return multiActiveOp != null ? multiActiveOp.type() : null;
   }
 
   public void enterSimpleOp() throws HsmException {
@@ -40,7 +40,7 @@ public class ActiveOperation {
   }
 
   synchronized void clearActiveOp(OperationType op) {
-    if (multiActiveOp != null && multiActiveOp.getType() == op) {
+    if (multiActiveOp != null && multiActiveOp.type() == op) {
       multiActiveOp = null;
     }
   }
@@ -54,7 +54,7 @@ public class ActiveOperation {
 
   public synchronized MultiPartOperation assertMultiOpInitialized(
       OperationType type) throws HsmException {
-    if (multiActiveOp == null || multiActiveOp.getType() != type) {
+    if (multiActiveOp == null || multiActiveOp.type() != type) {
       throw new HsmException(PKCS11T.CKR_OPERATION_NOT_INITIALIZED,
           "The session has not been initialized for " + type);
     }

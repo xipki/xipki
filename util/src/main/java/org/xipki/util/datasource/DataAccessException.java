@@ -236,7 +236,7 @@ public class DataAccessException extends Exception {
     this.reason = Args.notNull(reason, "reason");
   }
 
-  public Reason getReason() {
+  public Reason reason() {
     return reason;
   }
 }

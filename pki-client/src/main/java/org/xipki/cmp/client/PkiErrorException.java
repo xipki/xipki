@@ -11,7 +11,6 @@ import org.xipki.security.cmp.PkiStatusInfo;
  * Exception that wraps the PKIStatusInfo.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class PkiErrorException extends Exception {
@@ -39,15 +38,15 @@ public class PkiErrorException extends Exception {
     this.statusMessage = statusMessage;
   }
 
-  public int getStatus() {
+  public int status() {
     return status;
   }
 
-  public int getPkiFailureInfo() {
+  public int pkiFailureInfo() {
     return pkiFailureInfo;
   }
 
-  public String getStatusMessage() {
+  public String statusMessage() {
     return statusMessage;
   }
 

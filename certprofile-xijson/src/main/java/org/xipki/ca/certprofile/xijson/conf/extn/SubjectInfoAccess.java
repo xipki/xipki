@@ -28,7 +28,7 @@ public class SubjectInfoAccess implements JsonEncodable {
     this.accesses = Args.notEmpty(accesses, "accesses");
   }
 
-  public List<Access> getAccesses() {
+  public List<Access> accesses() {
     return accesses;
   }
 
@@ -57,18 +57,18 @@ public class SubjectInfoAccess implements JsonEncodable {
       this.accessLocation = Args.notNull(accessLocation, "accessLocation");
     }
 
-    public AccessMethodID getAccessMethod() {
+    public AccessMethodID accessMethod() {
       return accessMethod;
     }
 
-    public GeneralNameType getAccessLocation() {
+    public GeneralNameType accessLocation() {
       return accessLocation;
     }
 
     @Override
     public JsonMap toCodec() {
       return new JsonMap()
-          .put("accessMethod", accessMethod.getMainAlias())
+          .put("accessMethod", accessMethod.mainAlias())
           .put("accessLocation", accessLocation);
     }
 

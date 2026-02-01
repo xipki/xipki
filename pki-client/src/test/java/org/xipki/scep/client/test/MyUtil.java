@@ -63,7 +63,7 @@ public class MyUtil {
       certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
       BasicConstraints bc = new BasicConstraints(0);
       certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
-      String signatureAlgorithm = SignAlgo.getInstance(rcaKey).getJceName();
+      String signatureAlgorithm = SignAlgo.getInstance(rcaKey).jceName();
       ContentSigner contentSigner =
           new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
       return new X509Cert(certGenerator.build(contentSigner));
@@ -101,7 +101,7 @@ public class MyUtil {
 
     String sigAlgName;
     try {
-      sigAlgName = SignAlgo.getInstance(privateKey).getJceName();
+      sigAlgName = SignAlgo.getInstance(privateKey).jceName();
     } catch (NoSuchAlgorithmException ex) {
       throw new OperatorCreationException(ex.getMessage(), ex);
     }
@@ -148,7 +148,7 @@ public class MyUtil {
 
     ContentSigner contentSigner;
     try {
-      String sigAlgorithm = SignAlgo.getInstance(identityKey).getJceName();
+      String sigAlgorithm = SignAlgo.getInstance(identityKey).jceName();
       contentSigner = new JcaContentSignerBuilder(sigAlgorithm)
           .setProvider("BC").build(identityKey);
     } catch (OperatorCreationException | NoSuchAlgorithmException ex) {

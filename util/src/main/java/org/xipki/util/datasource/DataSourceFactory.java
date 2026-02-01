@@ -23,7 +23,6 @@ import java.util.Optional;
  * Factory to create {@link DataSourceWrapper}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class DataSourceFactory {

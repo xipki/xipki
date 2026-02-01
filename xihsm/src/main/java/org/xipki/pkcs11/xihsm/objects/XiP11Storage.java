@@ -122,7 +122,7 @@ public abstract class XiP11Storage extends XiP11Object {
       }
 
       for (XiAttribute attr : res) {
-        if (attr.getType() == type) {
+        if (attr.type() == type) {
           throw new HsmException(CKR_GENERAL_ERROR,
               "duplicated attribute " + PKCS11T.ckaCodeToName(type)
           );

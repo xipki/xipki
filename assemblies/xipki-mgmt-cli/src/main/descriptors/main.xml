@@ -24,6 +24,16 @@
       <fileMode>0644</fileMode>
     </fileSet>
     <fileSet>
+      <directory>../xipki-cli/src/main/unfiltered/xipki/etc/</directory>
+      <includes>
+        <include>cmp-client.json</include>
+        <include>csr.json</include>
+      </includes>
+      <outputDirectory>xipki/etc</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
       <directory>${project.build.directory}/karaf-jars</directory>
       <outputDirectory>.</outputDirectory>
       <excludes>

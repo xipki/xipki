@@ -29,7 +29,6 @@ import java.util.Set;
  * this class.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public abstract class Certprofile implements Closeable {
@@ -41,11 +40,11 @@ public abstract class Certprofile implements Closeable {
   public void close() {
   }
 
-  public ValidityMode getNotAfterMode() {
+  public ValidityMode notAfterMode() {
     return ValidityMode.BY_CA;
   }
 
-  public List<SignAlgo> getSignatureAlgorithms() {
+  public List<SignAlgo> signatureAlgorithms() {
     return null;
   }
 
@@ -54,29 +53,29 @@ public abstract class Certprofile implements Closeable {
    *
    * @return the SubjectControl, may not be <code>null</code>.
    */
-  public abstract SubjectControl getSubjectControl();
+  public abstract SubjectControl subjectControl();
 
   protected abstract void verifySubjectDnOccurrence(X500Name requestedSubject)
       throws BadCertTemplateException;
 
-  public AuthorityInfoAccessControl getAiaControl() {
+  public AuthorityInfoAccessControl aiaControl() {
     return null;
   }
 
-  public abstract CertificatePolicies getCertificatePolicies();
+  public abstract CertificatePolicies certificatePolicies();
 
-  public abstract Set<GeneralNameTag> getSubjectAltNameModes();
+  public abstract Set<GeneralNameTag> subjectAltNameModes();
 
-  public Set<ExtKeyUsageControl> getExtendedKeyUsages() {
+  public Set<ExtKeyUsageControl> extendedKeyUsages() {
     return null;
   }
 
   public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>>
-      getSubjectInfoAccessModes() {
+      subjectInfoAccessModes() {
     return null;
   }
 
-  public abstract ExtensionsControl getExtensionsControl();
+  public abstract ExtensionsControl extensionsControl();
 
   /**
    * Initializes this object.
@@ -88,21 +87,21 @@ public abstract class Certprofile implements Closeable {
    */
   public abstract void initialize(String data) throws CertprofileException;
 
-  public abstract CertLevel getCertLevel();
+  public abstract CertLevel certLevel();
 
-  public CertDomain getCertDomain() {
+  public CertDomain certDomain() {
     return CertDomain.RFC5280;
   }
 
-  public KeypairGenControl getKeypairGenControl() {
+  public KeypairGenControl keypairGenControl() {
     return KeypairGenControl.FORBIDDEN;
   }
 
-  public abstract PublicKeyControl getPublicKeyControl();
+  public abstract PublicKeyControl publicKeyControl();
 
-  public abstract Set<KeySingleUsage> getKeyUsage(KeySpec keySpec);
+  public abstract Set<KeySingleUsage> keyUsage(KeySpec keySpec);
 
-  public Integer getPathLenBasicConstraint() {
+  public Integer pathLenBasicConstraint() {
     return null;
   }
 
@@ -113,13 +112,13 @@ public abstract class Certprofile implements Closeable {
    *          Requested NotBefore. Could be {@code null}.
    * @return the granted NotBefore.
    */
-  public Instant getNotBefore(Instant requestedNotBefore) {
+  public Instant notBefore(Instant requestedNotBefore) {
     Instant now = Instant.now();
     return (requestedNotBefore != null && requestedNotBefore.isAfter(now))
             ? requestedNotBefore : now;
   }
 
-  public abstract Validity getValidity();
+  public abstract Validity validity();
 
   /**
    * As in RFC5280:
@@ -129,7 +128,7 @@ public abstract class Certprofile implements Closeable {
    *    99991231235959Z.
    *
    * @return true to use the fixed value 99991231235959Z in notAfter, false
-   *   as in defined in {@link #getValidity()}.
+   *   as in defined in {@link #validity()}.
    */
   public boolean hasNoWellDefinedExpirationDate() {
     return false;
@@ -154,7 +153,7 @@ public abstract class Certprofile implements Closeable {
       throw new BadCertTemplateException("unknown type of subject public key");
     }
 
-    if (!getPublicKeyControl().allowsPublicKey(keySpec)) {
+    if (!publicKeyControl().allowsPublicKey(keySpec)) {
       throw new BadCertTemplateException("key type " + keySpec
           + " is not permitted");
     }
@@ -174,16 +173,16 @@ public abstract class Certprofile implements Closeable {
    * @throws CertprofileException
    *         if error occurs.
    */
-  public SubjectInfo getSubject(X500Name requestedSubject)
+  public SubjectInfo subject(X500Name requestedSubject)
       throws CertprofileException, BadCertTemplateException {
     Args.notNull(requestedSubject, "requestedSubject");
     verifySubjectDnOccurrence(requestedSubject);
 
-    if (getCertLevel() == CertLevel.CROSS) {
+    if (certLevel() == CertLevel.CROSS) {
       return new SubjectInfo(requestedSubject, null);
     }
 
-    return ProfileUtil.getSubject(requestedSubject, getSubjectControl());
+    return ProfileUtil.getSubject(requestedSubject, subjectControl());
   }
 
   /**
@@ -222,14 +221,14 @@ public abstract class Certprofile implements Closeable {
    * @return maximal size in bytes of the certificate, 0 or negative value
    *         indicates accepting all sizes.
    */
-  public int getMaxCertSize() {
+  public int maxCertSize() {
     return 0;
   }
 
-  public byte[] getSubjectKeyIdentifier(
+  public byte[] subjectKeyIdentifier(
       SubjectPublicKeyInfo subjectPublicKeyInfo)
       throws CertprofileException {
-    SubjectKeyIdentifierControl control = getSubjectKeyIdentifierControl();
+    SubjectKeyIdentifierControl control = subjectKeyIdentifierControl();
     if (control == null) {
       control = new SubjectKeyIdentifierControl();
     }
@@ -238,7 +237,7 @@ public abstract class Certprofile implements Closeable {
     return control.computeKeyIdentifier(keyData);
   }
 
-  protected SubjectKeyIdentifierControl getSubjectKeyIdentifierControl() {
+  protected SubjectKeyIdentifierControl subjectKeyIdentifierControl() {
     return null;
   }
 

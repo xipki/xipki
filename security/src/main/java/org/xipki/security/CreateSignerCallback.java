@@ -31,8 +31,8 @@ public interface CreateSignerCallback {
     public KemEncapKey generateKemEncapKey(
         SecurityFactory securityFactory, SubjectPublicKeyInfo publicKeyInfo)
         throws XiSecurityException {
-      return securityFactory.getCsrControl().generateKemEncapKey(
-          publicKeyInfo, securityFactory.getRandom4Sign());
+      return securityFactory.csrControl().generateKemEncapKey(
+          publicKeyInfo, securityFactory.random4Sign());
     }
 
     @Override
@@ -74,7 +74,7 @@ public interface CreateSignerCallback {
       if (keyspec.isCompositeMLDSA()) {
         try {
           return SignAlgo.getInstance(
-              keyspec.getAlgorithmIdentifier());
+              keyspec.algorithmIdentifier());
         } catch (NoSuchAlgorithmException e) {
           return null;
         }

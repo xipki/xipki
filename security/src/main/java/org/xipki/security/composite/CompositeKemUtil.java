@@ -3,13 +3,19 @@
 
 package org.xipki.security.composite;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.SecretWithEncapsulation;
+import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.math.ec.ECCurve;
+import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.bouncycastle.math.ec.rfc7748.X448;
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMExtractor;
@@ -47,9 +53,9 @@ public class CompositeKemUtil {
 
     SecretWithEncap mlkemRes = mlKemEcapsulate(mlkemVariant, mlkemPk, rnd);
     SecretWithEncap tradRes  = tradEcapsulate(tradVariant, tradPk, rnd);
-    byte[] ct = IoUtil.concatenate(mlkemRes.getEncap(), tradRes.getEncap());
-    byte[] k = sha3256Kdf(mlkemRes.getSecret(),
-        tradRes.getSecret(), tradRes.getEncap(), tradPk,
+    byte[] ct = IoUtil.concatenate(mlkemRes.encap(), tradRes.encap());
+    byte[] k = sha3256Kdf(mlkemRes.secret(),
+        tradRes.secret(), tradRes.encap(), tradPk,
         algoSuite.label());
     return new SecretWithEncap(k, ct);
   }
@@ -131,7 +137,7 @@ public class CompositeKemUtil {
         byte[] k = new byte[32];
         rnd.nextBytes(k);
         SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
-            variant.keySpec().getAlgorithmIdentifier(), pk);
+            variant.keySpec().algorithmIdentifier(), pk);
 
         try {
           RSAPublicKey jceSk = (RSAPublicKey)
@@ -262,4 +268,46 @@ public class CompositeKemUtil {
     }
   }
 
+  /**
+   * @author Lijun Liao (xipki)
+   */
+  private enum WeierstraussCurveEnum {
+
+    P256(OIDs.Curve.secp256r1),
+    P384(OIDs.Curve.secp384r1),
+    P521(OIDs.Curve.secp521r1),
+    BP256(OIDs.Curve.brainpoolP256r1),
+    BP384(OIDs.Curve.brainpoolP384r1);
+
+    private final ECCurve curve;
+
+    private final ECPoint base;
+
+    WeierstraussCurveEnum(ASN1ObjectIdentifier oid) {
+      X9ECParameters params = CustomNamedCurves.getByOID(oid);
+      if (params == null) {
+        params = ECNamedCurveTable.getByOID(oid);
+      }
+
+      this.curve = params.getCurve();
+      this.base = params.getG();
+    }
+
+    public BigInteger order() {
+      return curve.getOrder();
+    }
+
+    public int fieldByteSize() {
+      return (curve.getFieldSize() + 7) / 8;
+    }
+
+    public ECPoint decodePoint(byte[] encoded) {
+      return curve.decodePoint(encoded);
+    }
+
+    public ECPoint multiplyBase(BigInteger k) {
+      return base.multiply(k).normalize();
+    }
+
+  }
 }

@@ -9,7 +9,6 @@ import org.xipki.security.X509Cert;
  * Certificate with id of this certificate in the database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertWithDbId {
@@ -22,11 +21,11 @@ public class CertWithDbId {
     this.cert = cert;
   }
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 
-  public Long getCertId() {
+  public Long certId() {
     return certId;
   }
 

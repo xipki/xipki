@@ -77,7 +77,7 @@ public class CertEnroller implements Runnable {
         continue;
       }
 
-      byte[] csr = order.getCsr();
+      byte[] csr = order.csr();
       if (csr == null) {
         // if the order is read from database, csr is null in the object,
         // even present in the database
@@ -90,15 +90,15 @@ public class CertEnroller implements Runnable {
       }
 
       EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
-      CertReqMeta certReqMeta = order.getCertReqMeta();
-      entry.setNotBefore(certReqMeta.getNotBefore());
-      entry.setNotAfter(certReqMeta.getNotAfter());
-      entry.setCertprofile(certReqMeta.getCertProfile());
+      CertReqMeta certReqMeta = order.certReqMeta();
+      entry.setNotBefore(certReqMeta.notBefore());
+      entry.setNotAfter(certReqMeta.notAfter());
+      entry.setCertprofile(certReqMeta.certProfile());
 
-      if (certReqMeta.getSubject() == null) {
+      if (certReqMeta.subject() == null) {
         entry.setP10req(csr);
       } else {
-        entry.setSubject(new X500NameType(certReqMeta.getSubject()));
+        entry.setSubject(new X500NameType(certReqMeta.subject()));
 
         CertificationRequest p10Req;
         try {
@@ -122,9 +122,9 @@ public class CertEnroller implements Runnable {
       LOG.info("start enrolling certificate for order {}", orderIdStr);
       try {
         EnrollOrPollCertsResponse sdkResp =
-            sdk.enrollCerts(certReqMeta.getCa(), sdkReq);
-        EnrollOrPollCertsResponse.Entry sdkRespEntry = sdkResp.getEntries()[0];
-        byte[] certBytes = sdkRespEntry.getCert();
+            sdk.enrollCerts(certReqMeta.ca(), sdkReq);
+        EnrollOrPollCertsResponse.Entry sdkRespEntry = sdkResp.entries()[0];
+        byte[] certBytes = sdkRespEntry.cert();
         boolean valid = certBytes != null;
         if (valid) {
           // check the certificate
@@ -137,7 +137,7 @@ public class CertEnroller implements Runnable {
           }
         } else {
           LOG.error("CA returned error for the order {}: {}",
-              orderIdStr, sdkRespEntry.getError());
+              orderIdStr, sdkRespEntry.error());
         }
 
         if (valid) {

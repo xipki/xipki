@@ -139,7 +139,7 @@ public enum AcmeError {
     qualifiedCode = "urn:ietf:params:acme:error:" + name();
   }
 
-  public String getQualifiedCode() {
+  public String qualifiedCode() {
     return qualifiedCode;
   }
 

@@ -23,7 +23,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ScepProtocolConf extends ProtocolConf {
@@ -57,19 +56,19 @@ public class ScepProtocolConf extends ProtocolConf {
     }
   }
 
-  public ScepControl getScep() {
+  public ScepControl scep() {
     return scep;
   }
 
-  public String getAuthenticator() {
+  public String authenticator() {
     return authenticator;
   }
 
-  public List<CaProfileConf> getCaProfiles() {
+  public List<CaProfileConf> caProfiles() {
     return caProfiles;
   }
 
-  public CaNameSignersConf getSigners() {
+  public CaNameSignersConf signers() {
     return signers;
   }
 
@@ -93,8 +92,8 @@ public class ScepProtocolConf extends ProtocolConf {
     CaNameSignersConf signers = (map == null) ? null
         : CaNameSignersConf.parse(map);
 
-    return new ScepProtocolConf(pConf.getLogReqResp(), pConf.getPop(),
-        pConf.getSdkClient(), scep, json.getString("authenticator"),
+    return new ScepProtocolConf(pConf.logReqResp(), pConf.pop(),
+        pConf.sdkClient(), scep, json.getString("authenticator"),
         caProfiles, signers);
   }
 

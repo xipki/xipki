@@ -77,7 +77,6 @@ import java.util.Set;
  * EST responder.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class EstResponder {
@@ -101,19 +100,19 @@ public class EstResponder {
       this.auditStatus = Args.notNull(auditStatus, "auditStatus");
     }
 
-    public int getHttpStatus() {
+    public int httpStatus() {
       return httpStatus;
     }
 
-    public String getAuditMessage() {
+    public String auditMessage() {
       return auditMessage;
     }
 
-    public AuditLevel getAuditLevel() {
+    public AuditLevel auditLevel() {
       return auditLevel;
     }
 
-    public AuditStatus getAuditStatus() {
+    public AuditStatus auditStatus() {
       return auditStatus;
     }
 
@@ -256,8 +255,8 @@ public class EstResponder {
               AuditLevel.INFO, AuditStatus.FAILED);
         }
 
-        caName = caProfileConf.getCa();
-        profile = caProfileConf.getCertprofile();
+        caName = caProfileConf.ca();
+        profile = caProfileConf.certprofile();
       } else if (tokens != null && tokens.length == 3) {
         caName = tokens[0].toLowerCase(Locale.ROOT);
         profile = tokens[1].toLowerCase(Locale.ROOT);
@@ -391,7 +390,7 @@ public class EstResponder {
                 ErrorCode.NOT_PERMITTED, "no requestor specified"));
       }
 
-      event.addEventData(CaAuditConstants.NAME_requestor, requestor.getName());
+      event.addEventData(CaAuditConstants.NAME_requestor, requestor.name());
 
       String ct = httpRequest.getHeader("Content-Type");
       if (!CT_pkcs10.equalsIgnoreCase(ct)) {
@@ -425,11 +424,11 @@ public class EstResponder {
 
       return toHttpResponse(respContent);
     } catch (OperationException ex) {
-      ErrorCode code = ex.getErrorCode();
+      ErrorCode code = ex.errorCode();
       if (LOG.isWarnEnabled()) {
         String msg = StringUtil.concat(
             "generate certificate, OperationException: code=",
-            code.name(), ", message=", ex.getErrorMessage());
+            code.name(), ", message=", ex.errorMessage());
         LogUtil.warn(LOG, ex, msg);
       }
 
@@ -472,15 +471,15 @@ public class EstResponder {
       auditMessage = code.name();
       if (code != ErrorCode.DATABASE_FAILURE
           && code != ErrorCode.SYSTEM_FAILURE) {
-        auditMessage += ": " + ex.getErrorMessage();
+        auditMessage += ": " + ex.errorMessage();
       }
 
       return new HttpResponse(sc);
     } catch (HttpRespAuditException ex) {
-      auditStatus = ex.getAuditStatus();
-      auditLevel = ex.getAuditLevel();
-      auditMessage = ex.getAuditMessage();
-      return new HttpResponse(ex.getHttpStatus());
+      auditStatus = ex.auditStatus();
+      auditLevel = ex.auditLevel();
+      auditMessage = ex.auditMessage();
+      return new HttpResponse(ex.httpStatus());
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "connection reset by peer");
@@ -503,8 +502,8 @@ public class EstResponder {
   private HttpResponse toHttpResponse(HttpRespContent respContent) {
     return respContent == null
         ? new HttpResponse(HttpStatusCode.SC_OK)
-        : new HttpResponse(HttpStatusCode.SC_OK, respContent.getContentType(),
-              null, respContent.isBase64(), respContent.getContent());
+        : new HttpResponse(HttpStatusCode.SC_OK, respContent.contentType(),
+              null, respContent.isBase64(), respContent.content());
   }
 
   private HttpRespContent enrollCert(
@@ -558,21 +557,21 @@ public class EstResponder {
     checkResponse(1, sdkResp);
 
     EnrollOrPollCertsResponse.Entry entry =
-        getEntry(sdkResp.getEntries(), reqId);
+        getEntry(sdkResp.entries(), reqId);
     if (!caGenKeyPair) {
       if (CMD_usimpleenroll.equals(command)) {
-        return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
+        return HttpRespContent.ofOk(CT_pkix_cert, true, entry.cert());
       } else {
         return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true,
-            buildCertsOnly(entry.getCert()));
+            buildCertsOnly(entry.cert()));
       }
     }
 
     if (CMD_userverkeygen.equals(command)) {
       try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
-        bo.write(PemEncoder.encode(entry.getPrivateKey(),
+        bo.write(PemEncoder.encode(entry.privateKey(),
                   PemEncoder.PemLabel.PRIVATE_KEY));
-        bo.write(PemEncoder.encode(entry.getCert(),
+        bo.write(PemEncoder.encode(entry.cert(),
                   PemEncoder.PemLabel.CERTIFICATE));
         bo.flush();
 
@@ -589,10 +588,10 @@ public class EstResponder {
       writeLine(bo, "XiPKI EST server");
 
       // private key
-      writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.getPrivateKey());
+      writeMultipartEntry(bo, boundaryBytes, CT_pkcs8, entry.privateKey());
 
       // certificate
-      byte[] certBytes = buildCertsOnly(entry.getCert());
+      byte[] certBytes = buildCertsOnly(entry.cert());
       writeMultipartEntry(bo, boundaryBytes, CT_pkcs7_mime_certyonly,
           certBytes);
 
@@ -751,12 +750,12 @@ public class EstResponder {
     checkResponse(1, sdkResp);
 
     EnrollOrPollCertsResponse.Entry entry =
-        getEntry(sdkResp.getEntries(), reqId);
+        getEntry(sdkResp.entries(), reqId);
     if (CMD_simplereenroll.equals(command)) {
       return HttpRespContent.ofOk(CT_pkcs7_mime_certyonly, true,
-          buildCertsOnly(entry.getCert()));
+          buildCertsOnly(entry.cert()));
     } else { // CMD_usimplereenroll
-      return HttpRespContent.ofOk(CT_pkix_cert, true, entry.getCert());
+      return HttpRespContent.ofOk(CT_pkix_cert, true, entry.cert());
     }
   } // method reenrollCert
 
@@ -765,7 +764,7 @@ public class EstResponder {
     CertprofileInfoResponse sdkResp = sdk.profileInfo(caName, profile);
     ASN1EncodableVector csrAttrs = new ASN1EncodableVector();
 
-    String[] extnTypes = sdkResp.getRequiredExtensionTypes();
+    String[] extnTypes = sdkResp.requiredExtensionTypes();
     if (extnTypes != null && extnTypes.length != 0) {
       ASN1EncodableVector asn1ExtnTypes = new ASN1EncodableVector();
       for (String extnType : extnTypes) {
@@ -776,15 +775,15 @@ public class EstResponder {
                     new DERSet(asn1ExtnTypes)));
     }
 
-    KeySpec[] keyTypes = sdkResp.getKeyTypes();
+    KeySpec[] keyTypes = sdkResp.keyTypes();
     if (keyTypes != null) {
       for (KeySpec keyType : keyTypes) {
         ASN1ObjectIdentifier typeOid =
-            keyType.getAlgorithmIdentifier().getAlgorithm();
+            keyType.algorithmIdentifier().getAlgorithm();
         if (keyType.isWeierstrassEC()) {
-          EcCurveEnum curve = keyType.getEcCurve();
+          EcCurveEnum curve = keyType.ecCurve();
           assert curve != null;
-          csrAttrs.add(new Attribute(typeOid, new DERSet(curve.getOid())));
+          csrAttrs.add(new Attribute(typeOid, new DERSet(curve.oid())));
         } else {
           csrAttrs.add(typeOid);
         }
@@ -798,13 +797,13 @@ public class EstResponder {
   private static void checkResponse(
       int expectedSize, EnrollOrPollCertsResponse resp)
       throws HttpRespAuditException {
-    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
     if (entries != null) {
       for (EnrollOrPollCertsResponse.Entry entry : entries) {
-        if (entry.getError() != null) {
+        if (entry.error() != null) {
           throw new HttpRespAuditException(
               HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-              entry.getError().toString(), AuditLevel.INFO, AuditStatus.FAILED);
+              entry.error().toString(), AuditLevel.INFO, AuditStatus.FAILED);
         }
       }
     }
@@ -821,7 +820,7 @@ public class EstResponder {
       EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)
       throws HttpRespAuditException {
     for (EnrollOrPollCertsResponse.Entry m : entries) {
-      if (certReqId.equals(m.getId())) {
+      if (certReqId.equals(m.id())) {
         return m;
       }
     }

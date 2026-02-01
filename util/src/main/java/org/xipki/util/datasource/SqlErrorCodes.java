@@ -13,7 +13,6 @@ import java.util.Set;
  * JDBC error codes for a particular database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 class SqlErrorCodes {
 

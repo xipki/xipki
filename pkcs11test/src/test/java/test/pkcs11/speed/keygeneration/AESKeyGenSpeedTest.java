@@ -6,7 +6,6 @@ package test.pkcs11.speed.keygeneration;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
-import org.xipki.pkcs11.wrapper.PKCS11Exception;
 import org.xipki.pkcs11.wrapper.PKCS11Token;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
 import test.pkcs11.wrapper.TestBase;
@@ -47,7 +46,7 @@ public abstract class AESKeyGenSpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws PKCS11Exception {
+  public void execTest() {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(mechanism) +

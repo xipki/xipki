@@ -39,7 +39,6 @@ import static org.xipki.security.SignAlgo.*;
  * PKCS#11 {@link XiContentSigner}.
  *
  * @author Lijun Liao (xipki)
- *
  */
 abstract class P11ContentSigner implements XiContentSigner {
 
@@ -58,7 +57,7 @@ abstract class P11ContentSigner implements XiContentSigner {
     this.signAlgo = Args.notNull(signAlgo, "signAlgo");
     try {
       this.encodedAlgorithmIdentifier =
-          signAlgo.getAlgorithmIdentifier().getEncoded();
+          signAlgo.algorithmIdentifier().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -73,17 +72,17 @@ abstract class P11ContentSigner implements XiContentSigner {
   static P11ContentSigner newInstance(
       P11Key identity, SignAlgo signAlgo, SecureRandom random,
       PublicKey publicKey, byte[] context) throws XiSecurityException {
-    long keyType = identity.getKey().id().getKeyType();
+    long keyType = identity.key().id().getKeyType();
     if (keyType == CKK_RSA) {
       return signAlgo.isRSAPSSSigAlgo() ? new RSAPSS(identity, signAlgo, random)
           : new RSAPkcs1v1_5(identity, signAlgo);
     } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2) {
       boolean isSm2p256v1 = (keyType == CKK_VENDOR_SM2)
-          || EcCurveEnum.SM2P256V1 == identity.getEcParams();
+          || EcCurveEnum.SM2P256V1 == identity.ecParams();
 
      if (isSm2p256v1) {
        if (publicKey == null) {
-         publicKey = Optional.ofNullable(identity.getPublicKey())
+         publicKey = Optional.ofNullable(identity.publicKey())
              .orElseThrow(() -> new XiSecurityException(
                  "SM2 signer needs public key, but could not get anyone."));
        }
@@ -94,7 +93,7 @@ abstract class P11ContentSigner implements XiContentSigner {
        return new ECDSA(identity, signAlgo);
      }
     } else if (keyType == CKK_EC_EDWARDS) {
-      EcCurveEnum curve = identity.getEcParams();
+      EcCurveEnum curve = identity.ecParams();
       boolean match = (curve == EcCurveEnum.ED25519) ? signAlgo == ED25519
           : signAlgo == ED448;
 
@@ -105,7 +104,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       return new EdDSA(identity, signAlgo);
     } else if (keyType == CKK_ML_DSA) {
-      Long variant = identity.getKey().pqcVariant();
+      Long variant = identity.key().pqcVariant();
       boolean match = false;
       if (variant != null) {
         match = (signAlgo == MLDSA44) ? variant == CKP_ML_DSA_44
@@ -129,7 +128,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   @Override
   public final AlgorithmIdentifier getAlgorithmIdentifier() {
-    return signAlgo.getAlgorithmIdentifier();
+    return signAlgo.algorithmIdentifier();
   }
 
   @Override
@@ -171,7 +170,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       if (identity.supportsSign(CKM_ECDSA)) {
         mechanism = CKM_ECDSA;
         this.outputStream = new DigestOutputStream(
-            signAlgo.getHashAlgo().createDigest());
+            signAlgo.hashAlgo().createDigest());
       } else if (identity.supportsSign(mech)) {
         mechanism = mech;
         this.outputStream = new ByteArrayOutputStream();
@@ -428,15 +427,15 @@ abstract class P11ContentSigner implements XiContentSigner {
 
       if (mechanism == CKM_RSA_PKCS || mechanism == CKM_RSA_X_509) {
         this.digestPkcsPrefix = PKCS1Util.getDigestPkcsPrefix(
-            signAlgo.getHashAlgo());
+            signAlgo.hashAlgo());
         this.outputStream = new DigestOutputStream(
-            signAlgo.getHashAlgo().createDigest());
+            signAlgo.hashAlgo().createDigest());
       } else {
         this.digestPkcsPrefix = null;
         this.outputStream = new ByteArrayOutputStream();
       }
 
-      this.modulusBitLen = identity.getKey().rsaModulus().bitLength();
+      this.modulusBitLen = identity.key().rsaModulus().bitLength();
     } // constructor
 
     @Override
@@ -512,7 +511,7 @@ abstract class P11ContentSigner implements XiContentSigner {
       }
 
       this.random = Args.notNull(random, "random");
-      HashAlgo hashAlgo = signAlgo.getHashAlgo();
+      HashAlgo hashAlgo = signAlgo.hashAlgo();
 
       long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
           .orElseThrow(() -> new XiSecurityException(
@@ -566,12 +565,12 @@ abstract class P11ContentSigner implements XiContentSigner {
     public byte[] getSignature() {
       try {
         if (mechanism == CKM_RSA_X_509) {
-          HashAlgo hash = signAlgo.getHashAlgo();
+          HashAlgo hash = signAlgo.hashAlgo();
           byte[] hashValue = ((DigestOutputStream) outputStream).digest();
           byte[] encodedHashValue;
           try {
             encodedHashValue = PKCS1Util.EMSA_PSS_ENCODE(hash, hashValue, hash,
-                hash.getLength(), identity.getKey().rsaModulus().bitLength(),
+                hash.length(), identity.key().rsaModulus().bitLength(),
                 random);
           } catch (XiSecurityException ex) {
             throw new TokenException("XiSecurityException: " + ex.getMessage(),
@@ -618,7 +617,7 @@ abstract class P11ContentSigner implements XiContentSigner {
         throw new XiSecurityException("not an SM2 algorithm: " + signAlgo);
       }
 
-      HashAlgo hashAlgo = signAlgo.getHashAlgo();
+      HashAlgo hashAlgo = signAlgo.hashAlgo();
       long mech = Optional.ofNullable(algoMechMap.get(signAlgo))
           .orElseThrow(() -> new XiSecurityException(
               "unsupported signature algorithm " + signAlgo));
@@ -700,11 +699,7 @@ abstract class P11ContentSigner implements XiContentSigner {
 
   /**
    * {@link OutputStream} with a {@link Digest} as the backend.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 2.0.0
    */
-
   static class DigestOutputStream extends OutputStream {
 
     private final Digest digest;

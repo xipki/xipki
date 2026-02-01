@@ -59,7 +59,7 @@ public class RSAPSSSignSpeedTest extends TestBase {
   private final CkMechanism signMechanism2;
 
   private PKCS11KeyPairSpec getMinimalKeyPairTemplate0() {
-    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA_2048);
+    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA2048);
   }
 
   public RSAPSSSignSpeedTest() {
@@ -68,7 +68,7 @@ public class RSAPSSSignSpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws TokenException {
+  public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +

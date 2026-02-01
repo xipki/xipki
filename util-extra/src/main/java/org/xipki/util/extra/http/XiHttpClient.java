@@ -66,7 +66,7 @@ public class XiHttpClient {
       return resp;
     }
 
-    String responseContentType = resp.getContentType();
+    String responseContentType = resp.contentType();
     boolean isValidContentType = false;
     if (responseContentType != null) {
       if (responseContentType.equalsIgnoreCase(expectedRespContentType)) {

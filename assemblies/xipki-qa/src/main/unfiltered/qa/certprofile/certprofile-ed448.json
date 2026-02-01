@@ -8,9 +8,11 @@
   "validity": "2y",
   "notBeforeTime": "current",
   "keypairGeneration": "ED448",
+  "signatureAlgorithms": ["ED25519","ED448"],
   "keyAlgorithms": ["ED448"],
   "subject": [{
-      "type": "country"
+      "type": "country",
+      "minOccurs": 0
     },{
       "type": "organization",
       "minOccurs": 0

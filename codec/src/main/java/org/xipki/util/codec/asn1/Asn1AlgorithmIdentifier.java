@@ -23,11 +23,11 @@ public class Asn1AlgorithmIdentifier {
     this.params = params;
   }
 
-  public String getOid() {
+  public String oid() {
     return oid;
   }
 
-  public byte[] getParams() {
+  public byte[] params() {
     return params;
   }
 

@@ -14,7 +14,7 @@ import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
-import org.xipki.security.SignSpec;
+import org.xipki.security.SignAlgo;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonEncodable;
@@ -23,7 +23,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +102,7 @@ public class XijsonCertprofileType implements JsonEncodable {
    */
   private KeypairGenControl keypairGeneration;
 
-  private List<SignSpec> signatureAlgorithms;
+  private List<SignAlgo> signatureAlgorithms;
 
   private List<KeySpec> keyAlgorithms;
 
@@ -142,7 +142,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     }
   }
 
-  public CertLevel getCertLevel() {
+  public CertLevel certLevel() {
     return certLevel;
   }
 
@@ -150,7 +150,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.certLevel = certLevel;
   }
 
-  public CertDomain getCertDomain() {
+  public CertDomain certDomain() {
     return certDomain;
   }
 
@@ -158,7 +158,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.certDomain = certDomain;
   }
 
-  public Map<String, String> getMetadata() {
+  public Map<String, String> metadata() {
     if (metadata == null) {
       metadata = new HashMap<>();
     }
@@ -169,7 +169,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.metadata = metadata;
   }
 
-  public String getValidity() {
+  public String validity() {
     return validity;
   }
 
@@ -177,7 +177,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.validity = validity;
   }
 
-  public ValidityMode getNotAfterMode() {
+  public ValidityMode notAfterMode() {
     return notAfterMode;
   }
 
@@ -185,7 +185,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.notAfterMode = notAfterMode;
   }
 
-  public String getNotBeforeTime() {
+  public String notBeforeTime() {
     return notBeforeTime;
   }
 
@@ -193,7 +193,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.notBeforeTime = notBeforeTime;
   }
 
-  public KeypairGenControl getKeypairGeneration() {
+  public KeypairGenControl keypairGeneration() {
     return keypairGeneration;
   }
 
@@ -201,15 +201,15 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.keypairGeneration = keypairGeneration;
   }
 
-  public List<SignSpec> getSignatureAlgorithms() {
+  public List<SignAlgo> signatureAlgorithms() {
     return signatureAlgorithms;
   }
 
-  public void setSignatureAlgorithms(List<SignSpec> signatureAlgorithms) {
+  public void setSignatureAlgorithms(List<SignAlgo> signatureAlgorithms) {
     this.signatureAlgorithms = signatureAlgorithms;
   }
 
-  public List<KeySpec> getKeyAlgorithms() {
+  public List<KeySpec> keyAlgorithms() {
     return keyAlgorithms;
   }
 
@@ -217,7 +217,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.keyAlgorithms = keyAlgorithms;
   }
 
-  public Boolean getKeepSubjectOrder() {
+  public Boolean keepSubjectOrder() {
     return keepSubjectOrder;
   }
 
@@ -225,7 +225,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.keepSubjectOrder = keepSubjectOrder;
   }
 
-  public Boolean getKeepExtensionsOrder() {
+  public Boolean keepExtensionsOrder() {
     return keepExtensionsOrder;
   }
 
@@ -233,7 +233,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.keepExtensionsOrder = keepExtensionsOrder;
   }
 
-  public List<RdnType> getSubject() {
+  public List<RdnType> subject() {
     if (subject == null) {
       subject = new LinkedList<>();
     }
@@ -244,7 +244,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.subject = subject;
   }
 
-  public List<ExtensionType> getExtensions() {
+  public List<ExtensionType> extensions() {
     if (extensions == null) {
       extensions = new LinkedList<>();
     }
@@ -255,7 +255,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     this.extensions = extensions;
   }
 
-  public Integer getMaxSize() {
+  public Integer maxSize() {
     return maxSize;
   }
 
@@ -265,8 +265,8 @@ public class XijsonCertprofileType implements JsonEncodable {
 
   public Map<String, ExtensionType> buildExtensions() {
     Map<String, ExtensionType> ret = new HashMap<>();
-    for (ExtensionType m : getExtensions()) {
-      String type = m.getType().getTextOid();
+    for (ExtensionType m : extensions()) {
+      String type = m.type().textOid();
       ret.put(type, m);
     }
     return ret;
@@ -281,19 +281,19 @@ public class XijsonCertprofileType implements JsonEncodable {
 
     Set<String> types = new HashSet<>();
     for (RdnType m : subject) {
-      String type = m.getType().getTextOid();
+      String type = m.type().textOid();
       if (!types.add(type)) {
         throw new CertprofileException("duplicated definition of subject "
-            + OIDs.getName(m.getType().getOid()));
+            + OIDs.getName(m.type().oid()));
       }
     }
 
     types.clear();
     for (ExtensionType m : extensions) {
-      String type = m.getType().getTextOid();
+      String type = m.type().textOid();
       if (!types.add(type)) {
         throw new CertprofileException("duplicated definition of extension "
-            + OIDs.getName(m.getType().getOid()));
+            + OIDs.getName(m.type().oid()));
       }
     }
   } // method validate
@@ -302,21 +302,21 @@ public class XijsonCertprofileType implements JsonEncodable {
       throws CertprofileException {
     Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
 
-    for (ExtensionType m : getExtensions()) {
-      ASN1ObjectIdentifier oid = m.getType().getOid();
+    for (ExtensionType m : extensions()) {
+      ASN1ObjectIdentifier oid = m.type().oid();
       if (OIDs.Extn.subjectAlternativeName.equals(oid)
           || OIDs.Extn.subjectInfoAccess.equals(oid)
           || OIDs.Extn.biometricInfo.equals(oid)) {
         continue;
       }
 
-      if (m.getConstant() == null) {
+      if (m.constant() == null) {
         continue;
       }
 
       ASN1Encodable value;
       try {
-        value = m.getConstant().toASN1();
+        value = m.constant().toASN1();
       } catch (IOException ex) {
         throw new CertprofileException(ex.getMessage(), ex);
       }
@@ -338,8 +338,8 @@ public class XijsonCertprofileType implements JsonEncodable {
     List<ExtensionControl> controls = new LinkedList<>();
     Set<ASN1ObjectIdentifier> set = new HashSet<>();
 
-    for (ExtensionType extn : getExtensions()) {
-      ASN1ObjectIdentifier oid = extn.getType().getOid();
+    for (ExtensionType extn : extensions()) {
+      ASN1ObjectIdentifier oid = extn.type().oid();
 
       if (set.contains(oid)) {
         throw new CertprofileException(
@@ -348,12 +348,12 @@ public class XijsonCertprofileType implements JsonEncodable {
 
       set.add(oid);
 
-      TripleState inReq = extn.getInRequest();
+      TripleState inReq = extn.inRequest();
       if (inReq == null) {
         inReq = TripleState.forbidden;
       }
 
-      if (inReq != TripleState.forbidden && extn.getConstant() != null) {
+      if (inReq != TripleState.forbidden && extn.constant() != null) {
         throw new CertprofileException(
             "constant Extension is not permitted in request");
       }
@@ -368,7 +368,14 @@ public class XijsonCertprofileType implements JsonEncodable {
 
   @Override
   public JsonMap toCodec() {
-    JsonMap ret = new JsonMap().putStringMap("metadata",  metadata)
+    JsonMap metadataMap = new JsonMap();
+    List<String> metaKeys = new ArrayList<>(metadata.keySet());
+    Collections.sort(metaKeys);
+    for (String metaKey : metaKeys) {
+      metadataMap.put(metaKey, metadata.get(metaKey));
+    }
+
+    JsonMap ret = new JsonMap().put("metadata",  metadataMap)
         .putEnum("certLevel", certLevel)
         .putEnum("certDomain",
             (certDomain == CertDomain.RFC5280) ? null : certDomain)
@@ -383,8 +390,8 @@ public class XijsonCertprofileType implements JsonEncodable {
 
     if (signatureAlgorithms != null) {
       List<String> texts = new ArrayList<>(signatureAlgorithms.size());
-      for (SignSpec v : signatureAlgorithms) {
-        texts.add(v.getAlgo().getJceName());
+      for (SignAlgo v : signatureAlgorithms) {
+        texts.add(v.jceName());
       }
       ret.putStrings("signatureAlgorithms", texts);
     }
@@ -392,7 +399,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     if (keyAlgorithms != null) {
       List<String> texts = new ArrayList<>(keyAlgorithms.size());
       for (KeySpec v : keyAlgorithms) {
-        texts.add(v.getText());
+        texts.add(v.text());
       }
       ret.putStrings("keyAlgorithms", texts);
     }
@@ -434,7 +441,7 @@ public class XijsonCertprofileType implements JsonEncodable {
     try {
       List<String> texts = json.getStringList("signatureAlgorithms");
       if (texts != null) {
-        ret.setSignatureAlgorithms(SignSpec.ofSignSpecs(texts));
+        ret.setSignatureAlgorithms(ofSignAlgos(texts));
       }
 
       texts = json.getStringList("keyAlgorithms");
@@ -465,6 +472,31 @@ public class XijsonCertprofileType implements JsonEncodable {
 
     ret.validate();
     return ret;
+  }
+
+  public static List<SignAlgo> ofSignAlgos(List<String> names)
+      throws NoSuchAlgorithmException {
+    List<SignAlgo> list = new ArrayList<>(names.size());
+    for (String name : names) {
+      list.add(ofSignAlgo(name));
+    }
+    return list;
+  }
+
+  private static SignAlgo ofSignAlgo(String name)
+      throws NoSuchAlgorithmException {
+    name = name.trim();
+    String name2 = name.replace('-', '_');
+
+    for (SignAlgo m : SignAlgo.values()) {
+      String tname = m.name();
+      if (tname.equalsIgnoreCase(name) || tname.equalsIgnoreCase(name2) ||
+          m.jceName().equalsIgnoreCase(name)) {
+        return m;
+      }
+    }
+
+    throw new NoSuchAlgorithmException("unknown SignAlgo " + name);
   }
 
 }

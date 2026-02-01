@@ -57,11 +57,11 @@ public class PKCS11Exception extends TokenException {
    *
    * @return The error code; e.g. 0x00000030.
    */
-  public long getErrorCode() {
+  public long errorCode() {
     return errorCode;
   }
 
-  public String getErrorName() {
+  public String errorName() {
     return errorName;
   }
 

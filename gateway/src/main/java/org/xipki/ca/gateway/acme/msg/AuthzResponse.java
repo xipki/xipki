@@ -36,15 +36,15 @@ public class AuthzResponse implements JsonEncodable {
     this.challenges = challenges;
   }
 
-  public AuthzStatus getStatus() {
+  public AuthzStatus status() {
     return status;
   }
 
-  public String getExpires() {
+  public String expires() {
     return expires;
   }
 
-  public Identifier getIdentifier() {
+  public Identifier identifier() {
     return identifier;
   }
 

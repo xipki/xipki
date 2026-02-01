@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Iterator which iterates the {@link BigInteger} specified in the file.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {

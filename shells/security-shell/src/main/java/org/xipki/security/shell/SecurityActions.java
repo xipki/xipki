@@ -119,19 +119,19 @@ public class SecurityActions {
       if (text != null && text) {
         return cert.toString();
       } else if (serial != null && serial) {
-        return getNumber(cert.getSerialNumber());
+        return getNumber(cert.serialNumber());
       } else if (subject != null && subject) {
         return (der != null && der)
-            ? Hex.encode(cert.getSubject().getEncoded())
-            : cert.getSubject().toString();
+            ? Hex.encode(cert.subject().getEncoded())
+            : cert.subject().toString();
       } else if (issuer != null && issuer) {
         return (der != null && der)
-            ? Hex.encode(cert.getIssuer().getEncoded())
-            : cert.getIssuer().toString();
+            ? Hex.encode(cert.issuer().getEncoded())
+            : cert.issuer().toString();
       } else if (notBefore != null && notBefore) {
-        return toUtcTimeyyyyMMddhhmmssZ(cert.getNotBefore());
+        return toUtcTimeyyyyMMddhhmmssZ(cert.notBefore());
       } else if (notAfter != null && notAfter) {
-        return toUtcTimeyyyyMMddhhmmssZ(cert.getNotAfter());
+        return toUtcTimeyyyyMMddhhmmssZ(cert.notAfter());
       } else if (fingerprint != null && fingerprint) {
         byte[] encoded = cert.getEncoded();
         return HashAlgo.getInstance(hashAlgo).hexHash(encoded);
@@ -424,7 +424,7 @@ public class SecurityActions {
 
       for (String certFile : certFiles) {
         X509Cert cert = X509Util.parseCert(new File(certFile));
-        String baseAlias = X509Util.getCommonName(cert.getSubject());
+        String baseAlias = X509Util.getCommonName(cert.subject());
         String alias = baseAlias;
         int idx = 2;
         while (aliases.contains(alias)) {

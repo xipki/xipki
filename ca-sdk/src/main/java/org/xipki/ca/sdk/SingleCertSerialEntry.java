@@ -12,7 +12,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class SingleCertSerialEntry extends SdkEncodable {
@@ -29,11 +28,11 @@ public class SingleCertSerialEntry extends SdkEncodable {
     this.error = error;
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public ErrorEntry getError() {
+  public ErrorEntry error() {
     return error;
   }
 

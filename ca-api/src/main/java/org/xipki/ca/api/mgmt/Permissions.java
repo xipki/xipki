@@ -54,7 +54,7 @@ public class Permissions {
     return PermissionConstants.permissionToString(value);
   }
 
-  public int getValue() {
+  public int value() {
     return value;
   }
 

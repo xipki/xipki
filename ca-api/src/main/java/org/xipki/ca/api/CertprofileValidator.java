@@ -21,7 +21,7 @@ import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.extra.type.Validity.Unit;
 
@@ -35,7 +35,6 @@ import java.util.Set;
  * CertProfile with identifier.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class CertprofileValidator {
@@ -46,11 +45,11 @@ public class CertprofileValidator {
       throws CertprofileException {
     StringBuilder msg = new StringBuilder();
 
-    ExtensionsControl controls = certprofile.getExtensionsControl();
-    List<ASN1ObjectIdentifier> types = controls.getTypes();
+    ExtensionsControl controls = certprofile.extensionsControl();
+    List<ASN1ObjectIdentifier> types = controls.types();
 
-    CertLevel certLevel = certprofile.getCertLevel();
-    CertDomain certDomain = certprofile.getCertDomain();
+    CertLevel certLevel = certprofile.certLevel();
+    CertDomain certDomain = certprofile.certDomain();
 
     ExtensionSpec spec = ExtensionSpec.getExtensionSpec(certDomain, certLevel);
 
@@ -111,7 +110,7 @@ public class CertprofileValidator {
 
     // make sure that required extensions are present
     set.clear();
-    Set<ASN1ObjectIdentifier> requiredTypes = spec.getRequiredExtensions();
+    Set<ASN1ObjectIdentifier> requiredTypes = spec.requiredExtensions();
 
     for (ASN1ObjectIdentifier type : requiredTypes) {
       ExtensionControl extCtrl = controls.getControl(type);
@@ -127,7 +126,7 @@ public class CertprofileValidator {
     }
 
     if (certLevel == CertLevel.CROSS) {
-      ExtensionsControl extnControls = certprofile.getExtensionsControl();
+      ExtensionsControl extnControls = certprofile.extensionsControl();
       ASN1ObjectIdentifier[] extnTypes =
           {OIDs.Extn.subjectKeyIdentifier, OIDs.Extn.basicConstraints};
       for (ASN1ObjectIdentifier extnType : extnTypes) {
@@ -136,7 +135,7 @@ public class CertprofileValidator {
           msg.append("Mandatory extension ")
               .append(getExtensionIDDesc(extnType)).append(" is not set, ");
         } else {
-          TripleState inRequest = control.getInRequest();
+          TripleState inRequest = control.inRequest();
           if (inRequest != TripleState.required
               && inRequest != TripleState.optional) {
             msg.append("Extension ").append(getExtensionIDDesc(extnType))
@@ -148,7 +147,7 @@ public class CertprofileValidator {
 
     // BasicConstraints
     if (certLevel == CertLevel.RootCA) {
-      Integer pathLen = certprofile.getPathLenBasicConstraint();
+      Integer pathLen = certprofile.pathLenBasicConstraint();
       if (pathLen != null) {
         msg.append("Root CA must not set PathLen, ");
       }
@@ -169,20 +168,20 @@ public class CertprofileValidator {
   private static void validateCABForumBR(
       Certprofile certprofile, StringBuilder msg) {
     // Subject with only one entry in a RDN is allowed
-    SubjectControl subjectCtl = certprofile.getSubjectControl();
+    SubjectControl subjectCtl = certprofile.subjectControl();
 
-    for (ASN1ObjectIdentifier m : subjectCtl.getTypes()) {
+    for (ASN1ObjectIdentifier m : subjectCtl.types()) {
       RdnControl ctl = subjectCtl.getControl(m);
-      if (ctl.getMaxOccurs() > 1) {
+      if (ctl.maxOccurs() > 1) {
         msg.append("multiple RDNs of the same type are not permitted, ");
       }
     }
 
-    CertLevel certLevel = certprofile.getCertLevel();
+    CertLevel certLevel = certprofile.certLevel();
 
     // validity
     if (certLevel == CertLevel.EndEntity) {
-      Validity validity = certprofile.getValidity();
+      Validity validity = certprofile.validity();
       if (validity.compareTo(maxCabEeValidity) > 0) {
         msg.append("validity exceeds the maximal validity of " +
             "subscriber certificate, ");
@@ -190,14 +189,14 @@ public class CertprofileValidator {
     }
 
     // Signature/hash algorithm
-    List<SignAlgo> sigAlgos = certprofile.getSignatureAlgorithms();
+    List<SignAlgo> sigAlgos = certprofile.signatureAlgorithms();
     if (sigAlgos == null) {
       msg.append("signature algorithms not defined, ");
     } else {
       List<HashAlgo> allowedHashAlgos =
           Arrays.asList(HashAlgo.SHA256, HashAlgo.SHA384, HashAlgo.SHA512);
       for (SignAlgo signAlgo : sigAlgos) {
-        HashAlgo hashAlgo = signAlgo.getHashAlgo();
+        HashAlgo hashAlgo = signAlgo.hashAlgo();
         if (!allowedHashAlgos.contains(hashAlgo)) {
           msg.append("unpermitted hash algorithm ")
               .append(hashAlgo).append(", ");
@@ -208,7 +207,7 @@ public class CertprofileValidator {
     // CRLDistributionPoints
     if (certLevel != CertLevel.RootCA) {
       // AuthorityInfoAccess*
-      AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
+      AuthorityInfoAccessControl aiaControl = certprofile.aiaControl();
       if (aiaControl != null) {
         if (!aiaControl.isIncludesOcsp()) {
           msg.append("access method id-ad-ocsp is not configured, ");
@@ -223,20 +222,20 @@ public class CertprofileValidator {
     // Certificate Policies
     if (certLevel == CertLevel.SubCA || certLevel == CertLevel.EndEntity) {
       CertificatePolicies certPolicyValue =
-          certprofile.getCertificatePolicies();
+          certprofile.certificatePolicies();
       if (certPolicyValue == null) {
         msg.append("CertificatePolicies is not configured, ");
       }
     }
 
     // ExtendedKeyUsage
-    Set<ExtKeyUsageControl> ekuControls = certprofile.getExtendedKeyUsages();
+    Set<ExtKeyUsageControl> ekuControls = certprofile.extendedKeyUsages();
     if (certLevel == CertLevel.EndEntity) {
       // ekuControls could not be null here.
       boolean xkuTlsServerRequired = false;
       boolean xkuTlsClientRequired = false;
       for (ExtKeyUsageControl m : ekuControls) {
-        ASN1ObjectIdentifier oid = m.getExtKeyUsage();
+        ASN1ObjectIdentifier oid = m.extKeyUsage();
         if (m.isRequired()) {
           if (OIDs.XKU.id_kp_serverAuth.equals(oid)) {
             xkuTlsServerRequired = true;
@@ -260,7 +259,7 @@ public class CertprofileValidator {
     } else {
       if (ekuControls != null) {
         for (ExtKeyUsageControl m : ekuControls) {
-          if (m.getExtKeyUsage().equals(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
+          if (m.extKeyUsage().equals(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
             msg.append(OIDs.XKU.id_kp_clientAuth).append(" is not allowed, ");
           }
         }
@@ -291,7 +290,7 @@ public class CertprofileValidator {
   } // method toString
 
   private static String getExtensionIDDesc(ASN1ObjectIdentifier oid) {
-    return ExtensionID.ofOid(oid).getMainAlias();
+    return ExtensionID.ofOid(oid).mainAlias();
   }
 
 }

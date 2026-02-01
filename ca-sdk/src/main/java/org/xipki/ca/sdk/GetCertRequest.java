@@ -12,7 +12,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class GetCertRequest extends SdkRequest {
@@ -29,11 +28,11 @@ public class GetCertRequest extends SdkRequest {
     this.issuer = issuer;
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public X500NameType getIssuer() {
+  public X500NameType issuer() {
     return issuer;
   }
 

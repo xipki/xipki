@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Database exporter of CA configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CaconfDbExporter extends DbPorter {
@@ -304,15 +303,15 @@ class CaconfDbExporter extends DbPorter {
     // caAliases
     Map<String, Integer> aliasToCaIdMap = getCaAliases();
     Map<Integer, List<String>> caHassPublishersMap =
-        getCaHasPublishers(caconf.getPublishers());
+        getCaHasPublishers(caconf.publishers());
 
     // caHasRequestors
     Map<Integer, List<CaConfType.CaHasRequestor>> caHasRequestorsMap =
-        getCaHasRequestors(caconf.getRequestors());
+        getCaHasRequestors(caconf.requestors());
 
     // caHasProfiles
     Map<Integer, List<String>> caHasProfilesMap =
-        getCaHasProfiles(caconf.getProfiles());
+        getCaHasProfiles(caconf.profiles());
 
     String columns = "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,"
         + "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
@@ -364,7 +363,7 @@ class CaconfDbExporter extends DbPorter {
         }
 
         CaConfColumn ccc = getCaConfColumn(rs);
-        BaseCaInfo base = new BaseCaInfo(signerType, ccc.getPermissions());
+        BaseCaInfo base = new BaseCaInfo(signerType, ccc.permissions());
         adoptConfColumn(base, ccc);
 
         CaConfType.CaInfo ci = new CaConfType.CaInfo(base,
@@ -393,7 +392,7 @@ class CaconfDbExporter extends DbPorter {
         CaConfType.Ca ca = new CaConfType.Ca(null, name, ci, aliases,
             caHasProfilesMap.get(id), caHasRequestorsMap.get(id),
             caHassPublishersMap.get(id));
-        caconf.getCas().add(ca);
+        caconf.cas().add(ca);
 
         ca.setId(id);
       }
@@ -420,10 +419,10 @@ class CaconfDbExporter extends DbPorter {
     String str = rs.getString("CA_URIS");
     if (StringUtil.isNotBlank(str)) {
       CaUris caUris = CaUris.decode(str);
-      ccc.setCacertUris(caUris.getCacertUris());
-      ccc.setCrlUris(caUris.getCrlUris());
-      ccc.setDeltaCrlUris(caUris.getDeltaCrlUris());
-      ccc.setOcspUris(caUris.getOcspUris());
+      ccc.setCacertUris(caUris.cacertUris());
+      ccc.setCrlUris(caUris.crlUris());
+      ccc.setDeltaCrlUris(caUris.deltaCrlUris());
+      ccc.setOcspUris(caUris.ocspUris());
     }
 
     str = rs.getString("MAX_VALIDITY");
@@ -471,26 +470,26 @@ class CaconfDbExporter extends DbPorter {
 
   public void adoptConfColumn(BaseCaInfo base, CaConfColumn cc) {
     // CA URIS
-    if (cc.getCacertUris() != null || cc.getCrlUris() != null
-        || cc.getDeltaCrlUris() != null || cc.getOcspUris() != null) {
-      base.setCaUris(new CaUris(cc.getCacertUris(), cc.getOcspUris(),
-          cc.getCrlUris(), cc.getDeltaCrlUris()));
+    if (cc.cacertUris() != null || cc.crlUris() != null
+        || cc.deltaCrlUris() != null || cc.ocspUris() != null) {
+      base.setCaUris(new CaUris(cc.cacertUris(), cc.ocspUris(),
+          cc.crlUris(), cc.deltaCrlUris()));
     }
 
-    base.setCrlControl(cc.getCrlControl());
-    base.setCtlogControl(cc.getCtlogControl());
-    base.setExtraControl(cc.getExtraControl());
-    base.setRevokeSuspendedControl(cc.getRevokeSuspendedControl());
+    base.setCrlControl(cc.crlControl());
+    base.setCtlogControl(cc.ctlogControl());
+    base.setExtraControl(cc.extraControl());
+    base.setRevokeSuspendedControl(cc.revokeSuspendedControl());
 
-    base.setSnSize(cc.getSnSize());
-    base.setMaxValidity(cc.getMaxValidity());
-    base.setKeypairGenNames(cc.getKeypairGenNames());
+    base.setSnSize(cc.snSize());
+    base.setMaxValidity(cc.maxValidity());
+    base.setKeypairGenNames(cc.keypairGenNames());
     base.setSaveCert(cc.isSaveCert());
     base.setSaveKeypair(cc.isSaveKeypair());
-    base.setNumCrls(cc.getNumCrls());
-    base.setExpirationPeriod(cc.getExpirationPeriod());
-    base.setKeepExpiredCertDays(cc.getKeepExpiredCertDays());
-    cc.setValidityMode(cc.getValidityMode());
+    base.setNumCrls(cc.numCrls());
+    base.setExpirationPeriod(cc.expirationPeriod());
+    base.setKeepExpiredCertDays(cc.keepExpiredCertDays());
+    cc.setValidityMode(cc.validityMode());
   }
 
   private Map<String, Integer> getCaAliases() throws DataAccessException {
@@ -625,7 +624,7 @@ class CaconfDbExporter extends DbPorter {
       List<? extends CaConfType.IdNameConf> entries) {
     Map<Integer, String> ret = new HashMap<>();
     for (CaConfType.IdNameConf m : entries) {
-      ret.put(m.getId(), m.getName());
+      ret.put(m.id(), m.name());
     }
     return ret;
   }

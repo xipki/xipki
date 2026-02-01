@@ -39,7 +39,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     @Override
     public void run() {
-      int keepDays = caInfo.getKeepExpiredCertDays();
+      int keepDays = caInfo.keepExpiredCertDays();
       if (keepDays < 0) {
         return;
       }
@@ -98,7 +98,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     }
 
     ScheduledThreadPoolExecutor executor =
-        caManager.getScheduledThreadPoolExecutor();
+        caManager.scheduledThreadPoolExecutor();
 
     Random random = new Random();
     final int minutesOfDay = 24 * 60;
@@ -110,7 +110,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
   public CertWithDbId removeCert(SerialWithId serialNumber, AuditEvent event)
       throws OperationException {
-    return removeCert0(serialNumber.getId(), serialNumber.getSerial(), event);
+    return removeCert0(serialNumber.id(), serialNumber.serial(), event);
   }
 
   public CertWithDbId removeCert(BigInteger serialNumber, AuditEvent event)
@@ -122,7 +122,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       long certId, BigInteger serialNumber, AuditEvent event)
       throws OperationException {
     if (caInfo.isSelfSigned()
-        && caInfo.getSerialNumber().equals(serialNumber)) {
+        && caInfo.serialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
           "could not remove CA certificate");
     }
@@ -132,7 +132,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       event.addEventData(CaAuditConstants.NAME_serial,
           LogUtil.formatCsn(serialNumber));
       CertWithRevocationInfo certWithRevInfo = (certId == 0)
-          ? certstore.getCertWithRevocationInfo(caIdent.getId(),
+          ? certstore.getCertWithRevocationInfo(caIdent.id(),
               serialNumber, caIdNameMap)
           : certstore.getCertWithRevocationInfo(certId, caIdNameMap);
 
@@ -140,13 +140,13 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
         return null;
       }
 
-      CertWithDbId certToRemove = certWithRevInfo.getCert();
+      CertWithDbId certToRemove = certWithRevInfo.cert();
       boolean succ = publisherModule.publishCertRemoved(certToRemove);
       if (!succ) {
         return null;
       }
 
-      certstore.removeCert(certWithRevInfo.getCert().getCertId());
+      certstore.removeCert(certWithRevInfo.cert().certId());
       successful = (certToRemove != null);
       return certToRemove;
     } finally {
@@ -179,7 +179,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       for (SerialWithId serial : serials) {
         // do not delete CA's own certificate
         if ((caInfo.isSelfSigned()
-            && caInfo.getSerialNumber().equals(serial.getSerial()))) {
+            && caInfo.serialNumber().equals(serial.serial()))) {
           continue;
         }
 
@@ -189,9 +189,9 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
           }
         } catch (OperationException ex) {
           LOG.info("removed {} expired certificates of CA {}",
-              sum, caIdent.getName());
+              sum, caIdent.name());
           LogUtil.error(LOG, ex, "could not remove expired certificate " +
-              "with serial" + serial.getSerial());
+              "with serial" + serial.serial());
           throw ex;
         }
       } // end for

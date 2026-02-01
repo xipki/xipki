@@ -22,7 +22,6 @@ import java.util.Set;
  * Wrapper of keypair generation database entry.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class KeypairGenEntryWrapper {
 
@@ -45,20 +44,20 @@ public class KeypairGenEntryWrapper {
     Args.notNull(securityFactory, "securityFactory");
     dbEntry.faulty(true);
 
-    String type = dbEntry.getType();
+    String type = dbEntry.type();
     if ("KEYPOOL".equalsIgnoreCase(type)) {
       generator = new KeypoolKeypairGenerator();
       ((KeypoolKeypairGenerator) generator).setShardId(shardId);
       ((KeypoolKeypairGenerator) generator).setDatasources(dataSourceMap);
     } else if ("SOFTWARE".equalsIgnoreCase(type)) {
-      generator = new SoftwareKeypairGenerator(securityFactory.getRandom4Key());
+      generator = new SoftwareKeypairGenerator(securityFactory.random4Key());
     } else if ("PKCS11".equalsIgnoreCase(type)) {
       generator = new P11KeypairGenerator(p11CryptServiceFactory);
     } else {
       for (KeypairGeneratorFactory factory : factories) {
         if (factory.canCreateKeypairGenerator(type)) {
           generator = factory.newKeypairGenerator(type,
-              dbEntry.getConf(), securityFactory);
+              dbEntry.conf(), securityFactory);
           break;
         }
       }
@@ -69,21 +68,21 @@ public class KeypairGenEntryWrapper {
     }
 
     try {
-      generator.initialize(dbEntry.getConf());
+      generator.initialize(dbEntry.conf());
     } catch (XiSecurityException ex) {
       throw new ObjectCreationException("error initializing keypair generator "
-          + dbEntry.getName(), ex);
+          + dbEntry.name(), ex);
     }
 
-    generator.setName(dbEntry.getName());
+    generator.setName(dbEntry.name());
     dbEntry.faulty(false);
   }
 
-  public KeypairGenEntry getDbEntry() {
+  public KeypairGenEntry dbEntry() {
     return dbEntry;
   }
 
-  public KeypairGenerator getGenerator() {
+  public KeypairGenerator generator() {
     return generator;
   }
 

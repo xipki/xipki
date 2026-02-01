@@ -1,13 +1,13 @@
 {
-	"serverUrl":"https://localhost:8444/ca/ra/",
-	"ssl":{
-		"storeType":"pkcs12",
-		"keystorePassword":"CHANGEIT",
-		"keystore":{
-			"file":"xipki/keycerts/ra-sdk-client.p12"
-		},
-		"trustanchors": [{
-			"file":"xipki/keycerts/ca-server-cert.pem"
-		}]
-	}
+  "serverUrl":"https://localhost:8444/ca/ra/",
+  "ssl":{
+    "storeType":"pkcs12",
+    "keystorePassword":"CHANGEIT",
+    "keystore":{
+      "file":"xipki/keycerts/ra-sdk-client.p12"
+    },
+    "trustanchors": [{
+      "file":"xipki/keycerts/ca-server-cert.pem"
+    }]
+  }
 }

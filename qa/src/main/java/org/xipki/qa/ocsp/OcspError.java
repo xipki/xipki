@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * OCSP error enum.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public enum OcspError {

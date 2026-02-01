@@ -18,7 +18,6 @@ import org.xipki.util.codec.Args;
  * Wrapper to an {@link CertificationRequest}.
  *
  * @author Lijun Liao (xipki)
- * @since 5.3.8
  */
 
 public class X509Csr {

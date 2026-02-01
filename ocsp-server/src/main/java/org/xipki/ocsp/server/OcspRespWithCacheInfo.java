@@ -7,7 +7,6 @@ package org.xipki.ocsp.server;
  * OCSP response with {@link ResponseCacheInfo}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspRespWithCacheInfo {
@@ -22,7 +21,7 @@ public class OcspRespWithCacheInfo {
       this.generatedAt = generatedAt;
     }
 
-    public long getGeneratedAt() {
+    public long generatedAt() {
       return generatedAt;
     }
 
@@ -30,7 +29,7 @@ public class OcspRespWithCacheInfo {
       this.nextUpdate = nextUpdate;
     }
 
-    public Long getNextUpdate() {
+    public Long nextUpdate() {
       return nextUpdate;
     }
 
@@ -45,11 +44,11 @@ public class OcspRespWithCacheInfo {
     this.cacheInfo = cacheInfo;
   }
 
-  public byte[] getResponse() {
+  public byte[] response() {
     return response;
   }
 
-  public ResponseCacheInfo getCacheInfo() {
+  public ResponseCacheInfo cacheInfo() {
     return cacheInfo;
   }
 

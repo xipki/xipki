@@ -51,7 +51,6 @@ import java.util.zip.ZipInputStream;
  * CA configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class CaConf {
@@ -130,29 +129,29 @@ public class CaConf {
   private void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
                      SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
-    if (root.getDbSchemas() != null) {
-      dbSchemas.putAll(root.getDbSchemas());
+    if (root.dbSchemas() != null) {
+      dbSchemas.putAll(root.dbSchemas());
     }
 
     // Signers
-    if (root.getSigners() != null) {
-      for (CaConfType.Signer m : root.getSigners()) {
-        SignerEntry en = new SignerEntry(m.getName(), m.getType(),
-            getValue(m.getConf(), zipEntries), getBase64Binary(m.getCert(),
+    if (root.signers() != null) {
+      for (CaConfType.Signer m : root.signers()) {
+        SignerEntry en = new SignerEntry(m.name(), m.type(),
+            getValue(m.conf(), zipEntries), getBase64Binary(m.cert(),
             zipEntries));
         addSigner(en);
       }
     }
 
     // Requestors
-    if (root.getRequestors() != null) {
-      for (CaConfType.Requestor m : root.getRequestors()) {
+    if (root.requestors() != null) {
+      for (CaConfType.Requestor m : root.requestors()) {
         String conf;
-        if (m.getConf() != null) {
-          conf = getValue(m.getConf(), zipEntries);
+        if (m.conf() != null) {
+          conf = getValue(m.conf(), zipEntries);
         } else {
-          if ("cert".equalsIgnoreCase(m.getType())) {
-            byte[] binary = getBinary(m.getBinaryConf(), zipEntries);
+          if ("cert".equalsIgnoreCase(m.type())) {
+            byte[] binary = getBinary(m.binaryConf(), zipEntries);
             if (binary == null) {
               conf = null;
             } else {
@@ -160,76 +159,76 @@ public class CaConf {
               conf = Base64.encodeToString(binary);
             }
           } else {
-            conf = getBase64Binary(m.getBinaryConf(), zipEntries);
+            conf = getBase64Binary(m.binaryConf(), zipEntries);
           }
         }
 
-        RequestorEntry en = new RequestorEntry(new NameId(null, m.getName()),
-            m.getType(), conf);
+        RequestorEntry en = new RequestorEntry(new NameId(null, m.name()),
+            m.type(), conf);
         addRequestor(en);
       }
     }
 
     // Publishers
-    if (root.getPublishers() != null) {
-      for (CaConfType.NameTypeConf m : root.getPublishers()) {
-        PublisherEntry en = new PublisherEntry(new NameId(null, m.getName()),
-            m.getType(), getValue(m.getConf(), zipEntries));
+    if (root.publishers() != null) {
+      for (CaConfType.NameTypeConf m : root.publishers()) {
+        PublisherEntry en = new PublisherEntry(new NameId(null, m.name()),
+            m.type(), getValue(m.conf(), zipEntries));
         addPublisher(en);
       }
     }
 
     // Profiles
-    if (root.getProfiles() != null) {
-      for (CaConfType.NameTypeConf m : root.getProfiles()) {
+    if (root.profiles() != null) {
+      for (CaConfType.NameTypeConf m : root.profiles()) {
         CertprofileEntry en = new CertprofileEntry(
-            new NameId(null, m.getName()), m.getType(),
-            getValue(m.getConf(), zipEntries));
+            new NameId(null, m.name()), m.type(),
+            getValue(m.conf(), zipEntries));
         addProfile(en);
       }
     }
 
     // KeypairGens
-    if (root.getKeypairGens() != null) {
-      for (CaConfType.NameTypeConf m : root.getKeypairGens()) {
-        KeypairGenEntry en = new KeypairGenEntry(m.getName(), m.getType(),
-            getValue(m.getConf(), zipEntries));
+    if (root.keypairGens() != null) {
+      for (CaConfType.NameTypeConf m : root.keypairGens()) {
+        KeypairGenEntry en = new KeypairGenEntry(m.name(), m.type(),
+            getValue(m.conf(), zipEntries));
         addKeypairGen(en);
       }
     }
 
     // CAs
-    if (root.getCas() != null) {
-      for (CaConfType.Ca m : root.getCas()) {
-        String name = m.getName();
+    if (root.cas() != null) {
+      for (CaConfType.Ca m : root.cas()) {
+        String name = m.name();
         GenSelfIssued genSelfIssued = null;
         CaEntry caEntry = null;
 
-        if (m.getCaInfo() != null) {
-          CaConfType.CaInfo ci = m.getCaInfo();
-          CaConfType.GenSelfIssued gsi = ci.getGenSelfIssued();
+        if (m.caInfo() != null) {
+          CaConfType.CaInfo ci = m.caInfo();
+          CaConfType.GenSelfIssued gsi = ci.genSelfIssued();
           if (gsi != null) {
-            if (ci.getCert() != null) {
+            if (ci.cert() != null) {
               throw new InvalidConfException(
                   "cert.file of CA " + name + " may not be set");
             }
 
-            Instant notBefore = gsi.getNotBefore() == null ? null
-                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotBefore());
-            Instant notAfter = gsi.getNotAfter() == null ? null
-                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.getNotAfter());
-            genSelfIssued = new GenSelfIssued(gsi.getProfile(),
-                gsi.getSubject(), gsi.getSerialNumber(), notBefore, notAfter);
+            Instant notBefore = gsi.notBefore() == null ? null
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notBefore());
+            Instant notAfter = gsi.notAfter() == null ? null
+                : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notAfter());
+            genSelfIssued = new GenSelfIssued(gsi.profile(),
+                gsi.subject(), gsi.serialNumber(), notBefore, notAfter);
           }
 
-          caEntry = new CaEntry(ci.getBase(), new NameId(null, name),
-              getValue(ci.getSignerConf(), zipEntries));
+          caEntry = new CaEntry(ci.base(), new NameId(null, name),
+              getValue(ci.signerConf(), zipEntries));
 
-          if (ci.getGenSelfIssued() == null) {
+          if (ci.genSelfIssued() == null) {
             X509Cert caCert;
 
-            if (ci.getCert() != null) {
-              byte[] bytes = getBinary(ci.getCert(), zipEntries);
+            if (ci.cert() != null) {
+              byte[] bytes = getBinary(ci.cert(), zipEntries);
               try {
                 caCert = X509Util.parseCert(bytes);
               } catch (CertificateException ex) {
@@ -240,11 +239,11 @@ public class CaConf {
               // extract from the signer configuration
               try {
                 List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(
-                    getValue(ci.getSignerConf(), zipEntries));
+                    getValue(ci.signerConf(), zipEntries));
                 SignerConf signerConf =
-                    new SignerConf(signerConfs.get(0).getConf());
+                    new SignerConf(signerConfs.get(0).conf());
 
-                String signerType = ci.getBase().getSignerType();
+                String signerType = ci.base().signerType();
                 ConcurrentContentSigner signer = securityFactory.createSigner(
                     signerType, signerConf, (X509Cert) null);
                 try {
@@ -280,28 +279,28 @@ public class CaConf {
         }
 
         List<CaHasRequestorEntry> caHasRequestors = null;
-        if (m.getRequestors() != null) {
+        if (m.requestors() != null) {
           caHasRequestors = new LinkedList<>();
-          for (CaConfType.CaHasRequestor req : m.getRequestors()) {
+          for (CaConfType.CaHasRequestor req : m.requestors()) {
             CaHasRequestorEntry en = new CaHasRequestorEntry(
-                new NameId(null, req.getRequestorName()),
-                req.getPermissions(), req.getProfiles());
+                new NameId(null, req.requestorName()),
+                req.permissions(), req.profiles());
             caHasRequestors.add(en);
           }
         }
 
         List<String> aliases = null;
-        if (m.getAliases() != null && !m.getAliases().isEmpty()) {
-          aliases = m.getAliases();
+        if (m.aliases() != null && !m.aliases().isEmpty()) {
+          aliases = m.aliases();
         }
         List<String> profileNames = null;
-        if (m.getProfiles() != null && !m.getProfiles().isEmpty()) {
-          profileNames = m.getProfiles();
+        if (m.profiles() != null && !m.profiles().isEmpty()) {
+          profileNames = m.profiles();
         }
 
         List<String> publisherNames = null;
-        if (m.getPublishers() != null && !m.getPublishers().isEmpty()) {
-          publisherNames = m.getPublishers();
+        if (m.publishers() != null && !m.publishers().isEmpty()) {
+          publisherNames = m.publishers();
         }
 
         SingleCa singleCa = new SingleCa(name, genSelfIssued, caEntry, aliases,
@@ -314,7 +313,7 @@ public class CaConf {
 
   public void addSigner(SignerEntry signer) {
     Args.notNull(signer, "signer");
-    this.signers.put(signer.getName(), signer);
+    this.signers.put(signer.name(), signer);
   }
 
   public Set<String> getSignerNames() {
@@ -327,7 +326,7 @@ public class CaConf {
 
   public void addRequestor(RequestorEntry requestor) {
     Args.notNull(requestor, "requestor");
-    this.requestors.put(requestor.getIdent().getName(), requestor);
+    this.requestors.put(requestor.ident().name(), requestor);
   }
 
   public Set<String> getRequestorNames() {
@@ -340,7 +339,7 @@ public class CaConf {
 
   public void addPublisher(PublisherEntry publisher) {
     Args.notNull(publisher, "publisher");
-    this.publishers.put(publisher.getIdent().getName(), publisher);
+    this.publishers.put(publisher.ident().name(), publisher);
   }
 
   public Set<String> getPublisherNames() {
@@ -353,7 +352,7 @@ public class CaConf {
 
   public void addProfile(CertprofileEntry profile) {
     Args.notNull(profile, "profile");
-    this.certprofiles.put(profile.getIdent().getName(), profile);
+    this.certprofiles.put(profile.ident().name(), profile);
   }
 
   public Set<String> getCertprofileNames() {
@@ -366,7 +365,7 @@ public class CaConf {
 
   public void addKeypairGen(KeypairGenEntry keypairgen) {
     Args.notNull(keypairgen, "keypairgen");
-    this.keypairgens.put(keypairgen.getName(), keypairgen);
+    this.keypairgens.put(keypairgen.name(), keypairgen);
   }
 
   public Set<String> getKeypairGenNames() {
@@ -379,7 +378,7 @@ public class CaConf {
 
   public void addSingleCa(SingleCa singleCa) {
     Args.notNull(singleCa, "singleCa");
-    this.cas.put(singleCa.getName(), singleCa);
+    this.cas.put(singleCa.name(), singleCa);
   }
 
   public Set<String> getDbSchemaNames() {
@@ -405,11 +404,11 @@ public class CaConf {
       return null;
     }
 
-    if (fileOrValue.getValue() != null) {
-      return fileOrValue.getValue();
+    if (fileOrValue.value() != null) {
+      return fileOrValue.value();
     }
 
-    String fileName = fileOrValue.getFile();
+    String fileName = fileOrValue.file();
     byte[] binary = zipEntries.get(fileName);
     if (binary == null) {
       throw new IOException("could not find ZIP entry " + fileName);
@@ -444,11 +443,11 @@ public class CaConf {
       return null;
     }
 
-    if (fileOrBinary.getBinary() != null) {
-      return fileOrBinary.getBinary();
+    if (fileOrBinary.binary() != null) {
+      return fileOrBinary.binary();
     }
 
-    String fileName = fileOrBinary.getFile();
+    String fileName = fileOrBinary.file();
     byte[] binary = zipEntries.get(fileName);
     if (binary == null) {
       throw new IOException("could not find ZIP entry " + fileName);
@@ -478,23 +477,23 @@ public class CaConf {
       this.notAfter     = notAfter;
     }
 
-    public String getProfile() {
+    public String profile() {
       return profile;
     }
 
-    public String getSubject() {
+    public String subject() {
       return subject;
     }
 
-    public String getSerialNumber() {
+    public String serialNumber() {
       return serialNumber;
     }
 
-    public Instant getNotBefore() {
+    public Instant notBefore() {
       return notBefore;
     }
 
-    public Instant getNotAfter() {
+    public Instant notAfter() {
       return notAfter;
     }
 
@@ -527,7 +526,7 @@ public class CaConf {
               "caEntry may not be null if genSelfIssued is non-null");
         }
 
-        if ((caEntry).getCert() != null) {
+        if ((caEntry).cert() != null) {
           throw new IllegalArgumentException(
               "caEntry.cert may not be null if genSelfIssued is non-null");
         }
@@ -541,31 +540,31 @@ public class CaConf {
       this.publisherNames = publisherNames;
     } // constructor
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public CaEntry getCaEntry() {
+    public CaEntry caEntry() {
       return caEntry;
     }
 
-    public List<String> getAliases() {
+    public List<String> aliases() {
       return aliases;
     }
 
-    public GenSelfIssued getGenSelfIssued() {
+    public GenSelfIssued genSelfIssued() {
       return genSelfIssued;
     }
 
-    public List<String> getProfileNames() {
+    public List<String> profileNames() {
       return profileNames;
     }
 
-    public List<CaHasRequestorEntry> getRequestors() {
+    public List<CaHasRequestorEntry> requestors() {
       return requestors;
     }
 
-    public List<String> getPublisherNames() {
+    public List<String> publisherNames() {
       return publisherNames;
     }
 

@@ -43,11 +43,11 @@ public class CaIdentifier {
     this.profile = profile;
   }
 
-  public String getUrl() {
+  public String url() {
     return url;
   }
 
-  public String getProfile() {
+  public String profile() {
     return profile;
   }
 
@@ -57,14 +57,14 @@ public class CaIdentifier {
 
   public String buildGetUrl(Operation operation, String message) {
     String str = url + "?operation=" +
-        Args.notNull(operation, "operation").getCode();
+        Args.notNull(operation, "operation").code();
     return StringUtil.isBlank(message) ? str
         : str + "&message=" +
             URLEncoder.encode(message, StandardCharsets.UTF_8);
   }
 
   public String buildPostUrl(Operation operation) {
-    return url + "?operation=" + Args.notNull(operation, "operation").getCode();
+    return url + "?operation=" + Args.notNull(operation, "operation").code();
   }
 
   @Override

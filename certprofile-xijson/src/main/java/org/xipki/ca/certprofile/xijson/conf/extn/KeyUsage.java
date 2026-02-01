@@ -27,7 +27,7 @@ public class KeyUsage implements JsonEncodable {
     this.usages = Args.notEmpty(usages, "usages");
   }
 
-  public List<SingleKeyUsages> getUsages() {
+  public List<SingleKeyUsages> usages() {
     return usages;
   }
 

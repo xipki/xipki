@@ -39,16 +39,16 @@ public final class EnvelopedDataDecryptor {
       Args.notNull(recipientCert, "recipientCert");
       Args.notNull(privKey, "privKey");
 
-      this.recipientId = new KeyTransRecipientId(recipientCert.getIssuer(),
-          recipientCert.getSerialNumber(), recipientCert.getSubjectKeyId());
+      this.recipientId = new KeyTransRecipientId(recipientCert.issuer(),
+          recipientCert.serialNumber(), recipientCert.subjectKeyId());
       this.recipient = new JceKeyTransEnvelopedRecipient(privKey);
     }
 
-    public Recipient getRecipient() {
+    public Recipient recipient() {
       return recipient;
     }
 
-    public RecipientId getRecipientId() {
+    public RecipientId recipientId() {
       return recipientId;
     }
 
@@ -73,7 +73,7 @@ public final class EnvelopedDataDecryptor {
     RecipientInformation recipientInfo = null;
     EnvelopedDataDecryptorInstance decryptor = null;
     for (EnvelopedDataDecryptorInstance m : decryptors) {
-      recipientInfo = recipientInfos.get(m.getRecipientId());
+      recipientInfo = recipientInfos.get(m.recipientId());
       if (recipientInfo != null) {
         decryptor = m;
         break;
@@ -85,7 +85,7 @@ public final class EnvelopedDataDecryptor {
     }
 
     try {
-      return recipientInfo.getContent(decryptor.getRecipient());
+      return recipientInfo.getContent(decryptor.recipient());
     } catch (CMSException ex) {
       throw new CodecException("could not decrypt the envelopedData");
     }

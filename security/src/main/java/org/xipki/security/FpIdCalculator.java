@@ -10,9 +10,7 @@ import org.xipki.util.misc.StringUtil;
  * MD'5 Fingerprint calculator.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class FpIdCalculator {
 
   private FpIdCalculator() {

@@ -22,11 +22,11 @@ public class CborTaggedObject implements CborEncodable {
     this.value = value;
   }
 
-  public long getTag() {
+  public long tag() {
     return tag;
   }
 
-  public Object getValue() {
+  public Object value() {
     return value;
   }
 

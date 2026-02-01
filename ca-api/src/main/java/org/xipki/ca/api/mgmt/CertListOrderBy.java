@@ -9,7 +9,6 @@ import org.xipki.util.misc.StringUtil;
  * The mode to sort the certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public enum CertListOrderBy {
@@ -27,7 +26,7 @@ public enum CertListOrderBy {
     this.text = text;
   }
 
-  public String getText() {
+  public String text() {
     return text;
   }
 

@@ -23,7 +23,6 @@ import java.util.Set;
  * Canonicalize the text files.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CanonicalizeCode {
@@ -31,7 +30,7 @@ public class CanonicalizeCode {
 
   private static final Set<String> textFileExtensions = new HashSet<>(
           Arrays.asList("txt", "xml", "xsd", "cfg", "properties",
-              "script", "jxb", "info"));
+              "script", "jxb", "info", "json"));
 
   private static final Set<String> excludeTextFiles = new HashSet<>();
 
@@ -47,7 +46,7 @@ public class CanonicalizeCode {
   }
 
   public static void main(String[] args) {
-    args = new String[] {"/Users/liao/source/xipki/xipki/"};
+    args = new String[] {"/Users/liao/source/xipki/xic509/"};
     for (String arg : args) {
       try {
         System.out.println("Canonicalize dir " + arg);

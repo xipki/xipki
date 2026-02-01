@@ -22,16 +22,14 @@ import java.util.Set;
  * to verify POP, to the random, etc.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public interface SecurityFactory {
 
   /**
    * Retrieves the types of supported signers.
    * @return lower-case types of supported signers, never {@code null}.
    */
-  Set<String> getSupportedSignerTypes();
+  Set<String> supportedSignerTypes();
 
   /**
    * Creates signer.
@@ -119,7 +117,7 @@ public interface SecurityFactory {
   default ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
       throws InvalidKeyException {
     return getContentVerifierProvider(
-        Args.notNull(cert, "cert").getPublicKey());
+        Args.notNull(cert, "cert").publicKey());
   }
 
   /**
@@ -208,12 +206,12 @@ public interface SecurityFactory {
   PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
       throws InvalidKeyException;
 
-  SecureRandom getRandom4Sign();
+  SecureRandom random4Sign();
 
-  SecureRandom getRandom4Key();
+  SecureRandom random4Key();
 
-  int getDfltSignerParallelism();
+  int dfltSignerParallelism();
 
-  CsrControl getCsrControl();
+  CsrControl csrControl();
 
 }

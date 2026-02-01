@@ -15,7 +15,6 @@ import java.util.List;
  * Responder option.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class ResponderOption {
@@ -42,7 +41,7 @@ class ResponderOption {
   private final List<String> servletPaths;
 
   ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
-    String str = Args.notNull(conf, "conf").getMode();
+    String str = Args.notNull(conf, "conf").mode();
     if (str == null
         || StringUtil.orEqualsIgnoreCase(str, "RFC6960", "RFC 6960")) {
       this.mode = OcspMode.RFC6960;
@@ -52,15 +51,15 @@ class ResponderOption {
       throw new InvalidConfException("invalid OCSP mode '" + str + "'");
     }
 
-    this.signerName = conf.getSigner();
-    this.requestOptionName = conf.getRequest();
-    this.responseOptionName = conf.getResponse();
+    this.signerName = conf.signer();
+    this.requestOptionName = conf.request();
+    this.responseOptionName = conf.response();
     this.inheritCaRevocation = conf.isInheritCaRevocation();
 
-    List<String> list = new ArrayList<>(conf.getStores());
+    List<String> list = new ArrayList<>(conf.stores());
     this.storeNames = Collections.unmodifiableList(list);
 
-    List<String> paths = conf.getServletPaths();
+    List<String> paths = conf.servletPaths();
     for (String path : paths) {
       if (path.isEmpty()) {
         continue;
@@ -75,7 +74,7 @@ class ResponderOption {
     this.servletPaths = Collections.unmodifiableList(list);
   } // constructor
 
-  public OcspMode getMode() {
+  public OcspMode mode() {
     return mode;
   }
 
@@ -83,23 +82,23 @@ class ResponderOption {
     return inheritCaRevocation;
   }
 
-  public String getSignerName() {
+  public String signerName() {
     return signerName;
   }
 
-  public String getRequestOptionName() {
+  public String requestOptionName() {
     return requestOptionName;
   }
 
-  public String getResponseOptionName() {
+  public String responseOptionName() {
     return responseOptionName;
   }
 
-  public List<String> getStoreNames() {
+  public List<String> storeNames() {
     return storeNames;
   }
 
-  public List<String> getServletPaths() {
+  public List<String> servletPaths() {
     return servletPaths;
   }
 

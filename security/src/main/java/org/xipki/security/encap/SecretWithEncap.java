@@ -24,11 +24,11 @@ public class SecretWithEncap {
     this.encap  = Args.notEmpty(encap, "encap");
   }
 
-  public byte[] getSecret() {
+  public byte[] secret() {
     return secret;
   }
 
-  public byte[] getEncap() {
+  public byte[] encap() {
     return encap;
   }
 }

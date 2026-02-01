@@ -64,7 +64,6 @@ import java.util.Set;
  * <a href="http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLContext.html#init%28javax.net.ssl.KeyManager[],%20javax.net.ssl.TrustManager[],%20java.security.SecureRandom%29">
  * SSLContext.html#init
  * </a>
- * @since 4.4
  */
 public class SslContextBuilder {
 
@@ -101,7 +100,6 @@ public class SslContextBuilder {
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#SSLContext">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
-   * @since 4.4.7
    */
   public SslContextBuilder setProtocol(String protocol) {
     this.protocol = protocol;
@@ -138,7 +136,6 @@ public class SslContextBuilder {
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyStore">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
-   * @since 4.4.7
    */
   public SslContextBuilder setKeyStoreType(String keyStoreType) {
     this.keyStoreType = keyStoreType;
@@ -158,7 +155,6 @@ public class SslContextBuilder {
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyManagerFactory">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
-   * @since 4.4.7
    */
   public SslContextBuilder setKeyManagerFactoryAlgorithm(String keyManagerFactoryAlgorithm) {
     this.keyManagerFactoryAlgorithm = keyManagerFactoryAlgorithm;
@@ -178,7 +174,6 @@ public class SslContextBuilder {
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#TrustManagerFactory">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
-   * @since 4.4.7
    */
   public SslContextBuilder setTrustManagerFactoryAlgorithm(String trustManagerFactoryAlgorithm) {
     this.trustManagerFactoryAlgorithm = trustManagerFactoryAlgorithm;

@@ -7,7 +7,6 @@ package org.xipki.qa.ocsp;
  * OCSP Certstatus enum.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public enum OcspCertStatus {

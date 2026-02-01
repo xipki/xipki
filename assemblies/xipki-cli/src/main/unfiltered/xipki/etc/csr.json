@@ -1,12 +1,12 @@
 {
-	"peerCerts": {
-		"file": "xipki/keycerts/dh-pop-certs.pem"
-	},
-	"kem": {
-		"type":"JCEKS",
-		"password":"$[kem-pop.keyPassword]",
-		"keystore":{
-			"file":"xipki/keycerts/kem-pop.jceks"
-		}
-	}
+  "peerCerts": {
+    "file": "xipki/keycerts/dh-pop-certs.pem"
+  },
+  "kem": {
+    "type":"JCEKS",
+    "password":"$[kem-pop.keyPassword]",
+    "keystore":{
+      "file":"xipki/keycerts/kem-pop.jceks"
+    }
+  }
 }

@@ -15,7 +15,6 @@ import java.util.List;
  * CMP request to de-suspend certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class UnsuspendCertRequest {
@@ -34,15 +33,15 @@ public class UnsuspendCertRequest {
       this.issuer = Args.notNull(issuer, "issuer");
     }
 
-    public X500Name getIssuer() {
+    public X500Name issuer() {
       return issuer;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
-    public byte[] getAuthorityKeyIdentifier() {
+    public byte[] authorityKeyIdentifier() {
       return authorityKeyIdentifier;
     }
 
@@ -57,7 +56,7 @@ public class UnsuspendCertRequest {
   public boolean addRequestEntry(Entry requestEntry) {
     Args.notNull(requestEntry, "requestEntry");
     for (Entry re : requestEntries) {
-      if (re.getId().equals(requestEntry.getId())) {
+      if (re.id().equals(requestEntry.id())) {
         return false;
       }
     }
@@ -66,7 +65,7 @@ public class UnsuspendCertRequest {
     return true;
   }
 
-  public List<Entry> getRequestEntries() {
+  public List<Entry> requestEntries() {
     return Collections.unmodifiableList(requestEntries);
   }
 

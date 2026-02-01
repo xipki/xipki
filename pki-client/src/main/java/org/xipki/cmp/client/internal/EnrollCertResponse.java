@@ -13,7 +13,6 @@ import java.util.List;
  * Response of certificate enrollment.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class EnrollCertResponse {
@@ -48,11 +47,11 @@ class EnrollCertResponse {
     resultEntries.add(resultEntry);
   }
 
-  List<CMPCertificate> getCaCertificates() {
+  List<CMPCertificate> caCertificates() {
     return caCertificates;
   }
 
-  List<ResultEntry> getResultEntries() {
+  List<ResultEntry> resultEntries() {
     return resultEntries;
   }
 

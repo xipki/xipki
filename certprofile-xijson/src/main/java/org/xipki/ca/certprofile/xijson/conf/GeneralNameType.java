@@ -30,13 +30,13 @@ public class GeneralNameType implements JsonEncodable {
         (Set<GeneralNameTag>) modes : new HashSet<>(modes);
   }
 
-  public Set<GeneralNameTag> getModes() {
+  public Set<GeneralNameTag> modes() {
     return modes;
   }
 
   public void addTags(GeneralNameTag... tags) {
     for (GeneralNameTag tag : tags) {
-      getModes().add(tag);
+      modes().add(tag);
     }
   } // method addTags
 

@@ -29,15 +29,15 @@ public class KemEncapsulation {
     Args.max(encryptedSecret.length, "encryptedSecret.length", 0xFFFF);
   }
 
-  public byte getAlg() {
+  public byte alg() {
     return alg;
   }
 
-  public byte[] getEncapKey() {
+  public byte[] encapKey() {
     return encapKey;
   }
 
-  public byte[] getEncryptedSecret() {
+  public byte[] encryptedSecret() {
     return encryptedSecret;
   }
 

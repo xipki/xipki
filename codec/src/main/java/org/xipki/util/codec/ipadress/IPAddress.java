@@ -34,44 +34,6 @@ public class IPAddress {
 
   private final int unusedBits;
 
-  public static void main(String[] args) {
-    try {
-      int afi = IPAddressFamily.AFI_IPv4;
-      Context context = Context.PREFIX;
-      IPAddress addr = getIPv4Instance("10.0.0.1", context);
-      System.out.println(addr.toString(afi, context));
-
-      addr = getIPv4Instance("10.0.1/24", context);
-      System.out.println(addr.toString(afi, context));
-
-      context = Context.RANGE_MIN;
-      addr = getIPv4Instance("10.2.0.0", context);
-      System.out.println(addr.toString(afi, context));
-
-      context = Context.RANGE_MAX;
-      addr = getIPv4Instance("10.4.255.255", context);
-      System.out.println(addr.toString(afi, context));
-
-      afi = IPAddressFamily.AFI_IPv6;
-      context = Context.PREFIX;
-      addr = getIPv6Instance("2002:1::/64", context);
-      System.out.println(addr.toString(afi, context));
-
-      addr = getIPv6Instance("2002:2::/56", context);
-      System.out.println(addr.toString(afi, context));
-
-      context = Context.RANGE_MIN;
-      addr = getIPv6Instance("2002:3::", context);
-      System.out.println(addr.toString(afi, context));
-
-      context = Context.RANGE_MAX;
-      addr = getIPv6Instance("2002:8::fff:ffff:ffff:ffff:ffff", context);
-      System.out.println(addr.toString(afi, context));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
   public IPAddress(byte[] value, int unusedBits) {
     this.unusedBits = unusedBits;
     this.value = Args.notEmptyBytes(value, "value");
@@ -81,11 +43,11 @@ public class IPAddress {
     this(value, 0);
   }
 
-  public byte[] getValue() {
+  public byte[] value() {
     return value;
   }
 
-  public int getUnusedBits() {
+  public int unusedBits() {
     return unusedBits;
   }
 

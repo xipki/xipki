@@ -39,7 +39,6 @@ import java.util.Set;
  * Actions to manage certificate profiles.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class ProfileActions {
 
@@ -98,8 +97,8 @@ public class ProfileActions {
             .append(caName).append("\n");
 
         for (CaProfileEntry entry: entries) {
-          String name = entry.getProfileName();
-          List<String> aliases = entry.getProfileAliases();
+          String name = entry.profileName();
+          List<String> aliases = entry.profileAliases();
           sb.append("\t").append(name);
           if (aliases != null && !aliases.isEmpty()) {
             sb.append(aliases.size() == 1 ? " (alias " : " (aliases ");
@@ -223,11 +222,11 @@ public class ProfileActions {
               () -> new IllegalCmdParamException(
                   "no certificate profile named " + name + " is defined"));
 
-      if (StringUtil.isBlank(entry.getConf())) {
+      if (StringUtil.isBlank(entry.conf())) {
         println("cert profile does not have conf");
       } else {
         saveVerbose("saved cert profile configuration to",
-            confFile, StringUtil.toUtf8Bytes(entry.getConf()));
+            confFile, StringUtil.toUtf8Bytes(entry.conf()));
       }
       return null;
     } // method execute0

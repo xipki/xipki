@@ -40,11 +40,11 @@ public class ExtendedKeyUsage implements JsonEncodable {
     this.optional = optional;
   }
 
-  public List<ExtendedKeyUsageID> getRequired() {
+  public List<ExtendedKeyUsageID> required() {
     return required;
   }
 
-  public List<ExtendedKeyUsageID> getOptional() {
+  public List<ExtendedKeyUsageID> optional() {
     return optional;
   }
 
@@ -53,13 +53,13 @@ public class ExtendedKeyUsage implements JsonEncodable {
 
     if (required != null) {
       for (ExtendedKeyUsageID usage : required) {
-        controls.add(new ExtKeyUsageControl(usage.getOid(), true));
+        controls.add(new ExtKeyUsageControl(usage.oid(), true));
       }
     }
 
     if (optional != null) {
       for (ExtendedKeyUsageID usage : optional) {
-        controls.add(new ExtKeyUsageControl(usage.getOid(), false));
+        controls.add(new ExtKeyUsageControl(usage.oid(), false));
       }
     }
 

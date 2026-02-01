@@ -27,7 +27,7 @@ public class SmimeCapabilities implements JsonEncodable {
     this.capabilities = Args.notEmpty(capabilities, "capabilities");
   }
 
-  public List<SmimeCapability> getCapabilities() {
+  public List<SmimeCapability> capabilities() {
     return capabilities;
   }
 
@@ -57,11 +57,11 @@ public class SmimeCapabilities implements JsonEncodable {
       this.parameter = parameter;
     }
 
-    public ASN1ObjectIdentifier getCapabilityId() {
+    public ASN1ObjectIdentifier capabilityId() {
       return capabilityId;
     }
 
-    public Integer getParameter() {
+    public Integer parameter() {
       return parameter;
     }
 

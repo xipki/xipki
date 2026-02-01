@@ -169,9 +169,9 @@ public class SslContextConf {
   }
 
   public static SslContextConf ofSslConf(SslConf ssl) {
-    return new SslContextConf(ssl.getStoreType(), ssl.getKeystore(),
-        ssl.getKeystorePassword(), ssl.getTrustanchors(),
-        ssl.getHostnameVerifier());
+    return new SslContextConf(ssl.storeType(), ssl.keystore(),
+        ssl.keystorePassword(), ssl.trustanchors(),
+        ssl.hostnameVerifier());
   }
 
 }

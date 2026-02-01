@@ -6,7 +6,6 @@ package org.xipki.ca.api.mgmt;
 /**
  * CA system status enum.
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public enum CaSystemStatus {

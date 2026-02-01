@@ -7,7 +7,6 @@ package org.xipki.ocsp.server.type;
  * Write only extension.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class WritableOnlyExtension extends Extension {
@@ -29,7 +28,7 @@ public class WritableOnlyExtension extends Extension {
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 

@@ -71,7 +71,6 @@ import java.util.concurrent.TimeUnit;
  * Manages the CA system.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CaManagerImpl implements CaManager, Closeable {
@@ -110,7 +109,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       inProcess = true;
       try {
         SystemEvent event = caConfStore.getSystemEvent(EVENT_CACHANGE);
-        long caChangedTime = (event == null) ? 0 : event.getEventTime();
+        long caChangedTime = (event == null) ? 0 : event.eventTime();
 
         LOG.info("check the restart CA system event: changed at={}, " +
                 "lastStartTime={}",
@@ -294,11 +293,11 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.keypairGenManager = new KeypairGenManager(this);
   } // constructor
 
-  public int getShardId() {
+  public int shardId() {
     return shardId;
   }
 
-  public SecurityFactory getSecurityFactory() {
+  public SecurityFactory securityFactory() {
     return securityFactory;
   }
 
@@ -306,7 +305,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     this.securityFactory = securityFactory;
   }
 
-  public P11CryptServiceFactory getP11CryptServiceFactory() {
+  public P11CryptServiceFactory p11CryptServiceFactory() {
     return p11CryptServiceFactory;
   }
 
@@ -321,7 +320,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   @Override
   public Set<String> getSupportedSignerTypes() {
-    return securityFactory.getSupportedSignerTypes();
+    return securityFactory.supportedSignerTypes();
   }
 
   @Override
@@ -368,15 +367,15 @@ public class CaManagerImpl implements CaManager, Closeable {
     noLock = caServerConf.isNoLock();
     LOG.info("ca.noLock: {}", noLock);
 
-    shardId = caServerConf.getShardId();
+    shardId = caServerConf.shardId();
     LOG.info("ca.shardId: {}", shardId);
 
     caServerConf.initSsl();
 
-    if (caServerConf.getCtLog() != null) {
+    if (caServerConf.ctLog() != null) {
       try {
         ctLogPublicKeyFinder =
-            new CtLogPublicKeyFinder(caServerConf.getCtLog());
+            new CtLogPublicKeyFinder(caServerConf.ctLog());
       } catch (Exception ex) {
         throw new CaMgmtException("could not load CtLogPublicKeyFinder: " +
             ex.getMessage(), ex);
@@ -388,9 +387,9 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       final String caDataSourceName = "ca";
       FileOrValue caDataSourceConf = null;
-      for (DataSourceConf datasource : caServerConf.getDatasources()) {
-        String name = datasource.getName().toLowerCase(Locale.ROOT);
-        FileOrValue conf = datasource.getConf();
+      for (DataSourceConf datasource : caServerConf.datasources()) {
+        String name = datasource.name().toLowerCase(Locale.ROOT);
+        FileOrValue conf = datasource.conf();
 
         if (caDataSourceName.equals(name)) {
           caDataSourceConf = conf;
@@ -399,15 +398,15 @@ public class CaManagerImpl implements CaManager, Closeable {
         }
       }
 
-      if (caServerConf.getCaConfFiles() == null) {
+      if (caServerConf.caConfFiles() == null) {
         LOG.info("loading CAConf from database");
         DataSourceWrapper caconfDatasource = allDataSources.get("caconf");
         caConfStore = new DbCaConfStore(caconfDatasource);
       } else {
-        LOG.info("loading CAConf from files {}", caServerConf.getCaConfFiles());
+        LOG.info("loading CAConf from files {}", caServerConf.caConfFiles());
         try {
           caConfStore = new FileCaConfStore(securityFactory,
-              certprofileFactoryRegister, caServerConf.getCaConfFiles());
+              certprofileFactoryRegister, caServerConf.caConfFiles());
         } catch (IOException ex) {
           throw new CaMgmtException("IO error: " + ex.getMessage(), ex);
         } catch (InvalidConfException ex) {
@@ -521,20 +520,20 @@ public class CaManagerImpl implements CaManager, Closeable {
     // synchronize caconf and ca certstore databases
     if (masterMode && certstore != null) {
       for (CertprofileEntry entry : certprofileDbEntries.values()) {
-        certstore.addCertProfile(entry.getIdent());
+        certstore.addCertProfile(entry.ident());
       }
 
       if (byCaRequestor != null) {
-        certstore.addRequestor(byCaRequestor.getIdent());
+        certstore.addRequestor(byCaRequestor.ident());
       }
 
       for (RequestorEntry entry : requestorDbEntries.values()) {
-        certstore.addRequestor(entry.getIdent());
+        certstore.addRequestor(entry.ident());
       }
 
       for (CaInfo entry : caInfos.values()) {
-        certstore.addCa(entry.getIdent(), entry.getCert(),
-            entry.getRevocationInfo());
+        certstore.addCa(entry.ident(), entry.cert(),
+            entry.revocationInfo());
       }
     }
 
@@ -561,8 +560,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     allDataSources.put(name, datasource);
-    if (conf.getFile() != null) {
-      LOG.info("associate datasource {} to the file {}", name, conf.getFile());
+    if (conf.file() != null) {
+      LOG.info("associate datasource {} to the file {}", name, conf.file());
     } else {
       LOG.info("associate datasource {} to text value", name);
     }
@@ -590,8 +589,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     SystemEvent lockInfo = caConfStore.getSystemEvent(EVENT_LOCK);
 
     if (lockInfo != null) {
-      String lockedBy = lockInfo.getOwner();
-      Instant lockedAt = Instant.ofEpochSecond(lockInfo.getEventTime());
+      String lockedBy = lockInfo.owner();
+      Instant lockedAt = Instant.ofEpochSecond(lockInfo.eventTime());
 
       if (!this.lockInstanceId.equals(lockedBy)) {
         String msg = "could not lock CA, it has been locked by " + lockedBy +
@@ -775,7 +774,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       // Add the CAs to the store
       for (Entry<String, CaInfo> entry : caInfos.entrySet()) {
         String caName = entry.getKey();
-        CaStatus status = entry.getValue().getStatus();
+        CaStatus status = entry.getValue().status();
         if (CaStatus.active != status) {
           continue;
         }
@@ -897,7 +896,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     LOG.info("stopped CA system");
   } // method close
 
-  public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {
+  public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
     return scheduledThreadPoolExecutor;
   }
 
@@ -959,7 +958,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public CaEntry getCa(String name) {
     CaInfo caInfo = caInfos.get(Args.toNonBlankLower(name, "name"));
-    return (caInfo == null) ? null : caInfo.getCaEntry();
+    return (caInfo == null) ? null : caInfo.caEntry();
   }
 
   @Override
@@ -970,9 +969,9 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
 
     List<X509Cert> ret = new LinkedList<>();
-    ret.add(caInfo.getCert());
-    if (caInfo.getCertchain() != null) {
-      ret.addAll(caInfo.getCertchain());
+    ret.add(caInfo.cert());
+    if (caInfo.certchain() != null) {
+      ret.addAll(caInfo.certchain());
     }
     return ret;
   }
@@ -1035,7 +1034,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addRequestor(RequestorEntry requestorEntry)
       throws CaMgmtException {
     requestorManager.addRequestor(requestorEntry);
-    certstore.addRequestor(requestorEntry.getIdent());
+    certstore.addRequestor(requestorEntry.ident());
   }
 
   @Override
@@ -1085,7 +1084,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addCertprofile(CertprofileEntry certprofileEntry)
       throws CaMgmtException {
     certprofileManager.addCertprofile(certprofileEntry);
-    certstore.addCertProfile(certprofileEntry.getIdent());
+    certstore.addCertProfile(certprofileEntry.ident());
   }
 
   public CertprofileInfoResponse getCertprofileInfo(String profileName)
@@ -1319,7 +1318,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   public KeypairGenerator getKeypairGenerator(String keypairGenName) {
     keypairGenName = Args.toNonBlankLower(keypairGenName, "keypairGenName");
     KeypairGenEntryWrapper keypairGen = keypairGens.get(keypairGenName);
-    return keypairGen == null ? null : keypairGen.getGenerator();
+    return keypairGen == null ? null : keypairGen.generator();
   }
 
   public IdentifiedCertprofile getIdentifiedCertprofile(String profileName) {
@@ -1435,12 +1434,12 @@ public class CaManagerImpl implements CaManager, Closeable {
     return confLoader.exportConf(caNames);
   }
 
-  public CtLogPublicKeyFinder getCtLogPublicKeyFinder() {
+  public CtLogPublicKeyFinder ctLogPublicKeyFinder() {
     return ctLogPublicKeyFinder;
   }
 
   public X509Ca getCa(CaIdentifierRequest req) {
-    X500NameType issuer = req.getIssuer();
+    X500NameType issuer = req.issuer();
     X500Name x500Issuer = null;
     if (issuer != null) {
       try {
@@ -1450,8 +1449,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       }
     }
 
-    byte[] authorityKeyId = req.getAuthorityKeyIdentifier();
-    byte[] issuerCertSha1Fp = req.getIssuerCertSha1Fp();
+    byte[] authorityKeyId = req.authorityKeyIdentifier();
+    byte[] issuerCertSha1Fp = req.issuerCertSha1Fp();
 
     if (x500Issuer == null
         && authorityKeyId == null
@@ -1462,20 +1461,20 @@ public class CaManagerImpl implements CaManager, Closeable {
     for (Map.Entry<String, X509Ca> entry : x509cas.entrySet()) {
       X509Ca ca = entry.getValue();
       if (x500Issuer != null) {
-        if (!x500Issuer.equals(ca.getCaCert().getSubject())) {
+        if (!x500Issuer.equals(ca.caCert().subject())) {
           continue;
         }
       }
 
       if (authorityKeyId != null) {
-        if (!Arrays.equals(ca.getCaCert().getSubjectKeyId(), authorityKeyId)) {
+        if (!Arrays.equals(ca.caCert().subjectKeyId(), authorityKeyId)) {
           continue;
         }
       }
 
       if (issuerCertSha1Fp != null) {
         if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(
-              ca.getHexSha1OfCert())) {
+              ca.hexSha1OfCert())) {
           continue;
         }
       }

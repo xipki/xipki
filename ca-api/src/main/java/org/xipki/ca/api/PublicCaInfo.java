@@ -18,7 +18,6 @@ import java.util.Arrays;
  * Public CA information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class PublicCaInfo {
@@ -47,14 +46,14 @@ public class PublicCaInfo {
       throws OperationException {
     this.caCert = Args.notNull(caCert, "caCert");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
-    this.issuer = caCert.getIssuer();
-    this.serialNumber = caCert.getSerialNumber();
-    this.subject = caCert.getSubject();
+    this.issuer = caCert.issuer();
+    this.serialNumber = caCert.serialNumber();
+    this.subject = caCert.subject();
     this.c14nSubject = X509Util.canonicalizeName(subject);
-    this.subjectKeyIdentifier = caCert.getSubjectKeyId();
+    this.subjectKeyIdentifier = caCert.subjectKeyId();
     this.extraControl = extraControl;
-    this.subjectAltName = (caCert.getSubjectAltNames() == null) ? null
-        : GeneralNames.getInstance(caCert.getSubjectAltNames());
+    this.subjectAltName = (caCert.subjectAltNames() == null) ? null
+        : GeneralNames.getInstance(caCert.subjectAltNames());
   } // constructor
 
   public PublicCaInfo(
@@ -80,11 +79,11 @@ public class PublicCaInfo {
    * Returns the CA URIs.
    * @return non-null CaUris.
    */
-  public CaUris getCaUris() {
+  public CaUris caUris() {
     return caUris;
   }
 
-  public X509Cert getCrlSignerCert() {
+  public X509Cert crlSignerCert() {
     return crlSignerCert;
   }
 
@@ -92,36 +91,36 @@ public class PublicCaInfo {
     this.crlSignerCert = caCert.equals(crlSignerCert) ? null : crlSignerCert;
   }
 
-  public X500Name getSubject() {
+  public X500Name subject() {
     return subject;
   }
 
-  public X500Name getIssuer() {
+  public X500Name issuer() {
     return issuer;
   }
 
-  public String getC14nSubject() {
+  public String c14nSubject() {
     return c14nSubject;
   }
 
-  public GeneralNames getSubjectAltName() {
+  public GeneralNames subjectAltName() {
     return subjectAltName;
   }
 
-  public byte[] getSubjectKeyIdentifier() {
+  public byte[] subjectKeyIdentifier() {
     return (subjectKeyIdentifier == null) ? null
         : Arrays.copyOf(subjectKeyIdentifier, subjectKeyIdentifier.length);
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
-  public ConfPairs getExtraControl() {
+  public ConfPairs extraControl() {
     return extraControl;
   }
 

@@ -53,11 +53,11 @@ public class ECDSASignVerifySpeedTest extends TestBase {
   private static final long signMechanism = CKM_ECDSA;
 
   private PKCS11KeyPairSpec getMinimalKeyPairTemplate0() {
-    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.EC_P256);
+    return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.P256);
   }
 
   @Test
-  public void main() throws TokenException {
+  public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +

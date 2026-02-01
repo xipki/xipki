@@ -12,7 +12,6 @@ import java.io.IOException;
  * ASN.1 ResponderID.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 public class ResponderID extends ASN1Type {
 
@@ -33,7 +32,7 @@ public class ResponderID extends ASN1Type {
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 

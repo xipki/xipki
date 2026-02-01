@@ -32,9 +32,7 @@ import java.util.Set;
  * {@link SignerFactory} for PKCS#11 token.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11SignerFactory implements SignerFactory {
 
   private static final String TYPE = "pkcs11";
@@ -101,26 +99,26 @@ public class P11SignerFactory implements SignerFactory {
 
     Integer iParallelism;
     try {
-      iParallelism = conf.getParallelism();
+      iParallelism = conf.parallelism();
     } catch (InvalidConfException e) {
       throw new ObjectCreationException(e);
     }
 
     int parallelism = Objects.requireNonNullElseGet(iParallelism,
-        () -> securityFactory.getDfltSignerParallelism());
+        () -> securityFactory.dfltSignerParallelism());
 
-    String moduleName = conf.getModule();
-    Integer slotIndex = conf.getSlot();
+    String moduleName = conf.module();
+    Integer slotIndex = conf.slot();
 
-    Long slotId = conf.getSlotId();
+    Long slotId = conf.slotId();
 
     if ((slotIndex == null) == (slotId == null)) {
       throw new ObjectCreationException(
           "exactly one of slot (index) and slot-id must be specified");
     }
 
-    String keyLabel = conf.getKeyLabel();
-    byte[] keyId = conf.getKeyId();
+    String keyLabel = conf.keyLabel();
+    byte[] keyId = conf.keyId();
 
     if ((keyId == null) == (keyLabel == null)) {
       throw new ObjectCreationException(
@@ -145,7 +143,7 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     try {
-      SignAlgo algo = conf.getAlgo();
+      SignAlgo algo = conf.algo();
 
       P11Key key = null;
       P11CompositeKey compositeKey = null;
@@ -172,17 +170,17 @@ public class P11SignerFactory implements SignerFactory {
       List<XiContentSigner> signers = new ArrayList<>(parallelism);
       PublicKey publicKey = null;
       if (certificateChain != null && certificateChain.length > 0) {
-        publicKey = certificateChain[0].getPublicKey();
+        publicKey = certificateChain[0].publicKey();
       }
 
       for (int i = 0; i < parallelism; i++) {
         XiContentSigner signer;
         if (compositeKey != null) {
           signer = P11CompositeContentSigner.newInstance(compositeKey, algo,
-                    securityFactory.getRandom4Sign(), publicKey);
+                    securityFactory.random4Sign(), publicKey);
         } else {
           signer = P11ContentSigner.newInstance(key, algo,
-                    securityFactory.getRandom4Sign(), publicKey);
+                    securityFactory.random4Sign(), publicKey);
         }
 
         signers.add(signer);
@@ -195,7 +193,7 @@ public class P11SignerFactory implements SignerFactory {
         concurrentSigner.setCertificateChain(certificateChain);
       } else {
         concurrentSigner.setPublicKey(
-            key != null ? key.getPublicKey() : compositeKey.getPublicKey());
+            key != null ? key.publicKey() : compositeKey.publicKey());
       }
 
       if (algo.isMac()) {

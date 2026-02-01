@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * The embedded audit service.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class EmbedAuditService implements AuditService {
@@ -136,12 +135,12 @@ public class EmbedAuditService implements AuditService {
 
   @Override
   public void logEvent(AuditEvent event) {
-    storeLog(AuditService.AUDIT_EVENT, event.getLevel(), event.toTextMessage());
+    storeLog(AuditService.AUDIT_EVENT, event.level(), event.toTextMessage());
   } // method logEvent
 
   @Override
   public void logEvent(PciAuditEvent event) {
-    storeLog(AuditService.PCI_AUDIT_EVENT, event.getLevel(),
+    storeLog(AuditService.PCI_AUDIT_EVENT, event.level(),
         event.toTextMessage());
   }
 
@@ -149,7 +148,7 @@ public class EmbedAuditService implements AuditService {
     Instant date = Instant.now();
 
     String payload = DTF.format(date.atZone(timeZone)) + DELIM
-                      + level.getText() + DELIM + eventType + DELIM + message;
+                      + level.text() + DELIM + eventType + DELIM + message;
 
     try {
       long size = Files.size(writerPath);

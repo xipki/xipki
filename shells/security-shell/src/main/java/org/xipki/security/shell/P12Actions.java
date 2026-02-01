@@ -208,15 +208,15 @@ public class P12Actions {
 
     private void assertMatch(KeyStore ks, X509Cert cert, String password)
         throws Exception {
-      KeySpec keySpec = KeySpec.ofPublicKey(cert.getSubjectPublicKeyInfo());
+      KeySpec keySpec = KeySpec.ofPublicKey(cert.subjectPublicKeyInfo());
       if (keySpec.isMontgomeryEC() || keySpec.isMlkem() ||
           keySpec.isCompositeMLKEM()) {
         // cannot be checked via creating dummy signature, just compare the
         // public keys
         char[] pwd = password.toCharArray();
         KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, pwd, null);
-        byte[] expectedEncoded = kp.getPublicKey().getEncoded();
-        byte[] encoded = cert.getPublicKey().getEncoded();
+        byte[] expectedEncoded = kp.publicKey().getEncoded();
+        byte[] encoded = cert.publicKey().getEncoded();
         if (!Arrays.equals(expectedEncoded, encoded)) {
           throw new XiSecurityException(
               "the certificate and private do not match");
@@ -285,7 +285,7 @@ public class P12Actions {
       KeystoreGenerationParameters params =
           new KeystoreGenerationParameters(getPassword());
 
-      SecureRandom random = securityFactory.getRandom4Key();
+      SecureRandom random = securityFactory.random4Key();
       if (random != null) {
         params.setRandom(random);
       }
@@ -364,7 +364,7 @@ public class P12Actions {
         byte[] encodedKey = PemEncoder.encode(
             kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
         byte[] encodedCert = PemEncoder.encode(
-            kp.getCertificateChain()[0].getEncoded(), PemLabel.CERTIFICATE);
+            kp.certificateChain()[0].getEncoded(), PemLabel.CERTIFICATE);
 
         IoUtil.save(keyOutFile, encodedKey);
         IoUtil.save(certOutFile, encodedCert);

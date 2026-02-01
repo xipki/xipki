@@ -14,7 +14,6 @@ import java.util.Set;
  * Test for {@link ConfPairs}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ConfPairsTest {

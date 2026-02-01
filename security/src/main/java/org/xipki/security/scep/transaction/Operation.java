@@ -22,7 +22,7 @@ public enum Operation {
     this.code = code;
   }
 
-  public String getCode() {
+  public String code() {
     return code;
   }
 

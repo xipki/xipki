@@ -18,7 +18,6 @@ import java.security.SecureRandom;
  * CMP requestor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class Requestor {
@@ -31,7 +30,7 @@ public abstract class Requestor {
     this.name = new GeneralName(Args.notNull(name, "name"));
   }
 
-  public GeneralName getName() {
+  public GeneralName name() {
     return name;
   }
 
@@ -59,17 +58,17 @@ public abstract class Requestor {
       this.mac = mac;
     }
 
-    public char[] getPassword() {
+    public char[] password() {
       return password;
     }
 
-    public byte[] getSenderKID() {
+    public byte[] senderKID() {
       return senderKID;
     }
 
-    public PBMParameter getParameter() {
-      return new PBMParameter(randomSalt(), owf.getAlgorithmIdentifier(),
-          iterationCount, mac.getAlgorithmIdentifier());
+    public PBMParameter parameter() {
+      return new PBMParameter(randomSalt(), owf.algorithmIdentifier(),
+          iterationCount, mac.algorithmIdentifier());
     }
 
     private byte[] randomSalt() {
@@ -88,7 +87,7 @@ public abstract class Requestor {
       this.signer = signer;
     }
 
-    public ConcurrentContentSigner getSigner() {
+    public ConcurrentContentSigner signer() {
       return signer;
     }
 
@@ -98,7 +97,7 @@ public abstract class Requestor {
             "requestor without certificate is not allowed");
       }
 
-      return signer.getCertificate().getSubject();
+      return signer.getCertificate().subject();
     }
 
   } // class SignatureCmpRequestor

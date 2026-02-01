@@ -18,7 +18,6 @@ import java.util.List;
  * CA URIs.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CaUris implements JsonEncodable {
@@ -55,7 +54,7 @@ public class CaUris implements JsonEncodable {
         : Collections.unmodifiableList(cacertUris);
   }
 
-  public List<String> getCacertUris() {
+  public List<String> cacertUris() {
     return cacertUris;
   }
 
@@ -64,7 +63,7 @@ public class CaUris implements JsonEncodable {
         : Collections.unmodifiableList(ocspUris);
   }
 
-  public List<String> getOcspUris() {
+  public List<String> ocspUris() {
     return ocspUris;
   }
 
@@ -73,7 +72,7 @@ public class CaUris implements JsonEncodable {
         : Collections.unmodifiableList(crlUris);
   }
 
-  public List<String> getCrlUris() {
+  public List<String> crlUris() {
     return crlUris;
   }
 
@@ -82,7 +81,7 @@ public class CaUris implements JsonEncodable {
         : Collections.unmodifiableList(deltaCrlUris);
   }
 
-  public List<String> getDeltaCrlUris() {
+  public List<String> deltaCrlUris() {
     return deltaCrlUris;
   }
 

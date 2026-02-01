@@ -12,7 +12,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
@@ -26,7 +25,7 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
     this.entries = entries;
   }
 
-  public BigInteger[] getEntries() {
+  public BigInteger[] entries() {
     return entries;
   }
 

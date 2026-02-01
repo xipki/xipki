@@ -9,9 +9,7 @@ import org.xipki.security.X509Cert;
  * Requestor interface.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
-
 public interface Requestor {
 
   enum Permission {
@@ -28,7 +26,7 @@ public interface Requestor {
    * authentication. Only used for internal logging.
    * @return the name of this requestor.
    */
-  String getName();
+  String name();
 
   /**
    * Returns whether the requested certificate profile for given CA is allowed.
@@ -48,9 +46,6 @@ public interface Requestor {
 
   /**
    * Password-based requestor interface. Used for EST, REST and SCEP gateway.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 6.4.0
    */
   interface PasswordRequestor extends Requestor {
 
@@ -62,30 +57,24 @@ public interface Requestor {
 
   /**
    * Simple password-based requestor interface, used for the CMP gateway.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 6.4.0
    */
   interface SimplePasswordRequestor extends Requestor {
 
-    byte[] getKeyId();
+    byte[] keyId();
 
-    char[] getPassword();
+    char[] password();
 
   }
 
   /**
    * Certificate-based requestor interface.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 6.4.0
    */
 
   interface CertRequestor extends Requestor {
 
-    byte[] getKeyId();
+    byte[] keyId();
 
-    X509Cert getCert();
+    X509Cert cert();
 
   }
 

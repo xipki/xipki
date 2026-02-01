@@ -23,7 +23,6 @@ import java.util.Map;
  * IssuerEntry for the EJBCA database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class EjbcaIssuerEntry {
@@ -40,7 +39,7 @@ class EjbcaIssuerEntry {
 
   public EjbcaIssuerEntry(X509Cert cert) throws CertificateEncodingException {
     this.cert = Args.notNull(cert, "cert");
-    this.notBefore = cert.getNotBefore();
+    this.notBefore = cert.notBefore();
     byte[] encodedCert = cert.getEncoded();
     this.id = HashAlgo.SHA1.hexHash(encodedCert);
     this.issuerHashMap = getIssuerHashAndKeys(encodedCert);
@@ -61,7 +60,7 @@ class EjbcaIssuerEntry {
 
     Map<HashAlgo, byte[]> hashes = new HashMap<>();
     for (HashAlgo ha : HashAlgo.values()) {
-      int hlen = ha.getLength();
+      int hlen = ha.length();
       byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
       int offset = 0;
       nameAndKeyHash[offset++] = 0x04;
@@ -78,7 +77,7 @@ class EjbcaIssuerEntry {
     return hashes;
   } // method getIssuerHashAndKeys
 
-  public String getId() {
+  public String id() {
     return id;
   }
 
@@ -90,8 +89,8 @@ class EjbcaIssuerEntry {
   public boolean matchHash(RequestIssuer reqIssuer) {
     byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
     return issuerHash != null &&
-        CompareUtil.areEqual(issuerHash, 0, reqIssuer.getData(),
-            reqIssuer.getNameHashFrom(), issuerHash.length);
+        CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
+            reqIssuer.nameHashFrom(), issuerHash.length);
   }
 
   public void setRevocationInfo(Instant revocationTime) {
@@ -99,15 +98,15 @@ class EjbcaIssuerEntry {
         Args.notNull(revocationTime, "revocationTime"), null);
   }
 
-  public CertRevocationInfo getRevocationInfo() {
+  public CertRevocationInfo revocationInfo() {
     return revocationInfo;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
-  public X509Cert getCert() {
+  public X509Cert cert() {
     return cert;
   }
 

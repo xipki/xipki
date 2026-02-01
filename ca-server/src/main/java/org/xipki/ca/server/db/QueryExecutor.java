@@ -19,7 +19,6 @@ import java.util.List;
  * Base class to execute the database queries to manage CA system.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 class QueryExecutor {
 

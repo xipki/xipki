@@ -5,7 +5,6 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonBuilder;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.conf.InvalidConfException;
@@ -34,7 +33,6 @@ import java.util.zip.ZipOutputStream;
  * Helper class to convert the CA configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class CaConfs {
@@ -52,7 +50,7 @@ public class CaConfs {
    * @throws IOException if IO error occurs while writing to the output stream.
    */
   public static void marshal(CaConfType.CaSystem root, OutputStream out)
-      throws IOException, CodecException {
+      throws IOException {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
 
@@ -76,7 +74,7 @@ public class CaConfs {
 
       CaConfType.CaSystem root = CaConfType.CaSystem.parse(confFile.toPath());
 
-      baseDir = root.getBasedir();
+      baseDir = root.basedir();
       if (StringUtil.isBlank(baseDir)) {
         File confFileParent = confFile.getParentFile();
         baseDir = (confFileParent == null) ? "." : confFileParent.getPath();
@@ -88,95 +86,95 @@ public class CaConfs {
 
       final Map<String, String> properties = new HashMap<>();
 
-      if (root.getProperties() != null) {
-        properties.putAll(root.getProperties());
+      if (root.properties() != null) {
+        properties.putAll(root.properties());
       }
 
       // Signers
-      if (root.getSigners() != null) {
-        for (CaConfType.Signer m : root.getSigners()) {
-          String name = m.getName();
+      if (root.signers() != null) {
+        for (CaConfType.Signer m : root.signers()) {
+          String name = m.name();
 
-          if (m.getConf() != null) {
-            String conf = convertSignerConf(m.getConf(), properties, baseDir);
+          if (m.conf() != null) {
+            String conf = convertSignerConf(m.conf(), properties, baseDir);
             if (conf.length() > 200) {
               String zipEntryName = "files/signer-" + name + ".conf";
               createFileOrValue(zipStream, conf, zipEntryName);
-              m.getConf().setFile(zipEntryName);
+              m.conf().setFile(zipEntryName);
             } else {
-              m.getConf().setValue(conf);
+              m.conf().setValue(conf);
             }
           }
 
-          if (m.getCert() != null && m.getCert().getFile() != null) {
+          if (m.cert() != null && m.cert().file() != null) {
             String zipEntryName = "files/signer-" + name + ".crt";
-            byte[] value = getBinary(m.getConf().getFile(),
+            byte[] value = getBinary(m.conf().file(),
                             properties, baseDir);
             createFileOrBinary(zipStream, value, zipEntryName);
-            m.getCert().setFile(zipEntryName);
+            m.cert().setFile(zipEntryName);
           }
         }
       }
 
       // Requestors
-      if (root.getRequestors() != null) {
-        for (CaConfType.Requestor m : root.getRequestors()) {
-          String name = m.getName();
+      if (root.requestors() != null) {
+        for (CaConfType.Requestor m : root.requestors()) {
+          String name = m.name();
 
-          if (m.getConf() != null && m.getConf().getFile() != null) {
+          if (m.conf() != null && m.conf().file() != null) {
             String zipEntryName = "files/requestor-" + name + ".conf";
-            String value = getValue(m.getConf().getFile(), properties, baseDir);
+            String value = getValue(m.conf().file(), properties, baseDir);
             createFileOrValue(zipStream, value, zipEntryName);
-            m.getConf().setFile(zipEntryName);
+            m.conf().setFile(zipEntryName);
           }
 
-          if (m.getBinaryConf() != null
-              && m.getBinaryConf().getFile() != null) {
+          if (m.binaryConf() != null
+              && m.binaryConf().file() != null) {
             String zipEntryName = "files/requestor-" + name + ".bin";
-            byte[] value = getBinary(m.getBinaryConf().getFile(),
+            byte[] value = getBinary(m.binaryConf().file(),
                             properties, baseDir);
             createFileOrBinary(zipStream, value, zipEntryName);
-            m.getBinaryConf().setFile(zipEntryName);
+            m.binaryConf().setFile(zipEntryName);
           }
         }
       }
 
       // Publishers
-      if (root.getPublishers() != null) {
-        for (CaConfType.NameTypeConf m : root.getPublishers()) {
-          if (m.getConf() != null && m.getConf().getFile() != null) {
-            String name = m.getName();
+      if (root.publishers() != null) {
+        for (CaConfType.NameTypeConf m : root.publishers()) {
+          if (m.conf() != null && m.conf().file() != null) {
+            String name = m.name();
             String zipEntryName = "files/publisher-" + name + ".conf";
-            String value = getValue(m.getConf().getFile(), properties, baseDir);
+            String value = getValue(m.conf().file(), properties, baseDir);
             createFileOrValue(zipStream, value, zipEntryName);
-            m.getConf().setFile(zipEntryName);
+            m.conf().setFile(zipEntryName);
           }
         }
       }
 
       // Profiles
-      if (root.getProfiles() != null) {
-        for (CaConfType.NameTypeConf m : root.getProfiles()) {
-          if (m.getConf() != null && m.getConf().getFile() != null) {
-            String name = m.getName();
+      if (root.profiles() != null) {
+        for (CaConfType.NameTypeConf m : root.profiles()) {
+          if (m.conf() != null && m.conf().file() != null) {
+            String name = m.name();
             String zipEntryName = "files/certprofile-" + name + ".conf";
-            String value = getValue(m.getConf().getFile(), properties, baseDir);
+            String value = getValue(m.conf().file(), properties, baseDir);
             createFileOrValue(zipStream, value, zipEntryName);
-            m.getConf().setFile(zipEntryName);
+            m.conf().setFile(zipEntryName);
           }
         }
       }
 
       // CAs
-      if (root.getCas() != null) {
-        for (CaConfType.Ca m : root.getCas()) {
-          if (m.getCaInfo() != null) {
-            String name = m.getName();
-            CaConfType.CaInfo ci = m.getCaInfo();
+      if (root.cas() != null) {
+        for (CaConfType.Ca m : root.cas()) {
+          if (m.caInfo() != null) {
+            String name = m.name();
+            CaConfType.CaInfo ci = m.caInfo();
 
             // SignerInfo
-            if (ci.getSignerConf() != null) {
-              FileOrValue fv = ci.getSignerConf();
+            if (ci.signerConf() != null) {
+              FileOrValue fv = ci.signerConf();
               String conf = convertSignerConf(fv, properties, baseDir);
               if (conf.length() > 200) {
                 String zipEntryName = "files/ca-" + name + "-signer.conf";
@@ -188,29 +186,29 @@ public class CaConfs {
             }
 
             // Cert and Certchain
-            if (ci.getGenSelfIssued() == null) {
-              if (ci.getCert() != null && ci.getCert().getFile() != null) {
+            if (ci.genSelfIssued() == null) {
+              if (ci.cert() != null && ci.cert().file() != null) {
                 String zipEntryName = "files/ca-" + name + ".crt";
-                byte[] value = getBinary(ci.getCert().getFile(),
+                byte[] value = getBinary(ci.cert().file(),
                                 properties, baseDir);
                 createFileOrBinary(zipStream, value, zipEntryName);
-                ci.getCert().setFile(zipEntryName);
+                ci.cert().setFile(zipEntryName);
               }
 
               if (CollectionUtil.isNotEmpty(ci.getCertchain())) {
                 for (int i = 0; i < ci.getCertchain().size(); i++) {
                   FileOrBinary fi = ci.getCertchain().get(i);
-                  if (fi.getFile() != null) {
+                  if (fi.file() != null) {
                     String zipEntryName =
                         "files/cacerts-" + name + "-" + i + ".crt";
-                    byte[] value = getBinary(fi.getFile(), properties, baseDir);
+                    byte[] value = getBinary(fi.file(), properties, baseDir);
                     createFileOrBinary(zipStream, value, zipEntryName);
                     fi.setFile(zipEntryName);
                   }
                 }
               }
             } else {
-              if (ci.getCert() != null) {
+              if (ci.cert() != null) {
                 throw new InvalidConfException(
                     "cert of CA " + name + " may not be set");
               }
@@ -222,11 +220,7 @@ public class CaConfs {
       // add the CAConf XML file
       byte[] bytes;
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
-        try {
-          marshal(root, bout);
-        } catch (CodecException e) {
-          throw new InvalidConfException(e);
-        }
+        marshal(root, bout);
         bytes = bout.toByteArray();
       }
 
@@ -307,10 +301,10 @@ public class CaConfs {
       FileOrValue confFv, Map<String, String> properties, String baseDir)
       throws IOException {
     String conf;
-    if (confFv.getValue() != null) {
-      conf = confFv.getValue();
+    if (confFv.value() != null) {
+      conf = confFv.value();
     } else {
-      conf = getValue(confFv.getFile(), properties, baseDir);
+      conf = getValue(confFv.file(), properties, baseDir);
     }
 
     conf = expandConf(conf, properties);

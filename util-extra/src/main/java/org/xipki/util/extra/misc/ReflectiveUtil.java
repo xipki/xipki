@@ -9,7 +9,6 @@ import org.xipki.util.extra.exception.ObjectCreationException;
  * Utility class for the reflective operations.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ReflectiveUtil {

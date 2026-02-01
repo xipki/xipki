@@ -35,7 +35,7 @@ public class V1KeyUsages {
         Args.notEmpty(usages, "usages"));
   }
 
-  public List<Usage> getUsages() {
+  public List<Usage> usages() {
     return usages;
   }
 
@@ -154,9 +154,9 @@ public class V1KeyUsages {
       if (defaultSingleKeyUsages != null) {
         equalsToDefault =
             CompareUtil.equals(
-                defaultSingleKeyUsages.getRequired(), required)
+                defaultSingleKeyUsages.required(), required)
             && CompareUtil.equals(
-                defaultSingleKeyUsages.getOptional(), optional);
+                defaultSingleKeyUsages.optional(), optional);
       }
 
       if (!equalsToDefault) {
@@ -182,9 +182,9 @@ public class V1KeyUsages {
       if (defaultSingleKeyUsages != null) {
         equalsToDefault =
             CompareUtil.equals(
-                defaultSingleKeyUsages.getRequired(), required)
+                defaultSingleKeyUsages.required(), required)
             && CompareUtil.equals(
-                defaultSingleKeyUsages.getOptional(), optional);
+                defaultSingleKeyUsages.optional(), optional);
       }
 
       if (!equalsToDefault) {
@@ -236,7 +236,7 @@ public class V1KeyUsages {
       this.required = required;
     }
 
-    public String getValue() {
+    public String value() {
       return value;
     }
 

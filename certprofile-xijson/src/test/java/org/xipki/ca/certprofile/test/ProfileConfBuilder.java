@@ -16,7 +16,7 @@ import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.security.KeyUsage;
-import org.xipki.security.SignSpec;
+import org.xipki.security.SignAlgo;
 import org.xipki.util.codec.json.JsonBuilder;
 import org.xipki.util.io.IoUtil;
 
@@ -38,6 +38,13 @@ import java.util.List;
 
 public class ProfileConfBuilder extends ExtensionConfBuilder {
 
+  protected static final String qa_dir   =
+      "assemblies/xipki-qa/src/main/unfiltered/qa/certprofile";
+  protected static final String qa_cab_dir  =
+      "assemblies/xipki-qa/src/main/unfiltered/qa/cab/certprofile";
+  protected static final String mgmt_dir =
+    "assemblies/xipki-mgmt-cli/src/main/unfiltered/xipki/ca-setup/certprofile";
+
   protected static final String REGEX_FQDN = ":FQDN";
 
   protected static void marshall(XijsonCertprofileType profile,
@@ -45,7 +52,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     // TODO: consider validate
     //validate = false;
     try {
-      Path path = Paths.get("tmp", filename);
+      Path path = Paths.get(filename);
       IoUtil.mkdirsParent(path);
       try (OutputStream out = Files.newOutputStream(path)) {
         String json = JsonBuilder.toPrettyJson(profile.toCodec());
@@ -78,7 +85,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     // Extensions
     // Extensions - controls
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
     list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
 
@@ -103,7 +110,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
             KeyUsage.keyEncipherment},
-        null));
+        null, profile.keyAlgorithms()));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(ExtensionID.extKeyUsage, true, false));
@@ -164,7 +171,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
     profile.setCertDomain(CertDomain.CABForumBR);
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(7500);
+    profile.setMaxSize(8400);
     profile.setValidity(validity);
     profile.setNotBeforeTime("current");
 
@@ -174,16 +181,16 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     }
 
     // SignatureAlgorithms
-    List<SignSpec> algos = Arrays.asList(
-        SignSpec.RSA_SHA256,
-        SignSpec.RSA_SHA384,
-        SignSpec.RSA_SHA512,
-        SignSpec.ECDSA_SHA256,
-        SignSpec.ECDSA_SHA384,
-        SignSpec.ECDSA_SHA512,
-        SignSpec.RSAPSS_SHA256,
-        SignSpec.RSAPSS_SHA384,
-        SignSpec.RSAPSS_SHA512);
+    List<SignAlgo> algos = Arrays.asList(
+        SignAlgo.RSA_SHA256,
+        SignAlgo.RSA_SHA384,
+        SignAlgo.RSA_SHA512,
+        SignAlgo.ECDSA_SHA256,
+        SignAlgo.ECDSA_SHA384,
+        SignAlgo.ECDSA_SHA512,
+        SignAlgo.RSAPSS_SHA256,
+        SignAlgo.RSAPSS_SHA384,
+        SignAlgo.RSAPSS_SHA512);
     profile.setSignatureAlgorithms(algos);
 
     // Subject
@@ -205,15 +212,14 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static XijsonCertprofileType getBaseProfile(
       String description, CertLevel certLevel, String validity,
-      boolean useMidnightNotBefore,
-      KeypairGenMode keypairGenMode,
+      boolean useMidnightNotBefore, KeypairGenMode keypairGenMode,
       AllowKeyMode... allowedKeyModes) {
     XijsonCertprofileType profile = new XijsonCertprofileType();
 
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(certLevel);
-    profile.setMaxSize(7500);
+    profile.setMaxSize(8400);
     profile.setValidity(validity);
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
@@ -225,25 +231,25 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     }
 
     // SignatureAlgorithms
-    List<SignSpec> algos = Arrays.asList(
-        SignSpec.RSA_SHA256,
-        SignSpec.RSA_SHA384,
-        SignSpec.RSA_SHA512,
-        SignSpec.ECDSA_SHA256,
-        SignSpec.ECDSA_SHA384,
-        SignSpec.ECDSA_SHA512,
-        SignSpec.RSAPSS_SHA256,
-        SignSpec.RSAPSS_SHA384,
-        SignSpec.RSAPSS_SHA512,
-        SignSpec.ECDSA_SHAKE128,
-        SignSpec.ECDSA_SHAKE256,
-        SignSpec.RSAPSS_SHAKE128,
-        SignSpec.RSAPSS_SHAKE256,
-        SignSpec.ED25519,
-        SignSpec.ED448,
-        SignSpec.SM2_SM3);
+    List<SignAlgo> algos = Arrays.asList(
+        SignAlgo.RSA_SHA256,
+        SignAlgo.RSA_SHA384,
+        SignAlgo.RSA_SHA512,
+        SignAlgo.ECDSA_SHA256,
+        SignAlgo.ECDSA_SHA384,
+        SignAlgo.ECDSA_SHA512,
+        SignAlgo.RSAPSS_SHA256,
+        SignAlgo.RSAPSS_SHA384,
+        SignAlgo.RSAPSS_SHA512,
+        SignAlgo.ECDSA_SHAKE128,
+        SignAlgo.ECDSA_SHAKE256,
+        SignAlgo.RSAPSS_SHAKE128,
+        SignAlgo.RSAPSS_SHAKE256,
+        SignAlgo.ED25519,
+        SignAlgo.ED448,
+        SignAlgo.SM2_SM3);
 
-    profile.setSignatureAlgorithms(algos);
+    // profile.setSignatureAlgorithms(algos);
 
     // Subject
     profile.setSubject(new ArrayList<>());
@@ -264,7 +270,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     profile.setMetadata(createDescription(description));
 
     profile.setCertLevel(CertLevel.EndEntity);
-    profile.setMaxSize(7500);
+    profile.setMaxSize(8400);
     profile.setValidity(validity);
     profile.setNotBeforeTime("current");
 
@@ -279,9 +285,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
         KeypairGenMode.FIRST_ALLOWED_KEY, allowKeyMode));
 
     // SignatureAlgorithm
-    List<SignSpec> algos = Arrays.asList(
-        SignSpec.ED25519,
-        SignSpec.ED448);
+    List<SignAlgo> algos = Arrays.asList(
+        SignAlgo.ED25519,
+        SignAlgo.ED448);
 
     profile.setSignatureAlgorithms(algos);
 
@@ -296,9 +302,10 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
         ? new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.contentCommitment}
         : new KeyUsage[]{KeyUsage.keyAgreement};
 
-    List<ExtensionType> extensions = profile.getExtensions();
+    List<ExtensionType> extensions = profile.extensions();
     extensions.add(createExtension(ExtensionID.keyUsage, true, true));
-    last(extensions).setKeyUsage(createKeyUsage(usages, null));
+    last(extensions).setKeyUsage(createKeyUsage(usages, null,
+        profile.keyAlgorithms()));
 
     return profile;
   } // method getEeBaseProfileForEdwardsOrMontgomeryCurves
@@ -314,7 +321,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static void addRdns(
       XijsonCertprofileType profile, RdnType... rdns) {
-    List<RdnType> list = profile.getSubject();
+    List<RdnType> list = profile.subject();
     Collections.addAll(list, rdns);
   }
 

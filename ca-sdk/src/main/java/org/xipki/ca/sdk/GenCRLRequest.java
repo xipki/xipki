@@ -10,7 +10,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class GenCRLRequest extends SdkRequest {
@@ -24,7 +23,7 @@ public class GenCRLRequest extends SdkRequest {
     this.crlDp = crlDp;
   }
 
-  public String getCrlDp() {
+  public String crlDp() {
     return crlDp;
   }
 

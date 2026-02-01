@@ -366,34 +366,34 @@ public class Actions {
           ? curl.curlPost(url, verbose, headerNameValues, userPassword, content)
           : curl.curlGet(url, verbose, headerNameValues, userPassword);
 
-      if (result.getContent() == null && result.getErrorContent() == null) {
+      if (result.content() == null && result.errorContent() == null) {
         println("NO response content");
       } else {
         if (outFile != null) {
-          if (result.getContent() != null) {
+          if (result.content() != null) {
             saveVerbose("saved response to file", outFile,
-                result.getContent());
+                result.content());
           } else {
             saveVerbose("saved (error) response to file",
-                "error-" + outFile, result.getErrorContent());
+                "error-" + outFile, result.errorContent());
           }
         } else {
-          String ct = result.getContentType();
+          String ct = result.contentType();
           String charset = getCharset(ct);
           if (charset == null) {
             charset = "UTF-8";
           }
 
-          if (result.getContent() != null) {
-            println(new String(result.getContent(), charset));
+          if (result.content() != null) {
+            println(new String(result.content(), charset));
           } else {
             println("ERROR: ");
-            println(new String(result.getContent(), charset));
+            println(new String(result.content(), charset));
           }
         }
       }
 
-      int sc = result.getStatusCode();
+      int sc = result.statusCode();
       if (sc != HttpStatusCode.SC_OK) {
         throw new RuntimeException("Received status code other than OK: " + sc);
       }

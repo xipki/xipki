@@ -31,15 +31,15 @@ public class NewOrderPayload implements JsonEncodable {
     this.notAfter = notAfter;
   }
 
-  public List<Identifier> getIdentifiers() {
+  public List<Identifier> identifiers() {
     return identifiers;
   }
 
-  public String getNotBefore() {
+  public String notBefore() {
     return notBefore;
   }
 
-  public String getNotAfter() {
+  public String notAfter() {
     return notAfter;
   }
 

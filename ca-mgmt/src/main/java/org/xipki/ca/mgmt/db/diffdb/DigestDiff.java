@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Compare content of two databases.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class DigestDiff {
@@ -94,7 +93,7 @@ class DigestDiff {
 
     // number of threads
     this.numTargetThreads = Math.min(numThreads,
-        targetDatasource.getMaximumPoolSize() - 1);
+        targetDatasource.maximumPoolSize() - 1);
 
     if (this.numTargetThreads != numThreads) {
       LOG.info("reduce the numTargetThreads from {} to {}",
@@ -150,7 +149,7 @@ class DigestDiff {
   private void diffSingleCa(RefDigestReader refReader,
                             Map<Integer, byte[]> caIdCertBytesMap)
       throws IOException, InterruptedException {
-    X509Cert caCert = refReader.getCaCert();
+    X509Cert caCert = refReader.caCert();
     byte[] caCertBytes = caCert.getEncoded();
 
     if (includeCaCerts != null && !includeCaCerts.isEmpty()) {
@@ -162,11 +161,11 @@ class DigestDiff {
         }
       }
       if (!include) {
-        System.out.println("skipped CA " + refReader.getCaSubjectName());
+        System.out.println("skipped CA " + refReader.caSubjectName());
       }
     }
 
-    String commonName = caCert.getCommonName();
+    String commonName = caCert.commonName();
     File caReportDir = new File(reportDirName, "ca-" + commonName);
 
     int idx = 2;
@@ -196,9 +195,9 @@ class DigestDiff {
 
     try {
       reporter.start();
-      ProcessLog processLog = new ProcessLog(refReader.getTotalAccount());
+      ProcessLog processLog = new ProcessLog(refReader.totalAccount());
       System.out.println("Processing certificates of CA \n\t'"
-          + refReader.getCaSubjectName() + "'");
+          + refReader.caSubjectName() + "'");
       processLog.printHeader();
 
       target = new TargetDigestReader(revokedOnly, processLog, refReader,

@@ -18,7 +18,6 @@ import java.nio.file.Path;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class GatewayConf {
@@ -130,7 +129,7 @@ public class GatewayConf {
     this.logReqResp = logReqResp;
   }
 
-  public String getReverseProxyMode() {
+  public String reverseProxyMode() {
     return reverseProxyMode;
   }
 
@@ -138,23 +137,23 @@ public class GatewayConf {
     this.reverseProxyMode = reverseProxyMode;
   }
 
-  public PopControlConf getPop() {
+  public PopControlConf pop() {
     return pop;
   }
 
-  public SdkClientConf getSdkClient() {
+  public SdkClientConf sdkClient() {
     return sdkClient;
   }
 
-  public Audits.AuditConf getAudit() {
+  public Audits.AuditConf audit() {
     return audit;
   }
 
-  public Securities.SecurityConf getSecurity() {
+  public Securities.SecurityConf security() {
     return security;
   }
 
-  public SupportedProtocols getProtocols() {
+  public SupportedProtocols protocols() {
     return protocols;
   }
 

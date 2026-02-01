@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
  * OBF (jetty's Obfuscate) password service.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class OBFPasswordService {
 

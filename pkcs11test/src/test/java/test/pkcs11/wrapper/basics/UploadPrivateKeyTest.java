@@ -111,7 +111,7 @@ public class UploadPrivateKeyTest {
     private static final int cRLSign = 6;
 
     @Test
-    public void main() throws Exception {
+    public void execTest() throws Exception {
       LOG.info("##################################################");
       LOG.info("Reading private key and certificate from: {}", p12ResourcePath);
       char[] filePassword = p12Password.toCharArray();

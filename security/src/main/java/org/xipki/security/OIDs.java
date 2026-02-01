@@ -14,7 +14,6 @@ import java.util.Map;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class OIDs {
 
   private static final Map<String, String> oidNameMap = new HashMap<>();

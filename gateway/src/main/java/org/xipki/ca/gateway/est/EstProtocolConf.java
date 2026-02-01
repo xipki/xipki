@@ -21,7 +21,6 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class EstProtocolConf extends ProtocolConf {
@@ -38,11 +37,11 @@ public class EstProtocolConf extends ProtocolConf {
     this.caProfiles = caProfiles;
   }
 
-  public String getAuthenticator() {
+  public String authenticator() {
     return authenticator;
   }
 
-  public List<CaProfileConf> getCaProfiles() {
+  public List<CaProfileConf> caProfiles() {
     return caProfiles;
   }
 
@@ -59,8 +58,8 @@ public class EstProtocolConf extends ProtocolConf {
       }
     }
 
-    return new EstProtocolConf(pConf.getLogReqResp(),
-        pConf.getPop(), pConf.getSdkClient(),
+    return new EstProtocolConf(pConf.logReqResp(),
+        pConf.pop(), pConf.sdkClient(),
         json.getString("authenticator"), caProfiles);
   }
 

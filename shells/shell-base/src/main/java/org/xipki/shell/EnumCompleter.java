@@ -18,7 +18,6 @@ import java.util.List;
  * Completer with static enums.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class EnumCompleter implements Completer {

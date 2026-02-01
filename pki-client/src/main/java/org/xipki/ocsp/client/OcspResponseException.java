@@ -13,7 +13,6 @@ import java.util.Map;
  * Exception related to the OCSP response.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class OcspResponseException extends Exception {

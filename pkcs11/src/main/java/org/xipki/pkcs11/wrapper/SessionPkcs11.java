@@ -82,7 +82,7 @@ class SessionPkcs11 {
 
   private void recover(boolean loginAllowed, PKCS11Exception e)
       throws PKCS11Exception {
-    long err = e.getErrorCode();
+    long err = e.errorCode();
     if (err == PKCS11T.CKR_USER_NOT_LOGGED_IN) {
       if (!loginAllowed || auth == null) {
         throw e;
@@ -94,7 +94,7 @@ class SessionPkcs11 {
         if (!auth.isCurable()) {
           recoverable = false;
           LOG.warn("session {} is not recoverable: {}",
-              hSession, PKCS11T.ckrCodeToName(ex.getErrorCode()));
+              hSession, PKCS11T.ckrCodeToName(ex.errorCode()));
         }
 
         throw ex;

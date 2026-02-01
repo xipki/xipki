@@ -14,7 +14,6 @@ import java.util.List;
  * OCSP request options.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class RequestOptions {
@@ -44,7 +43,7 @@ public class RequestOptions {
     this.useNonce = useNonce;
   }
 
-  public int getNonceLen() {
+  public int nonceLen() {
     return nonceLen;
   }
 
@@ -52,7 +51,7 @@ public class RequestOptions {
     this.nonceLen = Args.positive(nonceLen, "nonceLen");
   }
 
-  public HashAlgo getHashAlgorithm() {
+  public HashAlgo hashAlgorithm() {
     return hashAlgorithm;
   }
 
@@ -60,7 +59,7 @@ public class RequestOptions {
     this.hashAlgorithm = hashAlgorithm;
   }
 
-  public List<SignAlgo> getPreferredSignatureAlgorithms() {
+  public List<SignAlgo> preferredSignatureAlgorithms() {
     return preferredSignatureAlgorithms;
   }
 

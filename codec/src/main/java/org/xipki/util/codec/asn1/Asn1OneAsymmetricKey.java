@@ -42,15 +42,15 @@ public class Asn1OneAsymmetricKey {
     this.publicKey = publicKey;
   }
 
-  public Asn1AlgorithmIdentifier getPrivateKeyAlgorithm() {
+  public Asn1AlgorithmIdentifier privateKeyAlgorithm() {
     return privateKeyAlgorithm;
   }
 
-  public byte[] getPrivateKey() {
+  public byte[] privateKey() {
     return privateKey;
   }
 
-  public byte[] getPublicKey() {
+  public byte[] publicKey() {
     return publicKey;
   }
 

@@ -119,10 +119,10 @@ class Ca2Manager {
   boolean startCa(String caName) {
     CaInfo caEntry = manager.caInfos.get(caName);
 
-    CtlogControl ctlogControl = caEntry.getCtlogControl();
+    CtlogControl ctlogControl = caEntry.ctlogControl();
     CtLogClient ctlogClient = null;
     if (ctlogControl != null && ctlogControl.isEnabled()) {
-      String name = ctlogControl.getSslContextName();
+      String name = ctlogControl.sslContextName();
       SslContextConf ctxConf;
       if (name == null) {
         ctxConf = null;
@@ -134,7 +134,7 @@ class Ca2Manager {
           return false;
         }
       }
-      ctlogClient = new CtLogClient(ctlogControl.getServers(), ctxConf);
+      ctlogClient = new CtLogClient(ctlogControl.servers(), ctxConf);
     }
 
     X509Ca ca;
@@ -153,7 +153,7 @@ class Ca2Manager {
   Set<String> getSuccessfulCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.x509cas.keySet()) {
-      if (CaStatus.active == manager.caInfos.get(name).getStatus()) {
+      if (CaStatus.active == manager.caInfos.get(name).status()) {
         ret.add(name);
       }
     }
@@ -163,7 +163,7 @@ class Ca2Manager {
   Set<String> getFailedCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.caInfos.keySet()) {
-      if (CaStatus.active == manager.caInfos.get(name).getStatus()
+      if (CaStatus.active == manager.caInfos.get(name).status()
           && !manager.x509cas.containsKey(name)) {
         ret.add(name);
       }
@@ -174,7 +174,7 @@ class Ca2Manager {
   Set<String> getInactiveCaNames() {
     Set<String> ret = new HashSet<>();
     for (String name : manager.caInfos.keySet()) {
-      if (CaStatus.inactive == manager.caInfos.get(name).getStatus()) {
+      if (CaStatus.inactive == manager.caInfos.get(name).status()) {
         ret.add(name);
       }
     }
@@ -228,9 +228,9 @@ class Ca2Manager {
     CaInfo ca = queryExecutor.createCaInfo(name, manager.certstore);
     LOG.info("created CA {}:\n{}", name, ca.toString(false));
     manager.caInfos.put(name, ca);
-    manager.idNameMap.addCa(ca.getIdent());
+    manager.idNameMap.addCa(ca.ident());
     Set<CaHasRequestorEntry> caReqEntries =
-        queryExecutor.createCaHasRequestors(ca.getIdent());
+        queryExecutor.createCaHasRequestors(ca.ident());
     manager.caHasRequestors.put(name, caReqEntries);
     if (LOG.isInfoEnabled()) {
       StringBuilder sb = new StringBuilder();
@@ -241,18 +241,18 @@ class Ca2Manager {
     }
 
     Set<CaProfileIdAliases> profileIds =
-        queryExecutor.createCaHasProfiles(ca.getIdent());
+        queryExecutor.createCaHasProfiles(ca.ident());
     Set<CaProfileEntry> caProfileEntries = new HashSet<>();
     for (CaProfileIdAliases id : profileIds) {
-      String profileName = manager.idNameMap.getCertprofileName(id.getId());
+      String profileName = manager.idNameMap.getCertprofileName(id.id());
       caProfileEntries.add(new CaProfileEntry(profileName,
-          StringUtil.split(id.getAliases(), ",")));
+          StringUtil.split(id.aliases(), ",")));
     }
     manager.caHasProfiles.put(name, caProfileEntries);
     LOG.info("CA {} is associated with profiles: {}", name, caProfileEntries);
 
     Set<Integer> publisherIds =
-        queryExecutor.createCaHasPublishers(ca.getIdent());
+        queryExecutor.createCaHasPublishers(ca.ident());
     Set<String> publisherNames = new HashSet<>();
     for (Integer id : publisherIds) {
       publisherNames.add(manager.idNameMap.getPublisherName(id));
@@ -266,8 +266,8 @@ class Ca2Manager {
   void addCa(CaEntry caEntry, CertStore certstore) throws CaMgmtException {
     assertMasterMode();
 
-    NameId ident = Args.notNull(caEntry, "caEntry").getIdent();
-    String name = ident.getName();
+    NameId ident = Args.notNull(caEntry, "caEntry").ident();
+    String name = ident.name();
     CaManagerImpl.checkName(name, "CA name");
 
     if (manager.caInfos.containsKey(name)) {
@@ -275,24 +275,24 @@ class Ca2Manager {
     }
 
     SecurityFactory securityFactory = manager.securityFactory;
-    String origSignerConf = caEntry.getSignerConf();
+    String origSignerConf = caEntry.signerConf();
     String newSignerConf = CaUtil.canonicalizeSignerConf(origSignerConf);
     if (!origSignerConf.equals(newSignerConf)) {
       caEntry.setSignerConf(newSignerConf);
     }
 
-    BaseCaInfo base = caEntry.getBase();
+    BaseCaInfo base = caEntry.base();
 
     try {
       List<CaSignerConf> signerConfs =
-          CaEntry.splitCaSignerConfs(caEntry.getSignerConf());
+          CaEntry.splitCaSignerConfs(caEntry.signerConf());
       for (CaSignerConf m : signerConfs) {
-        SignerConf signerConf = new SignerConf(m.getConf());
+        SignerConf signerConf = new SignerConf(m.conf());
         ConcurrentContentSigner signer = securityFactory.createSigner(
-            base.getSignerType(), signerConf, caEntry.getCert());
+            base.signerType(), signerConf, caEntry.cert());
 
         try {
-          if (caEntry.getCert() == null) {
+          if (caEntry.cert() == null) {
             if (signer.getCertificate() == null) {
               throw new CaMgmtException(
                   "CA signer without certificate is not allowed");
@@ -309,24 +309,24 @@ class Ca2Manager {
     }
 
     manager.caConfStore.addCa(caEntry);
-    certstore.addCa(caEntry.getIdent(), caEntry.getCert(),
-        base.getRevocationInfo());
+    certstore.addCa(caEntry.ident(), caEntry.cert(),
+        base.revocationInfo());
     createAndStartCA(name);
   } // method addCa
 
   void changeCa(ChangeCaEntry entry) throws CaMgmtException {
     assertMasterMode();
 
-    String name = Args.notNull(entry, "entry").getIdent().getName();
+    String name = Args.notNull(entry, "entry").ident().name();
     NameId ident = manager.idNameMap.getCa(name);
     if (ident == null) {
       throw new CaMgmtException("Unknown CA " + name);
     }
 
-    entry.getIdent().setId(ident.getId());
+    entry.ident().setId(ident.id());
 
     CaInfo caInfo0 = manager.caInfos.get(name);
-    manager.caConfStore.changeCa(entry, caInfo0.getCaEntry().getBase(),
+    manager.caConfStore.changeCa(entry, caInfo0.caEntry().base(),
         manager.securityFactory);
 
     createAndStartCA(name);
@@ -335,7 +335,7 @@ class Ca2Manager {
   private void createAndStartCA(String caName) throws CaMgmtException {
     if (createCa(caName)) {
       CaInfo caInfo = manager.caInfos.get(caName);
-      if (CaStatus.active != caInfo.getStatus()) {
+      if (CaStatus.active != caInfo.status()) {
         return;
       }
 
@@ -362,8 +362,8 @@ class Ca2Manager {
       throw new CaMgmtException("unknown CA alias " + aliasName);
     }
 
-    manager.caConfStore.addCaAlias(aliasName, ca.getCaIdent());
-    manager.caAliases.put(aliasName, ca.getCaIdent().getId());
+    manager.caConfStore.addCaAlias(aliasName, ca.caIdent());
+    manager.caAliases.put(aliasName, ca.caIdent().id());
   } // method addCaAlias
 
   void removeCaAlias(String name) throws CaMgmtException {
@@ -379,8 +379,8 @@ class Ca2Manager {
     Integer caId = manager.caAliases.get(aliasName);
     for (String name : manager.x509cas.keySet()) {
       X509Ca ca = manager.x509cas.get(name);
-      if (ca.getCaIdent().getId().equals(caId)) {
-        return ca.getCaIdent().getName();
+      if (ca.caIdent().id().equals(caId)) {
+        return ca.caIdent().name();
       }
     }
     return null;
@@ -394,11 +394,11 @@ class Ca2Manager {
       return aliases;
     }
 
-    NameId caIdent = ca.getCaIdent();
+    NameId caIdent = ca.caIdent();
 
     for (String alias : manager.caAliases.keySet()) {
       Integer thisCaId = manager.caAliases.get(alias);
-      if (caIdent.getId().equals(thisCaId)) {
+      if (caIdent.id().equals(thisCaId)) {
         aliases.add(alias);
       }
     }
@@ -440,9 +440,9 @@ class Ca2Manager {
     LOG.info("revoking CA '{}'", caName);
     X509Ca ca = manager.x509cas.get(caName);
 
-    CertRevocationInfo currentRevInfo = ca.getCaInfo().getRevocationInfo();
+    CertRevocationInfo currentRevInfo = ca.caInfo().revocationInfo();
     if (currentRevInfo != null) {
-      CrlReason currentReason = currentRevInfo.getReason();
+      CrlReason currentReason = currentRevInfo.reason();
       if (currentReason != CrlReason.CERTIFICATE_HOLD) {
         throw new CaMgmtException("CA " + caName +
             " has been revoked with reason " + currentReason.name());
@@ -502,9 +502,9 @@ class Ca2Manager {
     assertMasterModeAndSetuped();
     profileName = Args.toNonBlankLower(profileName, "profileName");
 
-    BaseCaInfo base = caEntry.getBase();
-    if (base.getExpirationPeriod() < 0) {
-      LOG.warn("invalid expirationPeriod: {}", base.getExpirationPeriod());
+    BaseCaInfo base = caEntry.base();
+    if (base.expirationPeriod() < 0) {
+      LOG.warn("invalid expirationPeriod: {}", base.expirationPeriod());
       return null;
     }
 
@@ -517,15 +517,15 @@ class Ca2Manager {
     X509Cert caCert;
     try {
       caCert = SelfSignedCertBuilder.generateSelfSigned(manager.securityFactory,
-          base.getSignerType(), caEntry.getSignerConf(), certprofile,
+          base.signerType(), caEntry.signerConf(), certprofile,
           subject, serialNumber, notBefore, notAfter);
     } catch (OperationException | InvalidConfException ex) {
       throw new CaMgmtException(
           ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
 
-    String signerConf = caEntry.getSignerConf();
-    if (StringUtil.orEqualsIgnoreCase(base.getSignerType(),
+    String signerConf = caEntry.signerConf();
+    if (StringUtil.orEqualsIgnoreCase(base.signerType(),
         "PKCS12", "JCEKS")) {
       try {
         signerConf = CaUtil.canonicalizeSignerConf(signerConf);
@@ -557,7 +557,7 @@ class Ca2Manager {
       throw new CaMgmtException("unknown certificate profile " + profileName);
     }
 
-    if (certProfile.getCertLevel() != CertLevel.CROSS) {
+    if (certProfile.certLevel() != CertLevel.CROSS) {
       throw new CaMgmtException("certificate profile " + profileName
           + " is not for CROSS certificate");
     }
@@ -578,7 +578,7 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage());
     }
 
-    if (!manager.getSecurityFactory().verifyPop(csr, null, null, null)) {
+    if (!manager.securityFactory().verifyPop(csr, null, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
@@ -619,7 +619,7 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    return certInfo.getCert().getCert();
+    return certInfo.cert().cert();
   }
 
   KeyCertBytesPair generateKeyCert(
@@ -647,8 +647,8 @@ class Ca2Manager {
     }
 
     try {
-      return new KeyCertBytesPair(certInfo.getPrivateKey().getEncoded(),
-          certInfo.getCert().getCert().getEncoded());
+      return new KeyCertBytesPair(certInfo.privateKey().getEncoded(),
+          certInfo.cert().cert().getEncoded());
     } catch (IOException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
@@ -673,7 +673,7 @@ class Ca2Manager {
     }
 
     CertificationRequestInfo cri = csr.getCertificationRequestInfo();
-    if (!manager.getSecurityFactory().verifyPop(csr, null, null, null)) {
+    if (!manager.securityFactory().verifyPop(csr, null, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
@@ -699,7 +699,7 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    return certInfo.getCert().getCert();
+    return certInfo.cert().cert();
   } // method generateCertificate
 
   void revokeCertificate(
@@ -810,8 +810,8 @@ class Ca2Manager {
     NameId caId = null;
     for (String name : manager.caInfos.keySet()) {
       CaInfo ca = manager.caInfos.get(name);
-      if (issuer.equals(manager.caInfos.get(name).getCert().getSubject())) {
-        caId = ca.getIdent();
+      if (issuer.equals(manager.caInfos.get(name).cert().subject())) {
+        caId = ca.ident();
         break;
       }
     }
@@ -821,7 +821,7 @@ class Ca2Manager {
     }
 
     try {
-      return manager.certstore.getCertWithRevocationInfo(caId.getId(),
+      return manager.certstore.getCertWithRevocationInfo(caId.id(),
           serialNumber, manager.idNameMap);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);

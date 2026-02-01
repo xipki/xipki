@@ -6,13 +6,12 @@ package org.xipki.qa.ocsp;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 /**
  * OCSP response option.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspResponseOption {

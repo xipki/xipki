@@ -96,7 +96,7 @@ public class CaConfColumn implements JsonEncodable {
    */
   private ConfPairs extraControl;
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 
@@ -104,7 +104,7 @@ public class CaConfColumn implements JsonEncodable {
     this.version = version;
   }
 
-  public int getSnSize() {
+  public int snSize() {
     return snSize;
   }
 
@@ -112,7 +112,7 @@ public class CaConfColumn implements JsonEncodable {
     this.snSize = snSize;
   }
 
-  public List<String> getCacertUris() {
+  public List<String> cacertUris() {
     return cacertUris;
   }
 
@@ -120,7 +120,7 @@ public class CaConfColumn implements JsonEncodable {
     this.cacertUris = cacertUris;
   }
 
-  public List<String> getOcspUris() {
+  public List<String> ocspUris() {
     return ocspUris;
   }
 
@@ -128,7 +128,7 @@ public class CaConfColumn implements JsonEncodable {
     this.ocspUris = ocspUris;
   }
 
-  public List<String> getCrlUris() {
+  public List<String> crlUris() {
     return crlUris;
   }
 
@@ -136,7 +136,7 @@ public class CaConfColumn implements JsonEncodable {
     this.crlUris = crlUris;
   }
 
-  public List<String> getDeltaCrlUris() {
+  public List<String> deltaCrlUris() {
     return deltaCrlUris;
   }
 
@@ -144,7 +144,7 @@ public class CaConfColumn implements JsonEncodable {
     this.deltaCrlUris = deltaCrlUris;
   }
 
-  public Validity getMaxValidity() {
+  public Validity maxValidity() {
     return maxValidity;
   }
 
@@ -152,7 +152,7 @@ public class CaConfColumn implements JsonEncodable {
     this.maxValidity = maxValidity;
   }
 
-  public List<String> getKeypairGenNames() {
+  public List<String> keypairGenNames() {
     return keypairGenNames;
   }
 
@@ -176,7 +176,7 @@ public class CaConfColumn implements JsonEncodable {
     this.saveKeypair = saveKeypair;
   }
 
-  public ValidityMode getValidityMode() {
+  public ValidityMode validityMode() {
     return validityMode;
   }
 
@@ -184,7 +184,7 @@ public class CaConfColumn implements JsonEncodable {
     this.validityMode = validityMode;
   }
 
-  public Permissions getPermissions() {
+  public Permissions permissions() {
     return permissions;
   }
 
@@ -192,7 +192,7 @@ public class CaConfColumn implements JsonEncodable {
     this.permissions = permissions;
   }
 
-  public int getNumCrls() {
+  public int numCrls() {
     return numCrls;
   }
 
@@ -200,7 +200,7 @@ public class CaConfColumn implements JsonEncodable {
     this.numCrls = numCrls;
   }
 
-  public int getExpirationPeriod() {
+  public int expirationPeriod() {
     return expirationPeriod;
   }
 
@@ -208,7 +208,7 @@ public class CaConfColumn implements JsonEncodable {
     this.expirationPeriod = expirationPeriod;
   }
 
-  public int getKeepExpiredCertDays() {
+  public int keepExpiredCertDays() {
     return keepExpiredCertDays;
   }
 
@@ -216,7 +216,7 @@ public class CaConfColumn implements JsonEncodable {
     this.keepExpiredCertDays = keepExpiredCertDays;
   }
 
-  public CrlControl getCrlControl() {
+  public CrlControl crlControl() {
     return crlControl;
   }
 
@@ -224,7 +224,7 @@ public class CaConfColumn implements JsonEncodable {
     this.crlControl = crlControl;
   }
 
-  public CtlogControl getCtlogControl() {
+  public CtlogControl ctlogControl() {
     return ctlogControl;
   }
 
@@ -232,7 +232,7 @@ public class CaConfColumn implements JsonEncodable {
     this.ctlogControl = ctlogControl;
   }
 
-  public RevokeSuspendedControl getRevokeSuspendedControl() {
+  public RevokeSuspendedControl revokeSuspendedControl() {
     return revokeSuspendedControl;
   }
 
@@ -241,7 +241,7 @@ public class CaConfColumn implements JsonEncodable {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public ConfPairs getExtraControl() {
+  public ConfPairs extraControl() {
     return extraControl;
   }
 
@@ -357,7 +357,8 @@ public class CaConfColumn implements JsonEncodable {
     baseCaInfo.setSaveCert(saveCert);
     baseCaInfo.setSnSize(snSize);
     baseCaInfo.setSaveKeypair(saveKeypair);
-    baseCaInfo.setValidityMode(validityMode());
+    baseCaInfo.setValidityMode(validityMode == null
+        ? ValidityMode.STRICT : validityMode);
     baseCaInfo.setCrlControl(crlControl);
     baseCaInfo.setCtlogControl(ctlogControl);
     baseCaInfo.setExtraControl(extraControl);
@@ -368,29 +369,29 @@ public class CaConfColumn implements JsonEncodable {
     CaConfColumn cc = new CaConfColumn();
 
     // CA URIS
-    CaUris caUris = baseCaInfo.getCaUris();
+    CaUris caUris = baseCaInfo.caUris();
     if (caUris != null) {
-      cc.setCacertUris(caUris.getCacertUris());
-      cc.setCrlUris(caUris.getCrlUris());
-      cc.setDeltaCrlUris(caUris.getDeltaCrlUris());
-      cc.setOcspUris(caUris.getOcspUris());
+      cc.setCacertUris(caUris.cacertUris());
+      cc.setCrlUris(caUris.crlUris());
+      cc.setDeltaCrlUris(caUris.deltaCrlUris());
+      cc.setOcspUris(caUris.ocspUris());
     }
 
-    cc.setKeypairGenNames(baseCaInfo.getKeypairGenNames());
-    cc.setMaxValidity(baseCaInfo.getMaxValidity());
-    cc.setNumCrls(baseCaInfo.getNumCrls());
+    cc.setKeypairGenNames(baseCaInfo.keypairGenNames());
+    cc.setMaxValidity(baseCaInfo.maxValidity());
+    cc.setNumCrls(baseCaInfo.numCrls());
     cc.setSaveCert(baseCaInfo.isSaveCert());
     cc.setSaveKeypair(baseCaInfo.isSaveKeypair());
-    cc.setSnSize(baseCaInfo.getSnSize());
-    cc.setValidityMode(baseCaInfo.getValidityMode());
-    cc.setExpirationPeriod(baseCaInfo.getExpirationPeriod());
-    cc.setKeepExpiredCertDays(baseCaInfo.getKeepExpiredCertDays());
+    cc.setSnSize(baseCaInfo.snSize());
+    cc.setValidityMode(baseCaInfo.validityMode());
+    cc.setExpirationPeriod(baseCaInfo.expirationPeriod());
+    cc.setKeepExpiredCertDays(baseCaInfo.keepExpiredCertDays());
 
-    cc.setPermissions(baseCaInfo.getPermissions());
-    cc.setCtlogControl(baseCaInfo.getCtlogControl());
-    cc.setCrlControl(baseCaInfo.getCrlControl());
-    cc.setRevokeSuspendedControl(baseCaInfo.getRevokeSuspendedControl());
-    cc.setExtraControl(baseCaInfo.getExtraControl());
+    cc.setPermissions(baseCaInfo.permissions());
+    cc.setCtlogControl(baseCaInfo.ctlogControl());
+    cc.setCrlControl(baseCaInfo.crlControl());
+    cc.setRevokeSuspendedControl(baseCaInfo.revokeSuspendedControl());
+    cc.setExtraControl(baseCaInfo.extraControl());
 
     return cc;
   }
@@ -419,7 +420,7 @@ public class CaConfColumn implements JsonEncodable {
         .put("crlControl",          crlControl)
         .put("ctlogControl",        ctlogControl)
         .put("revokeSuspendedControl", revokeSuspendedControl)
-        .put("permissions",         permissions.getValue());
+        .put("permissions",         permissions.value());
 
     if (maxValidity != null) {
       map.put("maxValidity", maxValidity.toString());
@@ -429,10 +430,6 @@ public class CaConfColumn implements JsonEncodable {
 
   public CaUris caUris() {
     return new CaUris(cacertUris, ocspUris, crlUris, deltaCrlUris);
-  }
-
-  private ValidityMode validityMode() {
-    return validityMode == null ? ValidityMode.STRICT : validityMode;
   }
 
 }

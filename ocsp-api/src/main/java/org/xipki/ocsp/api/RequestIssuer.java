@@ -15,7 +15,6 @@ import java.util.Arrays;
  * Issuer in the OCSP request.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class RequestIssuer {
@@ -77,7 +76,7 @@ public class RequestIssuer {
 
   public String hashAlgorithmOID() {
     if (hashAlgo != null) {
-      return hashAlgo.getOid().getId();
+      return hashAlgo.oid().getId();
     } else {
       final int start = from + 2;
       byte[] bytes = Arrays.copyOfRange(data, start,
@@ -86,19 +85,19 @@ public class RequestIssuer {
     }
   }
 
-  public int getFrom() {
+  public int from() {
     return from;
   }
 
-  public byte[] getData() {
+  public byte[] data() {
     return data;
   }
 
-  public int getNameHashFrom() {
+  public int nameHashFrom() {
     return nameHashFrom;
   }
 
-  public int getLength() {
+  public int length() {
     return length;
   }
 

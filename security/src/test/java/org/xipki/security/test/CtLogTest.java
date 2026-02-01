@@ -18,7 +18,6 @@ import org.xipki.util.io.IoUtil;
  * CTLog test.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class CtLogTest {
 
@@ -50,10 +49,10 @@ public class CtLogTest {
 
     SignedCertificateTimestampList sctList2 =
         SignedCertificateTimestampList.getInstance(encodedScts);
-    SignedCertificateTimestamp sct = sctList2.getSctList().get(0);
-    sct.getDigitallySigned().getEncoded();
-    Object signatureObject = sctList2.getSctList().get(0).getDigitallySigned()
-        .getSignatureObject();
+    SignedCertificateTimestamp sct = sctList2.sctList().get(0);
+    sct.digitallySigned().getEncoded();
+    Object signatureObject = sctList2.sctList().get(0).digitallySigned()
+        .signatureObject();
     Assert.assertNotNull("signatureObject", signatureObject);
     Assert.assertArrayEquals(encodedScts, sctList2.getEncoded());
   }

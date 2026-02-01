@@ -62,7 +62,7 @@ public class ScepServer {
     this.generateCrl = generateCrl;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
@@ -148,19 +148,19 @@ public class ScepServer {
     return this.servlet;
   } // method getServlet
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
-  public X509Cert getRaCert() {
+  public X509Cert raCert() {
     return raCert;
   }
 
-  public X509Cert getNextCaCert() {
+  public X509Cert nextCaCert() {
     return nextCaCert;
   }
 
-  public X509Cert getNextRaCert() {
+  public X509Cert nextRaCert() {
     return nextRaCert;
   }
 

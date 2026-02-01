@@ -11,7 +11,6 @@ import org.xipki.util.codec.Args;
  * CertId or PKI error.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertIdOrError {
@@ -30,11 +29,11 @@ public class CertIdOrError {
     this.error = Args.notNull(error, "error");
   }
 
-  public CertId getCertId() {
+  public CertId certId() {
     return certId;
   }
 
-  public PkiStatusInfo getError() {
+  public PkiStatusInfo error() {
     return error;
   }
 

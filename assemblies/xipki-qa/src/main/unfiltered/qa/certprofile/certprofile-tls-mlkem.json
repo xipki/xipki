@@ -1,77 +1,79 @@
 {
   "metadata": {
-    "details": "certprofile tls with MLKEM keys",
-    "category": "A"
+    "category": "A",
+    "details": "certprofile tls"
   },
   "certLevel": "EndEntity",
-  "certDomain": "RFC5280",
   "maxSize": 8400,
   "validity": "5y",
   "notBeforeTime": "current",
   "keypairGeneration": "MLKEM512",
   "keyAlgorithms": ["MLKEM512","MLKEM768","MLKEM1024"],
   "subject": [{
-    "type": "country",
-    "minOccurs": 0
-  },{
-    "type": "organization",
-    "minOccurs": 0
-  },{
-    "type": "organizationalUnit",
-    "minOccurs": 0
-  },{
-    "type": "serialNumber",
-    "minOccurs": 0
-  },{
-    "type": "commonName",
-    "regex": ":FQDN",
-    "toSAN": "DNSName"
-  }],
+      "type": "country",
+      "minOccurs": 0
+    },{
+      "type": "organization",
+      "minOccurs": 0
+    },{
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },{
+      "type": "serialNumber",
+      "minOccurs": 0
+    },{
+      "type": "commonName",
+      "toSAN": "DNSName",
+      "regex": ":FQDN"
+    }
+  ],
   "extensions": [{
-    "type": "SubjectKeyIdentifier",
-    "required": true
-  },{
-    "type": "CRLDistributionPoints"
-  },{
-    "type": "FreshestCRL"
-  },{
-    "type": "SubjectAlternativeName",
-    "required": true,
-    "inRequest": "optional",
-    "subjectAltName": {
-      "modes": ["DNSName","IPAddress"]
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },{
+      "type": "CRLDistributionPoints"
+    },{
+      "type": "FreshestCRL"
+    },{
+      "type": "SubjectAlternativeName",
+      "required": true,
+      "inRequest": "optional",
+      "subjectAltName": {
+        "modes": ["IPAddress","DNSName"]
+      }
+    },{
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },{
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },{
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },{
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [{
+            "required": ["dataEncipherment","keyEncipherment"]
+          }
+        ]
+      }
+    },{
+      "type": "ExtendedKeyUsage",
+      "required": true,
+      "inRequest": "optional",
+      "extendedKeyUsage": {
+        "required": ["serverAuth"],
+        "optional": ["clientAuth"]
+      }
     }
-  },{
-    "type": "BasicConstraints",
-    "critical": true,
-    "required": true
-  },{
-    "type": "AuthorityInfoAccess",
-    "required": true,
-    "authorityInfoAccess": {
-      "includeCaIssuers": true,
-      "includeOcsp": true
-    }
-  },{
-    "type": "AuthorityKeyIdentifier",
-    "required": true
-  },{
-    "type": "KeyUsage",
-    "critical": true,
-    "required": true,
-    "inRequest": "optional",
-    "keyUsage": {
-      "usages": [{
-        "required": ["keyEncipherment","dataEncipherment","keyAgreement"]
-      }]
-    }
-  },{
-    "type": "ExtendedKeyUsage",
-    "required": true,
-    "inRequest": "optional",
-    "extendedKeyUsage": {
-      "required": ["serverAuth"],
-      "optional": ["clientAuth"]
-    }
-  }]
+  ]
 }

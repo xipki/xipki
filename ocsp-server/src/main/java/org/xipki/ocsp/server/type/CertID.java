@@ -11,7 +11,6 @@ import java.math.BigInteger;
  * ASN.1 CertID.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class CertID extends ASN1Type {
@@ -28,7 +27,7 @@ public class CertID extends ASN1Type {
     this.issuer = issuer;
     this.serialNumber = serialNumber;
 
-    int len = issuer.getLength();
+    int len = issuer.length();
 
     int snBytesLen = 1 + serialNumber.bitLength() / 8;
     len += getLen(snBytesLen);
@@ -37,16 +36,16 @@ public class CertID extends ASN1Type {
     this.encodedLength = getLen(bodyLength);
   }
 
-  public RequestIssuer getIssuer() {
+  public RequestIssuer issuer() {
     return issuer;
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLength;
   }
 

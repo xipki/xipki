@@ -15,7 +15,6 @@ import java.util.Set;
  * Completer with dynamic enums.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class DynamicEnumCompleter implements Completer {

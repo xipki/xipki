@@ -42,27 +42,27 @@ public class OrderResponse implements JsonEncodable {
     this.certificate = certificate;
   }
 
-  public OrderStatus getStatus() {
+  public OrderStatus status() {
     return status;
   }
 
-  public String getExpires() {
+  public String expires() {
     return expires;
   }
 
-  public String getNotBefore() {
+  public String notBefore() {
     return notBefore;
   }
 
-  public String getNotAfter() {
+  public String notAfter() {
     return notAfter;
   }
 
-  public List<Identifier> getIdentifiers() {
+  public List<Identifier> identifiers() {
     return identifiers;
   }
 
-  public List<String> getAuthorizations() {
+  public List<String> authorizations() {
     return authorizations;
   }
 
@@ -70,7 +70,7 @@ public class OrderResponse implements JsonEncodable {
     return finalize;
   }
 
-  public String getCertificate() {
+  public String certificate() {
     return certificate;
   }
 

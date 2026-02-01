@@ -1184,7 +1184,7 @@ public class PKCS11Token {
 
     long hKey = keyId.getHandle();
 
-    if (keyId.getType() == PKCS11KeyId.KeyIdType.KEYPAIR) {
+    if (keyId.type() == PKCS11KeyId.KeyIdType.KEYPAIR) {
       destroyKeyPairQuietly(new PKCS11KeyPair(
           keyId.getPublicKeyHandle(), hKey));
       return;

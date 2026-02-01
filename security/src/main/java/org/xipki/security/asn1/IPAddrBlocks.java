@@ -35,7 +35,7 @@ public class IPAddrBlocks extends ASN1Object {
     }
   }
 
-  public List<ASN1IPAddressFamily> getBlocks() {
+  public List<ASN1IPAddressFamily> blocks() {
     return Collections.unmodifiableList(blocks);
   }
 

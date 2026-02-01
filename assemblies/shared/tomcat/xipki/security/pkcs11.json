@@ -1,22 +1,22 @@
 {
-	"modules":[{
-		"name":"default",
-		"readonly":false,
-		"user":"CKU_USER",
-		"numSessions": 100,
-		"maxMessageSize":16384,
-		"newSessionTimeout":30000,
-		"includeSlots":[{
-			"index":0
-		}],
-		"nativeLibraries":[{
-			"path": "xihsm:file:vendor=xihsm,tenant=tenant1"
-		}],
-		"passwordSets":[{
-			"passwords":[
-				"123456"
-			]
-		}]
-	}]
+  "modules":[{
+    "name":"default",
+    "readonly":false,
+    "user":"CKU_USER",
+    "numSessions": 100,
+    "maxMessageSize":16384,
+    "newSessionTimeout":30000,
+    "includeSlots":[{
+      "index":0
+    }],
+    "nativeLibraries":[{
+      "path": "xihsm:file:vendor=xihsm,tenant=tenant1"
+    }],
+    "passwordSets":[{
+      "passwords":[
+        "123456"
+      ]
+    }]
+  }]
 }
 

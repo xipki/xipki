@@ -7,7 +7,6 @@ package org.xipki.ca.api.mgmt;
  * Exception related to CA management.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CaMgmtException extends Exception {

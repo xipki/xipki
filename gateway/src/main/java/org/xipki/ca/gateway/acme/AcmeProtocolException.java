@@ -26,15 +26,15 @@ public class AcmeProtocolException extends Exception {
         this.acmeDetail = acmeDetail;
     }
 
-    public int getHttpError() {
+    public int httpError() {
         return httpError;
     }
 
-    public AcmeError getAcmeError() {
+    public AcmeError acmeError() {
         return acmeError;
     }
 
-    public String getAcmeDetail() {
+    public String acmeDetail() {
         return acmeDetail;
     }
 }

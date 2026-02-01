@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class CrlDbCertStatusStore extends DbCertStatusStore {
@@ -112,7 +111,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       outputStream.write(i);
     }
 
-    public byte[] getHashValue() {
+    public byte[] hashValue() {
       if (digest == null) {
         return null;
       }
@@ -237,7 +236,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
   }
 
   @Override
-  protected List<Runnable> getScheduledServices() {
+  protected List<Runnable> scheduledServices() {
     return Collections.singletonList(storeUpdateService);
   }
 
@@ -387,7 +386,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       props = loadProperties(crlDownloadFile);
       Validity validity = Validity.getInstance(
           props.getProperty("download.before.nextupdate"));
-      if (validity.getValidity() < 1) {
+      if (validity.validity() < 1) {
         LOG.error("invalid download.before.nextupdate {}", validity);
       } else {
         if (validity.add(Instant.now()).isAfter(nextUpdate)) {
@@ -459,8 +458,8 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     // download the fingerprint if download.fp.url is specified
     if (hashUrl != null) {
       Curl.CurlResult downResult = curl.curlGet(hashUrl, false, null, null);
-      if (downResult.getContentLength() > 0
-          && Arrays.equals(hashValue, downResult.getContent())) {
+      if (downResult.contentLength() > 0
+          && Arrays.equals(hashValue, downResult.content())) {
         LOG.info("Fingerprint of the CRL has not changed, " +
             "skip downloading CRL");
         return;
@@ -479,7 +478,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     } finally {
       crlStream.close();
     }
-    String contentType = downResult.getContentType();
+    String contentType = downResult.contentType();
 
     if (!CT_PKIX_CRL.equals(contentType)) {
       LOG.error("Downloading CRL failed, expected content type {}, " +
@@ -487,11 +486,11 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
       return;
     }
 
-    if (downResult.getContentLength() < 10) {
-      byte[] errorContent = downResult.getErrorContent();
+    if (downResult.contentLength() < 10) {
+      byte[] errorContent = downResult.errorContent();
       if (errorContent == null) {
         LOG.error("Downloading CRL failed, CRL too short (len={}): ",
-            downResult.getContentLength());
+            downResult.contentLength());
       } else {
         LOG.error("Downloading CRL failed with error: {}",
             new String(errorContent));
@@ -501,14 +500,14 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
 
     // Extract CRLNumber from the CRL
     CrlStreamParser newCrlStreamParser = new CrlStreamParser(tmpCrlFile);
-    BigInteger newCrlNumber = newCrlStreamParser.getCrlNumber();
+    BigInteger newCrlNumber = newCrlStreamParser.crlNumber();
 
     boolean useNewCrl = crlNumber == null
         || newCrlNumber.compareTo(crlNumber) > 0;
 
     if (useNewCrl) {
       if (hashAlgo != null) {
-        byte[] crlHashValue = crlStream.getHashValue();
+        byte[] crlHashValue = crlStream.hashValue();
         if (crlHashValue == null) {
           throw new IllegalStateException(
               "should not reach here, crlHashValue is null");

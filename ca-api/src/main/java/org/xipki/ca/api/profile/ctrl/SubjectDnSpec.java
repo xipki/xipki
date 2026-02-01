@@ -305,28 +305,28 @@ public class SubjectDnSpec {
   }
 
   public static void fixRdnControl(RdnControl control) {
-    ASN1ObjectIdentifier type = Args.notNull(control, "control").getType();
+    ASN1ObjectIdentifier type = Args.notNull(control, "control").type();
 
     // pattern
-    if (control.getPattern() == null && PATTERNS.containsKey(type)) {
+    if (control.pattern() == null && PATTERNS.containsKey(type)) {
       control.setPattern(PATTERNS.get(type));
     }
 
     // length ranges
     Range specRange = RANGES.get(type);
     if (specRange != null) {
-      Range range = control.getStringLengthRange();
+      Range range = control.stringLengthRange();
       if (range == null) {
         control.setStringLengthRange(specRange);
       } else {
-        range.setRange(Math.max(specRange.getMin(), range.getMin()),
-            Math.min(specRange.getMax(), range.getMax()));
+        range.setRange(Math.max(specRange.min(), range.min()),
+            Math.min(specRange.max(), range.max()));
       }
     }
 
     StringControl strCtrl = STRING_CONTROLS.get(type);
     if (strCtrl != null) {
-      StringType stringType = control.getStringType();
+      StringType stringType = control.stringType();
       switch (strCtrl) {
         case IA5:
           control.setStringType(StringType.ia5String);

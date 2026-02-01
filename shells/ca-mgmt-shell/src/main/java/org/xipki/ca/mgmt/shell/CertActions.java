@@ -54,7 +54,6 @@ import java.util.Optional;
  * Actions to management certificates and CRLs.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class CertActions {
 
@@ -84,13 +83,13 @@ public class CertActions {
       }
 
       String msg = StringUtil.concat("certificate profile: ",
-          certInfo.getCertprofile(), "\nstatus: ",
-          (certInfo.getRevInfo() == null ? "good"
-              : "revoked with " + certInfo.getRevInfo()));
+          certInfo.certprofile(), "\nstatus: ",
+          (certInfo.revInfo() == null ? "good"
+              : "revoked with " + certInfo.revInfo()));
       println(msg);
       if (outputFile != null) {
         saveVerbose("saved certificate to file", outputFile,
-            encodeCert(certInfo.getCert().getCert().getEncoded(), outform));
+            encodeCert(certInfo.cert().cert().getEncoded(), outform));
       }
       return null;
     } // method execute0
@@ -236,12 +235,12 @@ public class CertActions {
         KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(
             caName, profileName, subject, notBefore, notAfter);
 
-        certBytes = keyCertBytesPair.getCert();
+        certBytes = keyCertBytesPair.cert();
 
         String ksFilePrefix = outFile.substring(0, outFile.lastIndexOf('.'));
 
         PrivateKey privKey = KeyUtil.getPrivateKey(
-            PrivateKeyInfo.getInstance(keyCertBytesPair.getKey()));
+            PrivateKeyInfo.getInstance(keyCertBytesPair.key()));
 
         if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
           CertificateFactory cf = CertificateFactory.getInstance("X509");
@@ -267,13 +266,13 @@ public class CertActions {
           if (keyPwd == null) {
             saveVerbose("save unencrypted key to file",
                 ksFilePrefix + "-key.pem",
-                PemEncoder.encode(keyCertBytesPair.getKey(),
+                PemEncoder.encode(keyCertBytesPair.key(),
                     PemEncoder.PemLabel.PRIVATE_KEY));
           } else {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
                 new JceOpenSSLPKCS8EncryptorBuilder(
                     PKCS8Generator.PBE_SHA1_3DES);
-            encryptorBuilder.setRandom(securityFactory.getRandom4Sign());
+            encryptorBuilder.setRandom(securityFactory.random4Sign());
             encryptorBuilder.setPassword(keyPwd);
 
             JcaPKCS8Generator gen =
@@ -383,7 +382,7 @@ public class CertActions {
       }
 
       saveVerbose("certificate saved to file", outputFile,
-          encodeCert(certInfo.getCert().getCert().getEncoded(), outform));
+          encodeCert(certInfo.cert().cert().getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -433,7 +432,7 @@ public class CertActions {
           encodeCrl(crl.getEncoded(), outform));
 
       if (withBaseCrl) {
-        Extensions extns = crl.getExtensions();
+        Extensions extns = crl.extensions();
         byte[] extnValue = X509Util.getCoreExtValue(extns,
             OIDs.Extn.deltaCRLIndicator);
         if (extnValue != null) {
@@ -539,9 +538,9 @@ public class CertActions {
 
     private String format(int index, CertListInfo info) {
       return StringUtil.concat(StringUtil.formatAccount(index, 4), " | ",
-          StringUtil.formatText(info.getSerialNumber().toString(16), 40),
-          " | ", info.getNotBefore().toString(), " | ",
-          info.getNotAfter().toString(), " | ", info.getSubject());
+          StringUtil.formatText(info.serialNumber().toString(16), 40),
+          " | ", info.notBefore().toString(), " | ",
+          info.notAfter().toString(), " | ", info.subject());
     } // method format
 
   } // class ListCert
@@ -659,13 +658,13 @@ public class CertActions {
       if (serialNumberS != null) {
         serialNumber = toBigInt(serialNumberS);
       } else if (certFile != null) {
-        X509Cert caCert = ca.getCert();
+        X509Cert caCert = ca.cert();
         X509Cert cert = X509Util.parseCert(new File(certFile));
         if (!X509Util.issues(caCert, cert)) {
           throw new CmdFailure("certificate '" + certFile +
               "' is not issued by CA " + caName);
         }
-        serialNumber = cert.getSerialNumber();
+        serialNumber = cert.serialNumber();
       } else {
         throw new IllegalCmdParamException(
             "neither serialNumber nor certFile is specified");

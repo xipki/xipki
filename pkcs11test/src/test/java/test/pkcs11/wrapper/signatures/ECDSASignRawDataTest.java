@@ -90,7 +90,7 @@ public class ECDSASignRawDataTest {
   private static abstract class Base extends SignatureTestBase {
 
     @Test
-    public void main() throws Exception {
+    public void execTest() throws Exception {
       LOG.info("##################################################");
       LOG.info("generate signature key pair");
 
@@ -112,7 +112,7 @@ public class ECDSASignRawDataTest {
       signatureMechanism.setExtraParams(new ExtraParams().ecOrderBitSize(256));
 
       PKCS11KeyId generatedKeyPair =
-          generateKeypair(PKCS11KeyPairType.EC_P256, inToken);
+          generateKeypair(PKCS11KeyPairType.P256, inToken);
       long generatedPrivateKey = generatedKeyPair.getHandle();
 
       int[] dataLens = {1057, 10570, 105700};

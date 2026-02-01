@@ -7,8 +7,8 @@
   "maxSize": 8400,
   "validity": "5y",
   "notBeforeTime": "current",
-  "keypairGeneration": "InheritCA",
-  "keyAlgorithms": ["RSA-2048","RSA-3072","RSA-4096"],
+  "keypairGeneration": "RSA2048",
+  "keyAlgorithms": ["RSA2048","RSA3072","RSA4096"],
   "subject": [{
       "type": "country",
       "minOccurs": 0
@@ -53,7 +53,7 @@
       "inRequest": "optional",
       "keyUsage": {
         "usages": [{
-            "required": ["digitalSignature","keyEncipherment"]
+            "required": ["keyEncipherment","digitalSignature"]
           }
         ]
       }

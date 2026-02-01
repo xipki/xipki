@@ -12,7 +12,6 @@ import java.util.List;
  * Response of revoking certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class RevokeCertResponse {

@@ -26,7 +26,6 @@ import java.io.IOException;
  * REST servlet.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 public class RestHttpServlet {
@@ -66,7 +65,7 @@ public class RestHttpServlet {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
       requestBytes = viaPost ? IoUtil.readAllBytes(req.getInputStream()) : null;
       httpResp = responder.service(path, requestBytes, req, event);
-      if (event.getStatus() == null) {
+      if (event.status() == null) {
         event.setStatus(AuditStatus.SUCCESSFUL);
       }
       return httpResp;
@@ -78,7 +77,7 @@ public class RestHttpServlet {
     } finally {
       LogUtil.logReqResp("REST Gateway", LOG, logReqResp, viaPost,
           req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.getBody());
+          httpResp == null ? null : httpResp.body());
 
       event.finish();
       auditService.logEvent(event);

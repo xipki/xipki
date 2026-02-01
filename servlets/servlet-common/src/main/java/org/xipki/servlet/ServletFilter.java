@@ -21,7 +21,6 @@ import java.io.IOException;
  * Filter.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public abstract class ServletFilter implements Filter {
 

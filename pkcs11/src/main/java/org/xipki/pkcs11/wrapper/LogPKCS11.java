@@ -614,7 +614,7 @@ public class LogPKCS11 {
       String method, Long hSession, PKCS11Exception e) {
     if (debugEnabled) {
       LOG.debug("{}: {}", buildText("ERR", method, hSession),
-          module.codeToName(Category.CKR, e.getErrorCode()));
+          module.codeToName(Category.CKR, e.errorCode()));
     }
     return e;
   }

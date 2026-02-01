@@ -97,7 +97,7 @@ public class PKCS11Module {
     return new PKCS11Module(modulePath);
   }
 
-  Boolean getEcdsaSignatureFixNeeded() {
+  Boolean ecdsaSignatureFixNeeded() {
     return ecdsaSignatureFixNeeded;
   }
 
@@ -105,7 +105,7 @@ public class PKCS11Module {
     this.ecdsaSignatureFixNeeded = ecdsaSignatureFixNeeded;
   }
 
-  Boolean getSm2SignatureFixNeeded() {
+  Boolean sm2SignatureFixNeeded() {
     return sm2SignatureFixNeeded;
   }
 
@@ -164,7 +164,7 @@ public class PKCS11Module {
     LOG.info("PKCS#11 module\n{}", this.description);
   }
 
-  public String getDescription() {
+  public String description() {
     return description;
   }
 

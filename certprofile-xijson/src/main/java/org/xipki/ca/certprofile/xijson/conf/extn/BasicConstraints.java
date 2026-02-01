@@ -22,7 +22,7 @@ public class BasicConstraints implements JsonEncodable {
     this.pathLen = Args.notNegative(pathLen, "pathLen");
   }
 
-  public int getPathLen() {
+  public int pathLen() {
     return pathLen;
   }
 

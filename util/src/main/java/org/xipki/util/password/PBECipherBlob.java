@@ -30,19 +30,19 @@ public class PBECipherBlob {
     this.cipherText = cipherText;
   }
 
-  public int getAlgo() {
+  public int algo() {
     return algo;
   }
 
-  public int getIterations() {
+  public int iterations() {
     return iterations;
   }
 
-  public byte[] getSalt() {
+  public byte[] salt() {
     return salt;
   }
 
-  public byte[] getCipherText() {
+  public byte[] cipherText() {
     return cipherText;
   }
 

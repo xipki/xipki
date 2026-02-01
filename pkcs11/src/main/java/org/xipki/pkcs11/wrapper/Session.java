@@ -270,49 +270,49 @@ public class Session {
 
     Asn1OneAsymmetricKey asn1Sk =
         Asn1OneAsymmetricKey.getInstance(privateKey.getEncoded());
-    String oid = asn1Sk.getPrivateKeyAlgorithm().getOid();
+    String oid = asn1Sk.privateKeyAlgorithm().oid();
 
-    byte[] publicKeyData = asn1Sk.getPublicKey();
+    byte[] publicKeyData = asn1Sk.publicKey();
     Asn1RSAPrivateKey rsaSk = null;
 
     // pre-check the match or private key and public key
     if (publicKey != null) {
       Asn1SubjectPublicKey asn1Pk =
           Asn1SubjectPublicKey.getInstance(publicKey.getEncoded());
-      if (!asn1Sk.getPrivateKeyAlgorithm().equals(asn1Pk.getAlgId())) {
+      if (!asn1Sk.privateKeyAlgorithm().equals(asn1Pk.algId())) {
         throw new InvalidKeySpecException("privateKey and publicKey " +
             "do not have the same AlgorithmIdentifier");
       }
 
       if (publicKeyData != null) {
-        if (!Arrays.equals(publicKeyData, asn1Pk.getPublicKeyData())) {
+        if (!Arrays.equals(publicKeyData, asn1Pk.publicKeyData())) {
           throw new InvalidKeySpecException("privateKey and publicKey " +
               "do not have the same publicKey data");
         }
       } else if (Asn1Const.id_rsaPublicKey.equals(oid)) {
-        rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.getPrivateKey());
+        rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.privateKey());
         Asn1RSAPublicKey rsaPk = Asn1RSAPublicKey.getInstance(
-            asn1Pk.getPublicKeyData());
-        if (!(Arrays.equals(rsaSk.getModulus(), rsaPk.getModulus())
-              && Arrays.equals(rsaSk.getPublicExponent(),
-                    rsaPk.getPublicExponent()))) {
+            asn1Pk.publicKeyData());
+        if (!(Arrays.equals(rsaSk.modulus(), rsaPk.modulus())
+              && Arrays.equals(rsaSk.publicExponent(),
+                    rsaPk.publicExponent()))) {
           throw new InvalidKeySpecException("RSA privateKey and publicKey " +
               "do not have the same publicKey data");
         }
 
-        publicKeyData = asn1Pk.getPublicKeyData();
+        publicKeyData = asn1Pk.publicKeyData();
       }
     }
 
     if (publicKeyData == null) {
       if (Asn1Const.id_rsaPublicKey.equals(oid)) {
         if (rsaSk == null) {
-          rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.getPrivateKey());
+          rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.privateKey());
         }
 
         publicKeyData = Asn1Util.toTLV(Asn1Const.TAG_SEQUENCE,
-            Asn1Util.toAsn1Int(rsaSk.getModulus()),
-            Asn1Util.toAsn1Int(rsaSk.getPublicExponent()));
+            Asn1Util.toAsn1Int(rsaSk.modulus()),
+            Asn1Util.toAsn1Int(rsaSk.publicExponent()));
       }
     }
 
@@ -322,13 +322,13 @@ public class Session {
 
     Template pubTemplate = template.publicKey();
 
-    long hPublicKey = importPublicKey(asn1Sk.getPrivateKeyAlgorithm(),
+    long hPublicKey = importPublicKey(asn1Sk.privateKeyAlgorithm(),
         publicKeyData, pubTemplate);
 
     boolean succ = false;
     try {
-      long hPrivateKey = importPrivateKey(asn1Sk.getPrivateKeyAlgorithm(),
-          asn1Sk.getPrivateKey(), publicKeyData, template.privateKey());
+      long hPrivateKey = importPrivateKey(asn1Sk.privateKeyAlgorithm(),
+          asn1Sk.privateKey(), publicKeyData, template.privateKey());
       succ = true;
       return new PKCS11KeyPair(hPublicKey, hPrivateKey);
     } finally {
@@ -343,7 +343,7 @@ public class Session {
       throws InvalidKeySpecException, PKCS11Exception {
     byte[] encoded = publicKey.getEncoded();
     Asn1SubjectPublicKey asn1Pk = Asn1SubjectPublicKey.getInstance(encoded);
-    return importPublicKey(asn1Pk.getAlgId(), asn1Pk.getPublicKeyData(),
+    return importPublicKey(asn1Pk.algId(), asn1Pk.publicKeyData(),
         template);
   }
 
@@ -351,16 +351,16 @@ public class Session {
       Asn1AlgorithmIdentifier algId, byte[] publicKeyData,
       Template template)
       throws InvalidKeySpecException, PKCS11Exception {
-    String oid = algId.getOid();
-    byte[] params = algId.getParams();
+    String oid = algId.oid();
+    byte[] params = algId.params();
 
     long dfltKeyType;
     switch (oid) {
       case Asn1Const.id_rsaPublicKey: {
         dfltKeyType = CKK_RSA;
         Asn1RSAPublicKey tKey = Asn1RSAPublicKey.getInstance(publicKeyData);
-        template.modulus(toUBigInt(tKey.getModulus()))
-            .publicExponent(toUBigInt(tKey.getPublicExponent()));
+        template.modulus(toUBigInt(tKey.modulus()))
+            .publicExponent(toUBigInt(tKey.publicExponent()));
         break;
       }
       case Asn1Const.id_ecPublicKey: {
@@ -384,9 +384,9 @@ public class Session {
           throw new InvalidKeySpecException(e);
         }
 
-        template.prime(toUBigInt(dsaParams.getP()))
-            .subprime(toUBigInt(dsaParams.getQ()))
-            .base(toUBigInt(dsaParams.getG()))
+        template.prime(toUBigInt(dsaParams.p()))
+            .subprime(toUBigInt(dsaParams.q()))
+            .base(toUBigInt(dsaParams.g()))
             .value(asUnsigned(value));
         break;
       }
@@ -442,22 +442,22 @@ public class Session {
     Asn1OneAsymmetricKey asn1Sk =
         Asn1OneAsymmetricKey.getInstance(privateKey.getEncoded());
 
-    byte[] publicKeyData = asn1Sk.getPublicKey();
+    byte[] publicKeyData = asn1Sk.publicKey();
     if (publicKeyData == null && publicKey != null) {
       publicKeyData = Asn1SubjectPublicKey.getInstance(
-          publicKey.getEncoded()).getPublicKeyData();
+          publicKey.getEncoded()).publicKeyData();
     }
 
-    return importPrivateKey(asn1Sk.getPrivateKeyAlgorithm(),
-        asn1Sk.getPrivateKey(), publicKeyData, template);
+    return importPrivateKey(asn1Sk.privateKeyAlgorithm(),
+        asn1Sk.privateKey(), publicKeyData, template);
   }
 
   private long importPrivateKey(
       Asn1AlgorithmIdentifier algId, byte[] privateKeyData,
       byte[] publicKeyData, Template template)
       throws InvalidKeySpecException, PKCS11Exception {
-    String oid = algId.getOid();
-    byte[] params = algId.getParams();
+    String oid = algId.oid();
+    byte[] params = algId.params();
 
     try {
       long dfltKeyType;
@@ -466,14 +466,14 @@ public class Session {
           dfltKeyType = CKK_RSA;
           Asn1RSAPrivateKey tKey =
               Asn1RSAPrivateKey.getInstance(privateKeyData);
-          template.modulus(toUBigInt(tKey.getModulus()))
-              .publicExponent(toUBigInt(tKey.getPublicExponent()))
-              .privateExponent(toUBigInt(tKey.getPrivateExponent()))
-              .prime1(toUBigInt(tKey.getPrime1()))
-              .prime2(toUBigInt(tKey.getPrime2()))
-              .exponent1(toUBigInt(tKey.getExponent1()))
-              .exponent2(toUBigInt(tKey.getExponent2()))
-              .coefficient(toUBigInt(tKey.getCoefficient()));
+          template.modulus(toUBigInt(tKey.modulus()))
+              .publicExponent(toUBigInt(tKey.publicExponent()))
+              .privateExponent(toUBigInt(tKey.privateExponent()))
+              .prime1(toUBigInt(tKey.prime1()))
+              .prime2(toUBigInt(tKey.prime2()))
+              .exponent1(toUBigInt(tKey.exponent1()))
+              .exponent2(toUBigInt(tKey.exponent2()))
+              .coefficient(toUBigInt(tKey.coefficient()));
           break;
         }
         case Asn1Const.id_ecPublicKey: {
@@ -489,13 +489,13 @@ public class Session {
           if (privateKeyWithEcPoint(dfltKeyType)) {
             if (publicKeyData != null) {
               template.ecPoint(publicKeyData);
-            } else if (ecPrivateKey.getPublicKey() != null) {
-              template.ecPoint(ecPrivateKey.getPublicKey());
+            } else if (ecPrivateKey.publicKey() != null) {
+              template.ecPoint(ecPrivateKey.publicKey());
             }
           }
 
           template.ecParams(params)
-              .value(ecPrivateKey.getPrivateKey());
+              .value(ecPrivateKey.privateKey());
           break;
         }
         case Asn1Const.id_dsaPublicKey: {
@@ -503,9 +503,9 @@ public class Session {
           Asn1DSAParams dsaParams = Asn1DSAParams.getInstance(params);
           byte[] value = Asn1Util.readBigInt(privateKeyData);
 
-          template.prime(toUBigInt(dsaParams.getP()))
-              .subprime(toUBigInt(dsaParams.getQ()))
-              .base(toUBigInt(dsaParams.getG()))
+          template.prime(toUBigInt(dsaParams.p()))
+              .subprime(toUBigInt(dsaParams.q()))
+              .base(toUBigInt(dsaParams.g()))
               .value(asUnsigned(value));
           break;
         }
@@ -992,7 +992,7 @@ public class Session {
 
     synchronized (module) {
       if (signatureType == SIGN_TYPE_ECDSA) {
-        Boolean b = module.getEcdsaSignatureFixNeeded();
+        Boolean b = module.ecdsaSignatureFixNeeded();
         if (b == null) {
           LOG.info("EcdsaSignatureFixNeeded: null");
         } else {
@@ -1034,7 +1034,7 @@ public class Session {
           return fixed ? fixedSigValue : orig;
         }
       } else if (signatureType == SIGN_TYPE_SM2) {
-        Boolean b = module.getSm2SignatureFixNeeded();
+        Boolean b = module.sm2SignatureFixNeeded();
         if (b == null) {
           LOG.info("Sm2SignatureFixNeeded: null");
         } else {
@@ -1560,7 +1560,7 @@ public class Session {
             getDefaultAttrValues(hObject));
       } catch (PKCS11Exception e) {
         LOG.trace("{}: reading object {} failed with {}", prefix, hObject,
-            e.getErrorName());
+            e.errorName());
       }
     }
   }

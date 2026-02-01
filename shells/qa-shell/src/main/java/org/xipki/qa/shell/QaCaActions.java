@@ -362,36 +362,36 @@ public class QaCaActions {
     @Override
     protected Object execute0() throws Exception {
       ChangeCaEntry ey = getChangeCaEntry();
-      String caName = ey.getIdent().getName();
+      String caName = ey.ident().name();
       println("checking CA " + caName);
 
       CaEntry ca = Optional.ofNullable(caManager.getCa(caName))
           .orElseThrow(() -> new CmdFailure(
               "could not find CA '" + caName + "'"));
 
-      CaUris eyUris = ey.getCaUris();
+      CaUris eyUris = ey.caUris();
       // CA cert uris
       if (eyUris != null) {
-        assertObjEquals("CA URIs", ey.getCaUris(),
-            ca.getBase().getCaUris());
+        assertObjEquals("CA URIs", ey.caUris(),
+            ca.base().caUris());
       }
 
       // CA certificate
-      if (ey.getEncodedCert() != null) {
-        if (!certEquals(ey.getEncodedCert(), ca.getCert().getEncoded())) {
+      if (ey.encodedCert() != null) {
+        if (!certEquals(ey.encodedCert(), ca.cert().getEncoded())) {
           throw new CmdFailure("CA cert is not as expected");
         }
       }
 
       // Certchain
-      if (ey.getEncodedCertchain() != null) {
-        List<byte[]> eyList = ey.getEncodedCertchain();
-        List<X509Cert> isList = ca.getCertchain();
+      if (ey.encodedCertchain() != null) {
+        List<byte[]> eyList = ey.encodedCertchain();
+        List<X509Cert> isList = ca.certchain();
         int eySize = eyList == null ? 0 : eyList.size();
         int isSize = isList == null ? 0 : isList.size();
 
         if (eySize != isSize) {
-          if (CollectionUtil.isNotEmpty(ca.getCertchain())) {
+          if (CollectionUtil.isNotEmpty(ca.certchain())) {
             throw new CmdFailure("Length of CA certchain " + isSize
                 + " is not as expected " + eySize);
           }
@@ -405,83 +405,83 @@ public class QaCaActions {
         }
       }
 
-      BaseCaInfo caBase = ca.getBase();
+      BaseCaInfo caBase = ca.base();
       // SN size
-      if (ey.getSerialNoLen() != null) {
+      if (ey.serialNoLen() != null) {
         assertObjEquals("serial number length",
-            ey.getSerialNoLen(), caBase.getSnSize());
+            ey.serialNoLen(), caBase.snSize());
       }
 
       // CRL control name
-      if (ey.getCrlControl() != null) {
+      if (ey.crlControl() != null) {
         assertObjEquals("CRL control",
-            new CrlControl(ey.getCrlControl()), caBase.getCrlControl());
+            new CrlControl(ey.crlControl()), caBase.crlControl());
       }
 
       // CRL signer name
-      if (ey.getCrlSignerName() != null) {
-        assertEquals("CRL signer name", ey.getCrlSignerName(),
-            caBase.getCrlSignerName());
+      if (ey.crlSignerName() != null) {
+        assertEquals("CRL signer name", ey.crlSignerName(),
+            caBase.crlSignerName());
       }
 
       // Expiration period
-      if (ey.getExpirationPeriod() != null) {
-        assertObjEquals("Expiration period", ey.getExpirationPeriod(),
-            caBase.getExpirationPeriod());
+      if (ey.expirationPeriod() != null) {
+        assertObjEquals("Expiration period", ey.expirationPeriod(),
+            caBase.expirationPeriod());
       }
 
       // Extra control
-      if (ey.getExtraControl() != null) {
-        assertObjEquals("Extra control", ey.getExtraControl(),
-            caBase.getExtraControl());
+      if (ey.extraControl() != null) {
+        assertObjEquals("Extra control", ey.extraControl(),
+            caBase.extraControl());
       }
 
       // Max validity
-      if (ey.getMaxValidity() != null) {
-        assertObjEquals("Max validity", ey.getMaxValidity(),
-            caBase.getMaxValidity());
+      if (ey.maxValidity() != null) {
+        assertObjEquals("Max validity", ey.maxValidity(),
+            caBase.maxValidity());
       }
 
       // Keep expired certificate
-      if (ey.getKeepExpiredCertDays() != null) {
+      if (ey.keepExpiredCertDays() != null) {
         assertObjEquals("keepExpiredCertDays",
-            ey.getKeepExpiredCertDays(), caBase.getKeepExpiredCertDays());
+            ey.keepExpiredCertDays(), caBase.keepExpiredCertDays());
       }
 
       // Num CRLs
-      if (ey.getNumCrls() != null) {
-        assertObjEquals("num CRLs", ey.getNumCrls(), caBase.getNumCrls());
+      if (ey.numCrls() != null) {
+        assertObjEquals("num CRLs", ey.numCrls(), caBase.numCrls());
       }
 
       // Permissions
-      if (ey.getPermissions() != null) {
-        assertObjEquals("permissions", new Permissions(ey.getPermissions()),
-            caBase.getPermissions());
+      if (ey.permissions() != null) {
+        assertObjEquals("permissions", new Permissions(ey.permissions()),
+            caBase.permissions());
       }
 
       // Signer Type
-      if (ey.getSignerType() != null) {
-        assertTypeEquals("signer type", ey.getSignerType(),
-            caBase.getSignerType());
+      if (ey.signerType() != null) {
+        assertTypeEquals("signer type", ey.signerType(),
+            caBase.signerType());
       }
 
-      if (ey.getSignerConf() != null) {
-        ConfPairs ex = new ConfPairs(ey.getSignerConf());
+      if (ey.signerConf() != null) {
+        ConfPairs ex = new ConfPairs(ey.signerConf());
         ex.removePair("keystore");
-        ConfPairs is = new ConfPairs(ca.getSignerConf());
+        ConfPairs is = new ConfPairs(ca.signerConf());
         is.removePair("keystore");
         assertObjEquals("signer conf", ex, is);
       }
 
       // Status
-      if (ey.getStatus() != null) {
-        assertObjEquals("status", ey.getStatus(), caBase.getStatus());
+      if (ey.status() != null) {
+        assertObjEquals("status", ey.status(), caBase.status());
       }
 
       // validity mode
-      if (ey.getValidityMode() != null) {
-        assertObjEquals("validity mode", ey.getValidityMode(),
-            caBase.getValidityMode());
+      if (ey.validityMode() != null) {
+        assertObjEquals("validity mode", ey.validityMode(),
+            caBase.validityMode());
       }
 
       println(" checked CA" + caName);
@@ -519,7 +519,7 @@ public class QaCaActions {
 
       CaProfileEntry receivedEntry = null;
       for (CaProfileEntry entry : entries) {
-        if (entry.getProfileName().equals(expectedEntry.getProfileName())) {
+        if (entry.profileName().equals(expectedEntry.profileName())) {
           receivedEntry = entry;
           break;
         }
@@ -527,7 +527,7 @@ public class QaCaActions {
 
       if (receivedEntry == null) {
         throw new CmdFailure("CA is not associated with profile '"
-            + expectedEntry.getProfileName() + "'");
+            + expectedEntry.profileName() + "'");
       }
 
       if (expectedEntry.equals(receivedEntry)) {
@@ -619,7 +619,7 @@ public class QaCaActions {
       CaHasRequestorEntry entry = null;
       String upRequestorName = requestorName.toLowerCase();
       for (CaHasRequestorEntry m : entries) {
-        if (m.getRequestorIdent().getName().equals(upRequestorName)) {
+        if (m.requestorIdent().name().equals(upRequestorName)) {
           entry = m;
           break;
         }
@@ -632,10 +632,10 @@ public class QaCaActions {
 
       if (permissions != null) {
         Permissions objPermissions = new Permissions(permissions);
-        if (objPermissions.getValue() != entry.getPermissions().getValue()) {
+        if (objPermissions.value() != entry.permissions().value()) {
           throw new CmdFailure("permissions: is '" +
-              entry.getPermissions().getValue() + "', but expected '" +
-              objPermissions.getValue() + "'");
+              entry.permissions().value() + "', but expected '" +
+              objPermissions.value() + "'");
         }
       }
 
@@ -646,8 +646,8 @@ public class QaCaActions {
           }
         }
 
-        if (!new ArrayList<>(profiles).equals(entry.getProfiles())) {
-          throw new CmdFailure("profiles: is '" + entry.getProfiles()
+        if (!new ArrayList<>(profiles).equals(entry.profiles())) {
+          throw new CmdFailure("profiles: is '" + entry.profiles()
               + "', but expected '" + profiles + "'");
         }
       }
@@ -682,8 +682,8 @@ public class QaCaActions {
               "certificate profile named '" + name + "' is not configured"));
 
       assertTypeEquals("type", type == null ? "xijson" : type,
-          cp.getType());
-      assertEquals("conf", conf, cp.getConf());
+          cp.type());
+      assertEquals("conf", conf, cp.conf());
       println(" checked profile " + name);
       return null;
     }
@@ -703,12 +703,12 @@ public class QaCaActions {
           .orElseThrow(() -> new CmdFailure(
               "publisher named '" + name + "' is not configured"));
 
-      if (cp.getType() != null) {
-        assertTypeEquals("type", type, cp.getType());
+      if (cp.type() != null) {
+        assertTypeEquals("type", type, cp.type());
       }
 
-      if (cp.getConf() != null) {
-        assertEquals("signer conf", conf, cp.getConf());
+      if (cp.conf() != null) {
+        assertEquals("signer conf", conf, cp.conf());
       }
 
       println(" checked publisher " + name);
@@ -732,11 +732,11 @@ public class QaCaActions {
 
       byte[] ex = IoUtil.read(certFile);
       String expType = RequestorEntry.TYPE_CERT;
-      if (!cr.getType().equals(expType)) {
+      if (!cr.type().equals(expType)) {
         throw new CmdFailure("IdNameTypeConf type is not " + expType);
       }
 
-      String conf = Optional.ofNullable(cr.getConf()).orElseThrow(() ->
+      String conf = Optional.ofNullable(cr.conf()).orElseThrow(() ->
         new CmdFailure("CaCert: is not configured explicitly as expected"));
 
       if (!certEquals(ex, Base64.decode(conf))) {
@@ -789,7 +789,7 @@ public class QaCaActions {
         }
         signerConf = pairs.getEncoded();
 
-        assertEquals("conf", signerConf, cr.getConf());
+        assertEquals("conf", signerConf, cr.conf());
       }
 
       println(" checked signer " + name);

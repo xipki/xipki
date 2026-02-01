@@ -25,11 +25,11 @@ public class RaEmulator {
     this.raCert = Args.notNull(raCert, "raCert");
   }
 
-  public PrivateKey getRaKey() {
+  public PrivateKey raKey() {
     return raKey;
   }
 
-  public X509Cert getRaCert() {
+  public X509Cert raCert() {
     return raCert;
   }
 

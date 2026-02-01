@@ -46,7 +46,7 @@ public class FileOrBinary implements JsonEncodable {
     this.binary = null;
   }
 
-  public String getFile() {
+  public String file() {
     return file;
   }
 
@@ -55,7 +55,7 @@ public class FileOrBinary implements JsonEncodable {
     this.file = null;
   }
 
-  public byte[] getBinary() {
+  public byte[] binary() {
     return binary;
   }
 

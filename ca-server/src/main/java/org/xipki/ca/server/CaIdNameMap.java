@@ -12,7 +12,6 @@ import java.util.Map;
  * Container of NameId of CA management entries.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class CaIdNameMap {
@@ -34,23 +33,23 @@ public class CaIdNameMap {
   private final Map<String, NameId> nameCaMap = new HashMap<>();
 
   public void addCertprofile(NameId nameId) {
-    idCertprofileMap.put(nameId.getId(), nameId);
-    nameCertprofileMap.put(nameId.getName(), nameId);
+    idCertprofileMap.put(nameId.id(), nameId);
+    nameCertprofileMap.put(nameId.name(), nameId);
   }
 
   public void addPublisher(NameId nameId) {
-    idPublisherMap.put(nameId.getId(), nameId);
-    namePublisherMap.put(nameId.getName(), nameId);
+    idPublisherMap.put(nameId.id(), nameId);
+    namePublisherMap.put(nameId.name(), nameId);
   }
 
   public void addRequestor(NameId nameId) {
-    idRequestorMap.put(nameId.getId(), nameId);
-    nameRequestorMap.put(nameId.getName(), nameId);
+    idRequestorMap.put(nameId.id(), nameId);
+    nameRequestorMap.put(nameId.name(), nameId);
   }
 
   public void addCa(NameId nameId) {
-    idCaMap.put(nameId.getId(), nameId);
-    nameCaMap.put(nameId.getName(), nameId);
+    idCaMap.put(nameId.id(), nameId);
+    nameCaMap.put(nameId.name(), nameId);
   }
 
   public NameId getCertprofile(int id) {
@@ -83,17 +82,17 @@ public class CaIdNameMap {
 
   public String getCertprofileName(int id) {
     NameId nid = idCertprofileMap.get(id);
-    return (nid == null) ? null : nid.getName();
+    return (nid == null) ? null : nid.name();
   }
 
   public String getPublisherName(int id) {
     NameId nid = idPublisherMap.get(id);
-    return (nid == null) ? null : nid.getName();
+    return (nid == null) ? null : nid.name();
   }
 
   public String getCaName(int id) {
     NameId nid = idCaMap.get(id);
-    return (nid == null) ? null : nid.getName();
+    return (nid == null) ? null : nid.name();
   }
 
   public void clearCertprofile() {
@@ -119,7 +118,7 @@ public class CaIdNameMap {
   public NameId removeCertprofile(int id) {
     NameId ident = idCertprofileMap.remove(id);
     if (ident != null) {
-      nameCertprofileMap.remove(ident.getName());
+      nameCertprofileMap.remove(ident.name());
     }
     return ident;
   } // method removeCertprofile
@@ -127,7 +126,7 @@ public class CaIdNameMap {
   public NameId removeRequestor(int id) {
     NameId ident = idRequestorMap.remove(id);
     if (ident != null) {
-      nameRequestorMap.remove(ident.getName());
+      nameRequestorMap.remove(ident.name());
     }
     return ident;
   } // method removeRequestor
@@ -135,7 +134,7 @@ public class CaIdNameMap {
   public NameId removeCa(String name) {
     NameId ident = nameCaMap.remove(name.toLowerCase());
     if (ident != null) {
-      idCaMap.remove(ident.getId());
+      idCaMap.remove(ident.id());
     }
     return ident;
   } // method removeCa

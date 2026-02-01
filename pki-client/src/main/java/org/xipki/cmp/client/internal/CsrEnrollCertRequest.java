@@ -11,7 +11,6 @@ import org.xipki.util.codec.Args;
  * CMP request to enroll certificate for given CSR.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CsrEnrollCertRequest extends IdentifiedObject {
@@ -27,11 +26,11 @@ class CsrEnrollCertRequest extends IdentifiedObject {
     this.csr = Args.notNull(csr, "csr");
   }
 
-  CertificationRequest getCsr() {
+  CertificationRequest csr() {
     return csr;
   }
 
-  String getCertprofile() {
+  String certprofile() {
     return certprofile;
   }
 

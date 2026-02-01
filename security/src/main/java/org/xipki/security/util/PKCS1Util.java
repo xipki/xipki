@@ -18,7 +18,6 @@ import java.util.Map;
  * PKCS#1 utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 5.3.14
  */
 public class PKCS1Util {
 
@@ -88,13 +87,13 @@ public class PKCS1Util {
         throw new XiSecurityException("contentDigest != mgfDigest");
       }
 
-      if (saltLen != contentDigest.getLength()) {
+      if (saltLen != contentDigest.length()) {
         throw new XiSecurityException("saltLen != "
-          + contentDigest.getLength() + ": " + saltLen);
+          + contentDigest.length() + ": " + saltLen);
       }
     }
 
-    final int hLen = contentDigest.getLength();
+    final int hLen = contentDigest.length();
     final byte[] salt = new byte[saltLen];
     final byte[] mDash = new byte[8 + saltLen + hLen];
     final byte trailer = (byte) 0xBC;
@@ -163,7 +162,7 @@ public class PKCS1Util {
     }
 
     int emBits = modulusBitLength - 1;
-    int hLen = mgfDigest.getLength();
+    int hLen = mgfDigest.length();
 
     // 1. If the length of M is greater than the input limitation for the hash
     //  function (2**61 - 1 octets for SHA-1) then output 'inconsistent' and
@@ -238,7 +237,7 @@ public class PKCS1Util {
       throws Exception {
     int k = (modulusBitLength + 7) / 8;
     int mLen = M.length;
-    int hLen = hashAlgo.getLength();
+    int hLen = hashAlgo.length();
 
     /*1.  Length checking:
 
@@ -279,7 +278,7 @@ public class PKCS1Util {
       throw new Exception("EM.length != k");
     }
 
-    int hLen = hashAlgo.getLength();
+    int hLen = hashAlgo.length();
 
     if (EM[0] != 0) {
       throw new Exception("decryption error");
@@ -342,7 +341,7 @@ public class PKCS1Util {
   }
 
   private static byte[] mgf1(HashAlgo mgfDigest, byte[] Z, int length) {
-    int mgfhLen = mgfDigest.getLength();
+    int mgfhLen = mgfDigest.length();
     byte[] mask = new byte[length];
     int counter = 0;
 

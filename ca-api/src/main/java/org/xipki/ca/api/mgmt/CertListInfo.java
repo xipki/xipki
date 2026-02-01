@@ -15,7 +15,6 @@ import java.time.Instant;
  * Certificate list container.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 public class CertListInfo implements JsonEncodable {
@@ -36,19 +35,19 @@ public class CertListInfo implements JsonEncodable {
     this.subject   = Args.notNull(subject, "subject");
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
-  public Instant getNotAfter() {
+  public Instant notAfter() {
     return notAfter;
   }
 
-  public String getSubject() {
+  public String subject() {
     return subject;
   }
 

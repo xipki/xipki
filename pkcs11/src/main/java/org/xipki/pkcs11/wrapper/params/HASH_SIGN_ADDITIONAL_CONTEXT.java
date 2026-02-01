@@ -27,11 +27,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class HASH_SIGN_ADDITIONAL_CONTEXT extends CkParams {
 
-  public long hedgeVariant;
+  private final long hedgeVariant;
 
-  public byte[] context;
+  private final byte[] context;
 
-  public long hash;
+  private final long hash;
 
   public HASH_SIGN_ADDITIONAL_CONTEXT(
       long hedgeVariant, byte[] context, long hash) {

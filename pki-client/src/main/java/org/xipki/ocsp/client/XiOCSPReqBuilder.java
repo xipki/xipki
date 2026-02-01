@@ -29,7 +29,6 @@ import java.util.List;
  * OCSP Request builder.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class XiOCSPReqBuilder {
   private final List<RequestObject> list = new ArrayList<>();

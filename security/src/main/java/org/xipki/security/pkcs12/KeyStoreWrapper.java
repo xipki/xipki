@@ -12,9 +12,7 @@ import java.security.KeyStore;
  * Keystore wrapper (containing the keystore object and its encoded form).
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
-
 public class KeyStoreWrapper {
 
   private final byte[] keystore;

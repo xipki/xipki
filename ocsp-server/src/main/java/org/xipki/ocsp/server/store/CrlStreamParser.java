@@ -79,7 +79,6 @@ import java.util.Iterator;
  * </pre>
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class CrlStreamParser extends Asn1StreamParser {
 
@@ -116,23 +115,23 @@ public class CrlStreamParser extends Asn1StreamParser {
           : invalidityDate.getEpochSecond();
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger serialNumber() {
       return serialNumber;
     }
 
-    public long getRevocationDate() {
+    public long revocationDate() {
       return revocationDate;
     }
 
-    public int getReason() {
+    public int reason() {
       return reason;
     }
 
-    public long getInvalidityDate() {
+    public long invalidityDate() {
       return invalidityDate;
     }
 
-    public X500Name getCertificateIssuer() {
+    public X500Name certificateIssuer() {
       return certificateIssuer;
     }
 
@@ -232,7 +231,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         }
 
         coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.reasonCode);
-        reason = coreExtValue == null ? CrlReason.UNSPECIFIED.getCode()
+        reason = coreExtValue == null ? CrlReason.UNSPECIFIED.code()
             : CRLReason.getInstance(coreExtValue).getValue().intValue();
       }
 
@@ -443,35 +442,35 @@ public class CrlStreamParser extends Asn1StreamParser {
     }
   } // constructor
 
-  public int getVersion() {
+  public int version() {
     return version;
   }
 
-  public X500Name getIssuer() {
+  public X500Name issuer() {
     return issuer;
   }
 
-  public Instant getThisUpdate() {
+  public Instant thisUpdate() {
     return thisUpdate;
   }
 
-  public Instant getNextUpdate() {
+  public Instant nextUpdate() {
     return nextUpdate;
   }
 
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
+  public AlgorithmIdentifier algorithmIdentifier() {
     return algorithmIdentifier;
   }
 
-  public byte[] getSignature() {
+  public byte[] signature() {
     return Arrays.copyOf(signature, signature.length);
   }
 
-  public BigInteger getCrlNumber() {
+  public BigInteger crlNumber() {
     return crlNumber;
   }
 
-  public BigInteger getBaseCrlNumber() {
+  public BigInteger baseCrlNumber() {
     return baseCrlNumber;
   }
 
@@ -479,7 +478,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     return baseCrlNumber != null;
   }
 
-  public Extensions getCrlExtensions() {
+  public Extensions crlExtensions() {
     return crlExtensions;
   }
 
@@ -532,7 +531,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       sigOut.close();
 
-      return verifier.verify(this.getSignature());
+      return verifier.verify(this.signature());
     } catch (InvalidKeyException | OperatorCreationException ex) {
       LogUtil.error(LOG, ex, "could not validate POP of CSR");
       return false;

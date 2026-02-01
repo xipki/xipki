@@ -13,7 +13,6 @@ import java.util.Map;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class CaNameScepSigners {
 
@@ -22,7 +21,7 @@ public class CaNameScepSigners {
   private final Map<String, ScepSigner> signers;
 
   public CaNameScepSigners(CaNameSigners signers) {
-    ConcurrentContentSigner signer = signers.getDefaultSigner();
+    ConcurrentContentSigner signer = signers.defaultSigner();
     this.defaultSigner = signer == null ? null : new ScepSigner(signer);
 
     this.signers = new HashMap<>();

@@ -44,7 +44,6 @@ import java.util.Optional;
  *
  * @author Lijun Liao
  */
-
 class GrandCertTemplateBuilder {
 
   private static final Logger LOG =
@@ -60,38 +59,38 @@ class GrandCertTemplateBuilder {
 
   GrandCertTemplateBuilder(CaInfo caInfo) {
     this.caInfo = caInfo;
-    this.keyspecByImplicitCA = caInfo.getCaKeySpec();
+    this.keyspecByImplicitCA = caInfo.caKeySpec();
   }
 
   X509Ca.GrantedCertTemplate create(
       boolean batch, IdentifiedCertprofile certprofile,
       CertTemplateData certTemplate, List<KeypairGenerator> keypairGenerators)
       throws OperationException {
-    if (caInfo.getRevocationInfo() != null) {
+    if (caInfo.revocationInfo() != null) {
       throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
     }
 
     if (certprofile == null) {
       throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
-          "unknown cert profile " + certTemplate.getCertprofileName());
+          "unknown cert profile " + certTemplate.certprofileName());
     }
 
     ConcurrentContentSigner signer = Optional.ofNullable(
-            caInfo.getSigner(certprofile.getSignatureAlgorithms()))
+            caInfo.getSigner(certprofile.signatureAlgorithms()))
         .orElseThrow(() -> new OperationException(ErrorCode.SYSTEM_FAILURE,
             "CA does not support any signature algorithm restricted by " +
             "the cert profile"));
 
-    final NameId certprofileIdent = certprofile.getIdent();
+    final NameId certprofileIdent = certprofile.ident();
 
-    switch (certprofile.getCertLevel()) {
+    switch (certprofile.certLevel()) {
       case RootCA:
         throw new OperationException(ErrorCode.NOT_PERMITTED,
             "CA is not allowed to generate Root CA certificate");
       case SubCA:
       case CROSS:
-        Integer reqPathlen = certprofile.getPathLenBasicConstraint();
-        int caPathLen = caInfo.getPathLenConstraint();
+        Integer reqPathlen = certprofile.pathLenBasicConstraint();
+        int caPathLen = caInfo.pathLenConstraint();
         boolean allowed = (reqPathlen == null && caPathLen == Integer.MAX_VALUE)
                             || (reqPathlen != null && reqPathlen < caPathLen);
         if (!allowed) {
@@ -103,10 +102,10 @@ class GrandCertTemplateBuilder {
     }
 
     boolean forCrossCert = certTemplate.isForCrossCert();
-    X500Name requestedSubject = forCrossCert ? certTemplate.getSubject()
-        : CaUtil.removeEmptyRdns(certTemplate.getSubject());
+    X500Name requestedSubject = forCrossCert ? certTemplate.subject()
+        : CaUtil.removeEmptyRdns(certTemplate.subject());
 
-    Instant reqNotBefore = certTemplate.getNotBefore();
+    Instant reqNotBefore = certTemplate.notBefore();
 
     Instant grantedNotBefore = certprofile.getNotBefore(reqNotBefore);
     // notBefore in the past is not permitted (due to the fact that some
@@ -116,18 +115,18 @@ class GrandCertTemplateBuilder {
       grantedNotBefore = _10MinBefore;
     }
 
-    if (grantedNotBefore.isAfter(caInfo.getNoNewCertificateAfter())) {
+    if (grantedNotBefore.isAfter(caInfo.noNewCertificateAfter())) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
           "CA is not permitted to issue certificate after " +
-          caInfo.getNoNewCertificateAfter());
+          caInfo.noNewCertificateAfter());
     }
 
-    if (grantedNotBefore.isBefore(caInfo.getNotBefore())) {
+    if (grantedNotBefore.isBefore(caInfo.notBefore())) {
       // notBefore may not be before CA's notBefore
-      grantedNotBefore = caInfo.getNotBefore();
+      grantedNotBefore = caInfo.notBefore();
     }
 
-    SubjectPublicKeyInfo grantedPublicKeyInfo = certTemplate.getPublicKeyInfo();
+    SubjectPublicKeyInfo grantedPublicKeyInfo = certTemplate.publicKeyInfo();
     PrivateKeyInfo privateKey = null;
 
     if (grantedPublicKeyInfo != null) {
@@ -151,7 +150,7 @@ class GrandCertTemplateBuilder {
             "RSA public key is too weak");
       }
     } else if (certTemplate.isServerkeygen()) {
-      KeypairGenControl kg = certprofile.getKeypairGenControl();
+      KeypairGenControl kg = certprofile.keypairGenControl();
 
       if (kg == null || kg.isForbidden()) {
         throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
@@ -159,7 +158,7 @@ class GrandCertTemplateBuilder {
       }
 
       KeySpec keyspec = kg.isInheritCA() ? keyspecByImplicitCA
-          : kg.getKeySpec();
+          : kg.keySpec();
 
       KeypairGenerator keypairGenerator = null;
 
@@ -177,7 +176,7 @@ class GrandCertTemplateBuilder {
             "found no keypair generator for keyspec " + keyspec);
       }
 
-      String name = keypairGenerator.getName();
+      String name = keypairGenerator.name();
 
       try {
         KeyInfoPair keyInfoPair = keypairGenerator.generateKeypair(keyspec);
@@ -193,7 +192,7 @@ class GrandCertTemplateBuilder {
       }
 
       // adapt the algorithm identifier in private key and public key
-      AlgorithmIdentifier keyAlgId = keyspec.getAlgorithmIdentifier();
+      AlgorithmIdentifier keyAlgId = keyspec.algorithmIdentifier();
       if (!privateKey.getPrivateKeyAlgorithm().equals(keyAlgId)) {
         ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
         try {
@@ -245,16 +244,16 @@ class GrandCertTemplateBuilder {
       // For cross certificate, the original requested certificate must be used.
       grantedSubject = requestedSubject;
     } else {
-      grantedSubject = subjectInfo.getGrantedSubject();
+      grantedSubject = subjectInfo.grantedSubject();
 
-      if (subjectInfo.getWarning() != null) {
-        msgBuilder.append(", ").append(subjectInfo.getWarning());
+      if (subjectInfo.warning() != null) {
+        msgBuilder.append(", ").append(subjectInfo.warning());
       }
     }
 
     // make sure that the grantedSubject does not equal the CA's subject
     if (X509Util.canonicalizeName(grantedSubject).equals(
-        caInfo.getPublicCaInfo().getC14nSubject())) {
+        caInfo.publicCaInfo().c14nSubject())) {
       throw new OperationException(ErrorCode.ALREADY_ISSUED,
           "certificate with the same subject as CA is not allowed");
     }
@@ -264,12 +263,12 @@ class GrandCertTemplateBuilder {
     if (certprofile.hasNoWellDefinedExpirationDate()) {
       grantedNotAfter = MAX_CERT_TIME;
     } else {
-      Validity validity = certprofile.getValidity();
+      Validity validity = certprofile.validity();
 
       if (validity == null) {
-        validity = caInfo.getMaxValidity();
-      } else if (validity.compareTo(caInfo.getMaxValidity()) > 0) {
-        validity = caInfo.getMaxValidity();
+        validity = caInfo.maxValidity();
+      } else if (validity.compareTo(caInfo.maxValidity()) > 0) {
+        validity = caInfo.maxValidity();
       }
 
       Instant maxNotAfter = validity.add(grantedNotBefore);
@@ -278,7 +277,7 @@ class GrandCertTemplateBuilder {
         maxNotAfter = MAX_CERT_TIME;
       }
 
-      grantedNotAfter = certTemplate.getNotAfter();
+      grantedNotAfter = certTemplate.notAfter();
 
       if (grantedNotAfter != null) {
         if (grantedNotAfter.isAfter(maxNotAfter)) {
@@ -289,9 +288,9 @@ class GrandCertTemplateBuilder {
         grantedNotAfter = maxNotAfter;
       }
 
-      if (grantedNotAfter.isAfter(caInfo.getNotAfter())) {
-        ValidityMode caMode = caInfo.getValidityMode();
-        ValidityMode profileMode = certprofile.getNotAfterMode();
+      if (grantedNotAfter.isAfter(caInfo.notAfter())) {
+        ValidityMode caMode = caInfo.validityMode();
+        ValidityMode profileMode = certprofile.notAfterMode();
         if (profileMode == null) {
           profileMode = ValidityMode.BY_CA;
         }
@@ -311,7 +310,7 @@ class GrandCertTemplateBuilder {
             profileMode == ValidityMode.CUTOFF;
 
         if (useCaNotAfter) {
-          grantedNotAfter = caInfo.getNotAfter();
+          grantedNotAfter = caInfo.notAfter();
         } else {
           throw new IllegalStateException(
               "should not reach here, CA ValidityMode " + caMode +
@@ -325,7 +324,7 @@ class GrandCertTemplateBuilder {
       warning = msgBuilder.substring(2);
     }
     X509Ca.GrantedCertTemplate gct = new X509Ca.GrantedCertTemplate(batch,
-        certTemplate.getCertReqId(), certTemplate.getExtensions(), certprofile,
+        certTemplate.certReqId(), certTemplate.extensions(), certprofile,
         grantedNotBefore, grantedNotAfter, requestedSubject,
         grantedPublicKeyInfo, privateKey, signer, warning);
     gct.setGrantedSubject(grantedSubject);
@@ -335,9 +334,6 @@ class GrandCertTemplateBuilder {
 
   /**
    * RSA broken key checker.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 2.1.0
    */
   private static class RSABrokenKey {
 

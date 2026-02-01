@@ -17,7 +17,6 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class EnrollCertsRequest extends SdkRequest {
@@ -48,7 +47,7 @@ public class EnrollCertsRequest extends SdkRequest {
 
   private Entry[] entries;
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
@@ -56,7 +55,7 @@ public class EnrollCertsRequest extends SdkRequest {
     this.transactionId = transactionId;
   }
 
-  public Boolean getGroupEnroll() {
+  public Boolean groupEnroll() {
     return groupEnroll;
   }
 
@@ -64,7 +63,7 @@ public class EnrollCertsRequest extends SdkRequest {
     this.groupEnroll = groupEnroll;
   }
 
-  public Boolean getExplicitConfirm() {
+  public Boolean explicitConfirm() {
     return explicitConfirm;
   }
 
@@ -72,7 +71,7 @@ public class EnrollCertsRequest extends SdkRequest {
     this.explicitConfirm = explicitConfirm;
   }
 
-  public Integer getConfirmWaitTimeMs() {
+  public Integer confirmWaitTimeMs() {
     return confirmWaitTimeMs;
   }
 
@@ -80,7 +79,7 @@ public class EnrollCertsRequest extends SdkRequest {
     this.confirmWaitTimeMs = confirmWaitTimeMs;
   }
 
-  public EmbedCertsMode getCaCertMode() {
+  public EmbedCertsMode caCertMode() {
     return caCertMode;
   }
 
@@ -88,7 +87,7 @@ public class EnrollCertsRequest extends SdkRequest {
     this.caCertMode = caCertMode;
   }
 
-  public Entry[] getEntries() {
+  public Entry[] entries() {
     return entries;
   }
 
@@ -173,7 +172,7 @@ public class EnrollCertsRequest extends SdkRequest {
 
     private OldCertInfo oldCertInfo;
 
-    public BigInteger getCertReqId() {
+    public BigInteger certReqId() {
       return certReqId;
     }
 
@@ -181,7 +180,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.certReqId = certReqId;
     }
 
-    public String getCertprofile() {
+    public String certprofile() {
       return certprofile;
     }
 
@@ -189,7 +188,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.certprofile = certprofile;
     }
 
-    public byte[] getSubjectPublicKey() {
+    public byte[] subjectPublicKey() {
       return subjectPublicKey;
     }
 
@@ -203,7 +202,7 @@ public class EnrollCertsRequest extends SdkRequest {
           : subjectPublicKey.getEncoded();
     }
 
-    public X500NameType getSubject() {
+    public X500NameType subject() {
       return subject;
     }
 
@@ -211,7 +210,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.subject = subject;
     }
 
-    public byte[] getExtensions() {
+    public byte[] extensions() {
       return extensions;
     }
 
@@ -223,7 +222,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.extensions = extensions == null ? null : extensions.getEncoded();
     }
 
-    public byte[] getP10req() {
+    public byte[] p10req() {
       return p10req;
     }
 
@@ -231,7 +230,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.p10req = p10req;
     }
 
-    public Instant getNotBefore() {
+    public Instant notBefore() {
       return notBefore;
     }
 
@@ -239,11 +238,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.notBefore = notBefore;
     }
 
-    public void notBefore(Instant notBefore) {
-      this.notBefore = notBefore;
-    }
-
-    public Instant getNotAfter() {
+    public Instant notAfter() {
       return notAfter;
     }
 
@@ -251,11 +246,7 @@ public class EnrollCertsRequest extends SdkRequest {
       this.notAfter = notAfter;
     }
 
-    public void notAfter(Instant notAfter) {
-      this.notAfter = notAfter;
-    }
-
-    public OldCertInfo getOldCertInfo() {
+    public OldCertInfo oldCertInfo() {
       return oldCertInfo;
     }
 

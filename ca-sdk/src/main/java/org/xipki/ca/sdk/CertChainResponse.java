@@ -11,7 +11,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
  * Response containing the certificate chain.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CertChainResponse extends SdkResponse {
@@ -22,7 +21,7 @@ public class CertChainResponse extends SdkResponse {
     this.certificates = certificates;
   }
 
-  public byte[][] getCertificates() {
+  public byte[][] certificates() {
     return certificates;
   }
 

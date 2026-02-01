@@ -13,7 +13,6 @@ import java.util.Map;
  * Container of the map of serial number to digest value of certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CertsBundle {
@@ -28,11 +27,11 @@ class CertsBundle {
     this.serialNumbers = Args.notEmpty(serialNumbers, "serialNumbers");
   }
 
-  public Map<BigInteger, DigestEntry> getCerts() {
+  public Map<BigInteger, DigestEntry> certs() {
     return certs;
   }
 
-  public List<BigInteger> getSerialNumbers() {
+  public List<BigInteger> serialNumbers() {
     return serialNumbers;
   }
 

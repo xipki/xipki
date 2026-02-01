@@ -13,7 +13,6 @@ import org.xipki.util.codec.Args;
  * Certificate Information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertificateInfo {
@@ -51,27 +50,27 @@ public class CertificateInfo {
     this.requestor = Args.notNull(requestor, "requestor");
   }
 
-  public CertWithDbId getCert() {
+  public CertWithDbId cert() {
     return cert;
   }
 
-  public PrivateKeyInfo getPrivateKey() {
+  public PrivateKeyInfo privateKey() {
     return privateKey;
   }
 
-  public NameId getIssuer() {
+  public NameId issuer() {
     return issuer;
   }
 
-  public X509Cert getIssuerCert() {
+  public X509Cert issuerCert() {
     return issuerCert;
   }
 
-  public NameId getProfile() {
+  public NameId profile() {
     return profile;
   }
 
-  public String getWarningMessage() {
+  public String warningMessage() {
     return warningMessage;
   }
 
@@ -79,7 +78,7 @@ public class CertificateInfo {
     this.warningMessage = warningMessage;
   }
 
-  public NameId getRequestor() {
+  public NameId requestor() {
     return requestor;
   }
 
@@ -87,7 +86,7 @@ public class CertificateInfo {
     return revocationInfo != null;
   }
 
-  public CertRevocationInfo getRevocationInfo() {
+  public CertRevocationInfo revocationInfo() {
     return revocationInfo;
   }
 
@@ -103,7 +102,7 @@ public class CertificateInfo {
     this.alreadyIssued = alreadyIssued;
   }
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
@@ -111,7 +110,7 @@ public class CertificateInfo {
     this.transactionId = transactionId;
   }
 
-  public X500Name getRequestedSubject() {
+  public X500Name requestedSubject() {
     return requestedSubject;
   }
 

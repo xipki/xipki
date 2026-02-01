@@ -22,7 +22,7 @@ public class PrivateKeyUsagePeriod implements JsonEncodable {
     this.validity = Args.notBlank(validity, "validity");
   }
 
-  public String getValidity() {
+  public String validity() {
     return validity;
   }
 

@@ -65,13 +65,13 @@ public class KemMacTest {
     // Sender: decrypts the mac key using private key
     byte[] macKeyBytes;
     {
-      byte alg = kemEncapKey.getEncapulation().getAlg();
+      byte alg = kemEncapKey.encapulation().alg();
       if (alg != KemEncapsulation.ALG_KMAC_MLKEM_HMAC) {
         throw new XiSecurityException("unknown wrap mechanism " + alg);
       }
 
       macKeyBytes = KEMUtil.mlkemDecryptSecret(myKeyPair.getPrivate(),
-          kemEncapKey.getEncapulation());
+          kemEncapKey.encapulation());
     }
 
     // Sender: compute the HMAC value
@@ -85,7 +85,7 @@ public class KemMacTest {
       byte[] rawSignature = mac.doFinal();
 
       try {
-        DERUTF8String utf8Id = new DERUTF8String(kemEncapKey.getId());
+        DERUTF8String utf8Id = new DERUTF8String(kemEncapKey.id());
         sig = new DERSequence(new ASN1Encodable[]{utf8Id,
                 new DEROctetString(rawSignature)}).getEncoded();
       } catch (IOException e) {
@@ -101,7 +101,7 @@ public class KemMacTest {
       byte[] rawSignature = ((ASN1OctetString) seq.getObjectAt(1)).getOctets();
 
       byte[] rawPkData = myPkInfo.getPublicKeyData().getOctets();
-      byte[] secret = KEMUtil.kmacDerive(masterKey.getSecretKey(), 32,
+      byte[] secret = KEMUtil.kmacDerive(masterKey.secretKey(), 32,
           "XIPKI-KEM".getBytes(StandardCharsets.US_ASCII), rawPkData);
 
       SecretKey macKey = new SecretKeySpec(secret, "AES");

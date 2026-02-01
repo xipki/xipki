@@ -30,7 +30,6 @@ import static org.xipki.ca.sdk.SdkConstants.*;
  * API client.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class SdkClient {
@@ -46,8 +45,8 @@ public class SdkClient {
   private boolean logReqResp = false;
 
   public SdkClient(SdkClientConf conf) throws ObjectCreationException {
-    this.serverUrl = conf.getServerUrl();
-    this.client = new XiHttpClient(SslContextConf.ofSslConf(conf.getSsl()));
+    this.serverUrl = conf.serverUrl();
+    this.client = new XiHttpClient(SslContextConf.ofSslConf(conf.ssl()));
   }
 
   public SdkClient(String serverUrl, SSLSocketFactory sslSocketFactory,
@@ -90,15 +89,15 @@ public class SdkClient {
     } finally {
       if (logReqResp && LOG.isDebugEnabled()) {
         LogUtil.logReqResp("SDK Gateway", LOG, logReqResp, viaPost,
-            command, encodedReq, resp == null ? null : resp.getContent());
+            command, encodedReq, resp == null ? null : resp.content());
       }
     }
 
     if (resp.isOK()) {
-      return resp.getContent();
+      return resp.content();
     }
 
-    byte[] errorContent = resp.getContent();
+    byte[] errorContent = resp.content();
     if (errorContent == null) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, null);
     } else {
@@ -129,7 +128,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    byte[][] certs = resp.getCertificates();
+    byte[][] certs = resp.certificates();
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
@@ -142,7 +141,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    return resp.getCertificates();
+    return resp.certificates();
   }
 
   public byte[] cacertBySubject(byte[] subject)
@@ -158,7 +157,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    byte[][] certs = resp.getCertificates();
+    byte[][] certs = resp.certificates();
     return certs == null || certs.length == 0 ? null : certs[0];
   }
 
@@ -174,7 +173,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    return resp.getCertificates();
+    return resp.certificates();
   }
 
   public CaNameResponse caNameBySubject(byte[] subject)
@@ -214,7 +213,7 @@ public class SdkClient {
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    return resp.getCrl();
+    return resp.crl();
   }
 
   public byte[] currentCrl(String ca) throws SdkErrorResponseException {
@@ -233,7 +232,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    return resp.getCrl();
+    return resp.crl();
   }
 
   private byte[] enrollCert0(String func, String cmd, String ca,
@@ -252,8 +251,8 @@ public class SdkClient {
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPollCertsResponse.Entry rEntry = resp.getEntries()[0];
-    return Optional.ofNullable(rEntry.getCert()).orElseThrow(() ->
+    EnrollOrPollCertsResponse.Entry rEntry = resp.entries()[0];
+    return Optional.ofNullable(rEntry.cert()).orElseThrow(() ->
         new SdkErrorResponseException(
             ErrorCode.SYSTEM_FAILURE, "error " + func));
   }
@@ -274,12 +273,12 @@ public class SdkClient {
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPollCertsResponse.Entry rEntry = resp.getEntries()[0];
-    if (rEntry.getCert() == null || rEntry.getPrivateKey() == null) {
+    EnrollOrPollCertsResponse.Entry rEntry = resp.entries()[0];
+    if (rEntry.cert() == null || rEntry.privateKey() == null) {
       throw new SdkErrorResponseException(
           ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
-    return new KeyCertBytesPair(rEntry.getPrivateKey(), rEntry.getCert());
+    return new KeyCertBytesPair(rEntry.privateKey(), rEntry.cert());
   }
 
   public byte[] enrollCert(String ca, String certprofile, byte[] p10Req)
@@ -346,8 +345,8 @@ public class SdkClient {
 
   private static void checkEnrollCertsRequest(EnrollCertsRequest req)
       throws SdkErrorResponseException {
-    for (EnrollCertsRequest.Entry m : req.getEntries()) {
-      String profile = m.getCertprofile();
+    for (EnrollCertsRequest.Entry m : req.entries()) {
+      String profile = m.certprofile();
       if (StringUtil.isBlank(profile)) {
         throw new SdkErrorResponseException(
             ErrorCode.UNKNOWN_CERT_PROFILE, "cert profile not set");
@@ -372,8 +371,8 @@ public class SdkClient {
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
 
-    EnrollOrPollCertsResponse.Entry[] entries = resp.getEntries();
-    int expectedSize = req.getEntries().length;
+    EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
+    int expectedSize = req.entries().length;
     int size = entries == null ? 0 : entries.length;
     if (expectedSize != size) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE,
@@ -450,7 +449,7 @@ public class SdkClient {
       throw new SdkErrorResponseException(
           ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    return resp.getPayload();
+    return resp.payload();
   }
 
 }

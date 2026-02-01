@@ -77,7 +77,7 @@ public class NonceManager {
     LOG.info("restored {} nonces", sum);
   }
 
-  public long getValidityMs() {
+  public long validityMs() {
     return validityMs;
   }
 

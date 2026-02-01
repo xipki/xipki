@@ -12,7 +12,6 @@ import org.xipki.util.extra.audit.PciAuditEvent;
  * The No-Operation audit service. The events will be ignored.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class NoopAuditService implements AuditService {

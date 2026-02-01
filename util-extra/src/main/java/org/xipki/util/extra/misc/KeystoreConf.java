@@ -11,7 +11,6 @@ import org.xipki.util.io.FileOrBinary;
  * Keystore configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 public class KeystoreConf {
 
@@ -27,15 +26,15 @@ public class KeystoreConf {
     this.keystore = keystore;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getPassword() {
+  public String password() {
     return password;
   }
 
-  public FileOrBinary getKeystore() {
+  public FileOrBinary keystore() {
     return keystore;
   }
 

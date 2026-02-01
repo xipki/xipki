@@ -13,7 +13,6 @@ import java.math.BigInteger;
  * Response for the operations enrolling certificates and polling certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class EnrollOrPollCertsResponse extends SdkResponse {
@@ -26,7 +25,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
   private byte[][] extraCerts;
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
@@ -34,7 +33,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     this.transactionId = transactionId;
   }
 
-  public Long getConfirmWaitTime() {
+  public Long confirmWaitTime() {
     return confirmWaitTime;
   }
 
@@ -42,7 +41,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     this.confirmWaitTime = confirmWaitTime;
   }
 
-  public Entry[] getEntries() {
+  public Entry[] entries() {
     return entries;
   }
 
@@ -50,7 +49,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     this.entries = entries;
   }
 
-  public byte[][] getExtraCerts() {
+  public byte[][] extraCerts() {
     return extraCerts;
   }
 
@@ -99,19 +98,19 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       this.privateKey = privateKey;
     }
 
-    public BigInteger getId() {
+    public BigInteger id() {
       return id;
     }
 
-    public ErrorEntry getError() {
+    public ErrorEntry error() {
       return error;
     }
 
-    public byte[] getCert() {
+    public byte[] cert() {
       return cert;
     }
 
-    public byte[] getPrivateKey() {
+    public byte[] privateKey() {
       return privateKey;
     }
 

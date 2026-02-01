@@ -1,28 +1,28 @@
 {
-	"scep":{
-		"includeCaCert":true,
-		"includeCertChain":false,
-		"includeSignerCert":true,
-		"supportGetCrl":true,
-		"maxSigningTimeBias":300
-	},
-	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
-	"caProfiles": [{
-		"name": "default",
-		"ca": "subcawithcrl",
-		"certprofile": "ocsp"
-	},{
-		"name": "myalias",
-		"ca": "subcawithcrl",
-		"certprofile": "ocsp"
-	}],
-	"signers":{
-		"signers":[{
-			"names":["subcawithcrl"],
-			"signer":{
-				"type":"pkcs12",
-				"conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12"
-			}
-		}]
-	}
+  "scep":{
+    "includeCaCert":true,
+    "includeCertChain":false,
+    "includeSignerCert":true,
+    "supportGetCrl":true,
+    "maxSigningTimeBias":300
+  },
+  "authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
+  "caProfiles": [{
+    "name": "default",
+    "ca": "subcawithcrl",
+    "certprofile": "ocsp"
+  },{
+    "name": "myalias",
+    "ca": "subcawithcrl",
+    "certprofile": "ocsp"
+  }],
+  "signers":{
+    "signers":[{
+      "names":["subcawithcrl"],
+      "signer":{
+        "type":"pkcs12",
+        "conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12"
+      }
+    }]
+  }
 }

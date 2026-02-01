@@ -1,33 +1,33 @@
 {
-	"scep":{
-		"includeCaCert":true,
-		"includeCertChain":false,
-		"includeSignerCert":true,
-		"supportGetCrl":true,
-		"maxSigningTimeBias":300
-	},
-	// WARNING: Replace the dummy authenticator with your own.
-	"authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
-	// When "caProfiles" is configured, short URL is possible
-	//   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
-	//   For alias "default": https://<host>:<port>/.well-known/est
-	//
-	//"caProfiles": [{
-	//	"name": "default",
-	//	"ca": "subca",
-	//	"certprofile": "tls"
-	//},{
-	//	"name": "myalias",
-	//	"ca": "subca",
-	//	"certprofile": "tls"
-	//}],
-	"signers":{
-		"signers":[{
-			"names":["myca"],
-			"signer":{
-				"type":"pkcs12",
-				"conf":"password=$[scep.keyPassword],keystore=fil2"
-			}
-		}]
-	}
+  "scep":{
+    "includeCaCert":true,
+    "includeCertChain":false,
+    "includeSignerCert":true,
+    "supportGetCrl":true,
+    "maxSigningTimeBias":300
+  },
+  // WARNING: Replace the dummy authenticator with your own.
+  "authenticator":"org.xipki.ca.gateway.dummy.DummyRequestorAuthenticator",
+  // When "caProfiles" is configured, short URL is possible
+  //   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
+  //   For alias "default": https://<host>:<port>/.well-known/est
+  //
+  //"caProfiles": [{
+  //  "name": "default",
+  //  "ca": "subca",
+  //  "certprofile": "tls"
+  //},{
+  //  "name": "myalias",
+  //  "ca": "subca",
+  //  "certprofile": "tls"
+  //}],
+  "signers":{
+    "signers":[{
+      "names":["myca"],
+      "signer":{
+        "type":"pkcs12",
+        "conf":"password=$[scep.keyPassword],keystore=fil2"
+      }
+    }]
+  }
 }

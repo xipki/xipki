@@ -1,77 +1,77 @@
 {
-	"prefix": "$[",
-	"suffix": "]",
-	"basedir": "..",
-	"sections" : [
-		{
-			"description": "XiPKI Configuration",
-			"includes": {
-				"dirs": [
-					"xipki-ca/",
-					"xipki-gateway/",
-					"xipki-ocsp/",
-					"xipki/",
-					"etc/"
-				],
-				"suffixes": [
-					"server.xml",
-					".json",
-					"org.xipki.ca.mgmt.client.cfg"
-				]
-			},
-			"replacements": {
-				// OCSP
-				"ocsp.keyPassword": "CHANGEIT",
-				"ocsp.shutdown.port": "8005",
-				"ocsp.http.port": "8080",
-				"ocsp.host": "localhost",
-				// CA
-				"ca.https.keyPassword": "CHANGEIT",
-				"ca.shutdown.port": "8006",
-				"ca.https.port": "8444",
-				"ca.host": "localhost",
-				"ca.name": "myca1",
-				"ca.alias": "myca",
-				// Gateway
-				"gateway.acme.enabled": "false",
-				"gateway.cmp.enabled": "true",
-				"gateway.est.enabled": "true",
-				"gateway.rest.enabled": "true",
-				"gateway.scep.enabled": "true",
-				"gateway.https.keyPassword": "CHANGEIT",
-				"gateway.shutdown.port": "8007",
-				"gateway.http.port": "8082",
-				"gateway.https.port": "8445",
-				"gateway.host": "localhost",
-				"ra.sdk.keyPassword": "CHANGEIT",
-				"kem-pop.keyPassword":"changeit-kem",
-				"dh-pop.keyPassword":"changeit-dh",
-				// Gateway.SCEP
-				"scep.keyPassword": "CHANGEIT",
-				// CLI
-				"cmp.client.ca.keyPassword": "CHANGEIT",
-				"cmp.client.keyPassword": "CHANGEIT",
-				"est.client.ca.keyPassword": "CHANGEIT",
-				"est.client.keyPassword": "CHANGEIT",
-				"rest.client.ca.keyPassword": "CHANGEIT",
-				"rest.client.keyPassword": "CHANGEIT",
-				// MGMT CLI
-				"ca.mgmt.client.keyPassword": "CHANGEIT"
-			}
-		},
-		{
-			"description": "tomcat.java.home",
-			"includes": {
-				"dirs": [
-					"qa/"
-				],
-				"suffixes": [
-					".script"
-				]
-			},
-			"replacements": {
-				"tomcat.java.home": "--env JAVA_HOME=~/test/xipki/jdk-tomcat"
-			}
-		}
-	]
+  "prefix": "$[",
+  "suffix": "]",
+  "basedir": "..",
+  "sections" : [
+    {
+      "description": "XiPKI Configuration",
+      "includes": {
+        "dirs": [
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/",
+          "xipki/",
+          "etc/"
+        ],
+        "suffixes": [
+          "server.xml",
+          ".json",
+          "org.xipki.ca.mgmt.client.cfg"
+        ]
+      },
+      "replacements": {
+        // OCSP
+        "ocsp.keyPassword": "CHANGEIT",
+        "ocsp.shutdown.port": "8005",
+        "ocsp.http.port": "8080",
+        "ocsp.host": "localhost",
+        // CA
+        "ca.https.keyPassword": "CHANGEIT",
+        "ca.shutdown.port": "8006",
+        "ca.https.port": "8444",
+        "ca.host": "localhost",
+        "ca.name": "myca1",
+        "ca.alias": "myca",
+        // Gateway
+        "gateway.acme.enabled": "false",
+        "gateway.cmp.enabled": "true",
+        "gateway.est.enabled": "true",
+        "gateway.rest.enabled": "true",
+        "gateway.scep.enabled": "true",
+        "gateway.https.keyPassword": "CHANGEIT",
+        "gateway.shutdown.port": "8007",
+        "gateway.http.port": "8082",
+        "gateway.https.port": "8445",
+        "gateway.host": "localhost",
+        "ra.sdk.keyPassword": "CHANGEIT",
+        "kem-pop.keyPassword":"changeit-kem",
+        "dh-pop.keyPassword":"changeit-dh",
+        // Gateway.SCEP
+        "scep.keyPassword": "CHANGEIT",
+        // CLI
+        "cmp.client.ca.keyPassword": "CHANGEIT",
+        "cmp.client.keyPassword": "CHANGEIT",
+        "est.client.ca.keyPassword": "CHANGEIT",
+        "est.client.keyPassword": "CHANGEIT",
+        "rest.client.ca.keyPassword": "CHANGEIT",
+        "rest.client.keyPassword": "CHANGEIT",
+        // MGMT CLI
+        "ca.mgmt.client.keyPassword": "CHANGEIT"
+      }
+    },
+    {
+      "description": "tomcat.java.home",
+      "includes": {
+        "dirs": [
+          "qa/"
+        ],
+        "suffixes": [
+          ".script"
+        ]
+      },
+      "replacements": {
+        "tomcat.java.home": "--env JAVA_HOME=~/test/xipki/jdk-tomcat"
+      }
+    }
+  ]
 }

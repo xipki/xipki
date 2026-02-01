@@ -43,7 +43,7 @@ import org.xipki.util.extra.misc.LogUtil;
 import org.xipki.util.extra.misc.RandomUtil;
 import org.xipki.util.extra.misc.ReqRespDebug;
 import org.xipki.util.extra.misc.ReqRespDebug.ReqRespPair;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 
@@ -224,7 +224,7 @@ public class QaOcspActions {
       RequestOptions requestOptions = getRequestOptions();
 
       IssuerHash issuerHash = new IssuerHash(
-          requestOptions.getHashAlgorithm(), issuerCert);
+          requestOptions.hashAlgorithm(), issuerCert);
 
       int numSucc = 0;
       int numFail = 0;
@@ -432,7 +432,7 @@ public class QaOcspActions {
           String filename = serialNumber.toString(16);
 
           if (saveReq) {
-            byte[] bytes = reqResp.getRequest();
+            byte[] bytes = reqResp.request();
             if (bytes != null) {
               IoUtil.save(new File(messageDir,
                   filename + FILE_SEP + "request.der"), bytes);
@@ -440,7 +440,7 @@ public class QaOcspActions {
           }
 
           if (saveResp) {
-            byte[] bytes = reqResp.getResponse();
+            byte[] bytes = reqResp.response();
             if (bytes != null) {
               IoUtil.save(new File(messageDir,
                   filename + FILE_SEP + "response.der"), bytes);
@@ -578,7 +578,7 @@ public class QaOcspActions {
               throw new IllegalCmdParamException(
                   "invalid certificate file  '" + certFile + "'", ex);
             }
-            BigInteger serial = cert.getSerialNumber();
+            BigInteger serial = cert.serialNumber();
             serialNumbers.add(new BigIntegerRange(serial, serial));
           }
         }

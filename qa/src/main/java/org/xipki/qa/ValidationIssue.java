@@ -9,7 +9,6 @@ import org.xipki.util.codec.Args;
  * Single validation issue.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ValidationIssue {

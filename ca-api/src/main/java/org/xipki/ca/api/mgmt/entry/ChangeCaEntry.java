@@ -72,11 +72,11 @@ public class ChangeCaEntry extends MgmtEntry {
     this.ident = Args.notNull(ident, "ident");
   }
 
-  public NameId getIdent() {
+  public NameId ident() {
     return ident;
   }
 
-  public CaStatus getStatus() {
+  public CaStatus status() {
     return status;
   }
 
@@ -84,7 +84,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.status = status;
   }
 
-  public Validity getMaxValidity() {
+  public Validity maxValidity() {
     return maxValidity;
   }
 
@@ -92,7 +92,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.maxValidity = maxValidity;
   }
 
-  public String getSignerType() {
+  public String signerType() {
     return signerType;
   }
 
@@ -100,7 +100,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.signerType = signerType == null ? null : signerType.toLowerCase();
   }
 
-  public String getSignerConf() {
+  public String signerConf() {
     return signerConf;
   }
 
@@ -108,7 +108,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.signerConf = signerConf;
   }
 
-  public String getCrlControl() {
+  public String crlControl() {
     return crlControl;
   }
 
@@ -116,7 +116,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.crlControl = crlControl;
   }
 
-  public String getCtlogControl() {
+  public String ctlogControl() {
     return ctlogControl;
   }
 
@@ -124,7 +124,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.ctlogControl = ctlogControl;
   }
 
-  public String getRevokeSuspendedControl() {
+  public String revokeSuspendedControl() {
     return revokeSuspendedControl;
   }
 
@@ -132,7 +132,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
-  public String getCrlSignerName() {
+  public String crlSignerName() {
     return crlSignerName;
   }
 
@@ -141,7 +141,7 @@ public class ChangeCaEntry extends MgmtEntry {
         : crlSignerName.toLowerCase();
   }
 
-  public List<String> getKeypairGenNames() {
+  public List<String> keypairGenNames() {
     return keypairGenNames;
   }
 
@@ -150,7 +150,7 @@ public class ChangeCaEntry extends MgmtEntry {
         : StringUtil.lowercase(keypairGenNames);
   }
 
-  public ValidityMode getValidityMode() {
+  public ValidityMode validityMode() {
     return validityMode;
   }
 
@@ -158,7 +158,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.validityMode = validityMode;
   }
 
-  public Boolean getSaveCert() {
+  public Boolean saveCert() {
     return saveCert;
   }
 
@@ -166,7 +166,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.saveCert = saveCert;
   }
 
-  public Boolean getSaveKeypair() {
+  public Boolean saveKeypair() {
     return saveKeypair;
   }
 
@@ -174,7 +174,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.saveKeypair = saveKeypair;
   }
 
-  public List<String> getPermissions() {
+  public List<String> permissions() {
     return permissions;
   }
 
@@ -182,7 +182,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.permissions = permissions;
   }
 
-  public Integer getExpirationPeriod() {
+  public Integer expirationPeriod() {
     return expirationPeriod;
   }
 
@@ -190,7 +190,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.expirationPeriod = expirationPeriod;
   }
 
-  public Integer getKeepExpiredCertDays() {
+  public Integer keepExpiredCertDays() {
     return keepExpiredCertDays;
   }
 
@@ -198,7 +198,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.keepExpiredCertDays = days;
   }
 
-  public String getExtraControl() {
+  public String extraControl() {
     return extraControl;
   }
 
@@ -206,7 +206,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.extraControl = extraControl;
   }
 
-  public Integer getSerialNoLen() {
+  public Integer serialNoLen() {
     return serialNoLen;
   }
 
@@ -218,7 +218,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.serialNoLen = serialNoLen;
   }
 
-  public CaUris getCaUris() {
+  public CaUris caUris() {
     return caUris;
   }
 
@@ -226,7 +226,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.caUris = caUris;
   }
 
-  public byte[] getEncodedCert() {
+  public byte[] encodedCert() {
     return encodedCert;
   }
 
@@ -234,7 +234,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.encodedCert = encodedCert;
   }
 
-  public List<byte[]> getEncodedCertchain() {
+  public List<byte[]> encodedCertchain() {
     return encodedCertchain;
   }
 
@@ -242,7 +242,7 @@ public class ChangeCaEntry extends MgmtEntry {
     this.encodedCertchain = encodedCertchain;
   }
 
-  public Integer getNumCrls() {
+  public Integer numCrls() {
     return numCrls;
   }
 

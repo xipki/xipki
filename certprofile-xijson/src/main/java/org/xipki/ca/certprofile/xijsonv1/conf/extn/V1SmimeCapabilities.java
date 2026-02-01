@@ -43,7 +43,7 @@ public class V1SmimeCapabilities {
         if (c.parameter.binary != null) {
           try {
             ASN1Integer ai = ASN1Integer.getInstance(
-                c.parameter.binary.getValue());
+                c.parameter.binary.value());
             v2Parameter = ai.intValueExact();
           } catch (Exception e) {
             LOG.warn("ignore SmimeCapability.parameter.binary", e);

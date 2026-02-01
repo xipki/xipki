@@ -16,7 +16,6 @@ import java.util.Objects;
  * hash value of certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class DigestEntry {
@@ -44,7 +43,7 @@ class DigestEntry {
     this.revInvTime = revInvTime;
   } // constructor
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
@@ -52,19 +51,19 @@ class DigestEntry {
     return revoked;
   }
 
-  public int getRevReason() {
+  public int revReason() {
     return revReason;
   }
 
-  public Long getRevTime() {
+  public Long revTime() {
     return revTime;
   }
 
-  public Long getRevInvTime() {
+  public Long revInvTime() {
     return revInvTime;
   }
 
-  public String getBase64HashValue() {
+  public String base64HashValue() {
     return base64HashValue;
   }
 

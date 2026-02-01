@@ -95,5 +95,7 @@ cp $KC_DIR/rest-client/* \
    $KC_DIR/ca-mgmt-client/*-cert.pem \
    $KC_DIR/ca-server/ca-server-cert.pem \
    $KC_DIR/gateway-server/gateway-server-cert.pem \
-   $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem* \
+   $KC_DIR/ra-sdk-client/ra-sdk-client-cert.pem \
+   $KC_DIR/dh-pop/dh-pop-certs.pem \
+   $KC_DIR/secretkeys/kem-pop.jceks \
    $TDIR

@@ -24,7 +24,6 @@ import java.util.Map;
  * OCSP response template.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 class ResponseTemplate {
@@ -48,9 +47,9 @@ class ResponseTemplate {
   static {
     // CertHash
     for (HashAlgo h : HashAlgo.values()) {
-      int hlen = h.getLength();
+      int hlen = h.length();
 
-      AlgorithmIdentifier algId = h.getAlgorithmIdentifier();
+      AlgorithmIdentifier algId = h.algorithmIdentifier();
       byte[] encoded;
       try {
         CertHash certHash = new CertHash(algId, new byte[hlen]);
@@ -68,18 +67,18 @@ class ResponseTemplate {
 
     Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE,
         false, new byte[17]);
-    extnInvalidityDate = new byte[extension.getEncodedLength()];
+    extnInvalidityDate = new byte[extension.encodedLength()];
     extension.write(extnInvalidityDate, 0);
 
     extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF,
         false, new byte[17]);
-    extnArchiveCutoff = new byte[extension.getEncodedLength()];
+    extnArchiveCutoff = new byte[extension.encodedLength()];
     extension.write(extnArchiveCutoff, 0);
   } // method static
 
   public static WritableOnlyExtension getCertHashExtension(
       HashAlgo hashAlgo, byte[] certHash) {
-    if (hashAlgo.getLength() != certHash.length) {
+    if (hashAlgo.length() != certHash.length) {
       throw new IllegalArgumentException("hashAlgo and certHash do not match");
     }
 
@@ -121,7 +120,7 @@ class ResponseTemplate {
       System.arraycopy(revokedInfoWithReasonPrefix, 0, encoded, 0, 2);
       ASN1Type.writeGeneralizedTime(revocationTime, encoded, 2);
       System.arraycopy(reasonPrefix, 0, encoded, 19, 4);
-      encoded[23] = (byte) reason.getCode();
+      encoded[23] = (byte) reason.code();
     }
     return encoded;
   } // method getEncodeRevokedInfo

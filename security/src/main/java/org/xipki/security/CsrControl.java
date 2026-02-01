@@ -51,12 +51,12 @@ public class CsrControl {
   }
 
   public CsrControl(CsrControlConf conf) throws InvalidConfException {
-    if (conf.getPeerCerts() == null) {
+    if (conf.peerCerts() == null) {
       this.peerCerts = null;
     } else {
       try {
         peerCerts = X509Util.parseCerts(
-            conf.getPeerCerts().readContent().getBytes(StandardCharsets.UTF_8));
+            conf.peerCerts().readContent().getBytes(StandardCharsets.UTF_8));
       } catch (Exception e) {
         throw new InvalidConfException(e);
       }
@@ -64,19 +64,19 @@ public class CsrControl {
 
     this.kemMasterKeys = new HashMap<>();
 
-    KeystoreConf kemConf = conf.getKem();
+    KeystoreConf kemConf = conf.kem();
     KeyStore ks;
     char[] password;
 
     try {
-      password = Passwords.resolvePassword(kemConf.getPassword());
+      password = Passwords.resolvePassword(kemConf.password());
     } catch (PasswordResolverException ex) {
       throw new InvalidConfException("error resolving password");
     }
 
     try (InputStream is = new ByteArrayInputStream(
-        kemConf.getKeystore().readContent())) {
-      ks = KeyUtil.getInKeyStore(kemConf.getType());
+        kemConf.keystore().readContent())) {
+      ks = KeyUtil.getInKeyStore(kemConf.type());
       ks.load(is, password);
     } catch (GeneralSecurityException | IOException ex) {
       throw new InvalidConfException("error loading keystore", ex);
@@ -109,7 +109,7 @@ public class CsrControl {
     }
   }
 
-  public List<X509Cert> getPeerCerts() {
+  public List<X509Cert> peerCerts() {
     return peerCerts;
   }
 
@@ -129,7 +129,7 @@ public class CsrControl {
 
     private KeystoreConf kem;
 
-    public FileOrValue getPeerCerts() {
+    public FileOrValue peerCerts() {
       return peerCerts;
     }
 
@@ -137,7 +137,7 @@ public class CsrControl {
       this.peerCerts = peerCerts;
     }
 
-    public KeystoreConf getKem() {
+    public KeystoreConf kem() {
       return kem;
     }
 

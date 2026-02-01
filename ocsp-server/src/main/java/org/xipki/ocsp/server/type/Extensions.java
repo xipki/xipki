@@ -9,7 +9,6 @@ import java.util.List;
  * ASN.1 Extensions.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class Extensions extends ASN1Type {
@@ -23,7 +22,7 @@ public class Extensions extends ASN1Type {
   public Extensions(List<Extension> extensions) {
     int len = 0;
     for (Extension m : extensions) {
-      len += m.getEncodedLength();
+      len += m.encodedLength();
     }
 
     this.bodyLen = len;
@@ -32,7 +31,7 @@ public class Extensions extends ASN1Type {
   }
 
   @Override
-  public int getEncodedLength() {
+  public int encodedLength() {
     return encodedLen;
   }
 

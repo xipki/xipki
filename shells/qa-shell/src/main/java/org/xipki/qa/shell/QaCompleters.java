@@ -12,7 +12,7 @@ import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.util.Collections;
 import java.util.LinkedList;

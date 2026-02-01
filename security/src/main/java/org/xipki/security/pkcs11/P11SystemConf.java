@@ -23,7 +23,6 @@ import java.util.Map;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class P11SystemConf {
 
   public static class MechanismFilterConf {
@@ -44,11 +43,11 @@ public class P11SystemConf {
       this.slots = (slots == null) ? new LinkedList<>() : slots;
     }
 
-    public String getMechanismSet() {
+    public String mechanismSet() {
       return mechanismSet;
     }
 
-    public List<SlotConf> getSlots() {
+    public List<SlotConf> slots() {
       return slots;
     }
 
@@ -96,15 +95,15 @@ public class P11SystemConf {
           : excludeMechanisms;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public List<String> getMechanisms() {
+    public List<String> mechanisms() {
       return mechanisms;
     }
 
-    public List<String> getExcludeMechanisms() {
+    public List<String> excludeMechanisms() {
       return excludeMechanisms;
     }
 
@@ -168,15 +167,15 @@ public class P11SystemConf {
       this.nativeLibraries = Args.notEmpty(nativeLibraries, "nativeLibraries");
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public List<NativeLibraryConf> getNativeLibraries() {
+    public List<NativeLibraryConf> nativeLibraries() {
       return nativeLibraries;
     }
 
-    public List<SlotConf> getIncludeSlots() {
+    public List<SlotConf> includeSlots() {
       return includeSlots;
     }
 
@@ -184,7 +183,7 @@ public class P11SystemConf {
       this.includeSlots = includeSlots;
     }
 
-    public List<SlotConf> getExcludeSlots() {
+    public List<SlotConf> excludeSlots() {
       return excludeSlots;
     }
 
@@ -200,7 +199,7 @@ public class P11SystemConf {
       this.readonly = readonly;
     }
 
-    public List<PasswordSetConf> getPasswordSets() {
+    public List<PasswordSetConf> passwordSets() {
       return passwordSets;
     }
 
@@ -208,7 +207,7 @@ public class P11SystemConf {
       this.passwordSets = passwordSets;
     }
 
-    public List<MechanismFilterConf> getMechanismFilters() {
+    public List<MechanismFilterConf> mechanismFilters() {
         return mechanismFilters;
     }
 
@@ -229,19 +228,19 @@ public class P11SystemConf {
       this.maxMessageSize = maxMessageSize;
     }
 
-    public String getUser() {
+    public String user() {
       return user == null ? "CKU_USER" : user;
     }
 
-    public String getUserName() {
+    public String userName() {
       return userName;
     }
 
-    public int getMaxMessageSize() {
+    public int maxMessageSize() {
       return maxMessageSize == null ? 16384 : maxMessageSize;
     }
 
-    public Integer getNumSessions() {
+    public Integer numSessions() {
       return numSessions;
     }
 
@@ -249,7 +248,7 @@ public class P11SystemConf {
       this.numSessions = numSessions;
     }
 
-    public Integer getNewSessionTimeout() {
+    public Integer newSessionTimeout() {
       return newSessionTimeout;
     }
 
@@ -307,11 +306,11 @@ public class P11SystemConf {
       this.path = Args.notBlank(path, "path");
     }
 
-    public String getPath() {
+    public String path() {
       return path;
     }
 
-    public List<String> getOperationSystems() {
+    public List<String> operationSystems() {
       return operationSystems;
     }
 
@@ -319,7 +318,7 @@ public class P11SystemConf {
       this.operationSystems = operationSystems;
     }
 
-    public Map<String, String> getProperties() {
+    public Map<String, String> properties() {
       return properties;
     }
 
@@ -355,11 +354,11 @@ public class P11SystemConf {
       this.passwords = Args.notEmpty(passwords, "passwords");
     }
 
-    public List<SlotConf> getSlots() {
+    public List<SlotConf> slots() {
       return slots;
     }
 
-    public List<String> getPasswords() {
+    public List<String> passwords() {
       return passwords;
     }
 
@@ -398,11 +397,11 @@ public class P11SystemConf {
       this.id = id;
     }
 
-    public Integer getIndex() {
+    public Integer index() {
       return index;
     }
 
-    public String getId() {
+    public String id() {
       return id;
     }
 
@@ -438,11 +437,11 @@ public class P11SystemConf {
         : mechanismSets;
   }
 
-  public List<ModuleConf> getModules() {
+  public List<ModuleConf> modules() {
     return modules;
   }
 
-  public List<MechanismSetConf> getMechanismSets() {
+  public List<MechanismSetConf> mechanismSets() {
     return mechanismSets;
   }
 

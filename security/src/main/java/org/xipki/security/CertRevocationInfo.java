@@ -17,9 +17,7 @@ import java.time.Instant;
  * Certificate revocation information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class CertRevocationInfo implements JsonEncodable {
 
   private CrlReason reason;
@@ -58,7 +56,7 @@ public class CertRevocationInfo implements JsonEncodable {
     this.invalidityTime = invalidityTime;
   }
 
-  public CrlReason getReason() {
+  public CrlReason reason() {
     return reason;
   }
 
@@ -78,7 +76,7 @@ public class CertRevocationInfo implements JsonEncodable {
    * Gets the revocation time.
    * @return revocation time, never be null
    */
-  public Instant getRevocationTime() {
+  public Instant revocationTime() {
     return revocationTime;
   }
 
@@ -86,7 +84,7 @@ public class CertRevocationInfo implements JsonEncodable {
    * Get the invalidity time.
    * @return invalidity time, may be null
    */
-  public Instant getInvalidityTime() {
+  public Instant invalidityTime() {
     return invalidityTime;
   }
 
@@ -113,7 +111,7 @@ public class CertRevocationInfo implements JsonEncodable {
 
   public String encode() {
     ConfPairs pairs = new ConfPairs()
-        .putPair("reason", reason.getDescription())
+        .putPair("reason", reason.description())
         .putPair("revocationTime",
             Long.toString(revocationTime.getEpochSecond()));
     if (invalidityTime != null) {
@@ -149,7 +147,7 @@ public class CertRevocationInfo implements JsonEncodable {
   public JsonMap toCodec() {
     JsonMap ret = new JsonMap();
     if (reason != null) {
-      ret.put("reason", reason.getDescription());
+      ret.put("reason", reason.description());
     }
     ret.put("revocationTime", revocationTime);
     ret.put("invalidityTime", invalidityTime);

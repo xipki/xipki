@@ -46,11 +46,11 @@ public class AuthzId {
     this.idText = Base64.getUrlNoPaddingEncoder().encodeToString(encoded);
   }
 
-  public long getOrderId() {
+  public long orderId() {
     return orderId;
   }
 
-  public int getSubId() {
+  public int subId() {
     return subId;
   }
 

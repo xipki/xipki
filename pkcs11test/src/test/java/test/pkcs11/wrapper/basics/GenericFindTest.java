@@ -82,7 +82,7 @@ public class GenericFindTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       LOG.info("##################################################");
       LOG.info("Find all signature private keys.");
       Template signatureKeyTemplate =

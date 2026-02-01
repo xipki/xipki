@@ -36,7 +36,6 @@ import java.util.zip.ZipFile;
  * Database importer of OCSP CertStore.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
@@ -76,9 +75,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), false);
     OcspCertstore certstore = OcspCertstore.parse(json);
 
-    if (certstore.getVersion() > VERSION_V2) {
+    if (certstore.version() > VERSION_V2) {
       throw new Exception("could not import Certstore greater than "
-          + VERSION_V2 + ": " + certstore.getVersion());
+          + VERSION_V2 + ": " + certstore.version());
     }
 
     File processLogFile =
@@ -86,9 +85,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println("importing OCSP certstore to database");
     try {
       if (!resume) {
-        importCertHashAlgo(certstore.getCerthashAlgo());
-        importCrlInfo(certstore.getCrlInfos());
-        importIssuer(certstore.getIssuers());
+        importCertHashAlgo(certstore.certhashAlgo());
+        importCrlInfo(certstore.crlInfos());
+        importIssuer(certstore.issuers());
       }
       importCert(certstore, processLogFile);
       IoUtil.deleteFile0(processLogFile);
@@ -129,7 +128,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       for (OcspCertstore.Issuer issuer : issuers) {
         try {
           String b64Cert = StringUtil.toUtf8String(
-              IoUtil.read(new File(baseDir, issuer.getCertFile())));
+              IoUtil.read(new File(baseDir, issuer.certFile())));
           byte[] encodedCert = Base64.decode(b64Cert);
 
           Certificate cert;
@@ -137,14 +136,14 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
             cert = Certificate.getInstance(encodedCert);
           } catch (RuntimeException ex) {
             LOG.error("could not parse certificate of issuer {}",
-                issuer.getId());
+                issuer.id());
             LOG.debug("could not parse certificate of issuer {}",
-                issuer.getId(), ex);
+                issuer.id(), ex);
             throw new CertificateException(ex.getMessage(), ex);
           }
 
           int idx = 1;
-          ps.setInt(idx++, issuer.getId());
+          ps.setInt(idx++, issuer.id());
           ps.setString(idx++, X509Util.cutX500Name(
               cert.getSubject(), maxX500nameLen));
           ps.setLong(idx++, DateUtil.toEpochSecond(
@@ -152,20 +151,20 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           ps.setLong(idx++, DateUtil.toEpochSecond(
               cert.getTBSCertificate().getEndDate().getDate()));
           ps.setString(idx++, sha1(encodedCert));
-          ps.setString(idx++, issuer.getRevInfo());
+          ps.setString(idx++, issuer.revInfo());
           ps.setString(idx++, b64Cert);
-          if (issuer.getCrlId() == null) {
+          if (issuer.crlId() == null) {
             ps.setNull(idx, Types.INTEGER);
           } else {
-            ps.setInt(idx, issuer.getCrlId());
+            ps.setInt(idx, issuer.crlId());
           }
 
           ps.execute();
         } catch (SQLException ex) {
-          System.err.println("could not import issuer with id=" + issuer.getId());
+          System.err.println("could not import issuer with id=" + issuer.id());
           throw translate(SQL_ADD_ISSUER, ex);
         } catch (CertificateException ex) {
-          System.err.println("could not import issuer with id=" + issuer.getId());
+          System.err.println("could not import issuer with id=" + issuer.id());
           throw ex;
         }
       }
@@ -190,12 +189,12 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       for (OcspCertstore.CrlInfo crlInfo : crlInfos) {
         try {
           int idx = 1;
-          ps.setInt(idx++, crlInfo.getId());
-          ps.setString(idx++, crlInfo.getName());
-          ps.setString(idx, crlInfo.getInfo());
+          ps.setInt(idx++, crlInfo.id());
+          ps.setString(idx++, crlInfo.name());
+          ps.setString(idx, crlInfo.info());
           ps.execute();
         } catch (SQLException ex) {
-          System.err.println("could not import CRL_INFO with id=" + crlInfo.getId());
+          System.err.println("could not import CRL_INFO with id=" + crlInfo.id());
           throw translate(SQL_ADD_CRLINFO, ex);
         }
       }
@@ -226,7 +225,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     deleteCertGreaterThan(minId - 1, LOG);
 
-    final long total = certstore.getCountCerts() - numProcessedBefore;
+    final long total = certstore.countCerts() - numProcessedBefore;
     final ProcessLog processLog = new ProcessLog(total);
 
     System.out.println("importing certificates from ID " + minId);
@@ -236,9 +235,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     OcspDbEntryType type = OcspDbEntryType.CERT;
 
     try (DbPortFileNameIterator certsFileIterator = new DbPortFileNameIterator(
-            baseDir + File.separator + type.getDirName() + ".mf")) {
+            baseDir + File.separator + type.dirName() + ".mf")) {
       while (certsFileIterator.hasNext()) {
-        String certsFile = baseDir + File.separator + type.getDirName()
+        String certsFile = baseDir + File.separator + type.dirName()
             + File.separator + certsFileIterator.next();
 
         // extract the toId from the filename
@@ -310,7 +309,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
       int numEntriesInBatch = 0;
       long lastSuccessfulCertId = 0;
 
-      List<OcspCertstore.Cert> list = certs.getCerts();
+      List<OcspCertstore.Cert> list = certs.certs();
       final int n = list.size();
 
       for (int i = 0; i < n; i++) {
@@ -319,7 +318,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         }
 
         OcspCertstore.Cert cert = list.get(i);
-        long id = cert.getId();
+        long id = cert.id();
         if (id < minId) {
           continue;
         }
@@ -330,21 +329,21 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         try {
           int idx = 1;
           psCert.setLong(idx++, id);
-          psCert.setInt(idx++, cert.getIid());
-          psCert.setString(idx++, cert.getSn());
-          psCert.setLong(idx++, cert.getUpdate());
-          psCert.setLong(idx++, cert.getNbefore());
-          psCert.setLong(idx++, cert.getNafter());
+          psCert.setInt(idx++, cert.iid());
+          psCert.setString(idx++, cert.sn());
+          psCert.setLong(idx++, cert.update());
+          psCert.setLong(idx++, cert.nbefore());
+          psCert.setLong(idx++, cert.nafter());
           setBoolean(psCert, idx++, cert.isRev());
-          setInt(psCert, idx++, cert.getRr());
-          setLong(psCert, idx++, cert.getRt());
-          setLong(psCert, idx++, cert.getRit());
-          psCert.setString(idx++, cert.getHash());
-          psCert.setString(idx++, cert.getSubject());
-          if (cert.getCrlId() == null) {
+          setInt(psCert, idx++, cert.rr());
+          setLong(psCert, idx++, cert.rt());
+          setLong(psCert, idx++, cert.rit());
+          psCert.setString(idx++, cert.hash());
+          psCert.setString(idx++, cert.subject());
+          if (cert.crlId() == null) {
             psCert.setNull(idx, Types.INTEGER);
           } else {
-            psCert.setInt(idx, cert.getCrlId());
+            psCert.setInt(idx, cert.crlId());
           }
           psCert.addBatch();
         } catch (SQLException ex) {

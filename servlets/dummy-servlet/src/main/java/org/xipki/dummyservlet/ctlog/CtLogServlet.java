@@ -162,7 +162,7 @@ public class CtLogServlet {
       JsonMap json = JsonParser.parseMap(is, false);
       AddPreChainRequest req0 = AddPreChainRequest.parse(json);
 
-      List<byte[]> chain = req0.getChain();
+      List<byte[]> chain = req0.chain();
       if (chain == null || chain.size() < 2) {
         LOG.warn("chain has less than two certificates");
         return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);

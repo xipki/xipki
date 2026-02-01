@@ -23,9 +23,7 @@ import java.util.Set;
  * An implementation of {@link P11CryptServiceFactory}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private static final Logger LOG =
@@ -71,14 +69,14 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private Map<String, P11ModuleConf> geModuleConfs()
       throws InvalidConfException {
-    List<P11SystemConf.ModuleConf> moduleTypes = pkcs11Conf.getModules();
+    List<P11SystemConf.ModuleConf> moduleTypes = pkcs11Conf.modules();
     List<P11SystemConf.MechanismSetConf> mechanismSets =
-        pkcs11Conf.getMechanismSets();
+        pkcs11Conf.mechanismSets();
 
     Map<String, P11ModuleConf> confs = new HashMap<>();
     for (P11SystemConf.ModuleConf moduleType : moduleTypes) {
       P11ModuleConf conf = new P11ModuleConf(moduleType, mechanismSets);
-      confs.put(conf.getName(), conf);
+      confs.put(conf.name(), conf);
     }
 
     if (!confs.containsKey(P11CryptServiceFactory.DEFAULT_P11MODULE_NAME)) {
@@ -111,7 +109,7 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     P11Module module = modules.get(name);
     if (module == null) {
       module = P11Module.getInstance(conf);
-      LOG.info("added PKCS#11 module {}\n{}", name, module.getDescription());
+      LOG.info("added PKCS#11 module {}\n{}", name, module.description());
       modules.put(name, module);
     }
 

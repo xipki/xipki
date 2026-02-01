@@ -22,9 +22,7 @@ import java.security.NoSuchAlgorithmException;
  * algorithms Plain-ECDSA and SM3.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
-
 public class XiECContentVerifierProviderBuilder
     extends BcECContentVerifierProviderBuilder {
 
@@ -50,7 +48,7 @@ public class XiECContentVerifierProviderBuilder
           "could not detect SignAlgo from sigAlgId");
     }
 
-    HashAlgo hashAlgo = signAlgo.getHashAlgo();
+    HashAlgo hashAlgo = signAlgo.hashAlgo();
     if (SignAlgo.SM2_SM3 == signAlgo) {
       return new SM2Signer();
     }

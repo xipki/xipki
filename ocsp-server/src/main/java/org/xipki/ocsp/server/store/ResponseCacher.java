@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Response cacher.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class ResponseCacher implements Closeable {
@@ -215,9 +214,9 @@ public class ResponseCacher implements Closeable {
           "storeIssuer is not permitted in slave mode");
     }
 
-    for (Integer id : issuerStore.getIds()) {
+    for (Integer id : issuerStore.ids()) {
       IssuerEntry issuer = issuerStore.getIssuerForId(id);
-      if (issuer.getCert().equals(issuerCert)) {
+      if (issuer.cert().equals(issuerCert)) {
         return issuer;
       }
     }
@@ -250,7 +249,7 @@ public class ResponseCacher implements Closeable {
         datasource.releaseResources(ps, null);
       }
     } catch (DataAccessException ex) {
-      if (ex.getReason().isDescendantOrSelfOf(Reason.DuplicateKey)) {
+      if (ex.reason().isDescendantOrSelfOf(Reason.DuplicateKey)) {
         return issuerStore.getIssuerForId(id);
       }
       throw ex;
@@ -344,7 +343,7 @@ public class ResponseCacher implements Closeable {
           ps.execute();
         } catch (SQLException ex) {
           DataAccessException dex = datasource.translate(sql, ex);
-          if (dex.getReason().isDescendantOrSelfOf(
+          if (dex.reason().isDescendantOrSelfOf(
                 Reason.DataIntegrityViolation)) {
             dataIntegrityViolationException = Boolean.TRUE;
           } else {
@@ -445,7 +444,7 @@ public class ResponseCacher implements Closeable {
       // add the new issuers
       rs = null;
 
-      ids.removeAll(issuerStore.getIds());
+      ids.removeAll(issuerStore.ids());
       if (ids.isEmpty()) {
         // no new issuer
         return true;
@@ -489,7 +488,7 @@ public class ResponseCacher implements Closeable {
   private static byte[] buildIdent(BigInteger serialNumber, SignAlgo sigAlgo) {
     byte[] snBytes = serialNumber.toByteArray();
     byte[] bytes = new byte[1 + snBytes.length];
-    bytes[0] = sigAlgo.getCode();
+    bytes[0] = sigAlgo.code();
     System.arraycopy(snBytes, 0, bytes, 1, snBytes.length);
     return bytes;
   }

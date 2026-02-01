@@ -12,7 +12,6 @@ import java.util.List;
  * CMP control configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CmpControlConf {
@@ -43,7 +42,7 @@ public class CmpControlConf {
 
   private Integer responsePbmIterationCount;
 
-  public Boolean getConfirmCert() {
+  public Boolean confirmCert() {
     return confirmCert;
   }
 
@@ -51,7 +50,7 @@ public class CmpControlConf {
     this.confirmCert = confirmCert;
   }
 
-  public Boolean getSendCaCert() {
+  public Boolean sendCaCert() {
     return sendCaCert;
   }
 
@@ -59,7 +58,7 @@ public class CmpControlConf {
     this.sendCaCert = sendCaCert;
   }
 
-  public Boolean getSendCertChain() {
+  public Boolean sendCertChain() {
     return sendCertChain;
   }
 
@@ -67,7 +66,7 @@ public class CmpControlConf {
     this.sendCertChain = sendCertChain;
   }
 
-  public Boolean getMessageTimeRequired() {
+  public Boolean messageTimeRequired() {
     return messageTimeRequired;
   }
 
@@ -75,7 +74,7 @@ public class CmpControlConf {
     this.messageTimeRequired = messageTimeRequired;
   }
 
-  public Boolean getSendResponderCert() {
+  public Boolean sendResponderCert() {
     return sendResponderCert;
   }
 
@@ -83,7 +82,7 @@ public class CmpControlConf {
     this.sendResponderCert = sendResponderCert;
   }
 
-  public Integer getMessageTimeBias() {
+  public Integer messageTimeBias() {
     return messageTimeBias;
   }
 
@@ -91,7 +90,7 @@ public class CmpControlConf {
     this.messageTimeBias = messageTimeBias;
   }
 
-  public Integer getConfirmWaitTime() {
+  public Integer confirmWaitTime() {
     return confirmWaitTime;
   }
 
@@ -99,7 +98,7 @@ public class CmpControlConf {
     this.confirmWaitTime = confirmWaitTime;
   }
 
-  public String getResponsePbmOwf() {
+  public String responsePbmOwf() {
     return responsePbmOwf;
   }
 
@@ -107,7 +106,7 @@ public class CmpControlConf {
     this.responsePbmOwf = responsePbmOwf;
   }
 
-  public List<String> getRequestPbmOwfs() {
+  public List<String> requestPbmOwfs() {
     return requestPbmOwfs;
   }
 
@@ -115,7 +114,7 @@ public class CmpControlConf {
     this.requestPbmOwfs = requestPbmOwfs;
   }
 
-  public String getResponsePbmMac() {
+  public String responsePbmMac() {
     return responsePbmMac;
   }
 
@@ -123,7 +122,7 @@ public class CmpControlConf {
     this.responsePbmMac = responsePbmMac;
   }
 
-  public List<String> getRequestSigAlgos() {
+  public List<String> requestSigAlgos() {
     return requestSigAlgos;
   }
 
@@ -131,7 +130,7 @@ public class CmpControlConf {
     this.requestSigAlgos = requestSigAlgos;
   }
 
-  public List<String> getRequestPbmMacs() {
+  public List<String> requestPbmMacs() {
     return requestPbmMacs;
   }
 
@@ -139,7 +138,7 @@ public class CmpControlConf {
     this.requestPbmMacs = requestPbmMacs;
   }
 
-  public Integer getResponsePbmIterationCount() {
+  public Integer responsePbmIterationCount() {
     return responsePbmIterationCount;
   }
 

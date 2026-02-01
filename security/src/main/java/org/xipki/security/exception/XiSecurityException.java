@@ -7,9 +7,7 @@ package org.xipki.security.exception;
  * General security exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class XiSecurityException extends Exception {
 
   public XiSecurityException(String message, Throwable cause) {

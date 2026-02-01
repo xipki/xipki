@@ -5,7 +5,7 @@ package org.xipki.ca.api.profile.ctrl;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.codec.Args;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 /**
  * @author Lijun Liao (xipki)
@@ -28,7 +28,7 @@ public class ExtensionControl {
     this.inRequest = inRequest == null ? TripleState.forbidden : inRequest;
   }
 
-  public ASN1ObjectIdentifier getType() {
+  public ASN1ObjectIdentifier type() {
     return type;
   }
 
@@ -40,7 +40,7 @@ public class ExtensionControl {
     return required;
   }
 
-  public TripleState getInRequest() {
+  public TripleState inRequest() {
     return inRequest;
   }
 

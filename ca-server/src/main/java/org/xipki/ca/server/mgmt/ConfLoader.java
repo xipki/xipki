@@ -220,17 +220,17 @@ class ConfLoader {
     for (String caName : conf.getCaNames()) {
       CaConf.SingleCa scc = conf.getCa(caName);
 
-      CaConf.GenSelfIssued genSelfIssued = scc.getGenSelfIssued();
-      CaEntry caEntry = scc.getCaEntry();
+      CaConf.GenSelfIssued genSelfIssued = scc.genSelfIssued();
+      CaEntry caEntry = scc.caEntry();
       if (caEntry != null) {
         if (manager.caInfos.containsKey(caName)) {
-          CaEntry entryB = manager.caInfos.get(caName).getCaEntry();
-          if (caEntry.getCert() == null && genSelfIssued != null) {
-            SignerConf signerConf = new SignerConf(caEntry.getSignerConf());
+          CaEntry entryB = manager.caInfos.get(caName).caEntry();
+          if (caEntry.cert() == null && genSelfIssued != null) {
+            SignerConf signerConf = new SignerConf(caEntry.signerConf());
             ConcurrentContentSigner signer = null;
             try {
               signer = securityFactory.createSigner(
-                  caEntry.getBase().getSignerType(), signerConf,
+                  caEntry.base().signerType(), signerConf,
                   (X509Cert) null);
               caEntry.setCert(signer.getCertificate());
             } catch (ObjectCreationException ex) {
@@ -251,9 +251,9 @@ class ConfLoader {
           }
         } else {
           if (genSelfIssued != null) {
-            manager.generateRootCa(caEntry, genSelfIssued.getProfile(),
-                genSelfIssued.getSubject(), genSelfIssued.getSerialNumber(),
-                genSelfIssued.getNotBefore(), genSelfIssued.getNotAfter());
+            manager.generateRootCa(caEntry, genSelfIssued.profile(),
+                genSelfIssued.subject(), genSelfIssued.serialNumber(),
+                genSelfIssued.notBefore(), genSelfIssued.notAfter());
             LOG.info("generated root CA {}", caName);
           } else {
             try {
@@ -268,9 +268,9 @@ class ConfLoader {
         }
       }
 
-      if (scc.getAliases() != null) {
+      if (scc.aliases() != null) {
         Set<String> aliasesB = manager.getAliasesForCa(caName);
-        for (String aliasName : scc.getAliases()) {
+        for (String aliasName : scc.aliases()) {
           if (aliasesB != null && aliasesB.contains(aliasName)) {
             LOG.info("ignored adding existing CA alias {} to CA {}",
                 aliasName, caName);
@@ -288,8 +288,8 @@ class ConfLoader {
         }
       }
 
-      if (scc.getProfileNames() != null) {
-        for (String profileName : scc.getProfileNames()) {
+      if (scc.profileNames() != null) {
+        for (String profileName : scc.profileNames()) {
           try {
             manager.addCertprofileToCa(profileName, caName);
             LOG.info("added certprofile {} to CA {}", profileName, caName);
@@ -302,9 +302,9 @@ class ConfLoader {
         }
       }
 
-      if (scc.getPublisherNames() != null) {
+      if (scc.publisherNames() != null) {
         Set<String> publishersB = manager.caHasPublishers.get(caName);
-        for (String publisherName : scc.getPublisherNames()) {
+        for (String publisherName : scc.publisherNames()) {
           if (publishersB != null && publishersB.contains(publisherName)) {
             LOG.info("ignored adding publisher {} to CA {}",
                 publisherName, caName);
@@ -323,16 +323,16 @@ class ConfLoader {
         }
       }
 
-      if (scc.getRequestors() != null) {
+      if (scc.requestors() != null) {
         Set<CaHasRequestorEntry> requestorsB =
             manager.caHasRequestors.get(caName);
 
-        for (CaHasRequestorEntry requestor : scc.getRequestors()) {
-          String requestorName = requestor.getRequestorIdent().getName();
+        for (CaHasRequestorEntry requestor : scc.requestors()) {
+          String requestorName = requestor.requestorIdent().name();
           CaHasRequestorEntry requestorB = null;
           if (requestorsB != null) {
             for (CaHasRequestorEntry m : requestorsB) {
-              if (m.getRequestorIdent().getName().equals(requestorName)) {
+              if (m.requestorIdent().name().equals(requestorName)) {
                 requestorB = m;
                 break;
               }
@@ -415,8 +415,8 @@ class ConfLoader {
 
             for (CaHasRequestorEntry m : requestors2) {
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor(
-                  m.getRequestorIdent().getName(), m.getPermissions(),
-                  new ArrayList<>(m.getProfiles()));
+                  m.requestorIdent().name(), m.permissions(),
+                  new ArrayList<>(m.profiles()));
 
               requestors.add(chr);
             }
@@ -439,15 +439,15 @@ class ConfLoader {
             publishers = new ArrayList<>(strs);
           }
 
-          CaEntry entry = manager.x509cas.get(name).getCaInfo().getCaEntry();
+          CaEntry entry = manager.x509cas.get(name).caInfo().caEntry();
 
           // Certificate
-          byte[] certBytes = entry.getCert().getEncoded();
+          byte[] certBytes = entry.cert().getEncoded();
           FileOrBinary cert = createFileOrBinary(zipStream, certBytes,
               "files/ca-" + name + "-cert.der");
 
           // certchain
-          List<X509Cert> certchain = entry.getCertchain();
+          List<X509Cert> certchain = entry.certchain();
           List<FileOrBinary> ccList = null;
           if (CollectionUtil.isNotEmpty(certchain)) {
             ccList = new ArrayList<>(certchain.size());
@@ -460,9 +460,9 @@ class ConfLoader {
           }
 
           FileOrValue signerConf = createFileOrValue(zipStream,
-              entry.getSignerConf(), "files/ca-" + name + "-signerconf.conf");
+              entry.signerConf(), "files/ca-" + name + "-signerconf.conf");
 
-          CaConfType.CaInfo caInfo = new CaConfType.CaInfo(entry.getBase(),
+          CaConfType.CaInfo caInfo = new CaConfType.CaInfo(entry.base(),
               signerConf, cert, ccList);
 
           CaConfType.Ca ca = new CaConfType.Ca(null, name, caInfo, aliases,
@@ -484,15 +484,15 @@ class ConfLoader {
           RequestorEntry entry = manager.requestorDbEntries.get(name);
           CaConfType.Requestor type;
 
-          if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.getType())) {
+          if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.type())) {
             FileOrBinary fob = createFileOrBinary(zipStream,
-                Base64.decode(entry.getConf()),
+                Base64.decode(entry.conf()),
                 "files/requestor-" + name + ".der");
-            type = new CaConfType.Requestor(null, name, entry.getType(), fob);
+            type = new CaConfType.Requestor(null, name, entry.type(), fob);
           } else {
-            FileOrValue fov = createFileOrValue(zipStream,  entry.getConf(),
+            FileOrValue fov = createFileOrValue(zipStream,  entry.conf(),
                 "files/requestor-" + name + ".conf");
-            type = new CaConfType.Requestor(null, name, entry.getType(), fov);
+            type = new CaConfType.Requestor(null, name, entry.type(), fov);
           }
 
           list.add(type);
@@ -509,8 +509,8 @@ class ConfLoader {
 
         for (String name : manager.publisherDbEntries.keySet()) {
           PublisherEntry entry = manager.publisherDbEntries.get(name);
-          NameTypeConf conf = new NameTypeConf(null, name, entry.getType(),
-              createFileOrValue(zipStream, entry.getConf(),
+          NameTypeConf conf = new NameTypeConf(null, name, entry.type(),
+              createFileOrValue(zipStream, entry.conf(),
                   "files/publisher-" + name + ".conf"));
           list.add(conf);
         }
@@ -525,8 +525,8 @@ class ConfLoader {
         List<NameTypeConf> list = new LinkedList<>();
         for (String name : manager.certprofileDbEntries.keySet()) {
           CertprofileEntry entry = manager.certprofileDbEntries.get(name);
-          NameTypeConf conf = new NameTypeConf(null, name, entry.getType(),
-              createFileOrValue(zipStream, entry.getConf(),
+          NameTypeConf conf = new NameTypeConf(null, name, entry.type(),
+              createFileOrValue(zipStream, entry.conf(),
                   "files/certprofile-" + name + ".conf"));
           list.add(conf);
         }
@@ -543,8 +543,8 @@ class ConfLoader {
         for (String name : manager.signerDbEntries.keySet()) {
           SignerEntry entry = manager.signerDbEntries.get(name);
           CaConfType.Signer conf = new CaConfType.Signer(
-              null, name, entry.getType(),
-              createFileOrValue(zipStream, entry.getConf(),
+              null, name, entry.type(),
+              createFileOrValue(zipStream, entry.conf(),
                   "files/signer-" + name + ".conf"),
               createFileOrBase64Value(zipStream, entry.base64Cert(),
                   "files/signer-" + name + ".der"));
@@ -563,11 +563,11 @@ class ConfLoader {
         for (String name : manager.keypairGenDbEntries.keySet()) {
           KeypairGenEntry entry = manager.keypairGenDbEntries.get(name);
 
-          FileOrValue fv = (entry.getConf() == null) ? null
-              : FileOrValue.ofValue(entry.getConf());
+          FileOrValue fv = (entry.conf() == null) ? null
+              : FileOrValue.ofValue(entry.conf());
 
           list.add(new CaConfType.NameTypeConf(
-              null, name, entry.getType(), fv));
+              null, name, entry.type(), fv));
         }
 
         if (!list.isEmpty()) {

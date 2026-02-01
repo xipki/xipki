@@ -15,7 +15,6 @@ import java.util.Map.Entry;
  * Container of name-value pairs.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ConfPairs implements JsonEncodable {
@@ -433,10 +432,9 @@ public class ConfPairs implements JsonEncodable {
       return null;
     }
 
-    JsonMap map = (JsonMap) json;
     ConfPairs ret = new ConfPairs();
-    for (String key : map.getKeys()) {
-      Object v = map.getObject(key);
+    for (String key : json.getKeys()) {
+      Object v = json.getObject(key);
       if (v == null) {
         throw new CodecException("value of key " + key + " shall not be null");
       }

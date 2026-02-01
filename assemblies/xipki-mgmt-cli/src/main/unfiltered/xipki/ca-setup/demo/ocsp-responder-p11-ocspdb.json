@@ -1,107 +1,97 @@
 {
-	//"responseCache":{
-	//	"datasource":{
-	//		"name":"datasource-cache",
-	//		"conf":{
-	//			"file":"etc/ocsp/database/ocsp-cache-db.properties"
-	//		}
-	//	},
-	//	"validity":"1d"
-	//},
-	"master":true,
-	"unknownIssuerBehaviour":"malformedRequest",
-	"datasources":[{
-		"name":"datasource1",
-		"conf":{
-			"file":"etc/ocsp/database/ocsp-db.properties"
-		}
-	}],
-	"requestOptions":[{
-		"name":"request1",
-		"hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
-		"maxRequestListCount":10,
-		"maxRequestSize":4096,
-		"nonce":{
-			"maxLen":32,
-			"minLen":4,
-			// valid values are ignore, forbidden, optional and required.
-			// in case of ignore and forbidded, maxLen and minLen will be ignored.
-			"occurrence":"optional"
-		},
-		"signatureRequired":false,
-		"supportsHttpGet":true,
-		"validateSignature":false,
-		"versions":["v1"]
-	}],
-	"responders":[{
-		"name":"responder1",
-		"inheritCaRevocation":true,
-		"mode":"RFC2560",
-		"request":"request1",
-		"response":"response1",
-		"servletPaths":["/"],
-		"signer":"signer1",
-		"stores":["store1"]
-	}],
-	"responseOptions":[{
-		"name":"response1",
-		"embedCertsMode":"SIGNER",
-		"includeCerthash":false,
-		"includeInvalidityDate":false,
-		"includeRevReason":true,
-		"responderIdByName":true
-	}],
-	"signers": [{
-		"name":"signer1",
-		"algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED448",
+  //"responseCache":{
+  //  "datasource":{
+  //    "name":"datasource-cache",
+  //    "conf":{
+  //      "file":"etc/ocsp/database/ocsp-cache-db.properties"
+  //    }
+  //  },
+  //  "validity":"1d"
+  //},
+  "master":true,
+  "unknownIssuerBehaviour":"malformedRequest",
+  "datasources":[{
+    "name":"datasource1",
+    "conf":{
+      "file":"etc/ocsp/database/ocsp-db.properties"
+    }
+  }],
+  "requestOptions":[{
+    "name":"request1",
+    "hashAlgorithms":["SHA1","SHA256","SHA384","SHA512"],
+    "maxRequestListCount":10,
+    "maxRequestSize":4096,
+    "nonce":{
+      "maxLen":32,
+      "minLen":4,
+      // valid values are ignore, forbidden, optional and required.
+      // in case of ignore and forbidded, maxLen and minLen will be ignored.
+      "occurrence":"optional"
+    },
+    "signatureRequired":false,
+    "supportsHttpGet":true,
+    "validateSignature":false,
+    "versions":["v1"]
+  }],
+  "responders":[{
+    "name":"responder1",
+    "inheritCaRevocation":true,
+    "mode":"RFC2560",
+    "request":"request1",
+    "response":"response1",
+    "servletPaths":["/"],
+    "signer":"signer1",
+    "stores":["store1"]
+  }],
+  "responseOptions":[{
+    "name":"response1",
+    "embedCertsMode":"SIGNER",
+    "includeCerthash":false,
+    "includeInvalidityDate":false,
+    "includeRevReason":true,
+    "responderIdByName":true
+  }],
+  "signers": [{
+    "name":"signer1",
+    "algorithms":["SHA256withECDSA","SHA256withRSA","ED25519","ED448",
           "SM3withSM2","MLDSA44","MLDSA65","MLDSA87",
-          "MLDSA44-RSA2048-PSS-SHA256",
-          "MLDSA44-ED25519-SHA512",
-          "MLDSA44-ECDSA-P256-SHA256",
-          "MLDSA65-RSA3072-PSS-SHA512",
-          "MLDSA65-RSA4096-PSS-SHA512",
-          "MLDSA65-RSA4096-PKCS15-SHA512",
-          "MLDSA65-ECDSA-P256-SHA512",
-          "MLDSA65-ECDSA-P384-SHA512",
-          "MLDSA65-ECDSA-BRAINPOOLP256R1-SHA512",
-          "MLDSA65-ED25519-SHA512",
-          "MLDSA87-ECDSA-P384-SHA512",
-          "MLDSA87-ECDSA-BRAINPOOLP384R1-SHA512",
-          "MLDSA87-ED448-SHAKE256",
-          "MLDSA87-RSA3072-PSS-SHA512",
-          "MLDSA87-RSA4096-PSS-SHA512",
-          "MLDSA87-ECDSA-P521-SHA512"
+          "MLDSA44-RSA2048", "MLDSA44-ED25519", "MLDSA44-P256",
+          "MLDSA65-RSA3072", "MLDSA65-RSA4096", "MLDSA65-RSA4096-PKCS15",
+          "MLDSA65-P256", "MLDSA65-P384", "MLDSA65-BRAINPOOLP256R1",
+          "MLDSA65-ED25519",
+          "MLDSA87-P384", "MLDSA87-BRAINPOOLP384R1", "MLDSA87-ED448",
+          "MLDSA87-RSA3072", "MLDSA87-RSA4096", "MLDSA87-P521"
         ],
-		"caCerts":[],
-		// For PKCS#12: only need to configure the key (certificate is in the p12 file)
-		//
-		//"type":"pkcs12",
-		//"key":"password=$[ocsp.keyPassword],keystore=file:keycerts/ocsp1.p12"
+    "caCerts":[],
+    // For PKCS#12: only need to configure the key (certificate is in the p12 file)
+    //
+    //"type":"pkcs12",
+    //"key":"password=$[ocsp.keyPassword],keystore=file:keycerts/ocsp1.p12"
 
-		// For PKCS#11, chnge 'type' to 'pkcs11', replace 'key' field with the following line
-		// and add a new field 'cert'
-		"type":"pkcs11",
-		"key": "slot=0,key-label=ocsp1",
-		"cert": {
-			"file": "keycerts/ocsp1.crt"
-		}
-	}],
-	"stores":[{
-		"name":"store1",
-		"ignoreExpiredCert":true,
-		"ignoreNotYetValidCert":true,
-		"includeArchiveCutoff":false,
-		"includeCrlId":false,
-		"retentionInterval":-1,
-		"minNextUpdatePeriod":"1d",
-		"unknownCertBehaviour":"unknown",
-		"updateInterval":"10m",
-		"source":{
-			"datasource":"datasource1",
-			"type":"xipki-db",
-			"conf":{
-			}
-		}
-	}]
+    // For PKCS#11, chnge 'type' to 'pkcs11', replace 'key' field with the following line
+    // and add a new field 'cert'
+    "type":"pkcs11",
+    "key": "slot=0,key-label=ocsp1",
+    "cert": {
+      "file": "keycerts/ocsp1.crt"
+    }
+  }],
+  "stores":[{
+    "name":"store1",
+    "ignoreExpiredCert":true,
+    "ignoreNotYetValidCert":true,
+    "includeArchiveCutoff":false,
+    "includeCrlId":false,
+    "retentionInterval":-1,
+    "minNextUpdatePeriod":"1d",
+    "unknownCertBehaviour":"unknown",
+    "updateInterval":"10m",
+    "source":{
+      "datasource":"datasource1",
+      "type":"xipki-db",
+      "conf":{
+      }
+    }
+  }]
 }
 

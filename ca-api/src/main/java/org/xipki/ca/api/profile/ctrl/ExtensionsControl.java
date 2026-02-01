@@ -33,12 +33,12 @@ public class ExtensionsControl {
     List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
     if (keepOrder) {
       for (ExtensionControl m : controls) {
-        sortedOids.add(m.getType());
+        sortedOids.add(m.type());
       }
     } else {
       Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
       for (ExtensionControl m : controls) {
-        oidSet.add(m.getType());
+        oidSet.add(m.type());
       }
 
       List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
@@ -60,7 +60,7 @@ public class ExtensionsControl {
 
     this.controls = new HashMap<>();
     for (ExtensionControl control : controls) {
-      this.controls.put(control.getType(), control);
+      this.controls.put(control.type(), control);
     }
 
   } // constructor
@@ -73,7 +73,7 @@ public class ExtensionsControl {
     return keepOrder;
   }
 
-  public List<ASN1ObjectIdentifier> getTypes() {
+  public List<ASN1ObjectIdentifier> types() {
     return types;
   }
 

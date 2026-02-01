@@ -14,7 +14,6 @@ import java.util.Set;
  * CertprofileFactory for the Certprofile of type 'json'.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class CertprofileFactoryImpl implements CertprofileFactory {

@@ -113,8 +113,7 @@ public class EdDSAGenerateKeyPairTest {
     private void generateEdwardsKeypair(PKCS11KeyPairType keyPairType)
         throws TokenException {
       PKCS11Token token = getToken();
-      final long mechCode = CKM_EC_EDWARDS_KEY_PAIR_GEN;
-      Assume.assumeTrue(token.supportsMechanism(mechCode,
+      Assume.assumeTrue(token.supportsMechanism(CKM_EC_EDWARDS_KEY_PAIR_GEN,
           CKF_GENERATE_KEY_PAIR));
 
       // first check out what attributes of the keys we may set

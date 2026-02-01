@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
  * HTTP OCSP requestor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class HttpOcspRequestor extends AbstractOcspRequestor {

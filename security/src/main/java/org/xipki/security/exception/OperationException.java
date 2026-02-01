@@ -7,9 +7,7 @@ package org.xipki.security.exception;
  * Operation exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class OperationException extends Exception {
 
   private final ErrorCode errorCode;
@@ -41,11 +39,11 @@ public class OperationException extends Exception {
     this.errorCode = errorCode;
   }
 
-  public ErrorCode getErrorCode() {
+  public ErrorCode errorCode() {
     return errorCode;
   }
 
-  public String getErrorMessage() {
+  public String errorMessage() {
     return errorMessage;
   }
 

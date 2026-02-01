@@ -14,7 +14,6 @@ import java.time.Instant;
  * CertStatus information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertStatusInfo {
@@ -70,7 +69,7 @@ public class CertStatusInfo {
     this.certprofile = certprofile;
   }
 
-  public Instant getThisUpdate() {
+  public Instant thisUpdate() {
     return thisUpdate;
   }
 
@@ -78,7 +77,7 @@ public class CertStatusInfo {
     this.thisUpdate = thisUpdate;
   }
 
-  public Instant getNextUpdate() {
+  public Instant nextUpdate() {
     return nextUpdate;
   }
 
@@ -86,7 +85,7 @@ public class CertStatusInfo {
     this.nextUpdate = nextUpdate;
   }
 
-  public CertStatus getCertStatus() {
+  public CertStatus certStatus() {
     return certStatus;
   }
 
@@ -94,19 +93,19 @@ public class CertStatusInfo {
     this.certStatus = Args.notNull(certStatus, "certStatus");
   }
 
-  public CertRevocationInfo getRevocationInfo() {
+  public CertRevocationInfo revocationInfo() {
     return revocationInfo;
   }
 
-  public HashAlgo getCertHashAlgo() {
+  public HashAlgo certHashAlgo() {
     return certHashAlgo;
   }
 
-  public byte[] getCertHash() {
+  public byte[] certHash() {
     return certHash;
   }
 
-  public String getCertprofile() {
+  public String certprofile() {
     return certprofile;
   }
 
@@ -114,7 +113,7 @@ public class CertStatusInfo {
     this.certprofile = certprofile;
   }
 
-  public CrlID getCrlId() {
+  public CrlID crlId() {
     return crlId;
   }
 
@@ -122,7 +121,7 @@ public class CertStatusInfo {
     this.crlId = crlId;
   }
 
-  public Instant getArchiveCutOff() {
+  public Instant archiveCutOff() {
     return archiveCutOff;
   }
 
@@ -130,7 +129,7 @@ public class CertStatusInfo {
     this.archiveCutOff = archiveCutOff;
   }
 
-  public static CertStatusInfo getCrlExpiredStatusInfo() {
+  public static CertStatusInfo crlExpiredStatusInfo() {
     return new CertStatusInfo(CertStatus.CRL_EXPIRED, Instant.now(),
         null, null);
   }

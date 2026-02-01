@@ -33,7 +33,7 @@ public class TlsFeature implements JsonEncodable {
     this.features = features;
   }
 
-  public List<Integer> getFeatures() {
+  public List<Integer> features() {
     return features;
   }
 

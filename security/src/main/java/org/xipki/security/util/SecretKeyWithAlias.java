@@ -20,11 +20,11 @@ public class SecretKeyWithAlias {
     this.secretKey = Args.notNull(secretKey, "secretKey");
   }
 
-  public String getAlias() {
+  public String alias() {
     return alias;
   }
 
-  public SecretKey getSecretKey() {
+  public SecretKey secretKey() {
     return secretKey;
   }
 }

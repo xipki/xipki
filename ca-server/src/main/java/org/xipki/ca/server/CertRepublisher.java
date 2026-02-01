@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Publish certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 2.1.0
  */
 
 class CertRepublisher {
@@ -78,8 +77,8 @@ class CertRepublisher {
                       onlyRevokedCerts);
           long maxId = 1;
           for (SerialWithId sid : serials) {
-            if (sid.getId() > maxId) {
-              maxId = sid.getId();
+            if (sid.id() > maxId) {
+              maxId = sid.id();
             }
             queue.put(new SerialWithIdQueueEntry(sid));
           }
@@ -138,7 +137,7 @@ class CertRepublisher {
         CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertForId(ca, caCert, sid.getId(),
+          certInfo = certstore.getCertForId(ca, caCert, sid.id(),
                       caIdNameMap);
         } catch (OperationException ex) {
           LogUtil.error(LOG, ex);
@@ -155,7 +154,7 @@ class CertRepublisher {
           boolean successful = publisher.certificateAdded(certInfo);
           if (!successful) {
             LOG.error("republish certificate serial={} to publisher {} failed",
-                LogUtil.formatCsn(sid.getSerial()), publisher.getIdent());
+                LogUtil.formatCsn(sid.serial()), publisher.ident());
             allSucc = false;
           }
         }

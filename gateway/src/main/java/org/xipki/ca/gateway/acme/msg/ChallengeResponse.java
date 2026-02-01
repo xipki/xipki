@@ -33,23 +33,23 @@ public class ChallengeResponse implements JsonEncodable {
     this.validated = validated;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getUrl() {
+  public String url() {
     return url;
   }
 
-  public String getToken() {
+  public String token() {
     return token;
   }
 
-  public ChallengeStatus getStatus() {
+  public ChallengeStatus status() {
     return status;
   }
 
-  public String getValidated() {
+  public String validated() {
     return validated;
   }
 

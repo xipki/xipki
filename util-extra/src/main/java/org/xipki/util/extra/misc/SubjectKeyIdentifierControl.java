@@ -43,15 +43,15 @@ public class SubjectKeyIdentifierControl implements JsonEncodable {
     return method;
   }
 
-  public String getHashAlgo() {
+  public String hashAlgo() {
     return hashAlgo;
   }
 
-  public TruncateMethod getTruncateMethod() {
+  public TruncateMethod truncateMethod() {
     return truncateMethod;
   }
 
-  public Integer getTruncateByteSize() {
+  public Integer truncateByteSize() {
     return truncateByteSize;
   }
 

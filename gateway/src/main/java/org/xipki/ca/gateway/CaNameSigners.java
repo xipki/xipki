@@ -17,9 +17,7 @@ import java.util.Set;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
-
 public class CaNameSigners {
 
   private final ConcurrentContentSigner defaultSigner;
@@ -62,7 +60,7 @@ public class CaNameSigners {
     return defaultSigner;
   }
 
-  public ConcurrentContentSigner getDefaultSigner() {
+  public ConcurrentContentSigner defaultSigner() {
     return defaultSigner;
   }
 

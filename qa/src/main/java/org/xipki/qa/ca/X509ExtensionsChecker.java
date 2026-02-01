@@ -56,7 +56,6 @@ import java.util.Set;
  * Extensions checker.
  *
  * @author Lijun Liao
- *
  */
 
 public class X509ExtensionsChecker {
@@ -100,63 +99,63 @@ public class X509ExtensionsChecker {
         Args.notNull(conf, "conf").buildExtensions();
 
     // Extension controls
-    ExtensionsControl extensionControls = certprofile.getExtensionsControl();
+    ExtensionsControl extensionControls = certprofile.extensionsControl();
 
     // Certificate Policies
     ASN1ObjectIdentifier type = OIDs.Extn.certificatePolicies;
     if (extensionControls.containsID(type)) {
       this.certificatePolicies =
-          extensions.get(type.getId()).getCertificatePolicies();
+          extensions.get(type.getId()).certificatePolicies();
     }
 
     // Policy Mappings
     type = OIDs.Extn.policyMappings;
     if (extensionControls.containsID(type)) {
-      this.policyMappings = extensions.get(type.getId()).getPolicyMappings();
+      this.policyMappings = extensions.get(type.getId()).policyMappings();
     }
 
     // Name Constraints
     type = OIDs.Extn.nameConstraints;
     if (extensionControls.containsID(type)) {
-      this.nameConstraints = extensions.get(type.getId()).getNameConstraints();
+      this.nameConstraints = extensions.get(type.getId()).nameConstraints();
     }
 
     // Policy Constraints
     type = OIDs.Extn.policyConstraints;
     if (extensionControls.containsID(type)) {
       this.policyConstraints =
-          extensions.get(type.getId()).getPolicyConstraints();
+          extensions.get(type.getId()).policyConstraints();
     }
 
     // Inhibit anyPolicy
     type = OIDs.Extn.inhibitAnyPolicy;
     if (extensionControls.containsID(type)) {
       this.inhibitAnyPolicy =
-          extensions.get(type.getId()).getInhibitAnyPolicy();
+          extensions.get(type.getId()).inhibitAnyPolicy();
     }
 
     type = OIDs.Extn.qCStatements;
     if (extensionControls.containsID(type)) {
-      this.qcStatements = extensions.get(type.getId()).getQcStatements();
+      this.qcStatements = extensions.get(type.getId()).qcStatements();
     }
 
     // tlsFeature
     type = OIDs.Extn.id_pe_tlsfeature;
     if (extensionControls.containsID(type)) {
-      this.tlsFeature = extensions.get(type.getId()).getTlsFeature();
+      this.tlsFeature = extensions.get(type.getId()).tlsFeature();
     }
 
     // SMIMECapabilities
     type = OIDs.Extn.id_smimeCapabilities;
     if (extensionControls.containsID(type)) {
       List<SmimeCapabilities.SmimeCapability> list =
-          extensions.get(type.getId()).getSmimeCapabilities().getCapabilities();
+          extensions.get(type.getId()).smimeCapabilities().capabilities();
 
       ASN1EncodableVector vec = new ASN1EncodableVector();
       for (SmimeCapabilities.SmimeCapability m : list) {
-        ASN1ObjectIdentifier oid = m.getCapabilityId();
+        ASN1ObjectIdentifier oid = m.capabilityId();
         ASN1Object params = null;
-        Integer capParam = m.getParameter();
+        Integer capParam = m.parameter();
         if (capParam != null) {
           params = new ASN1Integer(capParam);
         }
@@ -181,7 +180,7 @@ public class X509ExtensionsChecker {
 
     // constant extensions
     Map<ASN1ObjectIdentifier, ExtensionValue> constExtns =
-        certprofile.getConstantExtensions();
+        certprofile.constantExtensions();
     this.constantExtensions = new HashMap<>();
     if (constExtns != null) {
       for (Map.Entry<ASN1ObjectIdentifier, ExtensionValue> m
@@ -189,7 +188,7 @@ public class X509ExtensionsChecker {
         ExtensionValue v = m.getValue();
         byte[] encoded;
         try {
-          encoded = v.getValue().toASN1Primitive().getEncoded();
+          encoded = v.value().toASN1Primitive().getEncoded();
         } catch (IOException e) {
           throw new CertprofileException(
               "Cannot encode extension: " + OIDs.getName(m.getKey()));
@@ -241,13 +240,13 @@ public class X509ExtensionsChecker {
       return;
     }
 
-    CCCSimpleExtensionSchema schema = ex.getCccExtensionSchema();
+    CCCSimpleExtensionSchema schema = ex.cccExtensionSchema();
     if (schema == null) {
       throw new CertprofileException(
           "ccExtensionSchema is not set for " + type);
     }
 
-    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.getVersion()));
+    ASN1Sequence seq = new DERSequence(new ASN1Integer(schema.version()));
     this.cccExtensionSchemaType = type;
     try {
       this.cccExtensionSchemaValue = seq.getEncoded();
@@ -325,7 +324,7 @@ public class X509ExtensionsChecker {
       }
     }
 
-    ExtensionsControl extnControls = certprofile.getExtensionsControl();
+    ExtensionsControl extnControls = certprofile.extensionsControl();
     for (ASN1ObjectIdentifier oid : certExtnTypes) {
       ValidationIssue issue = createExtensionIssue(oid);
       result.add(issue);
@@ -353,7 +352,7 @@ public class X509ExtensionsChecker {
           extnChecker.checkExtnSubjectKeyIdentifier(failureMsg, extnValue,
               cert.getSubjectPublicKeyInfo());
         } else if (OIDs.Extn.keyUsage.equals(oid)) {
-          extnChecker.checkExtnKeyUsage(failureMsg, jceCert.getKeyUsage(),
+          extnChecker.checkExtnKeyUsage(failureMsg, jceCert.keyUsage(),
               requestedExtns, extnControl, keySpec);
         } else if (OIDs.Extn.certificatePolicies.equals(oid)) {
           extnChecker.checkExtnCertificatePolicies(
@@ -460,9 +459,9 @@ public class X509ExtensionsChecker {
       X500Name requestedSubject, KeySpec keySpec) {
     Set<ASN1ObjectIdentifier> types = new HashSet<>();
     // profile required extension types
-    ExtensionsControl extensionControls = certprofile.getExtensionsControl();
+    ExtensionsControl extensionControls = certprofile.extensionsControl();
 
-    for (ASN1ObjectIdentifier oid : extensionControls.getTypes()) {
+    for (ASN1ObjectIdentifier oid : extensionControls.types()) {
       ExtensionControl entry = extensionControls.getControl(oid);
       if (entry.isRequired()) {
         types.add(oid);
@@ -526,7 +525,7 @@ public class X509ExtensionsChecker {
         addIfNotIn(types, type);
       } else if (requestedSubject != null) {
         Map<ASN1ObjectIdentifier, GeneralNameTag> toSanModes =
-            certprofile.extensions().getSubjectToSubjectAltNameModes();
+            certprofile.extensions().subjectToSubjectAltNameModes();
         if (toSanModes != null) {
           for (ASN1ObjectIdentifier rdnType
               : requestedSubject.getAttributeTypes()) {
@@ -662,7 +661,7 @@ public class X509ExtensionsChecker {
     Set<ExtKeyUsageControl> ret = new HashSet<>();
 
     Set<ExtKeyUsageControl> controls =
-        certprofile.extensions().getExtendedKeyusages();
+        certprofile.extensions().extendedKeyusages();
     if (controls != null) {
       for (ExtKeyUsageControl control : controls) {
         if (control.isRequired() == required) {

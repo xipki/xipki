@@ -32,11 +32,11 @@ public class V1Range {
     this.max = max;
   }
 
-  public Integer getMin() {
+  public Integer min() {
     return min;
   }
 
-  public Integer getMax() {
+  public Integer max() {
     return max;
   }
 

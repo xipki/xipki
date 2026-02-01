@@ -18,7 +18,6 @@ import java.time.Instant;
  * CRL information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class CrlInfo {
@@ -107,23 +106,23 @@ public class CrlInfo {
     return encoded;
   }
 
-  public BigInteger getCrlNumber() {
+  public BigInteger crlNumber() {
     return crlNumber;
   }
 
-  public BigInteger getBaseCrlNumber() {
+  public BigInteger baseCrlNumber() {
     return baseCrlNumber;
   }
 
-  public Instant getThisUpdate() {
+  public Instant thisUpdate() {
     return thisUpdate;
   }
 
-  public Instant getNextUpdate() {
+  public Instant nextUpdate() {
     return nextUpdate;
   }
 
-  public CrlID getCrlId() {
+  public CrlID crlId() {
     return crlId;
   }
 

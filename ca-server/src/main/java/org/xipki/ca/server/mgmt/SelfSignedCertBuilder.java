@@ -48,7 +48,6 @@ import java.util.Optional;
  * Self-signed certificate builder.
  *
  * @author Lijun Liao
- *
  */
 
 public class SelfSignedCertBuilder {
@@ -75,7 +74,7 @@ public class SelfSignedCertBuilder {
           "serialNumber may not be non-positive: " + serialNumber);
     }
 
-    CertLevel level = Args.notNull(certprofile, "certprofile").getCertLevel();
+    CertLevel level = Args.notNull(certprofile, "certprofile").certLevel();
     if (CertLevel.RootCA != level) {
       throw new IllegalArgumentException("certprofile is not of level "
           + CertLevel.RootCA);
@@ -92,16 +91,16 @@ public class SelfSignedCertBuilder {
     try {
       List<CaEntry.CaSignerConf> signerConfs =
           CaEntry.splitCaSignerConfs(signerConf);
-      List<SignAlgo> restrictedSigAlgos = certprofile.getSignatureAlgorithms();
+      List<SignAlgo> restrictedSigAlgos = certprofile.signatureAlgorithms();
 
       String thisSignerConf = null;
       if (CollectionUtil.isEmpty(restrictedSigAlgos)) {
-        thisSignerConf = signerConfs.get(0).getConf();
+        thisSignerConf = signerConfs.get(0).conf();
       } else {
         for (SignAlgo algo : restrictedSigAlgos) {
           for (CaEntry.CaSignerConf m : signerConfs) {
-            if (m.getAlgo() == algo) {
-              thisSignerConf = m.getConf();
+            if (m.algo() == algo) {
+              thisSignerConf = m.conf();
               break;
             }
           }
@@ -147,7 +146,7 @@ public class SelfSignedCertBuilder {
       certprofile.checkPublicKey(publicKeyInfo);
     } catch (CertprofileException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.getIdent());
+          "exception in cert profile " + certprofile.ident());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.checkPublicKey", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -161,7 +160,7 @@ public class SelfSignedCertBuilder {
       subjectInfo = certprofile.getSubject(requestedSubject);
     } catch (CertprofileException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.getIdent());
+          "exception in cert profile " + certprofile.ident());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.getSubject", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -172,9 +171,9 @@ public class SelfSignedCertBuilder {
       notBefore = Instant.now();
     }
 
-    Validity validity = Optional.ofNullable(certprofile.getValidity())
+    Validity validity = Optional.ofNullable(certprofile.validity())
         .orElseThrow(() -> new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-            "no validity specified in the profile " + certprofile.getIdent()));
+            "no validity specified in the profile " + certprofile.ident()));
 
     Instant maxNotAfter = validity.add(notBefore);
     if (notAfter == null) {
@@ -183,7 +182,7 @@ public class SelfSignedCertBuilder {
       notAfter = maxNotAfter;
     }
 
-    X500Name grantedSubject = subjectInfo.getGrantedSubject();
+    X500Name grantedSubject = subjectInfo.grantedSubject();
 
     try {
       byte[] ski = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
@@ -202,7 +201,7 @@ public class SelfSignedCertBuilder {
             publicKeyInfo);
 
       CaUtil.addExtensions(extensionTuples, certBuilder,
-          certprofile.getExtensionControls());
+          certprofile.extensionControls());
       X509CertificateHolder certHolder;
       try {
         certHolder = certBuilder.build(signer0);

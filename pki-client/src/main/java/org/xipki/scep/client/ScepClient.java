@@ -62,17 +62,17 @@ public class ScepClient extends Client {
 
   private static ScepHttpResponse parseResp(Curl.CurlResult resp)
       throws ScepClientException {
-    int statusCode = resp.getStatusCode();
+    int statusCode = resp.statusCode();
     if (statusCode != HttpStatusCode.SC_OK) {
       String msg = "server returned status code " + statusCode;
-      byte[] errorContent = resp.getErrorContent();
+      byte[] errorContent = resp.errorContent();
       if (errorContent != null && errorContent.length != 0) {
         msg += ", message: " + new String(errorContent);
       }
       throw new ScepClientException(msg);
     }
 
-    return new ScepHttpResponse(resp.getContentType(), resp.getContent());
+    return new ScepHttpResponse(resp.contentType(), resp.content());
   }
 
 }

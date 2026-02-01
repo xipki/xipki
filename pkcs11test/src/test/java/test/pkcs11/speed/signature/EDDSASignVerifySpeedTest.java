@@ -57,7 +57,7 @@ public class EDDSASignVerifySpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws TokenException {
+  public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +

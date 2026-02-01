@@ -35,7 +35,6 @@ import java.util.Arrays;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
 
   private static class XDHContentVerifier implements ContentVerifier {
@@ -131,7 +130,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
           "unsupported verifyKey.getAlgorithm(): " + keyAlgName);
     }
 
-    if (!keyAlgName.equals(ownerKeyAndCert.getPrivateKey().getAlgorithm())) {
+    if (!keyAlgName.equals(ownerKeyAndCert.privateKey().getAlgorithm())) {
       throw new InvalidKeyException(
           "verifyKey and ownerKeyAndCert does not match");
     }
@@ -140,7 +139,7 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     byte[] zz;
     try {
       KeyAgreement keyAgreement = KeyAgreement.getInstance(keyAlgName, "BC");
-      keyAgreement.init(ownerKeyAndCert.getPrivateKey());
+      keyAgreement.init(ownerKeyAndCert.privateKey());
       keyAgreement.doPhase(verifyKey, true);
       zz = keyAgreement.generateSecret();
     } catch (GeneralSecurityException | RuntimeException ex) {
@@ -150,9 +149,9 @@ public class XiXDHContentVerifierProvider implements ContentVerifierProvider {
     // as defined in RFC 6955, raw hash algorithm is used as KDF
 
     // LeadingInfo := Subject Distinguished Name from certificate
-    byte[] leadingInfo = ownerKeyAndCert.getEncodedSubject();
+    byte[] leadingInfo = ownerKeyAndCert.encodedSubject();
     // TrailingInfo ::= Issuer Distinguished Name from certificate
-    byte[] trailingInfo = ownerKeyAndCert.getEncodedIssuer();
+    byte[] trailingInfo = ownerKeyAndCert.encodedIssuer();
     byte[] k = hash.hash(leadingInfo, zz, trailingInfo);
     this.hmacKey = new SecretKeySpec(k, hmacAlgorithm);
   } // constructor

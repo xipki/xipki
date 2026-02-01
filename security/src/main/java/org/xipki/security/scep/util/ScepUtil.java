@@ -72,7 +72,7 @@ public class ScepUtil {
         throw new CertificateException(ex);
       }
 
-      if (eeCert == null && cert.getBasicConstraints() == -1) {
+      if (eeCert == null && cert.basicConstraints() == -1) {
         eeCert = cert;
       } else {
         certs.add(cert);

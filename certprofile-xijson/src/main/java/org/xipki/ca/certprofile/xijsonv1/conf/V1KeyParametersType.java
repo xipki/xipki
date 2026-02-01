@@ -29,7 +29,7 @@ public class V1KeyParametersType {
       this.curves = curves;
     }
 
-    public List<DescribableOid> getCurves() {
+    public List<DescribableOid> curves() {
       return curves;
     }
 
@@ -46,7 +46,7 @@ public class V1KeyParametersType {
 
     private final List<Integer> modulus;
 
-    public List<Integer> getModulus() {
+    public List<Integer> modulus() {
       return modulus;
     }
 
@@ -69,7 +69,7 @@ public class V1KeyParametersType {
 
         List<Integer> modulus = new LinkedList<>();
         for (V1Range r : modulusLengths) {
-          for (int i = r.getMin(); i < r.getMax(); i++) {
+          for (int i = r.min(); i < r.max(); i++) {
             modulus.add(i);
           }
         }
@@ -86,11 +86,11 @@ public class V1KeyParametersType {
 
   private RsaParametersType rsa;
 
-  public EcParametersType getEc() {
+  public EcParametersType ec() {
     return ec;
   }
 
-  public RsaParametersType getRsa() {
+  public RsaParametersType rsa() {
     return rsa;
   }
 

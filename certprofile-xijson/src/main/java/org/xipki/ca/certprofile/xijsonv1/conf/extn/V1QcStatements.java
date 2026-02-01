@@ -115,7 +115,7 @@ public class V1QcStatements {
     public QcStatements.QcStatementValueType toV2() {
       ConstantExtnValue v2Constant = null;
       if (constant != null) {
-        v2Constant = new ConstantExtnValue(null, constant.getValue());
+        v2Constant = new ConstantExtnValue(null, constant.value());
       }
 
       return new QcStatements.QcStatementValueType(v2Constant,

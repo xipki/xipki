@@ -17,9 +17,7 @@ import java.util.Map;
  * Profile</a>.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public enum CrlReason {
 
   /**
@@ -98,11 +96,11 @@ public enum CrlReason {
     this.description = description;
   }
 
-  public int getCode() {
+  public int code() {
     return code;
   }
 
-  public String getDescription() {
+  public String description() {
     return description;
   }
 

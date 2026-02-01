@@ -17,7 +17,6 @@ import java.util.Set;
  * Certificate issuer information.
  *
  * @author Lijun Liao
- *
  */
 
 public class IssuerInfo {
@@ -73,7 +72,7 @@ public class IssuerInfo {
   }
 
   public byte[] getSubjectKeyIdentifier() {
-    return cert.getSubjectKeyId();
+    return cert.subjectKeyId();
   }
 
   public boolean isCutoffNotAfter() {
@@ -81,11 +80,11 @@ public class IssuerInfo {
   }
 
   public Instant getCaNotBefore() {
-    return cert.getNotBefore();
+    return cert.notBefore();
   }
 
   public Instant getCaNotAfter() {
-    return cert.getNotAfter();
+    return cert.notAfter();
   }
 
 }

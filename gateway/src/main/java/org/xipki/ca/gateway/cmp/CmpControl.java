@@ -21,7 +21,6 @@ import java.util.List;
  * CMP control.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class CmpControl {
@@ -61,21 +60,21 @@ public class CmpControl {
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
   public CmpControl(CmpControlConf conf) throws InvalidConfException {
-    this.confirmCert = getBoolean(conf.getConfirmCert(), false);
-    this.sendCaCert = getBoolean(conf.getSendCaCert(), false);
-    this.sendCertChain = getBoolean(conf.getSendCertChain(), false);
-    this.sendResponderCert = getBoolean(conf.getSendResponderCert(), true);
+    this.confirmCert = getBoolean(conf.confirmCert(), false);
+    this.sendCaCert = getBoolean(conf.sendCaCert(), false);
+    this.sendCertChain = getBoolean(conf.sendCertChain(), false);
+    this.sendResponderCert = getBoolean(conf.sendResponderCert(), true);
     this.messageTimeRequired = getBoolean(
-        conf.getMessageTimeRequired(), true);
-    this.messageTimeBias = conf.getMessageTimeBias() == null
+        conf.messageTimeRequired(), true);
+    this.messageTimeBias = conf.messageTimeBias() == null
         ? DFLT_MESSAGE_TIME_BIAS
-        : Duration.ofSeconds(Math.abs(conf.getMessageTimeBias()));
-    this.confirmWaitTime = conf.getConfirmWaitTime() == null
+        : Duration.ofSeconds(Math.abs(conf.messageTimeBias()));
+    this.confirmWaitTime = conf.confirmWaitTime() == null
         ? DFLT_CONFIRM_WAIT_TIME
-        : Duration.ofSeconds(Math.abs(conf.getConfirmWaitTime()));
+        : Duration.ofSeconds(Math.abs(conf.confirmWaitTime()));
 
     // protection algorithms
-    List<String> requestSigAlgos = conf.getRequestSigAlgos();
+    List<String> requestSigAlgos = conf.requestSigAlgos();
     if (CollectionUtil.isEmpty(requestSigAlgos)) {
       throw new InvalidConfException("requestSigAlgos is not set");
     }
@@ -88,22 +87,22 @@ public class CmpControl {
 
     // PBM
     try {
-      if (conf.getResponsePbmMac() != null) {
-        this.responsePbmMac = SignAlgo.getInstance(conf.getResponsePbmMac());
+      if (conf.responsePbmMac() != null) {
+        this.responsePbmMac = SignAlgo.getInstance(conf.responsePbmMac());
       }
 
-      if (conf.getResponsePbmOwf() != null) {
-        this.responsePbmOwf = HashAlgo.getInstance(conf.getResponsePbmOwf());
+      if (conf.responsePbmOwf() != null) {
+        this.responsePbmOwf = HashAlgo.getInstance(conf.responsePbmOwf());
       }
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException(ex.getMessage(), ex);
     }
 
     // PasswordBasedMac
-    List<String> pbmOwfs = conf.getRequestPbmOwfs();
+    List<String> pbmOwfs = conf.requestPbmOwfs();
     // PasswordBasedMac.mac
-    List<String> pbmMacs = conf.getRequestPbmMacs();
-    Integer pbmIterationCount = conf.getResponsePbmIterationCount();
+    List<String> pbmMacs = conf.requestPbmMacs();
+    Integer pbmIterationCount = conf.responsePbmIterationCount();
     if (pbmIterationCount == null) {
       pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
     }
@@ -156,7 +155,7 @@ public class CmpControl {
     }
   } // method initPbm
 
-  public EmbedCertsMode getCaCertsMode() {
+  public EmbedCertsMode caCertsMode() {
     if (!sendCaCert) {
       return EmbedCertsMode.NONE;
     }
@@ -171,11 +170,11 @@ public class CmpControl {
     return confirmCert;
   }
 
-  public Duration getMessageTimeBias() {
+  public Duration messageTimeBias() {
     return messageTimeBias;
   }
 
-  public Duration getConfirmWaitTime() {
+  public Duration confirmWaitTime() {
     return confirmWaitTime;
   }
 
@@ -183,19 +182,19 @@ public class CmpControl {
     return sendResponderCert;
   }
 
-  public AlgorithmValidator getSigAlgoValidator() {
+  public AlgorithmValidator sigAlgoValidator() {
     return sigAlgoValidator;
   }
 
-  public HashAlgo getResponsePbmOwf() {
+  public HashAlgo responsePbmOwf() {
     return responsePbmOwf;
   }
 
-  public SignAlgo getResponsePbmMac() {
+  public SignAlgo responsePbmMac() {
     return responsePbmMac;
   }
 
-  public int getResponsePbmIterationCount() {
+  public int responsePbmIterationCount() {
     return responsePbmIterationCount;
   }
 

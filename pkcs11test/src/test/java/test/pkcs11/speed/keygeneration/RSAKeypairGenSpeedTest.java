@@ -33,7 +33,7 @@ public class RSAKeypairGenSpeedTest extends TestBase {
 
     @Override
     protected PKCS11KeyPairSpec getMinimalKeyPairTemplate() {
-      return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA_2048);
+      return new PKCS11KeyPairSpec().keyPairType(PKCS11KeyPairType.RSA2048);
     }
 
   }
@@ -46,7 +46,7 @@ public class RSAKeypairGenSpeedTest extends TestBase {
   }
 
   @Test
-  public void main() throws PKCS11Exception {
+  public void execTest() throws PKCS11Exception {
     PKCS11Token token = getToken();
 
     Assume.assumeTrue(ckmCodeToName(mechanism) +

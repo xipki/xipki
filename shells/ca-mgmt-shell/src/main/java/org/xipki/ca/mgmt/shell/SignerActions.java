@@ -32,7 +32,6 @@ import java.util.Set;
  * Actions to manage signers.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class SignerActions {
 
@@ -185,7 +184,7 @@ public class SignerActions {
         SignerEntry entry = Optional.ofNullable(caManager.getSigner(name))
             .orElseThrow(() ->
                 new IllegalCmdParamException("please specify the type"));
-        tmpType = entry.getType();
+        tmpType = entry.type();
       }
 
       return ShellUtil.canonicalizeSignerConf(tmpType, conf, securityFactory);

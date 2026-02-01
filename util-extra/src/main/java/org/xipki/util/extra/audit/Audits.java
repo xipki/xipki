@@ -38,11 +38,11 @@ public class Audits {
       this.conf = conf;
     }
 
-    public String getType() {
+    public String type() {
       return type == null || type.isEmpty() ? "embed" : type;
     }
 
-    public ConfPairs getConf() {
+    public ConfPairs conf() {
       return conf;
     }
 

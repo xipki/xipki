@@ -1,15 +1,15 @@
 {
-	// To activate the logging of requests and responses, set writer.level to DEBUG
-	// in the file META-INF/classes/log4j2.properties.
-	"logReqResp": true,
-	"serverConf":"etc/ocsp/ocsp-responder.json",
-	"security":{
-		"keyStrongrandomEnabled":false,
-		"signStrongrandomEnabled":false,
-		"defaultSignerParallelism":32,
-		"pkcs11Conf":{
-			"file":"security/pkcs11.json"
-		}
-	}
+  // To activate the logging of requests and responses, set writer.level to DEBUG
+  // in the file META-INF/classes/log4j2.properties.
+  "logReqResp": true,
+  "serverConf":"etc/ocsp/ocsp-responder.json",
+  "security":{
+    "keyStrongrandomEnabled":false,
+    "signStrongrandomEnabled":false,
+    "defaultSignerParallelism":32,
+    "pkcs11Conf":{
+      "file":"security/pkcs11.json"
+    }
+  }
 }
 

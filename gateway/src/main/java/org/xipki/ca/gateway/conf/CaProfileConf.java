@@ -10,7 +10,6 @@ import org.xipki.util.codec.json.JsonMap;
  * Gateway's CA-Profile Map.
  *
  * @author Lijun Liao (xipki)
- * @since 6.4.0
  */
 public class CaProfileConf {
 
@@ -26,15 +25,15 @@ public class CaProfileConf {
     this.certprofile = Args.notBlank(certprofile, "certprofile");
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getCa() {
+  public String ca() {
     return ca;
   }
 
-  public String getCertprofile() {
+  public String certprofile() {
     return certprofile;
   }
 

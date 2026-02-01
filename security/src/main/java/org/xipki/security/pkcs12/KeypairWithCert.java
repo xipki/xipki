@@ -43,7 +43,7 @@ public class KeypairWithCert {
     this.key = Args.notNull(key, "key");
     this.certificateChain = Args.notNull(certificateChain, "certificateChain");
     Args.min(certificateChain.length, "certificateChain.length", 1);
-    this.publicKey = certificateChain[0].getPublicKey();
+    this.publicKey = certificateChain[0].publicKey();
   }
 
   /**
@@ -169,11 +169,11 @@ public class KeypairWithCert {
     return key;
   }
 
-  public PublicKey getPublicKey() {
+  public PublicKey publicKey() {
     return publicKey;
   }
 
-  public X509Cert[] getCertificateChain() {
+  public X509Cert[] certificateChain() {
     return certificateChain;
   }
 

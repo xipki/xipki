@@ -33,7 +33,7 @@ public class TransactionId {
     this.id = Hex.encode(bytes);
   }
 
-  public String getId() {
+  public String id() {
     return id;
   }
 

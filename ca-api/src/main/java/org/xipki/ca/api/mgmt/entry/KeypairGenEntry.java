@@ -16,7 +16,6 @@ import java.util.Collections;
 /**
  * Keypair generation entry.
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class KeypairGenEntry extends MgmtEntry {
@@ -35,15 +34,15 @@ public class KeypairGenEntry extends MgmtEntry {
     this.conf = conf;
   }
 
-  public String getName() {
+  public String name() {
     return StringUtil.lowercase(name);
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 

@@ -56,7 +56,6 @@ import java.util.Set;
  * Actions to manage CA.
  *
  * @author Lijun Liao (xipki)
- *
  */
 public class CaActions {
 
@@ -127,7 +126,7 @@ public class CaActions {
         caEntry.setCertchain(list);
       }
 
-      String msg = "CA " + caEntry.getIdent().getName();
+      String msg = "CA " + caEntry.ident().name();
       try {
         caManager.addCa(caEntry);
         println("added " + msg);
@@ -465,7 +464,7 @@ public class CaActions {
         saveVerbose("saved root certificate to file",
             rootcaCertOutFile, encodeCert(rootcaCert.getEncoded(), outform));
       }
-      println("generated root CA " + caEntry.getIdent().getName());
+      println("generated root CA " + caEntry.ident().name());
       return null;
     } // method execute0
 
@@ -560,9 +559,9 @@ public class CaActions {
         CaEntry caEntry = Optional.ofNullable(caManager.getCa(name))
             .orElseThrow(() -> new CmdFailure(
                 "could not find CA '" + name + "'"));
-        if (CaStatus.active == caEntry.getBase().getStatus()) {
+        if (CaStatus.active == caEntry.base().status()) {
           boolean started = caManager.getSuccessfulCaNames()
-              .contains(caEntry.getIdent().getName());
+              .contains(caEntry.ident().name());
           sb.append("started:              ").append(started).append("\n");
         }
         Set<String> aliases = caManager.getAliasesForCa(name);
@@ -598,9 +597,9 @@ public class CaActions {
           sb.append(" -");
         } else {
           for (CaHasRequestorEntry m : requestors) {
-            sb.append("\n\t").append(m.getRequestorIdent().getName())
-                .append(", permissions=").append(m.getPermissions())
-                .append(", profiles=").append(m.getProfiles());
+            sb.append("\n\t").append(m.requestorIdent().name())
+                .append(", permissions=").append(m.permissions())
+                .append(", profiles=").append(m.profiles());
           }
         }
       }
@@ -884,7 +883,7 @@ public class CaActions {
           CaEntry caEntry = Optional.ofNullable(caManager.getCa(caName))
               .orElseThrow(() -> new IllegalCmdParamException(
                   "please specify the signerType"));
-          tmpSignerType = caEntry.getBase().getSignerType();
+          tmpSignerType = caEntry.base().signerType();
         }
 
         signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType,

@@ -70,14 +70,14 @@ class SignerManager {
   void addSigner(SignerEntry signerEntry) throws CaMgmtException {
     manager.assertMasterMode();
 
-    String name = Args.notNull(signerEntry, "signerEntry").getName();
+    String name = Args.notNull(signerEntry, "signerEntry").name();
     CaManagerImpl.checkName(name, "signer name");
     if (manager.signerDbEntries.containsKey(name)) {
       throw new CaMgmtException(
           StringUtil.concat("Signer named ", name, " exists"));
     }
 
-    String conf = signerEntry.getConf();
+    String conf = signerEntry.conf();
     if (conf != null) {
       String newConf = CaUtil.canonicalizeSignerConf(conf);
       if (!conf.equals(newConf)) {
@@ -102,7 +102,7 @@ class SignerManager {
 
     for (String caName : manager.caInfos.keySet()) {
       CaInfo caInfo = manager.caInfos.get(caName);
-      if (name.equals(caInfo.getCrlSignerName())) {
+      if (name.equals(caInfo.crlSignerName())) {
         caInfo.setCrlSignerName(null);
       }
 
@@ -158,9 +158,9 @@ class SignerManager {
       }
 
       sb.append("module: ").append(moduleName).append(NL);
-      sb.append(module.getDescription()).append(NL);
+      sb.append(module.description()).append(NL);
 
-      List<P11SlotId> slots = module.getSlotIds();
+      List<P11SlotId> slots = module.slotIds();
       if (slotIndex == null) {
         output(sb, slots);
       } else {
@@ -193,8 +193,8 @@ class SignerManager {
     }
 
     for (P11SlotId slotId : slots) {
-      sb.append("\tslot[").append(slotId.getIndex()).append("]: ")
-          .append(slotId.getId()).append("\n");
+      sb.append("\tslot[").append(slotId.index()).append("]: ")
+          .append(slotId.id()).append("\n");
     }
   }
 

@@ -11,7 +11,6 @@ import java.util.Set;
  * Certprofile factory.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface CertprofileFactory {

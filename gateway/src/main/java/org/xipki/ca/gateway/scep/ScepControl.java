@@ -10,7 +10,6 @@ import org.xipki.util.codec.json.JsonMap;
  * SCEP control.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ScepControl {
@@ -59,7 +58,7 @@ public class ScepControl {
     this.supportGetCrl = supportGetCrl;
   }
 
-  public long getMaxSigningTimeBias() {
+  public long maxSigningTimeBias() {
     return maxSigningTimeBias;
   }
 

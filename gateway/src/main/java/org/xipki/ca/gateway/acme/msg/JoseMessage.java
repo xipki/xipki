@@ -29,11 +29,11 @@ public class JoseMessage implements JsonEncodable {
     return protected_;
   }
 
-  public String getPayload() {
+  public String payload() {
     return payload;
   }
 
-  public String getSignature() {
+  public String signature() {
     return signature;
   }
 

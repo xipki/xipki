@@ -11,7 +11,6 @@ import org.xipki.util.extra.audit.AuditStatus;
  * Response Audit Exception.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 public class HttpRespAuditException extends Exception {
@@ -33,19 +32,19 @@ public class HttpRespAuditException extends Exception {
     this.auditStatus = Args.notNull(auditStatus, "auditStatus");
   }
 
-  public int getHttpStatus() {
+  public int httpStatus() {
     return httpStatus;
   }
 
-  public String getAuditMessage() {
+  public String auditMessage() {
     return auditMessage;
   }
 
-  public AuditLevel getAuditLevel() {
+  public AuditLevel auditLevel() {
     return auditLevel;
   }
 
-  public AuditStatus getAuditStatus() {
+  public AuditStatus auditStatus() {
     return auditStatus;
   }
 

@@ -93,20 +93,20 @@ public class CaEmulator {
   public CaEmulator(PrivateKey caKey, X509Cert caCert, boolean generateCrl) {
     this.caKey = Args.notNull(caKey, "caKey");
     this.caCert = Args.notNull(caCert, "caCert");
-    this.caSubject = caCert.getSubject();
+    this.caSubject = caCert.subject();
     this.generateCrl = generateCrl;
     this.caCertBytes = caCert.getEncoded();
   }
 
-  public PrivateKey getCaKey() {
+  public PrivateKey caKey() {
     return caKey;
   }
 
-  public X509Cert getCaCert() {
+  public X509Cert caCert() {
     return caCert;
   }
 
-  public byte[] getCaCertBytes() {
+  public byte[] caCertBytes() {
     return Arrays.copyOf(caCertBytes, caCertBytes.length);
   }
 
@@ -150,7 +150,7 @@ public class CaEmulator {
     BasicConstraints bc = new BasicConstraints(false);
     certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
 
-    String signatureAlgorithm = SignAlgo.getInstance(caKey).getJceName();
+    String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
     ContentSigner contentSigner =
         new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
@@ -184,7 +184,7 @@ public class CaEmulator {
         new X509v2CRLBuilder(caSubject, Date.from(thisUpdate));
     Instant nextUpdate = thisUpdate.plus(30, ChronoUnit.DAYS);
     crlBuilder.setNextUpdate(Date.from(nextUpdate));
-    Instant caStartTime = caCert.getNotBefore();
+    Instant caStartTime = caCert.notBefore();
     Instant revocationTime = caStartTime.plus(1, ChronoUnit.MILLIS);
     if (revocationTime.isAfter(thisUpdate)) {
       revocationTime = caStartTime;
@@ -194,7 +194,7 @@ public class CaEmulator {
     crlBuilder.addExtension(OIDs.Extn.cRLNumber, false,
         new ASN1Integer(crlNumber.getAndAdd(1)));
 
-    String signatureAlgorithm = SignAlgo.getInstance(caKey).getJceName();
+    String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
     ContentSigner contentSigner =
         new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);

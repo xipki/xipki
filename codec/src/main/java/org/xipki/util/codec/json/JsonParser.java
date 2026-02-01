@@ -509,7 +509,7 @@ public class JsonParser {
 
   private CodecException.UnexpectedCharException buildUnexpected(int chr) {
     return new CodecException.UnexpectedCharException(
-        this.instream.getPosition(), (char) chr);
+        this.instream.position(), (char) chr);
   }
 
   private static boolean isDigit(int chr) {

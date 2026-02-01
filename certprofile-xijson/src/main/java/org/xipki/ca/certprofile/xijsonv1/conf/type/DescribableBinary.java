@@ -21,7 +21,7 @@ public class DescribableBinary extends V1Describable {
     this.value = Args.notNull(value, "value");
   }
 
-  public byte[] getValue() {
+  public byte[] value() {
     return value;
   }
 

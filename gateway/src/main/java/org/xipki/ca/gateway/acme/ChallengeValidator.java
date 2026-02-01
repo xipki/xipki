@@ -106,14 +106,14 @@ public class ChallengeValidator implements Runnable {
         continue;
       }
 
-      AcmeChallenge chall = chall2.getChallenge();
-      String type = chall.getType();
+      AcmeChallenge chall = chall2.challenge();
+      String type = chall.type();
       String receivedAuthorization = null;
-      AcmeIdentifier identifier = chall2.getIdentifier();
+      AcmeIdentifier identifier = chall2.identifier();
       // boolean authorizationValid = false;
 
       if (LOG.isDebugEnabled()) {
-        String host = identifier.getValue();
+        String host = identifier.value();
         if (host.startsWith("*.")) {
           host = host.substring(2);
         }
@@ -128,13 +128,13 @@ public class ChallengeValidator implements Runnable {
 
       switch (type) {
         case AcmeConstants.HTTP_01: {
-          String host = identifier.getValue();
+          String host = identifier.value();
           // host = "localhost:9081";
-          String url = "http://" + host + "/.well-known/acme-challenge/" + chall.getToken();
+          String url = "http://" + host + "/.well-known/acme-challenge/" + chall.token();
           try {
             XiHttpClient client = new XiHttpClient();
             HttpRespContent authzResp = client.httpGet(url);
-            receivedAuthorization = new String(authzResp.getContent(),
+            receivedAuthorization = new String(authzResp.content(),
                 StandardCharsets.UTF_8);
           } catch (IOException ex) {
             String message =  "error while validating challenge " + challId +
@@ -150,7 +150,7 @@ public class ChallengeValidator implements Runnable {
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
             try (SSLSocket socket = (SSLSocket)
-                factory.createSocket(identifier.getValue(), 443)) {
+                factory.createSocket(identifier.value(), 443)) {
               SSLParameters params = socket.getSSLParameters();
               params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
               params.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
@@ -182,7 +182,7 @@ public class ChallengeValidator implements Runnable {
             if (match) {
               String sanValue = ASN1IA5String.getInstance(
                                   names[0].getName()).getString();
-              match = identifier.getValue().equals(sanValue);
+              match = identifier.value().equals(sanValue);
             }
           }
 
@@ -204,12 +204,12 @@ public class ChallengeValidator implements Runnable {
           break;
         }
         case AcmeConstants.DNS_01: {
-          String host = identifier.getValue();
+          String host = identifier.value();
           if (host.startsWith("*.")) {
             host = host.substring(2);
           }
 
-          LOG.debug("dns-01: host='{}'", identifier.getValue());
+          LOG.debug("dns-01: host='{}'", identifier.value());
 
           String acmeDomain = "_acme-challenge." + host;
           Record[] records = null;
@@ -243,27 +243,27 @@ public class ChallengeValidator implements Runnable {
 
       boolean authorizationValid = false;
       if (receivedAuthorization != null) {
-        authorizationValid = chall.getExpectedAuthorization()
+        authorizationValid = chall.expectedAuthorization()
             .equals(receivedAuthorization.trim());
       }
 
       if (authorizationValid) {
         LOG.info("validated challenge {}/{} for identifier {}/{}",
-            chall.getType(), challId, identifier.getType(),
-            identifier.getValue());
+            chall.type(), challId, identifier.type(),
+            identifier.value());
         chall.setValidated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         chall.setStatus(ChallengeStatus.valid);
       } else {
         LOG.warn("validation failed for challenge {}/{} for identifier " +
                 "{}/{}: received='{}', expected='{}'",
-            chall.getType(), challId, identifier.getType(),
-            identifier.getValue(), receivedAuthorization,
-            chall.getExpectedAuthorization());
+            chall.type(), challId, identifier.type(),
+            identifier.value(), receivedAuthorization,
+            chall.expectedAuthorization());
         chall.setStatus(ChallengeStatus.invalid);
       }
 
-      if (chall.getAuthz() != null && chall.getAuthz().getOrder() != null) {
-        repo.flushOrderIfNotCached(chall.getAuthz().getOrder());
+      if (chall.authz() != null && chall.authz().order() != null) {
+        repo.flushOrderIfNotCached(chall.authz().order());
       }
     }
 

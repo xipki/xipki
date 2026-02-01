@@ -29,11 +29,11 @@ public class Asn1SubjectPublicKey {
     this.publicKeyData = Args.notNull(publicKeyData, "publicKeyData");
   }
 
-  public Asn1AlgorithmIdentifier getAlgId() {
+  public Asn1AlgorithmIdentifier algId() {
     return algId;
   }
 
-  public byte[] getPublicKeyData() {
+  public byte[] publicKeyData() {
     return publicKeyData;
   }
 

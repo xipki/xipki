@@ -42,19 +42,19 @@ public class CmpClientConf {
       this.dhPopCerts = dhPopCerts;
     }
 
-    public String getUrl() {
+    public String url() {
       return url;
     }
 
-    public Responder.PbmMac getPbmMac() {
+    public Responder.PbmMac pbmMac() {
       return pbmMac;
     }
 
-    public Responder.Signature getSignature() {
+    public Responder.Signature signature() {
       return signature;
     }
 
-    public FileOrBinary getDhPopCerts() {
+    public FileOrBinary dhPopCerts() {
       return dhPopCerts;
     }
 
@@ -80,11 +80,11 @@ public class CmpClientConf {
         this.macAlgos = Args.notEmpty(macAlgos, "macAlgos");
       }
 
-      public List<String> getOwfAlgos() {
+      public List<String> owfAlgos() {
         return owfAlgos;
       }
 
-      public List<String> getMacAlgos() {
+      public List<String> macAlgos() {
         return macAlgos;
       }
 
@@ -106,11 +106,11 @@ public class CmpClientConf {
         this.signatureAlgos = Args.notEmpty(signatureAlgos, "signatureAlgos");
       }
 
-      public FileOrBinary getCert() {
+      public FileOrBinary cert() {
         return cert;
       }
 
-      public List<String> getSignatureAlgos() {
+      public List<String> signatureAlgos() {
         return signatureAlgos;
       }
 
@@ -137,7 +137,7 @@ public class CmpClientConf {
     this.sendRequestorCert = sendRequestorCert;
   }
 
-  public Responder getResponder() {
+  public Responder responder() {
     return responder;
   }
 
@@ -145,7 +145,7 @@ public class CmpClientConf {
     this.responder = responder;
   }
 
-  public SslConf getSsl() {
+  public SslConf ssl() {
     return ssl;
   }
 

@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Report of the comparison result of two databases.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class DigestDiffReporter implements Closeable {
@@ -81,7 +80,7 @@ class DigestDiffReporter implements Closeable {
     startTime = Instant.now();
   }
 
-  public String getReportDirname() {
+  public String reportDirname() {
     return reportDirname;
   }
 
@@ -102,14 +101,14 @@ class DigestDiffReporter implements Closeable {
 
   public void addDiff(DigestEntry refCert, DigestEntry targetCert)
       throws IOException {
-    if (Args.notNull(refCert, "refCert").getSerialNumber().equals(
-        Args.notNull(targetCert, "targetCert").getSerialNumber())) {
+    if (Args.notNull(refCert, "refCert").serialNumber().equals(
+        Args.notNull(targetCert, "targetCert").serialNumber())) {
       throw new IllegalArgumentException(
           "refCert and targetCert are not of the same serialNumber");
     }
 
     numDiff.incrementAndGet();
-    String msg = StringUtil.concat(refCert.getSerialNumber().toString(16),
+    String msg = StringUtil.concat(refCert.serialNumber().toString(16),
         "\t", refCert.encodedOmitSerialNumber(), "\t",
         targetCert.encodedOmitSerialNumber(), "\n");
     synchronized (diffWriter) {

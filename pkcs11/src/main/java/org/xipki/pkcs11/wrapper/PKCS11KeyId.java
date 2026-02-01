@@ -63,7 +63,7 @@ public class PKCS11KeyId {
     return keyType;
   }
 
-  public KeyIdType getType() {
+  public KeyIdType type() {
     return type;
   }
 

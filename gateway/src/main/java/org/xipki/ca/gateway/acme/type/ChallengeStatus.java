@@ -20,7 +20,7 @@ public enum ChallengeStatus {
     this.code = code;
   }
 
-  public int getCode() {
+  public int code() {
     return code;
   }
 

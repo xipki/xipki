@@ -29,15 +29,15 @@ public class Problem implements JsonEncodable {
     this.subproblems = subproblems;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getDetail() {
+  public String detail() {
     return detail;
   }
 
-  public List<Subproblem> getSubproblems() {
+  public List<Subproblem> subproblems() {
     return subproblems;
   }
 

@@ -44,7 +44,7 @@ public class CrlTestVectorGenerateMain {
           .setPassword("1234")
           .setKeystore("file:src/test/resources/crls/ca.p12");
 
-      ConcurrentContentSigner csigner = securities.getSecurityFactory()
+      ConcurrentContentSigner csigner = securities.securityFactory()
           .createSigner("PKCS12", conf, (X509Cert) null);
       X509Cert caCert = csigner.getCertificate();
 
@@ -100,7 +100,7 @@ public class CrlTestVectorGenerateMain {
       X509Cert caCert, boolean addCrlNumber, boolean addAki)
       throws Exception {
     Instant thisUpdate = Instant.now();
-    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.getSubject(),
+    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.subject(),
         Date.from(thisUpdate));
     builder.setNextUpdate(Date.from(thisUpdate.plus(50 * 365,
         ChronoUnit.DAYS)));
@@ -111,7 +111,7 @@ public class CrlTestVectorGenerateMain {
 
     if (addAki) {
       builder.addExtension(OIDs.Extn.authorityKeyIdentifier, false,
-          new AuthorityKeyIdentifier(caCert.getSubjectKeyId()));
+          new AuthorityKeyIdentifier(caCert.subjectKeyId()));
     }
 
     return builder;

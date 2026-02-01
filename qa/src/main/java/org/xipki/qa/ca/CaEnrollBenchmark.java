@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * CA enrollment benchmark.
  *
  * @author Lijun Liao
- *
  */
 
 public class CaEnrollBenchmark extends BenchmarkExecutor {
@@ -141,7 +140,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
   private void parseEnrollCertResult(
       EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
-    EnrollOrPollCertsResponse.Entry[] entries = response.getEntries();
+    EnrollOrPollCertsResponse.Entry[] entries = response.entries();
     int n = entries == null ? 0 : entries.length;
     if (n != numCerts) {
       throw new Exception("expected " + numCerts +
@@ -150,9 +149,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
     for (int i = 0; i < numCerts; i++) {
       EnrollOrPollCertsResponse.Entry certResp = entries[i];
-      if (certResp.getError() != null) {
-        throw new Exception("CertReqId " + certResp.getId()
-            + ": server returned PKIStatus: " + certResp.getError());
+      if (certResp.error() != null) {
+        throw new Exception("CertReqId " + certResp.id()
+            + ": server returned PKIStatus: " + certResp.error());
       }
     }
   } // method parseEnrollCertResult

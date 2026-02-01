@@ -76,9 +76,7 @@ import static org.xipki.util.codec.Args.notNull;
  * X.509 certificate utility class.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class X509Util {
 
   private static final Logger LOG = LoggerFactory.getLogger(X509Util.class);
@@ -402,7 +400,7 @@ public class X509Util {
 
     int usage = 0;
     for (KeyUsage keyUsage : usages) {
-      usage |= keyUsage.getBcUsage();
+      usage |= keyUsage.bcUsage();
     }
 
     return new org.bouncycastle.asn1.x509.KeyUsage(usage);
@@ -587,7 +585,7 @@ public class X509Util {
       }
 
       try {
-        cert.verify(caCert.getPublicKey());
+        cert.verify(caCert.publicKey());
         return caCert;
       } catch (Exception ex) {
         LOG.warn("could not verify certificate: {}", ex.getMessage());
@@ -601,7 +599,7 @@ public class X509Util {
     Args.notNull(cert, "cert");
 
     // check basicConstraints
-    int pathLen = notNull(issuerCert, "issuerCert").getBasicConstraints();
+    int pathLen = notNull(issuerCert, "issuerCert").basicConstraints();
     if (pathLen == -1) {
       // issuerCert is not a CA certificate
       return false;
@@ -609,24 +607,24 @@ public class X509Util {
 
     // assert issuerCert.pathLen > cert.pathLen
     if (pathLen != Integer.MAX_VALUE) {
-      if (pathLen <= cert.getBasicConstraints()) {
+      if (pathLen <= cert.basicConstraints()) {
         return false;
       }
     }
 
-    boolean issues = issuerCert.getSubject().equals(cert.getIssuer());
+    boolean issues = issuerCert.subject().equals(cert.issuer());
     if (issues) {
-      byte[] ski = issuerCert.getSubjectKeyId();
-      byte[] aki = cert.getAuthorityKeyId();
+      byte[] ski = issuerCert.subjectKeyId();
+      byte[] aki = cert.authorityKeyId();
       if (ski != null && aki != null) {
         issues = Arrays.equals(ski, aki);
       }
     }
 
     if (issues) {
-      long issuerNotBefore = issuerCert.getNotBefore().toEpochMilli();
-      long issuerNotAfter = issuerCert.getNotAfter().toEpochMilli();
-      long notBefore = cert.getNotBefore().toEpochMilli();
+      long issuerNotBefore = issuerCert.notBefore().toEpochMilli();
+      long issuerNotAfter = issuerCert.notAfter().toEpochMilli();
+      long notBefore = cert.notBefore().toEpochMilli();
       issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
     }
 
@@ -637,11 +635,11 @@ public class X509Util {
       SubjectPublicKeyInfo publicKeyInfo) {
     KeySpec keySpec = KeySpec.ofPublicKey(publicKeyInfo);
     if (keySpec == null || publicKeyInfo.getAlgorithm().equals(
-                              keySpec.getAlgorithmIdentifier())) {
+                              keySpec.algorithmIdentifier())) {
       return publicKeyInfo;
     }
 
-    return new SubjectPublicKeyInfo(keySpec.getAlgorithmIdentifier(),
+    return new SubjectPublicKeyInfo(keySpec.algorithmIdentifier(),
             publicKeyInfo.getPublicKeyData());
   } // method toRfc3279Style
 
@@ -857,13 +855,13 @@ public class X509Util {
     StringBuilder sb = new StringBuilder(verbose ? 2000 : 100);
     if (!verbose) {
       sb.append("  issuer:       ")
-          .append(x500NameText(cert.getIssuer())).append('\n');
+          .append(x500NameText(cert.issuer())).append('\n');
       sb.append("  serialNumber: ")
-          .append(LogUtil.formatCsn(cert.getSerialNumber())).append('\n');
+          .append(LogUtil.formatCsn(cert.serialNumber())).append('\n');
       sb.append("  subject:      ")
-          .append(x500NameText(cert.getSubject())).append('\n');
-      sb.append("  notBefore:    ").append(cert.getNotBefore()).append("\n");
-      sb.append("  notAfter:     ").append(cert.getNotAfter());
+          .append(x500NameText(cert.subject())).append('\n');
+      sb.append("  notBefore:    ").append(cert.notBefore()).append("\n");
+      sb.append("  notAfter:     ").append(cert.notAfter());
     } else {
       sb.append(cert.toString(1));
       sb.append("\n  encoded:      ")
@@ -919,8 +917,8 @@ public class X509Util {
         certs.add(cert);
       } catch (CertificateException | IOException ex) {
         String msg = "could not parse the certificate";
-        if (m.getFile() != null) {
-          msg += " " + m.getFile();
+        if (m.file() != null) {
+          msg += " " + m.file();
         }
         throw new InvalidConfException(msg, ex);
       }

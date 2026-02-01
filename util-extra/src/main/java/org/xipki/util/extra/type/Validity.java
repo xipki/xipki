@@ -15,7 +15,6 @@ import java.time.temporal.ChronoUnit;
  *
  * @author Lijun Liao (xipki)
  */
-
 public class Validity implements Comparable<Validity> {
 
   public enum Unit {
@@ -35,11 +34,11 @@ public class Validity implements Comparable<Validity> {
       this.unit = unit;
     }
 
-    public String getSuffix() {
+    public String suffix() {
       return suffix;
     }
 
-    public ChronoUnit getUnit() {
+    public ChronoUnit unit() {
       return unit;
     }
 
@@ -91,11 +90,11 @@ public class Validity implements Comparable<Validity> {
     }
   } // method getInstance
 
-  public int getValidity() {
+  public int validity() {
     return validity;
   }
 
-  public Unit getUnit() {
+  public Unit unit() {
     return unit;
   }
 
@@ -114,12 +113,12 @@ public class Validity implements Comparable<Validity> {
           utcDate.getHour(), utcDate.getMinute(), utcDate.getSecond(),
           0, TIMEZONE_UTC).toInstant();
     } else {
-      return referenceDate.plus(validity, unit.getUnit());
+      return referenceDate.plus(validity, unit.unit());
     }
   } // method add
 
   public long approxMinutes() {
-    return unit.getUnit().getDuration().getSeconds() / 60;
+    return unit.unit().getDuration().getSeconds() / 60;
   }
 
   @Override

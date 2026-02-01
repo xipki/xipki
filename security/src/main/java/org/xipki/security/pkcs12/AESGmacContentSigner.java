@@ -27,9 +27,7 @@ import java.security.SecureRandom;
 /**
  * AES GMAC signer.
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
-
 public class AESGmacContentSigner implements XiContentSigner {
 
   private class AESGmacOutputStream extends OutputStream {
@@ -94,7 +92,7 @@ public class AESGmacContentSigner implements XiContentSigner {
     GCMParameters params = new GCMParameters(nonce, tagByteLen);
     try {
       this.sigAlgIdTemplate =
-          new AlgorithmIdentifier(signAlgo.getOid(), params).getEncoded();
+          new AlgorithmIdentifier(signAlgo.oid(), params).getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -129,7 +127,7 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return new AlgorithmIdentifier(signAlgo.getOid(),
+    return new AlgorithmIdentifier(signAlgo.oid(),
         new GCMParameters(nonce, tagByteLen));
   }
 
@@ -165,7 +163,7 @@ public class AESGmacContentSigner implements XiContentSigner {
     }
   }
 
-  public byte[] getNonce() {
+  public byte[] nonce() {
     return nonce.clone();
   }
 

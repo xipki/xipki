@@ -21,7 +21,6 @@ import java.util.List;
  * Configuration of the certificate's subject field.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class V1Subject {
@@ -41,11 +40,11 @@ public class V1Subject {
   }
 
   // do not encode the default value.
-  public Boolean getKeepRdnOrder() {
+  public Boolean keepRdnOrder() {
     return keepRdnOrder;
   }
 
-  public List<V1RdnType> getRdns() {
+  public List<V1RdnType> rdns() {
     return rdns;
   }
 
@@ -69,7 +68,7 @@ public class V1Subject {
       this.overridable = overridable;
     }
 
-    public String getText() {
+    public String text() {
       return text;
     }
 
@@ -116,7 +115,7 @@ public class V1Subject {
         if (value.isOverridable()) {
           LOG.warn("ignore RdnType.overridable=true");
         }
-        v2Value = value.getText();
+        v2Value = value.text();
       }
 
       if (group != null) {

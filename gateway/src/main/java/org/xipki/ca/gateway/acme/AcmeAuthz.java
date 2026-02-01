@@ -87,7 +87,7 @@ public class AcmeAuthz implements JsonEncodable {
     return authz;
   }
 
-  public AcmeOrder getOrder() {
+  public AcmeOrder order() {
     return order;
   }
 
@@ -95,11 +95,11 @@ public class AcmeAuthz implements JsonEncodable {
     this.order = order;
   }
 
-  public int getSubId() {
+  public int subId() {
     return subId;
   }
 
-  public AuthzStatus getStatus() {
+  public AuthzStatus status() {
     return status;
   }
 
@@ -108,7 +108,7 @@ public class AcmeAuthz implements JsonEncodable {
     this.status = status;
   }
 
-  public Instant getExpires() {
+  public Instant expires() {
     return expires;
   }
 
@@ -117,11 +117,11 @@ public class AcmeAuthz implements JsonEncodable {
     this.expires = expires;
   }
 
-  public AcmeIdentifier getIdentifier() {
+  public AcmeIdentifier identifier() {
     return identifier;
   }
 
-  public List<AcmeChallenge> getChallenges() {
+  public List<AcmeChallenge> challenges() {
     return challenges;
   }
 
@@ -151,7 +151,7 @@ public class AcmeAuthz implements JsonEncodable {
   }
 
   public String getUrl(String baseUrl) {
-    AuthzId authzId = new AuthzId(order.getId(), subId);
+    AuthzId authzId = new AuthzId(order.id(), subId);
     return baseUrl + "authz/" + authzId.toIdText();
   }
 
@@ -182,8 +182,7 @@ public class AcmeAuthz implements JsonEncodable {
     return copy;
   }
 
-  public static String encodeAuthzs(List<AcmeAuthz> authzs)
-      throws CodecException {
+  public static String encodeAuthzs(List<AcmeAuthz> authzs) {
     JsonList maps = new JsonList();
     for (AcmeAuthz m : authzs) {
       maps.add(m.toCodec());

@@ -10,7 +10,6 @@ import java.util.Set;
  * QA system manager for CA.
  *
  * @author Lijun Liao
- *
  */
 
 public interface CaQaSystemManager extends Closeable {

@@ -89,7 +89,7 @@ public class CtLogClient {
     byte[] issuerKeyHash;
     try {
       issuerKeyHash = HashAlgo.SHA256.hash(
-          caCert.getSubjectPublicKeyInfo().getEncoded());
+          caCert.subjectPublicKeyInfo().getEncoded());
     } catch (IOException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
@@ -132,7 +132,7 @@ public class CtLogClient {
             "error while calling " + url + ": " + ex.getMessage());
       }
 
-      byte[] respContent = Optional.ofNullable(res.getContent()).orElseThrow(
+      byte[] respContent = Optional.ofNullable(res.content()).orElseThrow(
           () -> new OperationException(ErrorCode.SYSTEM_FAILURE,
               "server does not return any content while responding " + url));
 
@@ -148,13 +148,13 @@ public class CtLogClient {
             "server does not return any well-formed response", e);
       }
 
-      DigitallySigned ds = DigitallySigned.getInstance(resp.getSignature(),
+      DigitallySigned ds = DigitallySigned.getInstance(resp.signature(),
           new AtomicInteger(0));
-      byte sctVersion = resp.getSct_version();
-      byte[] logId = resp.getId();
+      byte sctVersion = resp.sct_version();
+      byte[] logId = resp.id();
       String hexLogId = Hex.encodeUpper(logId);
-      long timestamp = resp.getTimestamp();
-      byte[] extensions = resp.getExtensions();
+      long timestamp = resp.timestamp();
+      byte[] extensions = resp.extensions();
 
       PublicKey verifyKey = publicKeyFinder == null ? null
           : publicKeyFinder.getPublicKey(logId);
@@ -162,7 +162,7 @@ public class CtLogClient {
         LOG.warn("could not find CtLog public key 0x{} to verify the SCT",
             hexLogId);
       } else {
-        SignatureAndHashAlgorithm algorithm = ds.getAlgorithm();
+        SignatureAndHashAlgorithm algorithm = ds.algorithm();
         String signAlgo = getSignatureAlgo(algorithm);
 
         boolean sigValid;
@@ -171,7 +171,7 @@ public class CtLogClient {
           sig.initVerify(verifyKey);
           CtLog.update(sig, sctVersion, timestamp, extensions,
               issuerKeyHash, preCertTbsCert);
-          sigValid = sig.verify(ds.getSignature());
+          sigValid = sig.verify(ds.signature());
         } catch (NoSuchAlgorithmException | NoSuchProviderException
                  | InvalidKeyException | SignatureException ex) {
           throw new OperationException(ErrorCode.SYSTEM_FAILURE,
@@ -198,7 +198,7 @@ public class CtLogClient {
   private static String getSignatureAlgo(SignatureAndHashAlgorithm algorithm)
       throws OperationException {
     String hashName;
-    switch (algorithm.getHash()) {
+    switch (algorithm.hash()) {
       case sha1:
         hashName = "SHA1";
         break;
@@ -213,18 +213,18 @@ public class CtLogClient {
         break;
       default:
         throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-            "unsupported hash algorithm " + algorithm.getHash());
+            "unsupported hash algorithm " + algorithm.hash());
     }
 
     String encAlgo;
-    SignatureAlgorithm signatureType = algorithm.getSignature();
+    SignatureAlgorithm signatureType = algorithm.signature();
     if (SignatureAlgorithm.ecdsa == signatureType) {
       encAlgo = "ECDSA";
     } else if (SignatureAlgorithm.rsa == signatureType) {
       encAlgo = "RSA";
     } else {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "unsupported signature algorithm " + algorithm.getSignature());
+          "unsupported signature algorithm " + algorithm.signature());
     }
 
     return hashName + "WITH" + encAlgo;

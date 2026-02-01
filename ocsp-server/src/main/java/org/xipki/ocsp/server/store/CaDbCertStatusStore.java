@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * OcspStore for XiPKI OCSP database.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CaDbCertStatusStore extends OcspStore {
@@ -91,7 +90,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
   private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-  protected List<Runnable> getScheduledServices() {
+  protected List<Runnable> scheduledServices() {
     return Collections.singletonList(storeUpdateService);
   }
 
@@ -127,7 +126,7 @@ public class CaDbCertStatusStore extends OcspStore {
               if (str != null) {
                 CertRevocationInfo revInfo =
                     CertRevocationInfo.fromEncoded(str);
-                revTime = revInfo.getRevocationTime();
+                revTime = revInfo.revocationTime();
               }
               SimpleIssuerEntry issuerEntry =
                   new SimpleIssuerEntry(id, revTime);
@@ -136,7 +135,7 @@ public class CaDbCertStatusStore extends OcspStore {
 
             // no change in the issuerStore
             Set<Integer> newIds = newIssuers.keySet();
-            Set<Integer> ids = issuerStore.getIds();
+            Set<Integer> ids = issuerStore.ids();
 
             boolean issuersUnchanged = (ids.size() == newIds.size())
                 && ids.containsAll(newIds) && newIds.containsAll(ids);
@@ -190,7 +189,7 @@ public class CaDbCertStatusStore extends OcspStore {
             String str = rs.getString("REV_INFO");
             if (str != null) {
               CertRevocationInfo revInfo = CertRevocationInfo.fromEncoded(str);
-              caInfoEntry.setRevocationInfo(revInfo.getRevocationTime());
+              caInfoEntry.setRevocationInfo(revInfo.revocationTime());
             }
 
             caInfos.add(caInfoEntry);
@@ -200,7 +199,7 @@ public class CaDbCertStatusStore extends OcspStore {
           if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             for (IssuerEntry m : caInfos) {
-              sb.append(overviewString(m.getCert())).append("\n");
+              sb.append(overviewString(m.cert())).append("\n");
             }
             if (sb.length() > 1) {
               sb.deleteCharAt(sb.length() - 1);
@@ -262,7 +261,7 @@ public class CaDbCertStatusStore extends OcspStore {
       PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
-        ps.setInt(1, issuer.getId());
+        ps.setInt(1, issuer.id());
         ps.setString(2, serialNumber.toString(16));
         rs = ps.executeQuery();
 
@@ -334,12 +333,12 @@ public class CaDbCertStatusStore extends OcspStore {
           Instant date;
           // expired certificate remains in status store forever.
           if (retentionInterval < 0) {
-            date = issuer.getNotBefore();
+            date = issuer.notBefore();
           } else {
             Instant t1 = Instant.now().minus(retentionInterval,
                 ChronoUnit.DAYS);
 
-            date = issuer.getNotBefore().isAfter(t1) ? issuer.getNotBefore()
+            date = issuer.notBefore().isAfter(t1) ? issuer.notBefore()
                 : t1;
           }
 
@@ -347,12 +346,12 @@ public class CaDbCertStatusStore extends OcspStore {
         }
       }
 
-      if ((!inheritCaRevocation) || issuer.getRevocationInfo() == null) {
+      if ((!inheritCaRevocation) || issuer.revocationInfo() == null) {
         return certStatusInfo;
       }
 
-      CertRevocationInfo caRevInfo = issuer.getRevocationInfo();
-      CertStatus certStatus = certStatusInfo.getCertStatus();
+      CertRevocationInfo caRevInfo = issuer.revocationInfo();
+      CertStatus certStatus = certStatusInfo.certStatus();
       boolean replaced = false;
       if (certStatus == CertStatus.GOOD) {
         replaced = true;
@@ -362,24 +361,24 @@ public class CaDbCertStatusStore extends OcspStore {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.getRevocationInfo().getRevocationTime().isAfter(
-            caRevInfo.getRevocationTime())) {
+        if (certStatusInfo.revocationInfo().revocationTime().isAfter(
+            caRevInfo.revocationTime())) {
           replaced = true;
         }
       }
 
       if (replaced) {
         CertRevocationInfo newRevInfo;
-        if (caRevInfo.getReason() == CrlReason.CA_COMPROMISE) {
+        if (caRevInfo.reason() == CrlReason.CA_COMPROMISE) {
           newRevInfo = caRevInfo;
         } else {
           newRevInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-              caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+              caRevInfo.revocationTime(), caRevInfo.invalidityTime());
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
-            certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
-            certStatusInfo.getCertprofile());
+            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
+            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
+            certStatusInfo.certprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {
@@ -463,12 +462,12 @@ public class CaDbCertStatusStore extends OcspStore {
     Set<X509Cert> excludeIssuers = null;
 
     if (caCerts != null) {
-      if (CollectionUtil.isNotEmpty(caCerts.getIncludes())) {
-        includeIssuers = DbCertStatusStore.parseCerts(caCerts.getIncludes());
+      if (CollectionUtil.isNotEmpty(caCerts.includes())) {
+        includeIssuers = DbCertStatusStore.parseCerts(caCerts.includes());
       }
 
-      if (CollectionUtil.isNotEmpty(caCerts.getExcludes())) {
-        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.getExcludes());
+      if (CollectionUtil.isNotEmpty(caCerts.excludes())) {
+        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.excludes());
       }
     }
 
@@ -481,7 +480,7 @@ public class CaDbCertStatusStore extends OcspStore {
     }
 
     if (updateInterval != null) {
-      List<Runnable> scheduledServices = getScheduledServices();
+      List<Runnable> scheduledServices = scheduledServices();
       int size = scheduledServices.size();
       if (size > 0) {
         this.scheduledThreadPoolExecutor =
@@ -516,7 +515,7 @@ public class CaDbCertStatusStore extends OcspStore {
   @Override
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
-    return (issuer == null) ? null : issuer.getCert();
+    return (issuer == null) ? null : issuer.cert();
   } // method getIssuerCert
 
   protected boolean isInitialized() {

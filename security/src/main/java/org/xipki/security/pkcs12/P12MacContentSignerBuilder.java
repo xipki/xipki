@@ -26,9 +26,7 @@ import java.util.List;
  * Builder of PKCS#12 MAC signers.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
-
 public class P12MacContentSignerBuilder {
 
   private final SecretKey key;

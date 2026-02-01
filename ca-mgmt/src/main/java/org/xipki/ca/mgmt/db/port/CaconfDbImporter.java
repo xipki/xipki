@@ -35,7 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Database importer of CA configuration.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class CaconfDbImporter extends DbPorter {
@@ -55,7 +54,7 @@ class CaconfDbImporter extends DbPorter {
     }
   }
 
-  public CaConfType.CaSystem getCaConf() {
+  public CaConfType.CaSystem caConf() {
     return caconf;
   }
 
@@ -73,14 +72,14 @@ class CaconfDbImporter extends DbPorter {
         throw new Exception("Database for caconf is not empty");
       }
 
-      importDbSchema(caconf.getDbSchemas());
-      importSigner(caconf.getSigners());
-      importRequestor(caconf.getRequestors());
-      importPublisher(caconf.getPublishers());
-      importProfile(caconf.getProfiles());
-      importKeypairGen(caconf.getKeypairGens());
+      importDbSchema(caconf.dbSchemas());
+      importSigner(caconf.signers());
+      importRequestor(caconf.requestors());
+      importPublisher(caconf.publishers());
+      importProfile(caconf.profiles());
+      importKeypairGen(caconf.keypairGens());
 
-      List<CaConfType.Ca> cas = caconf.getCas();
+      List<CaConfType.Ca> cas = caconf.cas();
       importCa(cas);
       importCaalias(cas);
       importCaHasRequestor(caconf);
@@ -152,18 +151,18 @@ class CaconfDbImporter extends DbPorter {
       ps = prepareStatement(sql);
 
       for (CaConfType.Signer signer : signers) {
-        String b64Cert = (signer.getCert() == null) ? null
-            : Base64.encodeToString(readContent(signer.getCert()));
+        String b64Cert = (signer.cert() == null) ? null
+            : Base64.encodeToString(readContent(signer.cert()));
         try {
           int idx = 1;
-          ps.setString(idx++, signer.getName());
-          ps.setString(idx++, signer.getType());
+          ps.setString(idx++, signer.name());
+          ps.setString(idx++, signer.type());
           ps.setString(idx++, b64Cert);
-          ps.setString(idx, readContent(signer.getConf()));
+          ps.setString(idx, readContent(signer.conf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import SIGNER with NAME=" + signer.getName());
+          System.err.println("could not import SIGNER with NAME=" + signer.name());
           throw translate(sql, ex);
         }
       }
@@ -186,14 +185,14 @@ class CaconfDbImporter extends DbPorter {
 
       for (CaConfType.Requestor requestor : requestors) {
         try {
-          ps.setInt(1, requestor.getId());
-          ps.setString(2, requestor.getName());
-          ps.setString(3, requestor.getType());
-          ps.setString(4, readContent(requestor.getConf()));
+          ps.setInt(1, requestor.id());
+          ps.setString(2, requestor.name());
+          ps.setString(3, requestor.type());
+          ps.setString(4, readContent(requestor.conf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import REQUESTOR with NAME=" + requestor.getName());
+          System.err.println("could not import REQUESTOR with NAME=" + requestor.name());
           throw translate(sql, ex);
         }
       }
@@ -216,14 +215,14 @@ class CaconfDbImporter extends DbPorter {
       for (CaConfType.NameTypeConf publisher : publishers) {
         try {
           int idx = 1;
-          ps.setInt(idx++, publisher.getId());
-          ps.setString(idx++, publisher.getName());
-          ps.setString(idx++, publisher.getType());
-          ps.setString(idx, readContent(publisher.getConf()));
+          ps.setInt(idx++, publisher.id());
+          ps.setString(idx++, publisher.name());
+          ps.setString(idx++, publisher.type());
+          ps.setString(idx, readContent(publisher.conf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import PUBLISHER with NAME=" + publisher.getName());
+          System.err.println("could not import PUBLISHER with NAME=" + publisher.name());
           throw translate(sql, ex);
         }
       }
@@ -245,17 +244,17 @@ class CaconfDbImporter extends DbPorter {
       for (CaConfType.NameTypeConf certprofile : profiles) {
         try {
           int idx = 1;
-          ps.setInt(idx++, certprofile.getId());
-          ps.setString(idx++, certprofile.getName());
-          ps.setString(idx++, certprofile.getType());
-          ps.setString(idx, readContent(certprofile.getConf()));
+          ps.setInt(idx++, certprofile.id());
+          ps.setString(idx++, certprofile.name());
+          ps.setString(idx++, certprofile.type());
+          ps.setString(idx, readContent(certprofile.conf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import PROFILE with NAME=" + certprofile.getName());
+          System.err.println("could not import PROFILE with NAME=" + certprofile.name());
           throw translate(sql, ex);
         } catch (IOException ex) {
-          System.err.println("could not import PROFILE with NAME=" + certprofile.getName());
+          System.err.println("could not import PROFILE with NAME=" + certprofile.name());
           throw ex;
         }
       }
@@ -282,7 +281,7 @@ class CaconfDbImporter extends DbPorter {
     try {
       ps = prepareStatement(deleteSql);
       for (CaConfType.NameTypeConf entry : keypairGens) {
-        String name = entry.getName();
+        String name = entry.name();
         try {
           ps.setString(1, name);
           ps.executeUpdate();
@@ -300,11 +299,11 @@ class CaconfDbImporter extends DbPorter {
       ps = prepareStatement(sql);
 
       for (CaConfType.NameTypeConf entry : keypairGens) {
-        String name = entry.getName();
+        String name = entry.name();
         try {
-          ps.setString(1, entry.getName());
-          ps.setString(2, entry.getType());
-          ps.setString(3, readContent(entry.getConf()));
+          ps.setString(1, entry.name());
+          ps.setString(2, entry.type());
+          ps.setString(3, readContent(entry.conf()));
 
           ps.executeUpdate();
         } catch (SQLException ex) {
@@ -321,8 +320,7 @@ class CaconfDbImporter extends DbPorter {
   } // method importKeypairGen
 
   private void importCa(List<CaConfType.Ca> cas)
-      throws DataAccessException, CertificateException, IOException,
-      CodecException {
+      throws DataAccessException, CertificateException, IOException {
     System.out.print("    importing table CA ... ");
     boolean succ = false;
 
@@ -335,10 +333,10 @@ class CaconfDbImporter extends DbPorter {
       ps = prepareStatement(sql);
 
       for (CaConfType.Ca ca : cas) {
-        CaConfType.CaInfo caInfo = ca.getCaInfo();
+        CaConfType.CaInfo caInfo = ca.caInfo();
 
         try {
-          byte[] certBytes = readContent(caInfo.getCert());
+          byte[] certBytes = readContent(caInfo.cert());
           X509Cert cert = X509Util.parseCert(certBytes);
 
           String certchainStr = null;
@@ -350,37 +348,37 @@ class CaconfDbImporter extends DbPorter {
             certchainStr = X509Util.encodeCertificates(certchainBytes);
           }
 
-          BaseCaInfo base = caInfo.getBase();
+          BaseCaInfo base = caInfo.base();
 
           String revInfoStr = null;
-          if (base.getRevocationInfo() != null) {
-            revInfoStr = base.getRevocationInfo().encode();
+          if (base.revocationInfo() != null) {
+            revInfoStr = base.revocationInfo().encode();
           }
 
           int idx = 1;
-          ps.setInt(   idx++, ca.getId());
-          ps.setString(idx++, ca.getName().toLowerCase());
-          ps.setString(idx++, base.getStatus().getStatus());
-          ps.setLong(  idx++, base.getNextCrlNo());
-          ps.setString(idx++, base.getCrlSignerName());
+          ps.setInt(   idx++, ca.id());
+          ps.setString(idx++, ca.name().toLowerCase());
+          ps.setString(idx++, base.status().status());
+          ps.setLong(  idx++, base.nextCrlNo());
+          ps.setString(idx++, base.crlSignerName());
           ps.setString(idx++,
-              X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
+              X509Util.cutX500Name(cert.subject(), maxX500nameLen));
           ps.setString(idx++, revInfoStr);
-          ps.setString(idx++, base.getSignerType());
-          ps.setString(idx++, readContent(caInfo.getSignerConf()));
+          ps.setString(idx++, base.signerType());
+          ps.setString(idx++, readContent(caInfo.signerConf()));
           ps.setString(idx++, Base64.encodeToString(certBytes));
           ps.setString(idx++, certchainStr);
 
           CaConfColumn caConfColumn =
-              CaConfColumn.fromBaseCaInfo(ca.getCaInfo().getBase());
+              CaConfColumn.fromBaseCaInfo(ca.caInfo().base());
           ps.setString(idx,   caConfColumn.encode());
 
           ps.executeUpdate();
         } catch (SQLException ex) {
-          System.err.println("could not import CA with NAME=" + ca.getName());
+          System.err.println("could not import CA with NAME=" + ca.name());
           throw translate(sql, ex);
         } catch (CertificateException | IOException ex) {
-          System.err.println("could not import CA with NAME=" + ca.getName());
+          System.err.println("could not import CA with NAME=" + ca.name());
           throw ex;
         }
       }
@@ -401,14 +399,14 @@ class CaconfDbImporter extends DbPorter {
     PreparedStatement ps = prepareStatement(sql);
     try {
       for (CaConfType.Ca ca : cas) {
-        for (String alias : ca.getAliases()) {
+        for (String alias : ca.aliases()) {
           try {
               ps.setString(1, alias);
-              ps.setInt(2, ca.getId());
+              ps.setInt(2, ca.id());
               ps.executeUpdate();
           } catch (SQLException ex) {
             System.err.println("could not import CAALIAS with alias="
-                + alias + " for CA " + ca.getName());
+                + alias + " for CA " + ca.name());
             throw translate(sql, ex);
           }
         }
@@ -430,20 +428,20 @@ class CaconfDbImporter extends DbPorter {
     PreparedStatement ps = prepareStatement(sql);
     try {
       Map<String, Integer> requestorNameToIdMap =
-          nameToIdMap(root.getRequestors());
+          nameToIdMap(root.requestors());
 
-      for (CaConfType.Ca ca : root.getCas()) {
-        for (CaConfType.CaHasRequestor entry : ca.getRequestors()) {
+      for (CaConfType.Ca ca : root.cas()) {
+        for (CaConfType.CaHasRequestor entry : ca.requestors()) {
           String errMsg = "could not import CA_HAS_REQUESTOR for CA="
-              + ca.getName() + " and REQUESTOR=" + entry.getRequestorName();
+              + ca.name() + " and REQUESTOR=" + entry.requestorName();
           try {
             int idx = 1;
-            ps.setInt(idx++, ca.getId());
+            ps.setInt(idx++, ca.id());
             ps.setInt(idx++, requestorNameToIdMap.get(
-                entry.getRequestorName()));
-            ps.setInt(idx++, entry.getPermissions().getValue());
+                entry.requestorName()));
+            ps.setInt(idx++, entry.permissions().value());
             ps.setString(idx, StringUtil.collectionAsString(
-                entry.getProfiles(), ","));
+                entry.profiles(), ","));
 
             ps.executeUpdate();
           } catch (SQLException ex) {
@@ -467,18 +465,18 @@ class CaconfDbImporter extends DbPorter {
     PreparedStatement ps = prepareStatement(sql);
     try {
       Map<String, Integer> publisherNameToIdMap =
-          nameToIdMap(root.getPublishers());
+          nameToIdMap(root.publishers());
 
-      for (CaConfType.Ca ca : root.getCas()) {
-        for (String publisher : ca.getPublishers()) {
+      for (CaConfType.Ca ca : root.cas()) {
+        for (String publisher : ca.publishers()) {
           try {
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
             ps.setInt(2, publisherNameToIdMap.get(publisher));
 
             ps.executeUpdate();
           } catch (SQLException ex) {
             System.err.println("could not import CA_HAS_PUBLISHER with CA="
-                + ca.getName() + " and PUBLISHER=" + publisher);
+                + ca.name() + " and PUBLISHER=" + publisher);
             throw translate(sql, ex);
           }
         }
@@ -499,23 +497,23 @@ class CaconfDbImporter extends DbPorter {
     final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", columns);
     PreparedStatement ps = prepareStatement(sql);
     try {
-      Map<String, Integer> profileNameToIdMap = nameToIdMap(root.getProfiles());
+      Map<String, Integer> profileNameToIdMap = nameToIdMap(root.profiles());
 
-      for (CaConfType.Ca ca : root.getCas()) {
-        for (String combinedProfile : ca.getProfiles()) {
+      for (CaConfType.Ca ca : root.cas()) {
+        for (String combinedProfile : ca.profiles()) {
           try {
             CaProfileEntry entry = CaProfileEntry.decode(combinedProfile);
-            ps.setInt(1, ca.getId());
+            ps.setInt(1, ca.id());
 
             ps.setInt(2, profileNameToIdMap.get(
-                entry.getProfileName()));
+                entry.profileName()));
             ps.setString(3, StringUtil.collectionAsString(
-                entry.getProfileAliases(), ","));
+                entry.profileAliases(), ","));
 
             ps.executeUpdate();
           } catch (SQLException ex) {
             System.err.println("could not import CA_HAS_PROFILE with CA="
-                + ca.getName() + " and PROFILE=" + combinedProfile);
+                + ca.name() + " and PROFILE=" + combinedProfile);
             throw translate(sql, ex);
           }
         }
@@ -531,7 +529,7 @@ class CaconfDbImporter extends DbPorter {
       List<? extends CaConfType.IdNameConf> entries) {
     Map<String, Integer> map = new HashMap<>();
     for (CaConfType.IdNameConf entry : entries) {
-      map.put(entry.getName(), entry.getId());
+      map.put(entry.name(), entry.id());
     }
     return map;
   }

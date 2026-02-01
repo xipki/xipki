@@ -109,7 +109,7 @@ public class KeyPairVisibilityTest {
       Assume.assumeNotNull((Object) soPin);
 
       PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
-          .keyPairType(PKCS11KeyPairType.EC_P256)
+          .keyPairType(PKCS11KeyPairType.P256)
           .label("ec-visibility-test-" + System.currentTimeMillis())
           .signVerify(true).sensitive(true).extractable(false)
           .token(inToken).private_(privateObj);
@@ -130,7 +130,7 @@ public class KeyPairVisibilityTest {
             || (vendorEnum == VendorEnum.CLOUDHSM
                 || vendorEnum == VendorEnum.TASS);
 
-        PKCS11KeyId.KeyIdType type = newKeyId.getType();
+        PKCS11KeyId.KeyIdType type = newKeyId.type();
         if (expectedFoundKeyPair) {
           Assert.assertEquals(PKCS11KeyId.KeyIdType.KEYPAIR, type);
         } else {

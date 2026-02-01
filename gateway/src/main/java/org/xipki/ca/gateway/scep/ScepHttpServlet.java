@@ -23,7 +23,6 @@ import java.io.IOException;
  * <p>URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ScepHttpServlet {
@@ -66,7 +65,7 @@ public class ScepHttpServlet {
     } finally {
       LogUtil.logReqResp("SCEP Gateway", LOG, logReqResp, viaPost,
           req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.getBody());
+          httpResp == null ? null : httpResp.body());
     }
   }
 

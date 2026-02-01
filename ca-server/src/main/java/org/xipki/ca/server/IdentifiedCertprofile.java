@@ -47,7 +47,6 @@ import java.util.Set;
  * CertProfile with identifier.
  *
  * @author Lijun Liao
- *
  */
 
 public class IdentifiedCertprofile implements Closeable {
@@ -61,52 +60,52 @@ public class IdentifiedCertprofile implements Closeable {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     this.certprofile = Args.notNull(certprofile, "certprofile");
 
-    this.certprofile.initialize(dbEntry.getConf());
-    if (this.certprofile.getCertLevel() != CertLevel.EndEntity
+    this.certprofile.initialize(dbEntry.conf());
+    if (this.certprofile.certLevel() != CertLevel.EndEntity
         && this.certprofile.hasNoWellDefinedExpirationDate()) {
       throw new CertprofileException(
           "CA certificate is not allowed to have notAfter 99991231235959Z");
     }
   } // constructor
 
-  public NameId getIdent() {
-    return dbEntry.getIdent();
+  public NameId ident() {
+    return dbEntry.ident();
   }
 
-  public Certprofile getCertprofile() {
+  public Certprofile certprofile() {
     return certprofile;
   }
 
-  public CertprofileEntry getDbEntry() {
+  public CertprofileEntry dbEntry() {
     return dbEntry;
   }
 
-  public List<SignAlgo> getSignatureAlgorithms() {
-    return certprofile.getSignatureAlgorithms();
+  public List<SignAlgo> signatureAlgorithms() {
+    return certprofile.signatureAlgorithms();
   }
 
   public Instant getNotBefore(Instant notBefore) {
-    return certprofile.getNotBefore(notBefore);
+    return certprofile.notBefore(notBefore);
   }
 
-  public Validity getValidity() {
-    return certprofile.getValidity();
+  public Validity validity() {
+    return certprofile.validity();
   }
 
   public boolean hasNoWellDefinedExpirationDate() {
     return certprofile.hasNoWellDefinedExpirationDate();
   }
 
-  public ValidityMode getNotAfterMode() {
-    return certprofile.getNotAfterMode();
+  public ValidityMode notAfterMode() {
+    return certprofile.notAfterMode();
   }
 
-  public CertLevel getCertLevel() {
-    return certprofile.getCertLevel();
+  public CertLevel certLevel() {
+    return certprofile.certLevel();
   }
 
-  public KeypairGenControl getKeypairGenControl() {
-    return certprofile.getKeypairGenControl();
+  public KeypairGenControl keypairGenControl() {
+    return certprofile.keypairGenControl();
   }
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
@@ -116,7 +115,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   public byte[] getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)
       throws CertprofileException {
-    return certprofile.getSubjectKeyIdentifier(publicKey);
+    return certprofile.subjectKeyIdentifier(publicKey);
   }
 
   @Override
@@ -126,16 +125,16 @@ public class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  public ExtensionsControl getExtensionControls() {
-    return certprofile.getExtensionsControl();
+  public ExtensionsControl extensionControls() {
+    return certprofile.extensionsControl();
   }
 
-  public Integer getPathLenBasicConstraint() {
-    return certprofile.getPathLenBasicConstraint();
+  public Integer pathLenBasicConstraint() {
+    return certprofile.pathLenBasicConstraint();
   }
 
-  public int getMaxCertSize() {
-    return certprofile.getMaxCertSize();
+  public int maxCertSize() {
+    return certprofile.maxCertSize();
   }
 
   public SubjectInfo getSubject(X500Name requestedSubject)
@@ -178,8 +177,8 @@ public class IdentifiedCertprofile implements Closeable {
     Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
-    ExtensionsControl controls = certprofile.getExtensionsControl();
-    List<ASN1ObjectIdentifier> types = new ArrayList<>(controls.getTypes());
+    ExtensionsControl controls = certprofile.extensionsControl();
+    List<ASN1ObjectIdentifier> types = new ArrayList<>(controls.types());
 
     // CTLog extension will be processed by the CA
     types.remove(OIDs.Extn.id_SignedCertificateTimestampList);
@@ -252,7 +251,7 @@ public class IdentifiedCertprofile implements Closeable {
 
       if (value != null) {
         CertprofileUtil.addExtension(values, type, extControl,
-            value.getValue());
+            value.value());
         types.remove(type);
       }
     }
@@ -270,8 +269,8 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     // Check the SubjectAltNames
-    if (certprofile.getCertDomain() == CertDomain.CABForumBR
-        && getCertLevel() == CertLevel.EndEntity) {
+    if (certprofile.certDomain() == CertDomain.CABForumBR
+        && certLevel() == CertLevel.EndEntity) {
       assertCommonNameInSAN(grantedSubject, values);
     }
 
@@ -289,7 +288,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    byte[] value = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
+    byte[] value = certprofile.subjectKeyIdentifier(publicKeyInfo);
     CertprofileUtil.addExtension(values, extType, extControl,
           new SubjectKeyIdentifier(value));
   }
@@ -298,7 +297,7 @@ public class IdentifiedCertprofile implements Closeable {
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
       ExtensionsControl controls, PublicCaInfo publicCaInfo)
       throws CertprofileException {
-    byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifier();
+    byte[] ikiValue = publicCaInfo.subjectKeyIdentifier();
     if (ikiValue == null) {
       return;
     }
@@ -325,7 +324,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    GeneralNames value = publicCaInfo.getSubjectAltName();
+    GeneralNames value = publicCaInfo.subjectAltName();
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
@@ -335,23 +334,23 @@ public class IdentifiedCertprofile implements Closeable {
       throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.authorityInfoAccess;
     ExtensionControl extControl = controls.getControl(extType);
-    CaUris caUris = publicCaInfo.getCaUris();
+    CaUris caUris = publicCaInfo.caUris();
 
     if (extControl == null) {
       return;
     }
 
     types.remove(extType);
-    AuthorityInfoAccessControl aiaControl = certprofile.getAiaControl();
+    AuthorityInfoAccessControl aiaControl = certprofile.aiaControl();
 
     List<String> caIssuers = null;
     if (aiaControl != null && aiaControl.isIncludesCaIssuers()) {
-      caIssuers = caUris.getCacertUris();
+      caIssuers = caUris.cacertUris();
     }
 
     List<String> ocspUris = null;
     if (aiaControl != null && aiaControl.isIncludesOcsp()) {
-      ocspUris = caUris.getOcspUris();
+      ocspUris = caUris.ocspUris();
     }
 
     boolean noUri = CollectionUtil.isEmpty(caIssuers)
@@ -375,12 +374,12 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    X509Cert crlSignerCert = publicCaInfo.getCrlSignerCert();
+    X509Cert crlSignerCert = publicCaInfo.crlSignerCert();
     X500Name crlSignerSubject = (crlSignerCert == null) ? null
-        : crlSignerCert.getSubject();
-    X500Name x500CaPrincipal = publicCaInfo.getSubject();
+        : crlSignerCert.subject();
+    X500Name x500CaPrincipal = publicCaInfo.subject();
 
-    List<String> uris = publicCaInfo.getCaUris().getCrlUris();
+    List<String> uris = publicCaInfo.caUris().crlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
     CRLDistPoint value = noUri ? null
         : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
@@ -400,13 +399,13 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    X509Cert crlSignerCert = publicCaInfo.getCrlSignerCert();
+    X509Cert crlSignerCert = publicCaInfo.crlSignerCert();
     X500Name crlSignerSubject = (crlSignerCert == null) ? null
-        : crlSignerCert.getSubject();
+        : crlSignerCert.subject();
 
-    X500Name x500CaPrincipal = publicCaInfo.getSubject();
+    X500Name x500CaPrincipal = publicCaInfo.subject();
 
-    List<String> uris = publicCaInfo.getCaUris().getDeltaCrlUris();
+    List<String> uris = publicCaInfo.caUris().deltaCrlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
     CRLDistPoint value = noUri ? null
         : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
@@ -426,7 +425,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    CertLevel certLevel = certprofile.getCertLevel();
+    CertLevel certLevel = certprofile.certLevel();
 
     // Level EE
     if (certLevel == CertLevel.EndEntity) {
@@ -436,7 +435,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     // Level CA+
-    Integer pathLen = certprofile.getPathLenBasicConstraint();
+    Integer pathLen = certprofile.pathLenBasicConstraint();
     Extension requestedExtn = requestedExtns.get(extType);
 
     if (requestedExtn != null) {
@@ -478,7 +477,7 @@ public class IdentifiedCertprofile implements Closeable {
     types.remove(extType);
     Set<KeyUsage> usages = new HashSet<>();
     // have a copy
-    Set<KeySingleUsage> thisKeyUsage = certprofile.getKeyUsage(keySpec);
+    Set<KeySingleUsage> thisKeyUsage = certprofile.keyUsage(keySpec);
     if (thisKeyUsage == null || thisKeyUsage.isEmpty()) {
       throw new CertprofileException("KeyUsage does not allow empty usages.");
     }
@@ -486,11 +485,12 @@ public class IdentifiedCertprofile implements Closeable {
     Set<KeySingleUsage> usageOccs = new HashSet<>(thisKeyUsage);
 
     // Signature only key specs
-    if (keySpec.isMldsa() || keySpec.isEdwardsEC()) {
+    if (keySpec.isMldsa() || keySpec.isEdwardsEC() ||
+        keySpec.isCompositeMLDSA()) {
       removeKeyUsage(keySpec, usageOccs, KeyUsage.keyAgreement,
           KeyUsage.dataEncipherment, KeyUsage.keyEncipherment,
           KeyUsage.decipherOnly,     KeyUsage.encipherOnly);
-    } else if (keySpec.isMlkem()) {
+    } else if (keySpec.isMlkem() || keySpec.isCompositeMLKEM()) {
       removeKeyUsage(keySpec, usageOccs, KeyUsage.keyCertSign, KeyUsage.cRLSign,
           KeyUsage.digitalSignature, KeyUsage.contentCommitment);
     } else if (keySpec.isMontgomeryEC()) {
@@ -502,8 +502,8 @@ public class IdentifiedCertprofile implements Closeable {
       // all usages are allowed
     }
 
-    CertLevel certLevel = certprofile.getCertLevel();
-    CertDomain certDomain = certprofile.getCertDomain();
+    CertLevel certLevel = certprofile.certLevel();
+    CertDomain certDomain = certprofile.certDomain();
     if (certLevel == CertLevel.EndEntity) {
       // make sure the EE certificate does not contain CA-only usages
       if (containsKeyusage(usageOccs, KeyUsage.keyCertSign)) {
@@ -537,7 +537,7 @@ public class IdentifiedCertprofile implements Closeable {
 
     for (KeySingleUsage k : usageOccs) {
       if (k.isRequired()) {
-        usages.add(k.getKeyUsage());
+        usages.add(k.keyUsage());
       }
     }
 
@@ -558,7 +558,7 @@ public class IdentifiedCertprofile implements Closeable {
     for (KeyUsage usage : usages) {
       KeySingleUsage singleUsage = null;
       for (KeySingleUsage control : usageControls) {
-        if (usage == control.getKeyUsage()) {
+        if (usage == control.keyUsage()) {
           if (!control.isRequired()) {
             singleUsage = control;
             break;
@@ -578,7 +578,7 @@ public class IdentifiedCertprofile implements Closeable {
   private static boolean containsKeyusage(
       Set<KeySingleUsage> usageControls, KeyUsage usage) {
     for (KeySingleUsage entry : usageControls) {
-      if (usage == entry.getKeyUsage()) {
+      if (usage == entry.keyUsage()) {
         return true;
       }
     }
@@ -598,10 +598,10 @@ public class IdentifiedCertprofile implements Closeable {
 
     types.remove(extType);
     List<ASN1ObjectIdentifier> usages = new LinkedList<>();
-    Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
+    Set<ExtKeyUsageControl> usageOccs = certprofile.extendedKeyUsages();
     for (ExtKeyUsageControl k : usageOccs) {
       if (k.isRequired()) {
-        usages.add(k.getExtKeyUsage());
+        usages.add(k.extKeyUsage());
       }
     }
 
@@ -610,14 +610,14 @@ public class IdentifiedCertprofile implements Closeable {
 
     if (extControl.isCritical()
         && usages.contains(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
-      extControl = new ExtensionControl(extControl.getType(), false,
-          extControl.isRequired(), extControl.getInRequest());
+      extControl = new ExtensionControl(extControl.type(), false,
+          extControl.isRequired(), extControl.inRequest());
     }
 
     if (!extControl.isCritical()
         && usages.contains(OIDs.XKU.id_kp_timeStamping)) {
-      extControl = new ExtensionControl(extControl.getType(), true,
-          extControl.isRequired(), extControl.getInRequest());
+      extControl = new ExtensionControl(extControl.type(), true,
+          extControl.isRequired(), extControl.inRequest());
     }
 
     CertprofileUtil.addExtension(values, extType, extControl,
@@ -652,7 +652,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     ASN1Sequence value = CertprofileUtil.createSubjectInfoAccess(
-        requestedExtns, certprofile.getSubjectInfoAccessModes());
+        requestedExtns, certprofile.subjectInfoAccessModes());
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
@@ -667,7 +667,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    CertificatePolicies value = certprofile.getCertificatePolicies();
+    CertificatePolicies value = certprofile.certificatePolicies();
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
@@ -682,7 +682,7 @@ public class IdentifiedCertprofile implements Closeable {
 
     // No private IP address is permitted
     GeneralName[] x509Names =
-        GeneralNames.getInstance(extValue.getValue()).getNames();
+        GeneralNames.getInstance(extValue.value()).getNames();
 
     for (GeneralName m : x509Names) {
       String domain = null;

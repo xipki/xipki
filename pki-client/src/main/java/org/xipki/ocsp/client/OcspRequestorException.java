@@ -7,7 +7,6 @@ package org.xipki.ocsp.client;
  * Exception related to the OCSP requestor.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class OcspRequestorException extends Exception {

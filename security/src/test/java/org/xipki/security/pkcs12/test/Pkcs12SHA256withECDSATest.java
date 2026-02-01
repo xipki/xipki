@@ -10,7 +10,6 @@ import org.xipki.security.SignAlgo;
  * for the signature algorithm SHA256withRSA.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class Pkcs12SHA256withECDSATest extends Pkcs12SignVerifyTest {
 

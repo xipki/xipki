@@ -10,9 +10,7 @@ import org.xipki.util.codec.Args;
  * PKIStatus.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class PkiStatusInfo {
 
   private final int status;

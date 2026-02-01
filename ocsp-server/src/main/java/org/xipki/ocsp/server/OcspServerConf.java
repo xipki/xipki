@@ -53,11 +53,11 @@ public class OcspServerConf {
       this.certs = Args.notNull(certs, "certs");
     }
 
-    public String getDir() {
+    public String dir() {
       return dir;
     }
 
-    public FileOrBinary[] getCerts() {
+    public FileOrBinary[] certs() {
       return certs;
     }
 
@@ -88,15 +88,15 @@ public class OcspServerConf {
       this.maxLen = maxLen;
     }
 
-    public QuadrupleState getOccurrence() {
+    public QuadrupleState occurrence() {
       return occurrence;
     }
 
-    public Integer getMinLen() {
+    public Integer minLen() {
       return minLen;
     }
 
-    public Integer getMaxLen() {
+    public Integer maxLen() {
       return maxLen;
     }
 
@@ -157,7 +157,7 @@ public class OcspServerConf {
       this.supportsHttpGet = supportsHttpGet;
     }
 
-    public int getMaxRequestListCount() {
+    public int maxRequestListCount() {
       return maxRequestListCount;
     }
 
@@ -165,7 +165,7 @@ public class OcspServerConf {
       this.maxRequestListCount = maxRequestListCount;
     }
 
-    public int getMaxRequestSize() {
+    public int maxRequestSize() {
       return maxRequestSize;
     }
 
@@ -173,11 +173,11 @@ public class OcspServerConf {
       this.maxRequestSize = maxRequestSize;
     }
 
-    public List<String> getVersions() {
+    public List<String> versions() {
       return versions;
     }
 
-    public Nonce getNonce() {
+    public Nonce nonce() {
       return nonce;
     }
 
@@ -197,7 +197,7 @@ public class OcspServerConf {
       this.validateSignature = validateSignature;
     }
 
-    public List<String> getHashAlgorithms() {
+    public List<String> hashAlgorithms() {
       if (hashAlgorithms == null) {
         hashAlgorithms = new LinkedList<>();
       }
@@ -208,7 +208,7 @@ public class OcspServerConf {
       this.hashAlgorithms = hashAlgorithms;
     }
 
-    public CertpathValidation getCertpathValidation() {
+    public CertpathValidation certpathValidation() {
       return certpathValidation;
     }
 
@@ -216,7 +216,7 @@ public class OcspServerConf {
       this.certpathValidation = certpathValidation;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -266,15 +266,15 @@ public class OcspServerConf {
       this.certs = certs;
     }
 
-    public CertPathValidationModel getValidationModel() {
+    public CertPathValidationModel validationModel() {
       return validationModel;
     }
 
-    public CertCollection getTrustanchors() {
+    public CertCollection trustanchors() {
       return trustanchors;
     }
 
-    public CertCollection getCerts() {
+    public CertCollection certs() {
       return certs;
     }
 
@@ -338,11 +338,11 @@ public class OcspServerConf {
       this.inheritCaRevocation = inheritCaRevocation;
     }
 
-    public List<String> getServletPaths() {
+    public List<String> servletPaths() {
       return servletPaths;
     }
 
-    public String getMode() {
+    public String mode() {
       return mode;
     }
 
@@ -350,23 +350,23 @@ public class OcspServerConf {
       return inheritCaRevocation;
     }
 
-    public String getSigner() {
+    public String signer() {
       return signer;
     }
 
-    public String getRequest() {
+    public String request() {
       return request;
     }
 
-    public String getResponse() {
+    public String response() {
       return response;
     }
 
-    public List<String> getStores() {
+    public List<String> stores() {
       return stores;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -391,11 +391,11 @@ public class OcspServerConf {
       this.validity = validity;
     }
 
-    public DataSourceConf getDatasource() {
+    public DataSourceConf datasource() {
       return datasource;
     }
 
-    public Validity getValidity() {
+    public Validity validity() {
       return validity == null ? new Validity(1, Unit.DAY) : validity;
     }
 
@@ -453,7 +453,7 @@ public class OcspServerConf {
       this.includeRevReason = includeRevReason;
     }
 
-    public EmbedCertsMode getEmbedCertsMode() {
+    public EmbedCertsMode embedCertsMode() {
       return embedCertsMode;
     }
 
@@ -469,7 +469,7 @@ public class OcspServerConf {
       this.includeCerthash = includeCerthash;
     }
 
-    public Long getCacheMaxAge() {
+    public Long cacheMaxAge() {
       return cacheMaxAge;
     }
 
@@ -477,7 +477,7 @@ public class OcspServerConf {
       this.cacheMaxAge = cacheMaxAge;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
@@ -542,27 +542,27 @@ public class OcspServerConf {
       this.caCerts = (caCerts == null) ? Collections.emptyList() : caCerts;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
-    public String getKey() {
+    public String key() {
       return key;
     }
 
-    public List<String> getAlgorithms() {
+    public List<String> algorithms() {
       return algorithms;
     }
 
-    public FileOrBinary getCert() {
+    public FileOrBinary cert() {
       return cert;
     }
 
-    public List<FileOrBinary> getCaCerts() {
+    public List<FileOrBinary> caCerts() {
       return caCerts;
     }
 
@@ -622,11 +622,11 @@ public class OcspServerConf {
       this.maxNextUpdatePeriod = maxNextUpdatePeriod;
     }
 
-    public Source getSource() {
+    public Source source() {
       return source;
     }
 
-    public Boolean getIgnoreExpiredCert() {
+    public Boolean ignoreExpiredCert() {
       return ignoreExpiredCert;
     }
 
@@ -634,7 +634,7 @@ public class OcspServerConf {
       this.ignoreExpiredCert = ignoreExpiredCert;
     }
 
-    public Boolean getIgnoreNotYetValidCert() {
+    public Boolean ignoreNotYetValidCert() {
       return ignoreNotYetValidCert;
     }
 
@@ -642,7 +642,7 @@ public class OcspServerConf {
       this.ignoreNotYetValidCert = ignoreNotYetValidCert;
     }
 
-    public Integer getRetentionInterval() {
+    public Integer retentionInterval() {
       return retentionInterval;
     }
 
@@ -650,7 +650,7 @@ public class OcspServerConf {
       this.retentionInterval = retentionInterval;
     }
 
-    public UnknownCertBehaviour getUnknownCertBehaviour() {
+    public UnknownCertBehaviour unknownCertBehaviour() {
       return unknownCertBehaviour;
     }
 
@@ -659,15 +659,15 @@ public class OcspServerConf {
       this.unknownCertBehaviour = unknownCertBehaviour;
     }
 
-    public String getMinNextUpdatePeriod() {
+    public String minNextUpdatePeriod() {
       return minNextUpdatePeriod;
     }
 
-    public String getMaxNextUpdatePeriod() {
+    public String maxNextUpdatePeriod() {
       return maxNextUpdatePeriod;
     }
 
-    public Boolean getIncludeArchiveCutoff() {
+    public Boolean includeArchiveCutoff() {
       return includeArchiveCutoff;
     }
 
@@ -675,7 +675,7 @@ public class OcspServerConf {
       this.includeArchiveCutoff = includeArchiveCutoff;
     }
 
-    public Boolean getIncludeCrlId() {
+    public Boolean includeCrlId() {
       return includeCrlId;
     }
 
@@ -683,11 +683,11 @@ public class OcspServerConf {
       this.includeCrlId = includeCrlId;
     }
 
-    public String getName() {
+    public String name() {
       return name;
     }
 
-    public String getUpdateInterval() {
+    public String updateInterval() {
       return updateInterval;
     }
 
@@ -734,15 +734,15 @@ public class OcspServerConf {
       this.conf = Args.notNull(conf, "conf");
     }
 
-    public String getType() {
+    public String type() {
       return type;
     }
 
-    public String getDatasource() {
+    public String datasource() {
       return datasource;
     }
 
-    public JsonMap getConf() {
+    public JsonMap conf() {
       return conf;
     }
 
@@ -772,11 +772,11 @@ public class OcspServerConf {
       this.excludes = excludes;
     }
 
-    public List<String> getIncludes() {
+    public List<String> includes() {
       return includes;
     }
 
-    public List<String> getExcludes() {
+    public List<String> excludes() {
       return excludes;
     }
 
@@ -916,31 +916,31 @@ public class OcspServerConf {
     return ret;
   }
 
-  public ResponseCache getResponseCache() {
+  public ResponseCache responseCache() {
     return responseCache;
   }
 
-  public List<Responder> getResponders() {
+  public List<Responder> responders() {
     return responders;
   }
 
-  public List<Signer> getSigners() {
+  public List<Signer> signers() {
     return signers;
   }
 
-  public List<Store> getStores() {
+  public List<Store> stores() {
     return stores;
   }
 
-  public List<DataSourceConf> getDatasources() {
+  public List<DataSourceConf> datasources() {
     return datasources;
   }
 
-  public List<RequestOption> getRequestOptions() {
+  public List<RequestOption> requestOptions() {
     return requestOptions;
   }
 
-  public List<ResponseOption> getResponseOptions() {
+  public List<ResponseOption> responseOptions() {
     return responseOptions;
   }
 
@@ -952,7 +952,7 @@ public class OcspServerConf {
     this.master = master;
   }
 
-  public UnknownIssuerBehaviour getUnknownIssuerBehaviour() {
+  public UnknownIssuerBehaviour unknownIssuerBehaviour() {
     return unknownIssuerBehaviour;
   }
 

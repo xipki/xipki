@@ -12,7 +12,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
  * certificates.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
@@ -23,7 +22,7 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
     this.entries = entries;
   }
 
-  public SingleCertSerialEntry[] getEntries() {
+  public SingleCertSerialEntry[] entries() {
     return entries;
   }
 

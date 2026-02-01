@@ -93,19 +93,19 @@ public class PkiMessage {
     this.senderNonce = Args.notNull(senderNonce, "senderNonce");
   }
 
-  public TransactionId getTransactionId() {
+  public TransactionId transactionId() {
     return transactionId;
   }
 
-  public Nonce getSenderNonce() {
+  public Nonce senderNonce() {
     return senderNonce;
   }
 
-  public MessageType getMessageType() {
+  public MessageType messageType() {
     return messageType;
   }
 
-  public Nonce getRecipientNonce() {
+  public Nonce recipientNonce() {
     return recipientNonce;
   }
 
@@ -113,7 +113,7 @@ public class PkiMessage {
     this.recipientNonce = recipientNonce;
   }
 
-  public PkiStatus getPkiStatus() {
+  public PkiStatus pkiStatus() {
     return pkiStatus;
   }
 
@@ -121,7 +121,7 @@ public class PkiMessage {
     this.pkiStatus = pkiStatus;
   }
 
-  public FailInfo getFailInfo() {
+  public FailInfo failInfo() {
     return failInfo;
   }
 
@@ -129,7 +129,7 @@ public class PkiMessage {
     this.failInfo = failInfo;
   }
 
-  public String getFailInfoText() {
+  public String failInfoText() {
     return failInfoText;
   }
 
@@ -137,7 +137,7 @@ public class PkiMessage {
     this.failInfoText = failInfoText;
   }
 
-  public ASN1Encodable getMessageData() {
+  public ASN1Encodable messageData() {
     return messageData;
   }
 
@@ -167,32 +167,32 @@ public class PkiMessage {
     return unsignedAttributes.remove(type);
   }
 
-  public ASN1Encodable getSignedAtrributeValue(ASN1ObjectIdentifier type) {
+  public ASN1Encodable getSignedAttributeValue(ASN1ObjectIdentifier type) {
     return signedAttributes.get(type);
   }
 
-  public ASN1Encodable getUnsignedAtrributeValue(ASN1ObjectIdentifier type) {
+  public ASN1Encodable getUnsignedAttributeValue(ASN1ObjectIdentifier type) {
     return unsignedAttributes.get(type);
   }
 
-  private AttributeTable getSignedAttributes() {
+  private AttributeTable signedAttributes() {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     // messageType
     addAttribute(vec, OIDs.Scep.messageType,
-        new DERPrintableString(Integer.toString(messageType.getCode())));
+        new DERPrintableString(Integer.toString(messageType.code())));
 
     // senderNonce
     addAttribute(vec, OIDs.Scep.senderNonce,
-        new DEROctetString(senderNonce.getBytes()));
+        new DEROctetString(senderNonce.bytes()));
 
     // transactionID
     addAttribute(vec, OIDs.Scep.transactionId,
-        new DERPrintableString(transactionId.getId()));
+        new DERPrintableString(transactionId.id()));
 
     // failInfo
     if (failInfo != null) {
       addAttribute(vec, OIDs.Scep.failInfo,
-          new DERPrintableString(Integer.toString(failInfo.getCode())));
+          new DERPrintableString(Integer.toString(failInfo.code())));
     }
 
     // failInfoText
@@ -204,13 +204,13 @@ public class PkiMessage {
     // pkiStatus
     if (pkiStatus != null) {
       addAttribute(vec, OIDs.Scep.pkiStatus,
-          new DERPrintableString(Integer.toString(pkiStatus.getCode())));
+          new DERPrintableString(Integer.toString(pkiStatus.code())));
     }
 
     // recipientNonce
     if (recipientNonce != null) {
       addAttribute(vec, OIDs.Scep.recipientNonce,
-          new DEROctetString(recipientNonce.getBytes()));
+          new DEROctetString(recipientNonce.bytes()));
     }
 
     for (Entry<ASN1ObjectIdentifier, ASN1Encodable> entry
@@ -220,7 +220,7 @@ public class PkiMessage {
     return new AttributeTable(vec);
   } // method getSignedAttributes
 
-  private AttributeTable getUnsignedAttributes() {
+  private AttributeTable unsignedAttributes() {
     if (unsignedAttributes.isEmpty()) {
       return null;
     }
@@ -242,7 +242,7 @@ public class PkiMessage {
     ContentSigner signer;
     try {
       signer = new JcaContentSignerBuilder(
-                signatureAlgorithm.getJceName()).build(signerKey);
+                signatureAlgorithm.jceName()).build(signerKey);
     } catch (OperatorCreationException ex) {
       throw new CodecException(ex);
     }
@@ -282,9 +282,9 @@ public class PkiMessage {
           new JcaSignerInfoGeneratorBuilder(new BcDigestCalculatorProvider());
 
       signerInfoBuilder.setSignedAttributeGenerator(
-          new DefaultSignedAttributeTableGenerator(getSignedAttributes()));
+          new DefaultSignedAttributeTableGenerator(signedAttributes()));
 
-      AttributeTable attrTable = getUnsignedAttributes();
+      AttributeTable attrTable = unsignedAttributes();
       if (attrTable != null) {
         signerInfoBuilder.setUnsignedAttributeGenerator(
             new SimpleAttributeTableGenerator(attrTable));
@@ -326,9 +326,9 @@ public class PkiMessage {
     CMSTypedData envelopable = new CMSProcessableByteArray(messageDataBytes);
     RecipientInfoGenerator recipientGenerator =
         new KeyTransRecipientInfoGenerator(
-            new IssuerAndSerialNumber(recipient.getIssuer(),
-                recipient.getSerialNumber()),
-            new JceAsymmetricKeyWrapper(recipient.getPublicKey())) {};
+            new IssuerAndSerialNumber(recipient.issuer(),
+                recipient.serialNumber()),
+            new JceAsymmetricKeyWrapper(recipient.publicKey())) {};
 
     edGenerator.addRecipientInfoGenerator(recipientGenerator);
     try {

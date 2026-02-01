@@ -69,7 +69,7 @@ public class IPAddressFamily {
     }
   }
 
-  public int getAfi() {
+  public int afi() {
     return afi;
   }
 

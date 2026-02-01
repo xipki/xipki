@@ -89,7 +89,7 @@ public class SessionAuth {
       LOG.info("authenticate successful as {} with {}", userText,
           (pins.get(0).length == 0 ? "NULL pin" : "pin"));
     } catch (PKCS11Exception ex) {
-      long err = ex.getErrorCode();
+      long err = ex.errorCode();
       if (err == PKCS11T.CKR_USER_ALREADY_LOGGED_IN) {
         LOG.warn("user already logged in");
         return;

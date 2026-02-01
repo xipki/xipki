@@ -71,7 +71,6 @@ import static org.xipki.ca.server.CaUtil.parseCert;
  * Execute the database queries to manage CA system.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
@@ -187,17 +186,17 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     final String sql = SqlUtil.buildInsertSql("SYSTEM_EVENT",
         "NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER");
 
-    int num = execUpdatePrepStmt0(sql, col2Str(systemEvent.getName()),
-        col2Long(systemEvent.getEventTime()),
-        col2Timestamp(new Timestamp(systemEvent.getEventTime() * 1000L)),
-        col2Str(systemEvent.getOwner()));
+    int num = execUpdatePrepStmt0(sql, col2Str(systemEvent.name()),
+        col2Long(systemEvent.eventTime()),
+        col2Timestamp(new Timestamp(systemEvent.eventTime() * 1000L)),
+        col2Str(systemEvent.owner()));
 
     if (num == 0) {
       throw new CaMgmtException(
-          "could not add system event " + systemEvent.getName());
+          "could not add system event " + systemEvent.name());
     }
 
-    LOG.info("added system event {}", systemEvent.getName());
+    LOG.info("added system event {}", systemEvent.name());
   } // method addSystemEvent
 
   @Override
@@ -208,7 +207,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   @Override
   public void changeSystemEvent(SystemEvent systemEvent)
       throws CaMgmtException {
-    deleteSystemEvent(systemEvent.getName());
+    deleteSystemEvent(systemEvent.name());
     addSystemEvent(systemEvent);
   } // method changeSystemEvent
 
@@ -298,14 +297,14 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     BaseCaInfo base = new BaseCaInfo(
-        rs.getString("SIGNER_TYPE"), conf.getPermissions());
+        rs.getString("SIGNER_TYPE"), conf.permissions());
     conf.fillBaseCaInfo(base);
 
-    base.setMaxValidity(conf.getMaxValidity());
+    base.setMaxValidity(conf.maxValidity());
     base.setNextCrlNo(getLong(rs, "NEXT_CRLNO"));
     base.setCaUris(conf.caUris());
-    base.setNumCrls(conf.getNumCrls());
-    base.setExpirationPeriod(conf.getExpirationPeriod());
+    base.setNumCrls(conf.numCrls());
+    base.setExpirationPeriod(conf.expirationPeriod());
     base.setStatus(CaStatus.forName(rs.getString("STATUS")));
 
     String crlsignerName = rs.getString("CRL_SIGNER_NAME");
@@ -326,7 +325,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     List<X509Cert> certchain = generateCertchain(rs.getString("CERTCHAIN"));
     // validate certchain
     if (CollectionUtil.isNotEmpty(certchain)) {
-      buildCertChain(entry.getCert(), certchain);
+      buildCertChain(entry.cert(), certchain);
       entry.setCertchain(certchain);
     }
 
@@ -345,7 +344,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     final String sql = "SELECT REQUESTOR_ID,PERMISSION,PROFILES FROM " +
         "CA_HAS_REQUESTOR WHERE CA_ID=?";
 
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.id()));
 
     Set<CaHasRequestorEntry> ret = new HashSet<>();
     for (ResultRow rs : rows) {
@@ -367,7 +366,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       throws CaMgmtException {
     final String sql =
         "SELECT PROFILE_ID,ALIASES FROM CA_HAS_PROFILE WHERE CA_ID=?";
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.id()));
 
     Set<CaProfileIdAliases> ret = new HashSet<>();
 
@@ -391,7 +390,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     final String sql = "SELECT " + column + " FROM " + table +
                         " WHERE CA_ID=?";
 
-    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.getId()));
+    List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.id()));
 
     Set<Integer> ret = new HashSet<>();
     for (ResultRow rs : rows) {
@@ -417,37 +416,37 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   public void addCa(CaEntry caEntry) throws CaMgmtException {
     Args.notNull(caEntry, "caEntry");
 
-    caEntry.getIdent().setId((int) getNextId(Table.CA));
+    caEntry.ident().setId((int) getNextId(Table.CA));
 
     String colNames ="ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT," +
         "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
 
     String sql = SqlUtil.buildInsertSql("CA", colNames);
 
-    byte[] encodedCert = caEntry.getCert().getEncoded();
-    List<X509Cert> certchain = caEntry.getCertchain();
+    byte[] encodedCert = caEntry.cert().getEncoded();
+    List<X509Cert> certchain = caEntry.certchain();
     String certchainStr = CollectionUtil.isEmpty(certchain) ? null
-        : encodeCertchain(buildCertChain(caEntry.getCert(), certchain));
+        : encodeCertchain(buildCertChain(caEntry.cert(), certchain));
 
-    BaseCaInfo base = caEntry.getBase();
+    BaseCaInfo base = caEntry.base();
     CaConfColumn cc = CaConfColumn.fromBaseCaInfo(base);
 
     String revInfoStr = null;
-    if (base.getRevocationInfo() != null) {
-      revInfoStr = base.getRevocationInfo().encode();
+    if (base.revocationInfo() != null) {
+      revInfoStr = base.revocationInfo().encode();
     }
 
     List<SqlColumn2> cols = CaUtil.asModifiableList(
-        col2Int(caEntry.getIdent().getId()), // ID
-        col2Str(caEntry.getIdent().getName()), // NAME
-        col2Str(base.getStatus().getStatus()), // STATUS
-        col2Long(base.getNextCrlNo()), // NEXT_CRLNO
-        col2Str(base.getCrlSignerName()), // CRL_SIGNER_NAME
+        col2Int(caEntry.ident().id()), // ID
+        col2Str(caEntry.ident().name()), // NAME
+        col2Str(base.status().status()), // STATUS
+        col2Long(base.nextCrlNo()), // NEXT_CRLNO
+        col2Str(base.crlSignerName()), // CRL_SIGNER_NAME
         // SUBJECT
         col2Str(X509Util.cutText(caEntry.subject(), getMaxX500nameLen())),
         col2Str(revInfoStr), // REV_INFO
-        col2Str(base.getSignerType()), // SIGNER_TYPE
-        col2Str(caEntry.getSignerConf()),  // SIGNER_CONF
+        col2Str(base.signerType()), // SIGNER_TYPE
+        col2Str(caEntry.signerConf()),  // SIGNER_CONF
         col2Str(Base64.encodeToString(encodedCert)), // CERT
         col2Str(certchainStr), // CERTCHAIN
         col2Str(cc.encode())); // CONFCOLUMN
@@ -455,11 +454,11 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     // insert to table ca
     int num = execUpdatePrepStmt0(sql, cols.toArray(new SqlColumn2[0]));
     if (num == 0) {
-      throw new CaMgmtException("could not add CA " + caEntry.getIdent());
+      throw new CaMgmtException("could not add CA " + caEntry.ident());
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added CA '{}':\n{}", caEntry.getIdent(),
+      LOG.info("added CA '{}':\n{}", caEntry.ident(),
           caEntry.toString(false, true));
     }
   } // method addCa
@@ -468,7 +467,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   public void addCaAlias(String aliasName, NameId ca) throws CaMgmtException {
     notNulls(aliasName, "aliasName", ca, "ca");
     final String sql = SqlUtil.buildInsertSql("CAALIAS", "NAME,CA_ID");
-    int num = execUpdatePrepStmt0(sql, col2Str(aliasName), col2Int(ca.getId()));
+    int num = execUpdatePrepStmt0(sql, col2Str(aliasName), col2Int(ca.id()));
 
     if (num == 0) {
       throw new CaMgmtException("could not add CA alias " + aliasName);
@@ -481,20 +480,20 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     Args.notNull(dbEntry, "dbEntry");
     final String sql = SqlUtil.buildInsertSql("PROFILE", "ID,NAME,TYPE,CONF");
 
-    dbEntry.getIdent().setId((int) getNextId(Table.PROFILE));
+    dbEntry.ident().setId((int) getNextId(Table.PROFILE));
 
     int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.getIdent().getId()),
-        col2Str(dbEntry.getIdent().getName()),
-        col2Str(dbEntry.getType()),
-        col2Str(dbEntry.getConf()));
+        col2Int(dbEntry.ident().id()),
+        col2Str(dbEntry.ident().name()),
+        col2Str(dbEntry.type()),
+        col2Str(dbEntry.conf()));
 
     if (num == 0) {
       throw new CaMgmtException(
-          "could not add certprofile " + dbEntry.getIdent());
+          "could not add certprofile " + dbEntry.ident());
     }
 
-    LOG.info("added profile '{}':\n{}", dbEntry.getIdent(), dbEntry);
+    LOG.info("added profile '{}':\n{}", dbEntry.ident(), dbEntry);
   } // method addCertprofile
 
   @Override
@@ -520,8 +519,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
     }
 
-    int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()),
-        col2Int(profile.getId()), col2Str(aliasesStr));
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.id()),
+        col2Int(profile.id()), col2Str(aliasesStr));
 
     if (num == 0) {
       throw new CaMgmtException("could not add profile " + profile
@@ -544,8 +543,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   private void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
       throws CaMgmtException {
-    int num = execUpdatePrepStmt0(sql, col2Int(ca.getId()),
-              col2Int(entity.getId()));
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.id()),
+              col2Int(entity.id()));
     if (num == 0) {
       throw new CaMgmtException(
           "could not add " + desc + " " + entity + " to CA " +  ca);
@@ -558,24 +557,24 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
-    dbEntry.getIdent().setId((int) getNextId(Table.REQUESTOR));
+    dbEntry.ident().setId((int) getNextId(Table.REQUESTOR));
 
     final String sql = SqlUtil.buildInsertSql(
         "REQUESTOR", "ID,NAME,TYPE,CONF");
 
     int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.getIdent().getId()),
-        col2Str(dbEntry.getIdent().getName()),
-        col2Str(dbEntry.getType()),
-        col2Str(dbEntry.getConf()));
+        col2Int(dbEntry.ident().id()),
+        col2Str(dbEntry.ident().name()),
+        col2Str(dbEntry.type()),
+        col2Str(dbEntry.conf()));
 
     if (num == 0) {
       throw new CaMgmtException(
-          "could not add requestor " + dbEntry.getIdent());
+          "could not add requestor " + dbEntry.ident());
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added requestor '{}':\n{}", dbEntry.getIdent(),
+      LOG.info("added requestor '{}':\n{}", dbEntry.ident(),
           dbEntry.toString(false));
     }
   } // method addRequestor
@@ -610,13 +609,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
 
     String profilesText = StringUtil.collectionAsString(
-                          requestor.getProfiles(), ",");
-    final NameId requestorIdent = requestor.getRequestorIdent();
+                          requestor.profiles(), ",");
+    final NameId requestorIdent = requestor.requestorIdent();
 
     int num = execUpdatePrepStmt0(sql,
-        col2Int(ca.getId()),
-        col2Int(requestorIdent.getId()),
-        col2Int(requestor.getPermissions().getValue()),
+        col2Int(ca.id()),
+        col2Int(requestorIdent.id()),
+        col2Int(requestor.permissions().value()),
         col2Str(profilesText));
 
     if (num == 0) {
@@ -626,8 +625,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     LOG.info(
         "added requestor '{}' to CA '{}': permission: {} ({}); profile: {}",
-        requestorIdent, ca, requestor.getPermissions().getValue(),
-        requestor.getPermissions(), profilesText);
+        requestorIdent, ca, requestor.permissions().value(),
+        requestor.permissions(), profilesText);
   } // method addRequestorToCa
 
   @Override
@@ -636,21 +635,21 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     final String sql = SqlUtil.buildInsertSql("PUBLISHER",
         "ID,NAME,TYPE,CONF");
 
-    dbEntry.getIdent().setId((int) getNextId(Table.PUBLISHER));
-    String name = dbEntry.getIdent().getName();
+    dbEntry.ident().setId((int) getNextId(Table.PUBLISHER));
+    String name = dbEntry.ident().name();
 
     int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.getIdent().getId()),
+        col2Int(dbEntry.ident().id()),
         col2Str(name),
-        col2Str(dbEntry.getType()),
-        col2Str(dbEntry.getConf()));
+        col2Str(dbEntry.type()),
+        col2Str(dbEntry.conf()));
 
     if (num == 0) {
       throw new CaMgmtException(
-          "could not add publisher " + dbEntry.getIdent());
+          "could not add publisher " + dbEntry.ident());
     }
 
-    LOG.info("added publisher '{}':\n{}", dbEntry.getIdent(), dbEntry);
+    LOG.info("added publisher '{}':\n{}", dbEntry.ident(), dbEntry);
   } // method addPublisher
 
   @Override
@@ -662,12 +661,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         currentCaConf, "currentCaConf",
         securityFactory, "securityFactory");
 
-    byte[] encodedCert = changeCaEntry.getEncodedCert();
+    byte[] encodedCert = changeCaEntry.encodedCert();
     if (encodedCert != null) {
       boolean anyCertIssued;
       try {
         anyCertIssued = datasource.columnExists(null, "CERT", "CA_ID",
-            changeCaEntry.getIdent().getId());
+            changeCaEntry.ident().id());
       } catch (DataAccessException ex) {
         throw new CaMgmtException(ex);
       }
@@ -678,13 +677,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
     }
 
-    String signerType = changeCaEntry.getSignerType();
-    String signerConf = changeCaEntry.getSignerConf();
+    String signerType = changeCaEntry.signerType();
+    String signerConf = changeCaEntry.signerConf();
 
     X509Cert caCert = null;
 
     if (signerType != null || signerConf != null || encodedCert != null
-        || CollectionUtil.isNotEmpty(changeCaEntry.getEncodedCertchain())) {
+        || CollectionUtil.isNotEmpty(changeCaEntry.encodedCertchain())) {
       // need CA certificate
       if (encodedCert != null) {
         caCert = parseCert(encodedCert);
@@ -692,9 +691,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         final String sql = "SELECT CERT FROM CA WHERE ID=?";
 
         ResultRow rs = Optional.ofNullable(
-            execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId())))
+            execQuery1PrepStmt0(sql, col2Int(changeCaEntry.ident().id())))
             .orElseThrow(() -> new CaMgmtException(
-                "unknown CA '" + changeCaEntry.getIdent()));
+                "unknown CA '" + changeCaEntry.ident()));
 
         caCert = parseCert(Base64.decode(rs.getString("CERT")));
       }
@@ -704,9 +703,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         final String sql = "SELECT SIGNER_TYPE,SIGNER_CONF FROM CA WHERE ID=?";
 
         ResultRow rs = Optional.ofNullable(
-            execQuery1PrepStmt0(sql, col2Int(changeCaEntry.getIdent().getId())))
+            execQuery1PrepStmt0(sql, col2Int(changeCaEntry.ident().id())))
             .orElseThrow(() -> new CaMgmtException(
-                "unknown CA '" + changeCaEntry.getIdent()));
+                "unknown CA '" + changeCaEntry.ident()));
 
         if (signerType == null) {
           signerType = rs.getString("SIGNER_TYPE");
@@ -722,12 +721,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
           for (CaSignerConf m : signerConfs) {
             ConcurrentContentSigner ignored = securityFactory.createSigner(
-                signerType, new SignerConf(m.getConf()), caCert);
+                signerType, new SignerConf(m.conf()), caCert);
             ignored.close();
           }
         } catch (XiSecurityException | ObjectCreationException ex) {
           throw new CaMgmtException("could not create signer for CA '"
-              + changeCaEntry.getIdent() + "'" + ex.getMessage(), ex);
+              + changeCaEntry.ident() + "'" + ex.getMessage(), ex);
         }
       }
     } // end if (signerType)
@@ -736,7 +735,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     String base64Cert = null;
     if (encodedCert != null) {
       try {
-        subject = X509Util.parseCert(encodedCert).getIssuerText();
+        subject = X509Util.parseCert(encodedCert).issuerText();
         base64Cert = Base64.encodeToString(encodedCert);
       } catch (CertificateException ex) {
         throw new CaMgmtException("could not parse the certificate", ex);
@@ -744,13 +743,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     String certchainStr = null;
-    if (changeCaEntry.getEncodedCertchain() != null) {
-      List<byte[]> encodedCertchain = changeCaEntry.getEncodedCertchain();
+    if (changeCaEntry.encodedCertchain() != null) {
+      List<byte[]> encodedCertchain = changeCaEntry.encodedCertchain();
       if (encodedCertchain.isEmpty()) {
         certchainStr = CaManager.NULL;
       } else {
         List<X509Cert> certs = new LinkedList<>();
-        for (byte[] m : changeCaEntry.getEncodedCertchain()) {
+        for (byte[] m : changeCaEntry.encodedCertchain()) {
           certs.add(parseCert(m));
         }
 
@@ -759,12 +758,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
     }
 
-    String status = (changeCaEntry.getStatus() == null) ? null
-        : changeCaEntry.getStatus().name();
+    String status = (changeCaEntry.status() == null) ? null
+        : changeCaEntry.status().name();
 
     List<SqlColumn> cols = CaUtil.asModifiableList(
         colStr("STATUS", status),
-        colStr("CRL_SIGNER_NAME", changeCaEntry.getCrlSignerName()),
+        colStr("CRL_SIGNER_NAME", changeCaEntry.crlSignerName()),
         colStr("SUBJECT", subject),
         colStr("SIGNER_TYPE", signerType),
         colStr("SIGNER_CONF", signerConf, false, true),
@@ -783,7 +782,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     changeIfNotNull("CA",
-        colInt("ID", changeCaEntry.getIdent().getId()),
+        colInt("ID", changeCaEntry.ident().id()),
         cols.toArray(new SqlColumn[0]));
   } // method changeCa
 
@@ -793,49 +792,49 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     CaConfColumn CC = CaConfColumn.fromBaseCaInfo(currentCaConf);
     CaConfColumn newCC = CC.copy();
 
-    if (changeCaEntry.getMaxValidity() != null) {
-      newCC.setMaxValidity(changeCaEntry.getMaxValidity());
+    if (changeCaEntry.maxValidity() != null) {
+      newCC.setMaxValidity(changeCaEntry.maxValidity());
     }
 
-    String str = changeCaEntry.getExtraControl();
+    String str = changeCaEntry.extraControl();
     if (str != null) {
       newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null
           : new ConfPairs(str));
     }
 
-    if (changeCaEntry.getValidityMode() != null) {
-      newCC.setValidityMode(changeCaEntry.getValidityMode());
+    if (changeCaEntry.validityMode() != null) {
+      newCC.setValidityMode(changeCaEntry.validityMode());
     }
 
-    CaUris changeUris = changeCaEntry.getCaUris();
+    CaUris changeUris = changeCaEntry.caUris();
     if (changeUris != null) {
       // CAcert URIs
-      List<String> uris = changeUris.getCacertUris();
+      List<String> uris = changeUris.cacertUris();
       if (uris != null) {
         newCC.setCacertUris(uris.isEmpty() ? null : uris);
       }
 
       // CRL URIs
-      uris = changeUris.getCrlUris();
+      uris = changeUris.crlUris();
       if (uris != null) {
         newCC.setCrlUris(uris.isEmpty() ? null : uris);
       }
 
       // DeltaCRL URIs
-      uris = changeUris.getDeltaCrlUris();
+      uris = changeUris.deltaCrlUris();
       if (uris != null) {
         newCC.setDeltaCrlUris(uris.isEmpty() ? null : uris);
       }
 
       // OCSP URIs
-      uris = changeUris.getOcspUris();
+      uris = changeUris.ocspUris();
       if (uris != null) {
         newCC.setOcspUris(uris.isEmpty() ? null : uris);
       }
     }
 
     // Keypair generation names
-    List<String> names = changeCaEntry.getKeypairGenNames();
+    List<String> names = changeCaEntry.keypairGenNames();
     if (names != null) {
       newCC.setKeypairGenNames(
           names.isEmpty() || names.get(0).equalsIgnoreCase(CaManager.NULL)
@@ -843,51 +842,51 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     // serial number size
-    if (changeCaEntry.getSerialNoLen() != null) {
-      newCC.setSnSize(changeCaEntry.getSerialNoLen());
+    if (changeCaEntry.serialNoLen() != null) {
+      newCC.setSnSize(changeCaEntry.serialNoLen());
     }
 
     // CRL control
-    str = changeCaEntry.getCrlControl();
+    str = changeCaEntry.crlControl();
     if (str != null) {
       newCC.setCrlControl(CaManager.NULL.equalsIgnoreCase(str)
           ? null : new CrlControl(str));
     }
 
     // CTLog control
-    str = changeCaEntry.getCtlogControl();
+    str = changeCaEntry.ctlogControl();
     if (str != null) {
       newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str)
           ? null : new CtlogControl(str));
     }
 
-    if (changeCaEntry.getSaveCert() != null) {
-      newCC.setSaveCert(changeCaEntry.getSaveCert());
+    if (changeCaEntry.saveCert() != null) {
+      newCC.setSaveCert(changeCaEntry.saveCert());
     }
 
-    if (changeCaEntry.getSaveKeypair() != null) {
-      newCC.setSaveKeypair(changeCaEntry.getSaveKeypair());
+    if (changeCaEntry.saveKeypair() != null) {
+      newCC.setSaveKeypair(changeCaEntry.saveKeypair());
     }
 
-    List<String> list = changeCaEntry.getPermissions();
+    List<String> list = changeCaEntry.permissions();
     if (list != null && !list.isEmpty()) {
       newCC.setPermissions(
           new Permissions(PermissionConstants.toIntPermission(list)));
     }
 
-    if (changeCaEntry.getNumCrls() != null) {
-      newCC.setNumCrls(changeCaEntry.getNumCrls());
+    if (changeCaEntry.numCrls() != null) {
+      newCC.setNumCrls(changeCaEntry.numCrls());
     }
 
-    if (changeCaEntry.getExpirationPeriod() != null) {
-      newCC.setExpirationPeriod(changeCaEntry.getExpirationPeriod());
+    if (changeCaEntry.expirationPeriod() != null) {
+      newCC.setExpirationPeriod(changeCaEntry.expirationPeriod());
     }
 
-    if (changeCaEntry.getKeepExpiredCertDays() != null) {
-      newCC.setKeepExpiredCertDays(changeCaEntry.getKeepExpiredCertDays());
+    if (changeCaEntry.keepExpiredCertDays() != null) {
+      newCC.setKeepExpiredCertDays(changeCaEntry.keepExpiredCertDays());
     }
 
-    str = changeCaEntry.getRevokeSuspendedControl();
+    str = changeCaEntry.revokeSuspendedControl();
     if (str != null) {
       newCC.setRevokeSuspendedControl(CaManager.NULL.equalsIgnoreCase(str)
           ? null : new RevokeSuspendedControl(str));
@@ -906,12 +905,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   @Override
   public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo)
       throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.getId()));
+    ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.id()));
     long nextCrlNoInDb = getLong(rs, "NEXT_CRLNO");
 
     if (nextCrlNoInDb < nextCrlNo) {
       execUpdatePrepStmt0("UPDATE CA SET NEXT_CRLNO=? WHERE ID=?",
-          col2Long(nextCrlNo), col2Int(ca.getId()));
+          col2Long(nextCrlNo), col2Int(ca.id()));
     }
   } // method commitNextCrlNoIfLess
 
@@ -919,11 +918,11 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   public IdentifiedCertprofile changeCertprofile(
       NameId nameId, String type, String conf, CaManagerImpl certprofileManager)
       throws CaMgmtException {
-    CertprofileEntry currentDbEntry = createCertprofile(nameId.getName());
+    CertprofileEntry currentDbEntry = createCertprofile(nameId.name());
     CertprofileEntry newDbEntry = new CertprofileEntry(
-        currentDbEntry.getIdent(),
-        str(type, currentDbEntry.getType()),
-        str(conf, currentDbEntry.getConf()));
+        currentDbEntry.ident(),
+        str(type, currentDbEntry.type()),
+        str(conf, currentDbEntry.conf()));
 
     IdentifiedCertprofile profile = Optional.ofNullable(
         certprofileManager.createCertprofile(newDbEntry)).orElseThrow(
@@ -931,7 +930,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     boolean failed = true;
     try {
-      changeIfNotNull("PROFILE", colInt("ID", nameId.getId()),
+      changeIfNotNull("PROFILE", colInt("ID", nameId.id()),
           colStr("TYPE", type), colStr("CONF", conf));
       failed = false;
       return profile;
@@ -951,11 +950,11 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     requestor.setDbEntry(new RequestorEntry(nameId, type, conf));
 
-    if (requestor.getDbEntry().faulty()) {
+    if (requestor.dbEntry().faulty()) {
       throw new CaMgmtException("invalid requestor configuration");
     }
 
-    changeIfNotNull("REQUESTOR", colInt("ID", nameId.getId()),
+    changeIfNotNull("REQUESTOR", colInt("ID", nameId.id()),
         colStr("TYPE", type), colStr("CONF", conf));
     return requestor;
   } // method changeRequestor
@@ -968,13 +967,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     Args.notNull(signerManager, "signerManager");
 
     SignerEntry dbEntry = createSigner(Args.notBlank(name, "name"));
-    String tmpType = (type == null ? dbEntry.getType() : type);
+    String tmpType = (type == null ? dbEntry.type() : type);
     if (conf != null) {
       conf = CaUtil.canonicalizeSignerConf(conf);
     }
 
     SignerEntry signer = new SignerEntry(name, tmpType,
-        (conf == null ? dbEntry.getConf() : conf),
+        (conf == null ? dbEntry.conf() : conf),
         (base64Cert == null ? dbEntry.base64Cert() : base64Cert));
     signerManager.createSigner(signer);
 
@@ -994,10 +993,10 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     KeypairGenEntry dbEntry =
         createKeypairGen(Args.notBlank(name, "name"));
-    String tmpType = (type == null ? dbEntry.getType() : type);
+    String tmpType = (type == null ? dbEntry.type() : type);
 
     KeypairGenEntry newDbEntry = new KeypairGenEntry(name, tmpType,
-        (conf == null ? dbEntry.getConf() : conf));
+        (conf == null ? dbEntry.conf() : conf));
 
     KeypairGenEntryWrapper wrapper = manager.createKeypairGenerator(newDbEntry);
 
@@ -1016,9 +1015,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     PublisherEntry currentDbEntry =
         createPublisher(Args.notBlank(name, "name"));
-    PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.getIdent(),
-        (type == null ? currentDbEntry.getType() : type),
-        (conf == null ? currentDbEntry.getConf() : conf));
+    PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.ident(),
+        (type == null ? currentDbEntry.type() : type),
+        (conf == null ? currentDbEntry.conf() : conf));
     IdentifiedCertPublisher publisher =
         publisherManager.createPublisher(dbEntry);
 
@@ -1114,12 +1113,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     int num = execUpdatePrepStmt0(
         "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
-        col2Str(dbEntry.getName()), col2Str(dbEntry.getType()),
-        col2Str(dbEntry.getConf()));
+        col2Str(dbEntry.name()), col2Str(dbEntry.type()),
+        col2Str(dbEntry.conf()));
 
     if (num == 0) {
       throw new CaMgmtException(
-          "could not add keypair generation " + dbEntry.getName());
+          "could not add keypair generation " + dbEntry.name());
     }
 
     LOG.info("added keypair generation: \n{}", dbEntry.toString(true));
@@ -1131,11 +1130,11 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     int num = execUpdatePrepStmt0(SqlUtil.buildInsertSql("SIGNER",
             "NAME,TYPE,CERT,CONF"),
-            col2Str(dbEntry.getName()),    col2Str(dbEntry.getType()),
-            col2Str(dbEntry.base64Cert()), col2Str(dbEntry.getConf()));
+            col2Str(dbEntry.name()),    col2Str(dbEntry.type()),
+            col2Str(dbEntry.base64Cert()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
-      throw new CaMgmtException("could not add signer " + dbEntry.getName());
+      throw new CaMgmtException("could not add signer " + dbEntry.name());
     }
 
     LOG.info("added signer: {}", dbEntry.toString(false, true));

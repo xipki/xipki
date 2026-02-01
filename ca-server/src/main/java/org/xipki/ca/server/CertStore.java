@@ -27,7 +27,6 @@ import java.util.List;
  * CA cert store.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public interface CertStore {
@@ -51,11 +50,11 @@ public interface CertStore {
       this.serial = serial;
     }
 
-    public BigInteger getSerial() {
+    public BigInteger serial() {
       return serial;
     }
 
-    public long getId() {
+    public long id() {
       return id;
     }
 

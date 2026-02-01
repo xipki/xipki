@@ -63,11 +63,11 @@ public class ASIdentifiers extends ASN1Object {
     this.rdi = rdi;
   }
 
-  public ASIdentifierChoice getAsnum() {
+  public ASIdentifierChoice asnum() {
     return asnum;
   }
 
-  public ASIdentifierChoice getRdi() {
+  public ASIdentifierChoice rdi() {
     return rdi;
   }
 

@@ -11,7 +11,6 @@ import java.util.Arrays;
  * QA extension value.
  *
  * @author Lijun Liao
- *
  */
 
 public class QaExtensionValue {

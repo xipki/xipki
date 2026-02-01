@@ -12,7 +12,6 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ConfirmCertsRequest extends SdkRequest {
@@ -26,11 +25,11 @@ public class ConfirmCertsRequest extends SdkRequest {
     this.entries = entries;
   }
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
-  public Entry[] getEntries() {
+  public Entry[] entries() {
     return entries;
   }
 
@@ -69,11 +68,11 @@ public class ConfirmCertsRequest extends SdkRequest {
       this.certReqId = certReqId;
     }
 
-    public BigInteger getCertReqId() {
+    public BigInteger certReqId() {
       return certReqId;
     }
 
-    public byte[] getCerthash() {
+    public byte[] certhash() {
       return certhash;
     }
 

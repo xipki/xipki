@@ -7,7 +7,6 @@ package org.xipki.ocsp.server.type;
  * Encoding exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class EncodingException extends Exception {

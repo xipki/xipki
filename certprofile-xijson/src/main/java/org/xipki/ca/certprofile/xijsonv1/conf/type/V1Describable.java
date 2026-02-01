@@ -7,7 +7,6 @@ package org.xipki.ca.certprofile.xijsonv1.conf.type;
  * Configuration with description.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class V1Describable {
@@ -18,7 +17,7 @@ public abstract class V1Describable {
     this.description = description;
   }
 
-  public String getDescription() {
+  public String description() {
     return description;
   }
 

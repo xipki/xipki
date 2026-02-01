@@ -29,12 +29,11 @@ public class PolicyMappings implements JsonEncodable {
     this.mappings = Args.notEmpty(mappings, "mappings");
   }
 
-  public List<PolicyIdMappingType> getMappings() {
+  public List<PolicyIdMappingType> mappings() {
     return mappings;
   }
 
   public org.bouncycastle.asn1.x509.PolicyMappings toPolicyMappings() {
-    List<PolicyIdMappingType> mappings = getMappings();
     final int n = mappings.size();
 
     CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
@@ -43,9 +42,9 @@ public class PolicyMappings implements JsonEncodable {
     for (int i = 0; i < n; i++) {
       PolicyIdMappingType mapping = mappings.get(i);
       issuerDomainPolicy[i]  = CertPolicyId.getInstance(
-          mapping.getIssuerDomainPolicy().getOid());
+          mapping.issuerDomainPolicy().oid());
       subjectDomainPolicy[i] = CertPolicyId.getInstance(
-          mapping.getSubjectDomainPolicy().getOid());
+          mapping.subjectDomainPolicy().oid());
     }
 
     return new org.bouncycastle.asn1.x509.PolicyMappings(
@@ -80,11 +79,11 @@ public class PolicyMappings implements JsonEncodable {
           Args.notNull(subjectDomainPolicy, "subjectDomainPolicy");
     }
 
-    public CertificatePolicyID getIssuerDomainPolicy() {
+    public CertificatePolicyID issuerDomainPolicy() {
       return issuerDomainPolicy;
     }
 
-    public CertificatePolicyID getSubjectDomainPolicy() {
+    public CertificatePolicyID subjectDomainPolicy() {
       return subjectDomainPolicy;
     }
 
@@ -92,10 +91,10 @@ public class PolicyMappings implements JsonEncodable {
     public JsonMap toCodec() {
       JsonMap ret = new JsonMap();
       if (issuerDomainPolicy != null) {
-        ret.put("issuerDomainPolicy", issuerDomainPolicy.getMainAlias());
+        ret.put("issuerDomainPolicy", issuerDomainPolicy.mainAlias());
       }
       if (issuerDomainPolicy != null) {
-        ret.put("subjectDomainPolicy", subjectDomainPolicy.getMainAlias());
+        ret.put("subjectDomainPolicy", subjectDomainPolicy.mainAlias());
       }
       return ret;
     }

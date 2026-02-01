@@ -16,7 +16,6 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class X500NameType extends SdkEncodable {
@@ -52,14 +51,15 @@ public class X500NameType extends SdkEncodable {
       this.name = X500Name.getInstance(encoded);
       this.text = null;
     } catch (IllegalArgumentException ex) {
-      throw new IllegalStateException("error encoding X500Name " + name);
+      throw new IllegalStateException("error encoding X500Name");
     }
   }
 
-  public String getText() {
+  public String text() {
     return text;
   }
 
+  @Override
   public byte[] getEncoded() {
     return encoded;
   }

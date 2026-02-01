@@ -36,9 +36,7 @@ import java.util.Set;
  * {@link SignerFactory} for the types pkcs12 and jceks.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P12SignerFactory implements SignerFactory {
 
   private static final String TYPE_PKCS12 = "pkcs12";
@@ -72,22 +70,22 @@ public class P12SignerFactory implements SignerFactory {
 
     Integer iParallelism;
     try {
-      iParallelism = conf.getParallelism();
+      iParallelism = conf.parallelism();
     } catch (InvalidConfException e) {
       throw new ObjectCreationException(e);
     }
 
     int parallelism = Objects.requireNonNullElseGet(iParallelism,
-        () -> securityFactory.getDfltSignerParallelism());
+        () -> securityFactory.dfltSignerParallelism());
 
-    String passwordHint = conf.getPassword();
+    String passwordHint = conf.password();
     char[] password = getPassword(passwordHint);
 
-    String keystore = conf.getKeystore();
-    String keyLabel = conf.getKeyLabel();
+    String keystore = conf.keystore();
+    String keyLabel = conf.keyLabel();
 
     try (InputStream keystoreStream = getInputStream(keystore)) {
-      SignAlgo sigAlgo = conf.getAlgo();
+      SignAlgo sigAlgo = conf.algo();
       if (sigAlgo != null && sigAlgo.isMac()) {
         P12MacContentSignerBuilder signerBuilder =
             new P12MacContentSignerBuilder(type, keystoreStream,
@@ -98,13 +96,13 @@ public class P12SignerFactory implements SignerFactory {
             keystoreStream, password, keyLabel, password, certificateChain);
         if (sigAlgo == null) {
           SubjectPublicKeyInfo pkInfo = keypairWithCert
-              .getCertificateChain()[0].getSubjectPublicKeyInfo();
-          sigAlgo = conf.getCallback().getSignAlgo(
-                      KeySpec.ofPublicKey(pkInfo), conf.getMode());
+              .certificateChain()[0].subjectPublicKeyInfo();
+          sigAlgo = conf.callback().getSignAlgo(
+                      KeySpec.ofPublicKey(pkInfo), conf.mode());
           conf.setAlgo(sigAlgo);
         }
 
-        PublicKey publicKey = keypairWithCert.getPublicKey();
+        PublicKey publicKey = keypairWithCert.publicKey();
 
         if (publicKey instanceof XDHPublicKey) {
           P12XdhMacContentSignerBuilder signerBuilder =
@@ -114,10 +112,10 @@ public class P12SignerFactory implements SignerFactory {
 
         if (SignAlgo.KEM_HMAC_SHA256 == sigAlgo) {
           SubjectPublicKeyInfo publicKeyInfo = keypairWithCert
-              .getCertificateChain()[0].getSubjectPublicKeyInfo();
+              .certificateChain()[0].subjectPublicKeyInfo();
           P12KemMacContentSignerBuilder signerBuilder =
               new P12KemMacContentSignerBuilder(keypairWithCert,
-                  conf.getCallback().generateKemEncapKey(
+                  conf.callback().generateKemEncapKey(
                       securityFactory, publicKeyInfo));
           return signerBuilder.createSigner(sigAlgo, parallelism);
         } else {
@@ -125,7 +123,7 @@ public class P12SignerFactory implements SignerFactory {
               new P12ContentSignerBuilder(keypairWithCert);
 
           return signerBuilder.createSigner(sigAlgo, parallelism,
-              securityFactory.getRandom4Sign());
+              securityFactory.random4Sign());
         }
       }
     } catch (XiSecurityException | IOException | InvalidConfException ex) {
@@ -138,18 +136,18 @@ public class P12SignerFactory implements SignerFactory {
       SignerConf conf, KeypairWithCert keypairWithCert)
       throws ObjectCreationException, XiSecurityException {
     // peer certificate is needed
-    List<X509Cert> peerCerts = conf.getPeerCertificates();
+    List<X509Cert> peerCerts = conf.peerCertificates();
     if (peerCerts == null || peerCerts.isEmpty()) {
       throw new ObjectCreationException("no peer certificate is specified");
     }
 
-    X509Cert myCert = keypairWithCert.getCertificateChain()[0];
+    X509Cert myCert = keypairWithCert.certificateChain()[0];
     X509Cert peerCert = null;
 
     AlgorithmIdentifier myKeyAlg =
-        myCert.getSubjectPublicKeyInfo().getAlgorithm();
+        myCert.subjectPublicKeyInfo().getAlgorithm();
     for (X509Cert m : peerCerts) {
-      if (m.getSubjectPublicKeyInfo().getAlgorithm().equals(myKeyAlg)) {
+      if (m.subjectPublicKeyInfo().getAlgorithm().equals(myKeyAlg)) {
         peerCert = m;
         break;
       }

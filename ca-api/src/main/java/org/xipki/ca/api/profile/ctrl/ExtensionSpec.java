@@ -46,7 +46,7 @@ public abstract class ExtensionSpec {
   private static final AtomicBoolean instancesInitialized =
       new AtomicBoolean(false);
 
-  public abstract Set<ASN1ObjectIdentifier> getRequiredExtensions();
+  public abstract Set<ASN1ObjectIdentifier> requiredExtensions();
 
   public abstract boolean isNotPermitted(ASN1ObjectIdentifier type);
 
@@ -152,7 +152,7 @@ public abstract class ExtensionSpec {
             OIDs.Extn.inhibitAnyPolicy,
             OIDs.Extn.id_pkix_ocsp_nocheck);
 
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return REQUIRED_EXTENSIONS;
     }
 
@@ -207,12 +207,12 @@ public abstract class ExtensionSpec {
     private Rfc5280RootCA() {
       Set<ASN1ObjectIdentifier> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
-      set.addAll(super.getRequiredExtensions());
+      set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return requiredExtensions;
     }
 
@@ -265,12 +265,12 @@ public abstract class ExtensionSpec {
     private Rfc5280SubCA() {
       Set<ASN1ObjectIdentifier> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
-      set.addAll(super.getRequiredExtensions());
+      set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return requiredExtensions;
     }
 
@@ -313,7 +313,7 @@ public abstract class ExtensionSpec {
         = Collections.emptySet();
 
     @Override
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return REQUIRED_EXTENSIONS;
     }
 
@@ -372,12 +372,12 @@ public abstract class ExtensionSpec {
     private BrowserForumBRSubCA() {
       Set<ASN1ObjectIdentifier> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
-      set.addAll(super.getRequiredExtensions());
+      set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return requiredExtensions;
     }
 
@@ -427,12 +427,12 @@ public abstract class ExtensionSpec {
     private BrowserForumBREndEntity() {
       Set<ASN1ObjectIdentifier> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
-      set.addAll(super.getRequiredExtensions());
+      set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> getRequiredExtensions() {
+    public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return requiredExtensions;
     }
 

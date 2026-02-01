@@ -7,9 +7,7 @@ package org.xipki.security;
  * Certpath validation model.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public enum CertPathValidationModel {
 
   PKIX,

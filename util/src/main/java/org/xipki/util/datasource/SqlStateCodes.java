@@ -14,7 +14,6 @@ import java.util.Set;
  * (the SQL state "class").
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class SqlStateCodes {
 

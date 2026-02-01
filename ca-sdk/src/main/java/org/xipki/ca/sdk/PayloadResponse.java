@@ -10,7 +10,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class PayloadResponse extends SdkResponse {
@@ -24,7 +23,7 @@ public class PayloadResponse extends SdkResponse {
     this.payload = payload;
   }
 
-  public byte[] getPayload() {
+  public byte[] payload() {
     return payload;
   }
 

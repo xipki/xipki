@@ -80,27 +80,27 @@ public enum EcCurveEnum {
     }
   }
 
-  public ASN1ObjectIdentifier getOid() {
+  public ASN1ObjectIdentifier oid() {
     return oid;
   }
 
-  public String getMainAlias() {
+  public String mainAlias() {
     return aliases.get(0);
   }
 
-  public byte[] getEncodedOid() {
+  public byte[] encodedOid() {
     return encodedOid.clone();
   }
 
-  public int getFieldBitSize() {
+  public int fieldBitSize() {
     return fieldBitSize;
   }
 
-  public int getFieldByteSize() {
+  public int fieldByteSize() {
     return fieldByteSize;
   }
 
-  public AlgorithmIdentifier getAlgId() {
+  public AlgorithmIdentifier algId() {
     return algId;
   }
 

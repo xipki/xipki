@@ -18,7 +18,6 @@ import java.security.cert.CertificateException;
  * Wrapper of requestor database entry.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class RequestorEntryWrapper {
@@ -34,8 +33,8 @@ public class RequestorEntryWrapper {
 
   public void setDbEntry(RequestorEntry dbEntry) {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
-    String type = dbEntry.getType();
-    String conf = dbEntry.getConf();
+    String type = dbEntry.type();
+    String conf = dbEntry.conf();
 
     dbEntry.faulty(true);
     if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(type)) {
@@ -45,16 +44,16 @@ public class RequestorEntryWrapper {
         dbEntry.faulty(false);
       } catch (CertificateException ex) {
         LogUtil.error(LOG, ex, "error while parsing certificate of " +
-            "requestor" + dbEntry.getIdent());
+            "requestor" + dbEntry.ident());
       }
     }
   } // method setDbEntry
 
-  public CertWithDbId getCert() {
+  public CertWithDbId cert() {
     return cert;
   }
 
-  public RequestorEntry getDbEntry() {
+  public RequestorEntry dbEntry() {
     return dbEntry;
   }
 

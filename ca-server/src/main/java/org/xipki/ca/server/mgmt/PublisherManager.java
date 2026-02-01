@@ -30,7 +30,6 @@ import java.util.Set;
  * Manages the publishers.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class PublisherManager {
@@ -76,7 +75,7 @@ class PublisherManager {
     for (String name : names) {
       PublisherEntry dbEntry = manager.caConfStore.createPublisher(name);
 
-      manager.idNameMap.addPublisher(dbEntry.getIdent());
+      manager.idNameMap.addPublisher(dbEntry.ident());
       dbEntry.faulty(true);
       manager.publisherDbEntries.put(name, dbEntry);
 
@@ -152,13 +151,13 @@ class PublisherManager {
     publisherNames.add(publisherName);
     manager.caHasPublishers.get(caName).add(publisherName);
 
-    publisher.caAdded(manager.caInfos.get(caName).getCert());
+    publisher.caAdded(manager.caInfos.get(caName).cert());
   } // method addPublisherToCa
 
   void addPublisher(PublisherEntry entry) throws CaMgmtException {
     manager.assertMasterMode();
 
-    String name = Args.notNull(entry, "entry").getIdent().getName();
+    String name = Args.notNull(entry, "entry").ident().name();
     CaManagerImpl.checkName(name, "publisher name");
     if (manager.publisherDbEntries.containsKey(name)) {
       throw new CaMgmtException(StringUtil.concat(
@@ -172,7 +171,7 @@ class PublisherManager {
     manager.caConfStore.addPublisher(entry);
 
     manager.publishers.put(name, publisher);
-    manager.idNameMap.addPublisher(entry.getIdent());
+    manager.idNameMap.addPublisher(entry.ident());
     manager.publisherDbEntries.put(name, entry);
   } // method addPublisher
 
@@ -217,7 +216,7 @@ class PublisherManager {
     IdentifiedCertPublisher oldPublisher = manager.publishers.remove(name);
     shutdownPublisher(oldPublisher);
 
-    manager.publisherDbEntries.put(name, publisher.getDbEntry());
+    manager.publisherDbEntries.put(name, publisher.dbEntry());
     manager.publishers.put(name, publisher);
   } // method changePublisher
 
@@ -266,13 +265,13 @@ class PublisherManager {
       publisher.close();
     } catch (Exception ex) {
       LogUtil.warn(LOG, ex, "could not shutdown CertPublisher "
-          + publisher.getIdent());
+          + publisher.ident());
     }
   } // method shutdownPublisher
 
   IdentifiedCertPublisher createPublisher(PublisherEntry entry)
       throws CaMgmtException {
-    String type = Args.notNull(entry, "entry").getType();
+    String type = Args.notNull(entry, "entry").type();
 
     CertPublisher publisher;
     IdentifiedCertPublisher ret;
@@ -289,7 +288,7 @@ class PublisherManager {
     } catch (ObjectCreationException | CertPublisherException
              | RuntimeException ex) {
       String msg = "invalid configuration for the publisher "
-          + entry.getIdent();
+          + entry.ident();
       LogUtil.error(LOG, ex, msg);
       throw new CaMgmtException(msg, ex);
     }

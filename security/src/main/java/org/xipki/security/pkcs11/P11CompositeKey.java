@@ -23,9 +23,7 @@ import java.security.PublicKey;
  * PKCS#11 composite key.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class P11CompositeKey {
 
   public static final String COMPOSITE_LABEL_PREFIX = "COMPOSITE:";
@@ -54,8 +52,8 @@ public class P11CompositeKey {
     this.pqcKey  = Args.notNull(pqcKey, "pqcKey");
     this.tradKey = Args.notNull(tradKey, "tradKey");
 
-    KeySpec  pqcKeySpec =  pqcKey.getKeySpec();
-    KeySpec tradKeySpec = tradKey.getKeySpec();
+    KeySpec  pqcKeySpec =  pqcKey.keySpec();
+    KeySpec tradKeySpec = tradKey.keySpec();
     if (algoSuite != null) {
       if (algoSuite.mldsaVariant().keySpec() != pqcKeySpec ||
           algoSuite. tradVariant().keySpec() != tradKeySpec) {
@@ -124,7 +122,7 @@ public class P11CompositeKey {
     this.sigAlgoSuite = algoSuite;
     this.kemAlgoSuite = null;
 
-    if (!pqcKey.getSlotId().equals(tradKey.getSlotId())) {
+    if (!pqcKey.slotId().equals(tradKey.slotId())) {
       throw new IllegalArgumentException(
           "pqcKey and tradKey are not in the same slot");
     }
@@ -135,8 +133,8 @@ public class P11CompositeKey {
     this.pqcKey  = Args.notNull(pqcKey, "pqcKey");
     this.tradKey = Args.notNull(tradKey, "tradKey");
 
-    KeySpec  pqcKeySpec =  pqcKey.getKeySpec();
-    KeySpec tradKeySpec = tradKey.getKeySpec();
+    KeySpec  pqcKeySpec =  pqcKey.keySpec();
+    KeySpec tradKeySpec = tradKey.keySpec();
     if (algoSuite != null) {
       if (algoSuite.mlkemVariant().keySpec() != pqcKeySpec ||
           algoSuite. tradVariant().keySpec() != tradKeySpec) {
@@ -194,7 +192,7 @@ public class P11CompositeKey {
     this.kemAlgoSuite = algoSuite;
     this.sigAlgoSuite = null;
 
-    if (!pqcKey.getSlotId().equals(tradKey.getSlotId())) {
+    if (!pqcKey.slotId().equals(tradKey.slotId())) {
       throw new IllegalArgumentException(
           "pqcKey and tradKey are not in the same slot");
     }
@@ -239,19 +237,19 @@ public class P11CompositeKey {
         && tradKey.supportsSign(tradMechanism);
   }
 
-  public P11SlotId getSlotId() {
-    return pqcKey.getSlotId();
+  public P11SlotId slotId() {
+    return pqcKey.slotId();
   }
 
-  public CompositeSigSuite getSigAlgoSuite() {
+  public CompositeSigSuite sigAlgoSuite() {
     return sigAlgoSuite;
   }
 
-  public CompositeKemSuite getKemAlgoSuite() {
+  public CompositeKemSuite kemAlgoSuite() {
     return kemAlgoSuite;
   }
 
-  public PublicKey getPublicKey() {
+  public PublicKey publicKey() {
     if (publicKeyInitialized) {
       return publicKey;
     }
@@ -260,8 +258,8 @@ public class P11CompositeKey {
       this.publicKey = initPublicKey();
     } catch (Exception e) {
       LogUtil.error(LOG, e, "could not initialize composite public key " +
-          "for (private) key (PQC: " + pqcKey.getKey().id() +
-          ", trad: " + tradKey.getKey().id() + " on slot " + getSlotId());
+          "for (private) key (PQC: " + pqcKey.key().id() +
+          ", trad: " + tradKey.key().id() + " on slot " + slotId());
     } finally {
       publicKeyInitialized = true;
     }
@@ -270,8 +268,8 @@ public class P11CompositeKey {
   }
 
   private PublicKey initPublicKey() throws IOException {
-    PublicKey  pqcPublicKey =  pqcKey.getPublicKey();
-    PublicKey tradPublicKey = tradKey.getPublicKey();
+    PublicKey  pqcPublicKey =  pqcKey.publicKey();
+    PublicKey tradPublicKey = tradKey.publicKey();
 
     byte[] pqc_pk = SubjectPublicKeyInfo.getInstance(
         pqcPublicKey.getEncoded()).getPublicKeyData().getOctets();

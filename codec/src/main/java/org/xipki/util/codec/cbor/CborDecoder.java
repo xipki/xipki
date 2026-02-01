@@ -78,11 +78,11 @@ public class CborDecoder implements AutoCloseable {
     this.maxPosition = offset + len;
   }
 
-  public int getStreamOffset() {
+  public int streamOffset() {
     return position;
   }
 
-  public byte[] getRemainingBytes() {
+  public byte[] remainingBytes() {
     return Arrays.copyOfRange(m_is, position, maxPosition);
   }
 
@@ -828,7 +828,7 @@ public class CborDecoder implements AutoCloseable {
     if (type.isNull()) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_ARRAY) {
+    } else if (type.majorType() == TYPE_ARRAY) {
       return readArrayLength();
     } else {
       throw new CodecException("stream does not have an array");
@@ -840,7 +840,7 @@ public class CborDecoder implements AutoCloseable {
     if (isNull(type)) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_MAP) {
+    } else if (type.majorType() == TYPE_MAP) {
       return readMapLength();
     } else {
       throw new CodecException("stream does not have an array");
@@ -852,7 +852,7 @@ public class CborDecoder implements AutoCloseable {
     if (isNull(type)) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_TAG) {
+    } else if (type.majorType() == TYPE_TAG) {
       return readTag();
     } else {
       throw new CodecException("stream does not have a tag");
@@ -860,14 +860,14 @@ public class CborDecoder implements AutoCloseable {
   }
 
   public static boolean isNull(CborType type) {
-    return type.getMajorType() == TYPE_FLOAT_SIMPLE
-      && type.getAdditionalInfo() == NULL;
+    return type.majorType() == TYPE_FLOAT_SIMPLE
+      && type.additionalInfo() == NULL;
   }
 
   public boolean skipBreak() throws CodecException {
     CborType type = peekType();
-    if (type.getMajorType() == TYPE_FLOAT_SIMPLE
-        && type.getAdditionalInfo() == BREAK) {
+    if (type.majorType() == TYPE_FLOAT_SIMPLE
+        && type.additionalInfo() == BREAK) {
       readBreak();
       return true;
     } else {
@@ -889,7 +889,7 @@ public class CborDecoder implements AutoCloseable {
     if (isNull(type)) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_FLOAT_SIMPLE) {
+    } else if (type.majorType() == TYPE_FLOAT_SIMPLE) {
       return readBoolean();
     } else {
       throw new CodecException("stream does not have integer");
@@ -901,8 +901,8 @@ public class CborDecoder implements AutoCloseable {
     if (isNull(type)) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_UNSIGNED_INTEGER
-      || type.getMajorType() == TYPE_NEGATIVE_INTEGER) {
+    } else if (type.majorType() == TYPE_UNSIGNED_INTEGER
+      || type.majorType() == TYPE_NEGATIVE_INTEGER) {
       return readLong();
     } else {
       throw new CodecException("stream does not have integer");
@@ -914,8 +914,8 @@ public class CborDecoder implements AutoCloseable {
     if (isNull(type)) {
       read1Byte();
       return null;
-    } else if (type.getMajorType() == TYPE_UNSIGNED_INTEGER
-      || type.getMajorType() == TYPE_NEGATIVE_INTEGER) {
+    } else if (type.majorType() == TYPE_UNSIGNED_INTEGER
+      || type.majorType() == TYPE_NEGATIVE_INTEGER) {
       return readInt();
     } else {
       throw new CodecException("stream does not have integer");

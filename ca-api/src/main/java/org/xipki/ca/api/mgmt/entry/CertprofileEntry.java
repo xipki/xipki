@@ -30,25 +30,25 @@ public class CertprofileEntry extends MgmtEntry {
     this.ident = Args.notNull(ident, "ident");
     this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
-    if ("all".equals(ident.getName()) || "null".equals(ident.getName())) {
+    if ("all".equals(ident.name()) || "null".equals(ident.name())) {
       throw new IllegalArgumentException(
           "certificate profile name may not be 'all' and 'null'");
     }
   }
 
-  public NameId getIdent() {
+  public NameId ident() {
     return ident;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 
-  public boolean isFaulty() {
+  public boolean faulty() {
     return faulty;
   }
 
@@ -64,7 +64,7 @@ public class CertprofileEntry extends MgmtEntry {
   public String toString(boolean verbose) {
     boolean bo = (verbose || conf == null || conf.length() < 301);
     return StringUtil.concatObjectsCap(200,
-        "id:     ", ident.getId(), "\nname:   ", ident.getName(),
+        "id:     ", ident.id(), "\nname:   ", ident.name(),
         "\nfaulty: ", faulty, "\ntype:   ", type, "\nconf:   ",
         (bo ? conf : StringUtil.concat(conf.substring(0, 297), "...")));
   }

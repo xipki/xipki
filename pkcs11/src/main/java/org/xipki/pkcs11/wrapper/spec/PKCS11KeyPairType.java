@@ -22,29 +22,29 @@ public interface PKCS11KeyPairType {
 
   ECEdwards ED448 = new ECEdwards("1.3.101.113");
 
-  EC EC_P256 = new EC("1.2.840.10045.3.1.7");
+  EC P256 = new EC("1.2.840.10045.3.1.7");
 
-  EC EC_P384 = new EC("1.3.132.0.34");
+  EC P384 = new EC("1.3.132.0.34");
 
-  EC EC_P521 = new EC("1.3.132.0.35");
+  EC P521 = new EC("1.3.132.0.35");
 
-  EC EC_BrainpoolP256R1 = new EC("1.3.36.3.3.2.8.1.1.7");
+  EC BRAINPOOLP256R1 = new EC("1.3.36.3.3.2.8.1.1.7");
 
-  EC EC_BrainpoolP384R1 = new EC("1.3.36.3.3.2.8.1.1.11");
+  EC BRAINPOOLP384R1 = new EC("1.3.36.3.3.2.8.1.1.11");
 
-  EC EC_BrainpoolP512R1 = new EC("1.3.36.3.3.2.8.1.1.13");
+  EC BRAINPOOLP512R1 = new EC("1.3.36.3.3.2.8.1.1.13");
 
-  EC EC_FRP256V1 = new EC("1.2.250.1.223.101.256.1");
+  EC FRP256V1 = new EC("1.2.250.1.223.101.256.1");
 
   SM2 SM2 = new SM2();
 
-  RSA RSA_1024 = new RSA(1024);
+  RSA RSA1024 = new RSA(1024);
 
-  RSA RSA_2048 = new RSA(2048);
+  RSA RSA2048 = new RSA(2048);
 
-  RSA RSA_3072 = new RSA(3072);
+  RSA RSA3072 = new RSA(3072);
 
-  RSA RSA_4096 = new RSA(4096);
+  RSA RSA4096 = new RSA(4096);
 
   MLDSA MLDSA44 = new MLDSA(PKCS11T.CKP_ML_DSA_44);
 

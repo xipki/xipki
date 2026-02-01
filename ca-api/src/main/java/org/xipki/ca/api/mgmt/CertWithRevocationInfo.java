@@ -10,7 +10,6 @@ import org.xipki.security.CertRevocationInfo;
  * Certificate with revocation information.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class CertWithRevocationInfo {
@@ -24,7 +23,7 @@ public class CertWithRevocationInfo {
   public CertWithRevocationInfo() {
   }
 
-  public CertWithDbId getCert() {
+  public CertWithDbId cert() {
     return cert;
   }
 
@@ -32,7 +31,7 @@ public class CertWithRevocationInfo {
     return revInfo != null;
   }
 
-  public CertRevocationInfo getRevInfo() {
+  public CertRevocationInfo revInfo() {
     return revInfo;
   }
 
@@ -44,7 +43,7 @@ public class CertWithRevocationInfo {
     this.revInfo = revInfo;
   }
 
-  public String getCertprofile() {
+  public String certprofile() {
     return certprofile;
   }
 

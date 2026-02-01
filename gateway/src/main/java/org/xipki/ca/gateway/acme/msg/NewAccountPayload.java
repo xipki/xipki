@@ -33,19 +33,19 @@ public class NewAccountPayload implements JsonEncodable {
     this.externalAccountBinding = externalAccountBinding;
   }
 
-  public Boolean getTermsOfServiceAgreed() {
+  public Boolean termsOfServiceAgreed() {
     return termsOfServiceAgreed;
   }
 
-  public Boolean getOnlyReturnExisting() {
+  public Boolean onlyReturnExisting() {
     return onlyReturnExisting;
   }
 
-  public List<String> getContact() {
+  public List<String> contact() {
     return contact;
   }
 
-  public JoseMessage getExternalAccountBinding() {
+  public JoseMessage externalAccountBinding() {
     return externalAccountBinding;
   }
 

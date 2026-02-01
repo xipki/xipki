@@ -51,9 +51,9 @@ public class CrlStreamParserTest {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("revoked-certs.crl");
 
-    Assert.assertEquals("version", 1, parser.getVersion());
+    Assert.assertEquals("version", 1, parser.version());
     Assert.assertEquals("CRL number", BigInteger.valueOf(1),
-        parser.getCrlNumber());
+        parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -75,9 +75,9 @@ public class CrlStreamParserTest {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("invaliditydate.crl");
 
-    Assert.assertEquals("version", 1, parser.getVersion());
+    Assert.assertEquals("version", 1, parser.version());
     Assert.assertEquals("CRL number", BigInteger.valueOf(1),
-        parser.getCrlNumber());
+        parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -99,9 +99,9 @@ public class CrlStreamParserTest {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-revoked-certs.crl");
 
-    Assert.assertEquals("version", 1, parser.getVersion());
+    Assert.assertEquals("version", 1, parser.version());
     Assert.assertEquals("CRL number",
-        BigInteger.valueOf(1), parser.getCrlNumber());
+        BigInteger.valueOf(1), parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -123,8 +123,8 @@ public class CrlStreamParserTest {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-crlnumber.crl");
 
-    Assert.assertEquals("version", 1, parser.getVersion());
-    Assert.assertNull("CRL number", parser.getCrlNumber());
+    Assert.assertEquals("version", 1, parser.version());
+    Assert.assertNull("CRL number", parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -146,8 +146,8 @@ public class CrlStreamParserTest {
     Certificate issuerSigner = getIssuerSigner();
     CrlStreamParser parser = getParser("no-extensions.crl");
 
-    Assert.assertEquals("version", 1, parser.getVersion());
-    Assert.assertNull("CRL number", parser.getCrlNumber());
+    Assert.assertEquals("version", 1, parser.version());
+    Assert.assertNull("CRL number", parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));

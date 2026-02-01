@@ -25,7 +25,6 @@ import java.io.IOException;
  * REST API exception.
  *
  * @author Lijun Liao (xipki)
- * @since 3.0.1
  */
 
 class HttpRaServlet {
@@ -67,7 +66,7 @@ class HttpRaServlet {
       respBody = response == null ? null : response.encode();
       int httpStatus = HttpStatusCode.SC_OK;
       if (response instanceof ErrorResponse) {
-        ErrorCode errCode = ((ErrorResponse) response).getCode();
+        ErrorCode errCode = ((ErrorResponse) response).code();
         switch (errCode) {
           case UNAUTHORIZED:
           case NOT_PERMITTED:

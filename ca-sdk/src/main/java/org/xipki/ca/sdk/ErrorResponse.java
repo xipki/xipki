@@ -13,7 +13,6 @@ import org.xipki.util.codec.cbor.CborEncoder;
  * Error response.
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
 
 public class ErrorResponse extends SdkResponse {
@@ -30,15 +29,15 @@ public class ErrorResponse extends SdkResponse {
     this.message = message;
   }
 
-  public ErrorCode getCode() {
+  public ErrorCode code() {
     return code;
   }
 
-  public String getMessage() {
+  public String message() {
     return message;
   }
 
-  public String getTransactionId() {
+  public String transactionId() {
     return transactionId;
   }
 
@@ -58,7 +57,7 @@ public class ErrorResponse extends SdkResponse {
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(3).writeTextString(transactionId)
-        .writeInt(code.getCode()).writeTextString(message);
+        .writeInt(code.code()).writeTextString(message);
   }
 
   public static ErrorResponse decode(byte[] encoded) throws CodecException {

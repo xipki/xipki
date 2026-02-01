@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * CA Certificate validator.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public interface CaCertValidator {
@@ -104,7 +103,7 @@ public interface CaCertValidator {
       this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
       Args.notEmpty(hashValues, "hashValues");
 
-      final int hLen = hashAlgo.getLength();
+      final int hLen = hashAlgo.length();
       for (byte[] m : hashValues) {
         if (m.length != hLen) {
           throw new IllegalArgumentException(

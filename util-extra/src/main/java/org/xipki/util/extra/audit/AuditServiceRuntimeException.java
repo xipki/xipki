@@ -7,7 +7,6 @@ package org.xipki.util.extra.audit;
  * Audit Service runtime exception.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 public class AuditServiceRuntimeException extends RuntimeException {
 

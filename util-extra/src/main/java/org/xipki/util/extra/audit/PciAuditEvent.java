@@ -23,7 +23,6 @@ import java.util.List;
  * PCI audit event.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class PciAuditEvent {
@@ -108,7 +107,7 @@ public class PciAuditEvent {
     return event;
   }
 
-  public AuditLevel getLevel() {
+  public AuditLevel level() {
     return level;
   }
 
@@ -116,7 +115,7 @@ public class PciAuditEvent {
     this.level = Args.notNull(level, "level");
   }
 
-  public String getUserId() {
+  public String userId() {
     return isBlank(userId) ? UNDEFINED : userId;
   }
 
@@ -124,7 +123,7 @@ public class PciAuditEvent {
     this.userId = userId;
   }
 
-  public String getEventType() {
+  public String eventType() {
     return isBlank(eventType) ? UNDEFINED : eventType;
   }
 
@@ -132,15 +131,15 @@ public class PciAuditEvent {
     this.eventType = eventType;
   }
 
-  public String getDate() {
+  public String date() {
     return date;
   }
 
-  public String getTime() {
+  public String time() {
     return time;
   }
 
-  public String getStatus() {
+  public String status() {
     return isBlank(status) ? UNDEFINED : status;
   }
 
@@ -148,7 +147,7 @@ public class PciAuditEvent {
     this.status = status;
   }
 
-  public String getOrigination() {
+  public String origination() {
     if (isBlank(origination)) {
       origination = getHostAddress();
     }
@@ -160,7 +159,7 @@ public class PciAuditEvent {
     this.origination = origination;
   }
 
-  public String getAffectedResource() {
+  public String affectedResource() {
     return isBlank(affectedResource) ? UNDEFINED : affectedResource;
   }
 
@@ -181,13 +180,13 @@ public class PciAuditEvent {
       buffer.append(prefix);
     }
 
-    buffer.append(replaceDelimiter(getUserId())).append(de);
-    buffer.append(replaceDelimiter(getEventType())).append(de);
-    buffer.append(replaceDelimiter(getDate())).append(de);
-    buffer.append(replaceDelimiter(getTime())).append(de);
-    buffer.append(replaceDelimiter(getStatus())).append(de);
-    buffer.append(replaceDelimiter(getOrigination())).append(de);
-    buffer.append(replaceDelimiter(getAffectedResource()));
+    buffer.append(replaceDelimiter(userId())).append(de);
+    buffer.append(replaceDelimiter(eventType())).append(de);
+    buffer.append(replaceDelimiter(date())).append(de);
+    buffer.append(replaceDelimiter(time())).append(de);
+    buffer.append(replaceDelimiter(status())).append(de);
+    buffer.append(replaceDelimiter(origination())).append(de);
+    buffer.append(replaceDelimiter(affectedResource()));
 
     return buffer;
   } // method toCharArrayWriter

@@ -19,7 +19,6 @@ import java.util.Date;
  * Wrapper to an {@link X509Certificate}.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public class X509Crl {
@@ -54,28 +53,28 @@ public class X509Crl {
     }
   }
 
-  public BigInteger getCrlNumber() {
+  public BigInteger crlNumber() {
     Extension extn = x509.getExtension(OIDs.Extn.cRLNumber);
     return extn == null ? null
         : ((ASN1Integer) extn.getParsedValue()).getValue();
   }
 
-  public BigInteger getBaseCrlNumber() {
+  public BigInteger baseCrlNumber() {
     Extension extn = x509.getExtension(OIDs.Extn.deltaCRLIndicator);
     return extn == null ? null
         : ((ASN1Integer) extn.getParsedValue()).getValue();
   }
 
-  public Instant getThisUpdate() {
+  public Instant thisUpdate() {
     return x509.getThisUpdate().toInstant();
   }
 
-  public Instant getNextUpdate() {
+  public Instant nextUpdate() {
     Date date = x509.getNextUpdate();
     return date == null ? null : date.toInstant();
   }
 
-  public Extensions getExtensions() {
+  public Extensions extensions() {
     return x509.getExtensions();
   }
 

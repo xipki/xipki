@@ -92,7 +92,7 @@ public class DecodedPkiMessage extends PkiMessage {
     super(transactionId, messageType, senderNonce);
   }
 
-  public X509Cert getSignatureCert() {
+  public X509Cert signatureCert() {
     return signatureCert;
   }
 
@@ -100,7 +100,7 @@ public class DecodedPkiMessage extends PkiMessage {
     this.signatureCert = signatureCert;
   }
 
-  public HashAlgo getDigestAlgorithm() {
+  public HashAlgo digestAlgorithm() {
     return digestAlgorithm;
   }
 
@@ -117,7 +117,7 @@ public class DecodedPkiMessage extends PkiMessage {
     this.contentEncryptionAlgorithm = encryptionAlgorithm;
   }
 
-  public String getFailureMessage() {
+  public String failureMessage() {
     return failureMessage;
   }
 
@@ -125,7 +125,7 @@ public class DecodedPkiMessage extends PkiMessage {
     this.failureMessage = failureMessage;
   }
 
-  public ASN1ObjectIdentifier getContentEncryptionAlgorithm() {
+  public ASN1ObjectIdentifier contentEncryptionAlgorithm() {
     return contentEncryptionAlgorithm;
   }
 
@@ -141,7 +141,7 @@ public class DecodedPkiMessage extends PkiMessage {
     return signatureValid;
   }
 
-  public Instant getSigningTime() {
+  public Instant signingTime() {
     return signingTime;
   }
 
@@ -214,14 +214,14 @@ public class DecodedPkiMessage extends PkiMessage {
     int iValue = Optional.ofNullable(
         getIntegerPrintStringAttrValue(signedAttrs, OIDs.Scep.messageType))
         .orElseThrow(() -> new CodecException(
-            "tid " + tid.getId() +
+            "tid " + tid.id() +
             ": missing required SCEP attribute messageType"));
 
     MessageType messageType;
     try {
       messageType = MessageType.forValue(iValue);
     } catch (IllegalArgumentException ex) {
-      throw new CodecException("tid " + tid.getId() +
+      throw new CodecException("tid " + tid.id() +
           ": invalid messageType '" + iValue + "'");
     }
 
@@ -229,7 +229,7 @@ public class DecodedPkiMessage extends PkiMessage {
     Nonce senderNonce = Optional.ofNullable(
         getNonceAttrValue(signedAttrs, OIDs.Scep.senderNonce)).orElseThrow(
             () -> new CodecException(
-                "tid " + tid.getId() +
+                "tid " + tid.id() +
                 ": missing required SCEP attribute senderNonce"));
 
     DecodedPkiMessage ret =
@@ -345,7 +345,7 @@ public class DecodedPkiMessage extends PkiMessage {
         SignAlgo signAlgo = SignAlgo.getInstance(
             signerInfo.toASN1Structure().getDigestEncryptionAlgorithm());
 
-        if (digestAlgo != signAlgo.getHashAlgo()) {
+        if (digestAlgo != signAlgo.hashAlgo()) {
           ret.setFailureMessage("digestAlgorithm and encryptionAlgorithm " +
               "do not use the same digestAlgorithm");
           return ret;

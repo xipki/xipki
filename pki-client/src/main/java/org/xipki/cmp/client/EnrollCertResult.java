@@ -15,7 +15,6 @@ import java.util.Set;
  * Certificate enrollment result.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class EnrollCertResult {
@@ -41,15 +40,15 @@ public class EnrollCertResult {
       this.error = Args.notNull(error, "error");
     }
 
-    public X509Cert getCertificate() {
+    public X509Cert certificate() {
       return certificate;
     }
 
-    public PrivateKeyInfo getPrivateKeyInfo() {
+    public PrivateKeyInfo privateKeyInfo() {
       return privateKeyInfo;
     }
 
-    public PkiStatusInfo getError() {
+    public PkiStatusInfo error() {
       return error;
     }
 
@@ -65,7 +64,7 @@ public class EnrollCertResult {
     this.caCertChain = caCertChain;
   }
 
-  public X509Cert[] getCaCertChain() {
+  public X509Cert[] caCertChain() {
     return caCertChain;
   }
 
@@ -73,7 +72,7 @@ public class EnrollCertResult {
     return certsOrErrors.get(Args.notBlank(id, "id"));
   }
 
-  public Set<String> getAllIds() {
+  public Set<String> allIds() {
     return certsOrErrors.keySet();
   }
 

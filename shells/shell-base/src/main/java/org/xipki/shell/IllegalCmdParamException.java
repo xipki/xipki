@@ -7,7 +7,6 @@ package org.xipki.shell;
  * Exception for illegal action parameters / options.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class IllegalCmdParamException extends Exception {

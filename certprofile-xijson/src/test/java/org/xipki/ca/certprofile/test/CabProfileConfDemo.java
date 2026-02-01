@@ -26,14 +26,16 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
   public static void main(String[] args) {
     try {
       // CA/Browser Forum
-      certprofileCabRootCa("qa/certprofile-cab-rootca.json");
-      certprofileCabSubCa ("qa/certprofile-cab-subca.json");
-      certprofileCabDomainValidatedTls      (
-          "qa/certprofile-cab-domain-validated.json");
+      certprofileCabRootCa(
+          qa_cab_dir + "/certprofile-cab-rootca.json");
+      certprofileCabSubCa (
+          qa_cab_dir + "/certprofile-cab-subca.json");
+      certprofileCabDomainValidatedTls(
+          qa_cab_dir + "/certprofile-cab-domain-validated.json");
       certprofileCabOrganizationValidatedTls(
-          "qa/certprofile-cab-org-validated.json");
+          qa_cab_dir + "/certprofile-cab-org-validated.json");
       certprofileCabIndividualValidatedTls  (
-          "qa/certprofile-cab-individual-validated.json");
+          qa_cab_dir + "/certprofile-cab-individual-validated.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -53,7 +55,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         rdn  (AttributeType.CN));
 
     // Extensions
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
 
@@ -63,7 +65,8 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
+        profile.keyAlgorithms()));
 
     marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
@@ -82,7 +85,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         rdn  (AttributeType.CN));
 
     // Extensions
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
 
     // Extensions - controls
     list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
@@ -102,7 +105,8 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
+        profile.keyAlgorithms()));
 
     // Extensions - CertificatePolicies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
@@ -126,7 +130,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         rdn01(AttributeType.SN),
         rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null));
 
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
     Map<CertificatePolicyID, String> policiesIdAndCpsMap = new HashMap<>();
@@ -152,7 +156,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         rdn01(AttributeType.SN),
         rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null));
 
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
     Map<CertificatePolicyID, String> policiesIdAndCpsMap = new HashMap<>();
@@ -178,7 +182,7 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         rdn01(AttributeType.SN),
         rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null));
 
-    List<ExtensionType> list = profile.getExtensions();
+    List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
     Map<CertificatePolicyID, String> policiesIdAndCpsMap = new HashMap<>();

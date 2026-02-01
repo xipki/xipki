@@ -15,9 +15,7 @@ import java.util.Arrays;
  * RFC 6955.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
-
 public class DHSigStaticKeyCertPair {
 
   private final PrivateKey privateKey;
@@ -35,11 +33,11 @@ public class DHSigStaticKeyCertPair {
   public DHSigStaticKeyCertPair(PrivateKey privateKey, X509Cert certificate) {
     this.privateKey = Args.notNull(privateKey, "privateKey");
     this.serialNumber = Args.notNull(certificate, "certificate")
-        .getSerialNumber();
+        .serialNumber();
 
     try {
-      this.encodedIssuer  = certificate.getIssuer().getEncoded();
-      this.encodedSubject = certificate.getSubject().getEncoded();
+      this.encodedIssuer  = certificate.issuer().getEncoded();
+      this.encodedSubject = certificate.subject().getEncoded();
     } catch (Exception ex) {
       throw new IllegalArgumentException("error encoding certificate", ex);
     }
@@ -47,27 +45,27 @@ public class DHSigStaticKeyCertPair {
     this.subject = X500Name.getInstance(this.encodedSubject);
   }
 
-  public PrivateKey getPrivateKey() {
+  public PrivateKey privateKey() {
     return privateKey;
   }
 
-  public X500Name getIssuer() {
+  public X500Name issuer() {
     return issuer;
   }
 
-  public X500Name getSubject() {
+  public X500Name subject() {
     return subject;
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public byte[] getEncodedIssuer() {
+  public byte[] encodedIssuer() {
     return Arrays.copyOf(encodedIssuer, encodedIssuer.length);
   }
 
-  public byte[] getEncodedSubject() {
+  public byte[] encodedSubject() {
     return Arrays.copyOf(encodedSubject, encodedSubject.length);
   }
 

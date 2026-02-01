@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
  * Test for the algorithm PBEWithHmacSHA256AndAES256.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
 
 public class PBEWithHmacSHA256AndAES256Test {

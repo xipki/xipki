@@ -28,7 +28,6 @@ import java.security.Signature;
 /**
  * Public keys can be found under https://ct.grahamedgecombe.com/
  * @author Lijun Liao (xipki)
- *
  */
 public class CtLogVerifyTest {
 
@@ -56,7 +55,7 @@ public class CtLogVerifyTest {
     X509Cert caCert = X509Util.parseCert(read(caCertFile));
 
     byte[] issuerKeyHash = HashAlgo.SHA256.hash(
-        caCert.getSubjectPublicKeyInfo().getEncoded());
+        caCert.subjectPublicKeyInfo().getEncoded());
     byte[] preCertTbsCert = CtLog.getPreCertTbsCert(
         cert.toBcCert().toASN1Structure().getTBSCertificate());
 
@@ -66,21 +65,21 @@ public class CtLogVerifyTest {
     byte[] encodedScts = ASN1OctetString.getInstance(extnValue).getOctets();
     SignedCertificateTimestampList list =
         SignedCertificateTimestampList.getInstance(encodedScts);
-    SerializedSCT sctList = list.getSctList();
+    SerializedSCT sctList = list.sctList();
     int size = sctList.size();
     Assert.assertEquals("SCT size", 2, size);
 
     SignedCertificateTimestamp sct = sctList.get(1);
-    byte[] logId = sct.getLogId();
+    byte[] logId = sct.logId();
     Assert.assertEquals("logId", Hex.encodeUpper(keyId),
         Hex.encodeUpper(logId));
 
     Signature sig = Signature.getInstance("SHA256withECDSA");
     sig.initVerify(key);
-    CtLog.update(sig, (byte) sct.getVersion(), sct.getTimestamp(),
-        sct.getExtensions(), issuerKeyHash, preCertTbsCert);
+    CtLog.update(sig, (byte) sct.version(), sct.timestamp(),
+        sct.extensions(), issuerKeyHash, preCertTbsCert);
 
-    boolean sigValid = sig.verify(sct.getDigitallySigned().getSignature());
+    boolean sigValid = sig.verify(sct.digitallySigned().signature());
     Assert.assertTrue("signature valid", sigValid);
   }
 

@@ -11,7 +11,6 @@ import java.util.Set;
  * CertPublisher factory interface.
  *
  * @author Lijun Liao (xipki)
- *
  */
 
 public interface CertPublisherFactory {

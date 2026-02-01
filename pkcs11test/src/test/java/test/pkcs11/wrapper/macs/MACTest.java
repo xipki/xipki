@@ -93,7 +93,7 @@ public class MACTest {
   private static abstract class Base extends TestBase {
 
     @Test
-    public void main() throws TokenException {
+    public void execTest() throws TokenException {
       CkMechanism signatureMechanism =
           getSupportedMechanism(CKM_SHA256_HMAC, CKF_SIGN);
 

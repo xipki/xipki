@@ -17,7 +17,6 @@ import java.util.Set;
  * Issuer store.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 class IssuerStore {
@@ -34,7 +33,7 @@ class IssuerStore {
   public void setIssuers(List<IssuerEntry> issuers) {
     Set<Integer> newIds = new HashSet<>();
     for (IssuerEntry issuer : issuers) {
-      int id = issuer.getId();
+      int id = issuer.id();
       if (newIds.contains(id)) {
         throw new IllegalArgumentException(
             "issuer with the same id " + id + " duplicated");
@@ -52,13 +51,13 @@ class IssuerStore {
     return ids.size();
   }
 
-  public Set<Integer> getIds() {
+  public Set<Integer> ids() {
     return ids;
   }
 
   public IssuerEntry getIssuerForId(int id) {
     for (IssuerEntry entry : issuers) {
-      if (entry.getId() == id) {
+      if (entry.id() == id) {
         return entry;
       }
     }
@@ -80,7 +79,7 @@ class IssuerStore {
     this.issuers.add(issuer);
 
     Set<Integer> newIds = new HashSet<>(this.ids);
-    newIds.add(issuer.getId());
+    newIds.add(issuer.id());
     this.ids = Collections.unmodifiableSet(newIds);
   }
 

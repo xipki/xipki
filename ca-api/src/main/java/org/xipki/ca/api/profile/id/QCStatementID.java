@@ -21,38 +21,38 @@ public class QCStatementID extends AbstractID {
 
   private static final Map<String, QCStatementID> typeMap = new HashMap<>();
 
-  public static QCStatementID QCStatementV1 = initOf(
+  public static final QCStatementID QCStatementV1 = initOf(
       OIDs.QCS.id_qcs_pkixQCSyntax_v1, "QCStatement1", "QCStatementV1");
 
-  public static QCStatementID QCStatementV2 = initOf(
+  public static final QCStatementID QCStatementV2 = initOf(
       OIDs.QCS.id_qcs_pkixQCSyntax_v2, "QCStatement2", "QCStatementV2");
 
-  public static QCStatementID etsi_qcs_QcCompliance = initOf(
+  public static final QCStatementID etsi_qcs_QcCompliance = initOf(
       OIDs.QCS.id_etsi_qcs_QcCompliance, "QcCompliance",
       "etsi-qcs-QcCompliance");
 
-  public static QCStatementID etsi_qcs_QcLimitValue = initOf(
+  public static final QCStatementID etsi_qcs_QcLimitValue = initOf(
       OIDs.QCS.id_etsi_qcs_QcLimitValue, "QcLimitValue",
       "etsi-qcs-QcLimitValue");
 
-  public static QCStatementID etsi_qcs_QcRetentionPeriod = initOf(
+  public static final QCStatementID etsi_qcs_QcRetentionPeriod = initOf(
       OIDs.QCS.id_etsi_qcs_QcRetentionPeriod, "QcRetentionPeriod",
       "etsi-qcs-QcRetentionPeriod");
 
-  public static QCStatementID etsi_qcs_QcSSCD = initOf(
+  public static final QCStatementID etsi_qcs_QcSSCD = initOf(
       OIDs.QCS.id_etsi_qcs_QcSSCD, "QcSSCD", "etsi-qcs-QcSSCD");
 
-  public static QCStatementID etsi_qcs_QcPDS = initOf(
+  public static final QCStatementID etsi_qcs_QcPDS = initOf(
       OIDs.QCS.id_etsi_qcs_QcPDS, "QcPDS", "etsi-qcs-QcPDS");
 
-  public static QCStatementID etsi_qcs_QcType = initOf(
+  public static final QCStatementID etsi_qcs_QcType = initOf(
       OIDs.QCS.id_etsi_qcs_QcType, "QcType", "etsi-qcs-QcType");
 
-  public static QCStatementID etsi_qcs_QcCClegislation = initOf(
+  public static final QCStatementID etsi_qcs_QcCClegislation = initOf(
       OIDs.QCS.id_etsi_qcs_QcCClegislation, "QcCClegislation",
       "etsi-qcs-QcCClegislation");
 
-  public static QCStatementID etsi_psd2_qcStatement = initOf(
+  public static final QCStatementID etsi_psd2_qcStatement = initOf(
       OIDs.QCS.id_etsi_psd2_qcStatement, "psd2-qcStatement",
       "etsi-psd2-qcStatement");
 

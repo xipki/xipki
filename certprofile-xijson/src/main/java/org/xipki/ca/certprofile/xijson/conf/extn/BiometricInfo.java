@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.type.TripleState;
+import org.xipki.util.codec.TripleState;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class BiometricInfo implements JsonEncodable {
         "includeSourceDataUri");
   }
 
-  public TripleState getIncludeSourceDataUri() {
+  public TripleState includeSourceDataUri() {
     return includeSourceDataUri;
   }
 
@@ -72,7 +72,7 @@ public class BiometricInfo implements JsonEncodable {
   public JsonMap toCodec() {
     List<String> hashAlgorithmsList = new ArrayList<>(hashAlgorithms.size());
     for (HashAlgo hashAlgo : hashAlgorithms) {
-      hashAlgorithmsList.add(hashAlgo.getJceName());
+      hashAlgorithmsList.add(hashAlgo.jceName());
     }
 
     return new JsonMap().putEnums("types", types)

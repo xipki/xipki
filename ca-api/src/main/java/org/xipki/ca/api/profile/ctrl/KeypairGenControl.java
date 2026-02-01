@@ -47,14 +47,14 @@ public class KeypairGenControl {
     return forbidden;
   }
 
-  public KeySpec getKeySpec() {
+  public KeySpec keySpec() {
     return keySpec;
   }
 
   public String text() {
     return inheritCA ? "InheritCA"
         : forbidden ? "Forbidden"
-        : keySpec.getText();
+        : keySpec.text();
   }
 
   public static KeypairGenControl valueOf(String name)

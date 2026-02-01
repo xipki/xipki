@@ -44,19 +44,19 @@ public class AbstractID {
         .replace("-", "");
   }
 
-  public ASN1ObjectIdentifier getOid() {
+  public ASN1ObjectIdentifier oid() {
     return oid;
   }
 
-  public String getTextOid() {
+  public String textOid() {
     return oid.getId();
   }
 
-  public List<String> getAliases() {
+  public List<String> aliases() {
     return aliases;
   }
 
-  public String getMainAlias() {
+  public String mainAlias() {
     return mainAlias;
   }
 
@@ -98,7 +98,7 @@ public class AbstractID {
     }
 
     for (T m : typeMap.values()) {
-      if (m.getAliases().contains(oidOrName)) {
+      if (m.aliases().contains(oidOrName)) {
         return m;
       }
     }
@@ -107,7 +107,7 @@ public class AbstractID {
   }
 
   protected static <T extends AbstractID> T addToMap(T t, Map<String, T> m) {
-    for (String a : t.getAliases()) {
+    for (String a : t.aliases()) {
       if (m.containsKey(a)) {
         throw new IllegalArgumentException("duplicated alias " + a);
       }

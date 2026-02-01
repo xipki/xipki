@@ -50,7 +50,6 @@ import java.util.Vector;
  * Wrapper to an {@link X509Certificate}.
  *
  * @author Lijun Liao (xipki)
- * @since 5.3.8
  */
 
 public class X509Cert {
@@ -181,7 +180,7 @@ public class X509Cert {
    *     {@code Integer.MAX_VALUE} is returned to indicate that there is no
    *     limit to the allowed length of the certification path.
    */
-  public int getBasicConstraints() {
+  public int basicConstraints() {
     if (basicConstraints != -2) {
       return basicConstraints;
     }
@@ -208,15 +207,15 @@ public class X509Cert {
     }
   }
 
-  public BigInteger getSerialNumber() {
+  public BigInteger serialNumber() {
     return serialNumber;
   }
 
-  public String getSerialNumberHex() {
+  public String serialNumberHex() {
     return "0x" + Hex.encode(serialNumber.toByteArray());
   }
 
-  public PublicKey getPublicKey() {
+  public PublicKey publicKey() {
     if (publicKey != null) {
       return publicKey;
     }
@@ -236,7 +235,7 @@ public class X509Cert {
     }
   }
 
-  public boolean[] getKeyUsage() {
+  public boolean[] keyUsage() {
     if (keyUsageProcessed) {
       return keyUsage;
     }
@@ -251,7 +250,7 @@ public class X509Cert {
               org.bouncycastle.asn1.x509.KeyUsage.getInstance(extnValue);
           keyUsage = new boolean[9];
           for (KeyUsage ku : KeyUsage.values()) {
-            keyUsage[ku.getBit()] = bc.hasUsages(ku.getBcUsage());
+            keyUsage[ku.bit()] = bc.hasUsages(ku.bcUsage());
           }
         }
       } else {
@@ -263,7 +262,7 @@ public class X509Cert {
     }
   }
 
-  public byte[] getSubjectAltNames() {
+  public byte[] subjectAltNames() {
     if (!sanProcessed) {
       synchronized (sync) {
         this.san = getCoreExtValue(OIDs.Extn.subjectAlternativeName);
@@ -274,15 +273,15 @@ public class X509Cert {
     return san == null ? null : san.clone();
   }
 
-  public X500Name getIssuer() {
+  public X500Name issuer() {
     return issuer;
   }
 
-  public X500Name getSubject() {
+  public X500Name subject() {
     return subject;
   }
 
-  public byte[] getSubjectKeyId() {
+  public byte[] subjectKeyId() {
     if (subjectKeyId != null) {
       return subjectKeyId;
     }
@@ -296,7 +295,7 @@ public class X509Cert {
     }
   }
 
-  public byte[] getAuthorityKeyId() {
+  public byte[] authorityKeyId() {
     if (authorityKeyId != null) {
       return authorityKeyId;
     }
@@ -311,7 +310,7 @@ public class X509Cert {
     }
   }
 
-  public String getSubjectText() {
+  public String subjectText() {
     if (subjectText != null) {
       return subjectText;
     }
@@ -322,7 +321,7 @@ public class X509Cert {
     }
   }
 
-  public String getIssuerText() {
+  public String issuerText() {
     if (issuerText != null) {
       return issuerText;
     }
@@ -333,7 +332,7 @@ public class X509Cert {
     }
   }
 
-  public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+  public SubjectPublicKeyInfo subjectPublicKeyInfo() {
     if (subjectPublicKeyInfo != null) {
       return subjectPublicKeyInfo;
     }
@@ -392,11 +391,11 @@ public class X509Cert {
     return selfSigned;
   }
 
-  public Instant getNotBefore() {
+  public Instant notBefore() {
     return notBefore;
   }
 
-  public Instant getNotAfter() {
+  public Instant notAfter() {
     return notAfter;
   }
 
@@ -416,7 +415,7 @@ public class X509Cert {
     }
   }
 
-  public String getCommonName() {
+  public String commonName() {
     return X509Util.getCommonName(subject);
   }
 
@@ -486,8 +485,8 @@ public class X509Cert {
   }
 
   public boolean hasKeyusage(KeyUsage usage) {
-    boolean[] usages = getKeyUsage();
-    return usages == null || usages[usage.getBit()];
+    boolean[] usages = keyUsage();
+    return usages == null || usages[usage.bit()];
   }
 
   @Override
@@ -549,7 +548,7 @@ public class X509Cert {
     try {
       SignAlgo signAlgo = SignAlgo.getInstance(sigAlg);
       if (signAlgo != null) {
-        signAlgoText = signAlgo.getJceName();
+        signAlgoText = signAlgo.jceName();
         if (signAlgoText == null) {
           signAlgoText = signAlgo.name();
         }
@@ -906,10 +905,10 @@ public class X509Cert {
       } else if (OIDs.Extn.id_SignedCertificateTimestampList.equals(oid)) {
         CtLog.SerializedSCT sctl =
             CtLog.SignedCertificateTimestampList.getInstance(
-                ((ASN1OctetString) extnValue).getOctets()).getSctList();
+                ((ASN1OctetString) extnValue).getOctets()).sctList();
         for (int i = 0; i < sctl.size(); i++) {
           CtLog.SignedCertificateTimestamp sct = sctl.get(i);
-          int version = sct.getVersion();
+          int version = sct.version();
           addIndent(sb, level1).append("Signed Certificate Timestamp:\n");
 
           addIndent(sb, level2).append("Version:    ").append("v")
@@ -917,11 +916,11 @@ public class X509Cert {
               .append("\n");
 
           addIndent(sb, level2).append("Log ID:\n");
-          Hex.append(sb, sct.getLogId(), 16, "  ".repeat(level + 3));
+          Hex.append(sb, sct.logId(), 16, "  ".repeat(level + 3));
 
           addIndent(sb, level2).append("Timestamp:  ").append(
-              Instant.ofEpochMilli(sct.getTimestamp())).append("\n");
-          byte[] sctExtensions = sct.getExtensions();
+              Instant.ofEpochMilli(sct.timestamp())).append("\n");
+          byte[] sctExtensions = sct.extensions();
           if (sctExtensions == null || sctExtensions.length == 0) {
             addIndent(sb, level2).append("Extensions: none\n");
           } else {
@@ -930,10 +929,10 @@ public class X509Cert {
           }
 
           CtLog.SignatureAndHashAlgorithm sigAlg =
-              sct.getDigitallySigned().getAlgorithm();
+              sct.digitallySigned().algorithm();
           String sigAlgText =
-              sigAlg.getSignature() + "-with-" + sigAlg.getHash();
-          byte[] sigValue = sct.getDigitallySigned().getSignature();
+              sigAlg.signature() + "-with-" + sigAlg.hash();
+          byte[] sigValue = sct.digitallySigned().signature();
           addIndent(sb, level2).append("Signature:  ")
               .append(sigAlgText).append("\n");
           Hex.append(sb, sigValue, 16, "  ".repeat(level + 3));
@@ -941,15 +940,15 @@ public class X509Cert {
       } else if (OIDs.Extn.autonomousSysIds.equals(oid)
           || OIDs.Extn.autonomousSysIdsV2.equals(oid)) {
         ASIdentifiers asIdentifiers = ASIdentifiers.getInstance(extnValue);
-        ASIdentifierChoice asNum = asIdentifiers.getAsnum();
-        ASIdentifierChoice rdi = asIdentifiers.getRdi();
+        ASIdentifierChoice asNum = asIdentifiers.asnum();
+        ASIdentifierChoice rdi = asIdentifiers.rdi();
         if (asNum != null) {
           addIndent(sb, level1).append("Autonomous System Numbers:");
           if (asNum.isInherit()) {
             sb.append(" inherit\n");
           } else {
             sb.append("\n");
-            for (ASIdOrRange asIdOrRange : asNum.getAsIdsOrRanges()) {
+            for (ASIdOrRange asIdOrRange : asNum.asIdsOrRanges()) {
               addIndent(sb, level2).append(asIdOrRange).append("\n");
             }
           }
@@ -961,8 +960,8 @@ public class X509Cert {
             sb.append(" inherit\n");
           } else {
             sb.append("\n");
-            for (ASIdOrRange asIdOrRange : rdi.getAsIdsOrRanges()) {
-              if (asIdOrRange.getId() != null) {
+            for (ASIdOrRange asIdOrRange : rdi.asIdsOrRanges()) {
+              if (asIdOrRange.id() != null) {
                 addIndent(sb, level2).append(asIdOrRange).append("\n");
               }
             }
@@ -971,16 +970,16 @@ public class X509Cert {
       } else if (OIDs.Extn.ipAddrBlocks.equals(oid)
           || OIDs.Extn.ipAddrBlocksV2.equals(oid)) {
         IPAddrBlocks blocks = IPAddrBlocks.getInstance(extnValue);
-        for (ASN1IPAddressFamily block : blocks.getBlocks()) {
-          int afi = block.getAfi();
+        for (ASN1IPAddressFamily block : blocks.blocks()) {
+          int afi = block.afi();
           addIndent(sb, level1).append(block.addressFamilyToString())
               .append(":");
-          IPAddressChoice choice = block.getIpAddressChoice();
+          IPAddressChoice choice = block.ipAddressChoice();
           if (choice.isInherit()) {
             sb.append(" inherit\n");
           } else {
             sb.append("\n");
-            for (IPAddressOrRange addrOrRange : choice.getAddressesOrRanges()) {
+            for (IPAddressOrRange addrOrRange : choice.addressesOrRanges()) {
               addIndent(sb, level2)
                   .append(addrOrRange.toString(afi)).append("\n");
             }

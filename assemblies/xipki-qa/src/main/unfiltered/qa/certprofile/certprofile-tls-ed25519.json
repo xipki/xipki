@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile tls with Ed25519 key"
+    "details": "certprofile tls sign"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,

@@ -20,9 +20,7 @@ import java.util.Arrays;
  * HMAC signer.
  *
  * @author Lijun Liao (xipki)
- * @since 2.2.0
  */
-
 public class HmacContentSigner implements XiContentSigner {
 
   private class HmacOutputStream extends OutputStream {
@@ -60,12 +58,12 @@ public class HmacContentSigner implements XiContentSigner {
     Args.notNull(signingKey, "signingKey");
     try {
       this.encodedAlgorithmIdentifier =
-          algorithm.getAlgorithmIdentifier().getEncoded();
+          algorithm.algorithmIdentifier().getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
 
-    this.hmac = new HMac(algorithm.getHashAlgo().createDigest());
+    this.hmac = new HMac(algorithm.hashAlgo().createDigest());
     byte[] keyBytes = signingKey.getEncoded();
     this.hmac.init(new KeyParameter(keyBytes, 0, keyBytes.length));
     this.outLen = hmac.getMacSize();
@@ -74,7 +72,7 @@ public class HmacContentSigner implements XiContentSigner {
 
   @Override
   public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return algorithm.getAlgorithmIdentifier();
+    return algorithm.algorithmIdentifier();
   }
 
   @Override

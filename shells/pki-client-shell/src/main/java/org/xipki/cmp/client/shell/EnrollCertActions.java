@@ -141,18 +141,18 @@ public class EnrollCertActions {
 
       CertifiedKeyPairOrError certOrError = null;
       if (result != null) {
-        String id = result.getAllIds().iterator().next();
+        String id = result.allIds().iterator().next();
         certOrError = result.getCertOrError(id);
       }
 
       if (certOrError == null) {
         throw new CmdFailure("error, received neither certificate nor error");
-      } else if (certOrError.getError() != null) {
-        throw new CmdFailure(certOrError.getError().toString());
+      } else if (certOrError.error() != null) {
+        throw new CmdFailure(certOrError.error().toString());
       }
 
       saveVerbose("certificate saved to file", outputFile,
-          encodeCert(certOrError.getCertificate().getEncoded(), outform));
+          encodeCert(certOrError.certificate().getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -206,21 +206,21 @@ public class EnrollCertActions {
 
       CertifiedKeyPairOrError certOrError = null;
       if (result != null) {
-        String id = result.getAllIds().iterator().next();
+        String id = result.allIds().iterator().next();
         certOrError = result.getCertOrError(id);
       }
 
       if (certOrError == null) {
         throw new CmdFailure("error, received neither certificate nor error");
-      } else if (certOrError.getError() != null) {
-        throw new CmdFailure(certOrError.getError().toString());
+      } else if (certOrError.error() != null) {
+        throw new CmdFailure(certOrError.error().toString());
       }
 
-      X509Cert cert = Optional.ofNullable(certOrError.getCertificate())
+      X509Cert cert = Optional.ofNullable(certOrError.certificate())
           .orElseThrow(() -> new CmdFailure(
               "no certificate received from the server"));
       PrivateKeyInfo privateKeyInfo = Optional.ofNullable(
-          certOrError.getPrivateKeyInfo()).orElseThrow(
+          certOrError.privateKeyInfo()).orElseThrow(
               () -> new CmdFailure("no private key received from the server"));
 
       if (StringUtil.isNotBlank(certOutputFile)) {
@@ -228,7 +228,7 @@ public class EnrollCertActions {
             encodeCert(cert.getEncoded(), certOutform));
       }
 
-      X509Cert[] caCertChain = result.getCaCertChain();
+      X509Cert[] caCertChain = result.caCertChain();
       int size = caCertChain == null ? 1 : 1 + caCertChain.length;
       X509Certificate[] certchain = new X509Certificate[size];
       certchain[0] = cert.toJceCert();
@@ -341,7 +341,7 @@ public class EnrollCertActions {
       }
 
       if (hashAlgo != null) {
-        conf.putPair("hash", hashAlgo.getJceName());
+        conf.putPair("hash", hashAlgo.jceName());
       }
 
       if (mode != null) {
@@ -428,7 +428,7 @@ public class EnrollCertActions {
 
             sc.setCallback(callback);
           } else if (keySpec.isMontgomeryEC()) {
-            List<X509Cert> peerCerts = client.getDhPopPeerCertificates();
+            List<X509Cert> peerCerts = client.dhPopPeerCertificates();
             if (CollectionUtil.isNotEmpty(peerCerts)) {
               sc.setPeerCertificates(peerCerts);
             }
@@ -709,7 +709,7 @@ public class EnrollCertActions {
           sourceDataUri = new DERIA5String(biometricUri);
         }
         BiometricData biometricData = new BiometricData(objBiometricType,
-            objBiometricHashAlgo.getAlgorithmIdentifier(),
+            objBiometricHashAlgo.algorithmIdentifier(),
             new DEROctetString(biometricDataHash), sourceDataUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
@@ -826,7 +826,7 @@ public class EnrollCertActions {
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return getSigner().getCertificate().getSubjectPublicKeyInfo();
+      return getSigner().getCertificate().subjectPublicKeyInfo();
     }
 
     @Override
@@ -856,18 +856,18 @@ public class EnrollCertActions {
       CertifiedKeyPairOrError certOrError = null;
 
       if (result != null) {
-        String id = result.getAllIds().iterator().next();
+        String id = result.allIds().iterator().next();
         certOrError = result.getCertOrError(id);
       }
 
       if (certOrError == null) {
         throw new CmdFailure("error, received neither certificate nor error");
-      } else if (certOrError.getError() != null) {
-        throw new CmdFailure(certOrError.getError().toString());
+      } else if (certOrError.error() != null) {
+        throw new CmdFailure(certOrError.error().toString());
       }
 
       saveVerbose("saved certificate to file", outputFile,
-          encodeCert(certOrError.getCertificate().getEncoded(), outform));
+          encodeCert(certOrError.certificate().getEncoded(), outform));
 
       return null;
     } // method execute0

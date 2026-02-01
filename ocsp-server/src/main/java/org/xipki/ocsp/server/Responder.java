@@ -13,7 +13,6 @@ import java.util.List;
  * Implementation of {@link Responder}.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class Responder {
@@ -39,36 +38,36 @@ public class Responder {
     this.stores = Args.notEmpty(stores, "stores");
   }
 
-  ResponderOption getResponderOption() {
+  ResponderOption responderOption() {
     return responderOption;
   }
 
-  public RequestOption getRequestOption() {
+  public RequestOption requestOption() {
     return requestOption;
   }
 
-  public ResponseOption getResponseOption() {
+  public ResponseOption responseOption() {
     return responseOption;
   }
 
-  ResponseSigner getSigner() {
+  ResponseSigner signer() {
     return signer;
   }
 
-  public List<OcspStore> getStores() {
+  public List<OcspStore> stores() {
     return stores;
   }
 
-  public int getMaxRequestSize() {
-    return requestOption.getMaxRequestSize();
+  public int maxRequestSize() {
+    return requestOption.maxRequestSize();
   }
 
   public boolean supportsHttpGet() {
     return requestOption.supportsHttpGet();
   }
 
-  public Long getCacheMaxAge() {
-    return responseOption.getCacheMaxAge();
+  public Long cacheMaxAge() {
+    return responseOption.cacheMaxAge();
   }
 
 }

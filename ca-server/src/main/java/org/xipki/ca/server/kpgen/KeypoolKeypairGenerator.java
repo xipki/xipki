@@ -41,7 +41,6 @@ import java.util.Set;
 /**
  * Keypool based keypair generator.
  *
- * @since 6.0.0
  * @author Lijun Liao (xipki)
  */
 
@@ -53,13 +52,6 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     byte[] cipherText;
     byte[] pukData;
   }
-
-  /**
-   * XiPKI Keypool database query executor.
-   *
-   * @author Lijun Liao (xipki)
-   * @since 6.0.0
-   */
 
   private static class KeypoolQueryExecutor {
 
@@ -182,7 +174,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     this.shardId = shardId;
   }
 
-  public int getShardId() {
+  public int shardId() {
     return shardId;
   }
 

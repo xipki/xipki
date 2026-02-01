@@ -12,7 +12,6 @@ import java.util.Set;
  * Extensions checker.
  *
  * @author Lijun Liao
- *
  */
 
 public class CheckerUtil {

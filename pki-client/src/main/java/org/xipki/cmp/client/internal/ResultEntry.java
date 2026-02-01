@@ -17,7 +17,6 @@ import java.math.BigInteger;
  * Result entry.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 abstract class ResultEntry extends IdentifiedObject {

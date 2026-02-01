@@ -61,35 +61,35 @@ public class Asn1RSAPrivateKey {
     this.coefficient = Args.notNull(coefficient, "coefficient");
   }
 
-  public byte[] getModulus() {
+  public byte[] modulus() {
     return modulus;
   }
 
-  public byte[] getPublicExponent() {
+  public byte[] publicExponent() {
     return publicExponent;
   }
 
-  public byte[] getPrivateExponent() {
+  public byte[] privateExponent() {
     return privateExponent;
   }
 
-  public byte[] getPrime1() {
+  public byte[] prime1() {
     return prime1;
   }
 
-  public byte[] getPrime2() {
+  public byte[] prime2() {
     return prime2;
   }
 
-  public byte[] getExponent1() {
+  public byte[] exponent1() {
     return exponent1;
   }
 
-  public byte[] getExponent2() {
+  public byte[] exponent2() {
     return exponent2;
   }
 
-  public byte[] getCoefficient() {
+  public byte[] coefficient() {
     return coefficient;
   }
 

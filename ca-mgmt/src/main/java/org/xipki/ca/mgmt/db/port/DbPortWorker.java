@@ -34,7 +34,6 @@ import java.util.List;
  * Worker for database export / import.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public abstract class DbPortWorker extends DbWorker {

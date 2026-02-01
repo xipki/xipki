@@ -53,11 +53,11 @@ public class OcspConf {
     return logReqResp;
   }
 
-  public String getServerConf() {
+  public String serverConf() {
     return serverConf == null ? DFLT_SERVER_CONF : serverConf;
   }
 
-  public SecurityConf getSecurity() {
+  public SecurityConf security() {
     return security == null ? SecurityConf.DEFAULT : security;
   }
 

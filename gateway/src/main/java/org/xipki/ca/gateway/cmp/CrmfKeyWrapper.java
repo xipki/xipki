@@ -213,7 +213,7 @@ abstract class CrmfKeyWrapper {
       // KeyDerivationFunction
       AlgorithmIdentifier keyDerivationFunction = new AlgorithmIdentifier(
           OIDs.Misc.iso18033_kdf2,
-          new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
+          new AlgorithmIdentifier(HashAlgo.SHA1.oid()));
       vec.add(new DERTaggedObject(true, 0, keyDerivationFunction));
 
       // SymmetricEncryption
@@ -224,7 +224,7 @@ abstract class CrmfKeyWrapper {
       // MessageAuthenticationCode
       AlgorithmIdentifier mac = new AlgorithmIdentifier(
           OIDs.Secg.id_hmac_full_ecies,
-          new AlgorithmIdentifier(HashAlgo.SHA1.getOid()));
+          new AlgorithmIdentifier(HashAlgo.SHA1.oid()));
       vec.add(new DERTaggedObject(true, 2, mac));
       return new DERSequence(vec);
     }

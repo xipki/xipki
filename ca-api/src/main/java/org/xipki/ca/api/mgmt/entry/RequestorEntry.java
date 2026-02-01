@@ -38,7 +38,7 @@ public class RequestorEntry extends MgmtEntry {
 
   public RequestorEntry(NameId ident, String type, String conf) {
     this.ident = Args.notNull(ident, "ident");
-    String name = ident.getName();
+    String name = ident.name();
     if (RequestorInfo.NAME_BY_CA.equals(name)) {
       throw new IllegalArgumentException("Requestor name could not be " + name);
     }
@@ -58,15 +58,15 @@ public class RequestorEntry extends MgmtEntry {
     this.conf = conf;
   }
 
-  public NameId getIdent() {
+  public NameId ident() {
     return ident;
   }
 
-  public String getType() {
+  public String type() {
     return type;
   }
 
-  public String getConf() {
+  public String conf() {
     return conf;
   }
 
@@ -85,8 +85,8 @@ public class RequestorEntry extends MgmtEntry {
 
   public String toString(boolean verbose) {
     StringBuilder sb = new StringBuilder(500);
-    sb.append(  "id:     ").append(ident.getId());
-    sb.append("\nname:   ").append(ident.getName());
+    sb.append(  "id:     ").append(ident.id());
+    sb.append("\nname:   ").append(ident.name());
     sb.append("\ntype:   ").append(type);
 
     sb.append("\nconf:   ");

@@ -6,9 +6,7 @@ package org.xipki.security;
 /**
  *
  * @author Lijun Liao (xipki)
- * @since 6.0.0
  */
-
 public class KeyCertBytesPair {
 
   private final byte[] key;
@@ -20,11 +18,11 @@ public class KeyCertBytesPair {
     this.cert = cert;
   }
 
-  public byte[] getKey() {
+  public byte[] key() {
     return key;
   }
 
-  public byte[] getCert() {
+  public byte[] cert() {
     return cert;
   }
 }

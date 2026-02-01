@@ -49,11 +49,11 @@ public class ASRange extends ASN1Object {
     this.max = ASN1Integer.getInstance(seq.getObjectAt(1));
   }
 
-  public ASN1Integer getMin() {
+  public ASN1Integer min() {
     return min;
   }
 
-  public ASN1Integer getMax() {
+  public ASN1Integer max() {
     return max;
   }
 

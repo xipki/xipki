@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Process Logger.
  *
  * @author Lijun Liao (xipki)
- * @since 2.0.0
  */
 
 public class ProcessLog {
