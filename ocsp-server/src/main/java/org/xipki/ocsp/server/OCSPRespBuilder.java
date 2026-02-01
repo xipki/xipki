@@ -11,9 +11,10 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Hex;
 
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class OCSPRespBuilder {
   }
 
   public byte[] buildOCSPResponse(
-      ConcurrentContentSigner signer, TaggedCertSequence taggedCertSequence,
+      ConcurrentSigner signer, TaggedCertSequence taggedCertSequence,
       Instant producedAt) throws OCSPException, NoIdleSignerException {
     ResponseData responseData =
         new ResponseData(0, responderId, producedAt, list, responseExtensions);
@@ -80,23 +81,18 @@ public class OCSPRespBuilder {
     byte[] tbs = new byte[responseData.encodedLength()];
     responseData.write(tbs, 0);
 
-    XiContentSigner signer0 = signer.borrowSigner();
+    XiSigner signer0 = signer.borrowSigner();
 
     byte[] signature;
     byte[] sigAlgId;
-
     try {
-      OutputStream sigOut = signer0.getOutputStream();
       try {
-        sigOut.write(tbs);
-        sigOut.close();
-      } catch (IOException ex) {
+        signature = signer0.x509Sign(tbs);
+      } catch (XiSecurityException ex) {
         throw new OCSPException(
             "exception signing TBSRequest: " + ex.getMessage(), ex);
       }
-
-      signature = signer0.getSignature();
-      sigAlgId = signer0.getEncodedAlgorithmIdentifier();
+      sigAlgId = signer0.getEncodedX509AlgId();
     } finally {
       signer.requiteSigner(signer0);
     }

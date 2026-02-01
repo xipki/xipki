@@ -10,9 +10,14 @@ import java.io.OutputStream;
  * @author Lijun Liao (xipki)
  */
 public class NopOutputStream extends OutputStream {
+
+  public static final NopOutputStream INSTANCE = new NopOutputStream();
+
+  private NopOutputStream() {
+  }
+
   @Override
   public void write(int b) throws IOException {
-
   }
 
   @Override

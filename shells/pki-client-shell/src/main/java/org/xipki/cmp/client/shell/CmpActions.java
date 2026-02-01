@@ -11,7 +11,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
 import org.xipki.cmp.client.CmpClient;
 import org.xipki.cmp.client.Requestor;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -93,7 +93,7 @@ public class CmpActions {
           }
         }
 
-        ConcurrentContentSigner signer =
+        ConcurrentSigner signer =
             securityFactory.createSigner("PKCS12", sc, (X509Cert)  null);
 
         return new Requestor.SignatureCmpRequestor(signer);

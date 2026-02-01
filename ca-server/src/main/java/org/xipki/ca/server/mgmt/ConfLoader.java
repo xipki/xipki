@@ -17,7 +17,7 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -227,12 +227,12 @@ class ConfLoader {
           CaEntry entryB = manager.caInfos.get(caName).caEntry();
           if (caEntry.cert() == null && genSelfIssued != null) {
             SignerConf signerConf = new SignerConf(caEntry.signerConf());
-            ConcurrentContentSigner signer = null;
+            ConcurrentSigner signer = null;
             try {
               signer = securityFactory.createSigner(
                   caEntry.base().signerType(), signerConf,
                   (X509Cert) null);
-              caEntry.setCert(signer.getCertificate());
+              caEntry.setCert(signer.getX509Cert());
             } catch (ObjectCreationException ex) {
               throw new CaMgmtException(
                   "could not create signer for CA " + caName, ex);

@@ -9,11 +9,12 @@ import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
+import org.bouncycastle.operator.ContentSigner;
+import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.bc.compositekem.CompositeMLKEMPublicKey;
 import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.KemEncapKey;
@@ -46,7 +47,7 @@ public class P12KemMacContentSignerBuilder {
 
   private final AlgorithmIdentifier sigAlgId;
 
-  private final byte[] encodedSigAlgId;
+  private final byte[] encodedX509SigAlgId;
 
   public P12KemMacContentSignerBuilder(
       KeypairWithCert keypairWithCert, KemEncapKey encapKey)
@@ -69,7 +70,7 @@ public class P12KemMacContentSignerBuilder {
         publicKeyData = SubjectPublicKeyInfo.getInstance(
             publicKey.getEncoded()).getPublicKeyData().getOctets();
       } else {
-        publicKeyData = keypairWithCert.certificateChain()[0]
+        publicKeyData = keypairWithCert.x509CertChain()[0]
             .subjectPublicKeyInfo().getPublicKeyData().getOctets();
       }
 
@@ -86,91 +87,96 @@ public class P12KemMacContentSignerBuilder {
     try {
       this.sigAlgId = new AlgorithmIdentifier(
           OIDs.Xipki.id_alg_KEM_HMAC_SHA256);
-      this.encodedSigAlgId = sigAlgId.getEncoded();
+      this.encodedX509SigAlgId = sigAlgId.getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("error encoding AlgorithmIdentifier", ex);
     }
   }
 
-  public ConcurrentContentSigner createSigner(
-      SignAlgo signAlgo, int parallelism) throws XiSecurityException {
+  public ConcurrentSigner createSigner(SignAlgo signAlgo, int parallelism)
+      throws XiSecurityException {
     Args.notNull(signAlgo, "signAlgo");
     if (signAlgo != SignAlgo.KEM_HMAC_SHA256) {
       throw new XiSecurityException("unknown signAlgo " + signAlgo);
     }
 
-    List<XiContentSigner> signers = new ArrayList<>(
+    List<XiSigner> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = buildContentSigner();
+      HmacXiSigner macSigner = new HmacXiSigner(SignAlgo.HMAC_SHA256, macKey);
+      XiSigner signer = new MyX509Signer(macSigner);
       signers.add(signer);
     }
 
     final boolean mac = true;
-    DfltConcurrentContentSigner concurrentSigner;
+    DfltConcurrentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentContentSigner(
+      concurrentSigner = new DfltConcurrentSigner(
           mac, signers, keypairWithCert.getKey());
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
 
-    if (keypairWithCert.certificateChain() != null) {
-      concurrentSigner.setCertificateChain(
-          keypairWithCert.certificateChain());
+    if (keypairWithCert.x509CertChain() != null) {
+      concurrentSigner.setX509CertChain(keypairWithCert.x509CertChain());
     }
 
     return concurrentSigner;
   } // method createSigner
 
-  private XiContentSigner buildContentSigner() throws XiSecurityException {
-
-    HmacContentSigner macSigner =
-        new HmacContentSigner(SignAlgo.HMAC_SHA256, macKey);
-
-    return new XiContentSigner() {
-      @Override
-      public byte[] getEncodedAlgorithmIdentifier() {
-        return encodedSigAlgId.clone();
-      }
-
-      @Override
-      public AlgorithmIdentifier getAlgorithmIdentifier() {
-        return sigAlgId;
-      }
-
-      @Override
-      public OutputStream getOutputStream() {
-        return macSigner.getOutputStream();
-      }
-
-      /**
-       * X509 Signature Value
-       * <pre>
-       * SEQUENCE ::= {
-       *   id         UTF8String,
-       *   signature  OCTET STRING
-       * }
-       * </pre>
-       * @return the encoded signature value.
-       */
-      @Override
-      public byte[] getSignature() {
-        byte[] rawSignature = macSigner.getSignature();
-        try {
-          return new DERSequence(new ASN1Encodable[]{utf8Id,
-              new DEROctetString(rawSignature)}).getEncoded();
-        } catch (IOException e) {
-          throw new IllegalStateException("error encoding the DER signature");
-        }
-      }
-
-    };
-  }
-
   public PrivateKey getKey() {
     return keypairWithCert.getKey();
+  }
+
+  private class MyX509Signer implements XiSigner {
+
+    private final HmacXiSigner macSigner;
+
+    public MyX509Signer(HmacXiSigner macSigner) {
+      this.macSigner = macSigner;
+    }
+
+    @Override
+    public ContentSigner x509Signer() {
+      return new ContentSigner() {
+        @Override
+        public AlgorithmIdentifier getAlgorithmIdentifier() {
+          return sigAlgId;
+        }
+
+        @Override
+        public OutputStream getOutputStream() {
+          return macSigner.x509Signer().getOutputStream();
+        }
+
+        /**
+         * X509 Signature Value
+         * <pre>
+         * SEQUENCE ::= {
+         *   id         UTF8String,
+         *   signature  OCTET STRING
+         * }
+         * </pre>
+         * @return the encoded signature value.
+         */
+        @Override
+        public byte[] getSignature() {
+          byte[] rawSignature = macSigner.x509Signer().getSignature();
+          try {
+            return new DERSequence(new ASN1Encodable[]{utf8Id,
+                new DEROctetString(rawSignature)}).getEncoded();
+          } catch (IOException e) {
+            throw new IllegalStateException("error encoding the DER signature");
+          }
+        }
+      };
+    }
+
+    @Override
+    public byte[] getEncodedX509AlgId() {
+      return encodedX509SigAlgId.clone();
+    }
   }
 
 }

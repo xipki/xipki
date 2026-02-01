@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
- * Configuration of {@link ConcurrentContentSigner}.
+ * Configuration of {@link ConcurrentSigner}.
  *
  * @author Lijun Liao (xipki)
  */

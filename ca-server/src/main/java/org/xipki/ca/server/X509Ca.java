@@ -32,13 +32,13 @@ import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
 import org.xipki.security.X509Crl;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.OperationException;
@@ -85,7 +85,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
     private final boolean batch;
 
-    private final ConcurrentContentSigner signer;
+    private final ConcurrentSigner signer;
     private final Extensions extensions;
     private final IdentifiedCertprofile certprofile;
     private final Instant grantedNotBefore;
@@ -103,7 +103,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         IdentifiedCertprofile certprofile, Instant grantedNotBefore,
         Instant grantedNotAfter, X500Name requestedSubject,
         SubjectPublicKeyInfo grantedPublicKey, PrivateKeyInfo privateKey,
-        ConcurrentContentSigner signer, String warning) {
+        ConcurrentSigner signer, String warning) {
       this.batch = batch;
       this.certId = certId == null ? BigInteger.ZERO : certId;
       this.extensions = extensions;
@@ -608,7 +608,7 @@ public class X509Ca extends X509CaModule implements Closeable {
         certBuilder.addExtension(OIDs.Extn.id_precertificate, true,
             DERNull.INSTANCE);
 
-        XiContentSigner signer0;
+        XiSigner signer0;
         try {
           signer0 = gct.signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
@@ -617,7 +617,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
         X509CertificateHolder precert;
         try {
-          precert = certBuilder.build(signer0);
+          precert = certBuilder.build(signer0.x509Signer());
         } finally {
           // returns the signer after the signing so that it can be used by
           // others
@@ -649,7 +649,7 @@ public class X509Ca extends X509CaModule implements Closeable {
             extnSctCtrl.isCritical(), extnValue));
       }
 
-      XiContentSigner signer0;
+      XiSigner signer0;
       try {
         signer0 = gct.signer.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -658,7 +658,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
       X509CertificateHolder bcCert;
       try {
-        bcCert = certBuilder.build(signer0);
+        bcCert = certBuilder.build(signer0.x509Signer());
       } finally {
         gct.signer.requiteSigner(signer0);
       }
@@ -752,7 +752,7 @@ public class X509Ca extends X509CaModule implements Closeable {
   }
 
   public boolean healthy() {
-    ConcurrentContentSigner signer = caInfo.getSigner(null);
+    ConcurrentSigner signer = caInfo.getSigner(null);
 
     boolean healthy = true;
     if (signer != null) {

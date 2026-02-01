@@ -71,7 +71,7 @@ import org.xipki.cmp.client.PkiErrorException;
 import org.xipki.cmp.client.Requestor;
 import org.xipki.cmp.client.RevokeCertRequest;
 import org.xipki.cmp.client.UnsuspendCertRequest;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
@@ -209,7 +209,7 @@ class CmpAgent {
     }
 
     if (requestor instanceof Requestor.SignatureCmpRequestor) {
-      ConcurrentContentSigner signer =
+      ConcurrentSigner signer =
           ((Requestor.SignatureCmpRequestor) requestor).signer();
       try {
         return CmpUtil.addProtection(request, signer, requestor.name(),
@@ -773,7 +773,7 @@ class CmpAgent {
           byte[] decryptedValue;
           try {
             if (requestor instanceof Requestor.SignatureCmpRequestor) {
-              ConcurrentContentSigner requestSigner =
+              ConcurrentSigner requestSigner =
                   ((Requestor.SignatureCmpRequestor) requestor).signer();
 
               if (!(requestSigner.getSigningKey() instanceof PrivateKey)) {

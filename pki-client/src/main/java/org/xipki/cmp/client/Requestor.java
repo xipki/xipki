@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
 import org.xipki.util.codec.Args;
@@ -80,24 +80,24 @@ public abstract class Requestor {
 
   public static class SignatureCmpRequestor extends Requestor {
 
-    private final ConcurrentContentSigner signer;
+    private final ConcurrentSigner signer;
 
-    public SignatureCmpRequestor(ConcurrentContentSigner signer) {
+    public SignatureCmpRequestor(ConcurrentSigner signer) {
       super(getSignerSubject(signer));
       this.signer = signer;
     }
 
-    public ConcurrentContentSigner signer() {
+    public ConcurrentSigner signer() {
       return signer;
     }
 
-    private static X500Name getSignerSubject(ConcurrentContentSigner signer) {
-      if (Args.notNull(signer, "signer").getCertificate() == null) {
+    private static X500Name getSignerSubject(ConcurrentSigner signer) {
+      if (Args.notNull(signer, "signer").getX509Cert() == null) {
         throw new IllegalArgumentException(
             "requestor without certificate is not allowed");
       }
 
-      return signer.getCertificate().subject();
+      return signer.getX509Cert().subject();
     }
 
   } // class SignatureCmpRequestor

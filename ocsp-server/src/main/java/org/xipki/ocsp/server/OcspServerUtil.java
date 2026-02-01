@@ -14,7 +14,7 @@ import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.security.CertPathValidationModel;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -94,7 +94,7 @@ public class OcspServerUtil {
       sigAlgos = Collections.singletonList("");
     }
 
-    List<ConcurrentContentSigner> singleSigners =
+    List<ConcurrentSigner> singleSigners =
         new ArrayList<>(sigAlgos.size());
 
     String name = signerType.name();
@@ -107,7 +107,7 @@ public class OcspServerUtil {
           responderKeyConf;
 
       try {
-        ConcurrentContentSigner requestorSigner =
+        ConcurrentSigner requestorSigner =
             securityFactory.createSigner(responderSignerType,
                 new SignerConf(signerConf), explicitCertificateChain);
         singleSigners.add(requestorSigner);

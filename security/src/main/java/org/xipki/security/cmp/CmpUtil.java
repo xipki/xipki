@@ -23,9 +23,9 @@ import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.OIDs;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.misc.StringUtil;
@@ -152,7 +152,7 @@ public class CmpUtil {
   }
 
   public static PKIMessage addProtection(
-      PKIMessage pkiMessage, ConcurrentContentSigner signer,
+      PKIMessage pkiMessage, ConcurrentSigner signer,
       GeneralName signerName, boolean addSignerCert)
       throws CMPException, NoIdleSignerException {
     Args.notNull(pkiMessage, "pkiMessage");
@@ -162,7 +162,7 @@ public class CmpUtil {
     if (signerName != null) {
       tmpSignerName = signerName;
     } else {
-      X500Name x500Name = Optional.ofNullable(signer.getCertificate())
+      X500Name x500Name = Optional.ofNullable(signer.getX509Cert())
           .orElseThrow(() -> new IllegalArgumentException(
               "signer without certificate is not allowed"))
           .subject();
@@ -173,14 +173,14 @@ public class CmpUtil {
         pkiMessage, tmpSignerName, null);
 
     if (addSignerCert) {
-      X509CertificateHolder signerCert = signer.getCertificate().toBcCert();
+      X509CertificateHolder signerCert = signer.getX509Cert().toBcCert();
       builder.addCMPCertificate(signerCert);
     }
 
-    XiContentSigner signer0 = signer.borrowSigner();
+    XiSigner signer0 = signer.borrowSigner();
     ProtectedPKIMessage signedMessage;
     try {
-      signedMessage = builder.build(signer0);
+      signedMessage = builder.build(signer0.x509Signer());
     } finally {
       signer.requiteSigner(signer0);
     }

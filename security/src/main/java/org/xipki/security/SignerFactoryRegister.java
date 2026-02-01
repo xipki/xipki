@@ -9,7 +9,7 @@ import java.util.Set;
 
 /**
  * Interface to register {@link SignerFactory} and to create new
- * {@link ConcurrentContentSigner}.
+ * {@link ConcurrentSigner}.
  *
  * @author Lijun Liao (xipki)
  */
@@ -22,7 +22,7 @@ public interface SignerFactoryRegister {
   Set<String> supportedSignerTypes();
 
   /**
-   * Creates a new {@link ConcurrentContentSigner}.
+   * Creates a new {@link ConcurrentSigner}.
    *
    * @param securityFactory
    *          Security factory. Must not be {@code null}.
@@ -36,7 +36,7 @@ public interface SignerFactoryRegister {
    * @throws ObjectCreationException
    *           If signer could not be created.
    */
-  ConcurrentContentSigner newSigner(
+  ConcurrentSigner newSigner(
       SecurityFactory securityFactory, String type, SignerConf conf,
       X509Cert[] certificateChain) throws ObjectCreationException;
 

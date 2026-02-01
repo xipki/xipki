@@ -28,7 +28,7 @@ import org.xipki.ca.gateway.scep.ScepHttpServlet;
 import org.xipki.ca.gateway.scep.ScepProtocolConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.Securities;
 import org.xipki.security.X509Cert;
 import org.xipki.security.auth.RequestorAuthenticator;
@@ -405,14 +405,14 @@ public class GatewayHttpFilter implements XiHttpFilter {
       return null;
     }
 
-    ConcurrentContentSigner defaultSigner =
+    ConcurrentSigner defaultSigner =
         buildSigner(securities, signersConf.getDefault());
     List<CaNameSignerConf> signerConfs = signersConf.signers();
-    Map<String, ConcurrentContentSigner> signerMap = null;
+    Map<String, ConcurrentSigner> signerMap = null;
     if (signerConfs != null && !signerConfs.isEmpty()) {
       signerMap = new HashMap<>();
       for (CaNameSignerConf m : signerConfs) {
-        ConcurrentContentSigner signer = buildSigner(securities, m.signer());
+        ConcurrentSigner signer = buildSigner(securities, m.signer());
         for (String name : m.names()) {
           signerMap.put(name, signer);
         }
@@ -422,7 +422,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     return new CaNameSigners(defaultSigner, signerMap);
   }
 
-  private static ConcurrentContentSigner buildSigner(
+  private static ConcurrentSigner buildSigner(
       Securities securities, SignerConf signerConf)
       throws InvalidConfException, ObjectCreationException {
     return (signerConf == null) ? null

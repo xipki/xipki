@@ -6,7 +6,7 @@ package org.xipki.security.pkcs12;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jcajce.interfaces.XDHPublicKey;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -61,7 +61,7 @@ public class P12SignerFactory implements SignerFactory {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(
+  public ConcurrentSigner newSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (!canCreateSigner(type)) {
@@ -96,7 +96,7 @@ public class P12SignerFactory implements SignerFactory {
             keystoreStream, password, keyLabel, password, certificateChain);
         if (sigAlgo == null) {
           SubjectPublicKeyInfo pkInfo = keypairWithCert
-              .certificateChain()[0].subjectPublicKeyInfo();
+              .x509CertChain()[0].subjectPublicKeyInfo();
           sigAlgo = conf.callback().getSignAlgo(
                       KeySpec.ofPublicKey(pkInfo), conf.mode());
           conf.setAlgo(sigAlgo);
@@ -105,14 +105,14 @@ public class P12SignerFactory implements SignerFactory {
         PublicKey publicKey = keypairWithCert.publicKey();
 
         if (publicKey instanceof XDHPublicKey) {
-          P12XdhMacContentSignerBuilder signerBuilder =
+          P12XdhMacSignerBuilder signerBuilder =
               getP12XdhMacContentSignerBuilder(conf, keypairWithCert);
           return signerBuilder.createSigner(parallelism);
         }
 
         if (SignAlgo.KEM_HMAC_SHA256 == sigAlgo) {
           SubjectPublicKeyInfo publicKeyInfo = keypairWithCert
-              .certificateChain()[0].subjectPublicKeyInfo();
+              .x509CertChain()[0].subjectPublicKeyInfo();
           P12KemMacContentSignerBuilder signerBuilder =
               new P12KemMacContentSignerBuilder(keypairWithCert,
                   conf.callback().generateKemEncapKey(
@@ -132,7 +132,7 @@ public class P12SignerFactory implements SignerFactory {
     }
   } // method newSigner
 
-  private static P12XdhMacContentSignerBuilder getP12XdhMacContentSignerBuilder(
+  private static P12XdhMacSignerBuilder getP12XdhMacContentSignerBuilder(
       SignerConf conf, KeypairWithCert keypairWithCert)
       throws ObjectCreationException, XiSecurityException {
     // peer certificate is needed
@@ -141,7 +141,7 @@ public class P12SignerFactory implements SignerFactory {
       throw new ObjectCreationException("no peer certificate is specified");
     }
 
-    X509Cert myCert = keypairWithCert.certificateChain()[0];
+    X509Cert myCert = keypairWithCert.x509CertChain()[0];
     X509Cert peerCert = null;
 
     AlgorithmIdentifier myKeyAlg =
@@ -157,7 +157,7 @@ public class P12SignerFactory implements SignerFactory {
       throw new ObjectCreationException("could not find peer certificate");
     }
 
-    return new P12XdhMacContentSignerBuilder(keypairWithCert, peerCert);
+    return new P12XdhMacSignerBuilder(keypairWithCert, peerCert);
   }
 
   private char[] getPassword(String passwordHint)

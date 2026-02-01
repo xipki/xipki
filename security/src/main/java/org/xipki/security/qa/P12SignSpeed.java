@@ -5,7 +5,7 @@ package org.xipki.security.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -44,7 +44,7 @@ public final class P12SignSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.sign(data);
+          signer.x509sign(data);
           account(batch, 0);
         } catch (Exception ex) {
           LOG.error("P12SignSpeed.Tester.run()", ex);
@@ -59,7 +59,7 @@ public final class P12SignSpeed extends BenchmarkExecutor {
 
   private static final Logger LOG = LoggerFactory.getLogger(P12SignSpeed.class);
 
-  private final ConcurrentContentSigner signer;
+  private final ConcurrentSigner signer;
 
   public P12SignSpeed(SecurityFactory securityFactory, SignAlgo signAlgo,
                       KeySpec keySpec, int threads) throws Exception {

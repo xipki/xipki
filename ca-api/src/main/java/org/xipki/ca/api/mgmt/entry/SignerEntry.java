@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -38,9 +38,9 @@ public class SignerEntry extends MgmtEntry {
 
   private X509Cert certificate;
 
-  private ConcurrentContentSigner signer;
+  private ConcurrentSigner signer;
 
-  public ConcurrentContentSigner signer() {
+  public ConcurrentSigner signer() {
     return signer;
   }
 
@@ -71,14 +71,14 @@ public class SignerEntry extends MgmtEntry {
     faulty = true;
     signer = securityFactory.createSigner(type,
         new SignerConf(conf), certificate);
-    if (signer.getCertificate() == null) {
+    if (signer.getX509Cert() == null) {
       throw new ObjectCreationException(
           "signer without certificate is not allowed");
     }
     faulty = false;
 
     if (certificate == null) {
-      setCertificate(signer.getCertificate());
+      setCertificate(signer.getX509Cert());
     }
   } // method initSigner
 

@@ -295,10 +295,10 @@ public class EnrollCertActions {
     @Option(name = "--module", description = "name of the PKCS#11 module")
     private String moduleName = "default";
 
-    private ConcurrentContentSigner signer;
+    private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentSigner getSigner()
         throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
@@ -368,10 +368,10 @@ public class EnrollCertActions {
         "PBE-encrypted.")
     private String passwordHint;
 
-    private ConcurrentContentSigner signer;
+    private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentSigner getSigner()
       throws ObjectCreationException, CmpClientException {
       if (signer == null) {
         char[] password;
@@ -821,26 +821,26 @@ public class EnrollCertActions {
       return rsaPss != null && rsaPss ? SignAlgoMode.RSAPSS : null;
     }
 
-    protected abstract ConcurrentContentSigner getSigner()
+    protected abstract ConcurrentSigner getSigner()
         throws ObjectCreationException, CmpClientException;
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return getSigner().getCertificate().subjectPublicKeyInfo();
+      return getSigner().getX509Cert().subjectPublicKeyInfo();
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
             throws Exception {
-      ConcurrentContentSigner signer = getSigner();
+      ConcurrentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
-      XiContentSigner signer0 = signer.borrowSigner();
+      XiSigner signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = popBuilder.build(signer0);
+        popSk = popBuilder.build(signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }

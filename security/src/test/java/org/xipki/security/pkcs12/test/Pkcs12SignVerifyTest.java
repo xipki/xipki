@@ -5,7 +5,7 @@ package org.xipki.security.pkcs12.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
@@ -29,7 +29,7 @@ import java.security.Signature;
  */
 public abstract class Pkcs12SignVerifyTest {
 
-  private ConcurrentContentSigner signer;
+  private ConcurrentSigner signer;
 
   protected Pkcs12SignVerifyTest() {
     if (Security.getProvider("BC") == null) {
@@ -47,7 +47,7 @@ public abstract class Pkcs12SignVerifyTest {
     return "1234";
   }
 
-  private ConcurrentContentSigner getSigner() throws Exception {
+  private ConcurrentSigner getSigner() throws Exception {
     if (signer != null) {
       return signer;
     }
@@ -77,12 +77,12 @@ public abstract class Pkcs12SignVerifyTest {
 
     byte[] signatureValue = sign(data);
     boolean signatureValid = verify(data, signatureValue,
-        getSigner().getCertificate());
+        getSigner().getX509Cert());
     Assert.assertTrue("Signature invalid", signatureValid);
   }
 
   protected byte[] sign(byte[] data) throws Exception {
-    return getSigner().sign(data);
+    return getSigner().x509sign(data);
   }
 
   protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)

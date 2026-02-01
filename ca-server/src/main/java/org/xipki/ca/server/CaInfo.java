@@ -17,7 +17,7 @@ import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -71,9 +71,9 @@ public class CaInfo {
 
   private final KeySpec caKeySpec;
 
-  private Map<SignAlgo, ConcurrentContentSigner> signers;
+  private Map<SignAlgo, ConcurrentSigner> signers;
 
-  private ConcurrentContentSigner dfltSigner;
+  private ConcurrentSigner dfltSigner;
 
   private final ConfPairs extraControl;
 
@@ -260,7 +260,7 @@ public class CaInfo {
     return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
   }
 
-  public ConcurrentContentSigner getSigner(List<SignAlgo> algos) {
+  public ConcurrentSigner getSigner(List<SignAlgo> algos) {
     if (CollectionUtil.isEmpty(algos)) {
       return dfltSigner;
     }
@@ -284,10 +284,10 @@ public class CaInfo {
     List<CaEntry.CaSignerConf> signerConfs =
         CaEntry.splitCaSignerConfs(caEntry.signerConf());
 
-    Map<SignAlgo, ConcurrentContentSigner> tmpSigners = new HashMap<>();
+    Map<SignAlgo, ConcurrentSigner> tmpSigners = new HashMap<>();
     for (CaEntry.CaSignerConf m : signerConfs) {
       SignerConf signerConf = new SignerConf(m.conf());
-      ConcurrentContentSigner signer;
+      ConcurrentSigner signer;
       try {
         signer = securityFactory.createSigner(caEntry.base().signerType(),
             signerConf, caEntry.cert());
@@ -299,7 +299,7 @@ public class CaInfo {
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "could not initialize the CA signer for CA "
             + caEntry.ident().name());
-        for (ConcurrentContentSigner ccs : tmpSigners.values()) {
+        for (ConcurrentSigner ccs : tmpSigners.values()) {
           ccs.close();
         }
         tmpSigners.clear();

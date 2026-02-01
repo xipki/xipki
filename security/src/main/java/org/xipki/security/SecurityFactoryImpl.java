@@ -119,14 +119,14 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   @Override
-  public ConcurrentContentSigner createSigner(
+  public ConcurrentSigner createSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (csrControl() != null && conf.peerCertificates() == null) {
       conf.setPeerCertificates(csrControl().peerCerts());
     }
 
-    ConcurrentContentSigner signer = signerFactoryRegister.newSigner(
+    ConcurrentSigner signer = signerFactoryRegister.newSigner(
         this, type, conf, certificateChain);
     if (!signer.isMac()) {
       validateSigner(signer, type, conf);
@@ -226,7 +226,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
   } // method getSecureRandom
 
   private static void validateSigner(
-      ConcurrentContentSigner signer, String signerType, SignerConf signerConf)
+      ConcurrentSigner signer, String signerType, SignerConf signerConf)
       throws ObjectCreationException {
     if (signer.getPublicKey() == null) {
       return;
@@ -243,7 +243,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
         verifier = Signature.getInstance(signatureAlgo.jceName());
       }
 
-      byte[] signatureValue = signer.sign(dummyContent);
+      byte[] signatureValue = signer.x509sign(dummyContent);
       verifier.initVerify(signer.getPublicKey());
       verifier.update(dummyContent);
       boolean valid = verifier.verify(signatureValue);
@@ -259,7 +259,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
         }
         copy.setAlgo(signatureAlgo);
         sb.append("conf='").append(copy.conf());
-        X509Cert cert = signer.getCertificate();
+        X509Cert cert = signer.getX509Cert();
         if (cert != null) {
           sb.append("', certificate subject='").append(cert.subjectText())
               .append("'");

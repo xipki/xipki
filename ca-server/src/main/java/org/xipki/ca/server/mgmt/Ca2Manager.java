@@ -38,7 +38,7 @@ import org.xipki.ca.server.CtLogClient;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyCertBytesPair;
 import org.xipki.security.OIDs;
@@ -288,16 +288,16 @@ class Ca2Manager {
           CaEntry.splitCaSignerConfs(caEntry.signerConf());
       for (CaSignerConf m : signerConfs) {
         SignerConf signerConf = new SignerConf(m.conf());
-        ConcurrentContentSigner signer = securityFactory.createSigner(
+        ConcurrentSigner signer = securityFactory.createSigner(
             base.signerType(), signerConf, caEntry.cert());
 
         try {
           if (caEntry.cert() == null) {
-            if (signer.getCertificate() == null) {
+            if (signer.getX509Cert() == null) {
               throw new CaMgmtException(
                   "CA signer without certificate is not allowed");
             }
-            caEntry.setCert(signer.getCertificate());
+            caEntry.setCert(signer.getX509Cert());
           }
         } finally {
           signer.close();

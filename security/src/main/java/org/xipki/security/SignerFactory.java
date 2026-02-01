@@ -8,7 +8,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Factory to create {@link ConcurrentContentSigner}.
+ * Factory to create {@link ConcurrentSigner}.
  *
  * @author Lijun Liao (xipki)
  */
@@ -42,7 +42,7 @@ public interface SignerFactory {
    * @throws ObjectCreationException
    *         if signer could not be created.
    */
-  ConcurrentContentSigner newSigner(
+  ConcurrentSigner newSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException;
 

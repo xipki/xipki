@@ -7,12 +7,12 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.cert.X509v2CRLBuilder;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.OIDs;
 import org.xipki.security.Securities;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.util.io.IoUtil;
 
 import java.math.BigInteger;
@@ -44,11 +44,11 @@ public class CrlTestVectorGenerateMain {
           .setPassword("1234")
           .setKeystore("file:src/test/resources/crls/ca.p12");
 
-      ConcurrentContentSigner csigner = securities.securityFactory()
+      ConcurrentSigner csigner = securities.securityFactory()
           .createSigner("PKCS12", conf, (X509Cert) null);
-      X509Cert caCert = csigner.getCertificate();
+      X509Cert caCert = csigner.getX509Cert();
 
-      XiContentSigner signer = csigner.borrowSigner();
+      XiSigner signer = csigner.borrowSigner();
       // no revoked certs
       X509v2CRLBuilder builder = getBuilder(caCert, true, true);
       buildCrl(builder, signer, "no-revoked-certs.crl");
@@ -90,9 +90,9 @@ public class CrlTestVectorGenerateMain {
   }
 
   private static void buildCrl(
-      X509v2CRLBuilder builder, XiContentSigner signer, String fn)
+      X509v2CRLBuilder builder, XiSigner signer, String fn)
       throws Exception {
-    byte[] encoded = builder.build(signer).getEncoded();
+    byte[] encoded = builder.build(signer.x509Signer()).getEncoded();
     IoUtil.save("output/" + fn, encoded);
   }
 

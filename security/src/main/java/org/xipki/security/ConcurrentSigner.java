@@ -16,7 +16,7 @@ import java.security.SignatureException;
  *
  * @author Lijun Liao (xipki)
  */
-public interface ConcurrentContentSigner {
+public interface ConcurrentSigner {
 
   String getName();
 
@@ -45,7 +45,7 @@ public interface ConcurrentContentSigner {
 
   PublicKey getPublicKey();
 
-  X509Cert getCertificate();
+  X509Cert getX509Cert();
 
   /**
    * Set the CertificateChain.
@@ -53,9 +53,9 @@ public interface ConcurrentContentSigner {
    * @param certchain
    *          Certificate chain of this signer. Could be {@code null}.
    */
-  void setCertificateChain(X509Cert[] certchain);
+  void setX509CertChain(X509Cert[] certchain);
 
-  X509Cert[] getCertificateChain();
+  X509Cert[] getX509CertChain();
 
   /**
    * Initializes me.
@@ -76,7 +76,8 @@ public interface ConcurrentContentSigner {
    * @throws SignatureException
    *         If could not sign the data.
    */
-  byte[] sign(byte[] data) throws NoIdleSignerException, SignatureException;
+  byte[] x509sign(byte[] data)
+      throws NoIdleSignerException, SignatureException;
 
   /**
    * Sign the data.
@@ -88,7 +89,8 @@ public interface ConcurrentContentSigner {
    * @throws SignatureException
    *         If could not sign the data.
    */
-  byte[][] sign(byte[][] data) throws NoIdleSignerException, SignatureException;
+  byte[][] x509sign(byte[][] data)
+      throws NoIdleSignerException, SignatureException;
 
   /**
    * Borrows a signer with implementation-dependent default timeout.
@@ -96,7 +98,7 @@ public interface ConcurrentContentSigner {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    */
-  XiContentSigner borrowSigner() throws NoIdleSignerException;
+  XiSigner borrowSigner() throws NoIdleSignerException;
 
   /**
    * Borrows a signer with the given {@code soTimeout}.
@@ -105,9 +107,9 @@ public interface ConcurrentContentSigner {
    * @throws NoIdleSignerException
    *         If no idle signer is available
    */
-  XiContentSigner borrowSigner(int soTimeout) throws NoIdleSignerException;
+  XiSigner borrowSigner(int soTimeout) throws NoIdleSignerException;
 
-  void requiteSigner(XiContentSigner signer);
+  void requiteSigner(XiSigner signer);
 
   boolean isHealthy();
 

@@ -14,7 +14,7 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -244,10 +244,10 @@ public class CaConf {
                     new SignerConf(signerConfs.get(0).conf());
 
                 String signerType = ci.base().signerType();
-                ConcurrentContentSigner signer = securityFactory.createSigner(
+                ConcurrentSigner signer = securityFactory.createSigner(
                     signerType, signerConf, (X509Cert) null);
                 try {
-                  caCert = signer.getCertificate();
+                  caCert = signer.getX509Cert();
                 } finally {
                   signer.close();
                 }

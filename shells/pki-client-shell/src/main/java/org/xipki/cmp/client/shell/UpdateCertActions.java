@@ -29,14 +29,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgoMode;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -174,10 +174,10 @@ public class UpdateCertActions {
     @Option(name = "--module", description = "name of the PKCS#11 module")
     private String moduleName = "default";
 
-    private ConcurrentContentSigner signer;
+    private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentSigner getSigner()
         throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
@@ -246,10 +246,10 @@ public class UpdateCertActions {
         "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
     private String passwordHint;
 
-    private ConcurrentContentSigner signer;
+    private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentSigner getSigner()
         throws ObjectCreationException {
       if (signer == null) {
         char[] password;
@@ -398,12 +398,12 @@ public class UpdateCertActions {
      * @throws ObjectCreationException
      *           if no signer can be built.
      */
-    protected abstract ConcurrentContentSigner getSigner()
+    protected abstract ConcurrentSigner getSigner()
         throws ObjectCreationException;
 
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return embedsPulibcKey
-          ? getSigner().getCertificate().subjectPublicKeyInfo()
+          ? getSigner().getX509Cert().subjectPublicKeyInfo()
           : null;
     } // method getPublicKey
 
@@ -411,14 +411,14 @@ public class UpdateCertActions {
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
         throws Exception {
-      ConcurrentContentSigner signer = getSigner();
+      ConcurrentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
-      XiContentSigner signer0 = signer.borrowSigner();
+      XiSigner signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = popBuilder.build(signer0);
+        popSk = popBuilder.build(signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }

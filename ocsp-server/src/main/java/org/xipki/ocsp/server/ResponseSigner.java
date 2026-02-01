@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
@@ -31,9 +31,9 @@ import java.util.Map.Entry;
 
 class ResponseSigner {
 
-  private final Map<SignAlgo, ConcurrentContentSigner> algoSignerMap;
+  private final Map<SignAlgo, ConcurrentSigner> algoSignerMap;
 
-  private final List<ConcurrentContentSigner> signers;
+  private final List<ConcurrentSigner> signers;
 
   private final TaggedCertSequence sequenceOfCert;
 
@@ -49,10 +49,10 @@ class ResponseSigner {
 
   private final boolean macSigner;
 
-  ResponseSigner(List<ConcurrentContentSigner> signers)
+  ResponseSigner(List<ConcurrentSigner> signers)
       throws CertificateException, IOException {
     this.signers = Args.notEmpty(signers, "signers");
-    ConcurrentContentSigner firstSigner = signers.get(0);
+    ConcurrentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
 
     if (this.macSigner) {
@@ -65,7 +65,7 @@ class ResponseSigner {
       byte[] keySha1 = firstSigner.getSha1OfMacKey();
       this.responderIdByKey = new ResponderID(keySha1);
     } else {
-      X509Cert[] tmpCertChain = firstSigner.getCertificateChain();
+      X509Cert[] tmpCertChain = firstSigner.getX509CertChain();
       if (tmpCertChain == null || tmpCertChain.length == 0) {
         throw new CertificateException(
             "no certificate is bound with the signer");
@@ -100,7 +100,7 @@ class ResponseSigner {
     }
 
     algoSignerMap = new HashMap<>();
-    for (ConcurrentContentSigner signer : signers) {
+    for (ConcurrentSigner signer : signers) {
       SignAlgo algo = signer.getAlgorithm();
       algoSignerMap.put(algo, signer);
     }
@@ -110,11 +110,11 @@ class ResponseSigner {
     return macSigner;
   }
 
-  public ConcurrentContentSigner getFirstSigner() {
+  public ConcurrentSigner getFirstSigner() {
     return signers.get(0);
   }
 
-  public ConcurrentContentSigner getSignerForPreferredSigAlgs(
+  public ConcurrentSigner getSignerForPreferredSigAlgs(
       List<AlgorithmIdentifier> prefSigAlgs) {
     if (prefSigAlgs == null) {
       return signers.get(0);
@@ -125,7 +125,7 @@ class ResponseSigner {
         // return any RSAPSS with MGF1 algorithms
         ASN1Encodable params = sigAlgId.getParameters();
         if (params == null) {
-          for (Entry<SignAlgo, ConcurrentContentSigner> entry
+          for (Entry<SignAlgo, ConcurrentSigner> entry
               : algoSignerMap.entrySet()) {
             SignAlgo m = entry.getKey();
             if (m.isRSAPSSMGF1SigAlgo()) {
@@ -171,7 +171,7 @@ class ResponseSigner {
   }
 
   public boolean isHealthy() {
-    for (ConcurrentContentSigner signer : signers) {
+    for (ConcurrentSigner signer : signers) {
       if (!signer.isHealthy()) {
         return false;
       }

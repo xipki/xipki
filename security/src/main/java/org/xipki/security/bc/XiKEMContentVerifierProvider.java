@@ -16,7 +16,7 @@ import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.HmacContentSigner;
+import org.xipki.security.pkcs12.HmacXiSigner;
 import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
@@ -37,12 +37,12 @@ public class XiKEMContentVerifierProvider implements ContentVerifierProvider {
 
     private final AlgorithmIdentifier algId;
 
-    private final HmacContentSigner verifier;
+    private final HmacXiSigner verifier;
 
     private MyContentVerifier(AlgorithmIdentifier algId)
         throws XiSecurityException {
       this.algId = algId;
-      this.verifier = new HmacContentSigner(SignAlgo.HMAC_SHA256, macKey);
+      this.verifier = new HmacXiSigner(SignAlgo.HMAC_SHA256, macKey);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class XiKEMContentVerifierProvider implements ContentVerifierProvider {
 
     @Override
     public OutputStream getOutputStream() {
-      return verifier.getOutputStream();
+      return verifier.x509Signer().getOutputStream();
     }
 
     @Override
@@ -61,7 +61,7 @@ public class XiKEMContentVerifierProvider implements ContentVerifierProvider {
       // id: will be used to identify the mackey. not used currently.
       // ASN1UTF8String id = (ASN1UTF8String) seq.getObjectAt(0);
       byte[] rawSignature = ((ASN1OctetString) seq.getObjectAt(1)).getOctets();
-      byte[] computedMacValue = verifier.getSignature();
+      byte[] computedMacValue = verifier.x509Signer().getSignature();
       return Arrays.equals(rawSignature, computedMacValue);
     }
 

@@ -3,6 +3,7 @@
 
 package org.xipki.security;
 
+import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.exception.NoIdleSignerException;
@@ -25,20 +26,20 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * An implementation of {@link ConcurrentContentSigner}.
+ * An implementation of {@link ConcurrentSigner}.
  *
  * @author Lijun Liao (xipki)
  */
-public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
+public class DfltConcurrentSigner implements ConcurrentSigner {
 
   private static final Logger LOG = LoggerFactory.getLogger(
-      DfltConcurrentContentSigner.class);
+      DfltConcurrentSigner.class);
 
   private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
 
   private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
-  private final ArrayBlockingQueue<XiContentSigner> signers;
+  private final ArrayBlockingQueue<XiSigner> signers;
 
   private final String name;
 
@@ -70,20 +71,20 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
     }
   } // method static
 
-  public DfltConcurrentContentSigner(
-      boolean mac, List<XiContentSigner> signers)
+  public DfltConcurrentSigner(
+      boolean mac, List<XiSigner> signers)
       throws NoSuchAlgorithmException {
     this(mac, signers, null);
   }
 
-  public DfltConcurrentContentSigner(
-      boolean mac, List<XiContentSigner> signers, Key signingKey)
+  public DfltConcurrentSigner(
+      boolean mac, List<XiSigner> signers, Key signingKey)
       throws NoSuchAlgorithmException {
     Args.notEmpty(signers, "signers");
 
     this.mac = mac;
-    this.algorithm = SignAlgo.getInstance(signers.get(0)
-        .getAlgorithmIdentifier());
+    this.algorithm = SignAlgo.getInstance(
+        signers.get(0).x509Signer().getAlgorithmIdentifier());
     this.signers = new ArrayBlockingQueue<>(signers.size());
     this.signers.addAll(signers);
 
@@ -123,7 +124,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public XiContentSigner borrowSigner() throws NoIdleSignerException {
+  public XiSigner borrowSigner() throws NoIdleSignerException {
     return borrowSigner(defaultSignServiceTimeout);
   }
 
@@ -133,9 +134,9 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
    * @param soTimeout timeout in milliseconds, 0 for infinitely.
    */
   @Override
-  public XiContentSigner borrowSigner(int soTimeout)
+  public XiSigner borrowSigner(int soTimeout)
       throws NoIdleSignerException {
-    XiContentSigner signer = null;
+    XiSigner signer = null;
     try {
       signer = signers.poll(soTimeout, TimeUnit.MILLISECONDS);
     } catch (InterruptedException ex) {
@@ -146,7 +147,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public void requiteSigner(XiContentSigner signer) {
+  public void requiteSigner(XiSigner signer) {
     signers.add(signer);
   }
 
@@ -160,7 +161,7 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public void setCertificateChain(X509Cert[] certificateChain) {
+  public void setX509CertChain(X509Cert[] certificateChain) {
     if (CollectionUtil.isEmpty(certificateChain)) {
       this.certificateChain = null;
       return;
@@ -181,24 +182,25 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public X509Cert getCertificate() {
+  public X509Cert getX509Cert() {
     return CollectionUtil.isEmpty(certificateChain) ? null
         : certificateChain[0];
   }
 
   @Override
-  public X509Cert[] getCertificateChain() {
+  public X509Cert[] getX509CertChain() {
     return certificateChain;
   }
 
   @Override
   public boolean isHealthy() {
-    XiContentSigner signer = null;
+    XiSigner signer = null;
     try {
       signer = borrowSigner();
-      OutputStream stream = signer.getOutputStream();
+      ContentSigner x509Signer = signer.x509Signer();
+      OutputStream stream = x509Signer.getOutputStream();
       stream.write(new byte[]{1, 2, 3, 4});
-      byte[] signature = signer.getSignature();
+      byte[] signature = x509Signer.getSignature();
       return signature != null && signature.length > 0;
     } catch (Exception ex) {
       LogUtil.error(LOG, ex);
@@ -215,39 +217,41 @@ public class DfltConcurrentContentSigner implements ConcurrentContentSigner {
   }
 
   @Override
-  public byte[] sign(byte[] data)
+  public byte[] x509sign(byte[] data)
       throws NoIdleSignerException, SignatureException {
-    XiContentSigner signer = borrowSigner();
+    XiSigner signer = borrowSigner();
     try {
-      OutputStream signatureStream = signer.getOutputStream();
+      ContentSigner x509Signer = signer.x509Signer();
+      OutputStream signatureStream = x509Signer.getOutputStream();
       try {
         signatureStream.write(data);
       } catch (IOException ex) {
         throw new SignatureException("could not write data to SignatureStream: "
             + ex.getMessage(), ex);
       }
-      return signer.getSignature();
+      return x509Signer.getSignature();
     } finally {
       requiteSigner(signer);
     }
   } // method sign
 
   @Override
-  public byte[][] sign(byte[][] data)
+  public byte[][] x509sign(byte[][] data)
       throws NoIdleSignerException, SignatureException {
     byte[][] signatures = new byte[data.length][];
-    XiContentSigner signer = borrowSigner();
+    XiSigner signer = borrowSigner();
 
     try {
+      ContentSigner x509Signer = signer.x509Signer();
       for (int i = 0; i < data.length; i++) {
-        OutputStream signatureStream = signer.getOutputStream();
+        OutputStream signatureStream = x509Signer.getOutputStream();
         try {
           signatureStream.write(data[i]);
         } catch (IOException ex) {
           throw new SignatureException("could not write data to " +
               "SignatureStream: " + ex.getMessage(), ex);
         }
-        signatures[i] = signer.getSignature();
+        signatures[i] = x509Signer.getSignature();
       }
     } finally {
       requiteSigner(signer);

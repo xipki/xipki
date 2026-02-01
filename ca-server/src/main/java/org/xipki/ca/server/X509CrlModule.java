@@ -23,13 +23,13 @@ import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.CrlReason;
 import org.xipki.security.KeyUsage;
 import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
 import org.xipki.security.X509Crl;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.util.X509Util;
@@ -660,10 +660,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         throw new OperationException(INVALID_EXTENSION, ex);
       }
 
-      ConcurrentContentSigner concurrentSigner = (crlSigner == null)
+      ConcurrentSigner concurrentSigner = (crlSigner == null)
           ? caInfo.getSigner(null) : crlSigner.signer();
 
-      XiContentSigner signer0;
+      XiSigner signer0;
       try {
         signer0 = concurrentSigner.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -673,7 +673,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
       X509Crl crl;
       try {
-        crl = new X509Crl(crlBuilder.build(signer0));
+        crl = new X509Crl(crlBuilder.build(signer0.x509Signer()));
       } finally {
         concurrentSigner.requiteSigner(signer0);
       }

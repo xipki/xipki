@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway;
 
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.misc.CollectionUtil;
@@ -20,12 +20,12 @@ import java.util.Set;
  */
 public class CaNameSigners {
 
-  private final ConcurrentContentSigner defaultSigner;
+  private final ConcurrentSigner defaultSigner;
 
-  private final Map<String, ConcurrentContentSigner> signers;
+  private final Map<String, ConcurrentSigner> signers;
 
-  public CaNameSigners(ConcurrentContentSigner defaultSigner,
-                       Map<String, ConcurrentContentSigner> signers)
+  public CaNameSigners(ConcurrentSigner defaultSigner,
+                       Map<String, ConcurrentSigner> signers)
       throws InvalidConfException {
     if (defaultSigner == null && CollectionUtil.isEmpty(signers)) {
       throw new InvalidConfException(
@@ -37,7 +37,7 @@ public class CaNameSigners {
       this.signers = null;
     } else {
       this.signers = new HashMap<>(signers.size() * 3 / 2);
-      for (Map.Entry<String, ConcurrentContentSigner> m : signers.entrySet()) {
+      for (Map.Entry<String, ConcurrentSigner> m : signers.entrySet()) {
         String name = m.getKey().toLowerCase(Locale.ROOT);
         if (this.signers.containsKey(name)) {
           throw new InvalidConfException(
@@ -48,10 +48,10 @@ public class CaNameSigners {
     }
   }
 
-  public ConcurrentContentSigner getSigner(String caName) {
+  public ConcurrentSigner getSigner(String caName) {
     String loName = Args.toNonBlankLower(caName, "caName");
     if (signers != null) {
-      ConcurrentContentSigner signer = signers.get(loName);
+      ConcurrentSigner signer = signers.get(loName);
       if (signer != null) {
         return signer;
       }
@@ -60,7 +60,7 @@ public class CaNameSigners {
     return defaultSigner;
   }
 
-  public ConcurrentContentSigner defaultSigner() {
+  public ConcurrentSigner defaultSigner() {
     return defaultSigner;
   }
 

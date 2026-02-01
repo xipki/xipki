@@ -29,7 +29,7 @@ import org.xipki.ca.server.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -720,7 +720,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
               CaEntry.splitCaSignerConfs(signerConf);
 
           for (CaSignerConf m : signerConfs) {
-            ConcurrentContentSigner ignored = securityFactory.createSigner(
+            ConcurrentSigner ignored = securityFactory.createSigner(
                 signerType, new SignerConf(m.conf()), caCert);
             ignored.close();
           }

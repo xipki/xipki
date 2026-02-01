@@ -29,7 +29,7 @@ import org.xipki.ocsp.server.store.IssuerEntry;
 import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.*;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
@@ -642,7 +642,7 @@ public class OcspServer implements Closeable {
         }
       }
 
-      ConcurrentContentSigner concurrentSigner = null;
+      ConcurrentSigner concurrentSigner = null;
       if (responder.responderOption().mode() != OcspMode.RFC2560) {
         ExtendedExtension extn = removeExtension(reqExtensions,
             OID.ID_PKIX_OCSP_PREFSIGALGS);

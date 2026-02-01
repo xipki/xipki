@@ -23,14 +23,14 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
@@ -70,7 +70,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
 
   private SecurityFactory securityFactory;
 
-  private ConcurrentContentSigner signer;
+  private ConcurrentSigner signer;
 
   private String confFile;
 
@@ -177,7 +177,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
   public void close() {
   }
 
-  private ConcurrentContentSigner signer() throws OcspRequestorException {
+  private ConcurrentSigner signer() throws OcspRequestorException {
     if (signer != null) {
       return signer;
     }
@@ -469,16 +469,16 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
       }
 
       if (requestOptions.isSignRequest()) {
-        ConcurrentContentSigner signer = signer();
+        ConcurrentSigner signer = signer();
 
-        reqBuilder.setRequestorName(signer.getCertificate().subject());
-        X509Cert[] certChain0 = signer.getCertificateChain();
+        reqBuilder.setRequestorName(signer.getX509Cert().subject());
+        X509Cert[] certChain0 = signer.getX509CertChain();
         Certificate[] certChain = new Certificate[certChain0.length];
         for (int i = 0; i < certChain.length; i++) {
           certChain[i] = certChain0[i].toBcCert().toASN1Structure();
         }
 
-        XiContentSigner signer0;
+        XiSigner signer0;
         try {
           signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
@@ -487,7 +487,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
         }
 
         try {
-          return reqBuilder.build(signer0, certChain);
+          return reqBuilder.build(signer0.x509Signer(), certChain);
         } finally {
           signer.requiteSigner(signer0);
         }

@@ -17,7 +17,7 @@ import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeyInfoPair;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
@@ -75,7 +75,7 @@ class GrandCertTemplateBuilder {
           "unknown cert profile " + certTemplate.certprofileName());
     }
 
-    ConcurrentContentSigner signer = Optional.ofNullable(
+    ConcurrentSigner signer = Optional.ofNullable(
             caInfo.getSigner(certprofile.signatureAlgorithms()))
         .orElseThrow(() -> new OperationException(ErrorCode.SYSTEM_FAILURE,
             "CA does not support any signature algorithm restricted by " +

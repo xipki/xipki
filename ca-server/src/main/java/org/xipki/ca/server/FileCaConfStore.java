@@ -26,7 +26,7 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
 import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
@@ -557,10 +557,10 @@ public class FileCaConfStore implements CaConfStore {
             CaEntry.splitCaSignerConfs(getValue(ci.signerConf(), baseDir));
         SignerConf signerConf = new SignerConf(signerConfs.get(0).conf());
 
-        ConcurrentContentSigner signer = securityFactory.createSigner(
+        ConcurrentSigner signer = securityFactory.createSigner(
             ci.base().signerType(), signerConf, (X509Cert) null);
         try {
-          caCert = signer.getCertificate();
+          caCert = signer.getX509Cert();
         } finally {
           signer.close();
         }

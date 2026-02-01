@@ -5,9 +5,10 @@ package org.xipki.security.pkcs12;
 
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.Arrays;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.io.IoUtil;
@@ -28,9 +29,15 @@ import java.security.SecureRandom;
  * AES GMAC signer.
  * @author Lijun Liao (xipki)
  */
-public class AESGmacContentSigner implements XiContentSigner {
+public class AESGmacContentSigner implements XiSigner {
 
-  private class AESGmacOutputStream extends OutputStream {
+  private static class AESGmacOutputStream extends OutputStream {
+
+    private final Cipher cipher;
+
+    AESGmacOutputStream(Cipher cipher) {
+      this.cipher = cipher;
+    }
 
     @Override
     public void write(int bb) throws IOException {
@@ -63,11 +70,11 @@ public class AESGmacContentSigner implements XiContentSigner {
 
   private final SecretKey signingKey;
 
-  private final OutputStream outputStream;
-
-  private final byte[] sigAlgIdTemplate;
+  private final byte[] x509SigAlgIdTemplate;
 
   private final int nonceOffset;
+
+  private final MyX509Signer x509Signer;
 
   public AESGmacContentSigner(SignAlgo signAlgo, SecretKey signingKey)
       throws XiSecurityException {
@@ -84,19 +91,18 @@ public class AESGmacContentSigner implements XiContentSigner {
         throw new XiSecurityException(ex2);
       }
     }
+
     this.cipher = cipher0;
-
     this.random = new SecureRandom();
-    this.outputStream = new AESGmacOutputStream();
 
-    GCMParameters params = new GCMParameters(nonce, tagByteLen);
+    final GCMParameters params = new GCMParameters(nonce, tagByteLen);
     try {
-      this.sigAlgIdTemplate =
+      this.x509SigAlgIdTemplate =
           new AlgorithmIdentifier(signAlgo.oid(), params).getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
-    this.nonceOffset = IoUtil.getIndex(sigAlgIdTemplate, nonce);
+    this.nonceOffset = IoUtil.getIndex(x509SigAlgIdTemplate, nonce);
 
     String message = "oid and singingKey do not match";
     int keyLen = signingKey.getEncoded().length;
@@ -118,28 +124,16 @@ public class AESGmacContentSigner implements XiContentSigner {
 
     // check the key.
     try {
-      cipher.init(Cipher.ENCRYPT_MODE, signingKey,
+      cipher0.init(Cipher.ENCRYPT_MODE, signingKey,
           new GCMParameterSpec(tagByteLen << 3, nonce));
     } catch (GeneralSecurityException ex) {
       throw new XiSecurityException(ex);
     }
+
+    this.x509Signer = new MyX509Signer();
   } // method AESGmacContentSigner
 
-  @Override
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return new AlgorithmIdentifier(signAlgo.oid(),
-        new GCMParameters(nonce, tagByteLen));
-  }
-
-  @Override
-  public byte[] getEncodedAlgorithmIdentifier() {
-    byte[] bytes = Arrays.copyOf(sigAlgIdTemplate, sigAlgIdTemplate.length);
-    System.arraycopy(nonce, 0, bytes, nonceOffset, nonceLen);
-    return bytes;
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
+  private void initCipher() {
     random.nextBytes(nonce);
     try {
       cipher.init(Cipher.ENCRYPT_MODE, signingKey,
@@ -147,24 +141,53 @@ public class AESGmacContentSigner implements XiContentSigner {
     } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
       throw new IllegalStateException(ex);
     }
-    return outputStream;
   }
 
   @Override
-  public byte[] getSignature() {
-    try {
-      return cipher.doFinal();
-    } catch (IllegalBlockSizeException ex) {
-      throw new IllegalStateException(
-          "IllegalBlockSizeException: " + ex.getMessage());
-    } catch (BadPaddingException ex) {
-      throw new IllegalStateException(
-          "BadPaddingException: " + ex.getMessage());
-    }
+  public ContentSigner x509Signer() {
+    return x509Signer;
+  }
+
+  @Override
+  public byte[] getEncodedX509AlgId() {
+    byte[] bytes = Arrays.copyOf(x509SigAlgIdTemplate,
+                      x509SigAlgIdTemplate.length);
+    System.arraycopy(nonce, 0, bytes, nonceOffset, nonceLen);
+    return bytes;
   }
 
   public byte[] nonce() {
     return nonce.clone();
+  }
+
+  private class MyX509Signer implements ContentSigner {
+
+    final AESGmacOutputStream outputStream = new AESGmacOutputStream(cipher);
+
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+      return new AlgorithmIdentifier(signAlgo.oid(),
+          new GCMParameters(nonce, tagByteLen));
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+      initCipher();
+      return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+      try {
+        return cipher.doFinal();
+      } catch (IllegalBlockSizeException ex) {
+        throw new IllegalStateException(
+            "IllegalBlockSizeException: " + ex.getMessage());
+      } catch (BadPaddingException ex) {
+        throw new IllegalStateException(
+            "BadPaddingException: " + ex.getMessage());
+      }
+    }
   }
 
 }

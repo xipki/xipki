@@ -37,13 +37,13 @@ public class KeypairWithCert {
 
   private final PublicKey publicKey;
 
-  private final X509Cert[] certificateChain;
+  private final X509Cert[] x509CertChain;
 
-  public KeypairWithCert(PrivateKey key, X509Cert[] certificateChain) {
+  public KeypairWithCert(PrivateKey key, X509Cert[] x509CertChain) {
     this.key = Args.notNull(key, "key");
-    this.certificateChain = Args.notNull(certificateChain, "certificateChain");
-    Args.min(certificateChain.length, "certificateChain.length", 1);
-    this.publicKey = certificateChain[0].publicKey();
+    this.x509CertChain = Args.notNull(x509CertChain, "x509CertChain");
+    Args.min(x509CertChain.length, "x509CertChain.length", 1);
+    this.publicKey = x509CertChain[0].publicKey();
   }
 
   /**
@@ -173,8 +173,8 @@ public class KeypairWithCert {
     return publicKey;
   }
 
-  public X509Cert[] certificateChain() {
-    return certificateChain;
+  public X509Cert[] x509CertChain() {
+    return x509CertChain;
   }
 
 }

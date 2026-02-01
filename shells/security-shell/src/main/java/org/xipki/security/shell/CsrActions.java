@@ -175,7 +175,7 @@ public class CsrActions {
      * @return the signer
      * @throws Exception If getting signer failed.
      */
-    protected abstract ConcurrentContentSigner getSigner() throws Exception;
+    protected abstract ConcurrentSigner getSigner() throws Exception;
 
     protected List<X509Cert> getPeerCertificates() {
       return securityFactory.csrControl().peerCerts();
@@ -188,12 +188,12 @@ public class CsrActions {
             "maximal one of cert and old-cert is allowed");
       }
 
-      ConcurrentContentSigner signer = getSigner();
+      ConcurrentSigner signer = getSigner();
 
       SubjectPublicKeyInfo subjectPublicKeyInfo =
-          (signer.getCertificate() == null)
+          (signer.getX509Cert() == null)
               ? KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey())
-              : signer.getCertificate().subjectPublicKeyInfo();
+              : signer.getX509Cert().subjectPublicKeyInfo();
 
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
@@ -388,7 +388,7 @@ public class CsrActions {
         }
 
         if (!updateOldCert) {
-          X509Cert signerCert = signer.getCertificate();
+          X509Cert signerCert = signer.getX509Cert();
           if (signerCert == null) {
             throw new IllegalCmdParamException("subject must be set");
           }
@@ -521,7 +521,7 @@ public class CsrActions {
     }
 
     private PKCS10CertificationRequest generateRequest(
-        ConcurrentContentSigner signer,
+        ConcurrentSigner signer,
         SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
         char[] challengePassword, List<Extension> extensions,
         Attribute... attrs) throws XiSecurityException {
@@ -559,7 +559,7 @@ public class CsrActions {
         }
       }
 
-      XiContentSigner signer0;
+      XiSigner signer0;
       try {
         signer0 = signer.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -567,7 +567,7 @@ public class CsrActions {
       }
 
       try {
-        return csrBuilder.build(signer0);
+        return csrBuilder.build(signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }
@@ -604,11 +604,11 @@ public class CsrActions {
     private String algo;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws Exception {
+    protected ConcurrentSigner getSigner() throws Exception {
       return getSigner(type, alias, algo, securityFactory);
     }
 
-    static ConcurrentContentSigner getSigner(
+    static ConcurrentSigner getSigner(
         String type, String alias, String algo,
         SecurityFactory securityFactory) throws Exception {
       SignerConf conf = getJceSignerConf(alias, 1,
@@ -657,13 +657,13 @@ public class CsrActions {
     private Boolean rsaPss = Boolean.FALSE;
 
     @Override
-    protected ConcurrentContentSigner getSigner() throws Exception {
+    protected ConcurrentSigner getSigner() throws Exception {
       SignAlgoMode mode = (rsaPss != null && rsaPss)
           ? SignAlgoMode.RSAPSS : null;
       return getSigner(moduleName, slotIndex, id, label, mode, securityFactory);
     }
 
-    ConcurrentContentSigner getSigner(
+    ConcurrentSigner getSigner(
         String moduleName, String slotIndex, String id, String label,
         SignAlgoMode mode, SecurityFactory securityFactory) throws Exception {
       byte[] idBytes = null;
@@ -752,7 +752,7 @@ public class CsrActions {
     }
 
     @Override
-    protected ConcurrentContentSigner getSigner()
+    protected ConcurrentSigner getSigner()
         throws ObjectCreationException {
       char[] pwd;
       try {

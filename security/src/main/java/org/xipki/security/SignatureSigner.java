@@ -4,6 +4,7 @@
 package org.xipki.security;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Args;
@@ -17,13 +18,19 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 /**
- * {@link XiContentSigner} based on {@link Signature}.
+ * {@link XiSigner} based on {@link Signature}.
  *
  * @author Lijun Liao (xipki)
  */
-public class SignatureSigner implements XiContentSigner {
+public class SignatureSigner implements XiSigner {
 
-  private class SignatureStream extends OutputStream {
+  private static class SignatureStream extends OutputStream {
+
+    private final Signature signer;
+
+    private SignatureStream(Signature signer) {
+      this.signer = signer;
+    }
 
     public byte[] getSignature() throws SignatureException {
       return signer.sign();
@@ -58,15 +65,9 @@ public class SignatureSigner implements XiContentSigner {
 
   } // class SignatureStream
 
-  private final AlgorithmIdentifier sigAlgId;
+  private final byte[] encodedX509SigAlgId;
 
-  private final byte[] encodedSigAlgId;
-
-  private final Signature signer;
-
-  private final SignatureStream stream = new SignatureStream();
-
-  private final PrivateKey key;
+  private final ContentSigner x509Signer;
 
   public SignatureSigner(SignAlgo sigAlgo, Signature signer, PrivateKey key)
       throws XiSecurityException {
@@ -76,44 +77,53 @@ public class SignatureSigner implements XiContentSigner {
   public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer,
                          PrivateKey key)
       throws XiSecurityException {
-    this.sigAlgId = Args.notNull(sigAlgId, "sigAlgId");
-    this.signer = Args.notNull(signer, "signer");
-    this.key = Args.notNull(key, "key");
+    Args.notNull(sigAlgId, "sigAlgId");
+    Args.notNull(signer, "signer");
+    Args.notNull(key, "key");
     try {
-      this.encodedSigAlgId = sigAlgId.getEncoded();
+      this.encodedX509SigAlgId = sigAlgId.getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
+
+    this.x509Signer = new ContentSigner() {
+      private final SignatureStream stream = new SignatureStream(signer);
+
+      @Override
+      public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return sigAlgId;
+      }
+
+      @Override
+      public OutputStream getOutputStream() {
+        try {
+          signer.initSign(key);
+        } catch (InvalidKeyException ex) {
+          throw new RuntimeOperatorException("could not initSign", ex);
+        }
+        return stream;
+      }
+
+      @Override
+      public byte[] getSignature() {
+        try {
+          return stream.getSignature();
+        } catch (SignatureException ex) {
+          throw new RuntimeOperatorException(
+              "exception obtaining signature: " + ex.getMessage(), ex);
+        }
+      }
+    };
   }
 
   @Override
-  public AlgorithmIdentifier getAlgorithmIdentifier() {
-    return sigAlgId;
+  public ContentSigner x509Signer() {
+    return x509Signer;
   }
 
   @Override
-  public byte[] getEncodedAlgorithmIdentifier() {
-    return Arrays.copyOf(encodedSigAlgId, encodedSigAlgId.length);
-  }
-
-  @Override
-  public OutputStream getOutputStream() {
-    try {
-      signer.initSign(key);
-    } catch (InvalidKeyException ex) {
-      throw new RuntimeOperatorException("could not initSign", ex);
-    }
-    return stream;
-  }
-
-  @Override
-  public byte[] getSignature() {
-    try {
-      return stream.getSignature();
-    } catch (SignatureException ex) {
-      throw new RuntimeOperatorException(
-          "exception obtaining signature: " + ex.getMessage(), ex);
-    }
+  public byte[] getEncodedX509AlgId() {
+    return Arrays.copyOf(encodedX509SigAlgId, encodedX509SigAlgId.length);
   }
 
 }

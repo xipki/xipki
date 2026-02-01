@@ -10,7 +10,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -49,7 +49,7 @@ public class P11SignSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.sign(data);
+          signer.x509sign(data);
           account(batch, 0);
         } catch (Exception ex) {
           LOG.error("P11SignSpeed.Tester.run()", ex);
@@ -64,7 +64,7 @@ public class P11SignSpeed extends BenchmarkExecutor {
 
   private final P11Slot slot;
 
-  private final ConcurrentContentSigner signer;
+  private final ConcurrentSigner signer;
 
   private final PKCS11KeyId keyId;
 

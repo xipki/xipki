@@ -22,6 +22,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiSigner;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.util.codec.Args;
@@ -568,11 +569,11 @@ public class GenerateCerts {
       KeyStoreAndCert keyStoreAndCert;
 
       if (keyCertConf.issuerName == null) {
-        ContentSigner contentSigner = KeyUtil.getContentSigner(
+        XiSigner signer = KeyUtil.getSigner(
             keyPair.getPrivate(), keyPair.getPublic(), random);
 
         keyStoreAndCert = generateSelfSignedCertificate(certType,
-            contentSigner, keyPair.getPrivate(), subjectPublicKeyInfo,
+            signer.x509Signer(), keyPair.getPrivate(), subjectPublicKeyInfo,
             genParams, subject, validity);
       } else {
         KeyWithCert caKeyCertPair =
@@ -581,10 +582,10 @@ public class GenerateCerts {
           throw new InvalidConfException(
               "unknown CA " + keyCertConf.issuerName);
         }
-        ContentSigner contentSigner = KeyUtil.getContentSigner(
+        XiSigner signer = KeyUtil.getSigner(
             caKeyCertPair.key(), caKeyCertPair.cert().publicKey(),
             random);
-        keyStoreAndCert = generateCertificate(certType, contentSigner,
+        keyStoreAndCert = generateCertificate(certType, signer.x509Signer(),
             caKeyCertPair.cert(), keyPair.getPrivate(),
             subjectPublicKeyInfo, genParams, subject, validity);
       }
@@ -674,11 +675,11 @@ public class GenerateCerts {
         KeyStoreAndCert keyStoreAndCert;
 
         if (keyCertConf.issuerName() == null) {
-          ContentSigner contentSigner = KeyUtil.getContentSigner(
+          XiSigner signer = KeyUtil.getSigner(
               keyPair.getPrivate(), keyPair.getPublic(), random, true);
 
           keyStoreAndCert = generateSelfSignedCertificate(certType,
-              contentSigner, keyPair.getPrivate(), subjectPublicKeyInfo,
+              signer.x509Signer(), keyPair.getPrivate(), subjectPublicKeyInfo,
               genParams, subject, validity);
         } else {
           KeyWithCert caKeyCertPair =
@@ -687,10 +688,9 @@ public class GenerateCerts {
             throw new InvalidConfException(
                 "unknown CA " + keyCertConf.issuerName());
           }
-          ContentSigner contentSigner =
-              KeyUtil.getContentSigner(caKeyCertPair.key(),
+          XiSigner signer = KeyUtil.getSigner(caKeyCertPair.key(),
               caKeyCertPair.cert().publicKey(), random);
-          keyStoreAndCert = generateCertificate(certType, contentSigner,
+          keyStoreAndCert = generateCertificate(certType, signer.x509Signer(),
               caKeyCertPair.cert(), keyPair.getPrivate(),
               subjectPublicKeyInfo, genParams, subject, validity);
         }

@@ -35,24 +35,23 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jcajce.spec.MLDSAParameterSpec;
 import org.bouncycastle.jcajce.spec.MLKEMParameterSpec;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.pkcs11.wrapper.Functions;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.X509Cert;
+import org.xipki.security.XiSigner;
 import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiKEMContentVerifierProvider;
 import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
 import org.xipki.security.bc.XiSignatureContentVerifierProvider;
-import org.xipki.security.bc.XiUnsignedSigner;
 import org.xipki.security.bc.XiXDHContentVerifierProvider;
 import org.xipki.security.bc.compositekem.CompositeKemKeyInfoConverter;
 import org.xipki.security.bc.compositekem.CompositeMLKEMPrivateKey;
@@ -330,11 +329,11 @@ public class KeyUtil {
     String dnStr = "CN=DUMMY";
     X500Name subjectDn = new X500Name(dnStr);
     SubjectPublicKeyInfo subjectPublicKeyInfo = kp.subjectPublicKeyInfo();
-    ContentSigner contentSigner;
+    XiSigner signer;
     if (params.unsigned() != null && params.unsigned()) {
-      contentSigner = XiUnsignedSigner.INSTANCE;
+      signer = XiUnsignedSigner.INSTANCE;
     } else {
-      contentSigner = getContentSigner(kp.keypair().getPrivate(),
+      signer = getSigner(kp.keypair().getPrivate(),
           kp.keypair().getPublic(), params.random(), true);
     }
 
@@ -357,7 +356,7 @@ public class KeyUtil {
         new ExtendedKeyUsage(new KeyPurposeId[]{
             KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_serverAuth}));
 
-    X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
+    X509Cert cert = new X509Cert(certGenerator.build(signer.x509Signer()));
 
     KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
     ks.load(null, params.password());
@@ -669,13 +668,13 @@ public class KeyUtil {
     return new XiSignatureContentVerifierProvider(publicKey);
   } // method getContentVerifierProvider
 
-  public static ContentSigner getContentSigner(
+  public static XiSigner getSigner(
       PrivateKey key, PublicKey publicKey, SecureRandom random)
       throws Exception {
-    return getContentSigner(key, publicKey, random, false);
+    return getSigner(key, publicKey, random, false);
   }
 
-  public static ContentSigner getContentSigner(
+  public static XiSigner getSigner(
       PrivateKey key, PublicKey publicKey, SecureRandom random,
       boolean allowUnsigned)
       throws Exception {
@@ -726,7 +725,7 @@ public class KeyUtil {
 
     P12ContentSignerBuilder builder =
         new P12ContentSignerBuilder(key, publicKey);
-    ConcurrentContentSigner csigner = builder.createSigner(algo, 1, random);
+    ConcurrentSigner csigner = builder.createSigner(algo, 1, random);
     return csigner.borrowSigner();
   } // method getContentSigner
 

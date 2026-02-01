@@ -18,7 +18,7 @@ import java.util.Set;
 
 /**
  * This is the core interface. It specifies the method to create
- * {@link ConcurrentContentSigner}, {@link ContentVerifierProvider},
+ * {@link ConcurrentSigner}, {@link ContentVerifierProvider},
  * to verify POP, to the random, etc.
  *
  * @author Lijun Liao (xipki)
@@ -45,7 +45,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  default ConcurrentContentSigner createSigner(
+  default ConcurrentSigner createSigner(
       String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException {
     X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
@@ -66,7 +66,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  ConcurrentContentSigner createSigner(
+  ConcurrentSigner createSigner(
       String type, SignerConf conf, X509Cert[] certs)
       throws ObjectCreationException;
 

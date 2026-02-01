@@ -42,7 +42,7 @@ import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.security.AlgorithmValidator;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
@@ -424,7 +424,7 @@ public abstract class BaseCmpResponder {
       }
     }
 
-    ConcurrentContentSigner signer = signers.getSigner(caName);
+    ConcurrentSigner signer = signers.getSigner(caName);
 
     GeneralName recipient = reqHeader.getRecipient();
     X500Name x500Name = getX500Name(recipient);
@@ -432,7 +432,7 @@ public abstract class BaseCmpResponder {
       RDN[] rdns = x500Name.getRDNs();
       // consider the empty DN
       if ((rdns != null && rdns.length > 0) // Not an empty DN
-          && !signer.getCertificate().subject().equals(x500Name)) {
+          && !signer.getX509Cert().subject().equals(x500Name)) {
         LOG.warn("tid={}: I am not the intended recipient, but '{}'",
             tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
@@ -674,7 +674,7 @@ public abstract class BaseCmpResponder {
   } // method verifyProtection
 
   private PKIMessage addProtection(
-      ConcurrentContentSigner signer, PKIMessage pkiMessage,
+      ConcurrentSigner signer, PKIMessage pkiMessage,
       AuditEvent event, Requestor requestor) {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {

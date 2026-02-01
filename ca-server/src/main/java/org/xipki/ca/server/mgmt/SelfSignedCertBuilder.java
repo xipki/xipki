@@ -16,12 +16,12 @@ import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
@@ -87,7 +87,7 @@ public class SelfSignedCertBuilder {
               "PKCS12 and JCEKS, is not specified"));
     }
 
-    ConcurrentContentSigner signer;
+    ConcurrentSigner signer;
     try {
       List<CaEntry.CaSignerConf> signerConfs =
           CaEntry.splitCaSignerConfs(signerConf);
@@ -127,7 +127,7 @@ public class SelfSignedCertBuilder {
   }
 
   private static X509Cert generateCertificate(
-      ConcurrentContentSigner signer, IdentifiedCertprofile certprofile,
+      ConcurrentSigner signer, IdentifiedCertprofile certprofile,
       String subject, BigInteger serialNumber, Instant notBefore,
       Instant notAfter)
       throws OperationException {
@@ -189,7 +189,7 @@ public class SelfSignedCertBuilder {
       PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject,
           grantedSubject, serialNumber, null, ski, null, null);
 
-      XiContentSigner signer0 = signer.borrowSigner();
+      XiSigner signer0 = signer.borrowSigner();
 
       ExtensionValues extensionTuples = certprofile.getExtensions(
           requestedSubject, grantedSubject, null, publicKeyInfo,
@@ -204,7 +204,7 @@ public class SelfSignedCertBuilder {
           certprofile.extensionControls());
       X509CertificateHolder certHolder;
       try {
-        certHolder = certBuilder.build(signer0);
+        certHolder = certBuilder.build(signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }

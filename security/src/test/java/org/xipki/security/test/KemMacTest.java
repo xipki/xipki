@@ -17,7 +17,7 @@ import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.encap.KemEncapsulation;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.HmacContentSigner;
+import org.xipki.security.pkcs12.HmacXiSigner;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 
@@ -106,11 +106,11 @@ public class KemMacTest {
 
       SecretKey macKey = new SecretKeySpec(secret, "AES");
 
-      HmacContentSigner verifier = new HmacContentSigner(
+      HmacXiSigner verifier = new HmacXiSigner(
           SignAlgo.HMAC_SHA256, macKey);
 
-      verifier.getOutputStream().write(data);
-      byte[] macValue = verifier.getSignature();
+      verifier.x509Signer().getOutputStream().write(data);
+      byte[] macValue = verifier.x509Signer().getSignature();
       boolean valid = Arrays.equals(rawSignature, macValue);
       Assert.assertTrue("signature invalid", valid);
     }

@@ -5,14 +5,14 @@ package org.xipki.security.pkcs11;
 
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignerConf;
 import org.xipki.security.SignerFactory;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Hex;
@@ -82,7 +82,7 @@ public class P11SignerFactory implements SignerFactory {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(
+  public ConcurrentSigner newSigner(
       String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
@@ -167,30 +167,30 @@ public class P11SignerFactory implements SignerFactory {
         }
       }
 
-      List<XiContentSigner> signers = new ArrayList<>(parallelism);
+      List<XiSigner> signers = new ArrayList<>(parallelism);
       PublicKey publicKey = null;
       if (certificateChain != null && certificateChain.length > 0) {
         publicKey = certificateChain[0].publicKey();
       }
 
       for (int i = 0; i < parallelism; i++) {
-        XiContentSigner signer;
+        XiSigner signer;
         if (compositeKey != null) {
-          signer = P11CompositeContentSigner.newInstance(compositeKey, algo,
+          signer = P11CompositeSigner.newInstance(compositeKey, algo,
                     securityFactory.random4Sign(), publicKey);
         } else {
-          signer = P11ContentSigner.newInstance(key, algo,
+          signer = P11XiSigner.newInstance(key, algo,
                     securityFactory.random4Sign(), publicKey);
         }
 
         signers.add(signer);
       }
 
-      DfltConcurrentContentSigner concurrentSigner =
-          new DfltConcurrentContentSigner(algo.isMac(), signers);
+      DfltConcurrentSigner concurrentSigner =
+          new DfltConcurrentSigner(algo.isMac(), signers);
 
       if (certificateChain != null) {
-        concurrentSigner.setCertificateChain(certificateChain);
+        concurrentSigner.setX509CertChain(certificateChain);
       } else {
         concurrentSigner.setPublicKey(
             key != null ? key.publicKey() : compositeKey.publicKey());

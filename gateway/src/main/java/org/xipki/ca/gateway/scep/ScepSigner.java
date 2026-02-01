@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.X509Cert;
 import org.xipki.security.scep.message.EnvelopedDataDecryptor;
 
@@ -24,20 +24,20 @@ public class ScepSigner {
 
   private final EnvelopedDataDecryptor decryptor;
 
-  public ScepSigner(ConcurrentContentSigner signer) {
+  public ScepSigner(ConcurrentSigner signer) {
     Key signingKey = signer.getSigningKey();
     if (!(signingKey instanceof PrivateKey)) {
       throw new IllegalArgumentException(
           "Unsupported signer type: the signing key is not a PrivateKey");
     }
 
-    if (!(signer.getCertificate().publicKey() instanceof RSAPublicKey)) {
+    if (!(signer.getX509Cert().publicKey() instanceof RSAPublicKey)) {
       throw new IllegalArgumentException(
           "The SCEP responder key is not RSA key");
     }
 
     this.key = (PrivateKey) signingKey;
-    this.cert = signer.getCertificate();
+    this.cert = signer.getX509Cert();
     this.decryptor = new EnvelopedDataDecryptor(
         new EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance(cert, key));
   }

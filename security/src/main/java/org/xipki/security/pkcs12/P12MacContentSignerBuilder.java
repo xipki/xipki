@@ -3,11 +3,11 @@
 
 package org.xipki.security.pkcs12;
 
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
@@ -84,23 +84,23 @@ public class P12MacContentSignerBuilder {
     }
   } // constructor
 
-  public ConcurrentContentSigner createSigner(SignAlgo sigAlgo, int parallelism)
+  public ConcurrentSigner createSigner(SignAlgo sigAlgo, int parallelism)
       throws XiSecurityException {
     Args.notNull(sigAlgo, "sigAlgo");
-    List<XiContentSigner> signers = new ArrayList<>(
+    List<XiSigner> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      XiContentSigner signer = sigAlgo.isGmac()
+      XiSigner signer = sigAlgo.isGmac()
           ? new AESGmacContentSigner(sigAlgo, key)
-          : new HmacContentSigner(sigAlgo, key);
+          : new HmacXiSigner(sigAlgo, key);
       signers.add(signer);
     }
 
     final boolean mac = true;
-    DfltConcurrentContentSigner concurrentSigner;
+    DfltConcurrentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
+      concurrentSigner = new DfltConcurrentSigner(mac, signers, key);
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }

@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.scep;
 
 import org.xipki.ca.gateway.CaNameSigners;
-import org.xipki.security.ConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
 import org.xipki.util.codec.Args;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class CaNameScepSigners {
   private final Map<String, ScepSigner> signers;
 
   public CaNameScepSigners(CaNameSigners signers) {
-    ConcurrentContentSigner signer = signers.defaultSigner();
+    ConcurrentSigner signer = signers.defaultSigner();
     this.defaultSigner = signer == null ? null : new ScepSigner(signer);
 
     this.signers = new HashMap<>();

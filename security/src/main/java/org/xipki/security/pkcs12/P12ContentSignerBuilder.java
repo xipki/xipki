@@ -17,18 +17,18 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
-import org.xipki.security.ConcurrentContentSigner;
-import org.xipki.security.DfltConcurrentContentSigner;
+import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.SignatureSigner;
 import org.xipki.security.X509Cert;
-import org.xipki.security.XiContentSigner;
-import org.xipki.security.XiWrappedContentSigner;
+import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.CollectionUtil;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -52,6 +52,29 @@ import java.util.List;
  */
 public class P12ContentSignerBuilder {
 
+  private static class MyXiSigner implements XiSigner {
+
+    private final byte[] encodedX509AlgId;
+
+    private final ContentSigner x509Signer;
+
+    public MyXiSigner(byte[] encodedX509AlgId, ContentSigner x509Signer) {
+      this.encodedX509AlgId =
+          Args.notNull(encodedX509AlgId, "encodedX509AlgId");
+      this.x509Signer = Args.notNull(x509Signer, "x509Signer");
+    }
+
+    @Override
+    public ContentSigner x509Signer() {
+      return x509Signer;
+    }
+
+    @Override
+    public byte[] getEncodedX509AlgId() {
+      return encodedX509AlgId.clone();
+    }
+  }
+
   private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
 
     private final SignAlgo signAlgo;
@@ -62,6 +85,7 @@ public class P12ContentSignerBuilder {
       this.signAlgo = signAlgo;
     }
 
+    @Override
     protected Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
@@ -91,6 +115,7 @@ public class P12ContentSignerBuilder {
       this.signAlgo = signAlgo;
     }
 
+    @Override
     protected Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
@@ -112,6 +137,7 @@ public class P12ContentSignerBuilder {
       this.signAlgo = signAlgo;
     }
 
+    @Override
     protected Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
@@ -136,7 +162,7 @@ public class P12ContentSignerBuilder {
   public P12ContentSignerBuilder(KeypairWithCert keypairWithCert) {
     this.key = Args.notNull(keypairWithCert, "keypairWithCert").getKey();
     this.publicKey = keypairWithCert.publicKey();
-    this.certificateChain = keypairWithCert.certificateChain();
+    this.certificateChain = keypairWithCert.x509CertChain();
   }
 
   public X509Cert certificate() {
@@ -152,10 +178,10 @@ public class P12ContentSignerBuilder {
     return key;
   }
 
-  public ConcurrentContentSigner createSigner(
+  public ConcurrentSigner createSigner(
       SignAlgo signAlgo, int parallelism, SecureRandom random)
       throws XiSecurityException {
-    List<XiContentSigner> signers = new ArrayList<>(
+    List<XiSigner> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     String provName = getProviderName(Args.notNull(signAlgo, "signAlgo"));
@@ -163,7 +189,7 @@ public class P12ContentSignerBuilder {
       try {
         for (int i = 0; i < parallelism; i++) {
           Signature signature = createSignature(signAlgo, provName, i == 0);
-          XiContentSigner signer =
+          XiSigner signer =
               new SignatureSigner(signAlgo, signature, key);
           signers.add(signer);
         }
@@ -177,27 +203,32 @@ public class P12ContentSignerBuilder {
       BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
       AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
 
+      byte[] encodedX509AlgId = null;
       for (int i = 0; i < parallelism; i++) {
         ContentSigner signer;
         try {
           signer = signerBuilder.build(keyparam);
-        } catch (OperatorCreationException ex) {
+          if (i == 0) {
+            encodedX509AlgId = signer.getAlgorithmIdentifier().getEncoded();
+          }
+        } catch (OperatorCreationException | IOException ex) {
           throw new XiSecurityException("operator creation error", ex);
         }
-        signers.add(new XiWrappedContentSigner(signer, true));
+
+        signers.add(new MyXiSigner(encodedX509AlgId, signer));
       }
     }
 
     final boolean mac = false;
-    ConcurrentContentSigner concurrentSigner;
+    ConcurrentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentContentSigner(mac, signers, key);
+      concurrentSigner = new DfltConcurrentSigner(mac, signers, key);
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
 
     if (certificateChain != null) {
-      concurrentSigner.setCertificateChain(certificateChain);
+      concurrentSigner.setX509CertChain(certificateChain);
     } else {
       concurrentSigner.setPublicKey(publicKey);
     }

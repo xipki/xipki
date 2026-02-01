@@ -364,7 +364,7 @@ public class P12Actions {
         byte[] encodedKey = PemEncoder.encode(
             kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
         byte[] encodedCert = PemEncoder.encode(
-            kp.certificateChain()[0].getEncoded(), PemLabel.CERTIFICATE);
+            kp.x509CertChain()[0].getEncoded(), PemLabel.CERTIFICATE);
 
         IoUtil.save(keyOutFile, encodedKey);
         IoUtil.save(certOutFile, encodedCert);

@@ -67,7 +67,7 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
   }
 
   @Override
-  public ConcurrentContentSigner newSigner(
+  public ConcurrentSigner newSigner(
       SecurityFactory securityFactory, String type, SignerConf conf,
       X509Cert[] certificateChain) throws ObjectCreationException {
     Args.notBlank(type, "type");
