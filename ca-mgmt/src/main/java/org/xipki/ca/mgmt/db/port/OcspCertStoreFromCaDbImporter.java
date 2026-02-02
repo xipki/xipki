@@ -493,7 +493,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private HashAlgo getCertHashAlgo() throws DataAccessException {
     String certHashAlgoStr = Optional.ofNullable(
-        dbSchemaInfo.getVariableValue("CERTHASH_ALGO"))
+        dbSchemaInfo.get("CERTHASH_ALGO"))
         .orElseThrow(() -> new DataAccessException(
             "Column with NAME='CERTHASH_ALGO' is not defined in " +
             "table DBSCHEMA"));

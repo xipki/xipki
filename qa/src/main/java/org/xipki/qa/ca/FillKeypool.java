@@ -4,11 +4,10 @@
 package org.xipki.qa.ca;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
-import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.KeyInfoPair;
 import org.xipki.security.KeySpec;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.KeyInfoPair;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -27,14 +26,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,24 +93,59 @@ public class FillKeypool implements AutoCloseable {
       throw new IllegalArgumentException("invalid encAlg " + encAlg);
     }
 
-    PBEKeySpec spec = new PBEKeySpec(password,
-        "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
-    SecretKeyFactory factory = SecretKeyFactory.getInstance(
-        "PBKDF2WithHmacSHA256");
-    SecretKey key = new SecretKeySpec(
-        factory.generateSecret(spec).getEncoded(), "AES");
-    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-
     Connection conn = datasource.getConnection();
-
     PreparedStatement ps = null;
+    Statement stmt = null;
     String sql = null;
+    ResultSet rs = null;
+    SecureRandom rnd = new SecureRandom();
+
     try {
+      // PBE salt and iteration
+      conn = datasource.getConnection();
+      Map<String, String> dbSchema = datasource.getDbSchema(conn);
+
+      Map<String, String> newDbSchema = new HashMap<>(2);
+      byte[] salt;
+      String b64Salt = dbSchema.get("PBE_SALT");
+      if (b64Salt != null) {
+        salt = Base64.decodeFast(b64Salt);
+      } else {
+        salt = new byte[20];
+        rnd.nextBytes(salt);
+        newDbSchema.put("PBE_SALT", Base64.encodeToString(salt));
+      }
+
+      String iterationStr = dbSchema.get("PBE_ITERATION");
+      int iteration;
+      if (iterationStr != null) {
+        iteration = Integer.parseInt(iterationStr);
+        if (iteration < 10000) {
+          throw new XiSecurityException("Invalid PBE_ITERATION " + iteration);
+        }
+      } else {
+        iteration = 100000;
+        newDbSchema.put("PBE_ITERATION", Integer.toString(iteration));
+      }
+
+      if (!newDbSchema.isEmpty()) {
+        datasource.addDbSchema(conn, newDbSchema);
+      }
+
+      stmt = conn.createStatement();
+
+      PBEKeySpec spec = new PBEKeySpec(password, salt, iteration, keyLength);
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(
+          "PBKDF2WithHmacSHA256");
+      SecretKey key = new SecretKeySpec(
+          factory.generateSecret(spec).getEncoded(), "AES");
+      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+
       sql = "DELETE FROM KEYPOOL";
-      datasource.createStatement(conn).executeUpdate(sql);
+      stmt.executeUpdate(sql);
 
       sql = "DELETE FROM KEYSPEC";
-      datasource.createStatement(conn).executeUpdate(sql);
+      stmt.executeUpdate(sql);
 
       KeySpec[] keyspecs = KeySpec.values();
 
@@ -130,13 +165,12 @@ public class FillKeypool implements AutoCloseable {
         ps.addBatch();
       }
       ps.executeBatch();
-
+      ps.close();
       ps = null;
 
       sql = "INSERT INTO KEYPOOL (ID,KID,SHARD_ID,ENC_ALG,ENC_META," +
           "DATA,PUKDATA) VALUES(?,?,?,?,?,?,?)";
 
-      SecureRandom rnd = new SecureRandom();
       ps = datasource.prepareStatement(sql);
       int id = 1;
 
@@ -220,20 +254,10 @@ public class FillKeypool implements AutoCloseable {
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
     } finally {
+      datasource.releaseResources(stmt, null, false);
       datasource.releaseResources(ps, null, false);
       datasource.returnConnection(conn);
     }
-  }
-
-  private static KeyInfoPair toRsaKeyInfoPair(PrivateKeyInfo priKeyInfo)
-      throws IOException {
-    RSAPrivateKey asn1PriKey = RSAPrivateKey.getInstance(
-        priKeyInfo.getPrivateKey().getOctets());
-    SubjectPublicKeyInfo pubKeyInfo = new SubjectPublicKeyInfo(
-        priKeyInfo.getPrivateKeyAlgorithm(),
-        new RSAPublicKey(asn1PriKey.getModulus(),
-            asn1PriKey.getPublicExponent()));
-    return new KeyInfoPair(pubKeyInfo, priKeyInfo);
   }
 
 }

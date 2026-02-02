@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Crl;
+import org.xipki.security.pkix.X509Crl;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
 import org.xipki.util.codec.Args;

@@ -5,7 +5,6 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.DbSchemaInfo;
 import org.xipki.ca.mgmt.db.DbToolBase;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -185,18 +185,18 @@ public class DbPorter extends DbToolBase {
 
   protected final int maxX500nameLen;
 
-  protected final DbSchemaInfo dbSchemaInfo;
+  protected final Map<String, String> dbSchemaInfo;
 
   public DbPorter(DataSourceWrapper datasource, String baseDir,
                   AtomicBoolean stopMe)
       throws DataAccessException {
     super(datasource, baseDir, stopMe);
 
-    this.dbSchemaInfo = new DbSchemaInfo(datasource);
+    this.dbSchemaInfo = datasource.getDbSchema(connection);
     this.dbSchemaVersion = Integer.parseInt(
-        dbSchemaInfo.getVariableValue("VERSION"));
+        dbSchemaInfo.get("VERSION"));
     this.maxX500nameLen  = Integer.parseInt(
-        dbSchemaInfo.getVariableValue("X500NAME_MAXLEN"));
+        dbSchemaInfo.get("X500NAME_MAXLEN"));
   }
 
   protected FileOrValue buildFileOrValue(String content, String fileName)

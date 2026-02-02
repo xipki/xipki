@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.diffdb.QueueEntry.DigestEntrySet;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -187,8 +187,8 @@ class RefDigestReader implements Closeable {
 
     String coreSql;
     if (dbType == DbType.XIPKI_OCSP_v4) {
-      String certHashAlgoInDb = datasource.getFirstStringValue(
-          null, "DBSCHEMA", "VALUE2", "NAME='CERTHASH_ALGO'");
+      String certHashAlgoInDb =
+          datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
       if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
         throw new IllegalArgumentException("certHashAlgo in parameter (" +
             certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");

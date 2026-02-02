@@ -8,9 +8,9 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.security.KeyInfoPair;
 import org.xipki.security.KeySpec;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.KeyInfoPair;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.conf.ConfPairs;
@@ -27,9 +27,9 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -220,15 +220,34 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       throw new IllegalArgumentException("property password not defined");
     }
 
+    Connection conn = null;
     try {
+      conn = datasource.getConnection();
+      Map<String, String> dbSchema = datasource.getDbSchema(conn);
+      String b64Salt = dbSchema.get("PBE_SALT");
+      if (b64Salt == null) {
+        throw new XiSecurityException("No PBE_SALT is specified");
+      }
+      byte[] salt = Base64.decodeFast(b64Salt);
+
+      String iterationStr = dbSchema.get("PBE_ITERATION");
+      if (iterationStr == null) {
+        throw new XiSecurityException("No PBE_ITERATION is specified");
+      }
+
+      int iteration = Integer.parseInt(iterationStr);
+      if (iteration < 10000) {
+        throw new XiSecurityException("Invalid PBE_ITERATION " + iteration);
+      }
+
       SecretKeyFactory factory = SecretKeyFactory.getInstance(
           "PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
 
       int[] keyLengths = {128, 192, 256};
       for (int keyLength : keyLengths) {
-        PBEKeySpec spec = new PBEKeySpec(passwordChars,
-            "ENC".getBytes(StandardCharsets.UTF_8), 10000, keyLength);
+        PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, iteration,
+                            keyLength);
         SecretKey key = new SecretKeySpec(
             factory.generateSecret(spec).getEncoded(), "AES");
         if (keyLength == 128) {
@@ -243,8 +262,9 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       cipher = Cipher.getInstance("AES/GCM/NoPadding");
     } catch (Exception ex) {
       throw new IllegalStateException("could not initialize Cipher", ex);
+    } finally {
+      datasource.returnConnection(conn);
     }
-
   }
 
   @Override

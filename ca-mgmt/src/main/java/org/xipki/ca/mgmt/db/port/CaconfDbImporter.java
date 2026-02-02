@@ -7,8 +7,7 @@ import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
-import org.xipki.ca.mgmt.db.DbSchemaInfo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.codec.CodecException;
@@ -28,7 +27,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -102,36 +100,26 @@ class CaconfDbImporter extends DbPorter {
       return;
     }
 
-    DbSchemaInfo dbSchemaInfo = new DbSchemaInfo(datasource);
-    Set<String> dbSchemaNames = dbSchemaInfo.getVariableNames();
-
-    final String sql = SqlUtil.buildInsertSql("DBSCHEMA", "NAME,VALUE2");
-    PreparedStatement ps = null;
+    Map<String, String> currentDbSchema = datasource.getDbSchema(connection);
+    Map<String, String> newDbSchema = new HashMap<>();
 
     boolean succ = false;
     try {
-      ps = prepareStatement(sql);
-
       for (Map.Entry<String, String> entry : entries.entrySet()) {
         String name = entry.getKey();
-        if (dbSchemaNames.contains(name)) {
+        if (currentDbSchema.containsKey(name)) {
           // do not import existing entry (with the same name)
           continue;
         }
-
-        try {
-          ps.setString(1, name);
-          ps.setString(2, entry.getValue());
-
-          ps.executeUpdate();
-        } catch (SQLException ex) {
-          System.err.println("could not import DBSCHEMA with NAME=" + name);
-          throw translate(sql, ex);
-        }
+        newDbSchema.put(name, entry.getValue());
       }
+
+      if (!newDbSchema.isEmpty()) {
+        datasource.addDbSchema(connection, newDbSchema);
+      }
+
       succ = true;
     } finally {
-      releaseResources(ps, null);
       System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
   } // method importDbSchema

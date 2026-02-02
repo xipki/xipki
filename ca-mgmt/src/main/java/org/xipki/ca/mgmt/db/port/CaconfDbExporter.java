@@ -14,8 +14,8 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.json.JsonBuilder;
 import org.xipki.util.conf.ConfPairs;
@@ -122,27 +122,11 @@ class CaconfDbExporter extends DbPorter {
       throws DataAccessException {
     System.out.print("    exporting table DBSCHEMA ... ");
     boolean succ = false;
-    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-
-    Map<String, String> dbSchemas = new HashMap<>();
-    caconf.setDbSchemas(dbSchemas);
-
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
     try {
-      stmt = prepareStatement(sql);
-      rs = stmt.executeQuery();
-
-      while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-        dbSchemas.put(name, value);
-      }
+      Map<String, String> dbSchemas = datasource.getDbSchema(connection);
+      caconf.setDbSchemas(dbSchemas);
       succ = true;
-    } catch (SQLException ex) {
-      throw translate(sql, ex);
     } finally {
-      releaseResources(stmt, rs);
       System.out.println(succ ? "SUCCESSFUL" : "FAILED");
     }
   } // method exportDbSchema

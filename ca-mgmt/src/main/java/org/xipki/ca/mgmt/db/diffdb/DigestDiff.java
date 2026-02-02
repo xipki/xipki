@@ -6,7 +6,7 @@ package org.xipki.ca.mgmt.db.diffdb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.benchmark.ProcessLog;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -250,9 +250,7 @@ class DigestDiff {
       throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
-      String dbSchemaVersion = datasource.getFirstStringValue(
-          null, "DBSCHEMA", "VALUE2", "WHERE NAME='VERSION'");
-
+      String dbSchemaVersion = datasource.getDbSchemaEntry(null, "VERSION");
       if (datasource.tableExists(conn, "CA")) {
         if ("4".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v4;
@@ -285,8 +283,7 @@ class DigestDiff {
 
   public static HashAlgo detectOcspDbCerthashAlgo(DataSourceWrapper datasource)
       throws DataAccessException {
-    String str = datasource.getFirstStringValue(null, "DBSCHEMA",
-        "VALUE2", "NAME='CERTHASH_ALGO'");
+    String str = datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
     try {
       return HashAlgo.getInstance(str);
     } catch (NoSuchAlgorithmException ex) {

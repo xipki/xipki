@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.ZipEntry;
@@ -100,17 +101,13 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
   private void importCertHashAlgo(String certHashAlgo)
       throws DataAccessException {
-    String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME='CERTHASH_ALGO'";
-    PreparedStatement ps = prepareStatement(sql);
     try {
-      ps.setString(1, certHashAlgo);
-      ps.executeUpdate();
-      dbSchemaInfo.setVariable("CERTHASH_ALGO", certHashAlgo);
-    } catch (SQLException ex) {
+      datasource.updateDbSchema(connection,
+          Map.of("CERTHASH_ALGO", certHashAlgo));
+      dbSchemaInfo.put("CERTHASH_ALGO", certHashAlgo);
+    } catch (DataAccessException ex) {
       System.err.println("could not import DBSCHEMA");
-      throw translate(sql, ex);
-    } finally {
-      releaseResources(ps, null);
+      throw ex;
     }
   }
 

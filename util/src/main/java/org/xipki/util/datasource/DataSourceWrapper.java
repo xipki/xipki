@@ -21,7 +21,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.xipki.util.codec.Args.notBlank;
@@ -1325,5 +1328,80 @@ public abstract class DataSourceWrapper implements Closeable {
           "unknown datasource type " + databaseType);
     }
   } // method createDataSource
+
+  public String getDbSchemaEntry(Connection conn, String name)
+      throws DataAccessException {
+    return getFirstStringValue(conn, "DBSCHEMA", "VALUE2",
+        "NAME='" + name + "'");
+  }
+
+  public Map<String, String> getDbSchema(Connection conn)
+      throws DataAccessException {
+    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
+    PreparedStatement stmt = null;
+    ResultSet rs = null;
+
+    Map<String, String> variables = new HashMap<>();
+    try {
+      stmt = (conn == null) ? prepareStatement(sql)
+              : prepareStatement(conn, sql);
+      if (stmt == null) {
+        throw new DataAccessException("could not create statement");
+      }
+
+      rs = stmt.executeQuery();
+      while (rs.next()) {
+        variables.put(rs.getString("NAME"), rs.getString("VALUE2"));
+      }
+
+      return variables;
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(stmt, rs, conn == null);
+    }
+  }
+
+  public void addDbSchema(Connection conn, Map<String, String> dbSchema)
+      throws DataAccessException {
+    String sql = "INSERT INTO DBSCHEMA (NAME, VALUE2) VALUES(?,?)";
+
+    PreparedStatement ps = null;
+    try {
+      ps = conn == null ? prepareStatement(sql) : prepareStatement(conn, sql);
+      for (Map.Entry<String, String> v : dbSchema.entrySet()) {
+        ps.setString(1, v.getKey());
+        ps.setString(2, v.getValue());
+        ps.addBatch();
+        LOG.info("added DBSCHEMA '{}'", v.getKey());
+      }
+      ps.executeBatch();
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(ps, null, conn == null);
+    }
+  }
+
+  public void updateDbSchema(Connection conn, Map<String, String> dbSchema)
+      throws DataAccessException {
+    String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME=?";
+
+    PreparedStatement ps = null;
+    try {
+      ps = conn == null ? prepareStatement(sql) : prepareStatement(conn, sql);
+      for (Map.Entry<String, String> v : dbSchema.entrySet()) {
+        ps.setString(1, v.getValue());
+        ps.setString(2, v.getKey());
+        ps.addBatch();
+        LOG.info("updated DBSCHEMA '{}'", v.getKey());
+      }
+      ps.executeBatch();
+    } catch (SQLException ex) {
+      throw translate(sql, ex);
+    } finally {
+      releaseResources(ps, null, conn == null);
+    }
+  }
 
 }

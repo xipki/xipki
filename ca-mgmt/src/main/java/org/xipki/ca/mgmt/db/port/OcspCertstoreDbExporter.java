@@ -108,7 +108,7 @@ class OcspCertstoreDbExporter extends DbPorter {
   private void exportHashAlgo(OcspCertstore certstore)
       throws DataAccessException {
     String certHashAlgoStr = Optional.ofNullable(
-        dbSchemaInfo.getVariableValue("CERTHASH_ALGO"))
+        dbSchemaInfo.get("CERTHASH_ALGO"))
         .orElseThrow(() -> new DataAccessException(
             "CERTHASH_ALGO is not defined in table DBSCHEMA"));
     certstore.setCerthashAlgo(certHashAlgoStr);
