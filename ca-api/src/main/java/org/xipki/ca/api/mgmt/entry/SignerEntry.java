@@ -3,10 +3,10 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;

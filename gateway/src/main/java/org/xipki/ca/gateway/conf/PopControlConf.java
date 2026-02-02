@@ -5,7 +5,7 @@ package org.xipki.ca.gateway.conf;
 
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.misc.KeystoreConf;
+import org.xipki.util.extra.type.KeystoreConf;
 
 import java.util.List;
 

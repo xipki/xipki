@@ -11,8 +11,8 @@ import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.CrlReason;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.CrlReason;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
 

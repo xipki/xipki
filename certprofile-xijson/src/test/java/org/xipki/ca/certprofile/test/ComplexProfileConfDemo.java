@@ -21,9 +21,9 @@ import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
 import org.xipki.ca.certprofile.xijson.conf.extn.PrivateKeyUsagePeriod;
 import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
 import org.xipki.ca.certprofile.xijson.conf.extn.SubjectInfoAccess;
-import org.xipki.security.KeyUsage;
 import org.xipki.security.OIDs;
-import org.xipki.security.TlsExtensionType;
+import org.xipki.security.pkix.KeyUsage;
+import org.xipki.security.pkix.TlsExtensionType;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.codec.TripleState;
 

@@ -4,12 +4,12 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.type.HourMinute;
-import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 

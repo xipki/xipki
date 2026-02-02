@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijsonv1.conf.extn;
 import org.xipki.ca.certprofile.xijson.conf.extn.SingleKeyUsages;
 import org.xipki.ca.certprofile.xijsonv1.conf.V1XijsonCertprofileType;
 import org.xipki.security.KeySpec;
-import org.xipki.security.KeyUsage;
+import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonList;

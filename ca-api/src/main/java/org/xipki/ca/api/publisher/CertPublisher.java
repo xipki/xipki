@@ -5,9 +5,9 @@ package org.xipki.ca.api.publisher;
 
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.X509Crl;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.pkix.X509Crl;
 import org.xipki.util.datasource.DataSourceMap;
 import org.xipki.util.extra.exception.CertPublisherException;
 

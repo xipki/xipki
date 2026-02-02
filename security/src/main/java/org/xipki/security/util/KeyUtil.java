@@ -16,7 +16,6 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.digests.SM3Digest;
 import org.bouncycastle.crypto.engines.RSABlindedEngine;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -40,27 +39,28 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.pkcs11.wrapper.Functions;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DHSigStaticKeyCertPair;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
-import org.xipki.security.bc.XiECContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiKEMContentVerifierProvider;
-import org.xipki.security.bc.XiRSAContentVerifierProviderBuilder;
-import org.xipki.security.bc.XiSignatureContentVerifierProvider;
-import org.xipki.security.bc.XiXDHContentVerifierProvider;
-import org.xipki.security.bc.compositekem.CompositeKemKeyInfoConverter;
-import org.xipki.security.bc.compositekem.CompositeMLKEMPrivateKey;
-import org.xipki.security.bc.compositekem.CompositeMLKEMPublicKey;
+import org.xipki.security.composite.kem.CompositeKemKeyInfoConverter;
+import org.xipki.security.composite.kem.CompositeMLKEMPrivateKey;
+import org.xipki.security.composite.kem.CompositeMLKEMPublicKey;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
+import org.xipki.security.pkix.DHSigStaticKeyCertPair;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.UnsignedSigner;
+import org.xipki.security.verify.XiECContentVerifierProviderBuilder;
+import org.xipki.security.verify.XiKEMContentVerifierProvider;
+import org.xipki.security.verify.XiRSAContentVerifierProviderBuilder;
+import org.xipki.security.verify.XiSignatureContentVerifierProvider;
+import org.xipki.security.verify.XiXDHContentVerifierProvider;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.codec.asn1.Asn1Util;
@@ -329,9 +329,9 @@ public class KeyUtil {
     String dnStr = "CN=DUMMY";
     X500Name subjectDn = new X500Name(dnStr);
     SubjectPublicKeyInfo subjectPublicKeyInfo = kp.subjectPublicKeyInfo();
-    XiSigner signer;
+    Signer signer;
     if (params.unsigned() != null && params.unsigned()) {
-      signer = XiUnsignedSigner.INSTANCE;
+      signer = UnsignedSigner.INSTANCE;
     } else {
       signer = getSigner(kp.keypair().getPrivate(),
           kp.keypair().getPublic(), params.random(), true);
@@ -586,7 +586,8 @@ public class KeyUtil {
     }
   }
 
-  public static Signer createPSSRSASigner(SignAlgo sigAlgo)
+  public static org.bouncycastle.crypto.Signer createPSSRSASigner(
+      SignAlgo sigAlgo)
       throws XiSecurityException {
     if (!Args.notNull(sigAlgo, "sigAlgo").isRSAPSSSigAlgo()) {
       throw new XiSecurityException(sigAlgo + " is not an RSAPSS algorithm");
@@ -668,13 +669,13 @@ public class KeyUtil {
     return new XiSignatureContentVerifierProvider(publicKey);
   } // method getContentVerifierProvider
 
-  public static XiSigner getSigner(
+  public static Signer getSigner(
       PrivateKey key, PublicKey publicKey, SecureRandom random)
       throws Exception {
     return getSigner(key, publicKey, random, false);
   }
 
-  public static XiSigner getSigner(
+  public static Signer getSigner(
       PrivateKey key, PublicKey publicKey, SecureRandom random,
       boolean allowUnsigned)
       throws Exception {
@@ -717,7 +718,7 @@ public class KeyUtil {
         algo = SignAlgo.getInstance(keySpec.algorithmIdentifier());
       } else if (allowUnsigned & (keySpec.isMontgomeryEC() ||
           keySpec.isMlkem() || keySpec.isCompositeMLKEM())) {
-        return XiUnsignedSigner.INSTANCE;
+        return UnsignedSigner.INSTANCE;
       } else {
         throw new IllegalArgumentException("unknown key-spec " + keySpec);
       }

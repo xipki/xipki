@@ -6,7 +6,7 @@ package org.xipki.ocsp.server;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.security.CertPathValidationModel;
+import org.xipki.security.verify.CertPathValidationModel;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonList;

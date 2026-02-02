@@ -5,7 +5,7 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;

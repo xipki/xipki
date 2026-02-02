@@ -5,16 +5,16 @@ package org.xipki.security.pkcs11;
 
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.SignerFactory;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
 import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
+import org.xipki.security.sign.SignerFactory;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.exception.ObjectCreationException;
@@ -167,19 +167,19 @@ public class P11SignerFactory implements SignerFactory {
         }
       }
 
-      List<XiSigner> signers = new ArrayList<>(parallelism);
+      List<Signer> signers = new ArrayList<>(parallelism);
       PublicKey publicKey = null;
       if (certificateChain != null && certificateChain.length > 0) {
         publicKey = certificateChain[0].publicKey();
       }
 
       for (int i = 0; i < parallelism; i++) {
-        XiSigner signer;
+        Signer signer;
         if (compositeKey != null) {
           signer = P11CompositeSigner.newInstance(compositeKey, algo,
                     securityFactory.random4Sign(), publicKey);
         } else {
-          signer = P11XiSigner.newInstance(key, algo,
+          signer = P11Signer.newInstance(key, algo,
                     securityFactory.random4Sign(), publicKey);
         }
 

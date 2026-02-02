@@ -5,13 +5,13 @@ package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.KeyInfoPair;
 import org.xipki.security.KeySpec;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.security.pkcs11.P11Module;
 import org.xipki.security.pkcs11.P11Slot;
 import org.xipki.security.pkcs11.P11SlotId;
+import org.xipki.security.pkix.KeyInfoPair;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.ConfPairs;
 

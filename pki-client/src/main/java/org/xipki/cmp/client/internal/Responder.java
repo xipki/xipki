@@ -6,10 +6,10 @@ package org.xipki.cmp.client.internal;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.AlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.verify.AlgorithmValidator;
 import org.xipki.util.codec.Args;
 
 import java.security.NoSuchAlgorithmException;

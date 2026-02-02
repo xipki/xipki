@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.security.KeyUsage;
+import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.codec.Args;
 
 /**

@@ -16,16 +16,16 @@ import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
@@ -189,7 +189,7 @@ public class SelfSignedCertBuilder {
       PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject,
           grantedSubject, serialNumber, null, ski, null, null);
 
-      XiSigner signer0 = signer.borrowSigner();
+      Signer signer0 = signer.borrowSigner();
 
       ExtensionValues extensionTuples = certprofile.getExtensions(
           requestedSubject, grantedSubject, null, publicKeyInfo,

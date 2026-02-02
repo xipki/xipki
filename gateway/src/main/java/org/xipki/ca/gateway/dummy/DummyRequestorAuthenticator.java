@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway.dummy;
 
-import org.xipki.security.X509Cert;
 import org.xipki.security.auth.Requestor;
 import org.xipki.security.auth.RequestorAuthenticator;
+import org.xipki.security.pkix.X509Cert;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

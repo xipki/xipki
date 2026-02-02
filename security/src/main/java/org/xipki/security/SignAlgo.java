@@ -21,6 +21,8 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.pkcs11.P11CompositeKey;
 import org.xipki.security.pkcs11.P11Key;
+import org.xipki.security.sign.SignAlgoMode;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;

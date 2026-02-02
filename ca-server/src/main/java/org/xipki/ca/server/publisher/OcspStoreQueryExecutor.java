@@ -6,11 +6,11 @@ package org.xipki.ca.server.publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -28,7 +28,6 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -137,28 +136,8 @@ class OcspStoreQueryExecutor {
 
     this.sqlCertRegistered = datasource.buildSelectFirstSql(1,
         "ID FROM CERT WHERE SN=? AND IID=?");
-    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
 
-    Map<String, String> variables = new HashMap<>();
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
-    try {
-      stmt = Optional.ofNullable(datasource.prepareStatement(sql)).orElseThrow(
-          () -> new DataAccessException("could not create statement"));
-
-      rs = stmt.executeQuery();
-      while (rs.next()) {
-        String name = rs.getString("NAME");
-        String value = rs.getString("VALUE2");
-        variables.put(name, value);
-      }
-    } catch (SQLException ex) {
-      throw datasource.translate(sql, ex);
-    } finally {
-      datasource.releaseResources(stmt, rs);
-    }
-
+    Map<String, String> variables = datasource.getDbSchema(null);
     String str = variables.get("VERSION");
     this.dbSchemaVersion = Integer.parseInt(str);
     str = variables.get("X500NAME_MAXLEN");

@@ -11,11 +11,11 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.X509Cert;
-import org.xipki.security.X509Crl;
 import org.xipki.security.exception.OperationException;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.CrlReason;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.pkix.X509Crl;
 import org.xipki.util.datasource.DataAccessException;
 
 import java.math.BigInteger;

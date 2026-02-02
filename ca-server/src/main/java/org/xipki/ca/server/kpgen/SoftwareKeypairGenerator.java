@@ -4,9 +4,9 @@
 package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.security.KeyInfoPair;
 import org.xipki.security.KeySpec;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.KeyInfoPair;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.conf.ConfPairs;
 

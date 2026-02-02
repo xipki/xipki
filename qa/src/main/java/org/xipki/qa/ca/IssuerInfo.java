@@ -3,7 +3,7 @@
 
 package org.xipki.qa.ca;
 
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.CollectionUtil;

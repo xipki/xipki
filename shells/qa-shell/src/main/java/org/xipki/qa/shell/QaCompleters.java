@@ -11,8 +11,8 @@ import org.xipki.qa.ocsp.OcspError;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
-import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.codec.TripleState;
+import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.Collections;
 import java.util.LinkedList;

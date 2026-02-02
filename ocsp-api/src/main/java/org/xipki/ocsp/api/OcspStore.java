@@ -4,7 +4,7 @@
 package org.xipki.ocsp.api;
 
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.datasource.DataSourceWrapper;

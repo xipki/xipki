@@ -8,9 +8,9 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.security.CtLog.SignedCertificateTimestamp;
-import org.xipki.security.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.OIDs;
+import org.xipki.security.pkix.CtLog.SignedCertificateTimestamp;
+import org.xipki.security.pkix.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.io.IoUtil;
 

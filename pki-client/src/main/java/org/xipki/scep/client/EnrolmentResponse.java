@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.message.PkiMessage;
 import org.xipki.security.scep.transaction.FailInfo;
 import org.xipki.security.scep.transaction.MessageType;

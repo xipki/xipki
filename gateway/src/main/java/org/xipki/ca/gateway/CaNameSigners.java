@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway;
 
-import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.misc.CollectionUtil;

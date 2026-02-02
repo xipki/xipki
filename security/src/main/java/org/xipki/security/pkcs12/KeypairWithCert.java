@@ -3,8 +3,8 @@
 
 package org.xipki.security.pkcs12;
 
-import org.xipki.security.X509Cert;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;

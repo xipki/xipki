@@ -46,7 +46,7 @@ import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.shell.SecurityCompleters;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;

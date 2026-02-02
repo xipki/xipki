@@ -28,13 +28,13 @@ import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.ca.server.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -107,13 +107,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     super(datasource);
 
     try {
-      Integer i = datasource.getFirstIntValue(null,
-          "DBSCHEMA", "VALUE2", "NAME='VERSION'");
-      dbSchemaVersion = i == null ? 9 : i;
+      Map<String, String> dbSchema = datasource.getDbSchema(null);
+      String str = dbSchema.get("VERSION");
+      dbSchemaVersion = str == null ? 9 : Integer.parseInt(str);
 
-      i = datasource.getFirstIntValue(null,
-          "DBSCHEMA", "VALUE2", "NAME='X500NAME_MAXLEN'");
-      this.maxX500nameLen = i != null ? i : 350;
+      str = dbSchema.get("X500NAME_MAXLEN");
+      this.maxX500nameLen = str == null ? 350 : Integer.parseInt(str);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -1170,54 +1169,30 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public void addDbSchema(String name, String value) throws CaMgmtException {
-    final String sql = SqlUtil.buildInsertSql("DBSCHEMA", "NAME,VALUE2");
-    int num = execUpdatePrepStmt0(sql, col2Str(name), col2Str(value));
-    if (num == 0) {
+    try {
+      datasource.addDbSchema(null, Map.of(name, value));
+    } catch (DataAccessException e) {
       throw new CaMgmtException("could not add DBSCHEMA " + name);
     }
-    LOG.info("added DBSCHEMA '{}'", name);
   }
 
   @Override
   public void changeDbSchema(String name, String value) throws CaMgmtException {
-    String sql = "UPDATE DBSCHEMA SET VALUE2=? WHERE NAME=?";
-    int num = execUpdatePrepStmt0(sql, col2Str(value), col2Str(name));
-
-    if (num == 0) {
+    try {
+      datasource.updateDbSchema(null, Map.of(name, value));
+    } catch (DataAccessException e) {
       throw new CaMgmtException("could not update DBSCHEMA " + name);
     }
-    LOG.info("added DBSCHEMA '{}'", name);
   }
 
   @Override
   public Map<String, String> getDbSchemas() throws CaMgmtException {
     Args.notNull(datasource, "datasource");
-
-    final String sql = "SELECT NAME,VALUE2 FROM DBSCHEMA";
-
-    Map<String, String> dbSchemas = new HashMap<>();
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-
     try {
-      stmt = Optional.ofNullable(datasource.prepareStatement(sql))
-          .orElseThrow(() -> new DataAccessException(
-              "could not create statement"));
-
-      rs = stmt.executeQuery();
-      while (rs.next()) {
-        dbSchemas.put(rs.getString("NAME"),
-            rs.getString("VALUE2"));
-      }
-    } catch (SQLException ex) {
-      throw new CaMgmtException(datasource.translate(sql, ex));
+      return datasource.getDbSchema(null);
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
-    } finally {
-      datasource.releaseResources(stmt, rs);
     }
-
-    return dbSchemas;
   }
 
   @Override

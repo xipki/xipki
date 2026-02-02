@@ -11,14 +11,12 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.util.codec.Hex;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,7 +79,7 @@ public class OCSPRespBuilder {
     byte[] tbs = new byte[responseData.encodedLength()];
     responseData.write(tbs, 0);
 
-    XiSigner signer0 = signer.borrowSigner();
+    Signer signer0 = signer.borrowSigner();
 
     byte[] signature;
     byte[] sigAlgId;

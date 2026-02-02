@@ -5,8 +5,8 @@ package org.xipki.ca.api;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.xipki.security.X509Cert;
 import org.xipki.security.exception.OperationException;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.ConfPairs;

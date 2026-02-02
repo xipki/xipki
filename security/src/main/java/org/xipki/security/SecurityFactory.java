@@ -7,6 +7,12 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.xipki.security.pkix.DHSigStaticKeyCertPair;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.CsrControl;
+import org.xipki.security.sign.SignerConf;
+import org.xipki.security.verify.AlgorithmValidator;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.ObjectCreationException;
 

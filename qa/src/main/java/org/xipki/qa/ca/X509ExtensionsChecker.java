@@ -37,7 +37,7 @@ import org.xipki.qa.CheckerUtil;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.extra.exception.CertprofileException;

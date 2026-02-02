@@ -4,8 +4,8 @@
 package org.xipki.ocsp.api;
 
 import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.util.codec.Args;
 
 import java.time.Instant;

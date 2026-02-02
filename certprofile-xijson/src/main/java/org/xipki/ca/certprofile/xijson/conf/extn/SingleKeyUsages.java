@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf.extn;
 import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.certprofile.xijson.KeyUsageControl;
 import org.xipki.security.KeySpec;
-import org.xipki.security.KeyUsage;
+import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;

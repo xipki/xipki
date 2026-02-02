@@ -13,10 +13,10 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.CrlReason;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
@@ -642,8 +642,7 @@ public class DbCertStatusStore extends OcspStore {
       throws DataAccessException, NoSuchAlgorithmException {
     // analyze the database
     String certHashAlgoStr = Optional.ofNullable(
-        datasource.getFirstStringValue(null, "DBSCHEMA", "VALUE2",
-            "NAME='CERTHASH_ALGO'"))
+        datasource.getDbSchemaEntry(null, "CERTHASH_ALGO"))
         .orElseThrow(() -> new DataAccessException("Column with " +
             "NAME='CERTHASH_ALGO' is not defined in table DBSCHEMA"));
 

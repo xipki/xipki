@@ -3,10 +3,10 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.xipki.security.AlgorithmValidator;
-import org.xipki.security.CollectionAlgorithmValidator;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.verify.AlgorithmValidator;
+import org.xipki.security.verify.CollectionAlgorithmValidator;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.type.EmbedCertsMode;

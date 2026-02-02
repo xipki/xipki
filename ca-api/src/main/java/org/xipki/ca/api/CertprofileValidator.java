@@ -19,9 +19,9 @@ import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.extra.type.Validity.Unit;
 

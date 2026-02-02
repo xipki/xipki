@@ -15,7 +15,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
+import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 import org.xipki.util.extra.type.Validity;
 
 import java.io.Closeable;

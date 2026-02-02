@@ -3,7 +3,7 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 
 import java.security.PrivateKey;

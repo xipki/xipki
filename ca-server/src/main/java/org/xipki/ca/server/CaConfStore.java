@@ -16,8 +16,8 @@ import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
-import org.xipki.security.CertRevocationInfo;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.pkix.CertRevocationInfo;
 
 import java.util.List;
 import java.util.Map;

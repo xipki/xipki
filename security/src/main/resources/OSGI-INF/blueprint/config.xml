@@ -16,11 +16,11 @@
       init-method="init" destroy-method="close"/>
 
   <bean id="signerFactoryRegister"
-       class="org.xipki.security.SignerFactoryRegisterImpl">
+       class="org.xipki.security.sign.SignerFactoryRegisterImpl">
   </bean>
 
-  <service ref="signerFactoryRegister" interface="org.xipki.security.SignerFactoryRegister"/>
-  <reference-list id="signerFactories" interface="org.xipki.security.SignerFactory"
+  <service ref="signerFactoryRegister" interface="org.xipki.security.sign.SignerFactoryRegister"/>
+  <reference-list id="signerFactories" interface="org.xipki.security.sign.SignerFactory"
        availability="optional">
     <reference-listener ref="signerFactoryRegister" bind-method="registFactory"
          unbind-method="unregistFactory"/>
@@ -42,7 +42,7 @@
 
   <!-- PKCS#12 -->
   <service ref="pkcs12SignerFactory"
-      interface="org.xipki.security.SignerFactory"/>
+      interface="org.xipki.security.sign.SignerFactory"/>
 
   <!-- PKCS#11 -->
   <bean id="p11CryptServiceFactory"
@@ -61,6 +61,6 @@
   </bean>
 
   <service ref="pkcs11SignerFactory"
-      interface="org.xipki.security.SignerFactory"/>
+      interface="org.xipki.security.sign.SignerFactory"/>
 
 </blueprint>

@@ -6,7 +6,7 @@ package org.xipki.security.util;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.http.XiHttpRequest;
 import org.xipki.util.misc.LruCache;

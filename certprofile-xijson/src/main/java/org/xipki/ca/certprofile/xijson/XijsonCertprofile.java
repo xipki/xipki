@@ -40,14 +40,14 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.codec.json.JsonList;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.codec.TripleState;
+import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 

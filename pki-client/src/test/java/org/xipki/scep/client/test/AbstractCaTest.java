@@ -19,7 +19,7 @@ import org.xipki.scep.client.ScepClient;
 import org.xipki.scep.serveremulator.ScepControl;
 import org.xipki.scep.serveremulator.ScepServer;
 import org.xipki.scep.serveremulator.ScepServerContainer;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.message.AuthorityCertStore;
 import org.xipki.security.scep.message.CaCaps;
 import org.xipki.security.scep.transaction.CaCapability;

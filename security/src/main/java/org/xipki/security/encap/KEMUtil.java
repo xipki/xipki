@@ -20,9 +20,9 @@ import org.bouncycastle.pqc.crypto.mlkem.MLKEMParameters;
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters;
 import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
 import org.xipki.security.OIDs;
-import org.xipki.security.bc.compositekem.CompositeMLKEMPrivateKey;
 import org.xipki.security.composite.CompositeKemSuite;
 import org.xipki.security.composite.CompositeKemUtil;
+import org.xipki.security.composite.kem.CompositeMLKEMPrivateKey;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.util.SecretKeyWithAlias;
 

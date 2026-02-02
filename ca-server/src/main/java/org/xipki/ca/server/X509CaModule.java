@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.audit.AuditEvent;
 import org.xipki.util.extra.audit.AuditLevel;

@@ -5,7 +5,6 @@ package org.xipki.security.pkcs12;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
@@ -17,13 +16,13 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignatureSigner;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.SignatureSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.CollectionUtil;
@@ -52,7 +51,7 @@ import java.util.List;
  */
 public class P12ContentSignerBuilder {
 
-  private static class MyXiSigner implements XiSigner {
+  private static class MyXiSigner implements Signer {
 
     private final byte[] encodedX509AlgId;
 
@@ -86,7 +85,7 @@ public class P12ContentSignerBuilder {
     }
 
     @Override
-    protected Signer createSigner(
+    protected org.bouncycastle.crypto.Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
@@ -116,7 +115,7 @@ public class P12ContentSignerBuilder {
     }
 
     @Override
-    protected Signer createSigner(
+    protected org.bouncycastle.crypto.Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
@@ -138,7 +137,7 @@ public class P12ContentSignerBuilder {
     }
 
     @Override
-    protected Signer createSigner(
+    protected org.bouncycastle.crypto.Signer createSigner(
         AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
         throws OperatorCreationException {
       signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
@@ -181,7 +180,7 @@ public class P12ContentSignerBuilder {
   public ConcurrentSigner createSigner(
       SignAlgo signAlgo, int parallelism, SecureRandom random)
       throws XiSecurityException {
-    List<XiSigner> signers = new ArrayList<>(
+    List<Signer> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     String provName = getProviderName(Args.notNull(signAlgo, "signAlgo"));
@@ -189,7 +188,7 @@ public class P12ContentSignerBuilder {
       try {
         for (int i = 0; i < parallelism; i++) {
           Signature signature = createSignature(signAlgo, provName, i == 0);
-          XiSigner signer =
+          Signer signer =
               new SignatureSigner(signAlgo, signature, key);
           signers.add(signer);
         }

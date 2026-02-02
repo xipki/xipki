@@ -9,7 +9,7 @@ import org.xipki.ca.api.profile.id.CertificatePolicyID;
 import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
-import org.xipki.security.KeyUsage;
+import org.xipki.security.pkix.KeyUsage;
 
 import java.util.HashMap;
 import java.util.List;

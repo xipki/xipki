@@ -3,12 +3,12 @@
 
 package org.xipki.security.pkcs12;
 
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
@@ -87,13 +87,13 @@ public class P12MacContentSignerBuilder {
   public ConcurrentSigner createSigner(SignAlgo sigAlgo, int parallelism)
       throws XiSecurityException {
     Args.notNull(sigAlgo, "sigAlgo");
-    List<XiSigner> signers = new ArrayList<>(
+    List<Signer> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      XiSigner signer = sigAlgo.isGmac()
+      Signer signer = sigAlgo.isGmac()
           ? new AESGmacContentSigner(sigAlgo, key)
-          : new HmacXiSigner(sigAlgo, key);
+          : new HmacSigner(sigAlgo, key);
       signers.add(signer);
     }
 

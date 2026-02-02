@@ -12,7 +12,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
-import org.xipki.security.KeyUsage;
+import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.codec.TripleState;
 
 import java.util.Arrays;

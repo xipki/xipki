@@ -8,8 +8,8 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.Arrays;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.sign.Signer;
 import org.xipki.util.codec.Args;
 import org.xipki.util.io.IoUtil;
 
@@ -29,7 +29,7 @@ import java.security.SecureRandom;
  * AES GMAC signer.
  * @author Lijun Liao (xipki)
  */
-public class AESGmacContentSigner implements XiSigner {
+public class AESGmacContentSigner implements Signer {
 
   private static class AESGmacOutputStream extends OutputStream {
 

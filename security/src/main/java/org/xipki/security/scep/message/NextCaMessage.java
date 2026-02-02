@@ -18,7 +18,7 @@ import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.util.ScepUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;

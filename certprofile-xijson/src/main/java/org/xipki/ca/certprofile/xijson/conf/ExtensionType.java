@@ -6,10 +6,10 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.certprofile.xijson.conf.extn.*;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.codec.TripleState;
+import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 
 /**
  * Extension configuration.

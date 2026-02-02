@@ -10,6 +10,8 @@ import org.xipki.security.pkcs11.P11CryptServiceFactoryImpl;
 import org.xipki.security.pkcs11.P11SignerFactory;
 import org.xipki.security.pkcs11.P11SystemConf;
 import org.xipki.security.pkcs12.P12SignerFactory;
+import org.xipki.security.sign.SignerFactory;
+import org.xipki.security.sign.SignerFactoryRegisterImpl;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;

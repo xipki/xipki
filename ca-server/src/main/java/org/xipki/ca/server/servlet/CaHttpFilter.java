@@ -15,7 +15,7 @@ import org.xipki.ca.server.SdkResponder;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.publisher.OcspCertPublisherFactory;
 import org.xipki.security.Securities;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.conf.InvalidConfException;

@@ -4,8 +4,8 @@
 package org.xipki.cmp.client;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.xipki.security.X509Cert;
 import org.xipki.security.cmp.PkiStatusInfo;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 
 import java.util.Map;

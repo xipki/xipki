@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.security.CertRevocationInfo;
+import org.xipki.security.pkix.CertRevocationInfo;
 
 /**
  * Certificate with revocation information.

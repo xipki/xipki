@@ -90,13 +90,7 @@ public class SslContextConfWrapper {
   }
 
   private static String emptyAsNull(String text) {
-    if (text == null) {
-      return null;
-    } else if (text.trim().isEmpty()) {
-      return null;
-    } else {
-      return text;
-    }
+    return (text == null || text.trim().isEmpty()) ? null : text;
   }
 
 }

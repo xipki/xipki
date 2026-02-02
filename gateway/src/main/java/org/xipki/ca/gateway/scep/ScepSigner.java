@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.message.EnvelopedDataDecryptor;
+import org.xipki.security.sign.ConcurrentSigner;
 
 import java.security.Key;
 import java.security.PrivateKey;

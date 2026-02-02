@@ -45,9 +45,20 @@ import org.xipki.cmp.client.EnrollCertRequest.EnrollType;
 import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.cmp.client.PkiErrorException;
-import org.xipki.security.*;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.KeySpec;
+import org.xipki.security.OIDs;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.KeyUsage;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.CreateSignerCallback;
+import org.xipki.security.sign.SignAlgoMode;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -837,7 +848,7 @@ public class EnrollCertActions {
 
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
-      XiSigner signer0 = signer.borrowSigner();
+      Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
         popSk = popBuilder.build(signer0.x509Signer());

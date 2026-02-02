@@ -19,9 +19,9 @@ import org.xipki.ca.certprofile.xijsonv1.conf.type.V1SubjectKeyIdentifierControl
 import org.xipki.security.KeySpec;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.codec.TripleState;
 
 import java.util.Collection;
 

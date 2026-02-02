@@ -12,11 +12,11 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.CertRevocationInfo;
-import org.xipki.security.CrlReason;
-import org.xipki.security.KeyCertBytesPair;
-import org.xipki.security.X509Cert;
-import org.xipki.security.X509Crl;
+import org.xipki.security.pkix.CertRevocationInfo;
+import org.xipki.security.pkix.CrlReason;
+import org.xipki.security.pkix.KeyCertBytesPair;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.pkix.X509Crl;
 
 import java.io.IOException;
 import java.io.InputStream;

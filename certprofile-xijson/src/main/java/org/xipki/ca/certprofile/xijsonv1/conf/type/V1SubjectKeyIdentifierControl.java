@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.xijsonv1.conf.type;
 
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
+import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 
 /**
  * Extension SubjectKeyIdentifierControl.

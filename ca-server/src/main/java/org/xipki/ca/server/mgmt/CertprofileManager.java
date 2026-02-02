@@ -21,10 +21,10 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.exception.ObjectCreationException;
 import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.codec.TripleState;
 
 import java.util.HashSet;
 import java.util.LinkedList;

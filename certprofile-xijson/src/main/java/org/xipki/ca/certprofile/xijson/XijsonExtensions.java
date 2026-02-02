@@ -42,10 +42,10 @@ import org.xipki.security.OIDs;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.SubjectKeyIdentifierControl;
-import org.xipki.util.codec.TripleState;
+import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 import org.xipki.util.extra.type.Validity;
 import org.xipki.util.misc.StringUtil;
 

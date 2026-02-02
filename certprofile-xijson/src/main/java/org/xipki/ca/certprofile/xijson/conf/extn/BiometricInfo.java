@@ -6,9 +6,9 @@ package org.xipki.ca.certprofile.xijson.conf.extn;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.TripleState;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.TripleState;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

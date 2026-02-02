@@ -57,9 +57,10 @@ import java.util.Set;
 /**
  * Builder for {@link javax.net.ssl.SSLContext} instances.
  * <p>
- * Please note: the default Oracle JSSE implementation of {@link SSLContext#init(KeyManager[],
- *  TrustManager[], SecureRandom)}
- * accepts multiple key and trust managers, however only first matching type is ever used.
+ * Please note: the default Oracle JSSE implementation of
+ * {@link SSLContext#init(KeyManager[], TrustManager[], SecureRandom)}
+ * accepts multiple key and trust managers, however only first matching type
+ * is ever used.
  * See for example:
  * <a href="http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLContext.html#init%28javax.net.ssl.KeyManager[],%20javax.net.ssl.TrustManager[],%20java.security.SecureRandom%29">
  * SSLContext.html#init
@@ -71,10 +72,12 @@ public class SslContextBuilder {
 
   private String protocol;
   private final Set<KeyManager> keyManagers;
-  private String keyManagerFactoryAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+  private String keyManagerFactoryAlgorithm =
+      KeyManagerFactory.getDefaultAlgorithm();
   private String keyStoreType = KeyStore.getDefaultType();
   private final Set<TrustManager> trustManagers;
-  private String trustManagerFactoryAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+  private String trustManagerFactoryAlgorithm =
+      TrustManagerFactory.getDefaultAlgorithm();
   private SecureRandom secureRandom;
   private Provider provider;
 
@@ -91,11 +94,11 @@ public class SslContextBuilder {
    * Sets the SSLContext protocol algorithm name.
    *
    * @param protocol
-   *            the SSLContext protocol algorithm name of the requested protocol. See
-   *            the SSLContext section in the <a href=
-   *            "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#SSLContext">Java
-   *            Cryptography Architecture Standard Algorithm Name
-   *            Documentation</a> for more information.
+   *        the SSLContext protocol algorithm name of the requested protocol.
+   *        See the SSLContext section in the <a href=
+   *        "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#SSLContext">Java
+   *        Cryptography Architecture Standard Algorithm Name Documentation</a>
+   *        for more information.
    * @return this builder
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#SSLContext">Java
@@ -127,11 +130,10 @@ public class SslContextBuilder {
    * Sets the key store type.
    *
    * @param keyStoreType
-   *            the SSLkey store type. See
-   *            the KeyStore section in the <a href=
-   *            "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyStore">Java
-   *            Cryptography Architecture Standard Algorithm Name
-   *            Documentation</a> for more information.
+   *        the SSLkey store type. See the KeyStore section in the <a href=
+   *        "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyStore">Java
+   *        Cryptography Architecture Standard Algorithm Name Documentation</a>
+   *        for more information.
    * @return this builder
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyStore">Java
@@ -146,17 +148,18 @@ public class SslContextBuilder {
    * Sets the key manager factory algorithm name.
    *
    * @param keyManagerFactoryAlgorithm
-   *            the key manager factory algorithm name of the requested protocol. See
-   *            the KeyManagerFactory section in the <a href=
-   *            "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyManagerFactory">Java
-   *            Cryptography Architecture Standard Algorithm Name
-   *            Documentation</a> for more information.
+   *        the key manager factory algorithm name of the requested protocol.
+   *        See the KeyManagerFactory section in the <a href=
+   *        "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyManagerFactory">Java
+   *        Cryptography Architecture Standard Algorithm Name Documentation</a>
+   *        for more information.
    * @return this builder
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyManagerFactory">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
    */
-  public SslContextBuilder setKeyManagerFactoryAlgorithm(String keyManagerFactoryAlgorithm) {
+  public SslContextBuilder setKeyManagerFactoryAlgorithm(
+      String keyManagerFactoryAlgorithm) {
     this.keyManagerFactoryAlgorithm = keyManagerFactoryAlgorithm;
     return this;
   }
@@ -165,25 +168,28 @@ public class SslContextBuilder {
    * Sets the trust manager factory algorithm name.
    *
    * @param trustManagerFactoryAlgorithm
-   *            the trust manager algorithm name of the requested protocol. See
-   *            the TrustManagerFactory section in the <a href=
-   *            "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#TrustManagerFactory">Java
-   *            Cryptography Architecture Standard Algorithm Name
-   *            Documentation</a> for more information.
+   *        the trust manager algorithm name of the requested protocol. See the
+   *        TrustManagerFactory section in the <a href=
+   *        "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#TrustManagerFactory">Java
+   *        Cryptography Architecture Standard Algorithm Name Documentation</a>
+   *        for more information.
    * @return this builder
    * @see <a href=
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#TrustManagerFactory">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
    */
-  public SslContextBuilder setTrustManagerFactoryAlgorithm(String trustManagerFactoryAlgorithm) {
+  public SslContextBuilder setTrustManagerFactoryAlgorithm(
+      String trustManagerFactoryAlgorithm) {
     this.trustManagerFactoryAlgorithm = trustManagerFactoryAlgorithm;
     return this;
   }
 
   public SslContextBuilder loadTrustMaterial(KeyStore truststore)
       throws NoSuchAlgorithmException, KeyStoreException {
-    final TrustManagerFactory tmfactory = TrustManagerFactory.getInstance(trustManagerFactoryAlgorithm == null
-                ? TrustManagerFactory.getDefaultAlgorithm() : trustManagerFactoryAlgorithm);
+    final TrustManagerFactory tmfactory =
+        TrustManagerFactory.getInstance(trustManagerFactoryAlgorithm == null
+            ? TrustManagerFactory.getDefaultAlgorithm()
+            : trustManagerFactoryAlgorithm);
     tmfactory.init(truststore);
     final TrustManager[] tms = tmfactory.getTrustManagers();
     if (tms != null) {
@@ -198,7 +204,8 @@ public class SslContextBuilder {
   }
 
   public SslContextBuilder loadTrustMaterial(File file, char[] storePassword)
-      throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+      throws NoSuchAlgorithmException, KeyStoreException,
+      CertificateException, IOException {
     Args.notNull(file, "Truststore file");
     try (InputStream is = Files.newInputStream(file.toPath())) {
       return loadTrustMaterial(is, storePassword);
@@ -211,24 +218,31 @@ public class SslContextBuilder {
    * @param instream input stream that contains the keystore.
    * @param storePassword Keystore password.
    * @return an SslContextbuilder which trusts the certificates in the keystore.
-   * @throws NoSuchAlgorithmException If th keystore type or other algorithms is not supported.
+   * @throws NoSuchAlgorithmException If th keystore type or other algorithms
+   *         is not supported.
    * @throws KeyStoreException if error occurs when parsing the keystore.
    * @throws CertificateException if error occurs when parsing the certificates.
-   * @throws IOException if error occurs when reading keystore from the input stream.
+   * @throws IOException if error occurs when reading keystore from the input
+   *         stream.
    */
-  public SslContextBuilder loadTrustMaterial(InputStream instream, char[] storePassword)
-      throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+  public SslContextBuilder loadTrustMaterial(
+      InputStream instream, char[] storePassword)
+      throws NoSuchAlgorithmException, KeyStoreException, CertificateException,
+      IOException {
     Args.notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
     trustStore.load(instream, storePassword);
     return loadTrustMaterial(trustStore);
   }
 
-  public SslContextBuilder loadKeyMaterial(KeyStore keystore, char[] keyPassword)
-      throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
-    final KeyManagerFactory kmfactory = KeyManagerFactory
-            .getInstance(keyManagerFactoryAlgorithm == null
-                ? KeyManagerFactory.getDefaultAlgorithm() : keyManagerFactoryAlgorithm);
+  public SslContextBuilder loadKeyMaterial(
+      KeyStore keystore, char[] keyPassword)
+      throws NoSuchAlgorithmException, KeyStoreException,
+      UnrecoverableKeyException {
+    final KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
+        keyManagerFactoryAlgorithm == null
+            ? KeyManagerFactory.getDefaultAlgorithm()
+            : keyManagerFactoryAlgorithm);
     kmfactory.init(keystore, keyPassword);
     final KeyManager[] kms = kmfactory.getKeyManagers();
     if (kms != null) {
@@ -237,16 +251,20 @@ public class SslContextBuilder {
     return this;
   }
 
-  public SslContextBuilder loadKeyMaterial(File file, char[] storePassword, char[] keyPassword)
-      throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+  public SslContextBuilder loadKeyMaterial(
+      File file, char[] storePassword, char[] keyPassword)
+      throws NoSuchAlgorithmException, KeyStoreException,
+      UnrecoverableKeyException, CertificateException, IOException {
     Args.notNull(file, "Keystore file");
     try (InputStream is = Files.newInputStream(file.toPath())) {
       return loadKeyMaterial(is, storePassword, keyPassword);
     }
   }
 
-  public SslContextBuilder loadKeyMaterial(InputStream instream, char[] storePassword, char[] keyPassword)
-      throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException, CertificateException, IOException {
+  public SslContextBuilder loadKeyMaterial(
+      InputStream instream, char[] storePassword, char[] keyPassword)
+      throws NoSuchAlgorithmException, KeyStoreException,
+      UnrecoverableKeyException, CertificateException, IOException {
     Args.notNull(instream, "Keystore instream");
     final KeyStore identityStore = KeyStore.getInstance(keyStoreType);
     identityStore.load(instream, storePassword);
@@ -258,8 +276,10 @@ public class SslContextBuilder {
       Collection<TrustManager> trustManagers, SecureRandom secureRandom)
       throws KeyManagementException {
     sslContext.init(
-        keyManagers.isEmpty()   ? null : keyManagers  .toArray(new KeyManager[0]),
-        trustManagers.isEmpty() ? null : trustManagers.toArray(new TrustManager[0]),
+        keyManagers.isEmpty() ? null
+            : keyManagers.toArray(new KeyManager[0]),
+        trustManagers.isEmpty() ? null
+            : trustManagers.toArray(new TrustManager[0]),
         secureRandom);
   }
 
@@ -276,11 +296,13 @@ public class SslContextBuilder {
 
   @Override
   public String toString() {
-    return "[provider=" + provider + ", protocol=" + protocol + ", keyStoreType=" + keyStoreType
+    return "[provider=" + provider + ", protocol=" + protocol
+        + ", keyStoreType=" + keyStoreType
         + ", keyManagerFactoryAlgorithm=" + keyManagerFactoryAlgorithm
         + ", keyManagers=" + keyManagers
         + ", trustManagerFactoryAlgorithm=" + trustManagerFactoryAlgorithm
-        + ", trustManagers=" + trustManagers + ", secureRandom=" + secureRandom + "]";
+        + ", trustManagers=" + trustManagers
+        + ", secureRandom=" + secureRandom + "]";
   }
 
 }

@@ -25,11 +25,21 @@ import org.bouncycastle.asn1.x509.qualified.QCStatement;
 import org.bouncycastle.asn1.x509.qualified.TypeOfBiometricData;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.security.*;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.OIDs;
+import org.xipki.security.SecurityFactory;
+import org.xipki.security.SignAlgo;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.BadInputException;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.DHSigStaticKeyCertPair;
+import org.xipki.security.pkix.KeyUsage;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.SignAlgoMode;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -559,7 +569,7 @@ public class CsrActions {
         }
       }
 
-      XiSigner signer0;
+      Signer signer0;
       try {
         signer0 = signer.borrowSigner();
       } catch (NoIdleSignerException ex) {

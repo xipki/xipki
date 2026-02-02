@@ -4,7 +4,7 @@
 package org.xipki.ocsp.client;
 
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.extra.misc.ReqRespDebug;
 
 import java.math.BigInteger;

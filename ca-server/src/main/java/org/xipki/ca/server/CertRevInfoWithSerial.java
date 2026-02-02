@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.security.CrlReason;
+import org.xipki.security.pkix.CrlReason;
 import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;

@@ -23,15 +23,15 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -478,7 +478,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
           certChain[i] = certChain0[i].toBcCert().toASN1Structure();
         }
 
-        XiSigner signer0;
+        Signer signer0;
         try {
           signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {

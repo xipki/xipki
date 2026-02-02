@@ -11,13 +11,13 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.util.codec.Args;
 
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class P12XdhMacSignerBuilder {
 
-  private static class XdhMacContentSigner extends HmacXiSigner {
+  private static class XdhMacContentSigner extends HmacSigner {
 
     private final byte[] prefix;
 
@@ -198,11 +198,11 @@ public class P12XdhMacSignerBuilder {
 
   public ConcurrentSigner createSigner(int parallelism)
       throws XiSecurityException {
-    List<XiSigner> signers = new ArrayList<>(
+    List<Signer> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      XiSigner signer =
+      Signer signer =
           new XdhMacContentSigner(algo, key, peerIssuerAndSerial);
       signers.add(signer);
     }

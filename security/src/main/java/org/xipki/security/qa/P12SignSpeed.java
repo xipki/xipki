@@ -5,14 +5,14 @@ package org.xipki.security.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.benchmark.BenchmarkExecutor;
 import org.xipki.util.codec.Args;

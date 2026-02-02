@@ -17,7 +17,7 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.CollectionStore;
 import org.xipki.scep.client.ScepClientException.OperationNotSupportedException;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.message.AuthorityCertStore;
 import org.xipki.security.scep.message.CaCaps;
 import org.xipki.security.scep.message.DecodedNextCaMessage;

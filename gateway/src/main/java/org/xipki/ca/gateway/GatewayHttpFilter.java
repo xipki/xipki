@@ -28,10 +28,10 @@ import org.xipki.ca.gateway.scep.ScepHttpServlet;
 import org.xipki.ca.gateway.scep.ScepProtocolConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.Securities;
-import org.xipki.security.X509Cert;
 import org.xipki.security.auth.RequestorAuthenticator;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.audit.Audits;
@@ -427,7 +427,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
       throws InvalidConfException, ObjectCreationException {
     return (signerConf == null) ? null
         : securities.securityFactory().createSigner(signerConf.type(),
-            new org.xipki.security.SignerConf(signerConf.conf()),
+            new org.xipki.security.sign.SignerConf(signerConf.conf()),
             X509Util.parseCerts(signerConf.certs())
                 .toArray(new X509Cert[0]));
   }

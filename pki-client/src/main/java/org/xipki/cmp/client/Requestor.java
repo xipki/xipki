@@ -7,9 +7,9 @@ import org.bouncycastle.asn1.cmp.PBMParameter;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.util.codec.Args;
 
 import java.security.SecureRandom;

@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.scep;
 
 import org.xipki.ca.gateway.CaNameSigners;
-import org.xipki.security.ConcurrentSigner;
+import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.util.codec.Args;
 
 import java.util.HashMap;

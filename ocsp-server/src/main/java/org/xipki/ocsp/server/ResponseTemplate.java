@@ -11,9 +11,9 @@ import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.Extension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.ocsp.server.type.WritableOnlyExtension;
-import org.xipki.security.CrlReason;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
+import org.xipki.security.pkix.CrlReason;
 
 import java.io.IOException;
 import java.time.Instant;

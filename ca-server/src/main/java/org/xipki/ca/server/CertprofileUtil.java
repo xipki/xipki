@@ -27,9 +27,9 @@ import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.security.KeyUsage;
 import org.xipki.security.OIDs;
 import org.xipki.security.exception.BadCertTemplateException;
+import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 

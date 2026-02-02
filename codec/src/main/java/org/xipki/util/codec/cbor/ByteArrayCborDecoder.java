@@ -15,7 +15,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import static org.xipki.util.codec.cbor.CborConstants.*;
+import static org.xipki.util.codec.cbor.CborConstants.TYPE_TEXT_STRING;
 
 /**
  * Provides a decoder capable of handling CBOR encoded data from a

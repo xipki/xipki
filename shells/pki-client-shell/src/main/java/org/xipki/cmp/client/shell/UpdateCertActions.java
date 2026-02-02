@@ -29,14 +29,14 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgoMode;
-import org.xipki.security.SignerConf;
-import org.xipki.security.X509Cert;
-import org.xipki.security.XiSigner;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.SignAlgoMode;
+import org.xipki.security.sign.Signer;
+import org.xipki.security.sign.SignerConf;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -415,7 +415,7 @@ public class UpdateCertActions {
 
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
-      XiSigner signer0 = signer.borrowSigner();
+      Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
         popSk = popBuilder.build(signer0.x509Signer());

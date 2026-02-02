@@ -6,9 +6,9 @@ package org.xipki.security.pkcs11;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiSigner;
 import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.sign.Signer;
 import org.xipki.security.util.DigestOutputStream;
 import org.xipki.util.codec.Args;
 import org.xipki.util.io.IoUtil;
@@ -21,20 +21,20 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * PKCS#11 {@link XiSigner} for composite signers.
+ * PKCS#11 {@link Signer} for composite signers.
  *
  * @author Lijun Liao (xipki)
  */
-public class P11CompositeSigner implements XiSigner {
+public class P11CompositeSigner implements Signer {
 
   private static final byte[] prefix =
       "CompositeAlgorithmSignatures2025".getBytes(StandardCharsets.US_ASCII);
 
   private final DigestOutputStream os;
 
-  private final P11XiSigner pqcSigner;
+  private final P11Signer pqcSigner;
 
-  private final P11XiSigner tradSigner;
+  private final P11Signer tradSigner;
 
   private final CompositeSigSuite algoSuite;
 
@@ -58,10 +58,10 @@ public class P11CompositeSigner implements XiSigner {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
 
-    this.pqcSigner = P11XiSigner.newInstance(
+    this.pqcSigner = P11Signer.newInstance(
         identity.pqcKey(), algoSuite.mldsaVariant().signAlgo(),
         rnd, identity.pqcKey().publicKey(), algoSuite.label());
-    this.tradSigner = P11XiSigner.newInstance(
+    this.tradSigner = P11Signer.newInstance(
         identity.tradKey(), algoSuite.tradVariant().signAlgo(),
         rnd, identity.tradKey().publicKey());
     this.x509Signer = new MyX509Signer();

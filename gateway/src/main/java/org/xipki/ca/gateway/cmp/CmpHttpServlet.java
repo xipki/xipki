@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.HttpRespAuditException;
 import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.security.X509Cert;
+import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.audit.AuditEvent;

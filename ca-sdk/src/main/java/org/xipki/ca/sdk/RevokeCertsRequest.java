@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.CrlReason;
+import org.xipki.security.pkix.CrlReason;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.util.codec.cbor.CborDecoder;

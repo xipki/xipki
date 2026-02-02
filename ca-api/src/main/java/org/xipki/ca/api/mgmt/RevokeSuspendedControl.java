@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.security.CrlReason;
+import org.xipki.security.pkix.CrlReason;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;

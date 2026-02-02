@@ -5,11 +5,11 @@ package org.xipki.security.pkcs12.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.X509Cert;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.P12ContentSignerBuilder;
+import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 

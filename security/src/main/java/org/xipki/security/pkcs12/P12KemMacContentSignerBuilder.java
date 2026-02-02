@@ -10,16 +10,16 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.security.ConcurrentSigner;
-import org.xipki.security.DfltConcurrentSigner;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.XiSigner;
-import org.xipki.security.bc.compositekem.CompositeMLKEMPublicKey;
+import org.xipki.security.composite.kem.CompositeMLKEMPublicKey;
 import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.encap.KemEncapsulation;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
@@ -100,12 +100,12 @@ public class P12KemMacContentSignerBuilder {
       throw new XiSecurityException("unknown signAlgo " + signAlgo);
     }
 
-    List<XiSigner> signers = new ArrayList<>(
+    List<Signer> signers = new ArrayList<>(
         Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
-      HmacXiSigner macSigner = new HmacXiSigner(SignAlgo.HMAC_SHA256, macKey);
-      XiSigner signer = new MyX509Signer(macSigner);
+      HmacSigner macSigner = new HmacSigner(SignAlgo.HMAC_SHA256, macKey);
+      Signer signer = new MyX509Signer(macSigner);
       signers.add(signer);
     }
 
@@ -129,11 +129,11 @@ public class P12KemMacContentSignerBuilder {
     return keypairWithCert.getKey();
   }
 
-  private class MyX509Signer implements XiSigner {
+  private class MyX509Signer implements Signer {
 
-    private final HmacXiSigner macSigner;
+    private final HmacSigner macSigner;
 
-    public MyX509Signer(HmacXiSigner macSigner) {
+    public MyX509Signer(HmacSigner macSigner) {
       this.macSigner = macSigner;
     }
 

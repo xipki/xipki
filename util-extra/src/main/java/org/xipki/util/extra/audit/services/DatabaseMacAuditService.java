@@ -123,8 +123,7 @@ public class DatabaseMacAuditService extends MacAuditService {
       }
 
       conn = datasource.getConnection();
-      String str = datasource.getFirstStringValue(conn, "DBSCHEMA",
-          "VALUE2", "NAME='MAX_MESSAGE_LEN'");
+      String str = datasource.getDbSchemaEntry(conn, "MAX_MESSAGE_LEN");
       this.maxMessageLength = str == null ? 1000: Integer.parseInt(str);
 
       long maxId = datasource.getMax(conn, "AUDIT", "ID",

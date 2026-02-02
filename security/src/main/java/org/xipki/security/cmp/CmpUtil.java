@@ -23,10 +23,10 @@ import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.PKMACBuilder;
 import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
-import org.xipki.security.ConcurrentSigner;
 import org.xipki.security.OIDs;
-import org.xipki.security.XiSigner;
 import org.xipki.security.exception.NoIdleSignerException;
+import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.Signer;
 import org.xipki.util.codec.Args;
 import org.xipki.util.misc.StringUtil;
 
@@ -177,7 +177,7 @@ public class CmpUtil {
       builder.addCMPCertificate(signerCert);
     }
 
-    XiSigner signer0 = signer.borrowSigner();
+    Signer signer0 = signer.borrowSigner();
     ProtectedPKIMessage signedMessage;
     try {
       signedMessage = builder.build(signer0.x509Signer());
