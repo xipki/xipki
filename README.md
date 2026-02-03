@@ -99,11 +99,12 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
   - Public key types of certificates: RSA, EC, Ed25519, Ed448, SM2, X25519, X448,
-    ML-DSA-44, ML-DSA-65, ML-DSA-87, ML-KEM-512, ML-KEM-768, ML-KEM-1024,
+    MLDSA / ML-DSA (ML-DSA-44, ML-DSA-65, ML-DSA-87),
+    MLKEM / ML-KEM (ML-KEM-512, ML-KEM-768, ML-KEM-1024),
     composite MLDSA (in draft-ietf-lamps-pq-composite-sigs),
     composite MLKEM (in draft-ietf-lamps-pq-composite-kem)
   - Signature algorithms of certificates
-    - ML-DSA-44, ML-DSA-65, ML-DSA-87,
+    - MLDSA / ML-DSA (ML-DSA-44, ML-DSA-65, ML-DSA-87),
     - Composite MLDSA (in draft-ietf-lamps-pq-composite-sigs),
     - ECDSA with hash algorithms: SHA-1, SHA-2, SHA-3, and SHAKE
     - Ed25519, Ed448
