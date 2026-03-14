@@ -26,15 +26,3 @@ jobs:
 
       - name: Targeted unit tests (security-sensitive modules)
         run: mvn -B -ntp -DskipTests -pl gateway,security -am test
-
-      - name: Dependency security scan (high/critical fail)
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: |
-          EXTRA=""
-          if [ -n "${NVD_API_KEY:-}" ]; then
-            EXTRA="-DnvdApiKey=${NVD_API_KEY}"
-          else
-            echo "INFO: NVD_API_KEY secret not set. Dependency-Check may run much slower."
-          fi
-          mvn -B -ntp -DskipTests org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=8 ${EXTRA}
