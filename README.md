@@ -206,6 +206,3 @@ the `xipki-setup-<version>/INSTALL.md`.
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
 
-### TODO
-  - Write a simple and strictly trusted RequestorAuthenticator used default.
-    Remove the DummyRequestorAuthenticator.
