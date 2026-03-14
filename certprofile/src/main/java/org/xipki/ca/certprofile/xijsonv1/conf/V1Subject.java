@@ -77,8 +77,7 @@ public class V1Subject {
     }
 
     public static ValueType parse(JsonMap json) throws CodecException {
-      return new ValueType(json.getNnString("text"),
-          json.getBool("overridable", false));
+      return new ValueType(json.getNnString("text"), json.getBool("overridable", false));
     }
 
   }

@@ -213,8 +213,7 @@ public class XiRSAPrivateKey extends XiPrivateKey {
             publicExponent, privateExponent, p, q, dP, dQ, qInv);
 
     try {
-      return new PrivateKeyInfo(
-          new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
+      return new PrivateKeyInfo(new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption,
               DERNull.INSTANCE), asn1Key).getEncoded();
     } catch (IOException ex) {
       throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,

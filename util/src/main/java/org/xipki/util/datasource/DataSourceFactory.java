@@ -55,8 +55,7 @@ public class DataSourceFactory {
     return createDataSource(name, config);
   } // method createDataSource
 
-  public DataSourceWrapper createDataSource(
-      String name, ConfigurableProperties conf)
+  public DataSourceWrapper createDataSource(String name, ConfigurableProperties conf)
       throws InvalidConfException {
     DatabaseType databaseType;
     String className = Args.notNull(conf, "conf").getProperty("dataSourceClassName");

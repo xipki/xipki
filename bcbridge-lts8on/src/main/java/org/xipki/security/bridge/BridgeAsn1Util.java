@@ -125,8 +125,7 @@ public class BridgeAsn1Util {
   public static BiometricData buildBiometricData(
         TypeOfBiometricData type, AlgorithmIdentifier hashAlgId,
         byte[] biometricDataHash, String sourceDataUri) {
-    return new BiometricData(type, hashAlgId,
-      new DEROctetString(biometricDataHash),
+    return new BiometricData(type, hashAlgId, new DEROctetString(biometricDataHash),
       sourceDataUri == null ? null : new DERIA5String(sourceDataUri));
   }
 
@@ -135,8 +134,7 @@ public class BridgeAsn1Util {
       AlgorithmIdentifier keyAlg, byte[] valueHint, byte[] encValue) {
     return new EncryptedValue(intendedAlg, symmAlg,
         (encSymmKey == null ? null : new DERBitString(encSymmKey)), keyAlg,
-        (valueHint == null ? null : new DEROctetString(valueHint)),
-        new DERBitString(encValue));
+        (valueHint == null ? null : new DEROctetString(valueHint)), new DERBitString(encValue));
   }
 
 }

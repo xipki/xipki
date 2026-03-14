@@ -183,8 +183,7 @@ public class ProfileActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

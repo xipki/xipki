@@ -205,8 +205,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
     OutputStream entriesFileOs = null;
     try {
-      entriesFileOs = Files.newOutputStream(
-          Paths.get(baseDir, type.dirName() + ".mf"),
+      entriesFileOs = Files.newOutputStream(Paths.get(baseDir, type.dirName() + ".mf"),
           StandardOpenOption.CREATE, StandardOpenOption.APPEND);
       exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
       return null;
@@ -344,8 +343,7 @@ class CaCertstoreDbExporter extends DbPorter {
             boolean ee = (i != 0);
 
             CaCertstore.Cert cert = new CaCertstore.Cert(id, certFileName,
-                rs.getInt("CA_ID"),  rs.getString("SN"),
-                rs.getInt("PID"),    rs.getInt("RID"), ee,
+                rs.getInt("CA_ID"), rs.getString("SN"), rs.getInt("PID"), rs.getInt("RID"), ee,
                 rs.getLong("LUPDATE"), rs.getInt("CRL_SCOPE"));
 
             if (privateKey != null) {
@@ -402,8 +400,7 @@ class CaCertstoreDbExporter extends DbPorter {
 
             BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
-            CaCertstore.Crl crl = new CaCertstore.Crl(id,
-                rs.getInt("CA_ID"), crlFilename,
+            CaCertstore.Crl crl = new CaCertstore.Crl(id, rs.getInt("CA_ID"), crlFilename,
                 crlNumber.toString(), rs.getInt("CRL_SCOPE"));
 
             ((CaCertstore.Crls) entriesInCurrentFile).add(crl);

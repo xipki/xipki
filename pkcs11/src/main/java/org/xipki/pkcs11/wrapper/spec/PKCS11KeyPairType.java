@@ -313,8 +313,7 @@ public interface PKCS11KeyPairType {
   class SM2 extends GenericEC {
 
     private SM2() {
-      super(PKCS11T.CKM_VENDOR_SM2_KEY_PAIR_GEN, PKCS11T.CKK_VENDOR_SM2,
-          "1.2.156.10197.1.301");
+      super(PKCS11T.CKM_VENDOR_SM2_KEY_PAIR_GEN, PKCS11T.CKK_VENDOR_SM2, "1.2.156.10197.1.301");
     }
 
     @Override

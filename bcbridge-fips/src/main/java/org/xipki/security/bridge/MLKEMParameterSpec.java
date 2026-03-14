@@ -37,8 +37,7 @@ public class MLKEMParameterSpec {
   }
 
   static MLKEMParameterSpec of(org.bouncycastle.pqc.jcajce.spec.MLKEMParameterSpec bc) {
-    switch (bc.getName().toUpperCase(Locale.ROOT)
-        .replace("-", "").replace("_", "")) {
+    switch (bc.getName().toUpperCase(Locale.ROOT).replace("-", "").replace("_", "")) {
       case "MLKEM512":
         return ml_kem_512;
       case "MLKEM768":

@@ -330,8 +330,7 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     final int countSingleResponses = singleResponses.length;
 
     if (countSingleResponses != serialNumbers.length) {
-      String msg = StringUtil.concat("response with ",
-          Integer.toString(countSingleResponses),
+      String msg = StringUtil.concat("response with ", Integer.toString(countSingleResponses),
           " singleResponse", (countSingleResponses > 1 ? "s" : ""),
           " is returned, expected is ", Integer.toString(serialNumbers.length));
       throw new OcspResponseException.OcspTargetUnmatched(msg);

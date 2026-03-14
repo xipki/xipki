@@ -419,8 +419,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     if (deltaCrl) {
       baseCrlNumber = Optional.ofNullable(caInfo.getMaxFullCrlNumber())
           .orElseThrow(() -> new OperationException(SYSTEM_FAILURE,
-              "Should not happen. No FullCRL is available while " +
-              "generating DeltaCRL"));
+              "Should not happen. No FullCRL is available while generating DeltaCRL"));
     }
 
     LOG.info("     START generateCrl: ca={}, deltaCRL={}, thisUpdate={}, " +

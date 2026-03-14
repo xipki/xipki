@@ -214,8 +214,7 @@ public class CmpResponder extends BaseCmpResponder {
         }
 
         boolean reuseOldPublicKey = publicKey == null;
-        oldCertInfo = new OldCertInfo(reuseOldPublicKey,
-            new OldCertInfo.ByIssuerAndSerial(
+        oldCertInfo = new OldCertInfo(reuseOldPublicKey, new OldCertInfo.ByIssuerAndSerial(
                 new X500NameType(oldCertId.getIssuer().getName().toASN1Primitive().getEncoded()),
                 oldCertId.getSerialNumber().getValue()));
       } // end if(reenroll)
@@ -495,8 +494,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       if (certDetails.getSerialNumber() == null) {
-        return buildErrorMsgPkiBody(rejection, badCertTemplate,
-            "serialNumber is not present");
+        return buildErrorMsgPkiBody(rejection, badCertTemplate, "serialNumber is not present");
       }
 
       BigInteger serialNumber = certDetails.getSerialNumber().getValue();
@@ -543,8 +541,7 @@ public class CmpResponder extends BaseCmpResponder {
         if (ext != null) {
           AuthorityKeyIdentifier tAki = AuthorityKeyIdentifier.getInstance(ext.getParsedValue());
           if (Asn1Util.getKeyIdentifier(tAki) == null) {
-            return buildErrorMsgPkiBody(rejection, badCertTemplate,
-                "issuer's AKI not present");
+            return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer's AKI not present");
           }
 
           if (aki == null) {

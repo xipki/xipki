@@ -88,8 +88,7 @@ public class DigestDiffWorker extends DbWorker {
     diff.setIncludeCaCerts(includeCaCerts);
     diff.diff();
     long end = Clock.systemUTC().millis();
-    System.out.println("finished in " +
-        StringUtil.formatTime((end - start) / 1000, false));
+    System.out.println("finished in " + StringUtil.formatTime((end - start) / 1000, false));
   } // method run0
 
 }

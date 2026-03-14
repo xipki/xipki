@@ -106,10 +106,8 @@ public class CaHasRequestorEntry extends MgmtEntry {
   }
 
   public static CaHasRequestorEntry parse(JsonMap json) throws CodecException {
-    return new CaHasRequestorEntry(
-        NameId.parse(json.getNnMap("requestorIdent")),
-        Permissions.parse(json.getList("permissions")),
-        json.getStringList("profiles"));
+    return new CaHasRequestorEntry(NameId.parse(json.getNnMap("requestorIdent")),
+        Permissions.parse(json.getList("permissions")), json.getStringList("profiles"));
   }
 
 }

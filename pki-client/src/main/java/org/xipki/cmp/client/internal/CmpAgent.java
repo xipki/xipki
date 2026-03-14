@@ -287,8 +287,7 @@ class CmpAgent {
   } // method send
 
   private PKIHeader buildPkiHeader(Requestor requestor, Responder responder) {
-    return buildPkiHeader(requestor, responder,  false, null,
-        null, (InfoTypeAndValue[]) null);
+    return buildPkiHeader(requestor, responder,  false, null, null, (InfoTypeAndValue[]) null);
   }
 
   private PKIHeader buildPkiHeader(
@@ -827,8 +826,7 @@ class CmpAgent {
     return new PKIMessage(header, new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content));
   } // method buildUnrevokeOrRemoveCertRequest
 
-  private PKIMessage buildPkiMessage(
-      Requestor requestor, Responder responder,
+  private PKIMessage buildPkiMessage(Requestor requestor, Responder responder,
       CsrEnrollCertRequest csr, Instant notBefore, Instant notAfter) {
     CmpUtf8Pairs utf8Pairs = null;
     if (notBefore != null) {

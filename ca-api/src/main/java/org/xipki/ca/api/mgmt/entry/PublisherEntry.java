@@ -86,8 +86,7 @@ public class PublisherEntry extends MgmtEntry {
   }
 
   public static PublisherEntry parse(JsonMap json) throws CodecException {
-    return new PublisherEntry(
-        NameId.parse(json.getNnMap("ident")),
+    return new PublisherEntry(NameId.parse(json.getNnMap("ident")),
         json.getNnString("type"), json.getString("conf"));
   }
 

@@ -244,8 +244,7 @@ public class OcspActions {
 
           if (isBlank(serverUrl)) {
             if (CollectionUtil.isEmpty(ocspUrls)) {
-              throw new IllegalCmdParamException(
-                  "could not extract OCSP responder URL");
+              throw new IllegalCmdParamException("could not extract OCSP responder URL");
             } else {
               String url = ocspUrls.get(0);
               if (ocspUrl != null && !ocspUrl.equals(url)) {
@@ -484,8 +483,7 @@ public class OcspActions {
 
       final int n = singleResponses.length;
       if (n != serialNumbers.size()) {
-        throw new CmdFailure("received status with " + n +
-            " single responses from server, but "
+        throw new CmdFailure("received status with " + n + " single responses from server, but "
             + serialNumbers.size() + " were requested");
       }
 
@@ -595,8 +593,7 @@ public class OcspActions {
               status = "unknown (RFC6960)";
             } else {
               status = StringUtil.concatObjects("revoked, reason = ",
-                  CrlReason.forReasonCode(reason).description(),
-                  ", revocationTime = ", revTime,
+                  CrlReason.forReasonCode(reason).description(), ", revocationTime = ", revTime,
                   (invTime == null ? "" : ", invalidityTime = " + invTime));
             }
           } else {

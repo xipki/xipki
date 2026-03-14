@@ -35,8 +35,7 @@ public abstract class PackUtil {
     }
   }
 
-  public static void bigEndianToInt(
-      byte[] bs, int off, int[] ns, int nsOff, int nsLen) {
+  public static void bigEndianToInt(byte[] bs, int off, int[] ns, int nsOff, int nsLen) {
     for (int i = 0; i < nsLen; ++i) {
       ns[nsOff + i] = bigEndianToInt(bs, off);
       off += 4;

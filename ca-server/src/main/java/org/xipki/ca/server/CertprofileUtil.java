@@ -117,9 +117,8 @@ public class CertprofileUtil {
             && !containsRdn(subject, OIDs.DN.givenName)
             && !containsRdn(subject, OIDs.DN.surname)) {
           throw new BadCertTemplateException(
-              "subject:street is prohibited if the " +
-              "subject:organizationName field, subject:givenName, and " +
-              "subject:surname field are absent.");
+              "subject:street is prohibited if the subject:organizationName field, " +
+              "subject:givenName, and subject:surname field are absent.");
         }
       }
 

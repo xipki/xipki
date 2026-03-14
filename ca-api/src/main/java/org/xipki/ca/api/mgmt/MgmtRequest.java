@@ -132,8 +132,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddCertprofile parse(JsonMap json) throws CodecException {
-      return new AddCertprofile(CertprofileEntry.parse(
-          json.getNnMap("certprofileEntry")));
+      return new AddCertprofile(CertprofileEntry.parse( json.getNnMap("certprofileEntry")));
     }
 
   } // class AddCertprofile
@@ -554,10 +553,8 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GenerateCert parse(JsonMap json) throws CodecException {
-      return new GenerateCert(json.getNnString("caName"),
-          json.getNnString("profileName"),
-          json.getInstant("notBefore"),
-          json.getInstant("notAfter"),
+      return new GenerateCert(json.getNnString("caName"), json.getNnString("profileName"),
+          json.getInstant("notBefore"), json.getInstant("notAfter"),
           json.getNnBytes("encodedCsr"));
     }
 
@@ -586,10 +583,8 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GenerateKeyCert parse(JsonMap json) throws CodecException {
-      return new GenerateKeyCert(json.getNnString("caName"),
-          json.getNnString("profileName"),
-          json.getInstant("notBefore"),
-          json.getInstant("notAfter"),
+      return new GenerateKeyCert(json.getNnString("caName"), json.getNnString("profileName"),
+          json.getInstant("notBefore"), json.getInstant("notAfter"),
           json.getNnString("subject"));
     }
   } // class GenerateKeyCert
@@ -651,12 +646,9 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GenerateCrossCertificate parse(JsonMap json) throws CodecException {
-      return new GenerateCrossCertificate(
-          json.getNnString("caName"),
-          json.getNnString("profileName"),
-          json.getBytes("encodedCsr"),
-          json.getBytes("encodedTargetCert"),
-          json.getInstant("notBefore"),
+      return new GenerateCrossCertificate( json.getNnString("caName"),
+          json.getNnString("profileName"), json.getBytes("encodedCsr"),
+          json.getBytes("encodedTargetCert"), json.getInstant("notBefore"),
           json.getInstant("notAfter"));
     }
 
@@ -731,10 +723,8 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GenerateRootCa parse(JsonMap json) throws CodecException {
-      GenerateRootCa ret = new GenerateRootCa(
-          CaEntry.parse(json.getNnMap("caEntry")),
-          json.getNnString("profileName"),
-          json.getNnString("subject"));
+      GenerateRootCa ret = new GenerateRootCa( CaEntry.parse(json.getNnMap("caEntry")),
+          json.getNnString("profileName"), json.getNnString("subject"));
 
       ret.setSerialNumber(json.getString("serialNumber"));
       ret.setNotBefore(json.getInstant("notBefore"));
@@ -1015,8 +1005,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static RemoveEntityFromCa parse(JsonMap json) throws CodecException {
-      return new RemoveEntityFromCa(json.getNnString("caName"),
-          json.getNnString("entityName"));
+      return new RemoveEntityFromCa(json.getNnString("caName"), json.getNnString("entityName"));
     }
 
   } // class RemoveEntityFromCa
@@ -1135,8 +1124,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       }
 
       return new RevokeCertificate(json.getNnString("caName"),
-          json.getNnBigInteger("serialNumber"), reason,
-          json.getInstant("invalidityTime"));
+          json.getNnBigInteger("serialNumber"), reason, json.getInstant("invalidityTime"));
     }
 
   } // class RevokeCertificate

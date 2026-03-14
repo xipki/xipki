@@ -297,8 +297,7 @@ public class Backend {
         if (keyType == CKK_VENDOR_SM2) {
           curve = WeierstraussCurveEnum.SM2;
 
-          byte[] ecParams = pkAttrs.removeByteArray(
-              PKCS11T.CKA_EC_PARAMS);
+          byte[] ecParams = pkAttrs.removeByteArray( PKCS11T.CKA_EC_PARAMS);
           if (ecParams != null) {
             if (WeierstraussCurveEnum.SM2 != WeierstraussCurveEnum.ofEcParams(ecParams)) {
               throw new HsmException(PKCS11T.CKR_TEMPLATE_INCONSISTENT, "The key is not SM2");
@@ -421,8 +420,7 @@ public class Backend {
     return handles;
   }
 
-  public long C_GenerateKey(
-      LoginState loginState, boolean sessionRw, long slotId,
+  public long C_GenerateKey( LoginState loginState, boolean sessionRw, long slotId,
       XiMechanism mechanism, XiTemplate template) throws HsmException {
     long keyType = template.removeNonNullLong(CKA_KEY_TYPE);
 
@@ -454,8 +452,7 @@ public class Backend {
     Store store = store(inToken);
     long handle = store.nextObjectHandle(slotId);
 
-    XiSecretKey secretKey = new XiSecretKey(
-        vendor, loginState.getUserType(), Origin.GENERATE,
+    XiSecretKey secretKey = new XiSecretKey( vendor, loginState.getUserType(), Origin.GENERATE,
         handle, inToken, keyType, mechanism.getCkm(), value);
     secretKey.updateAttributes(loginState, ObjectInitMethod.NEW, template);
 
@@ -463,8 +460,7 @@ public class Backend {
     return handle;
   }
 
-  public long C_CreateObject(
-      XiHsmVendor vendor, LoginState loginState, boolean sessionRw,
+  public long C_CreateObject( XiHsmVendor vendor, LoginState loginState, boolean sessionRw,
       long slotId, XiTemplate attributes) throws HsmException {
     boolean inToken = checkInToken(sessionRw, attributes);
     Store storage = store(inToken);

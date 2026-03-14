@@ -880,8 +880,7 @@ public class OcspServer implements Closeable {
       case REVOKED:
         CertRevocationInfo revInfo = certStatusInfo.revocationInfo();
         certStatus = ResponseTemplate.getEncodeRevokedInfo(
-            repOpt.isIncludeRevReason() ? revInfo.reason() : null,
-            revInfo.revocationTime());
+            repOpt.isIncludeRevReason() ? revInfo.reason() : null, revInfo.revocationTime());
 
         Instant invalidityDate = revInfo.invalidityTime();
         if (repOpt.isIncludeInvalidityDate() && invalidityDate != null
@@ -904,8 +903,7 @@ public class OcspServer implements Closeable {
     }
 
     if (certStatusInfo.archiveCutOff() != null) {
-      extensions.add(ResponseTemplate.getArchiveOffExtension(
-          certStatusInfo.archiveCutOff()));
+      extensions.add(ResponseTemplate.getArchiveOffExtension( certStatusInfo.archiveCutOff()));
     }
 
     if (LOG.isDebugEnabled()) {
@@ -915,8 +913,7 @@ public class OcspServer implements Closeable {
           : Arrays.equals(certStatus, bytes_certstatus_rfc6960_unknown) ? "RFC6960_unknown"
           : unknownAsRevoked.get() ? "unknown_as_revoked" : "revoked";
 
-      String msg = StringUtil.concatObjectsCap(250,
-          "issuer: ", certId.issuer(),
+      String msg = StringUtil.concatObjectsCap(250, "issuer: ", certId.issuer(),
           ", serialNumber: ", LogUtil.formatCsn(certId.serialNumber()),
           ", certStatus: ", certStatusText, ", thisUpdate: ", thisUpdate,
           ", nextUpdate: ", nextUpdate);

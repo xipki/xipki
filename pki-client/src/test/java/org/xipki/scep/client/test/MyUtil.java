@@ -113,8 +113,7 @@ public class MyUtil {
       throws CertificateException {
     return generateSelfsignedCert(
         Args.notNull(csr, "csr").getCertificationRequestInfo().getSubject(),
-        csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(),
-        identityKey);
+        csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
   }
 
   public static X509Cert generateSelfsignedCert(

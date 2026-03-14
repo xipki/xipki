@@ -91,8 +91,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
           VERSION_V2 + ": " + certstore.version());
     }
 
-    json = JsonParser.parseMap(Paths.get(baseDir, FILENAME_CA_CONFIGURATION),
-        false);
+    json = JsonParser.parseMap(Paths.get(baseDir, FILENAME_CA_CONFIGURATION), false);
     CaConfType.CaSystem caconf = CaConfType.CaSystem.parse(json);
 
     System.out.println("importing CA certstore to OCSP database");
@@ -303,8 +302,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
                             processLogFile, processLog, numProcessedBefore, importLog);
           minId = lastId + 1;
         } catch (Exception ex) {
-          System.err.println(
-              "\ncould not import certificates from file " + certsFile +
+          System.err.println( "\ncould not import certificates from file " + certsFile +
               ".\nplease continue with the option '--resume'");
           LOG.error("Exception", ex);
           throw ex;

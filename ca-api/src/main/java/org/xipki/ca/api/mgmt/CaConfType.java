@@ -568,8 +568,7 @@ public class CaConfType {
 
       return new Ca(json.getInt("id"), json.getNnString("name"),
           CaInfo.parse(json.getNnMap("caInfo")), json.getStringList("aliases"),
-          json.getStringList("profiles"), requestors,
-          json.getStringList("publishers"));
+          json.getStringList("profiles"), requestors, json.getStringList("publishers"));
     }
 
   } // class Ca
@@ -740,8 +739,7 @@ public class CaConfType {
       if (conf == null && binaryConf == null) {
         throw new IllegalArgumentException("conf and binaryConf may not be both null");
       } else if (conf != null && binaryConf != null) {
-        throw new IllegalArgumentException(
-            "conf and binaryConf may not be both non-null");
+        throw new IllegalArgumentException("conf and binaryConf may not be both non-null");
       }
 
       String name = json.getNnString("name");

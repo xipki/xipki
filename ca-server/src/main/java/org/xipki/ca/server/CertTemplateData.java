@@ -40,8 +40,7 @@ public class CertTemplateData {
   public CertTemplateData(
       X500Name subject, SubjectPublicKeyInfo publicKeyInfo, Instant notBefore,
       Instant notAfter, Extensions extensions, String certprofileName) {
-    this(subject, publicKeyInfo, notBefore, notAfter, extensions,
-        certprofileName, null, false);
+    this(subject, publicKeyInfo, notBefore, notAfter, extensions, certprofileName, null, false);
   }
 
   public CertTemplateData(

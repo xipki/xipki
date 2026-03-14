@@ -231,8 +231,7 @@ public class CsrActions {
           : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
 
       if (extnValue != null) {
-        extensions.add(
-            new Extension(OIDs.Extn.subjectInfoAccess, false, extnValue));
+        extensions.add( new Extension(OIDs.Extn.subjectInfoAccess, false, extnValue));
       }
 
       // Keyusage
@@ -368,8 +367,7 @@ public class CsrActions {
 
         PKCS10CertificationRequest csr = generateRequest(signer,
             subjectPublicKeyInfo, cert.getSubject(), challengePassword, extensions);
-        saveVerbose("saved CSR to file", outputFilename,
-            encodeCsr(csr.getEncoded(), outform));
+        saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
         return null;
       }
 
@@ -627,8 +625,7 @@ public class CsrActions {
     private String moduleName = "default";
 
     @Option(name = "--rsa-pss", description =
-        "whether to use the RSAPSS for the POP computation\n" +
-        "(only applied to RSA key)")
+        "whether to use the RSAPSS for the POP computation\n" + "(only applied to RSA key)")
     private Boolean rsaPss = Boolean.FALSE;
 
     @Override
@@ -637,8 +634,7 @@ public class CsrActions {
       return getSigner(moduleName, slotIndex, id, label, mode, securityFactory);
     }
 
-    ConcurrentSigner getSigner(
-        String moduleName, String slotIndex, String id, String label,
+    ConcurrentSigner getSigner( String moduleName, String slotIndex, String id, String label,
         SignAlgoMode mode, SecurityFactory securityFactory) throws Exception {
       byte[] idBytes = null;
       if (id != null) {

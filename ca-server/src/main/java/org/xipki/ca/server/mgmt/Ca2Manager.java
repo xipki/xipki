@@ -615,8 +615,7 @@ class Ca2Manager {
     X500Name x500Subject = new X500Name(subject);
 
     CertTemplateData certTemplateData = new CertTemplateData(
-        x500Subject, null, notBefore, notAfter, null,
-        profileName, BigInteger.ONE, true);
+        x500Subject, null, notBefore, notAfter, null, profileName, BigInteger.ONE, true);
 
     CertificateInfo certInfo;
     try {

@@ -52,8 +52,7 @@ public class BridgeKEMUtil {
 
   private static MLKEMPublicKeyParameters toPublicParameters(SubjectPublicKeyInfo pkInfo) {
     MLKEMParameters variant = getMLKEMVariant(pkInfo.getAlgorithm());
-    return new MLKEMPublicKeyParameters(variant,
-        BridgeAsn1Util.getPublicKeyData(pkInfo));
+    return new MLKEMPublicKeyParameters(variant, BridgeAsn1Util.getPublicKeyData(pkInfo));
   }
 
   private static MLKEMPrivateKeyParameters toPrivateParameters(PrivateKeyInfo skInfo) {

@@ -219,8 +219,7 @@ public abstract class DataSourceWrapper implements Closeable {
      *
      */
     @Override
-    public String buildSelectFirstSql(
-        int rows, String orderBy, String coreSql) {
+    public String buildSelectFirstSql(int rows, String orderBy, String coreSql) {
       if (isBlank(orderBy)) {
         return concat("SELECT ", coreSql, (coreSql.contains(" WHERE") ? " AND" : " WHERE"),
             " ROWNUM<", Integer.toString(rows + 1));
@@ -326,8 +325,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
     @Override
     protected String buildCreateSequenceSql(String sequenceName, long startValue) {
-      return concat("CREATE SEQUENCE ", sequenceName,
-          " AS BIGINT START WITH ",
+      return concat("CREATE SEQUENCE ", sequenceName, " AS BIGINT START WITH ",
           Long.toString(startValue), " INCREMENT BY 1");
     }
 
@@ -589,8 +587,7 @@ public abstract class DataSourceWrapper implements Closeable {
   public long getMin(Connection conn, String table, String column, String condition)
       throws DataAccessException {
     String sql = concat("SELECT MIN(", notBlank(column, "column"),
-        ") FROM ", notBlank(table, "table"),
-        (isBlank(condition) ? "" : " WHERE " + condition));
+        ") FROM ", notBlank(table, "table"), (isBlank(condition) ? "" : " WHERE " + condition));
 
     Statement stmt = null;
     ResultSet rs = null;
@@ -725,8 +722,7 @@ public abstract class DataSourceWrapper implements Closeable {
 
   public boolean tableHasColumn(Connection conn, String table, String column)
       throws DataAccessException {
-    String coreSql = concat(notBlank(column, "column"), " FROM ",
-        notBlank(table, "table"));
+    String coreSql = concat(notBlank(column, "column"), " FROM ", notBlank(table, "table"));
     final String sql = buildSelectFirstSql(1, coreSql);
 
     Statement stmt = null;
@@ -779,8 +775,7 @@ public abstract class DataSourceWrapper implements Closeable {
     try {
       dropSequence(sequenceName);
     } catch (DataAccessException ex) {
-      LOG.error("could not drop sequence {}: {}",
-          sequenceName, ex.getMessage());
+      LOG.error("could not drop sequence {}: {}", sequenceName, ex.getMessage());
     }
 
     createSequence(sequenceName, startValue);
@@ -914,8 +909,7 @@ public abstract class DataSourceWrapper implements Closeable {
       String onDeleteAction, String onUpdateAction)
       throws DataAccessException {
     final String sql = getSqlToAddForeignKeyConstraint(constraintName,
-        baseTable, baseColumn, referencedTable, referencedColumn,
-        onDeleteAction, onUpdateAction);
+        baseTable, baseColumn, referencedTable, referencedColumn, onDeleteAction, onUpdateAction);
     executeUpdate(conn, sql);
   } // method addForeignKeyConstraint
 

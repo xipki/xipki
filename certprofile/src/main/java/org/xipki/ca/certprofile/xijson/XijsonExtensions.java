@@ -743,14 +743,10 @@ public class XijsonExtensions {
     }
 
     List<ASN1ObjectIdentifier> simpleSchemaTypes = Arrays.asList(
-        OIDs.Extn.id_ccc_K_Vehicle_Cert,
-        OIDs.Extn.id_ccc_F_External_CA_Cert,
-        OIDs.Extn.id_ccc_P_VehicleOEM_Enc_Cert,
-        OIDs.Extn.id_ccc_Q_VehicleOEM_Sig_Cert,
-        OIDs.Extn.id_ccc_Device_Enc_Cert,
-        OIDs.Extn.id_ccc_Vehicle_Intermediate_Cert,
-        OIDs.Extn.id_ccc_J_VehicleOEM_CA_Cert,
-        OIDs.Extn.id_ccc_M_VehicleOEM_CA_Cert);
+        OIDs.Extn.id_ccc_K_Vehicle_Cert, OIDs.Extn.id_ccc_F_External_CA_Cert,
+        OIDs.Extn.id_ccc_P_VehicleOEM_Enc_Cert, OIDs.Extn.id_ccc_Q_VehicleOEM_Sig_Cert,
+        OIDs.Extn.id_ccc_Device_Enc_Cert, OIDs.Extn.id_ccc_Vehicle_Intermediate_Cert,
+        OIDs.Extn.id_ccc_J_VehicleOEM_CA_Cert, OIDs.Extn.id_ccc_M_VehicleOEM_CA_Cert);
 
     boolean isInstanceCAExtensionSchema =
         OIDs.Extn.id_ccc_E_Instance_CA_Cert.equals(type);

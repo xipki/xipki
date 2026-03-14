@@ -597,8 +597,7 @@ public class AcmeResponder {
 
         Boolean onlyReturnExisting = reqPayload.onlyReturnExisting();
         if (onlyReturnExisting != null && onlyReturnExisting) {
-          throw new AcmeProtocolException(SC_BAD_REQUEST,
-              AcmeError.accountDoesNotExist, null);
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.accountDoesNotExist, null);
         }
 
         // create a new account
@@ -1037,8 +1036,7 @@ public class AcmeResponder {
           }
         }
 
-        Extensions csrExtensions = X509Util.getExtensions(
-            csr.getCertificationRequestInfo());
+        Extensions csrExtensions = X509Util.getExtensions( csr.getCertificationRequestInfo());
 
         byte[] sanExtnValue = csrExtensions == null ? null
             : X509Util.getCoreExtValue(csrExtensions, OIDs.Extn.subjectAlternativeName);
@@ -1134,8 +1132,7 @@ public class AcmeResponder {
                 "could not retrieve CA certificate chain");
           }
 
-          String hexCaSubject = Hex.encode(
-              X509Util.extractCertSubject(cacerts[0]));
+          String hexCaSubject = Hex.encode(X509Util.extractCertSubject(cacerts[0]));
 
           if (!hexIssuer.equals(hexCaSubject)) {
             throw new AcmeProtocolException(SC_INTERNAL_SERVER_ERROR, AcmeError.serverInternal,
@@ -1151,8 +1148,7 @@ public class AcmeResponder {
         byte[] respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchain));
 
         LOG.info("downloaded certificate of order {}", order.idText());
-        return toHttpResponse(
-            HttpRespContent.ofOk(CT_PEM_CERTIFICATE_CHAIN, respBytes));
+        return toHttpResponse(HttpRespContent.ofOk(CT_PEM_CERTIFICATE_CHAIN, respBytes));
       }
       case CMD_authz: {
         if (tokens.length != 2) {

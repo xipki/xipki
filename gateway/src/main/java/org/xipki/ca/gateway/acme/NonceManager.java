@@ -63,8 +63,7 @@ public class NonceManager {
       while ((line = reader.readLine()) != null) {
         StringTokenizer tokenizer = new StringTokenizer(line, ":");
         String nonce = tokenizer.nextToken();
-        long notAfter = Math.min(maxNotAftter,
-            Long.parseLong(tokenizer.nextToken(), 16));
+        long notAfter = Math.min(maxNotAftter, Long.parseLong(tokenizer.nextToken(), 16));
 
         if (notAfter > now) {
           sum++;
@@ -132,8 +131,7 @@ public class NonceManager {
         }
 
         sum++;
-        String line = entry.getKey() + ":" +
-            Long.toString(entry.getValue(), 16) + "\n";
+        String line = entry.getKey() + ":" + Long.toString(entry.getValue(), 16) + "\n";
         os.write(line.getBytes(StandardCharsets.UTF_8));
       }
     } catch (IOException ex) {

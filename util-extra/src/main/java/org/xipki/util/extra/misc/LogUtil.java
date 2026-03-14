@@ -56,8 +56,7 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.error("({}.{} {}), {}: {}", trace.getClassName(),
-          trace.getMethodName(), trace.getLineNumber(),
-          th.getClass().getName(), th.getMessage());
+          trace.getMethodName(), trace.getLineNumber(), th.getClass().getName(), th.getMessage());
     } else {
       log.error("{}: {}", th.getClass().getName(), th.getMessage());
     }
@@ -101,8 +100,7 @@ public class LogUtil {
     if (traces.length > 2) {
       StackTraceElement trace = traces[2];
       log.error("({}.{} {}), {}: {}", trace.getClassName(),
-          trace.getMethodName(), trace.getLineNumber(),
-          th.getClass().getName(), th.getMessage());
+          trace.getMethodName(), trace.getLineNumber(), th.getClass().getName(), th.getMessage());
     } else {
       log.warn("{}: {}", th.getClass().getName(), th.getMessage());
     }
@@ -161,8 +159,7 @@ public class LogUtil {
     if (logReqResp && log.isDebugEnabled()) {
       if (viaPost) {
         log.debug("{} HTTP POST path: {}\nRequest:\n{}\nResponse:\n{}",
-            prefix, requestURI, toUtf8String(requestBytes),
-            toUtf8String(respBody));
+            prefix, requestURI, toUtf8String(requestBytes), toUtf8String(respBody));
       } else {
         log.debug("{} HTTP GET path: {}\nResponse:\n{}",
             prefix, requestURI, toUtf8String(respBody));
@@ -176,8 +173,7 @@ public class LogUtil {
     if (logReqResp && log.isDebugEnabled()) {
       if (viaPost) {
         log.debug("{} HTTP POST path: {}\nRequest:\n{}\nResponse:\n{}",
-            prefix, requestURI, base64Encode(requestBytes),
-            base64Encode(respBody));
+            prefix, requestURI, base64Encode(requestBytes), base64Encode(respBody));
       } else {
         log.debug("{} HTTP GET path: {}\nResponse:\n{}",
             prefix, requestURI, base64Encode(respBody));

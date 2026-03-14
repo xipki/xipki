@@ -33,8 +33,7 @@ class SqlErrorCodes {
   private static class H2 extends SqlErrorCodes {
 
     H2() {
-      badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111,
-          42112, 42121, 42122, 42132);
+      badSqlGrammarCodes = toSet(42000, 42001, 42101, 42102, 42111, 42112, 42121, 42122, 42132);
       duplicateKeyCodes = toSet(23001, 23505);
       dataIntegrityViolationCodes = toSet(22001, 22003, 22012, 22018,
           22025, 23000, 23002, 23003, 23502, 23503, 23506, 23507, 23513);

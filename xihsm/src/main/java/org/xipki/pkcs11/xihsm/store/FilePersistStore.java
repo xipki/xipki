@@ -211,8 +211,7 @@ public class FilePersistStore implements PersistStore {
     private final File slotDir;
 
     FileSlot(XiHsmVendor vendor, File slotDir, int slotIndex, long slotId, SlotUsers users) {
-      super(vendor,
-          new StoreSlotInfo(vendor, slotIndex, slotId,
+      super(vendor, new StoreSlotInfo(vendor, slotIndex, slotId,
               "sn-1234", "file-slot-" + slotId, users));
       this.slotDir = Args.notNull(slotDir, "slotDir");
 

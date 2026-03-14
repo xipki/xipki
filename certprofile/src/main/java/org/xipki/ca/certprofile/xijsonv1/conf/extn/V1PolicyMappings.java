@@ -32,16 +32,13 @@ public class V1PolicyMappings {
 
     public PolicyIdMappingType(DescribableOid issuerDomainPolicy,
                               DescribableOid subjectDomainPolicy) {
-      this.issuerDomainPolicy = Args.notNull(
-          issuerDomainPolicy,  "issuerDomainPolicy");
-      this.subjectDomainPolicy = Args.notNull(
-          subjectDomainPolicy, "subjectDomainPolicy");
+      this.issuerDomainPolicy = Args.notNull( issuerDomainPolicy,  "issuerDomainPolicy");
+      this.subjectDomainPolicy = Args.notNull( subjectDomainPolicy, "subjectDomainPolicy");
     }
 
     public static PolicyIdMappingType parse(JsonMap json)
         throws CodecException {
-      return new PolicyIdMappingType(
-          DescribableOid.parseNn(json, "issuerDomainPolicy"),
+      return new PolicyIdMappingType( DescribableOid.parseNn(json, "issuerDomainPolicy"),
           DescribableOid.parseNn(json, "subjectDomainPolicy"));
     }
 

@@ -104,8 +104,7 @@ public class KemMacTest {
 
       SecretKey macKey = new SecretKeySpec(secret, "AES");
 
-      HmacSigner verifier = new HmacSigner(
-          SignAlgo.HMAC_SHA256, macKey);
+      HmacSigner verifier = new HmacSigner( SignAlgo.HMAC_SHA256, macKey);
 
       verifier.x509Signer().getOutputStream().write(data);
       byte[] macValue = verifier.x509Signer().getSignature();

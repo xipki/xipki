@@ -285,8 +285,7 @@ public class X509Ca extends X509CaModule implements Closeable {
       RequestorInfo requestor, BigInteger serialNumber, CrlReason reason, Instant invalidityTime)
       throws OperationException {
     AuditEvent event = newAuditEvent(
-        reason == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_cert : TYPE_revoke_cert,
-        requestor);
+        reason == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_cert : TYPE_revoke_cert, requestor);
     try {
       CertWithRevocationInfo ret = revokerModule.revokeCert(
           serialNumber, reason, invalidityTime, event);

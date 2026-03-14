@@ -50,8 +50,7 @@ public class CrlActions {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
       }
 
-      saveVerbose("saved CRL to file", outFile,
-          XiAction.encodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outFile, XiAction.encodeCrl(crl.getEncoded(), outform));
       return null;
     } // method execute0
 

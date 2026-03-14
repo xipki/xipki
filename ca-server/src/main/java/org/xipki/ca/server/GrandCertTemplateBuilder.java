@@ -49,8 +49,7 @@ class GrandCertTemplateBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(GrandCertTemplateBuilder.class);
 
-  private static final Instant MAX_CERT_TIME = ZonedDateTime.of(
-      9999, 12, 31, 23, 59, 59, 0,
+  private static final Instant MAX_CERT_TIME = ZonedDateTime.of( 9999, 12, 31, 23, 59, 59, 0,
       ZoneOffset.UTC).toInstant(); //9999-12-31T23:59:59.000
 
   private final KeySpec keyspecByImplicitCA;

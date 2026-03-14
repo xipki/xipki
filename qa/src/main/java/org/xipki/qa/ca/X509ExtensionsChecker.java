@@ -287,8 +287,7 @@ public class X509ExtensionsChecker {
     ASN1ObjectIdentifier[] certExtnOids = extensions.getExtensionOIDs();
 
     if (certExtnOids == null) {
-      ValidationIssue issue = new ValidationIssue(
-          "X509.EXT.GEN", "extension general");
+      ValidationIssue issue = new ValidationIssue("X509.EXT.GEN", "extension general");
       result.add(issue);
       issue.setFailureMessage("no extension is present");
       return result;
@@ -636,8 +635,7 @@ public class X509ExtensionsChecker {
       byte[] extensionValue, Extensions requestedExtns, ExtensionControl extControl) {
     byte[] expected = getExpectedExtValue(extnType, requestedExtns, extControl);
     if (!Arrays.equals(expected, extensionValue)) {
-      CheckerUtil.addViolation(failureMsg, "extension values",
-          Hex.encode(extensionValue),
+      CheckerUtil.addViolation(failureMsg, "extension values", Hex.encode(extensionValue),
           (expected == null) ? "not present" : Hex.encode(expected));
     }
   } // method checkConstantExtnValue

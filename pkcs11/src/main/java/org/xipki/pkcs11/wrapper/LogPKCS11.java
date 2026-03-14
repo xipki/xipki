@@ -289,14 +289,12 @@ public class LogPKCS11 {
         debugIn(method, hSession, "hObject={}, {}", hObject, attrNames);
       }
 
-      Template template = pkcs11().C_GetAttributeValue(
-          hSession, hObject, attrTypes);
+      Template template = pkcs11().C_GetAttributeValue( hSession, hObject, attrTypes);
       if (debugEnabled) {
         Template tmpTemplate = new Template(template.attributes());
         template.attributesAsSensitive(PKCS11T.CKA_VALUE, PKCS11T.CKA_PRIME,
             // RSA
-            PKCS11T.CKA_PRIVATE_EXPONENT,
-            PKCS11T.CKA_PRIME_1, PKCS11T.CKA_PRIME_2,
+            PKCS11T.CKA_PRIVATE_EXPONENT, PKCS11T.CKA_PRIME_1, PKCS11T.CKA_PRIME_2,
             PKCS11T.CKA_EXPONENT_1, PKCS11T.CKA_EXPONENT_2);
         debugOut(method, hObject, tmpTemplate);
       }
@@ -358,8 +356,7 @@ public class LogPKCS11 {
       long hSession, CkMechanism mechanism, byte[] prefix, long hKey, byte[] suffix, int maxSize)
       throws PKCS11Exception {
     final String method = "C_DigestX";
-    debugIn(method, hSession,
-        "mechanism={}, prefix.len={}, hKey={}, suffix.len={}, maxSize={}",
+    debugIn(method, hSession, "mechanism={}, prefix.len={}, hKey={}, suffix.len={}, maxSize={}",
         mechanism, len(prefix), hKey, len(suffix), maxSize);
     try {
       return toNonNull(method, hSession,

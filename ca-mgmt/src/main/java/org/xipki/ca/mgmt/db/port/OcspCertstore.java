@@ -136,8 +136,7 @@ public class OcspCertstore implements JsonEncodable {
           json.getNnString("subject"), json.getInt("crlId"));
       boolean revoked = json.getBool("rev", false);
       if (revoked) {
-        ret.setRevocation(json.getNnInt("rr"),
-            json.getNnLong("rt"), json.getLong("rit"));
+        ret.setRevocation(json.getNnInt("rr"), json.getNnLong("rt"), json.getLong("rit"));
       }
       return ret;
     }

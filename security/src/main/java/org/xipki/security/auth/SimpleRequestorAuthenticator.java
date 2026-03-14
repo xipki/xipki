@@ -320,8 +320,7 @@ public class SimpleRequestorAuthenticator implements RequestorAuthenticator {
   public void init(String conf) throws XiSecurityException {
     String confFile = StringUtil.isBlank(conf) ? "etc/simple-requestors.json" : conf;
     try {
-      JsonMap root = JsonParser.parseMap(
-          Path.of(IoUtil.expandFilepath(confFile, true)), true);
+      JsonMap root = JsonParser.parseMap( Path.of(IoUtil.expandFilepath(confFile, true)), true);
 
       Set<MyPasswordRequestor> passwordRequestors0 = null;
       JsonList list = root.getList("passwords");

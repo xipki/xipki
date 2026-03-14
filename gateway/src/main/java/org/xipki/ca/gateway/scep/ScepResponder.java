@@ -668,8 +668,7 @@ public class ScepResponder {
     }
   } // method servicePkiOperation0
 
-  private SignedData getCert(
-      String caName, X500Name issuer, BigInteger serialNumber)
+  private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
       throws FailInfoException, OperationException, SdkErrorResponseException {
     byte[] encodedCert = Optional.ofNullable(sdk.getCert(caName, issuer, serialNumber))
         .orElseThrow(() -> FailInfoException.BAD_CERTID);

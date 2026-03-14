@@ -55,9 +55,8 @@ public class SIGN_ADDITIONAL_CONTEXT extends CkParams {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    return toString(indent, module,
-        "hedgeVariant", PKCS11T.codeToName(Category.CKH_HEDGE, hedgeVariant),
-        "pContext", context);
+    return toString(indent, module, "hedgeVariant",
+        PKCS11T.codeToName(Category.CKH_HEDGE, hedgeVariant), "pContext", context);
   }
 
   public static SIGN_ADDITIONAL_CONTEXT decode(Arch arch, byte[] encoded, AtomicInteger off)

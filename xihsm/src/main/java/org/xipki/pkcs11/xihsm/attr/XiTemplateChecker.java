@@ -38,8 +38,7 @@ public class XiTemplateChecker {
       HsmUtil.concatenate(cert_RO_Attrs, CKA_VALUE, CKA_URL);
 
   private static final long[] x509Cert_RW_Attrs =
-      HsmUtil.concatenate(cert_RW_Attrs,
-          CKA_ID, CKA_ISSUER, CKA_SUBJECT, CKA_SERIAL_NUMBER,
+      HsmUtil.concatenate(cert_RW_Attrs, CKA_ID, CKA_ISSUER, CKA_SUBJECT, CKA_SERIAL_NUMBER,
           CKA_HASH_OF_ISSUER_PUBLIC_KEY, CKA_HASH_OF_SUBJECT_PUBLIC_KEY,
           CKA_JAVA_MIDP_SECURITY_DOMAIN, CKA_NAME_HASH_ALGORITHM);
 
@@ -54,8 +53,7 @@ public class XiTemplateChecker {
       HsmUtil.concatenate(key_RO_Attrs, CKA_ALWAYS_SENSITIVE, CKA_NEVER_EXTRACTABLE);
 
   private static final long[] privateOrSecretKey_RW_Attrs =
-      HsmUtil.concatenate(key_RW_Attrs,
-          CKA_DECRYPT, CKA_EXTRACTABLE, CKA_SENSITIVE, CKA_SIGN,
+      HsmUtil.concatenate(key_RW_Attrs, CKA_DECRYPT, CKA_EXTRACTABLE, CKA_SENSITIVE, CKA_SIGN,
           CKA_UNWRAP,  CKA_WRAP_WITH_TRUSTED, CKA_UNWRAP_TEMPLATE, CKA_DERIVE_TEMPLATE);
 
   private static final long[] privateKey_RO_Attrs = privateOrSecretKey_RO_Attrs;

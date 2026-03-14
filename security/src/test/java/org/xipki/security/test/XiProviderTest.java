@@ -117,8 +117,7 @@ public class XiProviderTest {
     return md.digest();
   }
 
-  private static byte[] sign(
-      SignAlgo signAlgo, byte[] m, Provider prov, PrivateKey key)
+  private static byte[] sign( SignAlgo signAlgo, byte[] m, Provider prov, PrivateKey key)
       throws Exception {
     Signature sig = Signature.getInstance(signAlgo.jceName(), prov);
     sig.initSign(key, rnd);
@@ -127,8 +126,7 @@ public class XiProviderTest {
   }
 
   private static void verify(
-      SignAlgo signAlgo, byte[] m, byte[] sigValue,
-      Provider prov, PublicKey key)
+      SignAlgo signAlgo, byte[] m, byte[] sigValue, Provider prov, PublicKey key)
       throws Exception {
     Signature sig = Signature.getInstance(signAlgo.jceName(), prov);
     sig.initVerify(key);

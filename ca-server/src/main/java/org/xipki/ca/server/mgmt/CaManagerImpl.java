@@ -567,8 +567,7 @@ public class CaManagerImpl implements CaManager, Closeable {
             " since " + lockedAt +  ". In general this indicates that " +
             "another CA software in master mode is accessing the database " +
             "or the last shutdown of CA software in master mode is abnormal. " +
-            "If you know what you do, you can unlock it executing the " +
-            "ca:unlock command.";
+            "If you know what you do, you can unlock it executing the " + "ca:unlock command.";
         throw logAndCreateException(msg);
       }
 
@@ -1178,8 +1177,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   static void auditLogPciEvent(boolean successful, String eventType) {
-    PciAuditEvent event = PciAuditEvent.newPciAuditEvent(
-        "SYSTEM", eventType, "ca",
+    PciAuditEvent event = PciAuditEvent.newPciAuditEvent( "SYSTEM", eventType, "ca",
         (successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED),
         (successful ? AuditLevel.INFO : AuditLevel.ERROR));
     Audits.getAuditService().logEvent(event);

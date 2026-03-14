@@ -162,8 +162,7 @@ public class CaConf {
           }
         }
 
-        RequestorEntry en = new RequestorEntry(new NameId(null, m.name()),
-            m.type(), conf);
+        RequestorEntry en = new RequestorEntry(new NameId(null, m.name()), m.type(), conf);
         addRequestor(en);
       }
     }
@@ -207,8 +206,7 @@ public class CaConf {
           CaConfType.GenSelfIssued gsi = ci.genSelfIssued();
           if (gsi != null) {
             if (ci.cert() != null) {
-              throw new InvalidConfException(
-                  "cert.file of CA " + name + " may not be set");
+              throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
 
             Instant notBefore = gsi.notBefore() == null ? null

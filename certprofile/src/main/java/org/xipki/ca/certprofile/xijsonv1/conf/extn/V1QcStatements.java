@@ -63,8 +63,7 @@ public class V1QcStatements {
     }
 
     public ExtensionValueConf.QcStatementType toV2() {
-      return new ExtensionValueConf.QcStatementType(
-          QCStatementID.ofOid(statementId.oid()),
+      return new ExtensionValueConf.QcStatementType( QCStatementID.ofOid(statementId.oid()),
           (statementValue == null) ? null : statementValue.toV2());
     }
 
@@ -87,8 +86,7 @@ public class V1QcStatements {
 
     private final List<ExtensionValueConf.PdsLocationType> pdsLocations;
 
-    private QcStatementValueType(
-        DescribableBinary constant, Integer qcRetentionPeriod,
+    private QcStatementValueType( DescribableBinary constant, Integer qcRetentionPeriod,
         ExtensionValueConf.QcEuLimitValueType qcEuLimitValue,
         List<ExtensionValueConf.PdsLocationType> pdsLocations) {
       this.constant = constant;
@@ -96,8 +94,7 @@ public class V1QcStatements {
       this.qcEuLimitValue = qcEuLimitValue;
       this.pdsLocations = pdsLocations;
 
-      int num =    (constant == null ? 0 : 1) +
-          (qcRetentionPeriod == null ? 0 : 1) +
+      int num =    (constant == null ? 0 : 1) + (qcRetentionPeriod == null ? 0 : 1) +
           (qcEuLimitValue    == null ? 0 : 1);
 
       if (CollectionUtil.isNotEmpty(pdsLocations)) {

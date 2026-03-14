@@ -58,8 +58,7 @@ final class AcmeUtils {
     String kty = jwk.get("kty");
     if ("RSA".equalsIgnoreCase(kty)) {
       return KeyUtil.getRSAPublicKey(new RSAPublicKeySpec(
-        new BigInteger(1, decodeFast(jwk.get("n"))),
-        new BigInteger(1, decodeFast(jwk.get("e")))));
+        new BigInteger(1, decodeFast(jwk.get("n"))), new BigInteger(1, decodeFast(jwk.get("e")))));
     } else if ("EC".equalsIgnoreCase(kty)) {
       String curveName = jwk.get("crv");
       EcCurveEnum curve = EcCurveEnum.ofAlias(curveName);

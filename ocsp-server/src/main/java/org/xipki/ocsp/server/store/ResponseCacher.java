@@ -143,8 +143,7 @@ public class ResponseCacher implements Closeable {
     this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
     this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
-    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1,
-        "CERT FROM ISSUER WHERE ID=?");
+    this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1, "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
         "IID,IDENT,GENERATED_AT,NEXT_UPDATE,RESP FROM OCSP WHERE ID=?");
     this.onService = new AtomicBoolean(false);

@@ -60,8 +60,7 @@ public class NewAccountPayload implements JsonEncodable {
     JsonMap map = json.getMap("externalAccountBinding");
     JoseMessage externalAccountBinding = (map == null) ? null : JoseMessage.parse(map);
     return new NewAccountPayload(json.getBool("termsOfServiceAgreed"),
-        json.getBool("onlyReturnExisting"), json.getStringList("contact"),
-        externalAccountBinding);
+        json.getBool("onlyReturnExisting"), json.getStringList("contact"), externalAccountBinding);
   }
 
 }

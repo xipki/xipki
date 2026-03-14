@@ -40,16 +40,12 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileCabRootCa(String destFilename) {
     XijsonCertprofileType profile = getBaseCabProfile(
-        "certprofile RootCA (CA/Browser Forum BR)",
-        CertLevel.RootCA, "10y");
+        "certprofile RootCA (CA/Browser Forum BR)", CertLevel.RootCA, "10y");
 
     // Subject
-    addRdns(profile,
-        rdn  (AttributeType.C),
-        rdn  (AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn  (AttributeType.C),
+        rdn  (AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn  (AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -62,24 +58,19 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
-        profile.keyAlgorithms()));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null, profile.keyAlgorithms()));
 
     marshall(profile, destFilename, true);
   } // method certprofileCabRootCa
 
   private static void certprofileCabSubCa(String destFilename) {
     XijsonCertprofileType profile = getBaseCabProfile(
-        "certprofile SubCA (CA/Browser Forum BR)",
-        CertLevel.SubCA, "8y");
+        "certprofile SubCA (CA/Browser Forum BR)", CertLevel.SubCA, "8y");
 
     // Subject
-    addRdns(profile,
-        rdn  (AttributeType.C),
-        rdn  (AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn  (AttributeType.C),
+        rdn  (AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn  (AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -102,16 +93,14 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
-        profile.keyAlgorithms()));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null, profile.keyAlgorithms()));
 
     // Extensions - CertificatePolicies
     list.add(createExtension(ExtensionID.certificatePolicies, true, false));
     Map<CertificatePolicyID, String> policiesIdAndCpsMap = new HashMap<>();
     policiesIdAndCpsMap.put(CertificatePolicyID.ofOidOrName("1.2.3.4"),
         "http://abc.def.de/cfp");
-    last(list).setCertificatePolicies(
-        createCertificatePolicies(policiesIdAndCpsMap));
+    last(list).setCertificatePolicies( createCertificatePolicies(policiesIdAndCpsMap));
 
     marshall(profile, destFilename, true);
   } // method certprofileCabSubCa
@@ -121,10 +110,8 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
         "certprofile TLS (CA/Browser Forum BR, Domain Validated)");
 
     // Subject
-    addRdns(profile,
-        rdn  (AttributeType.C),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
+    addRdns(profile, rdn  (AttributeType.C),
+        rdn01(AttributeType.OU), rdn01(AttributeType.SN),
         rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
     List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies
@@ -136,20 +123,14 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabDomainValidatedTls
 
-  private static void certprofileCabOrganizationValidatedTls(
-      String destFilename) {
+  private static void certprofileCabOrganizationValidatedTls( String destFilename) {
     XijsonCertprofileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Organization Validated)");
 
     // Subject
-    addRdns(profile,
-        rdn  (AttributeType.C),
-        rdn01(AttributeType.ST),
-        rdn01(AttributeType.locality),
-        rdn  (AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
+    addRdns(profile, rdn(AttributeType.C), rdn01(AttributeType.ST), rdn01(AttributeType.locality),
+        rdn(AttributeType.O), rdn01(AttributeType.OU), rdn01(AttributeType.SN),
+        rdn(AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
 
     List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies
@@ -161,20 +142,14 @@ public class CabProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileCabOrganizationValidatedTls
 
-  private static void certprofileCabIndividualValidatedTls(
-      String destFilename) {
+  private static void certprofileCabIndividualValidatedTls( String destFilename) {
     XijsonCertprofileType profile = getBaseCabSubscriberProfile(
         "certprofile TLS (CA/Browser Forum BR, Individual Validated)");
 
     // Subject
-    addRdns(profile,
-        rdn  (AttributeType.C),
-        rdn01(AttributeType.ST),
-        rdn01(AttributeType.locality),
-        rdn  (AttributeType.givenName),
-        rdn  (AttributeType.surname),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
+    addRdns(profile, rdn(AttributeType.C), rdn01(AttributeType.ST), rdn01(AttributeType.locality),
+        rdn(AttributeType.givenName), rdn(AttributeType.surname), rdn01(AttributeType.SN),
+        rdn(AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
 
     List<ExtensionType> list = profile.extensions();
     // Extensions - CertificatePolicies

@@ -65,12 +65,9 @@ public class SslConf {
   }
 
   public static SslConf parse(JsonMap json) throws CodecException {
-    return new SslConf(json.getString("name"),
-        json.getString("storeType"),
-        json.getString("keystorePassword"),
-        FileOrBinary.parse(json.getMap("keystore")),
-        FileOrBinary.parseArray(json.getList("trustanchors")),
-        json.getString("hostnameVerifier"));
+    return new SslConf(json.getString("name"), json.getString("storeType"),
+        json.getString("keystorePassword"), FileOrBinary.parse(json.getMap("keystore")),
+        FileOrBinary.parseArray(json.getList("trustanchors")), json.getString("hostnameVerifier"));
   }
 
 }

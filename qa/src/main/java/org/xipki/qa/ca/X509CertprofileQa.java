@@ -81,8 +81,7 @@ public class X509CertprofileQa implements CertprofileQa {
       certprofile.initialize(conf);
 
       this.publicKeyControl = certprofile.publicKeyControl();
-      this.subjectChecker = new X509SubjectChecker(
-          certprofile.subjectControl());
+      this.subjectChecker = new X509SubjectChecker( certprofile.subjectControl());
       this.extensionsChecker = new X509ExtensionsChecker(conf, certprofile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);

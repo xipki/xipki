@@ -33,96 +33,61 @@ public class ProfileConfDemo extends ProfileConfBuilder {
           qa_dir + "/certprofile-rootca.json");
       certprofileSubCa (mgmt_dir + "/certprofile-subca.json",
           qa_dir + "/certprofile-subca.json");
-      certprofileOcsp  (mgmt_dir + "/certprofile-ocsp.json",
-          qa_dir + "/certprofile-ocsp.json");
-      certprofileScep  (mgmt_dir + "/certprofile-scep.json",
-          qa_dir + "/certprofile-scep.json");
+      certprofileOcsp  (mgmt_dir + "/certprofile-ocsp.json", qa_dir + "/certprofile-ocsp.json");
+      certprofileScep  (mgmt_dir + "/certprofile-scep.json", qa_dir + "/certprofile-scep.json");
       certprofileSmime (false, mgmt_dir + "/certprofile-smime.json",
           qa_dir + "/certprofile-smime.json");
       certprofileSmime (true, qa_dir + "/certprofile-smime-legacy.json");
-      certprofileTls(
-          new String[]{mgmt_dir + "/certprofile-tls.json",
-              qa_dir + "/certprofile-tls.json"},
-          KeyUsageMode.DEFAULT, KeypairGenMode.FIRST_ALLOWED_KEY,
+      certprofileTls( new String[]{mgmt_dir + "/certprofile-tls.json",
+          qa_dir + "/certprofile-tls.json"}, KeyUsageMode.DEFAULT, KeypairGenMode.FIRST_ALLOWED_KEY,
           AllowKeyMode.ALL);
 
-      certprofileTlsC(mgmt_dir + "/certprofile-tls-c.json",
-          qa_dir + "/certprofile-tls-c.json");
+      certprofileTlsC(mgmt_dir + "/certprofile-tls-c.json", qa_dir + "/certprofile-tls-c.json");
 
       certprofileMaxTime(qa_dir + "/certprofile-max-time.json");
 
-      certprofileTls(qa_dir + "/certprofile-tls-rsa.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.RSA);
+      certprofileTls(qa_dir + "/certprofile-tls-rsa.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.RSA);
 
-      certprofileTls(qa_dir + "/certprofile-tls-ec.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.EC);
+      certprofileTls(qa_dir + "/certprofile-tls-ec.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.EC);
 
-      certprofileTls(qa_dir + "/certprofile-tls-ed25519.json",
-          KeyUsageMode.SIGN_ONLY,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.ED25519);
+      certprofileTls(qa_dir + "/certprofile-tls-ed25519.json", KeyUsageMode.SIGN_ONLY,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.ED25519);
 
-      certprofileTls(qa_dir + "/certprofile-tls-mldsa.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.MLDSA);
+      certprofileTls(qa_dir + "/certprofile-tls-mldsa.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.MLDSA);
 
-      certprofileTls(qa_dir + "/certprofile-tls-mlkem.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.MLKEM);
+      certprofileTls(qa_dir + "/certprofile-tls-mlkem.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.MLKEM);
 
-      certprofileTls(qa_dir + "/certprofile-tls-edwards.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.EDDSA);
+      certprofileTls(qa_dir + "/certprofile-tls-edwards.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.EDDSA);
 
-      certprofileTls(qa_dir + "/certprofile-tls-montgomery.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.XDH);
+      certprofileTls(qa_dir + "/certprofile-tls-montgomery.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.XDH);
 
-      certprofileTls(qa_dir + "/certprofile-tls-compsig.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.COMPSIG);
+      certprofileTls(qa_dir + "/certprofile-tls-compsig.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.COMPSIG);
 
-      certprofileTls(qa_dir + "/certprofile-tls-compkem.json",
-          KeyUsageMode.DEFAULT,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.COMPKEM);
+      certprofileTls(qa_dir + "/certprofile-tls-compkem.json", KeyUsageMode.DEFAULT,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.COMPKEM);
 
-      certprofileTls(qa_dir + "/certprofile-tls-enc.json",
-          KeyUsageMode.ENC_ONLY,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.ALL_ENC);
+      certprofileTls(qa_dir + "/certprofile-tls-enc.json", KeyUsageMode.ENC_ONLY,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.ALL_ENC);
 
-      certprofileTls(
-          new String[]{mgmt_dir + "/certprofile-tls-sm2.json",
-              qa_dir + "/certprofile-tls-sm2.json"},
-          KeyUsageMode.SIGN_ONLY,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.SM2);
+      certprofileTls( new String[]{mgmt_dir + "/certprofile-tls-sm2.json",
+          qa_dir + "/certprofile-tls-sm2.json"}, KeyUsageMode.SIGN_ONLY,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.SM2);
 
-      certprofileTls(
-          new String[]{mgmt_dir + "/certprofile-tls-sm2-enc.json",
-              qa_dir + "/certprofile-tls-sm2-enc.json"},
-          KeyUsageMode.ENC_ONLY,
-          KeypairGenMode.FIRST_ALLOWED_KEY,
-          AllowKeyMode.SM2);
+      certprofileTls( new String[]{mgmt_dir + "/certprofile-tls-sm2-enc.json",
+          qa_dir + "/certprofile-tls-sm2-enc.json"}, KeyUsageMode.ENC_ONLY,
+          KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.SM2);
 
-      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-ed25519.json",
-          true, true);
-      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-ed448.json",
-          true, false);
-      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x25519.json",
-          false, true);
-      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x448.json",
-          false, false);
+      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-ed25519.json", true, true);
+      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-ed448.json", true, false);
+      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x25519.json", false, true);
+      certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x448.json", false, false);
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -134,12 +99,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         KeypairGenMode.FORBIDDEM, AllowKeyMode.ALL_SIGN);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn  (AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -152,8 +113,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},  null,
-        profile.keyAlgorithms()));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign},  null, profile.keyAlgorithms()));
 
     for (String destFilename : destFilenames) {
       marshall(profile, destFilename, true);
@@ -162,16 +122,11 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileCross(String... destFilenames) {
     XijsonCertprofileType profile = getBaseProfile("certprofile cross",
-        CertLevel.CROSS, "10y", KeypairGenMode.FORBIDDEM,
-        AllowKeyMode.ALL_SIGN);
+        CertLevel.CROSS, "10y", KeypairGenMode.FORBIDDEM, AllowKeyMode.ALL_SIGN);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -197,8 +152,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
-        profile.keyAlgorithms()));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null, profile.keyAlgorithms()));
 
     for (String destFilename : destFilenames) {
       marshall(profile, destFilename, true);
@@ -206,17 +160,12 @@ public class ProfileConfDemo extends ProfileConfBuilder {
   } // method certprofileCross
 
   private static void certprofileSubCa(String... destFilenames) {
-    XijsonCertprofileType profile = getBaseProfile(
-        "certprofile subca", CertLevel.SubCA, "8y",
+    XijsonCertprofileType profile = getBaseProfile( "certprofile subca", CertLevel.SubCA, "8y",
         KeypairGenMode.FORBIDDEM, AllowKeyMode.ALL_SIGN);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn  (AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -240,8 +189,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null,
-        profile.keyAlgorithms()));
+        new KeyUsage[]{KeyUsage.keyCertSign, KeyUsage.cRLSign}, null, profile.keyAlgorithms()));
 
     for (String destFilename : destFilenames) {
       marshall(profile, destFilename, true);
@@ -254,13 +202,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         KeypairGenMode.INHERITCA, AllowKeyMode.ALL_SIGN);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.organizationIdentifier),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O),
+        rdn01(AttributeType.organizationIdentifier), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -282,8 +226,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     // Extensions - keyUsage
     list.add(createExtension(ExtensionID.keyUsage, true, true));
-    last(list).setKeyUsage(createKeyUsage(
-        new KeyUsage[]{KeyUsage.contentCommitment}, null,
+    last(list).setKeyUsage(createKeyUsage( new KeyUsage[]{KeyUsage.contentCommitment}, null,
         profile.keyAlgorithms()));
 
     // Extensions - extendedKeyUsage
@@ -298,16 +241,11 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileScep(String... destFilenames) {
     XijsonCertprofileType profile = getBaseProfile("certprofile scep",
-        CertLevel.EndEntity, "5y",
-        KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.RSA);
+        CertLevel.EndEntity, "5y", KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.RSA);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -343,18 +281,13 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         "5y", KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
 
     // Subject
-    addRdns(profile,
-        rdn(AttributeType.C),
-        rdn(AttributeType.O),
-        rdn01(AttributeType.OU));
+    addRdns(profile, rdn(AttributeType.C), rdn(AttributeType.O), rdn01(AttributeType.OU));
 
     RdnType emailRdn = rdn(AttributeType.emailAddress, legacy ? 1 : 0,
         legacy ? 1 : 0, null, null, GeneralNameTag.rfc822Name);
     addRdns(profile, emailRdn);
 
-    addRdns(profile,
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     // Extensions - controls
@@ -366,8 +299,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - SubjectAltNames
     list.add(createExtension(ExtensionID.subjectAlternativeName, true, false));
     last(list).setInRequest(TripleState.optional);
-    GeneralNameType san = new GeneralNameType(
-        List.of(GeneralNameTag.rfc822Name));
+    GeneralNameType san = new GeneralNameType(List.of(GeneralNameTag.rfc822Name));
     last(list).setSubjectAltName(san);
 
     // Extensions - basicConstraints
@@ -384,8 +316,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
-        null, profile.keyAlgorithms()));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement}, null, profile.keyAlgorithms()));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extendedKeyUsage, true, false));
@@ -403,22 +334,16 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   private static void certprofileTlsEdwardsOrMontgomery(
       String destFilename, boolean edwards, boolean curve25519) {
-    String desc = "certprofile tls with " +
-        (edwards ? "edwards " : "montmomery ") +
+    String desc = "certprofile tls with " + (edwards ? "edwards " : "montmomery ") +
         (curve25519 ? "25519" : "448") + " curves";
 
     XijsonCertprofileType profile =
-        getEeBaseProfileForEdwardsOrMontgomeryCurves(
-            desc, "2y", edwards, curve25519);
+        getEeBaseProfileForEdwardsOrMontgomeryCurves( desc, "2y", edwards, curve25519);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null,
-              GeneralNameTag.DNSName));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null,
+            GeneralNameTag.DNSName));
 
     // Extensions
     // Extensions - controls
@@ -447,22 +372,18 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extendedKeyUsage, true, false));
     last(list).setExtendedKeyUsage(createExtendedKeyUsage(
-        new ExtendedKeyUsageID[]{ExtendedKeyUsageID.serverAuth,
-            ExtendedKeyUsageID.clientAuth},
+        new ExtendedKeyUsageID[]{ExtendedKeyUsageID.serverAuth, ExtendedKeyUsageID.clientAuth},
         null));
 
     marshall(profile, destFilename, true);
   } // method certprofileTlsEdwardsOrMontgomery
 
-  private static void certprofileTls(
-      String destFilename, KeyUsageMode keyUsageMode,
+  private static void certprofileTls( String destFilename, KeyUsageMode keyUsageMode,
       KeypairGenMode keypairGenMode, AllowKeyMode... modes) {
-    certprofileTls(new String[]{destFilename}, keyUsageMode,
-        keypairGenMode, modes);
+    certprofileTls(new String[]{destFilename}, keyUsageMode, keypairGenMode, modes);
   }
 
-  private static void certprofileTls(
-      String[] destFilenames, KeyUsageMode keyUsageMode,
+  private static void certprofileTls( String[] destFilenames, KeyUsageMode keyUsageMode,
       KeypairGenMode keypairGenMode, AllowKeyMode... modes) {
     String desc = "certprofile tls";
     if (keyUsageMode == KeyUsageMode.SIGN_ONLY) {
@@ -475,12 +396,9 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         "5y", keypairGenMode, modes);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O),
+        rdn01(AttributeType.OU), rdn01(AttributeType.SN),
+        rdn(AttributeType.CN, 1, 1, REGEX_FQDN, null, GeneralNameTag.DNSName));
 
     // Extensions
     // Extensions - controls
@@ -537,12 +455,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
         KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.ALL);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -565,8 +479,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
-        null, profile.keyAlgorithms()));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement}, null, profile.keyAlgorithms()));
 
     // Extensions - extendedKeyUsage
     list.add(createExtension(ExtensionID.extendedKeyUsage, true, false));
@@ -579,17 +492,12 @@ public class ProfileConfDemo extends ProfileConfBuilder {
   } // method certprofileTlsC
 
   private static void certprofileMaxTime(String destFilename) {
-    XijsonCertprofileType profile = getBaseProfile(
-        "certprofile max-time", CertLevel.EndEntity,
+    XijsonCertprofileType profile = getBaseProfile( "certprofile max-time", CertLevel.EndEntity,
         "UNDEFINED", KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
 
     // Subject
-    addRdns(profile,
-        rdn01(AttributeType.C),
-        rdn01(AttributeType.O),
-        rdn01(AttributeType.OU),
-        rdn01(AttributeType.SN),
-        rdn  (AttributeType.CN, 1, 1, ":FQDN", null));
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN, 1, 1, ":FQDN", null));
 
     // Extensions
     List<ExtensionType> list = profile.extensions();
@@ -612,8 +520,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment, KeyUsage.keyAgreement},
-        null, profile.keyAlgorithms()));
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement}, null, profile.keyAlgorithms()));
 
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime

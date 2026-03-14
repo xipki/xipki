@@ -22,12 +22,9 @@ import java.util.List;
 public class V1SubjectToSubjectAltNameType {
 
   private static final List<GeneralNameTag> allowedTargets = Arrays.asList(
-      GeneralNameTag.rfc822Name,
-      GeneralNameTag.DNSName,
-      GeneralNameTag.directoryName,
-      GeneralNameTag.uri,
-      GeneralNameTag.IPAddress,
-      GeneralNameTag.registeredID);
+      GeneralNameTag.rfc822Name, GeneralNameTag.DNSName,
+      GeneralNameTag.directoryName, GeneralNameTag.uri,
+      GeneralNameTag.IPAddress, GeneralNameTag.registeredID);
 
   private final DescribableOid source;
 
@@ -50,8 +47,7 @@ public class V1SubjectToSubjectAltNameType {
   }
 
   public static V1SubjectToSubjectAltNameType parse(JsonMap json) throws CodecException {
-    return new V1SubjectToSubjectAltNameType(
-        DescribableOid.parseNn(json, "source"),
+    return new V1SubjectToSubjectAltNameType( DescribableOid.parseNn(json, "source"),
         GeneralNameTag.getGeneralNameTag(json.getNnString("target")));
   }
 

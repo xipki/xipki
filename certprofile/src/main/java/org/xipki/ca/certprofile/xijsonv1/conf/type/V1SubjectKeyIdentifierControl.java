@@ -57,8 +57,7 @@ public class V1SubjectKeyIdentifierControl {
   public static V1SubjectKeyIdentifierControl parse(JsonMap json) throws CodecException {
     return new V1SubjectKeyIdentifierControl(
         json.getEnum("method", SubjectKeyIdentifierControl.SubjectKeyIdentifierMethod.class),
-        json.getString("hashAlgo"),
-        json.getString("truncateMethod"));
+        json.getString("hashAlgo"), json.getString("truncateMethod"));
   }
 
 }

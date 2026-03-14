@@ -29,8 +29,7 @@ public class PkiErrorException extends Exception {
     this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
   }
 
-  public PkiErrorException(
-      int status, int pkiFailureInfo, String statusMessage) {
+  public PkiErrorException(int status, int pkiFailureInfo, String statusMessage) {
     super(CmpUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
     this.status = status;
     this.pkiFailureInfo = pkiFailureInfo;

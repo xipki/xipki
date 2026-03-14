@@ -383,8 +383,7 @@ public class CaActions {
           caManager.removeCaAlias(caAlias);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(),
-              ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -588,8 +587,7 @@ public class CaActions {
           caManager.removeCa(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(),
-              ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
         }
       }
       return null;

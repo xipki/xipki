@@ -36,8 +36,7 @@ public class QCStatementID extends AbstractID {
       OIDs.QCS.id_etsi_qcs_QcLimitValue, "QcLimitValue", "etsi-qcs-QcLimitValue");
 
   public static final QCStatementID etsi_qcs_QcRetentionPeriod = initOf(
-      OIDs.QCS.id_etsi_qcs_QcRetentionPeriod, "QcRetentionPeriod",
-      "etsi-qcs-QcRetentionPeriod");
+      OIDs.QCS.id_etsi_qcs_QcRetentionPeriod, "QcRetentionPeriod", "etsi-qcs-QcRetentionPeriod");
 
   public static final QCStatementID etsi_qcs_QcSSCD = initOf(
       OIDs.QCS.id_etsi_qcs_QcSSCD, "QcSSCD", "etsi-qcs-QcSSCD");
@@ -49,8 +48,7 @@ public class QCStatementID extends AbstractID {
       OIDs.QCS.id_etsi_qcs_QcType, "QcType", "etsi-qcs-QcType");
 
   public static final QCStatementID etsi_qcs_QcCClegislation = initOf(
-      OIDs.QCS.id_etsi_qcs_QcCClegislation, "QcCClegislation",
-      "etsi-qcs-QcCClegislation");
+      OIDs.QCS.id_etsi_qcs_QcCClegislation, "QcCClegislation", "etsi-qcs-QcCClegislation");
 
   public static final QCStatementID etsi_psd2_qcStatement = initOf(
       OIDs.QCS.id_etsi_psd2_qcStatement, "psd2-qcStatement", "etsi-psd2-qcStatement");

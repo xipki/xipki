@@ -220,8 +220,7 @@ public class SslContextBuilder {
    * @throws IOException if error occurs when reading keystore from the input
    *         stream.
    */
-  public SslContextBuilder loadTrustMaterial(
-      InputStream instream, char[] storePassword)
+  public SslContextBuilder loadTrustMaterial(InputStream instream, char[] storePassword)
       throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
@@ -229,8 +228,7 @@ public class SslContextBuilder {
     return loadTrustMaterial(trustStore);
   }
 
-  public SslContextBuilder loadKeyMaterial(
-      KeyStore keystore, char[] keyPassword)
+  public SslContextBuilder loadKeyMaterial(KeyStore keystore, char[] keyPassword)
       throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
     final KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
         keyManagerFactoryAlgorithm == null
@@ -243,8 +241,7 @@ public class SslContextBuilder {
     return this;
   }
 
-  public SslContextBuilder loadKeyMaterial(
-      File file, char[] storePassword, char[] keyPassword)
+  public SslContextBuilder loadKeyMaterial(File file, char[] storePassword, char[] keyPassword)
       throws NoSuchAlgorithmException, KeyStoreException,
       UnrecoverableKeyException, CertificateException, IOException {
     Args.notNull(file, "Keystore file");
@@ -267,10 +264,8 @@ public class SslContextBuilder {
       SSLContext sslContext, Collection<KeyManager> keyManagers,
       Collection<TrustManager> trustManagers, SecureRandom secureRandom)
       throws KeyManagementException {
-    sslContext.init(
-        keyManagers.isEmpty()   ? null : keyManagers.toArray(new KeyManager[0]),
-        trustManagers.isEmpty() ? null : trustManagers.toArray(new TrustManager[0]),
-        secureRandom);
+    sslContext.init(keyManagers.isEmpty() ? null : keyManagers.toArray(new KeyManager[0]),
+        trustManagers.isEmpty() ? null : trustManagers.toArray(new TrustManager[0]), secureRandom);
   }
 
   public SSLContext build() throws NoSuchAlgorithmException, KeyManagementException {

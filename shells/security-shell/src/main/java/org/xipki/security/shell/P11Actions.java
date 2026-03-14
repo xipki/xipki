@@ -366,14 +366,12 @@ public class P11Actions {
 
     @Option(name = "--id", description =
         "id (hex) of the objects in the PKCS#11 device\n" +
-        "at least one of id and label must be specified " +
-            "(if handle is not set).")
+        "at least one of id and label must be specified (if handle is not set).")
     private String id;
 
     @Option(name = "--label", description =
         "label of the objects in the PKCS#11 device\n" +
-        "at least one of id and label must be specified " +
-            "(if handle is not set).")
+        "at least one of id and label must be specified (if handle is not set).")
     private String label;
 
     @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")

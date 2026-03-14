@@ -646,8 +646,7 @@ public class OIDs {
 
     // Certificate Transparency (RFC 6962)
     public static final ASN1ObjectIdentifier id_kp_certificateTransparency =
-        initOid(
-        "1.3.6.1.4.1.11129.2.4.4", "kp-certificateTransparency");
+        initOid( "1.3.6.1.4.1.11129.2.4.4", "kp-certificateTransparency");
   }
 
   public static final class Extn {
@@ -979,8 +978,7 @@ public class OIDs {
     public static final ASN1ObjectIdentifier id_RSAES_OAEP = initOid(
         "1.2.840.113549.1.1.7", "RSAES-OAEP");
 
-    public static final ASN1ObjectIdentifier id_mgf1 = initOid(
-        "1.2.840.113549.1.1.8", "mgf1");
+    public static final ASN1ObjectIdentifier id_mgf1 = initOid( "1.2.840.113549.1.1.8", "mgf1");
 
     public static final ASN1ObjectIdentifier sm2sign_with_sm3 = initOid(
         "1.2.156.10197.1.501", "sm2sign-with-sm3");
@@ -1118,11 +1116,9 @@ public class OIDs {
     public static final ASN1ObjectIdentifier id_aes256_GCM = initOid(
         "2.16.840.1.101.3.4.1.46", "AES256-GCM");
 
-    public static final ASN1ObjectIdentifier id_sm3 = initOid(
-        "1.2.156.10197.1.401", "id-sm3");
+    public static final ASN1ObjectIdentifier id_sm3 = initOid( "1.2.156.10197.1.401", "id-sm3");
 
-    public static final ASN1ObjectIdentifier id_sha1 = initOid(
-        "1.3.14.3.2.26", "id-sha1");
+    public static final ASN1ObjectIdentifier id_sha1 = initOid( "1.3.14.3.2.26", "id-sha1");
 
     public static final ASN1ObjectIdentifier id_sha224 = initOid(
         "2.16.840.1.101.3.4.2.4", "id-sha224");
@@ -1260,8 +1256,7 @@ public class OIDs {
             "1.3.6.1.5.5.7.6.50", "id-MLDSA87-ECDSA-brainpoolP384r1-SHA512");
 
     public static final ASN1ObjectIdentifier id_MLDSA87_Ed448_SHAKE256 =
-        initOid("1.3.6.1.5.5.7.6.51",
-            "id-MLDSA87-ECDSA-brainpoolP384r1-SHA512");
+        initOid("1.3.6.1.5.5.7.6.51", "id-MLDSA87-ECDSA-brainpoolP384r1-SHA512");
 
     public static final ASN1ObjectIdentifier id_MLDSA87_RSA3072_PSS_SHA512 =
         initOid("1.3.6.1.5.5.7.6.52", "id-MLDSA87-RSA3072-PSS-SHA512");

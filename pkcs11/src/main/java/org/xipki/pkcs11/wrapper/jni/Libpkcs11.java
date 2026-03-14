@@ -22,15 +22,13 @@ class Libpkcs11 {
 
   native static int getVersion(int moduleId);
 
-  native static byte[] query(
-      int op, byte[] resp,
+  native static byte[] query(int op, byte[] resp,
       int moduleId,  // module id
       long id,       // slotId, hSession
       long id2,      // object id, userType, flags,
       long id3,      // extra id,
       int size,      // size or count
-      byte[] data1, byte[] data2,
-      long ckm,     byte[] mechParams,
+      byte[] data1, byte[] data2, long ckm, byte[] mechParams,
       byte[] template1, byte[] template2);
 
 }

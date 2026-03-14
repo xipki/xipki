@@ -99,16 +99,13 @@ public class CmpUtil {
       // 4 - 7
       "badTime", "badRequest", "badMessageCheck", "badAlg",
       // 8 - 11
-      "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce",
-      "wrongIntegrity",
+      "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce", "wrongIntegrity",
       // 12 - 15
       "certConfirmed", "certRevoked", "badPOP", "missingTimeStamp",
       // 16 - 19
-      "notAuthorized", "unsupportedVersion", "transactionIdInUse",
-      "signerNotTrusted",
+      "notAuthorized", "unsupportedVersion", "transactionIdInUse", "signerNotTrusted",
       // 20 - 23
-      "badCertTemplate", "badSenderNonce", "addInfoNotAvailable",
-      "unacceptedExtension",
+      "badCertTemplate", "badSenderNonce", "addInfoNotAvailable", "unacceptedExtension",
       // 24 -27
       "-", "-", "-", "-",
       // 28 - 31

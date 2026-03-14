@@ -733,8 +733,7 @@ public abstract class BaseCmpResponder {
 
   protected static CertRepMessage buildErrCertResp(
       ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
-    return new CertRepMessage(null,
-        new CertResponse[]{new CertResponse(certReqId,
+    return new CertRepMessage(null, new CertResponse[]{new CertResponse(certReqId,
             generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
   }
 

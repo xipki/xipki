@@ -48,8 +48,7 @@ public class MultiPartOperation {
       }
 
       if (!keyMatch) {
-        throw new HsmException(
-            PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
+        throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
             type.getMethod() + " is not supported for the given key type " +
             key.getClass().getName());
       }

@@ -144,8 +144,7 @@ public class DatabaseMacAuditService extends MacAuditService {
         }
       }
 
-      String integrityText = datasource.getFirstStringValue(conn,
-          "INTEGRITY", "TEXT", "ID=1");
+      String integrityText = datasource.getFirstStringValue(conn, "INTEGRITY", "TEXT", "ID=1");
       if (integrityText == null) {
         String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(1,'')";
         try {

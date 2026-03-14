@@ -87,8 +87,7 @@ public class CrlHttpFilter implements XiHttpFilter {
     Connection conn = null;
     try {
       conn = dataSource.getConnection();
-      String sql = dataSource.buildSelectFirstSql(1,
-          "ID FROM CA WHERE NAME='" + caName + "'");
+      String sql = dataSource.buildSelectFirstSql(1, "ID FROM CA WHERE NAME='" + caName + "'");
       ResultSet rs = dataSource.createStatement(conn).executeQuery(sql);
 
       int id;
@@ -103,8 +102,7 @@ public class CrlHttpFilter implements XiHttpFilter {
         dataSource.releaseResources(null, rs);
       }
 
-      long crlNo = dataSource.getMax(conn, "CRL", "CRL_NO",
-          "CA_ID=" + id + " AND DELTACRL=" +
+      long crlNo = dataSource.getMax(conn, "CRL", "CRL_NO", "CA_ID=" + id + " AND DELTACRL=" +
               ("deltacrl".equalsIgnoreCase(type) ? 1 : 0));
       if (crlNo == 0) {
         LOG.warn("No CRL for CA {}", caName);

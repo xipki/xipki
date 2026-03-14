@@ -465,8 +465,7 @@ public class EjbcaCertStatusStore extends OcspStore {
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60),
-              intervalSeconds, TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }

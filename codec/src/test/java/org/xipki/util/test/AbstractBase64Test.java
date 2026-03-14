@@ -80,11 +80,9 @@ public abstract class AbstractBase64Test {
 
     if (!withPadding) {
       if (expectedEncoded.endsWith("==")) {
-        expectedEncoded = expectedEncoded.substring(
-            0, expectedEncoded.length() - 2);
+        expectedEncoded = expectedEncoded.substring( 0, expectedEncoded.length() - 2);
       } else if (expectedEncoded.endsWith("=")) {
-        expectedEncoded = expectedEncoded.substring(
-            0, expectedEncoded.length() - 1);
+        expectedEncoded = expectedEncoded.substring( 0, expectedEncoded.length() - 1);
       }
     }
 

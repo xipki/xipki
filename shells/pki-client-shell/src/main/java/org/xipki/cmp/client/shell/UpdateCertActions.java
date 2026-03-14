@@ -94,8 +94,7 @@ public class UpdateCertActions {
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
-      return new EnrollCertRequest.Entry("id-1", profile, certRequest,
-          null, true, true);
+      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, true, true);
     }
 
     @Override

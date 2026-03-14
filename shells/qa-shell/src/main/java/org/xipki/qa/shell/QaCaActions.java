@@ -311,10 +311,8 @@ public class QaCaActions {
       }
 
       String description = StringUtil.concatObjectsCap(200,
-          "subjectTemplate: ", subjectTemplate,
-          "\nprofile: ", certprofile,
-          "\nkeySpec: ", keyspec,
-          "\nmaxRequests: ", maxRequests);
+          "subjectTemplate: ", subjectTemplate, "\nprofile: ", certprofile,
+          "\nkeySpec: ", keyspec, "\nmaxRequests: ", maxRequests);
 
       RandomDn randomDn = null;
       if (randomDnStr != null) {
@@ -477,8 +475,7 @@ public class QaCaActions {
 
     @Override
     protected Object execute0() throws Exception {
-      println("checking CA profile CA='" + caName +
-          "', profile='" + profileNameAliases + "'");
+      println("checking CA profile CA='" + caName + "', profile='" + profileNameAliases + "'");
 
       if (caManager.getCa(caName) == null) {
         throw new CmdFailure("could not find CA '" + caName + "'");

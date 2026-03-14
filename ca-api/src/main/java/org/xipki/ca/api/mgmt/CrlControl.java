@@ -199,8 +199,7 @@ public class CrlControl implements JsonEncodable {
     } else {
       List<String> tokens = StringUtil.split(str.trim(), ":");
       if (tokens.size() != 2) {
-        throw new InvalidConfException(
-            "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
+        throw new InvalidConfException( "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
       }
 
       try {
@@ -250,8 +249,7 @@ public class CrlControl implements JsonEncodable {
   }
 
   public String toString(boolean verbose) {
-    return StringUtil.concatObjects(
-        "  interval unit:           ", intervalHours, " hours",
+    return StringUtil.concatObjects( "  interval unit:           ", intervalHours, " hours",
         "\n  full CRL intervals:      ", fullCrlIntervals,
         "\n  delta CRL intervals:     ", deltaCrlIntervals,
         "\n  overlap:                 ", overlap,
@@ -260,8 +258,7 @@ public class CrlControl implements JsonEncodable {
         "\n  include expired certs:   ", includeExpiredCerts,
         "\n  invalidity date mode:    ", invalidityDateMode,
         "\n  intervalDayTime:         ", "generate CRL at " + intervalDayTime,
-        " UTC", (verbose ? "\n  encoded:                 " : ""),
-        (verbose ? getConf() : ""));
+        " UTC", (verbose ? "\n  encoded:                 " : ""), (verbose ? getConf() : ""));
   } // method toString(boolean)
 
   public int fullCrlIntervals() {

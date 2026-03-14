@@ -18,8 +18,7 @@ public class ImportKeyPairTest {
   private static abstract class Base extends TestBase {
 
     private void testImport(KeyPair keyPair, KeyPairTemplate template) throws Exception {
-      String label = "test-" + UUID.randomUUID() + "-" +
-          System.currentTimeMillis();
+      String label = "test-" + UUID.randomUUID() + "-" + System.currentTimeMillis();
       template.labels(label);
     }
 

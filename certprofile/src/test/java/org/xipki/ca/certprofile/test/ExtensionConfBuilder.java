@@ -41,8 +41,7 @@ public class ExtensionConfBuilder {
   private static final Set<ExtensionID> OPTIONAL_REQUEST_EXTENSIONS;
 
   static {
-    REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
-        ExtensionID.subjectAltName,
+    REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet( ExtensionID.subjectAltName,
         ExtensionID.subjectInfoAccess);
 
     OPTIONAL_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
@@ -88,8 +87,7 @@ public class ExtensionConfBuilder {
         case ASN1: {
           extnId = ExtensionID.ofOid(new ASN1ObjectIdentifier("1.2.3.4.5.6"));
           try {
-            constValue = new ConstantExtnValue(type,
-                DERNull.INSTANCE.getEncoded());
+            constValue = new ConstantExtnValue(type, DERNull.INSTANCE.getEncoded());
           } catch (IOException e) {
             throw new RuntimeException(e);
           }
@@ -122,8 +120,7 @@ public class ExtensionConfBuilder {
 
   public static ExtensionValueConf.KeyUsage createKeyUsage(
       org.xipki.security.pkix.KeyUsage[] requiredUsages,
-      org.xipki.security.pkix.KeyUsage[] optionalUsages,
-      List<KeySpec> keySpecs) {
+      org.xipki.security.pkix.KeyUsage[] optionalUsages, List<KeySpec> keySpecs) {
     List<org.xipki.security.pkix.KeyUsage> reqSignUsages = new ArrayList<>();
     List<org.xipki.security.pkix.KeyUsage> reqEncUsages = new ArrayList<>();
     List<org.xipki.security.pkix.KeyUsage> reqKAUsages = new ArrayList<>();
@@ -346,8 +343,7 @@ public class ExtensionConfBuilder {
 
   public static ExtensionValueConf.PolicyIdMappingType createPolicyIdMapping(
       CertificatePolicyID issuerPolicyId, CertificatePolicyID subjectPolicyId) {
-    return new ExtensionValueConf.PolicyIdMappingType(
-        issuerPolicyId, subjectPolicyId);
+    return new ExtensionValueConf.PolicyIdMappingType( issuerPolicyId, subjectPolicyId);
   } // method createPolicyIdMapping
 
   public static ExtensionValueConf.PolicyConstraints createPolicyConstraints(
@@ -358,12 +354,10 @@ public class ExtensionConfBuilder {
 
   public static ExtensionValueConf.NameConstraints createNameConstraints() {
     List<GeneralSubtreeType> permitted = new LinkedList<>();
-    permitted.add(GeneralSubtreeType.ofDirectoryName(
-        "O=myorg organization, C=DE"));
+    permitted.add(GeneralSubtreeType.ofDirectoryName( "O=myorg organization, C=DE"));
 
     List<GeneralSubtreeType> excluded = new LinkedList<>();
-    excluded.add(GeneralSubtreeType.ofDirectoryName(
-        "OU=bad OU, O=myorg organization, C=DE"));
+    excluded.add(GeneralSubtreeType.ofDirectoryName( "OU=bad OU, O=myorg organization, C=DE"));
 
     return new ExtensionValueConf.NameConstraints(permitted, excluded);
   } // method createNameConstraints

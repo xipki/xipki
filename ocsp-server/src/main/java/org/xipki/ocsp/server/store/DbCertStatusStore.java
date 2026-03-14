@@ -454,9 +454,8 @@ public class DbCertStatusStore extends OcspStore {
                 caRevInfo.revocationTime(), caRevInfo.invalidityTime());
 
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
-            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
-            certStatusInfo.certprofile());
+            certStatusInfo.certHashAlgo(), certStatusInfo.certHash(), certStatusInfo.thisUpdate(),
+            certStatusInfo.nextUpdate(), certStatusInfo.certprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {

@@ -43,8 +43,7 @@ class CaconfDbImporter extends DbPorter {
       throws DataAccessException, InvalidConfException {
     super(datasource, srcDir, stopMe);
     try {
-      JsonMap json = JsonParser.parseMap(
-          Paths.get(baseDir, FILENAME_CA_CONFIGURATION), false);
+      JsonMap json = JsonParser.parseMap(Paths.get(baseDir, FILENAME_CA_CONFIGURATION), false);
       caconf = CaConfType.CaSystem.parse(json);
     } catch (CodecException ex) {
       throw new InvalidConfException(ex);

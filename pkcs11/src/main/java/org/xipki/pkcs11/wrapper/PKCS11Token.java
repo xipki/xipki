@@ -932,17 +932,14 @@ public class PKCS11Token {
 
   public boolean canGenerateKeyPair(PKCS11KeyPairType keyPairType) {
     CkMechanism mechanism = getGenerateKeyPairCkm(keyPairType);
-    return supportsMechanism(mechanism.getMechanism(),
-        CKF_GENERATE_KEY_PAIR);
+    return supportsMechanism(mechanism.getMechanism(), CKF_GENERATE_KEY_PAIR);
   }
 
   private CkMechanism getGenerateKeyPairCkm(PKCS11KeyPairType keyPairType) {
     CkMechanism mechanism = keyPairType.getGenerateMechanism();
     if (mechanism.getMechanism() == CKM_RSA_PKCS_KEY_PAIR_GEN) {
-      if (supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN,
-              CKF_GENERATE_KEY_PAIR)) {
-        mechanism = new CkMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN,
-            mechanism.getParameters());
+      if (supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)) {
+        mechanism = new CkMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN, mechanism.getParameters());
       }
     }
 
@@ -1035,8 +1032,7 @@ public class PKCS11Token {
   public String toString() {
     return "\nMaximal session count: " + maxSessionCount +
         "\nNew session timeout: " + timeOutWaitNewSessionMs + " ms" +
-        "\nRead only: " + readOnly +
-        "\nToken: " + token;
+        "\nRead only: " + readOnly + "\nToken: " + token;
   }
 
   /**

@@ -145,8 +145,7 @@ public abstract class XiKey extends XiP11Storage {
   private long[] allowedMechanisms;
 
   public XiKey(XiHsmVendor vendor, long cku, Origin newObjectMethod,
-              long handle, boolean inToken, long objectClass, long keyType,
-              Long keyGenMechanism) {
+              long handle, boolean inToken, long objectClass, long keyType, Long keyGenMechanism) {
     super(vendor, cku, newObjectMethod, handle, inToken, objectClass);
     this.keyType = keyType;
     this.keyGenMechanism = keyGenMechanism;

@@ -486,8 +486,7 @@ class ConfLoader {
         for (String name : manager.publisherDbEntries.keySet()) {
           PublisherEntry entry = manager.publisherDbEntries.get(name);
           NameTypeConf conf = new NameTypeConf(null, name, entry.type(),
-              createFileOrValue(zipStream, entry.conf(),
-                  "files/publisher-" + name + ".conf"));
+              createFileOrValue(zipStream, entry.conf(), "files/publisher-" + name + ".conf"));
           list.add(conf);
         }
 

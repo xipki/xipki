@@ -361,8 +361,7 @@ public class CaDbCertStatusStore extends OcspStore {
         }
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
-            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(),
-            certStatusInfo.certprofile());
+            certStatusInfo.thisUpdate(), certStatusInfo.nextUpdate(), certStatusInfo.certprofile());
       }
       return certStatusInfo;
     } catch (DataAccessException ex) {
@@ -469,8 +468,7 @@ public class CaDbCertStatusStore extends OcspStore {
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60),
-              intervalSeconds, TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }

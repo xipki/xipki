@@ -329,8 +329,7 @@ public class P11Slot implements Closeable {
           assert orderByteLen != null;
           priKeyInfo = new PrivateKeyInfo(algId,
               new org.bouncycastle.asn1.sec.ECPrivateKey(orderByteLen * 8,
-                  new BigInteger(1, privValue),
-                  new DERBitString(ecPoint), null));
+                  new BigInteger(1, privValue), new DERBitString(ecPoint), null));
         }
 
         return new KeyInfoPair(new SubjectPublicKeyInfo(algId, ecPoint), priKeyInfo);
@@ -847,8 +846,7 @@ public class P11Slot implements Closeable {
         : (objClass == CKO_OTP_KEY)     ? "    OTP Key"
         : Long.toString(objClass);
 
-    return  "handle=" + handle +
-        ", id=" + (id == null ? "<N/A>" : Hex.encode(id)) +
+    return  "handle=" + handle + ", id=" + (id == null ? "<N/A>" : Hex.encode(id)) +
         ", " + objClassText + (keySpec == null ? "" : ": " + keySpec) +
         ", label=" + (label == null ? "<N/A>" : label);
   }

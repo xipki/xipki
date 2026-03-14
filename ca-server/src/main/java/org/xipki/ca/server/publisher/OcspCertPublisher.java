@@ -157,8 +157,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCa(caCert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.issuerText(), caCert, null, ex,
-          "could not publish revocation of CA");
+      logAndAudit(caCert.issuerText(), caCert, null, ex, "could not publish revocation of CA");
       return false;
     }
   } // method caRevoked

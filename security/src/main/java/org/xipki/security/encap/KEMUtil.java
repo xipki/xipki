@@ -77,8 +77,7 @@ public class KEMUtil {
 
     try {
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.ENCRYPT_MODE,
-          new SecretKeySpec(skEncap.secret(), "AES"),
+      cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(skEncap.secret(), "AES"),
           // skEncap.getSecret() is always fresh, so we used here constant IV.
           new GCMParameterSpec(128, new byte[12]));
       byte[] encryptedSecret = cipher.doFinal(secret);

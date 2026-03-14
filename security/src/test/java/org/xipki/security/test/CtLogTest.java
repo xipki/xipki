@@ -30,15 +30,13 @@ public class CtLogTest {
       try {
         parseCtLogInCert(m);
       } catch (Exception ex) {
-        throw new Exception("exception throw while parsing CT Log in file " + m,
-            ex);
+        throw new Exception("exception throw while parsing CT Log in file " + m, ex);
       }
     }
   }
 
   private void parseCtLogInCert(String certFile) throws Exception {
-    byte[] certBytes = IoUtil.readAllBytesAndClose(
-        getClass().getResourceAsStream(certFile));
+    byte[] certBytes = IoUtil.readAllBytesAndClose( getClass().getResourceAsStream(certFile));
     certBytes = X509Util.toDerEncoded(certBytes);
     Certificate cert = Certificate.getInstance(certBytes);
     Extension extn = cert.getTBSCertificate().getExtensions().getExtension(

@@ -343,10 +343,8 @@ public class V1ExtensionType {
       }
     }
 
-    V1ExtensionType ret = new V1ExtensionType(
-        DescribableOid.parseNn(json, "type"),
-        json.getBool("critical"),
-        json.getBool("required"));
+    V1ExtensionType ret = new V1ExtensionType( DescribableOid.parseNn(json, "type"),
+        json.getBool("critical"), json.getBool("required"));
 
     TripleState inRequest = json.getEnum("inRequest", TripleState.class);
     if (inRequest == null) {

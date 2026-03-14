@@ -88,8 +88,7 @@ public class CmpClientConf {
       }
 
       public static PbmMac parse(JsonMap json) throws CodecException {
-        return new PbmMac(json.getNnStringList("owfAlgos"),
-            json.getNnStringList("macAlgos"));
+        return new PbmMac(json.getNnStringList("owfAlgos"), json.getNnStringList("macAlgos"));
       }
 
     } // class PbmMac

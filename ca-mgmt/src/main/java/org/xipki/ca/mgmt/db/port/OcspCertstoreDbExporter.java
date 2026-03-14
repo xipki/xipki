@@ -218,8 +218,7 @@ class OcspCertstoreDbExporter extends DbPorter {
 
     final String coreSql = "ID,SN,IID,LUPDATE,REV,RR,RT,RIT,NAFTER,NBEFORE," +
         "HASH,SUBJECT,CRL_ID FROM CERT WHERE ID>=?";
-    final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect,
-        "ID ASC", coreSql);
+    final String certSql = datasource.buildSelectFirstSql(numCertsPerSelect, "ID ASC", coreSql);
 
     final long maxId = max("CERT", "ID");
 

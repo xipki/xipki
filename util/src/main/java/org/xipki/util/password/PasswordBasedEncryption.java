@@ -119,8 +119,7 @@ public class PasswordBasedEncryption {
     int algoCode = blob.algo();
     PBEAlgo algo = Optional.ofNullable(PBEAlgo.forCode(algoCode))
         .orElseThrow(() -> new GeneralSecurityException("unknown algorithm code " + algoCode));
-    return decrypt(algo, blob.cipherText(),
-        password, blob.iterations(), blob.salt());
+    return decrypt(algo, blob.cipherText(), password, blob.iterations(), blob.salt());
   }
 
   public static byte[] decrypt(

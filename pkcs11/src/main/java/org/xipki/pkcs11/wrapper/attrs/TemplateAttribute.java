@@ -41,8 +41,7 @@ public class TemplateAttribute extends Attribute {
    */
   @Override
   protected String getValueString() {
-    return (value == null) ? "<NULL_PTR>" : "\n" +
-        ((Template) value).toString(false, "    ");
+    return (value == null) ? "<NULL_PTR>" : "\n" + ((Template) value).toString(false, "    ");
   }
 
 }

@@ -58,8 +58,7 @@ public class XiHsmVendor extends HsmVendor {
     super(name, vendorEnum, maxFrameSize, null, null,
         jsonCkmMultipartExclude, specialBehaviours, jsonNameToCodeMap);
     this.manufactureID = Args.notBlank(manufactureID, "manufactureID");
-    this.libraryDescription = Args.notBlank(libraryDescription,
-        "libraryDescription");
+    this.libraryDescription = Args.notBlank(libraryDescription, "libraryDescription");
     this.cryptokiVersion = Args.notNull(cryptokiVersion, "cryptokiVersion");
     this.libraryVersion = Args.notNull(libraryVersion, "libraryVersion");
     this.privateObjectVisibleToOther = privateObjectVisibleToOther;
@@ -246,8 +245,7 @@ public class XiHsmVendor extends HsmVendor {
     // excludeObjectClasses
     XiHsmVendor ret = new XiHsmVendor(block.getNnString("name"),
         manufactureID, libDescription, cryptokiVersion, libVersion,
-        block.getNnString("vendor"), maxFrameSize,
-        privateObjectVisibleToOther,
+        block.getNnString("vendor"), maxFrameSize, privateObjectVisibleToOther,
         jsonCkmMultipartExclude, behaviours, jsonNameToCodeMap, mechanisms);
 
     // keyTypes

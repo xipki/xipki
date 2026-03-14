@@ -195,8 +195,7 @@ public class QaOcspActions {
       if (shellFilePath != null) {
         File linuxShellFile = new File(shellFilePath + ".sh");
         IoUtil.save(linuxShellFile, StringUtil.toUtf8Bytes("#!/bin/sh\n" + linuxMsg));
-        IoUtil.save(shellFilePath + ".bat",
-            StringUtil.toUtf8Bytes("@echo off\r\n" + winMsg));
+        IoUtil.save(shellFilePath + ".bat", StringUtil.toUtf8Bytes("@echo off\r\n" + winMsg));
         linuxShellFile.setExecutable(true);
       }
 

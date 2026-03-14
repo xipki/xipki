@@ -258,10 +258,8 @@ public abstract class DbPortWorker extends DbWorker {
 
     PBEKeySpec spec = new PBEKeySpec(password, salt, iteration, 256 + 256);
     byte[] compositeKey = factory.generateSecret(spec).getEncoded();
-    SecretKey aesKey = new SecretKeySpec(
-        Arrays.copyOfRange(compositeKey, 0, 32), "AES");
-    SecretKey macKey = new SecretKeySpec(
-        Arrays.copyOfRange(compositeKey, 32, 64), "HMAC");
+    SecretKey aesKey = new SecretKeySpec(Arrays.copyOfRange(compositeKey, 0, 32), "AES");
+    SecretKey macKey = new SecretKeySpec(Arrays.copyOfRange(compositeKey, 32, 64), "HMAC");
 
     // We do NOT use AEAD algorithm e.g. GCM and CCM due to the fact that
     // in the decrypt process, some provides will buffer all data till the last

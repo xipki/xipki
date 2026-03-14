@@ -47,8 +47,7 @@ public class SessionAuth {
   }
 
   public static SessionAuth ofLoginUser(long userType, String userName, List<String> pins) {
-    return new SessionAuth(true, userType,
-        Args.notNull(userName, "userName"), pins);
+    return new SessionAuth(true, userType, Args.notNull(userName, "userName"), pins);
   }
 
   public static SessionAuth ofLogin(long userType, List<String> pins) {

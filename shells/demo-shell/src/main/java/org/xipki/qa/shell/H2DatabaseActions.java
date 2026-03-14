@@ -42,14 +42,12 @@ public class H2DatabaseActions {
             " and webPort=" + startedWebPort);
       } else {
         server = new Server();
-        server.runTool("-ifNotExists",
-            "-tcp", "-tcpPort", tcpPort, "-tcpAllowOthers",
+        server.runTool("-ifNotExists", "-tcp", "-tcpPort", tcpPort, "-tcpAllowOthers",
             "-web", "-webPort", webPort, "-webAllowOthers");
         startedWebPort = Integer.parseInt(webPort);
         startedTcpPort = Integer.parseInt(tcpPort);
         println("Started H2 TCP server and Web console server.");
-        Runtime.getRuntime().addShutdownHook(
-            new Thread(() -> {
+        Runtime.getRuntime().addShutdownHook( new Thread(() -> {
               if (server != null) {
                 println("Shutdown H2 TCP server and Web console server.");
                 server.shutdown();

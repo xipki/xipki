@@ -306,8 +306,7 @@ public class CaCertstore implements JsonEncodable {
       ret.setPrivateKeyFile(json.getString("privateKeyFile"));
       int rev = json.getNnInt("rev");
       if (rev != 0) {
-        ret.setRevocation(json.getNnInt("rr"),
-            json.getNnLong("rt"), json.getLong("rit"));
+        ret.setRevocation(json.getNnInt("rr"), json.getNnLong("rt"), json.getLong("rit"));
       }
       ret.setTid(json.getString("tid"));
       ret.setFpRs(json.getLong("fpRs"));
@@ -393,8 +392,7 @@ public class CaCertstore implements JsonEncodable {
 
     public static Crl parse(JsonMap json) throws CodecException {
       return new Crl(json.getNnLong("id"), json.getNnInt("caId"),
-          json.getNnString("file"), json.getNnString("crlNo"),
-          json.getNnInt("crlScope"));
+          json.getNnString("file"), json.getNnString("crlNo"), json.getNnInt("crlScope"));
     }
 
   } // class CaHasEntry

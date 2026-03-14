@@ -69,8 +69,7 @@ public class AccountResponse implements JsonEncodable {
     JsonMap map = json.getMap("externalAccountBinding");
     JoseMessage externalAccountBinding = (map == null) ? null : JoseMessage.parse(map);
     return new AccountResponse(status, json.getStringList("contact"),
-        externalAccountBinding, json.getBool("termsOfServiceAgreed"),
-        json.getString("orders"));
+        externalAccountBinding, json.getBool("termsOfServiceAgreed"), json.getString("orders"));
   }
 
 }

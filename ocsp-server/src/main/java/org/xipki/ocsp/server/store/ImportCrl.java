@@ -714,8 +714,7 @@ class ImportCrl {
         issuerId = Math.max(cachedIssuerId.get(), maxId) + 1;
         cachedIssuerId.set(issuerId);
 
-        sql = SqlUtil.buildInsertSql("ISSUER",
-            "ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO");
+        sql = SqlUtil.buildInsertSql("ISSUER", "ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT,REV_INFO");
         ps = datasource.prepareStatement(conn, sql);
         String subject = X509Util.x500NameText(caCert.subject);
 
@@ -925,8 +924,7 @@ class ImportCrl {
     }
 
     // import certificates
-    File[] certFiles = certsDir.listFiles(
-            (dir, name) -> name.endsWith(".der")
+    File[] certFiles = certsDir.listFiles( (dir, name) -> name.endsWith(".der")
                 || name.endsWith(".crt") || name.endsWith(".pem"));
 
     if (certFiles != null && certFiles.length > 0) {
@@ -954,8 +952,7 @@ class ImportCrl {
     }
 
     // import certificate serial numbers
-    File[] serialNumbersFiles = certsDir.listFiles(
-        (dir, name) -> name.endsWith(".serials"));
+    File[] serialNumbersFiles = certsDir.listFiles( (dir, name) -> name.endsWith(".serials"));
 
     if (serialNumbersFiles != null && serialNumbersFiles.length > 0) {
       int num = 0;

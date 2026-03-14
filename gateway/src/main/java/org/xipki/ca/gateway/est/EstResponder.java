@@ -414,8 +414,7 @@ public class EstResponder {
     } catch (OperationException ex) {
       ErrorCode code = ex.errorCode();
       if (LOG.isWarnEnabled()) {
-        String msg = StringUtil.concat(
-            "generate certificate, OperationException: code=",
+        String msg = StringUtil.concat("generate certificate, OperationException: code=",
             code.name(), ", message=", ex.errorMessage());
         LogUtil.warn(LOG, ex, msg);
       }
@@ -790,8 +789,7 @@ public class EstResponder {
       }
     }
     throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-        "found no response entry with certReqId " + certReqId,
-        AuditLevel.INFO, AuditStatus.FAILED);
+        "found no response entry with certReqId " + certReqId, AuditLevel.INFO, AuditStatus.FAILED);
   }
 
   private static byte[] buildCertsOnly(byte[]... certsBytes) throws IOException {

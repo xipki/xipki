@@ -319,8 +319,7 @@ public class KeyUtil {
     byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
     certGenerator.addExtension(OIDs.Extn.subjectKeyIdentifier, false,
         new SubjectKeyIdentifier(skiValue));
-    certGenerator.addExtension(OIDs.Extn.basicConstraints, true,
-        new BasicConstraints(false));
+    certGenerator.addExtension(OIDs.Extn.basicConstraints, true, new BasicConstraints(false));
     certGenerator.addExtension(OIDs.Extn.keyUsage, true,
         new KeyUsage(KeyUsage.digitalSignature));
     certGenerator.addExtension(OIDs.Extn.extendedKeyUsage, false,
@@ -706,8 +705,7 @@ public class KeyUtil {
 
   public static String providerName(String algo) {
     algo = algo.replace("_", "").replace("-", "");
-    if (StringUtil.orEqualsIgnoreCase(algo,
-        "SM2", "SM3", "SM2WITHSM3", "SM3WITHSM2") ||
+    if (StringUtil.orEqualsIgnoreCase(algo, "SM2", "SM3", "SM2WITHSM3", "SM3WITHSM2") ||
         algo.contains(OIDs.Algo.sm2sign_with_sm3.getId()) ||
         algo.contains(OIDs.Algo.id_sm3.getId())) {
       return SM2_PROVIDER_NAME;

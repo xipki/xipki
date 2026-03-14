@@ -118,8 +118,7 @@ public class P12Actions {
       }
 
       Certificate cert = ks.getCertificate(keyname);
-      saveVerbose("saved certificate to file", outFile,
-          encodeCert(cert.getEncoded(), outform));
+      saveVerbose("saved certificate to file", outFile, encodeCert(cert.getEncoded(), outform));
 
       return null;
     }

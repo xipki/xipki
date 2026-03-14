@@ -52,8 +52,7 @@ public class NotBeforeOption {
   private Instant setToMidnight(long epochSeconds) {
     ZonedDateTime zd = ZonedDateTime.ofInstant(
         Instant.ofEpochSecond(epochSeconds).plus(1, ChronoUnit.DAYS)
-            .minus(1, ChronoUnit.MILLIS),
-        midNightTimeZone);
+            .minus(1, ChronoUnit.MILLIS), midNightTimeZone);
 
     return ZonedDateTime.of(zd.getYear(), zd.getMonthValue(),
             zd.getDayOfMonth(), 0, 0, 0, 0, midNightTimeZone)

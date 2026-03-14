@@ -102,8 +102,7 @@ public class CkSessionInfo extends AbstractInfo {
 
   public static CkSessionInfo decode(Arch arch, byte[] encoded) {
     AtomicInteger off = new AtomicInteger();
-    return new CkSessionInfo(
-        readLong(arch, encoded, off), readLong(arch, encoded, off),
+    return new CkSessionInfo(readLong(arch, encoded, off), readLong(arch, encoded, off),
         readLong(arch, encoded, off), readLong(arch, encoded, off));
   }
 

@@ -60,8 +60,7 @@ public class PasswordActions {
 
       String password = OBFPasswordService.deobfuscate(passwordHint);
       if (outFile != null) {
-        saveVerbose("saved the password to file", outFile,
-            StringUtil.toUtf8Bytes(password));
+        saveVerbose("saved the password to file", outFile, StringUtil.toUtf8Bytes(password));
       } else {
         println("the password is: '" + password + "'");
       }

@@ -317,8 +317,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   private boolean existsIdent(NameId ident, String table) throws CaMgmtException {
     String existingName;
     try {
-      existingName = datasource.getFirstStringValue(
-          null, table, "NAME", "ID=" + ident.id());
+      existingName = datasource.getFirstStringValue(null, table, "NAME", "ID=" + ident.id());
     } catch (DataAccessException e) {
       throw new CaMgmtException(e);
     }
@@ -448,8 +447,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       cert.setCertId(certId);
     } catch (Exception ex) {
       LOG.error("could not save certificate {}: {}. Message: {}", certInfo.cert().cert().subject(),
-          encodedCert == null ? "null" : Base64.encodeToString(encodedCert, true),
-          ex.getMessage());
+          encodedCert == null ? "null" : Base64.encodeToString(encodedCert, true), ex.getMessage());
       LOG.debug("error", ex);
       return false;
     }
@@ -749,8 +747,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     List<ResultRow> rows = execQueryPrepStmt0(sql, params);
     List<SerialWithId> ret = new ArrayList<>();
     for (ResultRow row : rows) {
-      ret.add(new SerialWithId(row.getLong("ID"),
-          new BigInteger(row.getString("SN"), 16)));
+      ret.add(new SerialWithId(row.getLong("ID"), new BigInteger(row.getString("SN"), 16)));
       if (ret.size() >= numEntries) {
         break;
       }
@@ -799,8 +796,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     List<Long> crlNumbers = new LinkedList<>();
 
     List<ResultRow> rows = execQueryPrepStmt0(
-        "SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?",
-        col2Int(ca.id()), col2Bool(false));
+        "SELECT CRL_NO FROM CRL WHERE CA_ID=? AND DELTACRL=?", col2Int(ca.id()), col2Bool(false));
     for (ResultRow rs : rows) {
       crlNumbers.add(rs.getLong("CRL_NO"));
     }
@@ -907,8 +903,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   public CertificateInfo getCertInfo(
       NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException {
-    notNulls(ca, "ca", caCert, "caCert",
-        idNameMap, "idNameMap", serial, "serial");
+    notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap", serial, "serial");
 
     ResultRow rs = execQuery1PrepStmt0(sqlCertInfo, col2Int(ca.id()),
         col2Str(serial.toString(16)));
@@ -1061,8 +1056,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   @Override
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(
       NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt) throws OperationException {
-    notNulls(ca, "ca", notExpiredAt, "notExpiredAt",
-        baseCrlNumber, "baseCrlNumber");
+    notNulls(ca, "ca", notExpiredAt, "notExpiredAt", baseCrlNumber, "baseCrlNumber");
 
     // Get the Base FullCRL
     byte[] encodedCrl = getEncodedCrl(ca, baseCrlNumber);

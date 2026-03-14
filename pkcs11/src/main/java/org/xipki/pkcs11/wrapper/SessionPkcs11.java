@@ -108,8 +108,7 @@ class SessionPkcs11 {
 
       long hSessionNew = token.rawOpenSession(openSessionFlags, hSession);
       LOG.info("session {} is not active due to {}, replaced it " +
-          "with new session {}", hSession, PKCS11T.ckrCodeToName(err),
-          hSessionNew);
+          "with new session {}", hSession, PKCS11T.ckrCodeToName(err), hSessionNew);
 
       this.hSession = hSessionNew;
       this.recoverable = true;

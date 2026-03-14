@@ -29,8 +29,7 @@ public class MLDSAParameterSpec {
   }
 
   static MLDSAParameterSpec of(org.bouncycastle.pqc.jcajce.spec.MLDSAParameterSpec bc) {
-    switch (bc.getName().toUpperCase(Locale.ROOT)
-        .replace("-", "").replace("_", "")) {
+    switch (bc.getName().toUpperCase(Locale.ROOT).replace("-", "").replace("_", "")) {
       case "MLDSA44":
         return ml_dsa_44;
       case "MLDSA65":

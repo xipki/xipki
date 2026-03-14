@@ -124,9 +124,8 @@ public class V1XijsonCertprofileType {
   private final List<V1ExtensionType> extensions;
 
   public V1XijsonCertprofileType(
-      CertLevel certLevel, String validity,
-      String notBeforeTime, V1Subject subject,
-      List<V1ExtensionType> extensions) {
+      CertLevel certLevel, String validity, String notBeforeTime,
+      V1Subject subject, List<V1ExtensionType> extensions) {
     this.certLevel = Args.notNull(certLevel, "certLevel");
     this.validity = Args.notBlank(validity, "validity");
     this.notBeforeTime = Args.notBlank(notBeforeTime, "notBeforeTime");
@@ -160,10 +159,8 @@ public class V1XijsonCertprofileType {
     }
 
     V1XijsonCertprofileType ret = new V1XijsonCertprofileType(
-        json.getEnum("certLevel", CertLevel.class),
-        json.getString("validity"),
-        json.getString("notBeforeTime"),
-        V1Subject.parse(json.getNnMap("subject")),
+        json.getEnum("certLevel", CertLevel.class), json.getString("validity"),
+        json.getString("notBeforeTime"), V1Subject.parse(json.getNnMap("subject")),
         extensions);
 
     ret.metadata = json.getStringMap("metadata");

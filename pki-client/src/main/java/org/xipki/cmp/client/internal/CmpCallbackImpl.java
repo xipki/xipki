@@ -142,8 +142,7 @@ public class CmpCallbackImpl implements CmpCallback {
 
       SecretKey key;
       int iterations = func.getIterationCount().intValue();
-      key = keyFact.generateSecret(
-          new PBKDF2KeySpec(password, func.getSalt(), iterations,
+      key = keyFact.generateSecret(new PBKDF2KeySpec(password, func.getSalt(), iterations,
               KEYSIZE_PROVIDER.getKeySize(encScheme), func.getPrf()));
       key = new SecretKeySpec(key.getEncoded(), "AES");
 
@@ -159,8 +158,7 @@ public class CmpCallbackImpl implements CmpCallback {
 
       return cipher.doFinal(Asn1Util.getEncValue(ev));
     } catch (GeneralSecurityException ex) {
-      throw new GeneralSecurityException(
-          "Error while decrypting the EncryptedValue", ex);
+      throw new GeneralSecurityException( "Error while decrypting the EncryptedValue", ex);
     }
   } // method decrypt
 

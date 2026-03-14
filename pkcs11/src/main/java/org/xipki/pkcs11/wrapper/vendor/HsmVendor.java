@@ -327,8 +327,7 @@ public class HsmVendor {
     return map != null ? map.nameToCode(name) : PKCS11T.nameToCode(category, name);
   }
 
-  protected static void interpretCkm(
-      List<JsonMap> list, Map<Long, Long> map)
+  protected static void interpretCkm(List<JsonMap> list, Map<Long, Long> map)
       throws CodecException {
     for (JsonMap m : list) {
       String ckm = m.getNnString("ckm");

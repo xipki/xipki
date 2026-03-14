@@ -276,8 +276,7 @@ public class BridgeKeyUtil {
           variant == BridgeMlkemVariant.mlkem512 ? MLKEMParameters.ml_kem_512
         : variant == BridgeMlkemVariant.mlkem768 ? MLKEMParameters.ml_kem_768
         : MLKEMParameters.ml_kem_1024;
-    MLKEMKeyGenerationParameters params = new MLKEMKeyGenerationParameters(
-        rnd, mlkemParams);
+    MLKEMKeyGenerationParameters params = new MLKEMKeyGenerationParameters( rnd, mlkemParams);
     kpGen.init(params);
     AsymmetricCipherKeyPair keyPair = BridgeKeyUtil.generateKeyPair(kpGen);
     return new BridgeKeyPairBytes(

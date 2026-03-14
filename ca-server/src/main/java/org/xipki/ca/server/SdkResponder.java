@@ -136,8 +136,7 @@ public class SdkResponder {
 
     threadPoolExecutor = new ScheduledThreadPoolExecutor(1);
     threadPoolExecutor.setRemoveOnCancelPolicy(true);
-    threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(),
-        10, 10, TimeUnit.MINUTES);
+    threadPoolExecutor.scheduleAtFixedRate(new PendingPoolCleaner(), 10, 10, TimeUnit.MINUTES);
   }
 
   public SdkResponse service(String path, byte[] request, XiHttpRequest httpRequest) {
@@ -201,8 +200,7 @@ public class SdkResponder {
         }
 
         if (ca == null) {
-          return new ErrorResponse(null, PATH_NOT_FOUND,
-              "unknown CA '" + caName + "'");
+          return new ErrorResponse(null, PATH_NOT_FOUND, "unknown CA '" + caName + "'");
         }
       } else {
         switch (command) {
@@ -247,8 +245,7 @@ public class SdkResponder {
         clientCert = TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
       } catch (IOException ex) {
         LogUtil.error(LOG, ex, "error getTlsClientCert");
-        return new ErrorResponse(null, UNAUTHORIZED,
-            "error retrieving client certificate");
+        return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
       }
 
       if (clientCert == null) {
@@ -262,29 +259,23 @@ public class SdkResponder {
       }
 
       switch (command) {
-        case CMD_health:
-          return ca.healthy() ? null
+        case CMD_health: return ca.healthy() ? null
               : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
-        case CMD_cacert:
-          return buildCertChainResponse(ca.caInfo().cert(), null);
+        case CMD_cacert: return buildCertChainResponse(ca.caInfo().cert(), null);
         case CMD_cacerts:
           return buildCertChainResponse(ca.caInfo().cert(), ca.caInfo().certchain());
-        case CMD_enroll:
-          assertPermitted(requestor, ENROLL_CERT);
+        case CMD_enroll: assertPermitted(requestor, ENROLL_CERT);
           return enroll(ca, requireNonNullRequest(request), requestor, false, false);
-        case CMD_reenroll:
-          assertPermitted(requestor, REENROLL_CERT);
+        case CMD_reenroll: assertPermitted(requestor, REENROLL_CERT);
           return enroll(ca, requireNonNullRequest(request), requestor, true, false);
-        case CMD_enroll_cross:
-          assertPermitted(requestor, ENROLL_CROSS);
+        case CMD_enroll_cross: assertPermitted(requestor, ENROLL_CROSS);
           return enroll(ca, requireNonNullRequest(request), requestor, false, true);
         case CMD_poll_cert:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
             throw new OperationException(NOT_PERMITTED);
           }
           return poll(ca, (PollCertRequest) req, "-".equals(caName));
-        case CMD_revoke_cert:
-          assertPermitted(requestor, REVOKE_CERT);
+        case CMD_revoke_cert: assertPermitted(requestor, REVOKE_CERT);
           return revoke(requestor, ca, (RevokeCertsRequest) req, "-".equals(caName));
         case CMD_confirm_enroll:
           if (!(requestor.isPermitted(ENROLL_CERT) || requestor.isPermitted(REENROLL_CERT))) {
@@ -298,37 +289,27 @@ public class SdkResponder {
           revokePendingCertificates(requestor, ca, TransactionIdRequest.decode(
               requireNonNullRequest(request)).tid());
           return null;
-        case CMD_unsuspend_cert:
-          assertPermitted(requestor, UNSUSPEND_CERT);
+        case CMD_unsuspend_cert: assertPermitted(requestor, UNSUSPEND_CERT);
           return removeOrUnsuspend(requestor, ca,
               (UnsuspendOrRemoveCertsRequest) req, true, "-".equals(caName));
-        case CMD_remove_cert:
-          assertPermitted(requestor, REMOVE_CERT);
+        case CMD_remove_cert: assertPermitted(requestor, REMOVE_CERT);
           return removeOrUnsuspend(requestor, ca, (UnsuspendOrRemoveCertsRequest) req,
               false, "-".equals(caName));
-        case CMD_gen_crl:
-          assertPermitted(requestor, GEN_CRL);
+        case CMD_gen_crl: assertPermitted(requestor, GEN_CRL);
           return genCrl(requestor, ca, requireNonNullRequest(request));
-        case CMD_crl:
-          return getCrl(requestor, ca, requireNonNullRequest(request));
-        case CMD_get_cert:
-          assertPermitted(requestor, GET_CERT);
+        case CMD_crl: return getCrl(requestor, ca, requireNonNullRequest(request));
+        case CMD_get_cert: assertPermitted(requestor, GET_CERT);
           return getCert(ca, requireNonNullRequest(request));
-        case CMD_profileinfo:
-          return getProfileInfo(requireNonNullRequest(request));
-        case CMD_cacert2:
-          return buildCertChainResponse(ca.caCert(), null);
-        case CMD_cacerts2:
-          return buildCertChainResponse(ca.caCert(), ca.caInfo.certchain());
-        case CMD_caname:
-          String name = ca.caIdent().name();
+        case CMD_profileinfo: return getProfileInfo(requireNonNullRequest(request));
+        case CMD_cacert2: return buildCertChainResponse(ca.caCert(), null);
+        case CMD_cacerts2: return buildCertChainResponse(ca.caCert(), ca.caInfo.certchain());
+        case CMD_caname: String name = ca.caIdent().name();
           Set<String> aliases = caManager.getAliasesForCa(name);
           String[] aliasArray = CollectionUtil.isEmpty(aliases) ? null
               : aliases.toArray(new String[0]);
 
           return new CaNameResponse(name, aliasArray);
-        default:
-          return new ErrorResponse(null, PATH_NOT_FOUND,
+        default: return new ErrorResponse(null, PATH_NOT_FOUND,
               "invalid command '" + command + "'");
       }
     } catch (CodecException ex) {
@@ -432,8 +413,7 @@ public class SdkResponder {
                   "Invalid oldIsn.issuer: " + ex.getMessage());
             }
             if (!issuer.equals(ca.caCert().subjectText())) {
-              throw new OperationException(UNKNOWN_CERT,
-                  "unknown issuer " + issuer);
+              throw new OperationException(UNKNOWN_CERT, "unknown issuer " + issuer);
             }
 
             BigInteger serialNumber = ocIsn.serialNumber();
@@ -710,8 +690,7 @@ public class SdkResponder {
     }
 
     if (issuerCertSha1Fp != null) {
-      if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase(
-            ca.hexSha1OfCert())) {
+      if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase( ca.hexSha1OfCert())) {
         throw new OperationException(BAD_CERT_TEMPLATE,
             "IssuerCertSha256Fp does not target at the CA");
       }
@@ -932,8 +911,7 @@ public class SdkResponder {
     Instant invalidityDate = Instant.now();
     for (CertificateInfo remainingCert : remainingCerts) {
       try {
-        ca.revokeCert(requestor,
-            remainingCert.cert().cert().serialNumber(),
+        ca.revokeCert(requestor, remainingCert.cert().cert().serialNumber(),
             CrlReason.CESSATION_OF_OPERATION, invalidityDate);
       } catch (OperationException ex) {
         successful = false;

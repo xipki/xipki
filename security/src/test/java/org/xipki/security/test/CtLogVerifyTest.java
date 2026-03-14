@@ -53,13 +53,11 @@ public class CtLogVerifyTest {
     X509Cert cert = X509Util.parseCert(read(certFile));
     X509Cert caCert = X509Util.parseCert(read(caCertFile));
 
-    byte[] issuerKeyHash = HashAlgo.SHA256.hash(
-        caCert.subjectPublicKeyInfo().getEncoded());
+    byte[] issuerKeyHash = HashAlgo.SHA256.hash( caCert.subjectPublicKeyInfo().getEncoded());
     byte[] preCertTbsCert = CtLog.getPreCertTbsCert(
         cert.getCertHolder().toASN1Structure().getTBSCertificate());
 
-    byte[] extnValue = cert.getExtensionCoreValue(
-        OIDs.Extn.id_SignedCertificateTimestampList);
+    byte[] extnValue = cert.getExtensionCoreValue( OIDs.Extn.id_SignedCertificateTimestampList);
 
     byte[] encodedScts = ASN1OctetString.getInstance(extnValue).getOctets();
     SignedCertificateTimestampList list =
@@ -70,8 +68,7 @@ public class CtLogVerifyTest {
 
     SignedCertificateTimestamp sct = sctList.get(1);
     byte[] logId = sct.logId();
-    Assert.assertEquals("logId", Hex.encodeUpper(keyId),
-        Hex.encodeUpper(logId));
+    Assert.assertEquals("logId", Hex.encodeUpper(keyId), Hex.encodeUpper(logId));
 
     Signature sig = Signature.getInstance("SHA256withECDSA");
     sig.initVerify(key);

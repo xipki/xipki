@@ -260,8 +260,7 @@ public class CaConfColumn implements JsonEncodable {
     try {
       return parse(JsonParser.parseMap(encoded, false));
     } catch (CodecException e) {
-      throw new InvalidConfException (
-          "error decoding CaConfColumn: " + e.getMessage(), e);
+      throw new InvalidConfException ("error decoding CaConfColumn: " + e.getMessage(), e);
     }
   }
 

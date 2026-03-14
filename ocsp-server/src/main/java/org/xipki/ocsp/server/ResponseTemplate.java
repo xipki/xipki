@@ -54,8 +54,7 @@ class ResponseTemplate {
                 OIDs.Misc.isismtt_at_certHash, false, certHash.getEncoded());
         encoded = extn.getEncoded();
       } catch (IOException ex) {
-        throw new ExceptionInInitializerError(
-            "could not processing encoding of CertHash");
+        throw new ExceptionInInitializerError("could not processing encoding of CertHash");
       }
       byte[] prefix = Arrays.copyOf(encoded, encoded.length - hlen);
       extnCerthashPrefixMap.put(h, prefix);

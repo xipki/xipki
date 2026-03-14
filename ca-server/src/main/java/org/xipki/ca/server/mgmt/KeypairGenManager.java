@@ -89,8 +89,7 @@ class KeypairGenManager {
   } // method initSigners
 
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
-    if ("software".equalsIgnoreCase(
-        Args.notNull(keypairGenEntry, "keypairGenEntry").name())) {
+    if ("software".equalsIgnoreCase(Args.notNull(keypairGenEntry, "keypairGenEntry").name())) {
       throw new CaMgmtException("Adding keypair generation 'software' is not allowed");
     }
 

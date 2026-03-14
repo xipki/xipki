@@ -70,10 +70,8 @@ public class CmsTest {
       AlgorithmIdentifier hashAlgId = HashAlgo.SHA256.algorithmIdentifier();
       AlgorithmIdentifier mgfAlgId =
           new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, hashAlgId);
-      AlgorithmIdentifier oaepAlgId = new AlgorithmIdentifier(
-          OIDs.Algo.id_RSAES_OAEP,
-          new RSAESOAEPparams(hashAlgId, mgfAlgId,
-              RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM));
+      AlgorithmIdentifier oaepAlgId = new AlgorithmIdentifier( OIDs.Algo.id_RSAES_OAEP,
+          new RSAESOAEPparams(hashAlgId, mgfAlgId, RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM));
       recipient = new JceKeyTransRecipientInfoGenerator(jceCert, oaepAlgId);
     } else if (privateKey instanceof ECPrivateKey) {
       // We use ECDHE with AES Key Wrap (standard for EC-based CMS)
@@ -81,8 +79,7 @@ public class CmsTest {
       KeyPair keyPair = KeyUtil.generateKeyPair(keySpec, random);
       recipient = new JceKeyAgreeRecipientInfoGenerator(
           CMSAlgorithm.ECDH_SHA256KDF, // Key Agreement Algorithm
-          keyPair.getPrivate(),
-          keyPair.getPublic(),
+          keyPair.getPrivate(), keyPair.getPublic(),
           CMSAlgorithm.AES256_WRAP // Algorithm to wrap the content key
       ).setSecureRandom(random).addRecipient(jceCert)
           .setProvider(KeyUtil.tradProviderName());

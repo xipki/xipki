@@ -102,8 +102,7 @@ public class CkInfo extends AbstractInfo {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    return toString(indent, "CK_INFO", null,
-        "cryptokiVersion", cryptokiVersion,
+    return toString(indent, "CK_INFO", null, "cryptokiVersion", cryptokiVersion,
         "manufacturerID", manufacturerID, "libraryDescription", libraryDescription,
         "libraryVersion", libraryVersion, "flags", "0x" + Functions.toFullHex(flags));
   }

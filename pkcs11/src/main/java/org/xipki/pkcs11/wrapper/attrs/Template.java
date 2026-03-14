@@ -833,8 +833,7 @@ public class Template {
     return size;
   }
 
-  private static void encode(
-      Arch arch, Template template, byte[] dest, AtomicInteger off) {
+  private static void encode(Arch arch, Template template, byte[] dest, AtomicInteger off) {
     List<Attribute> attrs = template.attributes();
     final int longSize = attrs.size();
     JniUtil.writeLong(arch, longSize, dest, off);
@@ -851,8 +850,7 @@ public class Template {
       } else if (attr instanceof DateAttribute) {
         CkDate v = ((DateAttribute) attr).getCkDateValue();
         String s = v.year() + v.month() + v.day();
-        JniUtil.writeFixedLenByteArray(s.getBytes(StandardCharsets.UTF_8),
-            dest, off);
+        JniUtil.writeFixedLenByteArray(s.getBytes(StandardCharsets.UTF_8), dest, off);
       } else if (attr instanceof VersionAttribute) {
         CkVersion v = ((VersionAttribute) attr).getValue();
         dest[off.getAndIncrement()] = v.major();
@@ -884,8 +882,7 @@ public class Template {
     return decodeTemplate(arch, encoded, new AtomicInteger(0));
   }
 
-  private static Template decodeTemplate(
-      Arch arch, byte[] bytes, AtomicInteger off) {
+  private static Template decodeTemplate(Arch arch, byte[] bytes, AtomicInteger off) {
     int count = JniUtil.readInt(arch, bytes, off);
     List<Attribute> attrs = new ArrayList<>(count);
     for (int i = 0; i < count; i++) {

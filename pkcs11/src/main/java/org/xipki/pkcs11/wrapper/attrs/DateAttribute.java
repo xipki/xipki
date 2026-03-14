@@ -69,8 +69,7 @@ public class DateAttribute extends Attribute {
     int year  = Integer.parseInt(ckDate.year());
     int month = Integer.parseInt(ckDate.month());
     int day   = Integer.parseInt(ckDate.day());
-    return ZonedDateTime.of(year, month, day, 0, 0, 0, 0,
-        ZoneOffset.UTC).toInstant();
+    return ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
   }
 
   @Override

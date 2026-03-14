@@ -102,8 +102,7 @@ public class FileMacAuditService extends MacAuditService {
     if (StringUtil.isBlank(filePath)) {
       throw new IllegalArgumentException("property " + KEY_FILE + " not defined");
     }
-    filePath = IoUtil.expandFilepath(StringUtil.resolveVariables(filePath),
-              true);
+    filePath = IoUtil.expandFilepath(StringUtil.resolveVariables(filePath), true);
 
     File logFile = new File(filePath).getAbsoluteFile();
     this.logDir = logFile.getParentFile();

@@ -58,8 +58,7 @@ public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
   @Override
   protected org.bouncycastle.asn1.sec.ECPrivateKey getASN1ECPrivateKey() {
     return new org.bouncycastle.asn1.sec.ECPrivateKey(
-        curve.getOrder().bitLength(), new BigInteger(1, value),
-        new DERBitString(ecPoint), null);
+        curve.getOrder().bitLength(), new BigInteger(1, value), new DERBitString(ecPoint), null);
   }
 
   @Override

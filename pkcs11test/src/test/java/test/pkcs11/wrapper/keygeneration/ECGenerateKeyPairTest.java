@@ -168,17 +168,13 @@ public class ECGenerateKeyPairTest {
 
   static void fillTemplate(PKCS11KeyPairSpec template, CkMechanismInfo signatureMechanismInfo) {
     template
-        .signVerify(
-            signatureMechanismInfo.hasFlagBit(CKF_SIGN),
+        .signVerify(signatureMechanismInfo.hasFlagBit(CKF_SIGN),
             signatureMechanismInfo.hasFlagBit(CKF_VERIFY))
-        .signVerifyRecover(
-            signatureMechanismInfo.hasFlagBit(CKF_SIGN_RECOVER),
+        .signVerifyRecover(signatureMechanismInfo.hasFlagBit(CKF_SIGN_RECOVER),
             signatureMechanismInfo.hasFlagBit(CKF_VERIFY_RECOVER))
-        .decryptEncrypt(
-            signatureMechanismInfo.hasFlagBit(CKF_DECRYPT),
+        .decryptEncrypt(signatureMechanismInfo.hasFlagBit(CKF_DECRYPT),
             signatureMechanismInfo.hasFlagBit(CKF_ENCRYPT))
-        .unwrapWrap(
-            signatureMechanismInfo.hasFlagBit(CKF_UNWRAP),
+        .unwrapWrap(signatureMechanismInfo.hasFlagBit(CKF_UNWRAP),
             signatureMechanismInfo.hasFlagBit(CKF_WRAP))
         .derive(signatureMechanismInfo.hasFlagBit(CKF_DERIVE));
   }

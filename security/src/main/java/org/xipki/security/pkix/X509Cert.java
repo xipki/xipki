@@ -923,8 +923,7 @@ public class X509Cert {
         }
         break;
       }
-      default:
-        sb.append("<unsupported>");
+      default: sb.append("<unsupported>");
     }
 
     return sb.toString();

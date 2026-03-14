@@ -264,8 +264,7 @@ public class Asn1Util {
       }
 
       System.arraycopy(ele, Math.max(0, ele.length - rOrSLen),
-          ret, off + Math.max(0, rOrSLen - ele.length),
-          Math.min(rOrSLen, ele.length));
+          ret, off + Math.max(0, rOrSLen - ele.length), Math.min(rOrSLen, ele.length));
     }
 
     return ret;
@@ -500,8 +499,7 @@ public class Asn1Util {
     } else if (len < 0x010000) {
       return new byte[] {(byte) 0x82, (byte) (len >> 8), (byte) len};
     } else if (len < 0x01000000) {
-      return new byte[] {(byte) 0x83, (byte) (len >> 16),
-          (byte) (len >> 8), (byte) len};
+      return new byte[] {(byte) 0x83, (byte) (len >> 16), (byte) (len >> 8), (byte) len};
     } else {
       return new byte[] {(byte) 0x84, (byte) (len >> 24), (byte) (len >> 16),
           (byte) (len >> 8), (byte) len};

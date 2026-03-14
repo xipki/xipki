@@ -121,8 +121,7 @@ public interface SecurityFactory {
   default ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
       throws InvalidKeyException {
     try {
-      return getContentVerifierProvider(
-          Args.notNull(cert, "cert").publicKey());
+      return getContentVerifierProvider( Args.notNull(cert, "cert").publicKey());
     } catch (RuntimeException e) {
       throw new InvalidKeyException(e);
     }

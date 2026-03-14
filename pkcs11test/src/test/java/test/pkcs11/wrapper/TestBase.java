@@ -108,8 +108,7 @@ public abstract class TestBase {
   }
 
   protected void assertCanGenerate(PKCS11SecretKeySpec keySpec) {
-    Assume.assumeTrue("Can not generate secret key " +
-            ckkCodeToName(keySpec.keyType()),
+    Assume.assumeTrue("Can not generate secret key " + ckkCodeToName(keySpec.keyType()),
     keySpec.canGenerate(getToken()));
   }
 
@@ -177,8 +176,7 @@ public abstract class TestBase {
       Template attrValues = token.getAttrValues(p11Key,
           new AttributeTypes().value().prime().subprime().base()); // y, p, q, g
 
-      DSAPublicKeySpec keySpec = new DSAPublicKeySpec(
-          new BigInteger(1, attrValues.value()),
+      DSAPublicKeySpec keySpec = new DSAPublicKeySpec( new BigInteger(1, attrValues.value()),
           attrValues.prime(), attrValues.subprime(), attrValues.base());
       return KeyFactory.getInstance("DSA").generatePublic(keySpec);
     } else if (keyType == CKK_EC || keyType == CKK_EC_EDWARDS

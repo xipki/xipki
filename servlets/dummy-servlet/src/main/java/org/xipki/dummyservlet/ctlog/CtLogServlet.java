@@ -186,8 +186,7 @@ public class CtLogServlet {
 
       byte[] respContent = JsonBuilder.toJson(resp0.toJson()).getBytes(StandardCharsets.UTF_8);
 
-      return new HttpResponse(HttpStatusCode.SC_OK, "application/json",
-          null, respContent);
+      return new HttpResponse(HttpStatusCode.SC_OK, "application/json", null, respContent);
     } catch (Exception ex) {
       LogUtil.error(LOG, ex);
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);

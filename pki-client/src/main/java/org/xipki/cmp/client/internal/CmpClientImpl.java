@@ -356,8 +356,7 @@ public final class CmpClientImpl implements CmpClient {
 
     ResultEntry.UnrevokeOrRemoveCert entry =
         new ResultEntry.UnrevokeOrRemoveCert(id,
-            Args.notNull(issuerCert, "issuerCert").subject(),
-            Args.notNull(serial, "serial"));
+            Args.notNull(issuerCert, "issuerCert").subject(), Args.notNull(serial, "serial"));
 
     entry.setAuthorityKeyIdentifier(issuerCert.subjectKeyId());
 

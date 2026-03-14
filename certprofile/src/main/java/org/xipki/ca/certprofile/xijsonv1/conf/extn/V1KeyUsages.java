@@ -52,8 +52,7 @@ public class V1KeyUsages {
 
     List<KeyUsage> sortedOList = oList.isEmpty() ? null : toSortedUsages(oList);
 
-    SingleKeyUsages singleKeyUsages = new SingleKeyUsages(
-        null, sortedRList, sortedOList);
+    SingleKeyUsages singleKeyUsages = new SingleKeyUsages( null, sortedRList, sortedOList);
 
     return new ExtensionValueConf.KeyUsage(List.of(singleKeyUsages));
   }
@@ -95,15 +94,11 @@ public class V1KeyUsages {
     for (Usage u : usages) {
       KeyUsage ku = KeyUsage.getKeyUsage(u.value);
       switch (ku) {
-        case dataEncipherment:
-        case decipherOnly:
-        case encipherOnly:
-        case keyAgreement:
-        case keyEncipherment:
-          (u.required ? encryptRList : encryptOList).add(ku);
+        case dataEncipherment: case decipherOnly:
+        case encipherOnly: case keyAgreement:
+        case keyEncipherment: (u.required ? encryptRList : encryptOList).add(ku);
           break;
-        default:
-          (u.required ? signRList : signOList).add(ku);
+        default: (u.required ? signRList : signOList).add(ku);
           break;
       }
     }

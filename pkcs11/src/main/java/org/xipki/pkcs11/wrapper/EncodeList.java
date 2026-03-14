@@ -205,8 +205,7 @@ public class EncodeList {
         }
       } else if (oa instanceof FixedLenByteArrayW) {
         if (ob instanceof FixedLenByteArrayW) {
-          return Arrays.equals(((FixedLenByteArrayW) oa).v,
-              ((FixedLenByteArrayW) ob).v);
+          return Arrays.equals(((FixedLenByteArrayW) oa).v, ((FixedLenByteArrayW) ob).v);
         }
       } else if (oa instanceof VersionW) {
         if (ob instanceof VersionW) {

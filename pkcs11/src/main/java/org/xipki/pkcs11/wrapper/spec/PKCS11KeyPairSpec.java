@@ -171,8 +171,7 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
     return signVerifyRecover(signVerifyRecover, signVerifyRecover);
   }
 
-  public PKCS11KeyPairSpec signVerifyRecover(
-      Boolean signRecover, Boolean verifyRecover) {
+  public PKCS11KeyPairSpec signVerifyRecover(Boolean signRecover, Boolean verifyRecover) {
     assertChangeable();
     this.signRecover = signRecover;
     this.verifyRecover = verifyRecover;

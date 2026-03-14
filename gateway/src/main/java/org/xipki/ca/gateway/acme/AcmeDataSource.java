@@ -133,8 +133,7 @@ public class AcmeDataSource {
 
   public byte[] getCert(long orderId) throws AcmeSystemException {
     try {
-      String str = dataSource.getFirstStringValue(null,
-          "ORDER2", "CERT", "ID=" + orderId);
+      String str = dataSource.getFirstStringValue(null, "ORDER2", "CERT", "ID=" + orderId);
       return str == null ? null : Base64.decodeFast(str);
     } catch (DataAccessException e) {
       throw new AcmeSystemException(e);
@@ -143,8 +142,7 @@ public class AcmeDataSource {
 
   public byte[] getCsr(long orderId) throws AcmeSystemException {
     try {
-      String str = dataSource.getFirstStringValue(null,
-          "ORDER2", "CSR", "ID=" + orderId);
+      String str = dataSource.getFirstStringValue(null, "ORDER2", "CSR", "ID=" + orderId);
       return str == null ? null : Base64.decodeFast(str);
     } catch (DataAccessException e) {
       throw new AcmeSystemException(e);

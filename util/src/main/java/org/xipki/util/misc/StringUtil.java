@@ -169,8 +169,7 @@ public class StringUtil {
       return false;
     }
 
-    return prefix.equalsIgnoreCase(
-        str.substring(offset, offset + prefix.length()));
+    return prefix.equalsIgnoreCase(str.substring(offset, offset + prefix.length()));
   }
 
   public static boolean orEqualsIgnoreCase(String str, String... tokens) {

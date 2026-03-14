@@ -129,8 +129,7 @@ public class KeypairGenActions {
           caManager.removeKeypairGen(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg +
-              ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -174,8 +173,7 @@ public class KeypairGenActions {
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

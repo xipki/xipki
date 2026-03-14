@@ -284,8 +284,7 @@ public class SecurityActions {
       return null;
     }
 
-    private static void writePemCert(
-        OutputStream out, java.security.cert.Certificate cert)
+    private static void writePemCert(OutputStream out, java.security.cert.Certificate cert)
         throws CertificateEncodingException, IOException {
       out.write(PemEncoder.encode(cert.getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
     }
@@ -622,8 +621,7 @@ public class SecurityActions {
             derPemEncode(keyBytes, outform, PemEncoder.PemLabel.PRIVATE_KEY));
 
         byte[] rawCertBytes = extractCertFromSignedData(certBytes);
-        saveVerbose("certificate saved to file", certFile,
-            encodeCert(rawCertBytes, outform));
+        saveVerbose("certificate saved to file", certFile, encodeCert(rawCertBytes, outform));
       }
       return null;
     }
@@ -664,8 +662,7 @@ public class SecurityActions {
         } else {
           if (StringUtil.startsWithIgnoreCase(line, "content-type:")) {
             contentType = line.substring("content-type:".length()).trim();
-          } else if (StringUtil.startsWithIgnoreCase(line,
-              "content-transfer-encoding:")) {
+          } else if (StringUtil.startsWithIgnoreCase(line, "content-transfer-encoding:")) {
             encoding = line.substring("content-transfer-encoding:".length()).trim();
           }
         }

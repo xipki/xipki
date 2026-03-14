@@ -113,8 +113,7 @@ public class CkSlotInfo extends AbstractInfo {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    return toString(indent, "CK_SLOT_INFO", null,
-      "slotDescription", slotDescription,
+    return toString(indent, "CK_SLOT_INFO", null, "slotDescription", slotDescription,
       "manufacturerID", manufacturerID, "hardwareVersion", hardwareVersion,
       "firmwareVersion", firmwareVersion) + "\n" +
       Functions.toStringFlags(Category.CKF_SLOT, indent + "Flags: ", flags,

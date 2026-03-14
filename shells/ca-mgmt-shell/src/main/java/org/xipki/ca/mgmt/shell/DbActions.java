@@ -136,8 +136,7 @@ public class DbActions {
       String dataSourceUrl = dbProps.getProperty("dataSource.url");
       urlBuilder.append(dataSourceUrl);
     } else {
-      throw new IllegalArgumentException(
-          "unsupported database type " + datasourceClassName);
+      throw new IllegalArgumentException("unsupported database type " + datasourceClassName);
     }
 
     url = urlBuilder.toString();
@@ -150,8 +149,7 @@ public class DbActions {
     String boundary = "-".repeat(2 + Math.max(
         "Start executing script ".length() + scriptFilePathLen,
         "script file: ".length() + url.length()));
-    String msg = boundary + "\n       user: " + username +
-        "\n        URL: " + url;
+    String msg = boundary + "\n       user: " + username + "\n        URL: " + url;
     if (schema != null) {
       msg += "\n     schema: " + schema;
     }

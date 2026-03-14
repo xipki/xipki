@@ -113,8 +113,7 @@ public class RSAPKCSSignRawDataTest {
         // This signing operation is implemented in most of the drivers
         byte[] signatureValue = token.sign(signatureMechanism, generatedPrivateKey, dataToBeSigned);
 
-        LOG.info("The signature value is: {}",
-            new BigInteger(1, signatureValue).toString(16));
+        LOG.info("The signature value is: {}", new BigInteger(1, signatureValue).toString(16));
 
         // verify
         long generatedPublicKey = generatedKeyPair.getPublicKeyHandle();

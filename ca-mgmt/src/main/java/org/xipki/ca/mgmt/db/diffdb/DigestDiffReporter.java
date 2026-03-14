@@ -105,8 +105,7 @@ class DigestDiffReporter implements Closeable {
 
     numDiff.incrementAndGet();
     String msg = StringUtil.concat(refCert.serialNumber().toString(16),
-        "\t", refCert.encodedOmitSerialNumber(), "\t",
-        targetCert.encodedOmitSerialNumber(), "\n");
+        "\t", refCert.encodedOmitSerialNumber(), "\t", targetCert.encodedOmitSerialNumber(), "\n");
     synchronized (diffWriter) {
       diffWriter.write(msg);
     }
@@ -145,14 +144,11 @@ class DigestDiffReporter implements Closeable {
         "\n   missing: ", StringUtil.formatAccount(numMissing.get(), false),
         "\nunexpected: ", StringUtil.formatAccount(numUnexpected.get(), false),
         "\n     error: ", StringUtil.formatAccount(numError.get(), false),
-        "\n  duration: ", StringUtil.formatTime(durationSec, false),
-        "\nstart time: ", startTime,
-        "\n  end time: ", now,
-        "\n     speed: ", speedStr, "\n");
+        "\n  duration: ", StringUtil.formatTime(durationSec, false), "\nstart time: ", startTime,
+        "\n  end time: ", now, "\n     speed: ", speedStr, "\n");
 
     try {
-      IoUtil.save(reportDirname + File.separator + "overview.txt",
-          StringUtil.toUtf8Bytes(str));
+      IoUtil.save(reportDirname + File.separator + "overview.txt", StringUtil.toUtf8Bytes(str));
     } catch (IOException ex) {
       System.out.println("Could not write overview.txt with following content\n" + str);
     }

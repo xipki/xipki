@@ -32,10 +32,8 @@ public class StoreSlotInfo {
     this.serialNumber = serialNumber;
     this.userVerifier = Args.notNull(userVerifier, "userVerifier");
 
-    slotInfo = new CkSlotInfo(description, vendor.getManufactureID(),
-        PKCS11T.CKF_TOKEN_PRESENT,
-        HsmUtil.buildVersion(1, 1),
-        HsmUtil.buildVersion(1, 1));
+    slotInfo = new CkSlotInfo(description, vendor.getManufactureID(), PKCS11T.CKF_TOKEN_PRESENT,
+        HsmUtil.buildVersion(1, 1), HsmUtil.buildVersion(1, 1));
   }
 
   public int getSlotIndex() {

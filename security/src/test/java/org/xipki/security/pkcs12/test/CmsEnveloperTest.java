@@ -139,10 +139,8 @@ public class CmsEnveloperTest {
 
     byte[] data = Hex.decode("1234567890abcdef");
 
-    RSAESOAEPparams rsaOaepParams = new RSAESOAEPparams(
-        hashAlgo.algorithmIdentifier(),
-        RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION,
-        RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM);
+    RSAESOAEPparams rsaOaepParams = new RSAESOAEPparams( hashAlgo.algorithmIdentifier(),
+        RSAESOAEPparams.DEFAULT_MASK_GEN_FUNCTION, RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM);
 
     AlgorithmIdentifier oaepAlgId = new AlgorithmIdentifier(
         OIDs.Algo.id_RSAES_OAEP, rsaOaepParams);

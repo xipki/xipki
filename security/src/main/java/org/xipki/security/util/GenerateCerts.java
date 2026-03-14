@@ -226,8 +226,7 @@ public class GenerateCerts {
     public static KeyCertConf parse(JsonMap json) throws CodecException {
       return new KeyCertConf(json.getString("name"), json.getString("issuerName"),
           json.getString("keyType"), json.getString("certType"),
-          json.getString("subject"), json.getString("validity"),
-          json.getString("p12Password"));
+          json.getString("subject"), json.getString("validity"), json.getString("p12Password"));
     }
 
     public static List<KeyCertConf> parseList(JsonList json) throws CodecException {

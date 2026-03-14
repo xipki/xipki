@@ -105,8 +105,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     list.add(createExtension(ExtensionID.keyUsage, true, true));
     last(list).setKeyUsage(createKeyUsage(
         new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
-            KeyUsage.keyEncipherment},
-        null, profile.keyAlgorithms()));
+            KeyUsage.keyEncipherment}, null, profile.keyAlgorithms()));
 
     // Extensions - extenedKeyUsage
     list.add(createExtension(ExtensionID.extKeyUsage, true, false));
@@ -172,16 +171,9 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     }
 
     // SignatureAlgorithms
-    List<SignAlgo> algos = Arrays.asList(
-        SignAlgo.RSA_SHA256,
-        SignAlgo.RSA_SHA384,
-        SignAlgo.RSA_SHA512,
-        SignAlgo.ECDSA_SHA256,
-        SignAlgo.ECDSA_SHA384,
-        SignAlgo.ECDSA_SHA512,
-        SignAlgo.RSAPSS_SHA256,
-        SignAlgo.RSAPSS_SHA384,
-        SignAlgo.RSAPSS_SHA512);
+    List<SignAlgo> algos = Arrays.asList(SignAlgo.RSA_SHA256, SignAlgo.RSA_SHA384,
+        SignAlgo.RSA_SHA512, SignAlgo.ECDSA_SHA256, SignAlgo.ECDSA_SHA384, SignAlgo.ECDSA_SHA512,
+        SignAlgo.RSAPSS_SHA256, SignAlgo.RSAPSS_SHA384, SignAlgo.RSAPSS_SHA512);
     profile.setSignatureAlgorithms(algos);
 
     // Subject
@@ -214,30 +206,18 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
     profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
     if (certLevel == CertLevel.EndEntity) {
-      profile.setKeypairGeneration(BuilderUtil.createKeypairGenControl(
-          keypairGenMode,
+      profile.setKeypairGeneration(BuilderUtil.createKeypairGenControl( keypairGenMode,
           allowedKeyModes == null || allowedKeyModes.length == 0
               ? AllowKeyMode.RSA : allowedKeyModes[0]));
     }
 
     // SignatureAlgorithms
-    List<SignAlgo> algos = Arrays.asList(
-        SignAlgo.RSA_SHA256,
-        SignAlgo.RSA_SHA384,
-        SignAlgo.RSA_SHA512,
-        SignAlgo.ECDSA_SHA256,
-        SignAlgo.ECDSA_SHA384,
-        SignAlgo.ECDSA_SHA512,
-        SignAlgo.RSAPSS_SHA256,
-        SignAlgo.RSAPSS_SHA384,
-        SignAlgo.RSAPSS_SHA512,
-        SignAlgo.ECDSA_SHAKE128,
-        SignAlgo.ECDSA_SHAKE256,
-        SignAlgo.RSAPSS_SHAKE128,
-        SignAlgo.RSAPSS_SHAKE256,
-        SignAlgo.ED25519,
-        SignAlgo.ED448,
-        SignAlgo.SM2_SM3);
+    List<SignAlgo> algos = Arrays.asList( SignAlgo.RSA_SHA256,
+        SignAlgo.RSA_SHA384, SignAlgo.RSA_SHA512, SignAlgo.ECDSA_SHA256, SignAlgo.ECDSA_SHA384,
+        SignAlgo.ECDSA_SHA512, SignAlgo.RSAPSS_SHA256, SignAlgo.RSAPSS_SHA384,
+        SignAlgo.RSAPSS_SHA512, SignAlgo.ECDSA_SHAKE128, SignAlgo.ECDSA_SHAKE256,
+        SignAlgo.RSAPSS_SHAKE128, SignAlgo.RSAPSS_SHAKE256,
+        SignAlgo.ED25519, SignAlgo.ED448, SignAlgo.SM2_SM3);
 
     // profile.setSignatureAlgorithms(algos);
 
@@ -272,9 +252,7 @@ public class ProfileConfBuilder extends ExtensionConfBuilder {
         KeypairGenMode.FIRST_ALLOWED_KEY, allowKeyMode));
 
     // SignatureAlgorithm
-    List<SignAlgo> algos = Arrays.asList(
-        SignAlgo.ED25519,
-        SignAlgo.ED448);
+    List<SignAlgo> algos = Arrays.asList( SignAlgo.ED25519, SignAlgo.ED448);
 
     profile.setSignatureAlgorithms(algos);
 

@@ -36,8 +36,7 @@ public class V1ExtendedKeyUsage {
       (u.isRequired() ? rList : oList).add(v2Id);
     }
 
-    return new ExtendedKeyUsage(
-        rList.isEmpty() ? null : rList,
+    return new ExtendedKeyUsage( rList.isEmpty() ? null : rList,
         oList.isEmpty() ? null : oList);
   }
 
@@ -64,8 +63,7 @@ public class V1ExtendedKeyUsage {
     }
 
     public static Usage parse(JsonMap json) throws CodecException {
-      return new Usage(json.getString("description"),
-          json.getNnString("oid"),
+      return new Usage(json.getString("description"), json.getNnString("oid"),
           json.getBool("required", false));
     }
 

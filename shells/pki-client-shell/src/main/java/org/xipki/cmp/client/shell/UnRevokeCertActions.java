@@ -164,8 +164,7 @@ public class UnRevokeCertActions {
     }
 
     ReqInfo getReqInfo()
-        throws IllegalCmdParamException, CertificateException, IOException,
-        CmpClientException {
+        throws IllegalCmdParamException, CertificateException, IOException, CmpClientException {
       if (CollectionUtil.isEmpty(certFiles) && CollectionUtil.isEmpty(serialNumbersS)) {
         throw new IllegalCmdParamException("none of cert and serial is specified");
       }

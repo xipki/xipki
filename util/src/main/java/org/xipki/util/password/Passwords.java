@@ -320,15 +320,13 @@ public class Passwords {
 
     @Override
     public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
-      return PBEPasswordService.decryptPassword(
-          getMasterPassword(passwordHint), passwordHint);
+      return PBEPasswordService.decryptPassword(getMasterPassword(passwordHint), passwordHint);
     }
 
     @Override
     public String protectPassword(char[] password) throws PasswordResolverException {
       return PBEPasswordService.encryptPassword(
-          PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount,
-          getMasterPassword(null), password);
+          PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount, getMasterPassword(null), password);
     }
 
   } // class PBEPasswordResolver
@@ -399,8 +397,7 @@ public class Passwords {
       for (int i = 0; i < tries; i++) {
         char[] password;
         if (quorum == 1) {
-          password = Optional.ofNullable(
-              SecurePasswordInputPanel.readPassword(tmpPrompt))
+          password = Optional.ofNullable( SecurePasswordInputPanel.readPassword(tmpPrompt))
               .orElseThrow(() -> new PasswordResolverException("user has cancelled"));
         } else {
           char[][] passwordParts = new char[quorum][];
@@ -496,24 +493,19 @@ public class Passwords {
 
     PasswordCallback pwdCallback;
     switch (type.toUpperCase(Locale.ROOT)) {
-      case "FILE":
-        pwdCallback = new FilePasswordCallback();
+      case "FILE": pwdCallback = new FilePasswordCallback();
         break;
-      case "GUI":
-        pwdCallback = new GuiPasswordCallback();
+      case "GUI": pwdCallback = new GuiPasswordCallback();
         break;
-      case "PBE-GUI":
-        pwdCallback = new PBEGuiPasswordCallback();
+      case "PBE-GUI": pwdCallback = new PBEGuiPasswordCallback();
         break;
-      case OBFPasswordService.PROTOCOL_OBF:
-        pwdCallback = new OBFPasswordCallback();
+      case OBFPasswordService.PROTOCOL_OBF: pwdCallback = new OBFPasswordCallback();
         if (conf != null && !StringUtil.startsWithIgnoreCase(conf,
                               OBFPasswordService.PROTOCOL_OBF + ":")) {
           conf = OBFPasswordService.PROTOCOL_OBF + ":" + conf;
         }
         break;
-      default:
-        if (type.startsWith("java:")) {
+      default: if (type.startsWith("java:")) {
           String className = type.substring(5);
           try {
             pwdCallback = (PasswordCallback) Passwords.class.getClassLoader()

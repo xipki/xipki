@@ -50,14 +50,12 @@ public class BridgeKEMUtil {
         : MLKEMParameters.ml_kem_1024;
   }
 
-  private static MLKEMPublicKeyParameters toPublicParameters(
-      SubjectPublicKeyInfo pkInfo) {
+  private static MLKEMPublicKeyParameters toPublicParameters( SubjectPublicKeyInfo pkInfo) {
     MLKEMParameters variant = getMLKEMVariant(pkInfo.getAlgorithm());
     return new MLKEMPublicKeyParameters(variant, BridgeAsn1Util.getPublicKeyData(pkInfo));
   }
 
-  private static MLKEMPrivateKeyParameters toPrivateParameters(
-      PrivateKeyInfo skInfo) {
+  private static MLKEMPrivateKeyParameters toPrivateParameters( PrivateKeyInfo skInfo) {
     MLKEMParameters variant = getMLKEMVariant(skInfo.getPrivateKeyAlgorithm());
     byte[] skData = skInfo.getPrivateKey().getOctets();
     byte tag = skData[0];

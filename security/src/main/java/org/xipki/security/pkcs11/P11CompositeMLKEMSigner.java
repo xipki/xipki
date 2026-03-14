@@ -66,8 +66,7 @@ class P11CompositeMLKEMSigner implements Signer {
           tradVariant == CompKemTradVariant.RSA3072_OAEP ||
           tradVariant == CompKemTradVariant.RSA4096_OAEP) {
         long ckm = PKCS11T.CKM_RSA_PKCS_OAEP;
-        P11Params params = new P11Params.P11RSAPkcsOaepParams(
-            HashAlgo.SHA256, 0, null);
+        P11Params params = new P11Params.P11RSAPkcsOaepParams(HashAlgo.SHA256, 0, null);
         tradSS = identity.tradKey().decrypt(ckm, params, tradCT);
       } else {
         long ckm = PKCS11T.CKM_ECDH1_DERIVE;

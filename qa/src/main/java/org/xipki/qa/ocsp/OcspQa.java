@@ -113,8 +113,7 @@ public class OcspQa {
 
   public ValidationResult checkOcsp(
       OCSPResp response, IssuerHash issuerHash, List<BigInteger> serialNumbers,
-      Map<BigInteger, byte[]> encodedCerts,
-      Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
+      Map<BigInteger, byte[]> encodedCerts, Map<BigInteger, OcspCertStatus> expectedOcspStatuses,
       Map<BigInteger, Instant> expectedRevTimes,
       OcspResponseOption responseOption, boolean noSigVerify) {
     Args.notNull(response, "response");
@@ -184,8 +183,7 @@ public class OcspQa {
       SignAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
         try {
-          SignAlgo signAlgo = SignAlgo.getInstance(
-              basicResp.getSignatureAlgorithmID());
+          SignAlgo signAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithmID());
 
           if (signAlgo != expectedSigalgo) {
             issue.setFailureMessage("is '" + signAlgo.jceName() +
@@ -244,8 +242,7 @@ public class OcspQa {
       }
 
       if (respSigner != null) {
-        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST",
-            "signer certificate validation");
+        issue = new ValidationIssue("OCSP.SIGNERCERT.TRUST", "signer certificate validation");
         resultIssues.add(issue);
 
         for (int i = 0; i < singleResponses.length; i++) {
@@ -309,8 +306,7 @@ public class OcspQa {
       List<ValidationIssue> issues = checkSingleCert(i, singleResp,
           issuerHash, expectedStatus, encodedCert, expectedRevTime,
           extendedRevoke, responseOption.getNextUpdateOccurrence(),
-          responseOption.getCerthashOccurrence(),
-          responseOption.getCerthashAlg());
+          responseOption.getCerthashOccurrence(), responseOption.getCerthashAlg());
       resultIssues.addAll(issues);
     } // end for
 
@@ -321,8 +317,7 @@ public class OcspQa {
       int index, SingleResp singleResp, IssuerHash issuerHash,
       OcspCertStatus expectedStatus, byte[] encodedCert,
       Instant expectedRevTime, boolean extendedRevoke,
-      TripleState nextupdateOccurrence, TripleState certhashOccurrence,
-      HashAlgo certhashAlg) {
+      TripleState nextupdateOccurrence, TripleState certhashOccurrence, HashAlgo certhashAlg) {
     if (expectedStatus == OcspCertStatus.unknown
         || expectedStatus == OcspCertStatus.issuerUnknown) {
       certhashOccurrence = TripleState.forbidden;

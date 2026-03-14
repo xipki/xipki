@@ -23,12 +23,10 @@ public class AccessMethodID extends AbstractID {
   private static final Map<String, AccessMethodID> typeMap = new HashMap<>();
 
   // 1.3.6.1.5.5.7.48.1, id-ad-ocsp, id-pkix-ocsp
-  public static final AccessMethodID ocsp = initOf("1.3.6.1.5.5.7.48.1",
-      "OCSP", "pkix-ocsp");
+  public static final AccessMethodID ocsp = initOf("1.3.6.1.5.5.7.48.1", "OCSP", "pkix-ocsp");
 
   // 1.3.6.1.5.5.7.48.2, CA Issuers, id-ad-caIssuers, caIssuers
-  public static final AccessMethodID caIssuers = initOf(
-      "1.3.6.1.5.5.7.48.2", "CAIssuers");
+  public static final AccessMethodID caIssuers = initOf( "1.3.6.1.5.5.7.48.2", "CAIssuers");
 
   // 1.3.6.1.5.5.7.48.3, Time Stamping, id-ad-timeStamping, timeStamping
   public static final AccessMethodID timeStamping = initOf(

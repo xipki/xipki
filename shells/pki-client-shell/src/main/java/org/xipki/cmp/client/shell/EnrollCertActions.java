@@ -202,8 +202,7 @@ public class EnrollCertActions {
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest)
         throws Exception {
-      return new EnrollCertRequest.Entry("id-1", profile, certRequest,
-          null, true, false);
+      return new EnrollCertRequest.Entry("id-1", profile, certRequest, null, true, false);
     }
 
     @Override
@@ -458,8 +457,7 @@ public class EnrollCertActions {
     @Completion(Completers.ExtKeyusageCompleter.class)
     private List<String> extkeyusages;
 
-    @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true,
-        description =
+    @Option(name = "--subject-alt-name", aliases = "--san", multiValued = true, description =
             "subjectAltName, in the form of [tagNo]value or [tagText]value. "
             + "Valid tagNo/tagText/value:\n"
             + " '0'/'othername'/OID=[DirectoryStringChoice:]value,\n"

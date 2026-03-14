@@ -101,8 +101,7 @@ public class Asn1RSAPrivateKey {
     }
 
     int off = 1;
-    return new Asn1RSAPrivateKey(
-        bns[off++], bns[off++], bns[off++], bns[off++],
+    return new Asn1RSAPrivateKey(bns[off++], bns[off++], bns[off++], bns[off++],
         bns[off++], bns[off++], bns[off++], bns[off]);
   }
 

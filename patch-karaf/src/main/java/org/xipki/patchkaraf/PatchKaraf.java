@@ -187,8 +187,7 @@ public class PatchKaraf {
       String line;
       while ((line = reader.readLine()) != null) {
         if (line.startsWith("#org.ops4j.pax.url.mvn.localRepository")) {
-          writer.write("org.ops4j.pax.url.mvn.localRepository=" +
-              "${karaf.home}/not-exists");
+          writer.write("org.ops4j.pax.url.mvn.localRepository=${karaf.home}/not-exists");
         } else if (line.startsWith("org.ops4j.pax.url.mvn.repositories=")) {
           writer.write(commentContinuedLine(reader, line));
           writer.write("\norg.ops4j.pax.url.mvn.repositories=" +

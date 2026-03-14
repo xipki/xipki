@@ -39,8 +39,7 @@ public class ScepServerContainer {
   }
 
   public ScepServerContainer(int port, ScepServer scepServer) throws Exception {
-    this(port, Collections.singletonList(Args.notNull(scepServer,
-        "scepServer")));
+    this(port, Collections.singletonList(Args.notNull(scepServer, "scepServer")));
   }
 
   public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {

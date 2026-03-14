@@ -36,8 +36,7 @@ public class BridgeAsn1Util {
 
   static {
     /*
-    CertifiedKeyPair(CertOrEncCert certOrEncCert,
-                    EncryptedKey privateKey,
+    CertifiedKeyPair(CertOrEncCert certOrEncCert, EncryptedKey privateKey,
                     PKIPublicationInfo  publicationInfo)
      */
     boolean supported;
@@ -162,8 +161,7 @@ public class BridgeAsn1Util {
       AlgorithmIdentifier keyAlg, byte[] valueHint, byte[] encValue) {
     return new EncryptedValue(intendedAlg, symmAlg,
         (encSymmKey == null ? null : new DERBitString(encSymmKey)), keyAlg,
-        (valueHint  == null ? null : new DEROctetString(valueHint)),
-        new DERBitString(encValue));
+        (valueHint  == null ? null : new DEROctetString(valueHint)), new DERBitString(encValue));
   }
 
 }

@@ -547,8 +547,7 @@ public class RestResponder {
   private HttpRespContent enrollCerts(
       String command, String caName, String profile, Requestor requestor,
       byte[] request, XiHttpRequest httpRetriever, AuditEvent event)
-      throws HttpRespAuditException, OperationException, IOException,
-      SdkErrorResponseException {
+      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
     }
@@ -755,8 +754,7 @@ public class RestResponder {
   private HttpRespContent enrollCrossCert(
       String caName, String profile, Requestor requestor, byte[] request,
       XiHttpRequest httpRetriever, AuditEvent event)
-      throws HttpRespAuditException, OperationException, IOException,
-      SdkErrorResponseException {
+      throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
     if (!requestor.isPermitted(Requestor.Permission.ENROLL_CROSS)) {
       throw new OperationException(NOT_PERMITTED, "ENROLL_CROSS is not allowed");
     }
@@ -882,8 +880,7 @@ public class RestResponder {
     return HttpRespContent.ofOk(CT_pkix_cert, entry.cert());
   }
 
-  private static void checkResponse(
-      int expectedSize, EnrollOrPollCertsResponse resp)
+  private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
       throws HttpRespAuditException {
     EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
     if (entries != null) {
@@ -902,8 +899,7 @@ public class RestResponder {
     }
   }
 
-  private static void checkProfile(
-      Requestor requestor, String caName, String profile)
+  private static void checkProfile(Requestor requestor, String caName, String profile)
       throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {
       throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,

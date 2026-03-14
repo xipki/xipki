@@ -310,8 +310,7 @@ class CaconfDbExporter extends DbPorter {
         String name = rs.getString("NAME");
         String signerType = rs.getString("SIGNER_TYPE");
         FileOrValue signerConf =
-            buildFileOrValue(rs.getString("SIGNER_CONF"),
-                "ca-conf/signerconf-ca-" + name);
+            buildFileOrValue(rs.getString("SIGNER_CONF"), "ca-conf/signerconf-ca-" + name);
 
         FileOrBinary cert = buildFileOrBase64Binary(rs.getString("CERT"),
             "ca-conf/cert-ca-" + name + ".der");
