@@ -27,8 +27,7 @@ import java.util.List;
 
 class KeypairGenManager {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(KeypairGenManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KeypairGenManager.class);
 
   private boolean keypairGenInitialized;
 
@@ -47,8 +46,7 @@ class KeypairGenManager {
       try {
         entry.generator().close();
       } catch (IOException e) {
-        LogUtil.warn(LOG, e, "error closing keypair generator "
-            + entry.dbEntry().name());
+        LogUtil.warn(LOG, e, "error closing keypair generator " + entry.dbEntry().name());
       }
     }
   }
@@ -65,8 +63,7 @@ class KeypairGenManager {
 
     List<KeypairGenEntry> entries;
     if (dbSchemaVersion < 9) {
-      throw new CaMgmtException(
-          "dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
+      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
     }
 
     List<String> names = manager.caConfStore.getKeyPairGenNames();
@@ -94,8 +91,7 @@ class KeypairGenManager {
   void addKeypairGen(KeypairGenEntry keypairGenEntry) throws CaMgmtException {
     if ("software".equalsIgnoreCase(
         Args.notNull(keypairGenEntry, "keypairGenEntry").name())) {
-      throw new CaMgmtException(
-          "Adding keypair generation 'software' is not allowed");
+      throw new CaMgmtException("Adding keypair generation 'software' is not allowed");
     }
 
     manager.assertMasterMode();
@@ -143,8 +139,7 @@ class KeypairGenManager {
     LOG.info("removed keypair generation '{}'", name);
   } // method removeKeypairGen
 
-  void changeKeypairGen(String name, String type, String conf)
-      throws CaMgmtException {
+  void changeKeypairGen(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
@@ -166,16 +161,14 @@ class KeypairGenManager {
     manager.keypairGens.put(name, newKeypairGen);
   } // method changeKeypairGen
 
-  KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry)
-      throws CaMgmtException {
+  KeypairGenEntryWrapper createKeypairGen(KeypairGenEntry entry) throws CaMgmtException {
     Args.notNull(entry, "entry");
     KeypairGenEntryWrapper ret = new KeypairGenEntryWrapper();
     ret.setDbEntry(entry);
 
     try {
       ret.init(manager.securityFactory, manager.p11CryptServiceFactory,
-          manager.keypairGeneratorFactories, manager.shardId,
-          manager.getDataSourceMap());
+          manager.keypairGeneratorFactories, manager.shardId, manager.getDataSourceMap());
     } catch (ObjectCreationException ex) {
       final String message = "error createKeypairGen";
       LOG.debug(message, ex);

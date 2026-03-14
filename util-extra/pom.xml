@@ -13,8 +13,6 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <DynamicImport-Package>*</DynamicImport-Package>
-    <!-- For the datasource package -->
-    <Import-Package>com.zaxxer.hikari;version="[2.7,10)",*</Import-Package>
   </properties>
   <dependencies>
     <dependency>

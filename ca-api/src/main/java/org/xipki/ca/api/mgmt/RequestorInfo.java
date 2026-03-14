@@ -21,7 +21,6 @@ public interface RequestorInfo {
 
   /**
    * CA system as the requestor.
-   *
    */
 
   class ByCaRequestorInfo implements RequestorInfo {
@@ -64,8 +63,7 @@ public interface RequestorInfo {
 
     private final CertWithDbId cert;
 
-    public CertRequestorInfo(CaHasRequestorEntry caHasRequestor,
-                             CertWithDbId cert) {
+    public CertRequestorInfo(CaHasRequestorEntry caHasRequestor, CertWithDbId cert) {
       this.caHasRequestor = Args.notNull(caHasRequestor, "caHasRequestor");
       this.cert = Args.notNull(cert, "cert");
     }
@@ -94,12 +92,10 @@ public interface RequestorInfo {
     }
 
     @Override
-    public void assertPermitted(int permission)
-        throws InsufficientPermissionException {
+    public void assertPermitted(int permission) throws InsufficientPermissionException {
       if (!isPermitted(permission)) {
         throw new  InsufficientPermissionException("Permission "
-            + PermissionConstants.getTextForCode(permission)
-            + " is not permitted");
+            + PermissionConstants.getTextForCode(permission) + " is not permitted");
       }
     }
 
@@ -111,7 +107,6 @@ public interface RequestorInfo {
 
   boolean isPermitted(int requiredPermission);
 
-  void assertPermitted(int requiredPermission)
-      throws InsufficientPermissionException;
+  void assertPermitted(int requiredPermission) throws InsufficientPermissionException;
 
 }

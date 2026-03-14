@@ -17,14 +17,15 @@ import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiEdwardsECPublicKey extends XiECPublicKey {
 
   public XiEdwardsECPublicKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, Long keyGenMechanism,
-      byte[] ecParams, byte[] ecPoint) {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle,
+      boolean inToken, Long keyGenMechanism, byte[] ecParams, byte[] ecPoint) {
     super(vendor, cku, newObjectMethod, handle, inToken,
         PKCS11T.CKK_EC_EDWARDS, keyGenMechanism, ecParams, ecPoint);
   }
@@ -34,21 +35,17 @@ public class XiEdwardsECPublicKey extends XiECPublicKey {
       LoginState loginState, ObjectInitMethod initMethod,
       long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
       throws HsmException {
-    byte[] ecParams   = attrs.removeNonNullByteArray(
-        PKCS11T.CKA_EC_PARAMS);
-    byte[] derEcPoint = attrs.removeNonNullByteArray(
-        PKCS11T.CKA_EC_POINT);
+    byte[] ecParams   = attrs.removeNonNullByteArray(PKCS11T.CKA_EC_PARAMS);
+    byte[] derEcPoint = attrs.removeNonNullByteArray(PKCS11T.CKA_EC_POINT);
     byte[] ecPoint = HsmUtil.getOctetStringValue("EC_Point", derEcPoint);
 
-    XiEdwardsECPublicKey ret = new XiEdwardsECPublicKey(
-        vendor, cku, newObjectMethod,
-        handle, inToken, keyGenMechanism, ecParams, ecPoint);
+    XiEdwardsECPublicKey ret = new XiEdwardsECPublicKey(vendor, cku,
+        newObjectMethod, handle, inToken, keyGenMechanism, ecParams, ecPoint);
     ret.updateAttributes(loginState, initMethod, attrs);
     return ret;
   }
 
-  static void checkMechanismParameters(
-      EdwardsCurveEnum curve, XiMechanism mechanism)
+  static void checkMechanismParameters(EdwardsCurveEnum curve, XiMechanism mechanism)
       throws HsmException {
     if (curve == EdwardsCurveEnum.ED25519) {
       HsmUtil.assertNullParameter(mechanism);
@@ -61,8 +58,7 @@ public class XiEdwardsECPublicKey extends XiECPublicKey {
 
       EDDSA_PARAMS eddsaParams = (EDDSA_PARAMS) param;
       if (eddsaParams.phFlag()) {
-        throw new HsmException(PKCS11T.CKR_MECHANISM_PARAM_INVALID,
-            "EDDSA_PARAMS.phFlag != FALSE");
+        throw new HsmException(PKCS11T.CKR_MECHANISM_PARAM_INVALID, "EDDSA_PARAMS.phFlag != FALSE");
       }
 
       byte[] context = eddsaParams.context();

@@ -21,6 +21,8 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_MODULUS;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_PUBLIC_EXPONENT;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiRSAPublicKey extends XiPublicKey {
@@ -33,21 +35,18 @@ public class XiRSAPublicKey extends XiPublicKey {
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, Long keyGenMechanism,
       BigInteger modulus, BigInteger publicExponent) {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        PKCS11T.CKK_RSA, keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, PKCS11T.CKK_RSA, keyGenMechanism);
     this.modulus = Args.notNull(modulus, "modulus");
     this.publicExponent = Args.notNull(publicExponent, "publicExponent");
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertRsaPublicKeyAttributesSettable(attrs);
   }
 
   @Override
-  protected void doGetAttributes(
-      List<XiAttribute> res, long[] types, boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, CKA_MODULUS, modulus);

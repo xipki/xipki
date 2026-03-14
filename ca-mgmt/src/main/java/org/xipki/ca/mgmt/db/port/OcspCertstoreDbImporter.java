@@ -4,6 +4,7 @@
 package org.xipki.ca.mgmt.db.port;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.util.X509Util;
@@ -41,23 +42,18 @@ import java.util.zip.ZipFile;
 
 class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(OcspCertstoreDbImporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspCertstoreDbImporter.class);
 
   private final boolean resume;
 
   private final int numCertsPerCommit;
 
-  OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir,
-                          int numCertsPerCommit, boolean resume,
-                          AtomicBoolean stopMe)
-      throws Exception {
+  OcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir, int numCertsPerCommit,
+                          boolean resume, AtomicBoolean stopMe) throws Exception {
     super(datasource, srcDir, stopMe);
 
-    this.numCertsPerCommit =
-        Args.positive(numCertsPerCommit, "numCertsPerCommit");
-    File processLogFile =
-        new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+    this.numCertsPerCommit = Args.positive(numCertsPerCommit, "numCertsPerCommit");
+    File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     if (resume) {
       if (!processLogFile.exists()) {
         throw new Exception("could not process with '--resume' option");
@@ -72,8 +68,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
   } // constructor
 
   public void importToDb() throws Exception {
-    JsonMap json = JsonParser.parseMap(
-        Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), false);
+    JsonMap json = JsonParser.parseMap(Paths.get(baseDir, FILENAME_OCSP_CERTSTORE), false);
     OcspCertstore certstore = OcspCertstore.parse(json);
 
     if (certstore.version() > VERSION_V2) {
@@ -81,8 +76,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           + VERSION_V2 + ": " + certstore.version());
     }
 
-    File processLogFile =
-        new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
+    File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
     System.out.println("importing OCSP certstore to database");
     try {
       if (!resume) {
@@ -99,11 +93,9 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     System.out.println(" imported OCSP certstore to database");
   } // method importToDB
 
-  private void importCertHashAlgo(String certHashAlgo)
-      throws DataAccessException {
+  private void importCertHashAlgo(String certHashAlgo) throws DataAccessException {
     try {
-      datasource.updateDbSchema(connection,
-          Map.of("CERTHASH_ALGO", certHashAlgo));
+      datasource.updateDbSchema(connection, Map.of("CERTHASH_ALGO", certHashAlgo));
       dbSchemaInfo.put("CERTHASH_ALGO", certHashAlgo);
     } catch (DataAccessException ex) {
       System.err.println("could not import DBSCHEMA");
@@ -132,21 +124,17 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           try {
             cert = Certificate.getInstance(encodedCert);
           } catch (RuntimeException ex) {
-            LOG.error("could not parse certificate of issuer {}",
-                issuer.id());
-            LOG.debug("could not parse certificate of issuer {}",
-                issuer.id(), ex);
+            LOG.error("could not parse certificate of issuer {}", issuer.id());
+            LOG.debug("could not parse certificate of issuer {}", issuer.id(), ex);
             throw new CertificateException(ex.getMessage(), ex);
           }
 
+          TBSCertificate tbs = cert.getTBSCertificate();
           int idx = 1;
           ps.setInt(idx++, issuer.id());
-          ps.setString(idx++, X509Util.cutX500Name(
-              cert.getSubject(), maxX500nameLen));
-          ps.setLong(idx++, DateUtil.toEpochSecond(
-              cert.getTBSCertificate().getStartDate().getDate()));
-          ps.setLong(idx++, DateUtil.toEpochSecond(
-              cert.getTBSCertificate().getEndDate().getDate()));
+          ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
+          ps.setLong(idx++, DateUtil.toEpochSecond(tbs.getStartDate().getDate()));
+          ps.setLong(idx++, DateUtil.toEpochSecond(tbs.getEndDate().getDate()));
           ps.setString(idx++, sha1(encodedCert));
           ps.setString(idx++, issuer.revInfo());
           ps.setString(idx++, b64Cert);
@@ -172,8 +160,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   }
 
-  private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos)
-      throws DataAccessException {
+  private void importCrlInfo(List<OcspCertstore.CrlInfo> crlInfos) throws DataAccessException {
     if (CollectionUtil.isEmpty(crlInfos)) {
       return;
     }
@@ -202,8 +189,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
     }
   }
 
-  private void importCert(OcspCertstore certstore, File processLogFile)
-      throws Exception {
+  private void importCert(OcspCertstore certstore, File processLogFile) throws Exception {
     int numProcessedBefore = 0;
     long minId = 1;
     if (processLogFile.exists()) {
@@ -248,12 +234,10 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
               continue;
             }
           } catch (Exception ex) {
-            LOG.warn("invalid file name '{}', but will still be processed",
-                certsFile);
+            LOG.warn("invalid file name '{}', but will still be processed", certsFile);
           }
         } else {
-          LOG.warn("invalid file name '{}', but will still be processed",
-              certsFile);
+          LOG.warn("invalid file name '{}', but will still be processed", certsFile);
         }
 
         try {
@@ -273,28 +257,24 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
     processLog.printTrailer();
     echoToFile(MSG_CERTS_FINISHED, processLogFile);
-    System.out.println(" imported " + processLog.numProcessed()
-        + " certificates");
+    System.out.println(" imported " + processLog.numProcessed() + " certificates");
   } // method importCert
 
   private long importCert0(
-      PreparedStatement psCert, String certsZipFile, long minId,
-      File processLogFile, ProcessLog processLog, int numProcessedInLastProcess)
-      throws Exception {
+      PreparedStatement psCert, String certsZipFile, long minId, File processLogFile,
+      ProcessLog processLog, int numProcessedInLastProcess) throws Exception {
     ZipFile zipFile = new ZipFile(new File(certsZipFile));
     ZipEntry certsEntry = zipFile.getEntry("certs.json");
 
     OcspCertstore.Certs certs;
     try {
-      JsonMap json = JsonParser.parseMap(zipFile.getInputStream(certsEntry),
-          false);
+      JsonMap json = JsonParser.parseMap(zipFile.getInputStream(certsEntry), false);
       certs = OcspCertstore.Certs.parse(json);
     } catch (Exception ex) {
       try {
         zipFile.close();
       } catch (Exception e2) {
-        LOG.error("could not close ZIP file {}: {}",
-            certsZipFile, e2.getMessage());
+        LOG.error("could not close ZIP file {}: {}", certsZipFile, e2.getMessage());
         LOG.debug("could not close ZIP file {}", certsZipFile, e2);
       }
       throw ex;
@@ -350,8 +330,7 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
         boolean isLastBlock = i == n - 1;
 
         if (numEntriesInBatch > 0
-            && (numEntriesInBatch % this.numCertsPerCommit == 0
-                || isLastBlock)) {
+            && (numEntriesInBatch % this.numCertsPerCommit == 0 || isLastBlock)) {
           try {
             psCert.executeBatch();
             commit("(commit import cert to OCSP)");

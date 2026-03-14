@@ -37,14 +37,11 @@ public abstract class ExtensionSpec {
           "test"           // [RFC6761]
       ));
 
-  private static final Map<CertLevel, ExtensionSpec> rfc5280Instances =
-      new HashMap<>();
+  private static final Map<CertLevel, ExtensionSpec> rfc5280Instances = new HashMap<>();
 
-  private static final Map<CertLevel, ExtensionSpec> browserForumInstances =
-      new HashMap<>();
+  private static final Map<CertLevel, ExtensionSpec> browserForumInstances = new HashMap<>();
 
-  private static final AtomicBoolean instancesInitialized =
-      new AtomicBoolean(false);
+  private static final AtomicBoolean instancesInitialized = new AtomicBoolean(false);
 
   public abstract Set<ASN1ObjectIdentifier> requiredExtensions();
 
@@ -104,16 +101,14 @@ public abstract class ExtensionSpec {
         BrowserForumBRSubCA brSubCA = new BrowserForumBRSubCA();
         browserForumInstances.put(CertLevel.SubCA, brSubCA);
         browserForumInstances.put(CertLevel.CROSS, brSubCA);
-        browserForumInstances.put(CertLevel.EndEntity,
-            new BrowserForumBREndEntity());
+        browserForumInstances.put(CertLevel.EndEntity, new BrowserForumBREndEntity());
 
         instancesInitialized.set(true);
       }
     }
 
     return domain == CertDomain.CABForumBR
-        ? browserForumInstances.get(certLevel)
-        : rfc5280Instances.get(certLevel);
+        ? browserForumInstances.get(certLevel) : rfc5280Instances.get(certLevel);
   } // method getExtensionSpec
 
   private static class Rfc5280 extends ExtensionSpec {
@@ -218,20 +213,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type)
-          || super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280RootCA
@@ -276,20 +268,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type)
-          || super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280SubCA
@@ -319,20 +308,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type)
-          || super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class Rfc5280EndEntity
@@ -383,20 +369,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type)
-          || super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class BrowserForumBRSubCA
@@ -438,20 +421,17 @@ public abstract class ExtensionSpec {
 
     @Override
     public boolean isNotPermitted(ASN1ObjectIdentifier type) {
-      return NON_PERMITTED_EXTENSIONS.contains(type)
-          || super.isNotPermitted(type);
+      return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
     public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isCriticalOnly(type);
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
     public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
-      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type)
-          || super.isNonCriticalOnly(type);
+      return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
   } // class BrowserForumBREndEntity

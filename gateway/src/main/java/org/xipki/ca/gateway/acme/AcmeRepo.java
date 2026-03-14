@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -67,15 +68,14 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     }
 
     @Override
-    protected void entryRemoved(boolean evicted, Long key,
-                                AcmeAccount oldValue, AcmeAccount newValue) {
+    protected void entryRemoved(
+        boolean evicted, Long key, AcmeAccount oldValue, AcmeAccount newValue) {
       super.entryRemoved(evicted, key, oldValue, newValue);
       if (oldValue != null) {
         try {
           oldValue.flush();
         } catch (Throwable th) {
-          LogUtil.error(LOG, th,
-              "error flushing AcmeAccount " + oldValue.id());
+          LogUtil.error(LOG, th, "error flushing AcmeAccount " + oldValue.id());
         }
       }
     }
@@ -97,15 +97,13 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     }
 
     @Override
-    protected void entryRemoved(boolean evicted, Long key,
-                                AcmeOrder oldValue, AcmeOrder newValue) {
+    protected void entryRemoved(boolean evicted, Long key, AcmeOrder oldValue, AcmeOrder newValue) {
       super.entryRemoved(evicted, key, oldValue, newValue);
       if (oldValue != null) {
         try {
           oldValue.flush();
         } catch (Throwable th) {
-          LogUtil.error(LOG, th,
-              "error flushing AcmeOrder " + oldValue.id());
+          LogUtil.error(LOG, th, "error flushing AcmeOrder " + oldValue.id());
         }
       }
     }
@@ -172,12 +170,10 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   private boolean stopMe;
 
   public AcmeRepo(AcmeDataSource dataSource, int cacheSize, int syncDbSeconds) {
-    this.accountCache = new AccountLruCache(
-        Args.min(cacheSize, "cacheSize", 1));
-    this.orderCache   = new OrderLruCache(
-        Args.min(cacheSize, "cacheSize", 1));
+    this.accountCache  = new AccountLruCache(Args.min(cacheSize, "cacheSize", 1));
+    this.orderCache    = new OrderLruCache(Args.min(cacheSize, "cacheSize", 1));
     this.syncDbSeconds = Args.min(syncDbSeconds, "syncDbSeconds", 1);
-    this.dataSource = Args.notNull(dataSource, "dataSource");
+    this.dataSource    = Args.notNull(dataSource, "dataSource");
     this.dataSource.setIdChecker(this);
   }
 
@@ -191,8 +187,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     return orderCache.containsKey(id);
   }
 
-  IdsForOrder newIdsForOrder(int numAuthzs, int numChalls)
-      throws DataAccessException {
+  IdsForOrder newIdsForOrder(int numAuthzs, int numChalls) throws DataAccessException {
     return new IdsForOrder(dataSource.nextOrderId(),
         dataSource.nextAuthzIds(numAuthzs), dataSource.nextChallIds(numChalls));
   }
@@ -229,8 +224,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     return account;
   }
 
-  public AcmeAccount getAccountForJwk(Map<String, String> jwk)
-      throws AcmeSystemException {
+  public AcmeAccount getAccountForJwk(Map<String, String> jwk) throws AcmeSystemException {
     // from cache
     for (Map.Entry<Long, AcmeAccount> entry
         : accountCache.snapshot().entrySet()) {
@@ -264,8 +258,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public AcmeOrder getOrderForCert(byte[] cert) throws AcmeSystemException {
-    String sha256 = Base64.getUrlNoPaddingEncoder().encodeToString(
-        HashAlgo.SHA256.hash(cert));
+    String sha256 = Base64.getUrlNoPaddingEncoder().encodeToString(HashAlgo.SHA256.hash(cert));
     // do not read CSR and CERT to save bandwidth.
     AcmeOrder order = null;
     for (Map.Entry<Long, AcmeOrder> entry : orderCache.snapshot().entrySet()) {
@@ -285,8 +278,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     return order;
   }
 
-  public AcmeChallenge2 getChallenge(ChallId challId)
-      throws AcmeSystemException {
+  public AcmeChallenge2 getChallenge(ChallId challId) throws AcmeSystemException {
     AcmeOrder order = getOrder(challId.orderId());
     if (order == null) {
       return null;
@@ -330,8 +322,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     return orderIds;
   }
 
-  public Iterator<ChallId> getChallengesToValidate()
-      throws AcmeSystemException {
+  public Iterator<ChallId> getChallengesToValidate() throws AcmeSystemException {
     // from database
     List<ChallId> dbIds = dataSource.getChallengesToValidate();
     List<ChallId> ids = new LinkedList<>(dbIds);
@@ -350,11 +341,9 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
       for (AcmeAuthz authz : authzs) {
         for (AcmeChallenge challenge : authz.challenges()) {
-          ChallId challId = new ChallId(order.id(), authz.subId(),
-              challenge.subId());
+          ChallId challId = new ChallId(order.id(), authz.subId(), challenge.subId());
           boolean addMe = challenge.status() == ChallengeStatus.processing
-              && authz.status() == AuthzStatus.pending
-              && order.status() == OrderStatus.pending;
+              && authz.status() == AuthzStatus.pending && order.status() == OrderStatus.pending;
 
           if (addMe) {
             ids.add(challId);
@@ -419,8 +408,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
   private synchronized void writeToDb() throws AcmeSystemException {
     // save the accounts and orders
-    for (Map.Entry<Long, AcmeAccount> account
-        : accountCache.snapshot().entrySet()) {
+    for (Map.Entry<Long, AcmeAccount> account : accountCache.snapshot().entrySet()) {
       account.getValue().flush();
     }
 
@@ -430,8 +418,7 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
     }
   }
 
-  public synchronized void flushOrderIfNotCached(AcmeOrder order)
-      throws AcmeSystemException {
+  public synchronized void flushOrderIfNotCached(AcmeOrder order) throws AcmeSystemException {
     AcmeOrder cachedOrder = orderCache.get(order.id());
     if (cachedOrder != order) {
       order.flush();

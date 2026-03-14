@@ -3,23 +3,27 @@
 
 package test.pkcs11.wrapper.basics;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.xipki.pkcs11.wrapper.PKCS11Token;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.wrapper.type.CkMechanismInfo;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
+import org.xipki.security.pkix.JceX509Certificate;
+import org.xipki.security.util.KeyUtil;
 import test.pkcs11.wrapper.TestBase;
 import test.pkcs11.wrapper.TestHSMs;
-import test.pkcs11.wrapper.util.Util;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
+import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -115,9 +119,8 @@ public class UploadPrivateKeyTest {
       LOG.info("##################################################");
       LOG.info("Reading private key and certificate from: {}", p12ResourcePath);
       char[] filePassword = p12Password.toCharArray();
-      InputStream dataInputStream = getResourceAsStream(p12ResourcePath);
-      KeyStore keystore = KeyStore.getInstance("PKCS12");
-      keystore.load(dataInputStream, filePassword);
+      InputStream ksInputStream = getResourceAsStream(p12ResourcePath);
+      PKCS12KeyStore keystore = KeyUtil.loadPKCS12KeyStore(ksInputStream, filePassword);
 
       String keyAlias = null;
       Enumeration<String> aliases = keystore.aliases();
@@ -134,8 +137,7 @@ public class UploadPrivateKeyTest {
         throw new IOException("Given file does not include a key!");
       }
 
-      PrivateKey jcaPrivateKey =
-          (PrivateKey) keystore.getKey(keyAlias, filePassword);
+      PrivateKey jcaPrivateKey = KeyUtil.getPrivateKey(keystore.getKey(keyAlias));
 
       if (!jcaPrivateKey.getAlgorithm().equals("RSA")) {
         LOG.error("Private Key in the PKCS#12 file is not a RSA key.");
@@ -148,9 +150,8 @@ public class UploadPrivateKeyTest {
 
       Certificate[] certificateChain = keystore.getCertificateChain(keyAlias);
 
-      X509Certificate userCertificate = (X509Certificate) certificateChain[0];
-      String userCommonName = Util.getCommonName(
-          userCertificate.getSubjectX500Principal());
+      JceX509Certificate userCertificate = new JceX509Certificate(certificateChain[0]);
+      String userCommonName = getCommonName(userCertificate.getSubjectX500Principal());
 
       MessageDigest sha1 = MessageDigest.getInstance("SHA1");
       byte[] encodedCert = userCertificate.getEncoded();
@@ -180,15 +181,14 @@ public class UploadPrivateKeyTest {
 
       // create private key object template
       String keyLabel = userCommonName + "'s " +
-          Util.getRdnValue(userCertificate.getIssuerX500Principal(), "O");
+          getRdnValue(userCertificate.getIssuerX500Principal(), "O");
 
       byte[] extnValue = userCertificate.getExtensionValue("2.5.29.14");
       byte[] newObjectID;
       if (extnValue != null) {
         newObjectID = Arrays.copyOfRange(extnValue, 4, extnValue.length);
         if (newObjectID.length != 20) {
-          throw new IllegalStateException(
-              "invalid extension SubjectKeyIdentifier");
+          throw new IllegalStateException("invalid extension SubjectKeyIdentifier");
         }
       } else {
         // then we simply take the fingerprint of the certificate
@@ -253,8 +253,7 @@ public class UploadPrivateKeyTest {
               .unwrap(signatureMechanismInfo.hasFlagBit(CKF_UNWRAP));
         } else {
           // if we have neither mechanism info nor key usage we just try all
-          p11RsaPrivateKey.sign(true).signRecover(true).decrypt(true)
-              .derive(true).unwrap(true);
+          p11RsaPrivateKey.sign(true).signRecover(true).decrypt(true).derive(true).unwrap(true);
         }
       }
 
@@ -281,6 +280,32 @@ public class UploadPrivateKeyTest {
 
       LOG.info("##################################################");
     }
+  }
+
+  public static String getCommonName(X500Principal name) {
+    return getRdnValue(name, "CN");
+  }
+
+  public static String getRdnValue(X500Principal name, String rdnType) {
+    String dn = name.getName();
+    LdapName ldapDN;
+    try {
+      ldapDN = new LdapName(dn);
+    } catch (InvalidNameException ex) {
+      throw new IllegalArgumentException("invalid LdapName", ex);
+    }
+    for(Rdn rdn: ldapDN.getRdns()) {
+      if (rdn.getType().equalsIgnoreCase(rdnType)) {
+        Object obj = rdn.getValue();
+        if (obj instanceof String) {
+          return (String) obj;
+        } else {
+          return obj.toString();
+        }
+      }
+    }
+
+    return null;
   }
 
 }

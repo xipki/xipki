@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile TLS (CA/Browser Forum BR, Organization Validated)"
+  },
+  "certLevel": "EndEntity",
+  "certDomain": "CABForumBR",
+  "maxSize": 8400,
+  "validity": "397d",
+  "notBeforeTime": "current",
+  "keypairGeneration": "InheritCA",
+  "signatureAlgorithms": [
+    "ECDSA-SHA256",
+    "ECDSA-SHA384",
+    "ECDSA-SHA512",
+    "RSA-SHA256",
+    "RSA-SHA384",
+    "RSA-SHA512",
+    "RSAPSS-SHA256",
+    "RSAPSS-SHA384",
+    "RSAPSS-SHA512"
+  ],
+  "keyAlgorithms": [
+    "P256",
+    "P384",
+    "P521",
+    "RSA2048",
+    "RSA3072",
+    "RSA4096"
+  ],
+  "subject": [
+    {
+      "type": "country"
+    },
+    {
+      "type": "2.5.4.8",
+      "minOccurs": 0
+    },
+    {
+      "type": "locality",
+      "minOccurs": 0
+    },
+    {
+      "type": "organization"
+    },
+    {
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },
+    {
+      "type": "serialNumber",
+      "minOccurs": 0
+    },
+    {
+      "type": "commonName",
+      "toSAN": "DNSName",
+      "regex": ":FQDN"
+    }
+  ],
+  "extensions": [
+    {
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "CRLDistributionPoints"
+    },
+    {
+      "type": "SubjectAlternativeName",
+      "required": true,
+      "inRequest": "required",
+      "subjectAltName": {
+        "modes": [
+          "DNSName",
+          "IPAddress"
+        ]
+      }
+    },
+    {
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },
+    {
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },
+    {
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [
+          {
+            "required": [
+              "dataEncipherment",
+              "digitalSignature",
+              "keyEncipherment"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "ExtendedKeyUsage",
+      "required": true,
+      "inRequest": "optional",
+      "extendedKeyUsage": {
+        "required": [
+          "serverAuth"
+        ],
+        "optional": [
+          "clientAuth"
+        ]
+      }
+    },
+    {
+      "type": "SignedCertificateTimestampList",
+      "required": true
+    },
+    {
+      "type": "CertificatePolicies",
+      "required": true,
+      "certificatePolicies": {
+        "certificatePolicyInformations": [
+          {
+            "policyIdentifier": "OrganizationValidation"
+          }
+        ]
+      }
+    }
+  ]
+}

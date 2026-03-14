@@ -37,8 +37,7 @@ public class LogUtil {
     for (String prefix : prefixes) {
       for (String propName : propNames) {
         if (propName.startsWith(prefix)) {
-          sb.append(propName).append(": ")
-              .append(props.getProperty(propName)).append("\n");
+          sb.append(propName).append(": ").append(props.getProperty(propName)).append("\n");
         }
       }
     }

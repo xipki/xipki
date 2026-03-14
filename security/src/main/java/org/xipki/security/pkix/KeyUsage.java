@@ -12,16 +12,15 @@ import org.xipki.util.codec.Args;
  */
 public enum KeyUsage {
 
-  digitalSignature(0, org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
-  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation,
-      "nonRepudiation"),
-  keyEncipherment(2,  org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment),
-  dataEncipherment(3, org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment),
-  keyAgreement(4,     org.bouncycastle.asn1.x509.KeyUsage.keyAgreement),
-  keyCertSign(5,      org.bouncycastle.asn1.x509.KeyUsage.keyCertSign),
-  cRLSign(6,          org.bouncycastle.asn1.x509.KeyUsage.cRLSign),
-  encipherOnly(7,     org.bouncycastle.asn1.x509.KeyUsage.encipherOnly),
-  decipherOnly(8,     org.bouncycastle.asn1.x509.KeyUsage.decipherOnly);
+  digitalSignature(0,  org.bouncycastle.asn1.x509.KeyUsage.digitalSignature),
+  contentCommitment(1, org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation, "nonRepudiation"),
+  keyEncipherment(2,   org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment),
+  dataEncipherment(3,  org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment),
+  keyAgreement(4,      org.bouncycastle.asn1.x509.KeyUsage.keyAgreement),
+  keyCertSign(5,       org.bouncycastle.asn1.x509.KeyUsage.keyCertSign),
+  cRLSign(6,           org.bouncycastle.asn1.x509.KeyUsage.cRLSign),
+  encipherOnly(7,      org.bouncycastle.asn1.x509.KeyUsage.encipherOnly),
+  decipherOnly(8,      org.bouncycastle.asn1.x509.KeyUsage.decipherOnly);
 
   private final int bit;
 

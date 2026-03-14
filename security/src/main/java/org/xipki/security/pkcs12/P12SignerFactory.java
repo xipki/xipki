@@ -6,6 +6,7 @@ package org.xipki.security.pkcs12;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jcajce.interfaces.XDHPublicKey;
+import org.osgi.service.component.annotations.Component;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -37,18 +38,13 @@ import java.util.Set;
  *
  * @author Lijun Liao (xipki)
  */
+@Component(service = SignerFactory.class)
 public class P12SignerFactory implements SignerFactory {
 
   private static final String TYPE_PKCS12 = "pkcs12";
   private static final String TYPE_JCEKS = "jceks";
 
   private static final Set<String> types = Set.of(TYPE_PKCS12, TYPE_JCEKS);
-
-  private SecurityFactory securityFactory;
-
-  public void setSecurityFactory(SecurityFactory securityFactory) {
-    this.securityFactory = securityFactory;
-  }
 
   @Override
   public Set<String> getSupportedSignerTypes() {
@@ -62,8 +58,12 @@ public class P12SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentSigner newSigner(
-      String type, SignerConf conf, X509Cert[] certificateChain)
+      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
+    if (securityFactory == null) {
+      throw new ObjectCreationException("securityFactory could not be null");
+    }
+
     if (!canCreateSigner(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
     }
@@ -75,8 +75,8 @@ public class P12SignerFactory implements SignerFactory {
       throw new ObjectCreationException(e);
     }
 
-    int parallelism = Objects.requireNonNullElseGet(iParallelism,
-        () -> securityFactory.dfltSignerParallelism());
+    int parallelism = Objects.requireNonNullElseGet(
+        iParallelism, securityFactory::dfltSignerParallelism);
 
     String passwordHint = conf.password();
     char[] password = getPassword(passwordHint);
@@ -88,17 +88,14 @@ public class P12SignerFactory implements SignerFactory {
       SignAlgo sigAlgo = conf.algo();
       if (sigAlgo != null && sigAlgo.isMac()) {
         P12MacContentSignerBuilder signerBuilder =
-            new P12MacContentSignerBuilder(type, keystoreStream,
-                password, keyLabel, password);
+            new P12MacContentSignerBuilder(type, keystoreStream, password, keyLabel, password);
         return signerBuilder.createSigner(sigAlgo, parallelism);
       } else {
-        KeypairWithCert keypairWithCert = KeypairWithCert.fromKeystore(type,
+        KeypairWithCert keypairWithCert = KeypairWithCert.fromPKCS12Keystore(
             keystoreStream, password, keyLabel, password, certificateChain);
         if (sigAlgo == null) {
-          SubjectPublicKeyInfo pkInfo = keypairWithCert
-              .x509CertChain()[0].subjectPublicKeyInfo();
-          sigAlgo = conf.callback().getSignAlgo(
-                      KeySpec.ofPublicKey(pkInfo), conf.mode());
+          SubjectPublicKeyInfo pkInfo = keypairWithCert.x509CertChain()[0].subjectPublicKeyInfo();
+          sigAlgo = conf.callback().getSignAlgo(KeySpec.ofPublicKey(pkInfo), conf.mode());
           conf.setAlgo(sigAlgo);
         }
 
@@ -111,19 +108,16 @@ public class P12SignerFactory implements SignerFactory {
         }
 
         if (SignAlgo.KEM_HMAC_SHA256 == sigAlgo) {
-          SubjectPublicKeyInfo publicKeyInfo = keypairWithCert
-              .x509CertChain()[0].subjectPublicKeyInfo();
+          // MLKEM, Composite MLKEM
+          SubjectPublicKeyInfo publicKeyInfo =
+              keypairWithCert.x509CertChain()[0].subjectPublicKeyInfo();
           P12KemMacContentSignerBuilder signerBuilder =
               new P12KemMacContentSignerBuilder(keypairWithCert,
-                  conf.callback().generateKemEncapKey(
-                      securityFactory, publicKeyInfo));
+                  conf.callback().generateKemEncapKey(securityFactory, publicKeyInfo));
           return signerBuilder.createSigner(sigAlgo, parallelism);
         } else {
-          P12ContentSignerBuilder signerBuilder =
-              new P12ContentSignerBuilder(keypairWithCert);
-
-          return signerBuilder.createSigner(sigAlgo, parallelism,
-              securityFactory.random4Sign());
+          P12ContentSignerBuilder signerBuilder = new P12ContentSignerBuilder(keypairWithCert);
+          return signerBuilder.createSigner(sigAlgo, parallelism, securityFactory.random4Sign());
         }
       }
     } catch (XiSecurityException | IOException | InvalidConfException ex) {
@@ -144,8 +138,7 @@ public class P12SignerFactory implements SignerFactory {
     X509Cert myCert = keypairWithCert.x509CertChain()[0];
     X509Cert peerCert = null;
 
-    AlgorithmIdentifier myKeyAlg =
-        myCert.subjectPublicKeyInfo().getAlgorithm();
+    AlgorithmIdentifier myKeyAlg = myCert.subjectPublicKeyInfo().getAlgorithm();
     for (X509Cert m : peerCerts) {
       if (m.subjectPublicKeyInfo().getAlgorithm().equals(myKeyAlg)) {
         peerCert = m;
@@ -160,8 +153,7 @@ public class P12SignerFactory implements SignerFactory {
     return new P12XdhMacSignerBuilder(keypairWithCert, peerCert);
   }
 
-  private char[] getPassword(String passwordHint)
-      throws ObjectCreationException {
+  private char[] getPassword(String passwordHint) throws ObjectCreationException {
     char[] password;
     if (passwordHint == null) {
       password = null;
@@ -171,18 +163,15 @@ public class P12SignerFactory implements SignerFactory {
       try {
         password = Passwords.resolvePassword(passwordHint);
       } catch (PasswordResolverException ex) {
-        throw new ObjectCreationException(
-            "could not resolve password. Message: " + ex.getMessage());
+        throw new ObjectCreationException("could not resolve password: " + ex.getMessage());
       }
     }
     return password;
   }
 
-  private static InputStream getInputStream(String str)
-      throws ObjectCreationException {
+  private static InputStream getInputStream(String str) throws ObjectCreationException {
     if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
-      return new ByteArrayInputStream(
-          Base64.decode(str.substring(7))); // "base64:".length() = 7
+      return new ByteArrayInputStream(Base64.decode(str.substring(7))); // "base64:".length() = 7
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
       String fn = str.substring(5); // "file:".length() = 5
       try {

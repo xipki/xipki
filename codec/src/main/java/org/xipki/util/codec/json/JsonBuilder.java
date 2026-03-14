@@ -47,7 +47,7 @@ public class JsonBuilder {
    * Create a generator
    */
   public JsonBuilder() {
-     this(false);
+    this(false);
   }
 
   /**
@@ -87,7 +87,7 @@ public class JsonBuilder {
       throw new RuntimeException(e);
     }
     return builder.toString();
-   }
+  }
 
   public String doToJson(JsonList root) {
     StringBuilder builder = new StringBuilder();
@@ -107,28 +107,24 @@ public class JsonBuilder {
    * @throws CodecException if output error occurs.
    * @throws NullPointerException if value or out == null.
    */
-  private void writeList(JsonList value, Appendable out, int level)
-      throws CodecException {
+  private void writeList(JsonList value, Appendable out, int level) throws CodecException {
     final int size = value.size();
 
     append(out, '[');
     boolean containsListOrMap = false;
     if (size != 0) {
-      boolean wrapLongLine = pretty
-          && out instanceof CharSequence
-          && !value.withListOrMap();
+      boolean wrapLongLine = pretty && out instanceof CharSequence && !value.withListOrMap();
 
       if (wrapLongLine) {
         int maxLineEndIndex = Math.max(40, 70 - indent.length() * level);
         int offset = ((CharSequence) out).length();
-        // evaluate the length of first line's prefix: 10
+        // evaluate the length of first line's prefix
         offset -= 20;
 
         for (int i = 0; i < size; ++i) {
           Object v = value.getAt(i);
           if (!containsListOrMap) {
-            containsListOrMap =
-                (v instanceof JsonMap) || (v instanceof JsonList);
+            containsListOrMap = (v instanceof JsonMap) || (v instanceof JsonList);
           }
 
           writeValue(v, out, level + 1);
@@ -147,8 +143,7 @@ public class JsonBuilder {
         for (int i = 0; i < size; ++i) {
           Object v = value.getAt(i);
           if (!containsListOrMap) {
-            containsListOrMap =
-                (v instanceof JsonMap) || (v instanceof JsonList);
+            containsListOrMap = (v instanceof JsonMap) || (v instanceof JsonList);
           }
 
           writeValue(v, out, level + 1);
@@ -168,8 +163,7 @@ public class JsonBuilder {
     }
   }
 
-  private void writeMap(JsonMap value, Appendable out, int level)
-      throws CodecException {
+  private void writeMap(JsonMap value, Appendable out, int level) throws CodecException {
     if (pretty) {
       append(out, "{\n");
     } else {
@@ -205,8 +199,7 @@ public class JsonBuilder {
     }
   }
 
-  protected void writeValue(Object value, Appendable out, int level)
-      throws CodecException {
+  protected void writeValue(Object value, Appendable out, int level) throws CodecException {
     if (value == null) {
       append(out, "null");
       return;
@@ -217,10 +210,10 @@ public class JsonBuilder {
       if (d.isInfinite() | d.isNaN()) {
         append(out, "null");
       } else {
-        write(d.doubleValue(), out);
+        write(d, out);
       }
       return;
-   }
+  }
 
     if (value instanceof Float) {
       final Float f = (Float) value;
@@ -261,8 +254,7 @@ public class JsonBuilder {
     append(out, '\"');
   }
 
-  private void writeKey(String key, Appendable out)
-      throws CodecException {
+  private void writeKey(String key, Appendable out) throws CodecException {
     append(out, '\"');
     writeEscaped(key, out);
     if (withSpaceAfterKey) {
@@ -272,8 +264,7 @@ public class JsonBuilder {
     }
   }
 
-  private static void writeEscaped(String s, Appendable out)
-      throws CodecException {
+  private static void writeEscaped(String s, Appendable out) throws CodecException {
     final int length = s.length();
     for (int i = 0; i < length; i++) {
       final char ch = s.charAt(i);
@@ -302,8 +293,7 @@ public class JsonBuilder {
     }//for
   }
 
-  private void write(long value, Appendable out)
-      throws CodecException {
+  private void write(long value, Appendable out) throws CodecException {
     if (value == 0) {
       append(out, '0');
       return;
@@ -326,8 +316,7 @@ public class JsonBuilder {
     }
   }
 
-  private void write(double value, Appendable out)
-      throws CodecException {
+  private void write(double value, Appendable out) throws CodecException {
     write((long) value, out);
     if (value < 0) {
       value *= -1;
@@ -347,8 +336,7 @@ public class JsonBuilder {
     }
   }
 
-  private void appendIndent(Appendable out, int level)
-      throws CodecException {
+  private void appendIndent(Appendable out, int level) throws CodecException {
     if (pretty) {
       for (int i = 0; i < level; i++) {
         append(out, indent);
@@ -364,8 +352,7 @@ public class JsonBuilder {
     }
   }
 
-  private static void append(Appendable out, String str)
-      throws CodecException {
+  private static void append(Appendable out, String str) throws CodecException {
     try {
       out.append(str);
     } catch (IOException e) {

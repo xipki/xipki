@@ -112,8 +112,7 @@ public class CtLogServlet {
   private final SignatureAndHashAlgorithm signatureAndHashAlgorithm;
 
   private CtLogServlet(byte[] pkcs8PrivateKeyBytes, byte[] publicKeyInfoBytes) {
-    SubjectPublicKeyInfo publicKeyInfo =
-        SubjectPublicKeyInfo.getInstance(publicKeyInfoBytes);
+    SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKeyInfoBytes);
     byte[] canonicalizedBytes;
     try {
       canonicalizedBytes = publicKeyInfo.getEncoded();
@@ -147,8 +146,7 @@ public class CtLogServlet {
 
     try {
       KeyFactory kf = KeyFactory.getInstance(keyType);
-      this.signingKey = kf.generatePrivate(
-          new PKCS8EncodedKeySpec(pkcs8PrivateKeyBytes));
+      this.signingKey = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8PrivateKeyBytes));
     } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
       String msg = "error creating private key";
       LogUtil.error(LOG, ex, msg);
@@ -170,8 +168,7 @@ public class CtLogServlet {
 
       Certificate cert = Certificate.getInstance(chain.get(0));
       Certificate caCert = Certificate.getInstance(chain.get(1));
-      byte[] issuerKeyHash = HashAlgo.SHA256.hash(
-          caCert.getSubjectPublicKeyInfo().getEncoded());
+      byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
       byte[] preCertTbsCert = CtLog.getPreCertTbsCert(cert.getTBSCertificate());
 
       byte sctVersion = 0;
@@ -179,18 +176,15 @@ public class CtLogServlet {
 
       Signature sig = Signature.getInstance(signatureAlgo);
       sig.initSign(signingKey);
-      CtLog.update(sig, sctVersion, timestamp, null,
-          issuerKeyHash, preCertTbsCert);
+      CtLog.update(sig, sctVersion, timestamp, null, issuerKeyHash, preCertTbsCert);
       byte[] signature = sig.sign();
       DigitallySigned digitallySigned =
           new DigitallySigned(signatureAndHashAlgorithm, signature);
 
       AddPreChainResponse resp0 = new AddPreChainResponse(
-          sctVersion, logId, timestamp, null,
-          digitallySigned.getEncoded());
+          sctVersion, logId, timestamp, null, digitallySigned.getEncoded());
 
-      byte[] respContent = JsonBuilder.toJson(resp0.toJson())
-          .getBytes(StandardCharsets.UTF_8);
+      byte[] respContent = JsonBuilder.toJson(resp0.toJson()).getBytes(StandardCharsets.UTF_8);
 
       return new HttpResponse(HttpStatusCode.SC_OK, "application/json",
           null, respContent);

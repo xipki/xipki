@@ -28,15 +28,14 @@ public class CaHasRequestorEntry extends MgmtEntry {
 
   private final List<String> profiles;
 
-  public CaHasRequestorEntry(NameId requestorIdent,
-                             Permissions permissions, List<String> profiles) {
+  public CaHasRequestorEntry(NameId requestorIdent, Permissions permissions,
+                            List<String> profiles) {
     this.requestorIdent = Args.notNull(requestorIdent, "requestorIdent");
     this.permissions = permissions;
     if (CollectionUtil.isEmpty(profiles)) {
       this.profiles = Collections.emptyList();
     } else {
-      this.profiles = CollectionUtil.unmodifiableList(
-          StringUtil.lowercase(profiles));
+      this.profiles = CollectionUtil.unmodifiableList(StringUtil.lowercase(profiles));
     }
   }
 
@@ -57,8 +56,7 @@ public class CaHasRequestorEntry extends MgmtEntry {
       return false;
     }
 
-    return profiles.contains("all")
-        || profiles.contains(certprofile.toLowerCase());
+    return profiles.contains("all") || profiles.contains(certprofile.toLowerCase());
   }
 
   public boolean isPermitted(int permission) {

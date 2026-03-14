@@ -5,7 +5,6 @@ package org.xipki.ca.api;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.xipki.security.exception.OperationException;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
@@ -42,8 +41,7 @@ public class PublicCaInfo {
 
   private final ConfPairs extraControl;
 
-  public PublicCaInfo(X509Cert caCert, CaUris caUris, ConfPairs extraControl)
-      throws OperationException {
+  public PublicCaInfo(X509Cert caCert, CaUris caUris, ConfPairs extraControl) {
     this.caCert = Args.notNull(caCert, "caCert");
     this.caUris = (caUris == null) ? CaUris.EMPTY_INSTANCE : caUris;
     this.issuer = caCert.issuer();
@@ -57,9 +55,8 @@ public class PublicCaInfo {
   } // constructor
 
   public PublicCaInfo(
-      X500Name subject, X500Name issuer, BigInteger serialNumber,
-      GeneralNames subjectAltName, byte[] subjectKeyIdentifier,
-      CaUris caUris, ConfPairs extraControl) {
+      X500Name subject, X500Name issuer, BigInteger serialNumber, GeneralNames subjectAltName,
+      byte[] subjectKeyIdentifier, CaUris caUris, ConfPairs extraControl) {
     this.subject = Args.notNull(subject, "subject");
     this.issuer = Args.notNull(issuer, "issuer");
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");

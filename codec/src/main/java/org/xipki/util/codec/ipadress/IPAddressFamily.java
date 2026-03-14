@@ -7,7 +7,7 @@ import org.xipki.util.codec.Args;
 /**
  * A list of AFI is available under
  * https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml.
- *
+ * <p>
  * A list of SAFI is available under
  * https://www.iana.org/assignments/safi-namespace/safi-namespace.xhtml
  *

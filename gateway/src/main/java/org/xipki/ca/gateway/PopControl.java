@@ -3,27 +3,25 @@
 
 package org.xipki.ca.gateway;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.jcajce.interfaces.XDHPrivateKey;
-import org.xipki.ca.gateway.conf.PopControlConf;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.DHSigStaticKeyCertPair;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 import org.xipki.security.verify.AlgorithmValidator;
 import org.xipki.security.verify.CollectionAlgorithmValidator;
-import org.xipki.util.codec.Base64;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.type.KeystoreConf;
-import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 import org.xipki.util.password.PasswordResolverException;
 import org.xipki.util.password.Passwords;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
@@ -32,9 +30,8 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -52,24 +49,22 @@ public class PopControl {
 
   private final CollectionAlgorithmValidator popAlgoValidator;
 
-  private final List<DHSigStaticKeyCertPair> dhKeyAndCerts =
-      new ArrayList<>(1);
+  private final List<DHSigStaticKeyCertPair> dhKeyAndCerts = new ArrayList<>(1);
 
   private final X509Cert[] dhCerts;
 
-  private final Map<String, SecretKeyWithAlias> kemMasterSecretKeys =
-      new HashMap<>(1);
+  private final Map<String, SecretKeyWithAlias> kemMasterSecretKeys = new HashMap<>(1);
 
   private SecretKeyWithAlias defaultKemMasterSecretKeys;
 
-  public PopControl(PopControlConf conf) throws InvalidConfException {
+  public PopControl(GatewayConf.PopControlConf conf) throws InvalidConfException {
     // pop signature algorithms
     if (conf.sigAlgos() == null) {
       this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
     } else {
       try {
-        this.popAlgoValidator = CollectionAlgorithmValidator
-            .buildAlgorithmValidator(conf.sigAlgos());
+        this.popAlgoValidator =
+            CollectionAlgorithmValidator.buildAlgorithmValidator(conf.sigAlgos());
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid signature algorithm", ex);
       }
@@ -80,9 +75,12 @@ public class PopControl {
       dhCerts = null;
     } else {
       try {
-        Object[] res = loadKeyStore(conf.dh());
-        char[] password = (char[]) res[0];
-        KeyStore ks = (KeyStore) res[1];
+        LoadedKeyStore res = loadKeyStore(conf.dh());
+        PKCS12KeyStore ks = res.pkcs12KeyStore;
+        if (ks == null) {
+          throw new InvalidConfException("invalid dhSig keystore configuration: " +
+              "keystore type is not PKCS12: " + conf.dh().type());
+        }
 
         Enumeration<String> aliases = ks.aliases();
         List<X509Cert> certs = new LinkedList<>();
@@ -92,24 +90,21 @@ public class PopControl {
             continue;
           }
 
-          Key key = ks.getKey(alias, password);
+          PrivateKeyInfo keyInfo = ks.getKey(alias);
+          PrivateKey key = KeyUtil.getPrivateKey(keyInfo);
           if (!(key instanceof XDHPrivateKey)) {
             // we consider only XDH key
             continue;
           }
 
-          X509Cert cert = new X509Cert(
-              (X509Certificate) ks.getCertificate(alias));
-
-          dhKeyAndCerts.add(
-              new DHSigStaticKeyCertPair((XDHPrivateKey) key, cert));
+          X509Cert cert = new X509Cert(ks.getCertificate(alias));
+          dhKeyAndCerts.add(new DHSigStaticKeyCertPair(key, cert));
           certs.add(cert);
         }
 
         this.dhCerts = certs.toArray(new X509Cert[0]);
       } catch (GeneralSecurityException | ClassCastException ex) {
-        throw new InvalidConfException(
-            "invalid dhStatic pop configuration", ex);
+        throw new InvalidConfException("invalid dhStatic pop configuration", ex);
       }
     }
 
@@ -118,9 +113,13 @@ public class PopControl {
     }
 
     try {
-      Object[] res = loadKeyStore(conf.kem());
-      char[] password = (char[]) res[0];
-      KeyStore ks = (KeyStore) res[1];
+      LoadedKeyStore res = loadKeyStore(conf.kem());
+      char[] password = res.password;
+      KeyStore ks = res.keyStore;
+      if (ks == null) {
+        throw new InvalidConfException(
+            "invalid kem keystore configuration: invalid keystore type " + conf.kem().type());
+      }
 
       Enumeration<String> aliases = ks.aliases();
       while (aliases.hasMoreElements()) {
@@ -132,8 +131,7 @@ public class PopControl {
         Key key = ks.getKey(alias, password);
         if (key instanceof SecretKey) {
           // we consider only Secret key
-          this.kemMasterSecretKeys.put(alias,
-              new SecretKeyWithAlias(alias, (SecretKey) key));
+          this.kemMasterSecretKeys.put(alias, new SecretKeyWithAlias(alias, (SecretKey) key));
         }
       }
 
@@ -142,12 +140,12 @@ public class PopControl {
         this.defaultKemMasterSecretKeys = this.kemMasterSecretKeys.get(alias);
       }
     } catch (InvalidConfException | KeyStoreException | NoSuchAlgorithmException
-             | UnrecoverableKeyException ex) {
+            | UnrecoverableKeyException ex) {
       throw new InvalidConfException("invalid KEM pop configuration", ex);
     }
   } // constructor
 
-  private Object[] loadKeyStore(KeystoreConf conf) throws InvalidConfException {
+  private LoadedKeyStore loadKeyStore(KeystoreConf conf) throws InvalidConfException {
     if (StringUtil.isBlank(conf.type())) {
       throw new InvalidConfException("keystore type is not defined in conf");
     }
@@ -157,8 +155,7 @@ public class PopControl {
     }
 
     if (StringUtil.isBlank(conf.password())) {
-      throw new InvalidConfException(
-          "keystore password is not defined in conf");
+      throw new InvalidConfException("keystore password is not defined in conf");
     }
 
     char[] password;
@@ -168,34 +165,24 @@ public class PopControl {
       throw new InvalidConfException("error resolving password");
     }
 
-    try (InputStream is = new ByteArrayInputStream(
-        conf.keystore().readContent())) {
-      KeyStore ks = KeyUtil.getInKeyStore(conf.type());
-      ks.load(is, password);
-      return new Object[]{password, ks};
-    } catch (IOException | KeyStoreException | NoSuchAlgorithmException
-             | CertificateException ex) {
+    try (InputStream is = new ByteArrayInputStream(conf.keystore().readContent())) {
+      String confType = conf.type();
+      LoadedKeyStore ret = new LoadedKeyStore();
+      ret.password = password;
+
+      if ("PKCS12".equalsIgnoreCase(confType) || "PKCS#12".equalsIgnoreCase(confType)) {
+        ret.pkcs12KeyStore = KeyUtil.loadPKCS12KeyStore(is, password);
+      } else {
+        ret.keyStore = KeyUtil.loadKeyStore(conf.type(), is, password);
+      }
+      return ret;
+    } catch (IOException | XiSecurityException ex) {
       throw new InvalidConfException("error loading keystore", ex);
     }
   }
 
-  private InputStream getKeyStoreInputStream(String keystoreStr)
-      throws InvalidConfException {
-    if (keystoreStr.startsWith("base64:")) {
-      byte[] bytes = Base64.decode(keystoreStr.substring("base64:".length()));
-      return new ByteArrayInputStream(bytes);
-    } else {
-      try {
-        return new FileInputStream(IoUtil.expandFilepath(keystoreStr, true));
-      } catch (FileNotFoundException e) {
-        throw new InvalidConfException(e.getMessage(), e);
-      }
-    }
-  }
-
   public X509Cert[] dhCertificates() {
-    return (dhCerts == null || dhCerts.length == 0) ? null
-        : Arrays.copyOf(dhCerts, dhCerts.length);
+    return (dhCerts == null || dhCerts.length == 0) ? null : Arrays.copyOf(dhCerts, dhCerts.length);
   }
 
   public DHSigStaticKeyCertPair getDhKeyCertPair(
@@ -224,6 +211,16 @@ public class PopControl {
 
   public AlgorithmValidator popAlgoValidator() {
     return popAlgoValidator;
+  }
+
+  private static class LoadedKeyStore {
+
+    private char[] password;
+
+    private KeyStore keyStore;
+
+    private PKCS12KeyStore pkcs12KeyStore;
+
   }
 
 }

@@ -10,6 +10,8 @@ import org.xipki.util.codec.asn1.Asn1Util;
 import static org.xipki.pkcs11.wrapper.spec.PKCS11Spec.appendElement;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public interface PKCS11KeyPairType {
@@ -138,13 +140,11 @@ public interface PKCS11KeyPairType {
       String className = getClass().getSimpleName();
       StringBuilder sb = new StringBuilder();
       if (withName) {
-        sb.append(indent).append("PKCS11KeyPairType.").append(className)
-            .append(":");
+        sb.append(indent).append("PKCS11KeyPairType.").append(className).append(":");
         indent += "  ";
       }
 
-      appendElement(sb, indent, "keyType",
-          PKCS11T.ckkCodeToName(getKeyType()));
+      appendElement(sb, indent, "keyType", PKCS11T.ckkCodeToName(getKeyType()));
       appendElement(sb, indent, "Curve", curveOid);
       return sb.toString();
     }
@@ -153,22 +153,19 @@ public interface PKCS11KeyPairType {
 
   class EC extends GenericEC {
     public EC(String curveOid) {
-      super(PKCS11T.CKM_EC_KEY_PAIR_GEN,
-          PKCS11T.CKK_EC, curveOid);
+      super(PKCS11T.CKM_EC_KEY_PAIR_GEN, PKCS11T.CKK_EC, curveOid);
     }
   }
 
   class ECEdwards extends GenericEC {
     public ECEdwards(String curveOid) {
-      super(PKCS11T.CKM_EC_EDWARDS_KEY_PAIR_GEN,
-          PKCS11T.CKK_EC_EDWARDS, curveOid);
+      super(PKCS11T.CKM_EC_EDWARDS_KEY_PAIR_GEN, PKCS11T.CKK_EC_EDWARDS, curveOid);
     }
   }
 
   class ECMontgomery extends GenericEC {
     public ECMontgomery(String curveOid) {
-      super(PKCS11T.CKM_EC_MONTGOMERY_KEY_PAIR_GEN,
-          PKCS11T.CKK_EC_MONTGOMERY, curveOid);
+      super(PKCS11T.CKM_EC_MONTGOMERY_KEY_PAIR_GEN, PKCS11T.CKK_EC_MONTGOMERY, curveOid);
     }
   }
 
@@ -212,8 +209,7 @@ public interface PKCS11KeyPairType {
         indent += "  ";
       }
 
-      appendElement(sb, indent, "keyType",
-          PKCS11T.ckkCodeToName(getKeyType()));
+      appendElement(sb, indent, "keyType", PKCS11T.ckkCodeToName(getKeyType()));
       appendElement(sb, indent, "variant", variant);
       return sb.toString();
     }
@@ -260,8 +256,7 @@ public interface PKCS11KeyPairType {
         indent += "  ";
       }
 
-      appendElement(sb, indent, "keyType",
-          PKCS11T.ckkCodeToName(getKeyType()));
+      appendElement(sb, indent, "keyType", PKCS11T.ckkCodeToName(getKeyType()));
       appendElement(sb, indent, "variant", variant);
       return sb.toString();
     }
@@ -308,8 +303,7 @@ public interface PKCS11KeyPairType {
         indent += "  ";
       }
 
-      appendElement(sb, indent, "keyType",
-          PKCS11T.ckkCodeToName(getKeyType()));
+      appendElement(sb, indent, "keyType", PKCS11T.ckkCodeToName(getKeyType()));
       appendElement(sb, indent, "ModulusBits", modulusBits);
       return sb.toString();
     }
@@ -319,8 +313,8 @@ public interface PKCS11KeyPairType {
   class SM2 extends GenericEC {
 
     private SM2() {
-      super(PKCS11T.CKM_VENDOR_SM2_KEY_PAIR_GEN,
-          PKCS11T.CKK_VENDOR_SM2, "1.2.156.10197.1.301");
+      super(PKCS11T.CKM_VENDOR_SM2_KEY_PAIR_GEN, PKCS11T.CKK_VENDOR_SM2,
+          "1.2.156.10197.1.301");
     }
 
     @Override

@@ -69,11 +69,9 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
         LOG.debug("revoking suspended certificates");
         int num = revokeSuspendedCerts();
         if (num == 0) {
-          LOG.debug("revoked {} suspended certificates of CA '{}'",
-              num, caIdent);
+          LOG.debug("revoked {} suspended certificates of CA '{}'", num, caIdent);
         } else {
-          LOG.info("revoked {} suspended certificates of CA '{}'",
-              num, caIdent);
+          LOG.info("revoked {} suspended certificates of CA '{}'", num, caIdent);
         }
       } catch (Throwable th) {
         LogUtil.error(LOG, th, "could not revoke suspended certificates");
@@ -84,8 +82,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   } // class SuspendedCertsRevoker
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(X509RevokerModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(X509RevokerModule.class);
 
   private final boolean masterMode;
 
@@ -110,20 +107,17 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       return;
     }
 
-    ScheduledThreadPoolExecutor executor =
-        caManager.scheduledThreadPoolExecutor();
+    ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
 
     Random random = new Random();
     this.suspendedCertsRevoker = executor.scheduleAtFixedRate(
-        new SuspendedCertsRevoker(),
-        random.nextInt(60), 60, TimeUnit.MINUTES);
+        new SuspendedCertsRevoker(), random.nextInt(60), 60, TimeUnit.MINUTES);
   } // constructor
 
   public CertWithRevocationInfo revokeCert(
-      BigInteger serialNumber, CrlReason reason, Instant invalidityTime,
-      AuditEvent event) throws OperationException {
-    if (caInfo.isSelfSigned()
-        && caInfo.serialNumber().equals(serialNumber)) {
+      BigInteger serialNumber, CrlReason reason, Instant invalidityTime, AuditEvent event)
+      throws OperationException {
+    if (caInfo.isSelfSigned() && caInfo.serialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
           "insufficient permission to revoke CA certificate");
     }
@@ -137,8 +131,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
       case AA_COMPROMISE:
       case REMOVE_FROM_CRL:
         throw new OperationException(ErrorCode.NOT_PERMITTED,
-            "insufficient permission to revoke certificate with reason " +
-            reason.description());
+            "insufficient permission to revoke certificate with reason " + reason.description());
       case UNSPECIFIED:
       case KEY_COMPROMISE:
       case AFFILIATION_CHANGED:
@@ -164,8 +157,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   public CertWithDbId unsuspendCert(BigInteger serialNumber, AuditEvent event)
       throws OperationException {
-    if (caInfo.isSelfSigned()
-        && caInfo.serialNumber().equals(serialNumber)) {
+    if (caInfo.isSelfSigned() && caInfo.serialNumber().equals(serialNumber)) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
           "insufficient permission to unsuspend CA certificate");
     }
@@ -182,26 +174,19 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
   private CertWithRevocationInfo revokeCertificate0(
       BigInteger serialNumber, CrlReason reason, Instant invalidityTime,
-      boolean force, AuditEvent event)
-      throws OperationException {
+      boolean force, AuditEvent event) throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(NAME_serial, hexSerial);
     event.addEventData(NAME_reason, reason.description());
     if (invalidityTime != null) {
-      event.addEventData(NAME_invalidity_time,
-          DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityTime));
+      event.addEventData(NAME_invalidity_time, DateUtil.toUtcTimeyyyyMMddhhmmss(invalidityTime));
     }
 
-    LOG.info("     START revokeCertificate: ca={}, serialNumber={}, " +
-            "reason={}, invalidityTime={}",
+    LOG.info("     START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
         caIdent.name(), hexSerial, reason.description(), invalidityTime);
 
-    CertWithRevocationInfo revokedCert;
-
-    CertRevocationInfo revInfo =
-        new CertRevocationInfo(reason, Instant.now(), invalidityTime);
-
-    revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo,
+    CertRevocationInfo revInfo = new CertRevocationInfo(reason, Instant.now(), invalidityTime);
+    CertWithRevocationInfo revokedCert = certstore.revokeCert(caIdent, serialNumber, revInfo,
         force, caIdNameMap);
 
     if (revokedCert == null) {
@@ -213,8 +198,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     if (LOG.isInfoEnabled()) {
       LOG.info("SUCCESSFUL revokeCertificate: ca={}, serialNumber={}, " +
               "reason={}, invalidityTime={}, revocationResult=REVOKED",
-          caIdent.name(), hexSerial, reason.description(),
-          invalidityTime);
+          caIdent.name(), hexSerial, reason.description(), invalidityTime);
     }
 
     return revokedCert;
@@ -225,8 +209,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     boolean successful = false;
     AuditEvent event = newAuditEvent(TYPE_revoke_suspendedCert, null);
     try {
-      CertWithRevocationInfo ret =
-          revokeSuspendedCert0(serialNumber, reason, event);
+      CertWithRevocationInfo ret = revokeSuspendedCert0(serialNumber, reason, event);
       successful = (ret != null);
       return ret;
     } finally {
@@ -235,16 +218,14 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   }
 
   private CertWithRevocationInfo revokeSuspendedCert0(
-      SerialWithId serialNumber, CrlReason reason, AuditEvent event)
-      throws OperationException {
+      SerialWithId serialNumber, CrlReason reason, AuditEvent event) throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber.serial());
 
     event.addEventData(NAME_serial, hexSerial);
     event.addEventData(NAME_reason, reason.description());
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("     START revokeSuspendedCert: ca={}, serialNumber={}, " +
-              "reason={}",
+      LOG.info("     START revokeSuspendedCert: ca={}, serialNumber={}, reason={}",
           caIdent.name(), hexSerial, reason.description());
     }
 
@@ -257,46 +238,36 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     publisherModule.publishCertRevoked(revokedCert);
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("SUCCESSFUL revokeSuspendedCert: ca={}, serialNumber={}, " +
-              "reason={}",
+      LOG.info("SUCCESSFUL revokeSuspendedCert: ca={}, serialNumber={}, reason={}",
           caIdent.name(), hexSerial, reason.description());
     }
 
     return revokedCert;
   } // method revokeSuspendedCert0
 
-  private CertWithDbId unsuspendCert0(
-      BigInteger serialNumber, boolean force, AuditEvent event)
+  private CertWithDbId unsuspendCert0(BigInteger serialNumber, boolean force, AuditEvent event)
       throws OperationException {
     String hexSerial = LogUtil.formatCsn(serialNumber);
     event.addEventData(NAME_serial, hexSerial);
 
-    LOG.info("     START unsuspendertificate: ca={}, serialNumber={}",
-        caIdent.name(), hexSerial);
-
-    CertWithDbId unrevokedCert =
-        certstore.unsuspendCert(caIdent, serialNumber, force, caIdNameMap);
+    LOG.info("     START unsuspendertificate: ca={}, serialNumber={}", caIdent.name(), hexSerial);
+    CertWithDbId unrevokedCert = certstore.unsuspendCert(caIdent, serialNumber, force, caIdNameMap);
     if (unrevokedCert == null) {
       return null;
     }
 
     publisherModule.publishCertUnrevoked(unrevokedCert);
-
-    LOG.info("SUCCESSFUL unsuspendCertificate: ca={}, serialNumber={}",
-        caIdent.name(), hexSerial);
-
+    LOG.info("SUCCESSFUL unsuspendCertificate: ca={}, serialNumber={}", caIdent.name(), hexSerial);
     return unrevokedCert;
   } // doUnrevokeCertificate
 
-  public void revokeCa(RequestorInfo requestor,
-                       CertRevocationInfo revocationInfo)
+  public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo)
       throws OperationException {
     caInfo.setRevocationInfo(Args.notNull(revocationInfo, "revocationInfo"));
 
     if (caInfo.isSelfSigned()) {
       AuditEvent event = newAuditEvent(
-          revocationInfo.reason() == CrlReason.CERTIFICATE_HOLD
-              ? TYPE_suspend_ca :TYPE_revoke_ca,
+          revocationInfo.reason() == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_ca :TYPE_revoke_ca,
           requestor);
       boolean successful = true;
       try {
@@ -312,8 +283,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     boolean succ = publisherModule.publishCaRevoked(revocationInfo);
     if (!succ) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "could not publish event caRevoked of CA " + caIdent +
-              " to at least one publisher");
+          "could not publish event caRevoked of CA " + caIdent + " to at least one publisher");
     }
   } // method revokeCa
 
@@ -333,8 +303,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     boolean succ = publisherModule.publishCaUnrevoked();
     if (!succ) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "could not event caUnrevoked of CA " + caIdent +
-              " to at least one publisher");
+          "could not event caUnrevoked of CA " + caIdent + " to at least one publisher");
     }
 
   } // method unrevokeCa
@@ -345,8 +314,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     boolean successful = false;
     try {
       int num = revokeSuspendedCerts0();
-      LOG.info("revoked {} suspended certificates of CA {}",
-          num, caIdent.name());
+      LOG.info("revoked {} suspended certificates of CA {}", num, caIdent.name());
       successful = true;
       return num;
     } finally {
@@ -379,8 +347,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
             "should not reach here, unknown Validity Unit " + val.unit());
     }
 
-    final Instant latestLastUpdatedAt =
-        Instant.now().minus(durationMinutes, ChronoUnit.MINUTES);
+    final Instant latestLastUpdatedAt = Instant.now().minus(durationMinutes, ChronoUnit.MINUTES);
     final CrlReason reason = control.targetReason();
 
     int sum = 0;
@@ -400,10 +367,8 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
             sum++;
           }
         } catch (OperationException ex) {
-          LOG.info("revoked {} suspended certificates of CA {}",
-              sum, caIdent.name());
-          LogUtil.error(LOG, ex, "could not revoke suspended " +
-              "certificate with serial" + serial);
+          LOG.info("revoked {} suspended certificates of CA {}", sum, caIdent.name());
+          LogUtil.error(LOG, ex, "could not revoke suspended certificate with serial" + serial);
           throw ex;
         } // end try
       } // end for

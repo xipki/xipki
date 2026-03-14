@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class Asn1AlgorithmIdentifier {
@@ -31,8 +33,8 @@ public class Asn1AlgorithmIdentifier {
     return params;
   }
 
-  public static Asn1AlgorithmIdentifier getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1AlgorithmIdentifier getInstance(byte[] encoded
+  ) throws InvalidKeySpecException {
     return getInstance(encoded, new AtomicInteger());
   }
 
@@ -54,8 +56,7 @@ public class Asn1AlgorithmIdentifier {
     return Arrays.equals(params, b.params);
   }
 
-  public static Asn1AlgorithmIdentifier getInstance(
-      byte[] encoded, AtomicInteger offset)
+  public static Asn1AlgorithmIdentifier getInstance(byte[] encoded, AtomicInteger offset)
       throws InvalidKeySpecException {
     String errMsg = "invalid AlgorithmIdentifier";
     try {

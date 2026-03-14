@@ -36,10 +36,8 @@ public class KeypairGenEntryWrapper {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
   }
 
-  public void init(SecurityFactory securityFactory,
-                   P11CryptServiceFactory p11CryptServiceFactory,
-                   Set<KeypairGeneratorFactory> factories,
-                   int shardId, DataSourceMap dataSourceMap)
+  public void init(SecurityFactory securityFactory, P11CryptServiceFactory p11CryptServiceFactory,
+                  Set<KeypairGeneratorFactory> factories, int shardId, DataSourceMap dataSourceMap)
       throws ObjectCreationException {
     Args.notNull(securityFactory, "securityFactory");
     dbEntry.faulty(true);
@@ -56,8 +54,7 @@ public class KeypairGenEntryWrapper {
     } else {
       for (KeypairGeneratorFactory factory : factories) {
         if (factory.canCreateKeypairGenerator(type)) {
-          generator = factory.newKeypairGenerator(type,
-              dbEntry.conf(), securityFactory);
+          generator = factory.newKeypairGenerator(type, dbEntry.conf(), securityFactory);
           break;
         }
       }
@@ -70,8 +67,8 @@ public class KeypairGenEntryWrapper {
     try {
       generator.initialize(dbEntry.conf());
     } catch (XiSecurityException ex) {
-      throw new ObjectCreationException("error initializing keypair generator "
-          + dbEntry.name(), ex);
+      throw new ObjectCreationException("error initializing keypair generator " + dbEntry.name(),
+          ex);
     }
 
     generator.setName(dbEntry.name());

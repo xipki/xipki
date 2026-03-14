@@ -26,8 +26,7 @@ public enum ValidityMode {
     Args.notNull(text, "text");
 
     if ("LAX".equalsIgnoreCase(text) // historic reason
-        || "BY-CA".equalsIgnoreCase(text)
-        || "BYCA".equalsIgnoreCase(text)) {
+        || "BY-CA".equalsIgnoreCase(text) || "BYCA".equalsIgnoreCase(text)) {
       return BY_CA;
     }
 

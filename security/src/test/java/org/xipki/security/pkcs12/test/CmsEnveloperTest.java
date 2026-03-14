@@ -6,26 +6,20 @@ package org.xipki.security.pkcs12.test;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.EnvelopedData;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.cms.*;
-import org.bouncycastle.cms.bc.BcPasswordEnvelopedRecipient;
-import org.bouncycastle.cms.bc.BcPasswordRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKEKEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKEKRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientId;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceKeyTransEnvelopedRecipient;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
+import org.bouncycastle.cms.jcajce.*;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
+import org.xipki.security.pkix.JceX509Certificate;
 import org.xipki.security.util.KeyUtil;
 
 import javax.crypto.SecretKey;
@@ -35,10 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.X509Certificate;
 import java.security.spec.ECGenParameterSpec;
 import java.util.Iterator;
 
@@ -49,11 +40,11 @@ import java.util.Iterator;
  */
 public class CmsEnveloperTest {
 
+  private static final String PROVIDER_NAME = KeyUtil.tradProviderName();
+
   @BeforeClass
   public static void init() {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
   }
 
   @Test
@@ -64,21 +55,21 @@ public class CmsEnveloperTest {
 
   @Test
   public void testEeKeyAgree() throws Exception {
-    KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
     char[] password = "1234".toCharArray();
+
+    PKCS12KeyStore ks;
     try (InputStream is = Files.newInputStream(
         Paths.get("src/test/resources/pkcs12test/test-ec.p12"))) {
-      ks.load(is, password);
+      ks = KeyUtil.loadPKCS12KeyStore(is, password);
     }
 
-    X509Certificate reciCert = (X509Certificate) ks.getCertificate("main");
-    Certificate cert = Certificate.getInstance(reciCert.getEncoded());
+    Certificate reciCert = ks.getCertificate("main");
     ASN1ObjectIdentifier curve = (ASN1ObjectIdentifier)
-        cert.getSubjectPublicKeyInfo().getAlgorithm().getParameters();
+        reciCert.getSubjectPublicKeyInfo().getAlgorithm().getParameters();
 
-    PrivateKey reciPrivKey = (PrivateKey) ks.getKey("main", password);
+    PrivateKeyInfo reciPrivKeyInfo = ks.getKey("main");
+    PrivateKey reciPrivKey = KeyUtil.getPrivateKey(reciPrivKeyInfo);
 
-    final String bc = "BC";
     byte[] data = Hex.decode("1234567890abcdef");
 
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
@@ -86,22 +77,25 @@ public class CmsEnveloperTest {
     KeyPairGenerator kpGen = KeyPairGenerator.getInstance("EC");
     kpGen.initialize(new ECGenParameterSpec(curve.getId()));
     KeyPair kp = kpGen.generateKeyPair();
+
+    JceX509Certificate jceReciCert = new JceX509Certificate(reciCert);
     edGen.addRecipientInfoGenerator(
         new JceKeyAgreeRecipientInfoGenerator(CMSAlgorithm.ECDH_SHA256KDF,
             kp.getPrivate(), kp.getPublic(), CMSAlgorithm.AES128_WRAP)
-            .addRecipient(reciCert).setProvider(bc));
+            .addRecipient(jceReciCert).setProvider(PROVIDER_NAME));
 
     CMSEnvelopedData ed = edGen.generate(new CMSProcessableByteArray(data),
         new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_GCM)
-            .setProvider(bc).build());
+            .setProvider(PROVIDER_NAME).build());
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
 
-    RecipientId rid = new JceKeyAgreeRecipientId(reciCert);
+    RecipientId rid = new JceKeyAgreeRecipientId(jceReciCert);
 
     RecipientInformation recipient = recipients.get(rid);
     byte[] recData = recipient.getContent(
-        new JceKeyAgreeEnvelopedRecipient(reciPrivKey).setProvider(bc));
+        new JceKeyAgreeEnvelopedRecipient(reciPrivKey).setProvider(
+            KeyUtil.tradProviderName()));
     Assert.assertArrayEquals(recData, data);
   }
 
@@ -114,11 +108,11 @@ public class CmsEnveloperTest {
     byte[] kekId = new byte[]{1, 2, 3, 4, 5};
 
     edGen.addRecipientInfoGenerator(
-        new JceKEKRecipientInfoGenerator(kekId, kek).setProvider("BC"));
+        new JceKEKRecipientInfoGenerator(kekId, kek).setProvider(PROVIDER_NAME));
 
     CMSEnvelopedData ed = edGen.generate(new CMSProcessableByteArray(data),
         new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_GCM)
-            .setProvider("BC").build());
+            .setProvider(PROVIDER_NAME).build());
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
@@ -126,22 +120,22 @@ public class CmsEnveloperTest {
 
     byte[] recData = recipient.getContent(
         new JceKEKEnvelopedRecipient(kek).setKeySizeValidation(true)
-            .setProvider("BC"));
+            .setProvider(PROVIDER_NAME));
     Assert.assertArrayEquals(recData, data);
   }
 
   @Test
   public void testRsaOaep() throws Exception {
     HashAlgo hashAlgo = HashAlgo.SHA256;
-    KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
-    char[] password = "1234".toCharArray();
+    PKCS12KeyStore ks;
+    char[] password = "CHANGEIT".toCharArray();
     try (InputStream is = Files.newInputStream(
-        Paths.get("src/test/resources/pkcs12test/test1.p12"))) {
-      ks.load(is, password);
+        Paths.get("src/test/resources/pkcs12test/test1-enc.p12"))) {
+      ks = KeyUtil.loadPKCS12KeyStore(is, password);
     }
 
-    X509Certificate reciCert = (X509Certificate) ks.getCertificate("main");
-    PrivateKey reciKey = (PrivateKey) ks.getKey("main", password);
+    Certificate reciCert = ks.getCertificate("main");
+    PrivateKey reciKey = KeyUtil.getPrivateKey(ks.getKey("main"));
 
     byte[] data = Hex.decode("1234567890abcdef");
 
@@ -155,25 +149,25 @@ public class CmsEnveloperTest {
 
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
 
-    final String bc = "BC";
+    JceX509Certificate jceReciCert = new JceX509Certificate(reciCert);
+
     edGen.addRecipientInfoGenerator(new JceKeyTransRecipientInfoGenerator(
-        reciCert, oaepAlgId).setProvider(bc));
+        jceReciCert, oaepAlgId).setProvider(PROVIDER_NAME));
 
     CMSEnvelopedData ed = edGen.generate(new CMSProcessableByteArray(data),
         new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES128_GCM)
-            .setProvider(bc).build());
+            .setProvider(PROVIDER_NAME).build());
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
     RecipientInformation recipient = it.next();
 
     byte[] recData = recipient.getContent(
-        new JceKeyTransEnvelopedRecipient(reciKey).setProvider(bc));
+        new JceKeyTransEnvelopedRecipient(reciKey).setProvider(PROVIDER_NAME));
     Assert.assertArrayEquals(recData, data);
   }
 
-  private void passwordTest(String algorithm, PasswordRecipient.PRF prf,
-                            char[] password)
+  private void passwordTest(String algorithm, PasswordRecipient.PRF prf, char[] password)
       throws Exception {
     byte[] data = Hex.decode("1234567890abcdef");
     byte[] salt = new byte[20];
@@ -182,7 +176,7 @@ public class CmsEnveloperTest {
     CMSEnvelopedDataGenerator edGen = new CMSEnvelopedDataGenerator();
 
     edGen.addRecipientInfoGenerator(
-        new BcPasswordRecipientInfoGenerator(
+        new JcePasswordRecipientInfoGenerator(
             new ASN1ObjectIdentifier(algorithm), password)
             .setPRF(prf).setSaltAndIterationCount(salt, iterationCOunt));
 
@@ -196,11 +190,9 @@ public class CmsEnveloperTest {
 
     RecipientInformationStore recipients = ed.getRecipientInfos();
     Iterator<RecipientInformation> it = recipients.getRecipients().iterator();
-    PasswordRecipientInformation recipient =
-        (PasswordRecipientInformation) it.next();
+    PasswordRecipientInformation recipient = (PasswordRecipientInformation) it.next();
 
-    byte[] recData = recipient.getContent(
-        new BcPasswordEnvelopedRecipient(password));
+    byte[] recData = recipient.getContent(new JcePasswordEnvelopedRecipient(password));
     Assert.assertArrayEquals(recData, data);
   }
 

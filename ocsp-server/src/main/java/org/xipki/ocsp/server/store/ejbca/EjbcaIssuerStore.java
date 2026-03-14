@@ -32,8 +32,7 @@ class EjbcaIssuerStore {
       for (EjbcaIssuerEntry existingEntry : this.entries) {
         if (existingEntry.id().contentEquals(entry.id())) {
           throw new IllegalArgumentException(
-              "issuer with the same id (fingerprint) " + entry.id()
-              + " already available");
+              "issuer with the same id (fingerprint) " + entry.id() + " already available");
         }
       }
       this.entries.add(entry);

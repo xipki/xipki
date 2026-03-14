@@ -43,11 +43,9 @@ public class IPAddressOrRange extends ASN1Object {
   }
 
   public String toString(int afi) {
-    if (addressPrefix != null) {
-      return addressPrefix.toString(afi, IPAddress.Context.PREFIX);
-    } else {
-      return addressRange.toString(afi);
-    }
+    return (addressPrefix != null)
+        ? addressPrefix.toString(afi, IPAddress.Context.PREFIX)
+        : addressRange.toString(afi);
   }
 
   @Override

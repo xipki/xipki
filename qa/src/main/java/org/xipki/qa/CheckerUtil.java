@@ -11,13 +11,12 @@ import java.util.Set;
 /**
  * Extensions checker.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CheckerUtil {
 
-  public static <T> Set<T> elementInBnotInA(
-      Collection<T> collectionA, Collection<T> collectionB) {
+  public static <T> Set<T> elementInBnotInA(Collection<T> collectionA, Collection<T> collectionB) {
     if (collectionB == null) {
       return Collections.emptySet();
     }

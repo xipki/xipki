@@ -78,15 +78,13 @@ public class Validity implements Comparable<Validity> {
       unit = Unit.DAY;
       numValdityS = validityS;
     } else {
-      throw new IllegalArgumentException(
-          String.format("invalid validityS: %s", validityS));
+      throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
     }
 
     try {
       return new Validity(Integer.parseInt(numValdityS), unit);
     } catch (NumberFormatException ex) {
-      throw new IllegalArgumentException(
-          String.format("invalid validityS: %s", validityS));
+      throw new IllegalArgumentException(String.format("invalid validityS: %s", validityS));
     }
   } // method getInstance
 
@@ -109,9 +107,8 @@ public class Validity implements Comparable<Validity> {
           day = 28;
         }
       }
-      return ZonedDateTime.of(year + validity, month, day,
-          utcDate.getHour(), utcDate.getMinute(), utcDate.getSecond(),
-          0, TIMEZONE_UTC).toInstant();
+      return ZonedDateTime.of(year + validity, month, day, utcDate.getHour(),
+          utcDate.getMinute(), utcDate.getSecond(), 0, TIMEZONE_UTC).toInstant();
     } else {
       return referenceDate.plus(validity, unit.unit());
     }

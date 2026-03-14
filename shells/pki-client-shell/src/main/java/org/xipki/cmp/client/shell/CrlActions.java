@@ -31,8 +31,7 @@ public class CrlActions {
   public static class CmpGetCrl extends CrlAction {
 
     @Override
-    protected X509CRLHolder retrieveCrl()
-        throws CmpClientException, PkiErrorException {
+    protected X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException {
       ReqRespDebug debug = getReqRespDebug();
       try {
         return client.downloadCrl(caName, debug);
@@ -64,13 +63,11 @@ public class CrlActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true,
-        description = "where to save the CRL")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the CRL")
     @Completion(FileCompleter.class)
     protected String outFile;
 
-    protected abstract X509CRLHolder retrieveCrl()
-        throws CmpClientException, PkiErrorException;
+    protected abstract X509CRLHolder retrieveCrl() throws CmpClientException, PkiErrorException;
 
     @Override
     protected Object execute0() throws Exception {
@@ -82,8 +79,7 @@ public class CrlActions {
         throw new CmdFailure("received no CRL from server: " + ex.getMessage());
       }
 
-      saveVerbose("saved CRL to file", outFile,
-          encodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
       return null;
     } // method execute0
 

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ExtensionsControl {
@@ -25,8 +27,7 @@ public class ExtensionsControl {
 
   private final boolean keepOrder;
 
-  public ExtensionsControl(
-      List<ExtensionControl> controls, boolean keepOrder) {
+  public ExtensionsControl(List<ExtensionControl> controls, boolean keepOrder) {
     Args.notEmpty(controls, "controls");
     this.keepOrder = keepOrder;
 

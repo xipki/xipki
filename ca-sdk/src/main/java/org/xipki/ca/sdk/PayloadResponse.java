@@ -38,8 +38,7 @@ public class PayloadResponse extends SdkResponse {
       assertArrayStart("PayloadResponse", decoder, 1);
       return new PayloadResponse(decoder.readByteString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, PayloadResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, PayloadResponse.class), ex);
     }
   }
 

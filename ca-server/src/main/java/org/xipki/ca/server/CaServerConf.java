@@ -38,8 +38,7 @@ public class CaServerConf {
 
     private final String hostverifier;
 
-    public SslContext(String name, String hostverifier,
-                      FileOrBinary[] trustanchors) {
+    public SslContext(String name, String hostverifier, FileOrBinary[] trustanchors) {
       this.name = Args.notBlank(name, "name");
       this.trustanchors = trustanchors;
       this.hostverifier = hostverifier;
@@ -48,8 +47,7 @@ public class CaServerConf {
     public static SslContext parse(JsonMap json) throws CodecException {
       String name = json.getNnString("name");
       String hostverifier = json.getString("hostverifier");
-      FileOrBinary[] trustanchors = FileOrBinary.parseArray(
-          json.getList("trustanchors"));
+      FileOrBinary[] trustanchors = FileOrBinary.parseArray(json.getList("trustanchors"));
       return new SslContext(name, hostverifier, trustanchors);
     }
 
@@ -153,19 +151,16 @@ public class CaServerConf {
 
   private final Map<String, SslContextConf> sslContextConfMap = new HashMap<>();
 
-  public static CaServerConf readConfFromFile(String fileName)
-      throws InvalidConfException {
+  public static CaServerConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
       return parse(JsonParser.parseMap(Paths.get(fileName), true));
     } catch (CodecException e) {
-      throw new InvalidConfException(
-          "error parsing configuration " + fileName, e);
+      throw new InvalidConfException("error parsing configuration " + fileName, e);
     }
   }
 
-  public static CaServerConf parse(JsonMap json)
-      throws CodecException, InvalidConfException {
+  public static CaServerConf parse(JsonMap json) throws CodecException, InvalidConfException {
     JsonMap map = json.getMap("audit");
     CaServerConf ret = new CaServerConf();
     if (map != null) {
@@ -224,8 +219,7 @@ public class CaServerConf {
     }
 
     ret.certprofileFactories = json.getStringList("certprofileFactories");
-    ret.keypairGeneratorFactories = json.getStringList(
-        "keypairGeneratorFactories");
+    ret.keypairGeneratorFactories = json.getStringList("keypairGeneratorFactories");
     ret.caConfFiles = json.getStringList("caConfFiles");
 
     ret.validate();
@@ -295,8 +289,7 @@ public class CaServerConf {
 
     if (sslContextConfMap.isEmpty()) {
       for (SslContext m : sslContexts) {
-        SslContextConf conf = new SslContextConf(m.trustanchors,
-            m.hostverifier);
+        SslContextConf conf = new SslContextConf(m.trustanchors, m.hostverifier);
         try {
           conf.init();
         } catch (ObjectCreationException e) {
@@ -326,13 +319,11 @@ public class CaServerConf {
 
     if (caConfFiles == null) {
       if (!withCaconfDb) {
-        throw new InvalidConfException(
-            "datasource 'caconf' is required but is not configured.");
+        throw new InvalidConfException("datasource 'caconf' is required but is not configured.");
       }
     } else {
       if (withCaconfDb) {
-        throw new InvalidConfException(
-            "datasource 'caconf' is not allowed but is configured.");
+        throw new InvalidConfException("datasource 'caconf' is not allowed but is configured.");
       }
     }
     TlsHelper.checkReverseProxyMode(reverseProxyMode);

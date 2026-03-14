@@ -112,8 +112,7 @@ public class CrlControl implements JsonEncodable {
 
   public static final String KEY_INTERVAL_TIME = "interval.time";
 
-  public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE =
-      "fullcrl.extended.nextupdate";
+  public static final String KEY_FULLCRL_EXTENDED_NEXTUPDATE = "fullcrl.extended.nextupdate";
 
   public static final String KEY_EXCLUDE_REASON = "exclude.reason";
 
@@ -143,13 +142,11 @@ public class CrlControl implements JsonEncodable {
     this(toConfPairs(conf));
   }
 
-  private static ConfPairs toConfPairs(String conf)
-      throws InvalidConfException {
+  private static ConfPairs toConfPairs(String conf) throws InvalidConfException {
     try {
       return new ConfPairs(conf);
     } catch (RuntimeException ex) {
-      throw new InvalidConfException(
-          ex.getClass().getName() + ": " + ex.getMessage(), ex);
+      throw new InvalidConfException(ex.getClass().getName() + ": " + ex.getMessage(), ex);
     }
   }
 
@@ -162,32 +159,25 @@ public class CrlControl implements JsonEncodable {
     }
 
     this.excludeReason = getBoolean(props, KEY_EXCLUDE_REASON, false);
-    this.includeExpiredCerts =
-        getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
+    this.includeExpiredCerts = getBoolean(props, KEY_INCLUDE_EXPIREDCERTS, false);
 
     int h = getInteger(props, KEY_INTERVAL_HOURS, 24);
-    if (h != 1 && h != 2 && h != 3 && h != 4 && h != 6 && h != 8
-        && h != 12 && h != 24) {
-      throw new InvalidConfException(KEY_INTERVAL_HOURS + " " + h +
-          " not in [1,2,3,4,6,8,12,24]");
+    if (h != 1 && h != 2 && h != 3 && h != 4 && h != 6 && h != 8 && h != 12 && h != 24) {
+      throw new InvalidConfException(KEY_INTERVAL_HOURS + " " + h + " not in [1,2,3,4,6,8,12,24]");
     }
 
     this.intervalHours = h;
     // Maximal interval allowed by CA/Browser Forum's Baseline Requirements
-    this.fullCrlIntervals   = getInteger(props,
-        KEY_FULLCRL_INTERVALS, 7 * 24 / h);
-    this.deltaCrlIntervals  = getInteger(props,
-        KEY_DELTACRL_INTERVALS, 0);
-    this.extendedNextUpdate = getBoolean(props,
-        KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
+    this.fullCrlIntervals   = getInteger(props, KEY_FULLCRL_INTERVALS, 7 * 24 / h);
+    this.deltaCrlIntervals  = getInteger(props, KEY_DELTACRL_INTERVALS, 0);
+    this.extendedNextUpdate = getBoolean(props, KEY_FULLCRL_EXTENDED_NEXTUPDATE, false);
 
     Validity ov;
     if (props.value(KEY_OVERLAP_DAYS) != null) {
-      ov = new Validity(getInteger(props, KEY_OVERLAP_DAYS, 1),
-              Validity.Unit.DAY);
+      ov = new Validity(getInteger(props, KEY_OVERLAP_DAYS, 1), Validity.Unit.DAY);
     } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
       ov = new Validity(getInteger(props, KEY_OVERLAP_MINUTES, 24 * 60),
-              Validity.Unit.MINUTE);
+            Validity.Unit.MINUTE);
     } else if (props.value(KEY_OVERLAP) != null) {
       ov = Validity.getInstance(props.value(KEY_OVERLAP));
     } else {
@@ -218,8 +208,7 @@ public class CrlControl implements JsonEncodable {
         int minute = Integer.parseInt(tokens.get(1));
         hm = new HourMinute(hour, minute);
       } catch (IllegalArgumentException ex) {
-        throw new InvalidConfException(
-            "invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
+        throw new InvalidConfException("invalid " + KEY_INTERVAL_TIME + ": '" + str + "'");
       }
     }
 
@@ -246,10 +235,8 @@ public class CrlControl implements JsonEncodable {
     return new ConfPairs()
         .putPair(KEY_DELTACRL_INTERVALS,   Integer.toString(deltaCrlIntervals))
         .putPair(KEY_EXCLUDE_REASON,       Boolean.toString(excludeReason))
-        .putPair(KEY_INCLUDE_EXPIREDCERTS,
-            Boolean.toString(includeExpiredCerts))
-        .putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE,
-            Boolean.toString(extendedNextUpdate))
+        .putPair(KEY_INCLUDE_EXPIREDCERTS, Boolean.toString(includeExpiredCerts))
+        .putPair(KEY_FULLCRL_EXTENDED_NEXTUPDATE, Boolean.toString(extendedNextUpdate))
         .putPair(KEY_FULLCRL_INTERVALS,    Integer.toString(fullCrlIntervals))
         .putPair(KEY_INTERVAL_HOURS,       Integer.toString(intervalHours))
         .putPair(KEY_INTERVAL_TIME,        intervalDayTime.toString())
@@ -315,32 +302,27 @@ public class CrlControl implements JsonEncodable {
 
   public final void validate() throws InvalidConfException {
     int h = intervalHours;
-    if (!(h == 1 || h == 2 || h == 3 || h == 4 || h == 6
-        || h == 8 || h == 12 || h == 24)) {
-      throw new InvalidConfException(intervalHours + " " + h +
-          " not in [1,2,3,4,6,8,12,24]");
+    if (!(h == 1 || h == 2 || h == 3 || h == 4 || h == 6 || h == 8 || h == 12 || h == 24)) {
+      throw new InvalidConfException(intervalHours + " " + h + " not in [1,2,3,4,6,8,12,24]");
     }
 
     if (deltaCrlIntervals < 0) {
       throw new InvalidConfException(
           "deltaCRLIntervals may not be less than 0: " + deltaCrlIntervals);
     } else if (deltaCrlIntervals > 0 && deltaCrlIntervals >= fullCrlIntervals) {
-      throw new InvalidConfException(
-          "deltaCrlIntervals shall not be greater than or equal to " +
-          "fullCrlIntervals: " + deltaCrlIntervals + " >= " + fullCrlIntervals);
+      throw new InvalidConfException("deltaCrlIntervals shall not be greater than or " +
+          "equal to fullCrlIntervals: " + deltaCrlIntervals + " >= " + fullCrlIntervals);
     }
 
     int prod = fullCrlIntervals * intervalHours;
     if (!(fullCrlIntervals > 0 && (prod % 24 == 0 || 24 % prod == 0))) {
-      throw new InvalidConfException(
-          "invalid fullCRLIntervals: " + fullCrlIntervals);
+      throw new InvalidConfException("invalid fullCRLIntervals: " + fullCrlIntervals);
     }
 
     if (deltaCrlIntervals > 0) {
       prod = deltaCrlIntervals * intervalHours;
       if (!(prod % 24 == 0 || 24 % prod == 0)) {
-        throw new InvalidConfException(
-            "invalid deltaCRLIntervals: " + deltaCrlIntervals);
+        throw new InvalidConfException("invalid deltaCRLIntervals: " + deltaCrlIntervals);
       }
     }
 
@@ -378,15 +360,13 @@ public class CrlControl implements JsonEncodable {
       try {
         return Integer.parseInt(str.trim());
       } catch (NumberFormatException ex) {
-        throw new InvalidConfException(
-            propKey + " does not have numeric value: " + str);
+        throw new InvalidConfException(propKey + " does not have numeric value: " + str);
       }
     }
     return dfltValue;
   } // method getInteger
 
-  private static boolean getBoolean(
-      ConfPairs props, String propKey, boolean dfltValue)
+  private static boolean getBoolean(ConfPairs props, String propKey, boolean dfltValue)
       throws InvalidConfException {
     String str = props.value(propKey);
     if (str != null) {
@@ -396,8 +376,7 @@ public class CrlControl implements JsonEncodable {
       } else if ("false".equalsIgnoreCase(str)) {
         return Boolean.FALSE;
       } else {
-        throw new InvalidConfException(propKey +
-            " does not have boolean value: " + str);
+        throw new InvalidConfException(propKey + " does not have boolean value: " + str);
       }
     }
     return dfltValue;

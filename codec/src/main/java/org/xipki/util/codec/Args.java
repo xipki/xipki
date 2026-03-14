@@ -165,8 +165,7 @@ public class Args {
   public static int range(int argument, String name, int min, int max) {
     if (argument < min || argument > max) {
       throw new IllegalArgumentException(String.format(
-          "%s may not be out of the range [%d, %d]: %d",
-          name, min, max, argument));
+          "%s may not be out of the range [%d, %d]: %d", name, min, max, argument));
     }
     return argument;
   }
@@ -174,8 +173,7 @@ public class Args {
   public static long range(long argument, String name, long min, long max) {
     if (argument < min || argument > max) {
       throw new IllegalArgumentException(String.format(
-          "%s may not be out of the range [%d, %d]: %d",
-          name, min, max, argument));
+          "%s may not be out of the range [%d, %d]: %d", name, min, max, argument));
     }
     return argument;
   }
@@ -206,8 +204,7 @@ public class Args {
     return argument.toLowerCase();
   }
 
-  public static <T> Collection<T> notEmpty(
-      Collection<T> argument, String name) {
+  public static <T> Collection<T> notEmpty(Collection<T> argument, String name) {
     Objects.requireNonNull(argument, name + " may not be null");
     if (argument.isEmpty()) {
       throw new IllegalArgumentException(name + " may not be empty");
@@ -231,6 +228,22 @@ public class Args {
     return argument;
   }
 
+  public static <T> List<T> noNullElements(List<T> argument, String name) {
+    Objects.requireNonNull(argument, name + " may not be null");
+
+    for (T e : argument) {
+      if (e == null) {
+        throw new IllegalArgumentException(name + " may not contain null element");
+      }
+    }
+
+    return argument;
+  }
+  public static <T> List<T> notEmptyAndNoNullElements(List<T> argument, String name) {
+    notEmpty(argument, name);
+    return noNullElements(argument, name);
+  }
+
   public static <K,V> Map<K,V> notEmpty(Map<K,V> argument, String name) {
     Objects.requireNonNull(argument, name + " may not be null");
     if (argument.isEmpty()) {
@@ -239,8 +252,7 @@ public class Args {
     return argument;
   }
 
-  public static <K,V> Dictionary<K,V> notEmpty(
-      Dictionary<K,V> argument, String name) {
+  public static <K,V> Dictionary<K,V> notEmpty(Dictionary<K,V> argument, String name) {
     Objects.requireNonNull(argument, name + " may not be null");
     if (argument.isEmpty()) {
       throw new IllegalArgumentException(name + " may not be empty");
@@ -248,14 +260,11 @@ public class Args {
     return argument;
   }
 
-  public static void exactOne(
-      Object value1, String name1, Object value2, String name2) {
+  public static void exactOne(Object value1, String name1, Object value2, String name2) {
     if (value1 == null && value2 == null) {
-      throw new IllegalArgumentException(name1 + " and " + name2
-          + " may not be both null");
+      throw new IllegalArgumentException(name1 + " and " + name2 + " may not be both null");
     } else if (value1 != null && value2 != null) {
-      throw new IllegalArgumentException(name1 + " and " + name2
-          + " may not be both non-null");
+      throw new IllegalArgumentException(name1 + " and " + name2 + " may not be both non-null");
     }
   }
 
@@ -297,8 +306,7 @@ public class Args {
 
     for (T e : argument) {
       if (e == null) {
-        throw new IllegalArgumentException(
-            name + " may not contain null element");
+        throw new IllegalArgumentException(name + " may not contain null element");
       }
     }
 
@@ -310,8 +318,7 @@ public class Args {
 
     for (T e : argument) {
       if (e == null) {
-        throw new IllegalArgumentException(
-            name + " may not contain null element");
+        throw new IllegalArgumentException(name + " may not contain null element");
       }
     }
 

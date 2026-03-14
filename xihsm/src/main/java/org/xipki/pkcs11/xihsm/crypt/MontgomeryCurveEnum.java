@@ -8,19 +8,21 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.xihsm.util.HsmException;
-import org.xipki.pkcs11.xihsm.util.OIDs;
+import org.xipki.security.OIDs;
 
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum MontgomeryCurveEnum {
 
-  X25519(OIDs.x25519, "curve25519", 32, 32),
-  X448(OIDs.x448, "curve448", 56, 56);
+  X25519(OIDs.Curve.id_X25519, "curve25519", 32, 32),
+  X448(OIDs.Curve.id_X448, "curve448", 56, 56);
 
   private final int privateKeySize;
 
@@ -66,16 +68,14 @@ public enum MontgomeryCurveEnum {
 
   public static MontgomeryCurveEnum ofEcParams(byte[] ecParams) {
     for (MontgomeryCurveEnum v : values()) {
-      if (Arrays.equals(v.encodedOid, ecParams)
-          || Arrays.equals(v.encodedCurveName, ecParams)) {
+      if (Arrays.equals(v.encodedOid, ecParams) || Arrays.equals(v.encodedCurveName, ecParams)) {
         return v;
       }
     }
     return null;
   }
 
-  public static MontgomeryCurveEnum ofEcParamsNonNull(byte[] ecParams)
-      throws HsmException {
+  public static MontgomeryCurveEnum ofEcParamsNonNull(byte[] ecParams) throws HsmException {
     MontgomeryCurveEnum curve = ofEcParams(ecParams);
     if (curve == null) {
       throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,

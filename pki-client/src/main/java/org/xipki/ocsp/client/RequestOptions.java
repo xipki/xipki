@@ -63,10 +63,8 @@ public class RequestOptions {
     return preferredSignatureAlgorithms;
   }
 
-  public void setPreferredSignatureAlgorithms(
-      SignAlgo[] preferredSignatureAlgorithms) {
-    this.preferredSignatureAlgorithms =
-        Arrays.asList(preferredSignatureAlgorithms);
+  public void setPreferredSignatureAlgorithms(SignAlgo[] preferredSignatureAlgorithms) {
+    this.preferredSignatureAlgorithms = Arrays.asList(preferredSignatureAlgorithms);
   }
 
   public boolean isUseHttpGetForRequest() {

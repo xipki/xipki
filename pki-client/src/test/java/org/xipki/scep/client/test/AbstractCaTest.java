@@ -120,11 +120,9 @@ public abstract class AbstractCaTest {
         "http://localhost:" + port + "/scep/pkiclient.exe", null);
 
     CaCertValidator caCertValidator =
-        new CaCertValidator.PreprovisionedCaCertValidator(
-            scepServer.caCert());
+        new CaCertValidator.PreprovisionedCaCertValidator(scepServer.caCert());
 
-    ScepClient client = new ScepClient(caId, caCertValidator,
-        new DefaultCurl());
+    ScepClient client = new ScepClient(caId, caCertValidator, new DefaultCurl());
 
     client.refresh();
 
@@ -168,12 +166,10 @@ public abstract class AbstractCaTest {
         X509Cert expNextRaCert = scepServer.nextRaCert();
         X509Cert nextRaSigCert = nextCa.signatureCert();
         X509Cert nextRaEncCert = nextCa.encryptionCert();
-        Assert.assertEquals("Next RA certificate",
-            nextRaSigCert, nextRaEncCert);
+        Assert.assertEquals("Next RA certificate", nextRaSigCert, nextRaEncCert);
 
         if (!expNextRaCert.equals(nextRaSigCert)) {
-          Assert.fail(
-              "Configured and received next RA certificate not the same");
+          Assert.fail("Configured and received next RA certificate not the same");
         }
       }
     }
@@ -195,8 +191,7 @@ public abstract class AbstractCaTest {
       PKCS10CertificationRequest p10Req = MyUtil.generateRequest(
           privKey, subjectPublicKeyInfo, subject, secret, null);
 
-      selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(),
-          privKey);
+      selfSignedCert = MyUtil.generateSelfsignedCert(p10Req.toASN1Structure(), privKey);
 
       EnrolmentResponse enrolResp = client.scepPkcsReq(
           p10Req.toASN1Structure(), privKey, selfSignedCert);
@@ -208,37 +203,32 @@ public abstract class AbstractCaTest {
       enroledCert = cert;
 
       // try :: self-signed certificate's subject different from the one of CSR
-      p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo,
-          subject, secret, null);
+      p10Req = MyUtil.generateRequest(privKey, subjectPublicKeyInfo, subject, secret, null);
       csr = p10Req.toASN1Structure();
 
       selfSignedCert = MyUtil.generateSelfsignedCert(new X500Name("CN=dummy"),
           csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), privKey);
-      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey,
-          selfSignedCert);
+      enrolResp = client.scepPkcsReq(p10Req.toASN1Structure(), privKey, selfSignedCert);
 
       PkiStatus status = enrolResp.pkcsRep().pkiStatus();
-      Assert.assertEquals("PkiStatus with invalid secret",
-          PkiStatus.FAILURE, status);
+      Assert.assertEquals("PkiStatus with invalid secret", PkiStatus.FAILURE, status);
     }
 
     // certPoll
-    EnrolmentResponse enrolResp =
-        client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
+    EnrolmentResponse enrolResp = client.scepCertPoll(privKey, selfSignedCert, csr, issuerName);
 
     List<X509Cert> certs = enrolResp.certificates();
     Assert.assertFalse("number of received certificates", certs.isEmpty());
     Assert.assertNotNull("enrolled certificate", certs.get(0));
 
     // getCert
-    certs = client.scepGetCert(privKey, selfSignedCert, issuerName,
-        enroledCert.serialNumber());
+    certs = client.scepGetCert(privKey, selfSignedCert, issuerName, enroledCert.serialNumber());
     Assert.assertFalse("number of received certificates", certs.isEmpty());
     Assert.assertNotNull("received certificate", certs.get(0));
 
     // getCRL
     X509CRLHolder crl = client.scepGetCrl(privKey, enroledCert, issuerName,
-        enroledCert.serialNumber());
+                          enroledCert.serialNumber());
     Assert.assertNotNull("received CRL", crl);
 
     // getNextCA

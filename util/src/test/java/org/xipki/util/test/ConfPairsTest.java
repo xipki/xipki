@@ -102,8 +102,7 @@ public class ConfPairsTest {
     for (String isName : isNames) {
       String expValue = expNameValues.get(isName);
       Assert.assertNotNull("name " + isName + " is not expected", expValue);
-      Assert.assertEquals("value of name " + isName, expValue,
-          confPairs.value(isName));
+      Assert.assertEquals("value of name " + isName, expValue, confPairs.value(isName));
     }
   }
 

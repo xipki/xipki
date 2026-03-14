@@ -11,6 +11,8 @@ import org.xipki.pkcs11.xihsm.util.OperationType;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ActiveOperation {
@@ -28,8 +30,7 @@ public class ActiveOperation {
     simpleActiveOp.set(true);
   }
 
-  public synchronized void enterMultiOp(MultiPartOperation op)
-      throws HsmException {
+  public synchronized void enterMultiOp(MultiPartOperation op) throws HsmException {
     assertNotActive();
     this.multiActiveOp = op;
   }
@@ -52,8 +53,8 @@ public class ActiveOperation {
     }
   }
 
-  public synchronized MultiPartOperation assertMultiOpInitialized(
-      OperationType type) throws HsmException {
+  public synchronized MultiPartOperation assertMultiOpInitialized(OperationType type)
+      throws HsmException {
     if (multiActiveOp == null || multiActiveOp.type() != type) {
       throw new HsmException(PKCS11T.CKR_OPERATION_NOT_INITIALIZED,
           "The session has not been initialized for " + type);

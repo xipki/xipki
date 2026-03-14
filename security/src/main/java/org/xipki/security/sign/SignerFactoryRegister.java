@@ -39,7 +39,7 @@ public interface SignerFactoryRegister {
    *           If signer could not be created.
    */
   ConcurrentSigner newSigner(
-      SecurityFactory securityFactory, String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException;
+      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException;
 
 }

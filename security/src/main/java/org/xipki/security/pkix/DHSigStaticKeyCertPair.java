@@ -32,8 +32,7 @@ public class DHSigStaticKeyCertPair {
 
   public DHSigStaticKeyCertPair(PrivateKey privateKey, X509Cert certificate) {
     this.privateKey = Args.notNull(privateKey, "privateKey");
-    this.serialNumber = Args.notNull(certificate, "certificate")
-        .serialNumber();
+    this.serialNumber = Args.notNull(certificate, "certificate").serialNumber();
 
     try {
       this.encodedIssuer  = certificate.issuer().getEncoded();

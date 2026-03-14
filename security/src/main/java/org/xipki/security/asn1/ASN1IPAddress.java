@@ -6,6 +6,7 @@ import org.bouncycastle.asn1.ASN1BitString;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.DERBitString;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.ipadress.IPAddress;
 
@@ -22,8 +23,7 @@ public class ASN1IPAddress extends ASN1Object {
   private final ASN1BitString value;
 
   public ASN1IPAddress(byte[] bytes, int unusedBits) {
-    this.value = new DERBitString(
-        Args.notNull(bytes, "bytes"), unusedBits);
+    this.value = new DERBitString(Args.notNull(bytes, "bytes"), unusedBits);
   }
 
   private ASN1IPAddress(ASN1BitString bitString) {
@@ -40,8 +40,7 @@ public class ASN1IPAddress extends ASN1Object {
   }
 
   public String toString(int afi, IPAddress.Context context) {
-    return new IPAddress(value.getBytes(), value.getPadBits())
-        .toString(afi, context);
+    return new IPAddress(value.getBytes(), value.getPadBits()).toString(afi, context);
   }
 
   public static ASN1IPAddress getInstance(Object obj) {
@@ -50,7 +49,7 @@ public class ASN1IPAddress extends ASN1Object {
     } else if (obj instanceof ASN1BitString) {
       return new ASN1IPAddress((ASN1BitString) obj);
     } else if (obj != null) {
-      return new ASN1IPAddress(ASN1BitString.getInstance(obj));
+      return new ASN1IPAddress(Asn1Util.toASN1BitString(obj));
     } else {
       throw new IllegalArgumentException("invalid obj: null");
     }

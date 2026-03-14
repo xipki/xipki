@@ -49,8 +49,7 @@ public abstract class AESKeyGenSpeedTest extends TestBase {
   public void execTest() {
     PKCS11Token token = getToken();
 
-    Assume.assumeTrue(ckmCodeToName(mechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(mechanism) + " is not supported, skip test",
         token.supportsMechanism(mechanism, CKF_GENERATE));
 
     boolean[] inTokens = new boolean[] {false, true};

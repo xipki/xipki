@@ -52,14 +52,12 @@ public class OIDs {
     return initOid(new ASN1ObjectIdentifier(oid), name);
   }
 
-  private static ASN1ObjectIdentifier initOid(
-      ASN1ObjectIdentifier oid, String name) {
+  private static ASN1ObjectIdentifier initOid(ASN1ObjectIdentifier oid, String name) {
     String id = oid.getId();
     String mainAlias = name != null ? name.trim() : id;
 
     if (oidNameMap.put(id, mainAlias) != null) {
-      throw new RuntimeException("duplicated oid: " + oid.getId() +
-          " (alias " + mainAlias + ")");
+      throw new RuntimeException("duplicated oid: " + oid.getId() + " (alias " + mainAlias + ")");
     }
 
     return oid;
@@ -142,8 +140,7 @@ public class OIDs {
     // deprecated id_xipki_ext_cmpRequestExtensions := id_xipki_ext {2}
     // deprecated id_xipki_ext_authorizationTemplate := id_xipki_ext {3}
 
-    private static final ASN1ObjectIdentifier id_xipki_cmp =
-        id_xipki.branch("2");
+    private static final ASN1ObjectIdentifier id_xipki_cmp = id_xipki.branch("2");
 
     // deprecated ASN1ObjectIdentifier id_xipki_cmp_cmpGenmsg =
     // id_xipki_cmp.branch("1");
@@ -153,8 +150,7 @@ public class OIDs {
     public static final ASN1ObjectIdentifier id_xipki_cmp_kem_encapkey =
         initOid(id_xipki_cmp.branch("3"), "xipki-cmp-kem-encapkey");
 
-    private static final ASN1ObjectIdentifier id_xipki_alg =
-        id_xipki.branch("3");
+    private static final ASN1ObjectIdentifier id_xipki_alg = id_xipki.branch("3");
 
     public static final ASN1ObjectIdentifier id_alg_dhPop_x25519 =
         initOid(id_xipki_alg.branch("1"), "xipki-alg-dhPop-x25519");
@@ -164,6 +160,9 @@ public class OIDs {
 
     public static final ASN1ObjectIdentifier id_alg_KEM_HMAC_SHA256 =
         initOid(id_xipki_alg.branch("3"), "xipki-alg-KEM-HMAC-SHA256");
+
+    public static final ASN1ObjectIdentifier id_alg_ECIES_hkdfsha256_aes256_gcm =
+          initOid(id_xipki_alg.branch("4"), "xipki-alg-ECIES_HKDFSHA512_AES256_GCM");
 
   } // class Xipki
 
@@ -223,8 +222,7 @@ public class OIDs {
 
   public static class PolicyQualifierId {
 
-    public static final ASN1ObjectIdentifier cps =
-        initOid("1.3.6.1.5.5.7.2.1", "CPS");
+    public static final ASN1ObjectIdentifier cps = initOid("1.3.6.1.5.5.7.2.1", "CPS");
     public static final ASN1ObjectIdentifier userNotice =
         initOid("1.3.6.1.5.5.7.2.2", "User Notice");
   }
@@ -234,8 +232,7 @@ public class OIDs {
     /**
      * country code - StringType(SIZE(2)).
      */
-    public static final ASN1ObjectIdentifier country =
-        initOid("2.5.4.6", "at-country");
+    public static final ASN1ObjectIdentifier country = initOid("2.5.4.6", "at-country");
 
     /**
      * organization - StringType(SIZE(1..64))
@@ -258,14 +255,12 @@ public class OIDs {
     /**
      * Title.
      */
-    public static final ASN1ObjectIdentifier title =
-        initOid("2.5.4.12", "at-title");
+    public static final ASN1ObjectIdentifier title = initOid("2.5.4.12", "at-title");
 
     /**
      * common name - StringType(SIZE(1..64))
      */
-    public static final ASN1ObjectIdentifier commonName =
-        initOid("2.5.4.3", "at-commonName");
+    public static final ASN1ObjectIdentifier commonName = initOid("2.5.4.3", "at-commonName");
 
     /**
      * device serial number name - StringType(SIZE(1..64))
@@ -276,32 +271,26 @@ public class OIDs {
     /**
      * street - StringType(SIZE(1..64))
      */
-    public static final ASN1ObjectIdentifier street =
-        initOid("2.5.4.9", "at-street");
+    public static final ASN1ObjectIdentifier street = initOid("2.5.4.9", "at-street");
 
     /**
      * locality name - StringType(SIZE(1..64))
      */
-    public static final ASN1ObjectIdentifier locality =
-        initOid("2.5.4.7", "at-locality");
+    public static final ASN1ObjectIdentifier locality = initOid("2.5.4.7", "at-locality");
 
     /**
      * state, or province name - StringType(SIZE(1..64))
      */
-    public static final ASN1ObjectIdentifier state =
-        initOid("2.5.4.8", "at-state");
+    public static final ASN1ObjectIdentifier state = initOid("2.5.4.8", "at-state");
 
     /**
      * Naming attributes of type X520name.
      */
-    public static final ASN1ObjectIdentifier surname =
-        initOid("2.5.4.4", "at-surname");
+    public static final ASN1ObjectIdentifier surname = initOid("2.5.4.4", "at-surname");
 
-    public static final ASN1ObjectIdentifier givenName =
-        initOid("2.5.4.42", "at-givenName");
+    public static final ASN1ObjectIdentifier givenName = initOid("2.5.4.42", "at-givenName");
 
-    public static final ASN1ObjectIdentifier initials =
-        initOid("2.5.4.43", "at-initials");
+    public static final ASN1ObjectIdentifier initials = initOid("2.5.4.43", "at-initials");
 
     public static final ASN1ObjectIdentifier generationQualifier =
         initOid("2.5.4.44", "at-generationQualifier");
@@ -318,20 +307,17 @@ public class OIDs {
     /**
      * postalCode - DirectoryString(SIZE(1..40)
      */
-    public static final ASN1ObjectIdentifier postalCode =
-        initOid("2.5.4.17", "at-postalCode");
+    public static final ASN1ObjectIdentifier postalCode = initOid("2.5.4.17", "at-postalCode");
 
     /**
      * dnQualifier - DirectoryString(SIZE(1..64)
      */
-    public static final ASN1ObjectIdentifier dnQualifier =
-        initOid("2.5.4.46", "at-dnQualifier");
+    public static final ASN1ObjectIdentifier dnQualifier = initOid("2.5.4.46", "at-dnQualifier");
 
     /**
      * RFC 3039 Pseudonym - DirectoryString(SIZE(1..64)
      */
-    public static final ASN1ObjectIdentifier pseudonym =
-        initOid("2.5.4.65", "at-pseudonym");
+    public static final ASN1ObjectIdentifier pseudonym = initOid("2.5.4.65", "at-pseudonym");
 
     /**
      * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z.
@@ -348,8 +334,7 @@ public class OIDs {
     /**
      * RFC 3039 Gender - PrintableString (SIZE(1))-- "M", "F", "m" or "f".
      */
-    public static final ASN1ObjectIdentifier gender =
-        initOid("1.3.6.1.5.5.7.9.3", "at-gender");
+    public static final ASN1ObjectIdentifier gender = initOid("1.3.6.1.5.5.7.9.3", "at-gender");
 
     /**
      * RFC 3039 CountryOfCitizenship - PrintableString (SIZE (2))
@@ -381,8 +366,7 @@ public class OIDs {
     /**
      * RFC 2256 dmdName.
      */
-    public static final ASN1ObjectIdentifier dmdName =
-        initOid("2.5.4.54", "at-dmdName");
+    public static final ASN1ObjectIdentifier dmdName = initOid("2.5.4.54", "at-dmdName");
 
     /**
      * id-at-telephoneNumber.
@@ -393,8 +377,7 @@ public class OIDs {
     /**
      * id-at-name.
      */
-    public static final ASN1ObjectIdentifier name =
-        initOid("2.5.4.41", "at-name");
+    public static final ASN1ObjectIdentifier name = initOid("2.5.4.41", "at-name");
 
     /**
      * Email address (RSA PKCS#9 extension) - IA5String.
@@ -684,8 +667,7 @@ public class OIDs {
     /**
      * Key Usage
      */
-    public static final ASN1ObjectIdentifier keyUsage =
-        initOid("2.5.29.15", "keyUsage");
+    public static final ASN1ObjectIdentifier keyUsage = initOid("2.5.29.15", "keyUsage");
 
     /**
      * Private Key Usage Period
@@ -714,14 +696,12 @@ public class OIDs {
     /**
      * CRL Number
      */
-    public static final ASN1ObjectIdentifier cRLNumber =
-        initOid("2.5.29.20", "cRLNumber");
+    public static final ASN1ObjectIdentifier cRLNumber = initOid("2.5.29.20", "cRLNumber");
 
     /**
      * Reason code
      */
-    public static final ASN1ObjectIdentifier reasonCode =
-        initOid("2.5.29.21", "reasonCode");
+    public static final ASN1ObjectIdentifier reasonCode = initOid("2.5.29.21", "reasonCode");
 
     /**
      * Hold Instruction Code
@@ -870,8 +850,7 @@ public class OIDs {
     /**
      * NoRevAvail extension in attribute certificates.
      */
-    public static final ASN1ObjectIdentifier noRevAvail =
-        initOid("2.5.29.56", "noRevAvail");
+    public static final ASN1ObjectIdentifier noRevAvail = initOid("2.5.29.56", "noRevAvail");
 
     /**
      * TargetInformation extension in attribute certificates.
@@ -1191,17 +1170,13 @@ public class OIDs {
 
   public static class Curve {
 
-    public static final ASN1ObjectIdentifier id_X25519 = initOid(
-        "1.3.101.110", "X25519");
+    public static final ASN1ObjectIdentifier id_X25519 = initOid("1.3.101.110", "X25519");
 
-    public static final ASN1ObjectIdentifier id_X448 = initOid(
-        "1.3.101.111", "X448");
+    public static final ASN1ObjectIdentifier id_X448 = initOid("1.3.101.111", "X448");
 
-    public static final ASN1ObjectIdentifier id_ED25519 = initOid(
-        "1.3.101.112", "ED25519");
+    public static final ASN1ObjectIdentifier id_ED25519 = initOid("1.3.101.112", "ED25519");
 
-    public static final ASN1ObjectIdentifier id_ED448 = initOid(
-        "1.3.101.113", "ED448");
+    public static final ASN1ObjectIdentifier id_ED448 = initOid("1.3.101.113", "ED448");
 
     public static final ASN1ObjectIdentifier sm2p256v1 = initOid(
         "1.2.156.10197.1.301", "sm2p256v1");
@@ -1212,17 +1187,14 @@ public class OIDs {
     public static final ASN1ObjectIdentifier secp192r1 = initOid(
         "1.2.840.10045.3.1.1", "secp192r1");
 
-    public static final ASN1ObjectIdentifier secp224r1 = initOid(
-        "1.3.132.0.33", "secp224r1");
+    public static final ASN1ObjectIdentifier secp224r1 = initOid("1.3.132.0.33", "secp224r1");
 
     public static final ASN1ObjectIdentifier secp256r1 = initOid(
         "1.2.840.10045.3.1.7", "secp256r1");
 
-    public static final ASN1ObjectIdentifier secp384r1 = initOid(
-        "1.3.132.0.34", "secp384r1");
+    public static final ASN1ObjectIdentifier secp384r1 = initOid("1.3.132.0.34", "secp384r1");
 
-    public static final ASN1ObjectIdentifier secp521r1 = initOid(
-        "1.3.132.0.35", "secp521r1");
+    public static final ASN1ObjectIdentifier secp521r1 = initOid("1.3.132.0.35", "secp521r1");
 
     public static final ASN1ObjectIdentifier brainpoolP192r1 = initOid(
         "1.3.36.3.3.2.8.1.1.3", "brainpoolP192r1");
@@ -1345,8 +1317,7 @@ public class OIDs {
     public static final ASN1ObjectIdentifier signedData = initOid(
         "1.2.840.113549.1.7.2", "signedData");
 
-    public static final ASN1ObjectIdentifier data = initOid(
-        "1.2.840.113549.1.7.1", "data");
+    public static final ASN1ObjectIdentifier data = initOid("1.2.840.113549.1.7.1", "data");
 
     public static final ASN1ObjectIdentifier envelopedData = initOid(
         "1.2.840.113549.1.7.3", "envelopedData");

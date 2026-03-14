@@ -24,8 +24,7 @@ public class UnsignedSigner implements Signer {
   private static final AlgorithmIdentifier x509AlgId =
       new AlgorithmIdentifier(OIDs.Algo.id_alg_unsigned);
 
-  private static final byte[] encodedX509AlgId =
-      Hex.decode("300a06082b06010505070624");
+  private static final byte[] encodedX509AlgId = Hex.decode("300a06082b06010505070624");
 
   private final ContentSigner x509Signer;
 

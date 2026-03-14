@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -38,8 +39,7 @@ public class AcmeAccount {
     }
 
     public Data(Map<String, String> jwk, List<String> contact,
-                JoseMessage externalAccountBinding,
-                Boolean termsOfServiceAgreed) {
+                JoseMessage externalAccountBinding, Boolean termsOfServiceAgreed) {
       this.jwk = jwk;
       this.contact = contact;
       this.externalAccountBinding = externalAccountBinding;
@@ -80,20 +80,16 @@ public class AcmeAccount {
 
     @Override
     public JsonMap toCodec() {
-      return new JsonMap().putStringMap("jwk", jwk)
-          .putStrings("contact", contact)
+      return new JsonMap().putStringMap("jwk", jwk).putStrings("contact", contact)
           .put("externalAccountBinding", externalAccountBinding)
           .put("termsOfServiceAgreed", termsOfServiceAgreed);
     }
 
     public static Data parse(JsonMap json) throws CodecException {
       JsonMap map = json.getMap("externalAccountBinding");
-      JoseMessage externalAccountBinding = (map == null) ? null
-          : JoseMessage.parse(map);
-      return new Data(json.getStringMap("jwk"),
-          json.getStringList("contact"),
-          externalAccountBinding,
-          json.getBool("termsOfServiceAgreed"));
+      JoseMessage externalAccountBinding = (map == null) ? null : JoseMessage.parse(map);
+      return new Data(json.getStringMap("jwk"), json.getStringList("contact"),
+          externalAccountBinding, json.getBool("termsOfServiceAgreed"));
     }
 
   }
@@ -210,9 +206,8 @@ public class AcmeAccount {
   }
 
   public AccountResponse toResponse(String baseUrl) {
-    return new AccountResponse(status, data.contact,
-        data.externalAccountBinding, data.termsOfServiceAgreed,
-        baseUrl + "orders/" + idStr);
+    return new AccountResponse(status, data.contact, data.externalAccountBinding,
+        data.termsOfServiceAgreed, baseUrl + "orders/" + idStr);
   }
 
   public String getLocation(String baseUrl) {

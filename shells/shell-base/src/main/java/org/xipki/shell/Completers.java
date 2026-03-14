@@ -43,8 +43,7 @@ public class Completers {
 
     public ClientCrlReasonCompleter() {
       setTokens("unspecified", "keyCompromise", "affiliationChanged",
-          "superseded", "cessationOfOperation", "certificateHold",
-          "privilegeWithdrawn");
+          "superseded", "cessationOfOperation", "certificateHold", "privilegeWithdrawn");
     }
 
   } // class ClientCrlReasonCompleter
@@ -62,9 +61,8 @@ public class Completers {
   public static class KeyusageCompleter extends EnumCompleter {
 
     public KeyusageCompleter() {
-      setTokens("digitalSignature", "contentCommitment", "keyEncipherment",
-          "dataEncipherment", "keyAgreement", "keyCertSign", "cRLSign",
-          "encipherOnly", "decipherOnly");
+      setTokens("digitalSignature", "contentCommitment", "keyEncipherment", "dataEncipherment",
+          "keyAgreement", "keyCertSign", "cRLSign", "encipherOnly", "decipherOnly");
     }
 
   } // class KeyusageCompleter
@@ -119,8 +117,7 @@ public class Completers {
 
     public HashAlgCompleter() {
       setTokens("SHA1", "SHA224", "SHA256", "SHA384", "SHA512",
-          "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SM3",
-          "SHAKE128", "SHAKE256");
+          "SHA3-224", "SHA3-256", "SHA3-384", "SHA3-512", "SM3", "SHAKE128", "SHAKE256");
     }
 
   } // class HashAlgCompleter
@@ -130,33 +127,20 @@ public class Completers {
 
     public SigAlgCompleter() {
       setTokens(
-          "SHA1WITHRSA",     "SHA224WITHRSA", "SHA256WITHRSA",
-          "SHA384WITHRSA",   "SHA512WITHRSA",
-          "SHA3-224WITHRSA", "SHA3-256WITHRSA",
-          "SHA3-384WITHRSA", "SHA3-512WITHRSA",
-          "SHA1WITHRSAANDMGF1",
-          "SHA224WITHRSAANDMGF1",   "SHA256WITHRSAANDMGF1",
-          "SHA384WITHRSAANDMGF1",   "SHA512WITHRSAANDMGF1",
-          "SHA3-224WITHRSAANDMGF1", "SHA3-256WITHRSAANDMGF1",
-          "SHA3-384WITHRSAANDMGF1", "SHA3-512WITHRSAANDMGF1",
-          "SHAKE128WITHRSAPSS",     "SHAKE256WITHRSAPSS",
-          "SHA1WITHECDSA",
-          "SHA224WITHECDSA",        "SHA256WITHECDSA",
-          "SHA384WITHECDSA",        "SHA512WITHECDSA",
-          "SHA3-224WITHECDSA",      "SHA3-256WITHECDSA",
-          "SHA3-384WITHECDSA",      "SHA3-512WITHECDSA", "SM3WITHSM2",
-          "SHAKE128WITHECDSA",      "SHAKE256WITHECDSA",
-          "ED25519", "ED448", "MLDSA44", "MLDSA65", "MLDSA87",
-          "MLDSA44-RSA2048",         "MLDSA44-RSA2048-PKCS15",
-          "MLDSA44-ED25519",         "MLDSA44-P256",
-          "MLDSA65-RSA3072",         "MLDSA65-RSA3072-PKCS15",
-          "MLDSA65-RSA4096",         "MLDSA65-RSA4096-PKCS15",
-          "MLDSA65-P256",            "MLDSA65-P384",
-          "MLDSA65-BRAINPOOLP256R1", "MLDSA65-ED25519",
-          "MLDSA87-P384",            "MLDSA87-BRAINPOOLP384R1",
-          "MLDSA87-ED448",           "MLDSA87-RSA3072",
-          "MLDSA87-RSA4096",         "MLDSA87-P521"
-          );
+          "RSA-SHA1",     "RSA-SHA224",    "RSA-SHA256",    "RSA-SHA384", "RSA-SHA512",
+          "RSA-SHA3-224", "RSA-SHA3-256",  "RSA-SHA3-384",  "RSA-SHA3-512",
+          "RSAPSS-SHA1",  "RSAPSS-SHA224", "RSAPSS-SHA256", "RSAPSS-SHA384",
+          "RSAPSS-SHA512", "RSAPSS-SHA3-224", "RSAPSS-SHA3-256", "RSAPSS-SHA3-384",
+          "RSAPSS-SHA3-512", "RSAPSS-SHAKE128", "RSAPSS-SHAKE256",
+          "ECDSA-SHA1", "ECDSA-SHA224", "ECDSA-SHA256", "ECDSA-SHA384", "ECDSA-SHA512",
+          "ECDSA-SHA3-224", "ECDSA-SHA3-256", "ECDSA-SHA3-384", "ECDSA-SHA3-512",
+          "SM2-SM3", "ECDSA-SHAKE128", "ECDSA-SHAKE256", "ED25519", "ED448",
+          "MLDSA44", "MLDSA65", "MLDSA87", "KEM-HMAC-SHA256",
+          "MLDSA44-RSA2048", "MLDSA44-ED25519", "MLDSA44-P256",
+          "MLDSA65-RSA3072", "MLDSA65-RSA4096", "MLDSA65-P256",
+          "MLDSA65-P384",    "MLDSA65-BP256",   "MLDSA65-ED25519",
+          "MLDSA87-P384",    "MLDSA87-BP384",   "MLDSA87-ED448",
+          "MLDSA87-RSA3072", "MLDSA87-RSA4096", "MLDSA87-P521");
     }
 
   }

@@ -44,8 +44,7 @@ public class SdkClientConf {
     return new SdkClientConf(json.getString("serverUrl"), ssl);
   }
 
-  public static SdkClientConf decode(byte[] encoded)
-      throws IOException, InvalidConfException {
+  public static SdkClientConf decode(byte[] encoded) throws InvalidConfException {
     try {
       JsonMap root = JsonParser.parseMap(encoded, true);
       return parse(root);

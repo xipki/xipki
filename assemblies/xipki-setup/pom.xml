@@ -10,10 +10,19 @@
   </parent>
   <artifactId>xipki-setup</artifactId>
   <packaging>pom</packaging>
-  <name>XiPKI :: assembly :: ${project.artifactId}</name>
+  <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <skipDeploy>false</skipDeploy>
   </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>karaf-features</artifactId>
+      <version>${project.version}</version>
+      <classifier>features</classifier>
+      <type>xml</type>
+    </dependency>
+  </dependencies>
   <build>
     <resources>
       <resource>
@@ -43,29 +52,141 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
         <executions>
           <execution>
-            <id>copy-jar</id>
+            <!-- Uncompress the standard Karaf distribution -->
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/t2</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.karaf</groupId>
+                  <artifactId>apache-karaf-minimal</artifactId>
+                  <type>tar.gz</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-wars</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.outputDirectory}/setup/lib</outputDirectory>
+              <outputDirectory>${project.build.directory}/t2/webapps</outputDirectory>
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                  <version>${slf4j.version}</version>
+                  <groupId>org.xipki.servlet</groupId>
+                  <artifactId>ca-servlet</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-simple</artifactId>
-                  <version>${slf4j.version}</version>
+                  <groupId>org.xipki.servlet</groupId>
+                  <artifactId>ocsp-servlet</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki.servlet</groupId>
+                  <artifactId>gateway-servlet</artifactId>
+                  <version>${project.version}</version>
+                  <type>war</type>
                 </artifactItem>
               </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Copy the JDBC jars to tomcat's lib folder -->
+            <id>jdbc-jars</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <stripVersion>false</stripVersion>
+              <outputDirectory>${project.build.directory}/t2/xipki-ca/tomcat/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.mariadb.jdbc</groupId>
+                  <artifactId>mariadb-java-client</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.h2database</groupId>
+                  <artifactId>h2</artifactId>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-maven-plugin</artifactId>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>add-features-to-repo-lts</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <repository>${project.build.directory}/t2/bc-lts/xipki-mgmt-cli/system</repository>
+              <descriptors>
+                <descriptor>mvn:org.xipki/karaf-features/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <!-- apache karaf -->
+                <feature>hidden-do-not-call-me</feature>
+                <feature>framework</feature>
+                <feature>shell</feature>
+                <feature>log</feature>
+                <feature>bundle</feature>
+                <feature>feature</feature>
+                <feature>scr</feature>
+                <!-- xipki -->
+                <feature>xipki-bc-lts</feature>
+                <feature>xipki-ca-mgmt</feature>
+                <feature>xipki-demo</feature>
+              </features>
+            </configuration>
+          </execution>
+          <execution>
+            <id>add-features-to-repo-fips</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>features-add-to-repository</goal>
+            </goals>
+            <configuration>
+              <repository>${project.build.directory}/t2/bc-fips/xipki-mgmt-cli/system</repository>
+              <descriptors>
+                <descriptor>mvn:org.xipki/karaf-features/${project.version}/xml/features</descriptor>
+              </descriptors>
+              <features>
+                <!-- apache karaf -->
+                <feature>hidden-do-not-call-me</feature>
+                <feature>framework</feature>
+                <feature>shell</feature>
+                <feature>log</feature>
+                <feature>bundle</feature>
+                <feature>feature</feature>
+                <feature>scr</feature>
+                <!-- xipki -->
+                <feature>xipki-bc-fips</feature>
+                <feature>xipki-ca-mgmt</feature>
+                <feature>xipki-demo</feature>
+              </features>
             </configuration>
           </execution>
         </executions>
@@ -79,44 +200,64 @@
             <configuration>
               <target>
                 <delete dir="${project.build.directory}/t"/>
+                <java failonerror="true" classname="org.xipki.patchkaraf.PatchKaraf">
+                  <arg value="--dir"/>
+                  <arg file="${project.build.directory}/t2/apache-karaf-minimal-${karaf.version}"/>
+                  <arg value="--no-backup"/>
+                  <arg value="--disable-jmxremote"/>
+                  <arg value="--repos"/>
+                  <arg value="mvn:org.xipki/karaf-features/${project.version}/xml/features"/>
+                  <arg value="--features"/>
+                  <arg value="(feature,shell,log,bundle,scr),xipki-bc-lts,xipki-ca-mgmt"/>
+                  <arg value="--no-startup"/>
+                  <arg value="jansi org.apache.felix.metatype org.apache.felix.coordinator org.apache.felix.configadmin.plugin.interpolation org.apache.felix.configurator org.apache.karaf.config.core"/>
+                  <arg value="--export-jre-packages"/>
+                  <arg value=" com.ibm.db2.jcc, org.h2.jdbcx, org.h2.tools, org.hsqldb.jdbc, org.mariadb.jdbc, com.mysql.jdbc.jdbc2.optional, oracle.jdbc.pool, org.postgresql.ds"/>
+                </java>
 
-                <copy file="../../README.md"
-                      todir="${project.build.directory}/t"/>
-                <copy file="../../CHANGELOG.md"
-                      todir="${project.build.directory}/t"/>
-                <copy todir="${project.build.directory}/t" >
-                  <fileset dir="${project.build.outputDirectory}">
-                    <include name="prepare.sh"/>
-                    <include name="INSTALL.md"/>
-                    <include name="license/**"/>
-                    <include name="setup/**"/>
-                  </fileset>
+                <!-- extract common files from the war files -->
+                <unzip src="${project.build.directory}/t2/webapps/ca-servlet.war"
+                   dest="${project.build.directory}/t2/ca-war"/>
+                <zip destfile="${project.build.directory}/t/xipki-ca/tomcat/webapps/ca.war"
+                     basedir="${project.build.directory}/t2/ca-war"
+                     excludes="WEB-INF/lib/HikariCP-*.jar, WEB-INF/lib/slf4j-api-*.jar, WEB-INF/lib/slf4j-jdk14-*.jar, WEB-INF/lib/codec-*.jar, WEB-INF/lib/util-*.jar, WEB-INF/lib/pkcs11-*.jar, WEB-INF/lib/security-*.jar, WEB-INF/lib/servlet-common-*.jar, WEB-INF/lib/xihsm-*.jar, WEB-INF/lib/osgi-placeholder-*.jar"/>
+
+                <mkdir dir="${project.build.directory}/t/war-common"/>
+                <copy todir="${project.build.directory}/t/war-common" preservelastmodified="true">
+                  <fileset dir="${project.build.directory}/t2/ca-war"
+                           includes="WEB-INF/lib/slf4j-api-*.jar, WEB-INF/lib/slf4j-jdk14-*.jar, WEB-INF/lib/servlet-common-*.jar, WEB-INF/lib/osgi-placeholder-*.jar"/>
                 </copy>
 
-                <unzip src="../xipki-ca/target/xipki-ca-${project.version}.zip"
-                   dest="${project.build.directory}/t"/>
-                <move file="${project.build.directory}/t/xipki-ca-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-ca"/>
+                <unzip src="${project.build.directory}/t2/webapps/ocsp-servlet.war"
+                   dest="${project.build.directory}/t2/ocsp-war"/>
+                <zip destfile="${project.build.directory}/t/xipki-ocsp/tomcat/webapps/ocsp.war"
+                     basedir="${project.build.directory}/t2/ocsp-war"
+                     excludes="WEB-INF/lib/HikariCP-*.jar, WEB-INF/lib/slf4j-api-*.jar, WEB-INF/lib/slf4j-jdk14-*.jar, WEB-INF/lib/codec-*.jar, WEB-INF/lib/util-*.jar, WEB-INF/lib/pkcs11-*.jar, WEB-INF/lib/security-*.jar, WEB-INF/lib/servlet-common-*.jar, WEB-INF/lib/xihsm-*.jar"/>
 
-                <unzip src="../xipki-ocsp/target/xipki-ocsp-${project.version}.zip"
-                   dest="${project.build.directory}/t"/>
-                <move file="${project.build.directory}/t/xipki-ocsp-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-ocsp"/>
+                <unzip src="${project.build.directory}/t2/webapps/gateway-servlet.war"
+                     dest="${project.build.directory}/t2/gw-war"/>
+                <zip destfile="${project.build.directory}/t/xipki-gateway/tomcat/webapps/gw.war"
+                     basedir="${project.build.directory}/t2/gw-war"
+                     excludes="WEB-INF/lib/HikariCP-*.jar, WEB-INF/lib/slf4j-api-*.jar, WEB-INF/lib/slf4j-jdk14-*.jar, WEB-INF/lib/codec-*.jar, WEB-INF/lib/util-*.jar, WEB-INF/lib/pkcs11-*.jar, WEB-INF/lib/security-*.jar, WEB-INF/lib/servlet-common-*.jar, WEB-INF/lib/xihsm-*.jar"/>
 
-                <unzip src="../xipki-gateway/target/xipki-gateway-${project.version}.zip"
-                       dest="${project.build.directory}/t"/>
-                <move file="${project.build.directory}/t/xipki-gateway-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-gateway"/>
+                <!-- duplicated org.apache.karaf.features.cfg files -->
+                <copy file="${project.build.directory}/t2/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
+                     todir="${project.build.directory}/t2/bc-lts/xipki-cli/etc"/>
+                <replace file="${project.build.directory}/t2/bc-lts/xipki-cli/etc/org.apache.karaf.features.cfg"
+                      token="xipki-ca-mgmt" value="xipki-pki-client"/>
 
-                <untar src="../xipki-cli/target/xipki-cli-${project.version}.tar.gz"
-                       dest="${project.build.directory}/t" compression="gzip"/>
-                <move file="${project.build.directory}/t/xipki-cli-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-cli"/>
+                <copy file="${project.build.directory}/t2/bc-lts/xipki-cli/etc/org.apache.karaf.features.cfg"
+                     todir="${project.build.directory}/t2/bc-fips/xipki-cli/etc"/>
+                <replace file="${project.build.directory}/t2/bc-fips/xipki-cli/etc/org.apache.karaf.features.cfg"
+                      token="xipki-bc-lts" value="xipki-bc-fips"/>
 
-                <untar src="../xipki-mgmt-cli/target/xipki-mgmt-cli-${project.version}.tar.gz"
-                       dest="${project.build.directory}/t" compression="gzip"/>
-                <move file="${project.build.directory}/t/xipki-mgmt-cli-${project.version}"
-                      tofile="${project.build.directory}/t/xipki-mgmt-cli"/>
+                <move file="${project.build.directory}/t2/apache-karaf-minimal-${karaf.version}/etc/org.apache.karaf.features.cfg"
+                     todir="${project.build.directory}/t2/bc-lts/xipki-mgmt-cli/etc"/>
+
+                <copy file="${project.build.directory}/t2/bc-lts/xipki-mgmt-cli/etc/org.apache.karaf.features.cfg"
+                     todir="${project.build.directory}/t2/bc-fips/xipki-mgmt-cli/etc"/>
+                <replace file="${project.build.directory}/t2/bc-fips/xipki-mgmt-cli/etc/org.apache.karaf.features.cfg"
+                      token="xipki-bc-lts" value="xipki-bc-fips"/>
               </target>
             </configuration>
             <goals>
@@ -138,9 +279,10 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assembly/descriptors/main.xml</descriptor>
+                <descriptor>src/assembly/descriptors/main-bcfips.xml</descriptor>
+                <descriptor>src/assembly/descriptors/main-bclts.xml</descriptor>
               </descriptors>
-              <appendAssemblyId>false</appendAssemblyId>
+              <appendAssemblyId>true</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>
               <recompressZippedFiles>true</recompressZippedFiles>
               <!-- Do not install/publish the zip file -->

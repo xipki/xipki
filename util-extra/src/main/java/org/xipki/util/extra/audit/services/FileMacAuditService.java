@@ -36,8 +36,7 @@ import java.util.StringTokenizer;
 
 public class FileMacAuditService extends MacAuditService {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(FileMacAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileMacAuditService.class);
 
   public static final String KEY_FILE = "file";
 
@@ -70,8 +69,7 @@ public class FileMacAuditService extends MacAuditService {
 
     try {
       if (date.isAfter(lastMsOfToday)) {
-        ZonedDateTime now = ZonedDateTime.ofInstant(date,
-            ZoneId.systemDefault());
+        ZonedDateTime now = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
         int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
         lastMsOfToday = DateUtil.getLastMsOfDay(now);
         writer.close();
@@ -89,7 +87,7 @@ public class FileMacAuditService extends MacAuditService {
   protected void storeIntegrity(String integrityText) {
     if (integrityText != null) {
       try (InputStream is = new ByteArrayInputStream(
-          integrityText.getBytes(StandardCharsets.UTF_8))) {
+                              integrityText.getBytes(StandardCharsets.UTF_8))) {
         writer.flush();
         Files.copy(is, integrityFilePath, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException ex) {
@@ -102,8 +100,7 @@ public class FileMacAuditService extends MacAuditService {
   protected void doExtraInit(ConfPairs confPairs) throws InvalidConfException {
     String filePath = confPairs.value(KEY_FILE);
     if (StringUtil.isBlank(filePath)) {
-      throw new IllegalArgumentException(
-          "property " + KEY_FILE + " not defined");
+      throw new IllegalArgumentException("property " + KEY_FILE + " not defined");
     }
     filePath = IoUtil.expandFilepath(StringUtil.resolveVariables(filePath),
               true);
@@ -113,8 +110,7 @@ public class FileMacAuditService extends MacAuditService {
     try {
       IoUtil.mkdirs(this.logDir);
     } catch (IOException e) {
-      throw new InvalidConfException(
-          "error mkdirs for " + this.logDir.getPath());
+      throw new InvalidConfException("error mkdirs for " + this.logDir.getPath());
     }
 
     String fileName = logFile.getName();
@@ -141,8 +137,7 @@ public class FileMacAuditService extends MacAuditService {
         String fName = f.getName();
         if (!(f.isFile() && fName.startsWith(logFileNamePrefix)
               && fName.endsWith(logFileNameSuffix)
-              && fName.length() == logFileNamePrefix.length() + 10
-                                    + logFileNameSuffix.length())) {
+              && fName.length() == logFileNamePrefix.length() + 10 + logFileNameSuffix.length())) {
           continue;
         }
 
@@ -155,32 +150,27 @@ public class FileMacAuditService extends MacAuditService {
             latestYyyyMMdd = yyyyMMdd;
           }
         } catch (Exception ex) {
-          LOG.warn("could not parse name of file {}, ignore it",
-              f.getAbsolutePath());
+          LOG.warn("could not parse name of file {}, ignore it", f.getAbsolutePath());
         }
 
         if (latestYyyyMMdd > yyyyMMddNow) {
           throw new IllegalStateException("audit file " + f.getAbsolutePath()
-                  + " is generated after " + yyyyMMddNow
-              + ", this is not allowed.");
+                  + " is generated after " + yyyyMMddNow + ", this is not allowed.");
         }
       }
     }
 
     this.integrityFilePath = new File(logDir,
-        this.logFileNamePrefix.substring(0,
-            this.logFileNamePrefix.length() - 1)
-        + ".integrity").toPath();
+        this.logFileNamePrefix.substring(0, this.logFileNamePrefix.length() - 1) +
+        ".integrity").toPath();
 
     File integrityFile = integrityFilePath.toFile();
     String integrityText;
     try {
       integrityText = integrityFile.exists()
-          ? IoUtil.readLastNonBlankLine(integrityFile)
-          : null;
+          ? IoUtil.readLastNonBlankLine(integrityFile) : null;
     } catch (IOException ex) {
-      throw new IllegalStateException(
-          "error reading " + integrityFile.getPath(), ex);
+      throw new IllegalStateException("error reading " + integrityFile.getPath(), ex);
     }
 
     if (latestYyyyMMdd > 0) {
@@ -189,8 +179,7 @@ public class FileMacAuditService extends MacAuditService {
       try {
         lastLine = IoUtil.readLastNonBlankLine(latestFile);
       } catch (IOException e) {
-        throw new IllegalStateException(
-            "error while reading " + latestFile.getPath());
+        throw new IllegalStateException("error while reading " + latestFile.getPath());
       }
 
       StringTokenizer tokenizer = new StringTokenizer(lastLine, DELIM);
@@ -219,8 +208,7 @@ public class FileMacAuditService extends MacAuditService {
     try {
       fw = new FileOutputStream(currentLogFile, true);
     } catch (IOException ex) {
-      throw new IllegalStateException(
-          "error opening file " + currentLogFile.getPath());
+      throw new IllegalStateException("error opening file " + currentLogFile.getPath());
     }
 
     return new OutputStreamWriter(fw);

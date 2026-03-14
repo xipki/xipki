@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -29,9 +30,9 @@ public class OrderResponse implements JsonEncodable {
   private final String certificate;
 
   public OrderResponse(
-      OrderStatus status, String expires, String notBefore,
-      String notAfter, List<Identifier> identifiers,
-      List<String> authorizations, String finalize, String certificate) {
+      OrderStatus status, String expires, String notBefore, String notAfter,
+      List<Identifier> identifiers, List<String> authorizations,
+      String finalize, String certificate) {
     this.status = status;
     this.expires = expires;
     this.notBefore = notBefore;
@@ -78,8 +79,7 @@ public class OrderResponse implements JsonEncodable {
   public JsonMap toCodec() {
     return new JsonMap().putEnum("status", status).put("expires", expires)
         .put("notBefore", notBefore).put("notAfter", notAfter)
-        .putEncodables("identifiers", identifiers)
-        .putStrings("authorizations", authorizations)
+        .putEncodables("identifiers", identifiers).putStrings("authorizations", authorizations)
         .put("finalize", finalize).put("certificate", certificate);
   }
 

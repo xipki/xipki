@@ -103,8 +103,7 @@ public class SecretKeyVisibilityTest {
       testVisibility(false, true);
     }
 
-    private void testVisibility(boolean inToken, boolean privateObj)
-        throws Exception {
+    private void testVisibility(boolean inToken, boolean privateObj) throws Exception {
       TestHSMs.TestHSM hsm = getHSM();
       byte[] soPin = hsm.getSoPin();
       Assume.assumeNotNull((Object) soPin);
@@ -131,15 +130,12 @@ public class SecretKeyVisibilityTest {
 
         VendorEnum vendorEnum = vendor.getVendorEnum();
         boolean expectedFound = !privateObj
-            || (vendorEnum == VendorEnum.CLOUDHSM
-                || vendorEnum == VendorEnum.TASS);
+            || (vendorEnum == VendorEnum.CLOUDHSM || vendorEnum == VendorEnum.TASS);
 
         if (expectedFound) {
-          Assert.assertNotNull("SecretKey shall be visible for SO user",
-              newKeyId);
+          Assert.assertNotNull("SecretKey shall be visible for SO user", newKeyId);
         } else {
-          Assert.assertNull("SecretKey shall not be visible for SO user",
-              newKeyId);
+          Assert.assertNull("SecretKey shall not be visible for SO user", newKeyId);
         }
       } finally {
         token.logoutSo();

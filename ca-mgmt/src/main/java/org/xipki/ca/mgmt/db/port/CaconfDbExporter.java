@@ -51,8 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class CaconfDbExporter extends DbPorter {
 
-  CaconfDbExporter(DataSourceWrapper datasource, String destDir,
-                   AtomicBoolean stopMe)
+  CaconfDbExporter(DataSourceWrapper datasource, String destDir, AtomicBoolean stopMe)
       throws DataAccessException {
     super(datasource, destDir, stopMe);
   }
@@ -74,8 +73,7 @@ class CaconfDbExporter extends DbPorter {
       exportKeypairGen(caconf);
     }
 
-    try (OutputStream os = Files.newOutputStream(
-        Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
+    try (OutputStream os = Files.newOutputStream(Paths.get(baseDir, FILENAME_CA_CONFIGURATION))) {
       String json = JsonBuilder.toPrettyJson(caconf.toCodec());
       os.write(StringUtil.toUtf8Bytes(json));
     }
@@ -118,8 +116,7 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportRequestor
 
-  private void exportDbSchema(CaConfType.CaSystem caconf)
-      throws DataAccessException {
+  private void exportDbSchema(CaConfType.CaSystem caconf) throws DataAccessException {
     System.out.print("    exporting table DBSCHEMA ... ");
     boolean succ = false;
     try {
@@ -131,8 +128,7 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportDbSchema
 
-  private void exportSigner(CaConfType.CaSystem caconf)
-      throws DataAccessException, IOException {
+  private void exportSigner(CaConfType.CaSystem caconf) throws DataAccessException, IOException {
     System.out.print("    exporting table SIGNER ... ");
     boolean succ = false;
     List<CaConfType.Signer> signers = new LinkedList<>();
@@ -149,10 +145,8 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         String name = rs.getString("NAME");
 
-        CaConfType.Signer signer = new CaConfType.Signer(null, name,
-            rs.getString("TYPE"),
-            buildFileOrValue(rs.getString("CONF"),
-                "ca-conf/conf-signer-" + name),
+        CaConfType.Signer signer = new CaConfType.Signer(null, name, rs.getString("TYPE"),
+            buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-signer-" + name),
             buildFileOrBase64Binary(rs.getString("CERT"),
                 "ca-conf/cert-signer-" + name + ".der"));
 
@@ -188,8 +182,7 @@ class CaconfDbExporter extends DbPorter {
         String name = rs.getString("NAME");
         CaConfType.NameTypeConf entry = new CaConfType.NameTypeConf(null, name,
             rs.getString("TYPE"),
-            buildFileOrValue(rs.getString("CONF"),
-                "ca-conf/conf-publisher-" + name));
+            buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-publisher-" + name));
 
         keypairGens.add(entry);
       }
@@ -223,8 +216,7 @@ class CaconfDbExporter extends DbPorter {
 
         CaConfType.NameTypeConf publisher = new CaConfType.NameTypeConf(
             null, name, rs.getString("TYPE"),
-            buildFileOrValue(rs.getString("CONF"),
-                "ca-conf/conf-publisher-" + name));
+            buildFileOrValue(rs.getString("CONF"), "ca-conf/conf-publisher-" + name));
 
         publisher.setId(rs.getInt("ID"));
         publishers.add(publisher);
@@ -260,8 +252,7 @@ class CaconfDbExporter extends DbPorter {
 
         CaConfType.NameTypeConf profile = new CaConfType.NameTypeConf(
             null, name, rs.getString("TYPE"),
-            buildFileOrValue(rs.getString("CONF"),
-                "ca-conf/certprofile-" + name));
+            buildFileOrValue(rs.getString("CONF"), "ca-conf/certprofile-" + name));
 
         profile.setId(rs.getInt("ID"));
         profiles.add(profile);
@@ -286,16 +277,14 @@ class CaconfDbExporter extends DbPorter {
 
     // caAliases
     Map<String, Integer> aliasToCaIdMap = getCaAliases();
-    Map<Integer, List<String>> caHassPublishersMap =
-        getCaHasPublishers(caconf.publishers());
+    Map<Integer, List<String>> caHassPublishersMap = getCaHasPublishers(caconf.publishers());
 
     // caHasRequestors
     Map<Integer, List<CaConfType.CaHasRequestor>> caHasRequestorsMap =
         getCaHasRequestors(caconf.requestors());
 
     // caHasProfiles
-    Map<Integer, List<String>> caHasProfilesMap =
-        getCaHasProfiles(caconf.profiles());
+    Map<Integer, List<String>> caHasProfilesMap = getCaHasProfiles(caconf.profiles());
 
     String columns = "SELECT ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,"
         + "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN";
@@ -334,8 +323,7 @@ class CaconfDbExporter extends DbPorter {
           try {
             certchain = X509Util.listCertificates(encodedCertchain);
           } catch (CertificateException e) {
-            throw new InvalidConfException(
-                "error parsing CERTCHAIN of CA " + name);
+            throw new InvalidConfException("error parsing CERTCHAIN of CA " + name);
           }
 
           certchainConf = new ArrayList<>(certchain.size());
@@ -350,8 +338,7 @@ class CaconfDbExporter extends DbPorter {
         BaseCaInfo base = new BaseCaInfo(signerType, ccc.permissions());
         adoptConfColumn(base, ccc);
 
-        CaConfType.CaInfo ci = new CaConfType.CaInfo(base,
-            signerConf, cert, certchainConf);
+        CaConfType.CaInfo ci = new CaConfType.CaInfo(base, signerConf, cert, certchainConf);
 
         base.setNextCrlNo(rs.getLong("NEXT_CRLNO"));
         base.setStatus(CaStatus.forName(rs.getString("STATUS")));
@@ -374,8 +361,7 @@ class CaconfDbExporter extends DbPorter {
         }
 
         CaConfType.Ca ca = new CaConfType.Ca(null, name, ci, aliases,
-            caHasProfilesMap.get(id), caHasRequestorsMap.get(id),
-            caHassPublishersMap.get(id));
+            caHasProfilesMap.get(id), caHasRequestorsMap.get(id), caHassPublishersMap.get(id));
         caconf.cas().add(ca);
 
         ca.setId(id);
@@ -390,8 +376,7 @@ class CaconfDbExporter extends DbPorter {
     }
   } // method exportCa
 
-  private CaConfColumn getCaConfColumn(ResultSet rs)
-      throws SQLException, InvalidConfException {
+  private CaConfColumn getCaConfColumn(ResultSet rs) throws SQLException, InvalidConfException {
     if (dbSchemaVersion >= 7) {
       String confColumn = rs.getString("CONF");
       return CaConfColumn.decode(confColumn); // validate the confColumn
@@ -456,8 +441,7 @@ class CaconfDbExporter extends DbPorter {
     // CA URIS
     if (cc.cacertUris() != null || cc.crlUris() != null
         || cc.deltaCrlUris() != null || cc.ocspUris() != null) {
-      base.setCaUris(new CaUris(cc.cacertUris(), cc.ocspUris(),
-          cc.crlUris(), cc.deltaCrlUris()));
+      base.setCaUris(new CaUris(cc.cacertUris(), cc.ocspUris(), cc.crlUris(), cc.deltaCrlUris()));
     }
 
     base.setCrlControl(cc.crlControl());
@@ -513,8 +497,7 @@ class CaconfDbExporter extends DbPorter {
       while (rs.next()) {
         int caId = rs.getInt("CA_ID");
         int publisherId = rs.getInt("PUBLISHER_ID");
-        List<String> publisherNames = ret.computeIfAbsent(caId,
-            k -> new LinkedList<>());
+        List<String> publisherNames = ret.computeIfAbsent(caId, k -> new LinkedList<>());
         publisherNames.add(publisherIdToNameMap.get(publisherId));
       }
     } catch (SQLException ex) {
@@ -526,8 +509,7 @@ class CaconfDbExporter extends DbPorter {
     return ret;
   }
 
-  private Map<Integer, List<String>> getCaHasProfiles(
-      List<CaConfType.NameTypeConf> profiles)
+  private Map<Integer, List<String>> getCaHasProfiles(List<CaConfType.NameTypeConf> profiles)
       throws DataAccessException {
     Map<Integer, String> profileIdToNameMap = idToNameMap(profiles);
 
@@ -571,8 +553,7 @@ class CaconfDbExporter extends DbPorter {
     Map<Integer, String> requestorIdToNameMap = idToNameMap(requestors);
     Map<Integer, List<CaConfType.CaHasRequestor>> ret = new HashMap<>();
 
-    final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES " +
-        "FROM CA_HAS_REQUESTOR";
+    final String sql = "SELECT CA_ID,REQUESTOR_ID,PERMISSION,PROFILES FROM CA_HAS_REQUESTOR";
 
     PreparedStatement stmt = null;
     ResultSet rs = null;
@@ -587,12 +568,10 @@ class CaconfDbExporter extends DbPorter {
         String profiles = rs.getString("PROFILES");
 
         CaConfType.CaHasRequestor m = new CaConfType.CaHasRequestor(
-            requestorIdToNameMap.get(requestorId),
-            permissionToStringList(permission),
+            requestorIdToNameMap.get(requestorId), permissionToStringList(permission),
             StringUtil.split(profiles, ","));
 
-        List<CaConfType.CaHasRequestor> set = ret.computeIfAbsent(caId,
-            k -> new LinkedList<>());
+        List<CaConfType.CaHasRequestor> set = ret.computeIfAbsent(caId, k -> new LinkedList<>());
         set.add(m);
       }
     } catch (SQLException ex) {
@@ -604,8 +583,7 @@ class CaconfDbExporter extends DbPorter {
     return ret;
   }
 
-  private static Map<Integer, String> idToNameMap(
-      List<? extends CaConfType.IdNameConf> entries) {
+  private static Map<Integer, String> idToNameMap(List<? extends CaConfType.IdNameConf> entries) {
     Map<Integer, String> ret = new HashMap<>();
     for (CaConfType.IdNameConf m : entries) {
       ret.put(m.id(), m.name());

@@ -8,6 +8,8 @@ import org.xipki.security.KeySpec;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class PublicKeyControl {
@@ -19,8 +21,7 @@ public class PublicKeyControl {
   }
 
   public boolean allowsPublicKey(KeySpec keySpec) {
-    if (algorithms == null) return true;
-    return algorithms.contains(keySpec);
+    return algorithms == null || algorithms.contains(keySpec);
   }
 
 }

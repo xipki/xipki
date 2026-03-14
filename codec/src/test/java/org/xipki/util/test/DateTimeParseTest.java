@@ -23,8 +23,7 @@ public class DateTimeParseTest {
         "2016-01-01T12:04:01.99+04:00", "2016-01-01T04:04:01.99-04:00");
   }
 
-  private static void decodeTimestamp(
-      String timestamp1, String timestamp2, String... timestamps) {
+  private static void decodeTimestamp(String timestamp1, String timestamp2, String... timestamps) {
     Instant t1 = CborDecoder.parseRFC3339Timestamp(timestamp1);
     Instant t2 = CborDecoder.parseRFC3339Timestamp(timestamp2);
     Assert.assertEquals("timestamp", t1, t2);

@@ -3,6 +3,7 @@
 
 package org.xipki.security.sign;
 
+import org.xipki.security.SecurityFactory;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.extra.exception.ObjectCreationException;
 
@@ -38,13 +39,15 @@ public interface SignerFactory {
    *          Configuration of the signer. Must not be {@code null}.
    * @param certificateChain
    *          Certificate chain of the signer. Could be {@code null}.
+   * @param securityFactory
+   *          The SecuirtyFactory. Must not be {@code null}.
    *
    * @return new signer.
    * @throws ObjectCreationException
    *         if signer could not be created.
    */
-  ConcurrentSigner newSigner(
-      String type, SignerConf conf, X509Cert[] certificateChain)
+  ConcurrentSigner newSigner(SecurityFactory securityFactory, String type, SignerConf conf,
+                            X509Cert[] certificateChain)
       throws ObjectCreationException;
 
 }

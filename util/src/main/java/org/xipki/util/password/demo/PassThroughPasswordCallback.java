@@ -16,12 +16,10 @@ public class PassThroughPasswordCallback implements PasswordCallback {
   private char[] password;
 
   public PassThroughPasswordCallback() {
-    String sepLine =
-        "===========================================================";
+    String sepLine = "===========================================================";
     String msg = sepLine +
         "\n|| PassThroughPasswordCallback IS ONLY FOR DEMO PURPOSE, ||" +
-        "\n|| DO NOT USE IT IN THE PRODUCTION ENVIRONMENT.          ||\n" +
-        sepLine;
+        "\n|| DO NOT USE IT IN THE PRODUCTION ENVIRONMENT.          ||\n" + sepLine;
     System.out.println(msg);
   }
 
@@ -34,8 +32,7 @@ public class PassThroughPasswordCallback implements PasswordCallback {
   }
 
   @Override
-  public char[] getPassword(String prompt, String testToken)
-      throws PasswordResolverException {
+  public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
     return password.clone();
   }
 

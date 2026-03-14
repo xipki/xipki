@@ -61,24 +61,21 @@ public class SignerEntry extends MgmtEntry {
     }
   }
 
-  public void initSigner(SecurityFactory securityFactory)
-      throws ObjectCreationException {
+  public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
     Args.notNull(securityFactory, "securityFactory");
     if (signer != null) {
       return;
     }
 
     faulty = true;
-    signer = securityFactory.createSigner(type,
-        new SignerConf(conf), certificate);
-    if (signer.getX509Cert() == null) {
-      throw new ObjectCreationException(
-          "signer without certificate is not allowed");
+    signer = securityFactory.createSigner(type, new SignerConf(conf), certificate);
+    if (signer.x509Cert() == null) {
+      throw new ObjectCreationException("signer without certificate is not allowed");
     }
     faulty = false;
 
     if (certificate == null) {
-      setCertificate(signer.getX509Cert());
+      setCertificate(signer.x509Cert());
     }
   } // method initSigner
 
@@ -88,8 +85,7 @@ public class SignerEntry extends MgmtEntry {
 
   public void setCertificate(X509Cert certificate) {
     if (base64Cert != null) {
-      throw new IllegalStateException(
-          "certificate is already specified by base64Cert");
+      throw new IllegalStateException("certificate is already specified by base64Cert");
     }
     this.certificate = certificate;
     this.base64Cert = (certificate == null) ? null
@@ -171,10 +167,8 @@ public class SignerEntry extends MgmtEntry {
     }
 
     SignerEntry objB = (SignerEntry) obj;
-    return name.equals(objB.name)
-        && type.equals(objB.type)
-        && CompareUtil.equals(conf, objB.conf)
-        && CompareUtil.equals(base64Cert, objB.base64Cert);
+    return name.equals(objB.name) && type.equals(objB.type)
+        && CompareUtil.equals(conf, objB.conf) && CompareUtil.equals(base64Cert, objB.base64Cert);
   } // method equals
 
   @Override
@@ -189,17 +183,13 @@ public class SignerEntry extends MgmtEntry {
       signerConf = SignerConf.eraseSensitiveData(signerConf);
     }
 
-    if (verbose || signerConf.length() < 101) {
-      return signerConf;
-    } else {
-      return StringUtil.concat(signerConf.substring(0, 97), "...");
-    }
+    return (verbose || signerConf.length() < 101) ? signerConf
+        : StringUtil.concat(signerConf.substring(0, 97), "...");
   } // method signerConfToString
 
   @Override
   public JsonMap toCodec() {
-    JsonMap ret = new JsonMap()
-        .put("name", name).put("type", type).put("conf", conf);
+    JsonMap ret = new JsonMap().put("name", name).put("type", type).put("conf", conf);
 
     if (certificate != null) {
       ret.put("certificate", certificate.getEncoded());
@@ -209,8 +199,7 @@ public class SignerEntry extends MgmtEntry {
 
   public static SignerEntry parse(JsonMap json) throws CodecException {
     SignerEntry ret = new SignerEntry(json.getNnString("name"),
-        json.getNnString("type"), json.getString("conf"),
-        null);
+        json.getNnString("type"), json.getString("conf"), null);
 
     byte[] bytes = json.getBytes("certificate");
     if (bytes != null) {

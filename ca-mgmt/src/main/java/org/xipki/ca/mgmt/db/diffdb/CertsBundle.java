@@ -21,8 +21,7 @@ class CertsBundle {
 
   private final List<BigInteger> serialNumbers;
 
-  public CertsBundle(Map<BigInteger, DigestEntry> certs,
-                     List<BigInteger> serialNumbers) {
+  public CertsBundle(Map<BigInteger, DigestEntry> certs, List<BigInteger> serialNumbers) {
     this.certs = Args.notEmpty(certs, "certs");
     this.serialNumbers = Args.notEmpty(serialNumbers, "serialNumbers");
   }

@@ -42,8 +42,7 @@ class ResponderOption {
 
   ResponderOption(OcspServerConf.Responder conf) throws InvalidConfException {
     String str = Args.notNull(conf, "conf").mode();
-    if (str == null
-        || StringUtil.orEqualsIgnoreCase(str, "RFC6960", "RFC 6960")) {
+    if (str == null || StringUtil.orEqualsIgnoreCase(str, "RFC6960", "RFC 6960")) {
       this.mode = OcspMode.RFC6960;
     } else if (StringUtil.orEqualsIgnoreCase(str, "RFC2560", "RFC 2560")) {
       this.mode = OcspMode.RFC2560;
@@ -66,8 +65,7 @@ class ResponderOption {
       }
 
       if (path.charAt(0) != '/') {
-        throw new InvalidConfException("servlet path '" + path
-            + "' must start with '/'");
+        throw new InvalidConfException("servlet path '" + path + "' must start with '/'");
       }
     }
     list = new ArrayList<>(paths);

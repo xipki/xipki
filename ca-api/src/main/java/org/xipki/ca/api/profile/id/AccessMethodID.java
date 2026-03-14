@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class AccessMethodID extends AbstractID {
@@ -47,8 +49,7 @@ public class AccessMethodID extends AbstractID {
       l.addAll(Arrays.asList(aliases));
     }
     l.add(oid);
-    return addToMap(new AccessMethodID(new ASN1ObjectIdentifier(oid), l),
-        typeMap);
+    return addToMap(new AccessMethodID(new ASN1ObjectIdentifier(oid), l), typeMap);
   }
 
   public static AccessMethodID ofOid(ASN1ObjectIdentifier oid) {
@@ -68,8 +69,7 @@ public class AccessMethodID extends AbstractID {
     }
 
     try {
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(c14n);
-      return ofOid(oid);
+      return ofOid(new ASN1ObjectIdentifier(c14n));
     } catch (RuntimeException e) {
       return null;
     }

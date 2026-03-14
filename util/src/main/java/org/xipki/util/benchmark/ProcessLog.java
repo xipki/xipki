@@ -65,8 +65,7 @@ public class ProcessLog {
 
   private int totalAverageSpeed;
 
-  private final ConcurrentLinkedDeque<MeasurePoint> measureDeque =
-      new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
 
   public ProcessLog(long total) {
     this.total = total;
@@ -87,12 +86,10 @@ public class ProcessLog {
     if (hasTotal) {
       sb.append(formatText("", PERCENT_LEN));
     }
-    sb.append(formatText("average", SPEED_LEN))
-        .append(formatText("current", SPEED_LEN))
+    sb.append(formatText("average", SPEED_LEN)).append(formatText("current", SPEED_LEN))
         .append(formatText("time", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("time", DURATION_LEN))
-          .append(formatText("finish", TIME_LEN));
+      sb.append(formatText("time", DURATION_LEN)).append(formatText("finish", TIME_LEN));
     }
     sb.append('\n');
 
@@ -101,12 +98,10 @@ public class ProcessLog {
     if (hasTotal) {
       sb.append(formatText("%", PERCENT_LEN));
     }
-    sb.append(formatText("speed", SPEED_LEN))
-        .append(formatText("speed", SPEED_LEN))
+    sb.append(formatText("speed", SPEED_LEN)).append(formatText("speed", SPEED_LEN))
       .append(formatText("spent", DURATION_LEN));
     if (hasTotal) {
-      sb.append(formatText("left", DURATION_LEN))
-          .append(formatText("at", TIME_LEN));
+      sb.append(formatText("left", DURATION_LEN)).append(formatText("at", TIME_LEN));
     }
     sb.append('\n');
 
@@ -121,8 +116,7 @@ public class ProcessLog {
 
     totalAverageSpeed = 0;
     if (totalElapsedTime.toMillis() > 0) {
-      totalAverageSpeed = (int) averagePerSecond(
-          numProcessed.get(), totalElapsedTime.toMillis());
+      totalAverageSpeed = (int) averagePerSecond(numProcessed.get(), totalElapsedTime.toMillis());
     }
   }
 
@@ -180,8 +174,7 @@ public class ProcessLog {
     final Instant now = Instant.now();
     final long tmpNumProcessed = numProcessed.get();
 
-    if (!forcePrint && Duration.between(lastPrintTime, now).toMillis()
-                          < MS_900) {
+    if (!forcePrint && Duration.between(lastPrintTime, now).toMillis() < MS_900) {
       return;
     }
 
@@ -189,9 +182,8 @@ public class ProcessLog {
     lastPrintTime = now;
 
     int numMeasurePoints = measureDeque.size();
-    MeasurePoint referenceMeasurePoint = (numMeasurePoints > 10)
-        ? measureDeque.removeFirst()
-        : measureDeque.getFirst();
+    MeasurePoint refMeasurePoint = (numMeasurePoints > 10)
+        ? measureDeque.removeFirst() : measureDeque.getFirst();
 
     StringBuilder sb = new StringBuilder("\r");
 
@@ -214,11 +206,9 @@ public class ProcessLog {
 
     // current speed
     long currentSpeed = 0;
-    long t2Milli = Duration.between(referenceMeasurePoint.measureTime, now)
-                    .toMillis();
+    long t2Milli = Duration.between(refMeasurePoint.measureTime, now).toMillis();
     if (t2Milli > 0) {
-      currentSpeed = averagePerSecond(
-          tmpNumProcessed - referenceMeasurePoint.measureAccount, t2Milli);
+      currentSpeed = averagePerSecond(tmpNumProcessed - refMeasurePoint.measureAccount, t2Milli);
     }
     sb.append(StringUtil.formatAccount(currentSpeed, SPEED_LEN));
 
@@ -238,8 +228,7 @@ public class ProcessLog {
       }
 
       if (remainTimeSeconds < 1) {
-        sb.append(formatText("--", DURATION_LEN))
-            .append(formatText("--", TIME_LEN));
+        sb.append(formatText("--", DURATION_LEN)).append(formatText("--", TIME_LEN));
       } else {
         sb.append(StringUtil.formatTime(remainTimeSeconds, DURATION_LEN))
             .append(buildDateTime(finishAt));
@@ -266,8 +255,7 @@ public class ProcessLog {
     Duration elapsedTime = Duration.between(startTime, Instant.now());
     int averageSpeed = 0;
     if (!elapsedTime.isZero()) {
-      averageSpeed = (int) averagePerSecond(numProcessed.get(),
-          elapsedTime.toMillis());
+      averageSpeed = (int) averagePerSecond(numProcessed.get(), elapsedTime.toMillis());
     }
     return averageSpeed;
   }
@@ -301,9 +289,8 @@ public class ProcessLog {
     sb.append(second);
 
     ZonedDateTime now = ZonedDateTime.now();
-    ZonedDateTime midNight = ZonedDateTime.of(now.getYear(),
-        now.getMonthValue(), now.getDayOfMonth(),
-        0, 0, 0, 0, now.getZone());
+    ZonedDateTime midNight = ZonedDateTime.of(now.getYear(), now.getMonthValue(),
+        now.getDayOfMonth(), 0, 0, 0, 0, now.getZone());
 
     long days = Duration.between(midNight.toInstant(), time).toDays();
     if (days > 0) {

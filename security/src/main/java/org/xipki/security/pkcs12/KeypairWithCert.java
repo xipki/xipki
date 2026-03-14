@@ -3,24 +3,18 @@
 
 package org.xipki.security.pkcs12;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
-import org.xipki.util.misc.StringUtil;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -50,7 +44,6 @@ public class KeypairWithCert {
    * Read keypair and certificate from the keystore with external certificate.
    * The specified stream remains open after this method returns.
    *
-   * @param keystoreType the keystore type.
    * @param keystoreStream the inputstream containing the keystore.
    * @param keystorePassword the password to read the keystore.
    * @param keyname the alias of key entry in the keystore.
@@ -59,11 +52,11 @@ public class KeypairWithCert {
    * @return keypair and certificate pair read from the keystore.
    * @throws XiSecurityException if Security error occurs.
    */
-  public static KeypairWithCert fromKeystore(
-      String keystoreType, InputStream keystoreStream, char[] keystorePassword,
+  public static KeypairWithCert fromPKCS12Keystore(
+      InputStream keystoreStream, char[] keystorePassword,
       String keyname, char[] keyPassword, X509Cert cert)
       throws XiSecurityException {
-    return fromKeystore(keystoreType, keystoreStream, keystorePassword,
+    return fromPKCS12Keystore(keystoreStream, keystorePassword,
         keyname, keyPassword, cert == null ? null : new X509Cert[] {cert});
   }
 
@@ -73,7 +66,6 @@ public class KeypairWithCert {
    * <p>
    * The specified stream remains open after this method returns.
    *
-   * @param keystoreType the keystore type.
    * @param keystoreStream the inputstream containing the keystore.
    * @param keystorePassword the password to read the keystore.
    * @param keyname the alias of key entry in the keystore.
@@ -82,42 +74,24 @@ public class KeypairWithCert {
    * @return keypair and certificate pair read from the keystore.
    * @throws XiSecurityException if Security error occurs.
    */
-  public static KeypairWithCert fromKeystore(
-      String keystoreType, InputStream keystoreStream, char[] keystorePassword,
+  public static KeypairWithCert fromPKCS12Keystore(
+      InputStream keystoreStream, char[] keystorePassword,
       String keyname, char[] keyPassword, X509Cert[] certchain)
       throws XiSecurityException {
-    if (!StringUtil.orEqualsIgnoreCase(keystoreType, "PKCS12", "JCEKS")) {
-      throw new IllegalArgumentException(
-          "unsupported keystore type: " + keystoreType);
-    }
-
     Args.notNull(keystoreStream, "keystoreStream");
     Args.notNull(keystorePassword, "keystorePassword");
     Args.notNull(keyPassword, "keyPassword");
 
-    KeyStore keystore;
-    try {
-      keystore = KeyUtil.getInKeyStore(keystoreType);
-    } catch (KeyStoreException ex) {
-      throw new XiSecurityException(ex.getMessage(), ex);
-    }
-
-    try {
-      keystore.load(keystoreStream, keystorePassword);
-      return fromKeystore(keystore, keyname, keyPassword, certchain);
-    } catch (NoSuchAlgorithmException | ClassCastException
-             | CertificateException | IOException ex) {
-      throw new XiSecurityException(ex.getMessage(), ex);
-    }
+    PKCS12KeyStore keystore = KeyUtil.loadPKCS12KeyStore(keystoreStream, keystorePassword);
+    return fromKeystore(keystore, keyname, keyPassword, certchain);
   }
 
   public static KeypairWithCert fromKeystore(
-      KeyStore keystore, String keyname, char[] keyPassword,
-      X509Cert[] certchain) throws XiSecurityException {
+      PKCS12KeyStore keystore, String keyname, char[] keyPassword, X509Cert[] certchain)
+      throws XiSecurityException {
     Args.notNull(keyPassword, "keyPassword");
 
     try {
-
       String tmpKeyname = keyname;
       if (tmpKeyname == null) {
         Enumeration<String> aliases = keystore.aliases();
@@ -134,7 +108,8 @@ public class KeypairWithCert {
         }
       }
 
-      PrivateKey key = (PrivateKey) keystore.getKey(tmpKeyname, keyPassword);
+      PrivateKeyInfo keyInfo = keystore.getKey(tmpKeyname);
+      PrivateKey key = KeyUtil.getPrivateKey(keyInfo);
 
       Set<X509Cert> caCerts = new HashSet<>();
 
@@ -146,21 +121,20 @@ public class KeypairWithCert {
           caCerts.addAll(Arrays.asList(certchain).subList(1, n));
         }
       } else {
-        cert = new X509Cert(
-            (X509Certificate) keystore.getCertificate(tmpKeyname));
+        cert = new X509Cert(keystore.getCertificate(tmpKeyname));
       }
 
       Certificate[] certsInKeystore = keystore.getCertificateChain(tmpKeyname);
       if (certsInKeystore.length > 1) {
         for (int i = 1; i < certsInKeystore.length; i++) {
-          caCerts.add(new X509Cert((X509Certificate) certsInKeystore[i]));
+          caCerts.add(new X509Cert(certsInKeystore[i]));
         }
       }
 
       X509Cert[] certificateChain = X509Util.buildCertPath(cert, caCerts);
 
       return new KeypairWithCert(key, certificateChain);
-    } catch (GeneralSecurityException | ClassCastException ex) {
+    } catch (ClassCastException | InvalidKeySpecException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // method fromKeystore

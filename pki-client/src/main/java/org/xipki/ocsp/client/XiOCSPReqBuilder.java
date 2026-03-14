@@ -68,8 +68,7 @@ public class XiOCSPReqBuilder {
    * @param singleRequestExtensions the extensions to attach to the request
    * @return a reference to this object.
    */
-  public XiOCSPReqBuilder addRequest(
-      CertID certId, Extensions singleRequestExtensions) {
+  public XiOCSPReqBuilder addRequest(CertID certId, Extensions singleRequestExtensions) {
     list.add(new RequestObject(certId, singleRequestExtensions));
 
     return this;
@@ -82,26 +81,21 @@ public class XiOCSPReqBuilder {
    * @return a reference to this object.
    */
   public XiOCSPReqBuilder setRequestorName(X500Name requestorName) {
-    this.requestorName = new GeneralName(GeneralName.directoryName,
-        requestorName);
-
+    this.requestorName = new GeneralName(GeneralName.directoryName, requestorName);
     return this;
   }
 
   public XiOCSPReqBuilder setRequestorName(GeneralName requestorName) {
     this.requestorName = requestorName;
-
     return this;
   }
 
   public XiOCSPReqBuilder setRequestExtensions(Extensions requestExtensions) {
     this.requestExtensions = requestExtensions;
-
     return this;
   }
 
-  private OCSPRequest generateRequest(
-      ContentSigner contentSigner, Certificate[] chain)
+  private OCSPRequest generateRequest(ContentSigner contentSigner, Certificate[] chain)
       throws OCSPException {
     Iterator<RequestObject> it = list.iterator();
 
@@ -115,15 +109,13 @@ public class XiOCSPReqBuilder {
       }
     }
 
-    TBSRequest tbsReq = new TBSRequest(requestorName,
-        new DERSequence(requests), requestExtensions);
+    TBSRequest tbsReq = new TBSRequest(requestorName, new DERSequence(requests), requestExtensions);
 
     Signature signature = null;
 
     if (contentSigner != null) {
       if (requestorName == null) {
-        throw new OCSPException(
-            "requestorName must be specified if request is signed.");
+        throw new OCSPException("requestorName must be specified if request is signed.");
       }
 
       try {
@@ -164,8 +156,7 @@ public class XiOCSPReqBuilder {
     return generateRequest(null, null);
   }
 
-  public OCSPRequest build(ContentSigner signer, Certificate[] chain)
-      throws OCSPException {
+  public OCSPRequest build(ContentSigner signer, Certificate[] chain) throws OCSPException {
     if (signer == null) {
       throw new IllegalArgumentException("no signer specified");
     }

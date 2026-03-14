@@ -27,12 +27,7 @@ public class CertID extends ASN1Type {
     this.issuer = issuer;
     this.serialNumber = serialNumber;
 
-    int len = issuer.length();
-
-    int snBytesLen = 1 + serialNumber.bitLength() / 8;
-    len += getLen(snBytesLen);
-
-    this.bodyLength = len;
+    this.bodyLength = issuer.length() + getLen(1 + serialNumber.bitLength() / 8);
     this.encodedLength = getLen(bodyLength);
   }
 

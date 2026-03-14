@@ -30,14 +30,12 @@ public class CertprofileInfoRequest extends SdkRequest {
     encoder.writeArrayStart(1).writeTextString(profile);
   }
 
-  public static CertprofileInfoRequest decode(byte[] encoded)
-      throws CodecException {
+  public static CertprofileInfoRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoRequest", decoder, 1);
       return new CertprofileInfoRequest(decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CertprofileInfoRequest.class), ex);
     }
   }
 

@@ -28,29 +28,23 @@ public class KeyPairTemplate {
     this.publicKey = Template.newPublicKey(keyType);
   }
 
-  public KeyPairTemplate(Template privateKey,
-                         Template publicKey) {
-    this.privateKey = Objects.requireNonNull(
-        privateKey, "privateKey must not be null");
-    this.publicKey = Objects.requireNonNull(
-        publicKey, "publicKey must not be null");
+  public KeyPairTemplate(Template privateKey, Template publicKey) {
+    this.privateKey = Objects.requireNonNull(privateKey, "privateKey must not be null");
+    this.publicKey = Objects.requireNonNull(publicKey, "publicKey must not be null");
     if (!Objects.equals(privateKey.keyType(), publicKey.keyType())) {
-      throw new IllegalArgumentException(
-          "privateKey and publicKey do not have the same key type.");
+      throw new IllegalArgumentException("privateKey and publicKey do not have the same key type.");
     }
 
     if (privateKey.class_() == null) {
       privateKey.class_(PKCS11T.CKO_PRIVATE_KEY);
     } else if (privateKey.class_() != PKCS11T.CKO_PRIVATE_KEY) {
-      throw new IllegalArgumentException(
-          "privateKey must have the class CKO_PRIVATE_KEY");
+      throw new IllegalArgumentException("privateKey must have the class CKO_PRIVATE_KEY");
     }
 
     if (publicKey.class_() == null) {
       publicKey.class_(PKCS11T.CKO_PUBLIC_KEY);
     } else if (publicKey.class_() != PKCS11T.CKO_PUBLIC_KEY) {
-      throw new IllegalArgumentException(
-          "publicKey must have the class CKO_PUBLIC_KEY");
+      throw new IllegalArgumentException("publicKey must have the class CKO_PUBLIC_KEY");
     }
   }
 
@@ -137,8 +131,7 @@ public class KeyPairTemplate {
     return private_(private_, private_);
   }
 
-  public KeyPairTemplate private_(Boolean privateKeyPrivate,
-                                  Boolean publicKeyPrivate) {
+  public KeyPairTemplate private_(Boolean privateKeyPrivate, Boolean publicKeyPrivate) {
     if (privateKeyPrivate != null) {
       privateKey.private_(privateKeyPrivate);
     }

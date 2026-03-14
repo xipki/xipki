@@ -22,7 +22,7 @@ public class ScepControl {
   private final String secret;
 
   public ScepControl(boolean sendCaCert, boolean pendingCert,
-                     boolean sendSignerCert, String secret) {
+                    boolean sendSignerCert, String secret) {
     this.secret = Args.notBlank(secret, "secret");
     this.sendCaCert = sendCaCert;
     this.pendingCert = pendingCert;

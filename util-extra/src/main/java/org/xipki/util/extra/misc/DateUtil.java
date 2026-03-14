@@ -24,14 +24,12 @@ public class DateUtil {
 
   private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
 
-  private static final DateTimeFormatter SDF1 =
-      DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+  private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
   private DateUtil() {
   }
 
-  public static Instant parseRFC3339Timestamp(String timestamp)
-      throws DateTimeParseException {
+  public static Instant parseRFC3339Timestamp(String timestamp) throws DateTimeParseException {
     return CborDecoder.parseRFC3339Timestamp(timestamp);
   }
 
@@ -52,8 +50,7 @@ public class DateUtil {
       LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
       return localDate.atZone(ZONE_UTC).toInstant();
     } catch (DateTimeParseException ex) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime +
-          "': " + ex.getMessage());
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
   } // method parseUtcTimeyyyyMMddhhmmss
 
@@ -71,12 +68,10 @@ public class DateUtil {
     }
 
     try {
-      LocalDateTime localDate = LocalDateTime.parse(
-          coreUtcTime + "000000", SDF1);
+      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
       return localDate.atZone(ZONE_UTC).toInstant();
     } catch (DateTimeParseException ex) {
-      throw new IllegalArgumentException("invalid utcTime '" + utcTime +
-          "': " + ex.getMessage());
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
     }
   } // method parseUtcTimeyyyyMMdd
 
@@ -85,14 +80,12 @@ public class DateUtil {
   }
 
   public static Instant getLastMsOfDay(ZonedDateTime cal) {
-    return ZonedDateTime.of(cal.getYear(), cal.getMonthValue(),
-        cal.getDayOfMonth(), 23, 59, 59, 999,
-        cal.getZone()).toInstant();
+    return ZonedDateTime.of(cal.getYear(), cal.getMonthValue(), cal.getDayOfMonth(),
+        23, 59, 59, 999, cal.getZone()).toInstant();
   }
 
   public static int getYyyyMMdd(ZonedDateTime cal) {
-    return cal.getYear() * 10000 + cal.getMonthValue() * 100
-        + cal.getDayOfMonth();
+    return cal.getYear() * 10000 + cal.getMonthValue() * 100 + cal.getDayOfMonth();
   }
 
   public static long toEpochSecond(Date date) {

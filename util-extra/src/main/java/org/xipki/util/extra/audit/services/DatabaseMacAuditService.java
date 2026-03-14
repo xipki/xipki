@@ -33,17 +33,14 @@ import java.time.Instant;
 
 public class DatabaseMacAuditService extends MacAuditService {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DatabaseMacAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DatabaseMacAuditService.class);
 
   public static final String KEY_DATASOURCE = "datasource";
 
-  private static final String SQL_ADD_AUDIT =
-      SqlUtil.buildInsertSql("AUDIT",
+  private static final String SQL_ADD_AUDIT = SqlUtil.buildInsertSql("AUDIT",
           "SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG");
 
-  private static final String SQL_UPDATE_INTEGRITY =
-      "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
+  private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
 
   private int maxMessageLength = 1000;
 
@@ -60,8 +57,7 @@ public class DatabaseMacAuditService extends MacAuditService {
       ps.setString(1, integrityText);
       ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new IllegalStateException(
-          datasource.translate(SQL_UPDATE_INTEGRITY, ex));
+      throw new IllegalStateException(datasource.translate(SQL_UPDATE_INTEGRITY, ex));
     } catch (DataAccessException ex) {
       throw new IllegalStateException(ex);
     } finally {
@@ -78,9 +74,8 @@ public class DatabaseMacAuditService extends MacAuditService {
   }
 
   @Override
-  protected void storeLog(
-          Instant date, long thisId, int eventType, String levelText,
-          long previousId, String message, String thisTag) {
+  protected void storeLog(Instant date, long thisId, int eventType, String levelText,
+                          long previousId, String message, String thisTag) {
     String logMessage = message.length() <= maxMessageLength
         ? message : message.substring(0, maxMessageLength - 4) + " ...";
 
@@ -111,8 +106,7 @@ public class DatabaseMacAuditService extends MacAuditService {
   protected void doExtraInit(ConfPairs confPairs) throws InvalidConfException {
     String dataSourceFile = confPairs.value(KEY_DATASOURCE);
     if (StringUtil.isBlank(dataSourceFile)) {
-      throw new IllegalArgumentException("property " + KEY_DATASOURCE
-          + " not defined");
+      throw new IllegalArgumentException("property " + KEY_DATASOURCE + " not defined");
     }
 
     Connection conn = null;
@@ -126,8 +120,7 @@ public class DatabaseMacAuditService extends MacAuditService {
       String str = datasource.getDbSchemaEntry(conn, "MAX_MESSAGE_LEN");
       this.maxMessageLength = str == null ? 1000: Integer.parseInt(str);
 
-      long maxId = datasource.getMax(conn, "AUDIT", "ID",
-          "SHARD_ID=" + shardId);
+      long maxId = datasource.getMax(conn, "AUDIT", "ID", "SHARD_ID=" + shardId);
       if (maxId < 1) {
         id.set(0);
         previousTag = null;

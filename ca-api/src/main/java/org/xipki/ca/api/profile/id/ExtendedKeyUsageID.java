@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 
@@ -21,12 +23,10 @@ import java.util.Map;
 // org.xipki.shell.Completers.ExtKeyusageCompleter
 public class ExtendedKeyUsageID extends AbstractID {
 
-  private static final Map<String, ExtendedKeyUsageID> typeMap =
-      new HashMap<>();
+  private static final Map<String, ExtendedKeyUsageID> typeMap = new HashMap<>();
 
   // 2.5.29.37.0, any Extended Key Usage, anyExtendedKeyUsage
-  public static final ExtendedKeyUsageID any =
-      initOf("2.5.29.37.0", "any");
+  public static final ExtendedKeyUsageID any = initOf("2.5.29.37.0", "any");
 
   // 1.3.6.1.5.5.7.3.1, TLS Server authentication, id-kp-serverAuth
   public static final ExtendedKeyUsageID serverAuth =
@@ -103,8 +103,7 @@ public class ExtendedKeyUsageID extends AbstractID {
       l.addAll(Arrays.asList(aliases));
     }
     l.add(oid);
-    return addToMap(new ExtendedKeyUsageID(new ASN1ObjectIdentifier(oid), l),
-        typeMap);
+    return addToMap(new ExtendedKeyUsageID(new ASN1ObjectIdentifier(oid), l), typeMap);
   }
 
   public static ExtendedKeyUsageID ofOid(ASN1ObjectIdentifier oid) {
@@ -126,8 +125,7 @@ public class ExtendedKeyUsageID extends AbstractID {
 
     try {
       ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(c14n);
-      return new ExtendedKeyUsageID(oid,
-          Collections.singletonList(oid.getId()));
+      return new ExtendedKeyUsageID(oid, Collections.singletonList(oid.getId()));
     } catch (RuntimeException e) {
       return null;
     }

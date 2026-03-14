@@ -26,8 +26,7 @@ import java.util.Set;
  */
 public class CollectionAlgorithmValidator implements AlgorithmValidator {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      CollectionAlgorithmValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CollectionAlgorithmValidator.class);
 
   public static final CollectionAlgorithmValidator INSTANCE;
 
@@ -45,8 +44,8 @@ public class CollectionAlgorithmValidator implements AlgorithmValidator {
     INSTANCE = new CollectionAlgorithmValidator(secureAlgos);
   }
 
-  public static CollectionAlgorithmValidator buildAlgorithmValidator(
-      Collection<String> algoNames) throws NoSuchAlgorithmException {
+  public static CollectionAlgorithmValidator buildAlgorithmValidator(Collection<String> algoNames)
+      throws NoSuchAlgorithmException {
     Set<SignAlgo> algos = new HashSet<>();
     for (String algoName : algoNames) {
       SignAlgo sa;

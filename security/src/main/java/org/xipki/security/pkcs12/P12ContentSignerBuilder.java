@@ -3,20 +3,9 @@
 
 package org.xipki.security.pkcs12;
 
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
-import org.bouncycastle.crypto.signers.DSADigestSigner;
-import org.bouncycastle.crypto.signers.ECDSASigner;
-import org.bouncycastle.crypto.signers.RSADigestSigner;
-import org.bouncycastle.crypto.signers.SM2Signer;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.composite.CompositeMLDSAPrivateKey;
+import org.xipki.security.composite.CompositeSigSuite;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
@@ -25,22 +14,13 @@ import org.xipki.security.sign.SignatureSigner;
 import org.xipki.security.sign.Signer;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.InvalidKeyException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.Signature;
-import java.security.SignatureException;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,101 +30,6 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 public class P12ContentSignerBuilder {
-
-  private static class MyXiSigner implements Signer {
-
-    private final byte[] encodedX509AlgId;
-
-    private final ContentSigner x509Signer;
-
-    public MyXiSigner(byte[] encodedX509AlgId, ContentSigner x509Signer) {
-      this.encodedX509AlgId =
-          Args.notNull(encodedX509AlgId, "encodedX509AlgId");
-      this.x509Signer = Args.notNull(x509Signer, "x509Signer");
-    }
-
-    @Override
-    public ContentSigner x509Signer() {
-      return x509Signer;
-    }
-
-    @Override
-    public byte[] getEncodedX509AlgId() {
-      return encodedX509AlgId.clone();
-    }
-  }
-
-  private static class RSAContentSignerBuilder extends BcContentSignerBuilder {
-
-    private final SignAlgo signAlgo;
-
-    private RSAContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.algorithmIdentifier(),
-          signAlgo.hashAlgo().algorithmIdentifier());
-      this.signAlgo = signAlgo;
-    }
-
-    @Override
-    protected org.bouncycastle.crypto.Signer createSigner(
-        AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      if (signAlgo.isRSAPSSSigAlgo()) {
-        try {
-          return KeyUtil.createPSSRSASigner(signAlgo);
-        } catch (XiSecurityException ex) {
-          throw new OperatorCreationException(ex.getMessage(), ex);
-        }
-      } else {
-        Digest dig = digestProvider.get(digAlgId);
-        return new RSADigestSigner(dig);
-      }
-    }
-
-  } // class RSAContentSignerBuilder
-
-  private static class ECDSAContentSignerBuilder
-      extends BcContentSignerBuilder {
-
-    private final SignAlgo signAlgo;
-
-    private ECDSAContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.algorithmIdentifier(),
-          signAlgo.hashAlgo().algorithmIdentifier());
-      this.signAlgo = signAlgo;
-    }
-
-    @Override
-    protected org.bouncycastle.crypto.Signer createSigner(
-        AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-
-      Digest dig = signAlgo.hashAlgo().createDigest();
-      return new DSADigestSigner(new ECDSASigner(), dig);
-    }
-
-  } // class ECDSAContentSignerBuilder
-
-  private static class SM2ContentSignerBuilder extends BcContentSignerBuilder {
-
-    private final SignAlgo signAlgo;
-
-    private SM2ContentSignerBuilder(SignAlgo signAlgo) {
-      super(signAlgo.algorithmIdentifier(),
-          signAlgo.hashAlgo().algorithmIdentifier());
-      this.signAlgo = signAlgo;
-    }
-
-    @Override
-    protected org.bouncycastle.crypto.Signer createSigner(
-        AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException {
-      signAlgo.assertSameAlgorithm(sigAlgId, digAlgId);
-      return new SM2Signer(signAlgo.hashAlgo().createDigest());
-    }
-
-  } // class SM2ContentSignerBuilder
 
   private final PrivateKey key;
 
@@ -177,44 +62,35 @@ public class P12ContentSignerBuilder {
     return key;
   }
 
-  public ConcurrentSigner createSigner(
-      SignAlgo signAlgo, int parallelism, SecureRandom random)
+  public ConcurrentSigner createSigner(SignAlgo signAlgo, int parallelism, SecureRandom random)
       throws XiSecurityException {
-    List<Signer> signers = new ArrayList<>(
-        Args.positive(parallelism, "parallelism"));
+    Args.notNull(signAlgo, "signAlgo");
 
-    String provName = getProviderName(Args.notNull(signAlgo, "signAlgo"));
-    if (provName != null && Security.getProvider(provName) != null) {
-      try {
-        for (int i = 0; i < parallelism; i++) {
-          Signature signature = createSignature(signAlgo, provName, i == 0);
-          Signer signer =
-              new SignatureSigner(signAlgo, signature, key);
-          signers.add(signer);
-        }
-      } catch (Exception ex) {
-        signers.clear();
-      }
-    }
+    List<Signer> signers = new ArrayList<>(Args.positive(parallelism, "parallelism"));
 
-    if (CollectionUtil.isEmpty(signers)) {
-      Object[] rv = ff(signAlgo, random);
-      BcContentSignerBuilder signerBuilder = (BcContentSignerBuilder) rv[0];
-      AsymmetricKeyParameter keyparam = (AsymmetricKeyParameter) rv[1];
+    if (signAlgo.isCompositeMLDSA()) {
+      CompositeSigSuite suite = signAlgo.compositeSigAlgoSuite();
 
-      byte[] encodedX509AlgId = null;
+      String pqcProvName  = getProviderName(suite.pqcVariant().signAlgo());
+      String tradProvName = getProviderName(suite.tradVariant().signAlgo());
+
+      SignAlgo  pqcAlgo = suite.pqcVariant().signAlgo();
+      SignAlgo tradAlgo = suite.tradVariant().signAlgo();
+      CompositeMLDSAPrivateKey compKey = (CompositeMLDSAPrivateKey) key;
+
       for (int i = 0; i < parallelism; i++) {
-        ContentSigner signer;
-        try {
-          signer = signerBuilder.build(keyparam);
-          if (i == 0) {
-            encodedX509AlgId = signer.getAlgorithmIdentifier().getEncoded();
-          }
-        } catch (OperatorCreationException | IOException ex) {
-          throw new XiSecurityException("operator creation error", ex);
-        }
-
-        signers.add(new MyXiSigner(encodedX509AlgId, signer));
+        boolean checkSig = (i == 0);
+        Signer pqcSigner = buildSigner(compKey.pqcKey(), pqcProvName,
+            pqcAlgo, random, suite.label(), checkSig);
+        Signer tradSigner = buildSigner(compKey.tradKey(), tradProvName,
+            tradAlgo, random, null, checkSig);
+        Signer signer = new P12CompositeMLDSASigner(signAlgo, pqcSigner, tradSigner);
+        signers.add(signer);
+      }
+    } else {
+      String provName = getProviderName(signAlgo);
+      for (int i = 0; i < parallelism; i++) {
+        signers.add(buildSigner(key, provName, signAlgo, random, null, (i == 0)));
       }
     }
 
@@ -234,88 +110,27 @@ public class P12ContentSignerBuilder {
     return concurrentSigner;
   } // method createSigner
 
-  private String getProviderName(SignAlgo signAlgo) {
-    return signAlgo.isRSAPkcs1SigAlgo() ? "SunRsaSign"
-        // Currently, the provider SunEC is much slower (5x) than BC,
-        // so we do not use the Signature variant.
-        : signAlgo.isECDSASigAlgo()   ? null
-        : signAlgo.isEDDSASigAlgo()   ? "BC"
-        : signAlgo.isMLDSASigAlgo()   ? "BC"
-        : signAlgo.isCompositeMLDSA() ? "BC"
-        : null;
-  }
-
-  private Signature createSignature(
-      SignAlgo signAlgo, String provName, boolean test)
-      throws NoSuchAlgorithmException, NoSuchProviderException,
-      InvalidKeyException, SignatureException {
-    Signature signature =
-        Signature.getInstance(signAlgo.jceName(), provName);
-    signature.initSign(key);
-    if (test) {
-      signature.update(new byte[]{1, 2, 3, 4});
-      signature.sign();
-    }
-    return signature;
-  }
-
-  private Object[] ff(SignAlgo signAlgo, SecureRandom random)
-      throws XiSecurityException {
-    BcContentSignerBuilder signerBuilder;
-    AsymmetricKeyParameter keyparam;
+  private static Signer buildSigner(
+      PrivateKey key, String provName, SignAlgo signAlgo, SecureRandom random,
+      byte[] context, boolean testSignature) throws XiSecurityException {
+    Signature signature;
     try {
-      if (key instanceof RSAPrivateKey) {
-        if (!(signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo())) {
-          throw new NoSuchAlgorithmException("the given algorithm is not a " +
-              "valid RSA signature algorithm '" + signAlgo + "'");
-        }
-
-        if (key instanceof RSAPrivateCrtKey) {
-          RSAPrivateCrtKey rsaKey = (RSAPrivateCrtKey) key;
-          keyparam = new RSAPrivateCrtKeyParameters(rsaKey.getModulus(),
-              rsaKey.getPublicExponent(), rsaKey.getPrivateExponent(),
-              rsaKey.getPrimeP(), rsaKey.getPrimeQ(),
-              rsaKey.getPrimeExponentP(), rsaKey.getPrimeExponentQ(),
-              rsaKey.getCrtCoefficient());
-        } else {
-          RSAPrivateKey rsaKey = (RSAPrivateKey) key;
-          keyparam = new RSAKeyParameters(true, rsaKey.getModulus(),
-              rsaKey.getPrivateExponent());
-        }
-
-        signerBuilder = new RSAContentSignerBuilder(signAlgo);
-      } else if (key instanceof ECPrivateKey) {
-        keyparam = ECUtil.generatePrivateKeyParameter(key);
-        BigInteger curveOrder = ((ECPrivateKey) key).getParams().getOrder();
-        if (KeyUtil.isSm2primev1Curve(curveOrder)) {
-          if (!signAlgo.isSM2SigAlgo()) {
-            throw new NoSuchAlgorithmException("the given algorithm is not " +
-                "a valid SM2 signature algorithm " + signAlgo);
-          }
-          signerBuilder = new SM2ContentSignerBuilder(signAlgo);
-        } else {
-          if (!signAlgo.isECDSASigAlgo()) {
-            throw new NoSuchAlgorithmException("the given algorithm is not " +
-                "a valid ECDSA signature algorithm " + signAlgo);
-          }
-          signerBuilder = new ECDSAContentSignerBuilder(signAlgo);
-        }
-      } else {
-        throw new XiSecurityException(
-            "unsupported key " + key.getClass().getName());
+      signature = Signature.getInstance(signAlgo.jceName(), provName);
+      KeyUtil.initSign(signature, key, null);
+      if (testSignature) {
+        signature.update(new byte[]{1, 2, 3, 4});
+        signature.sign();
       }
-    } catch (InvalidKeyException ex) {
-      throw new XiSecurityException("invalid key: " + ex.getMessage(), ex);
-    } catch (NoSuchAlgorithmException ex) {
-      throw new XiSecurityException("no such algorithm: " + ex.getMessage(),
-          ex);
+    } catch (GeneralSecurityException e) {
+      throw new XiSecurityException("error building Signature for SignAlgo " + signAlgo, e);
     }
 
-    if (random != null) {
-      signerBuilder.setSecureRandom(random);
-    }
+    return new SignatureSigner(signAlgo, signature, random, key, context);
+  }
 
-    return new Object[] {signerBuilder, keyparam};
+  private String getProviderName(SignAlgo signAlgo) {
+    return signAlgo.isMLDSASigAlgo() || signAlgo.isCompositeMLDSA()
+        ? KeyUtil.pqcProviderName() : KeyUtil.providerName(signAlgo.jceName());
   }
 
 }

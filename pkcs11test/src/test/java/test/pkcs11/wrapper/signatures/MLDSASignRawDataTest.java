@@ -122,8 +122,7 @@ public class MLDSASignRawDataTest {
           .signVerify(true).sensitive(true).private_(true)
           .keyPairType(keyPairType);
 
-      PKCS11KeyId generatedKeyPair =
-          token.generateKeyPair(template);
+      PKCS11KeyId generatedKeyPair = token.generateKeyPair(template);
 
       int[] dataLens = {1057, 10570, 105700};
 
@@ -134,16 +133,14 @@ public class MLDSASignRawDataTest {
 
         // This signing operation is implemented in most of the drivers
         long generatedPrivateKey = generatedKeyPair.getHandle();
-        byte[] signatureValue = token.sign(sigMechanism,
-            generatedPrivateKey, dataToBeSigned);
+        byte[] signatureValue = token.sign(sigMechanism, generatedPrivateKey, dataToBeSigned);
         LOG.info("The signature value is: {}", Functions.toHex(signatureValue));
 
         // verify signature
         long generatedPublicKey = generatedKeyPair.getPublicKeyHandle();
 
         // verify with JCE
-        String stdMldsaName = PKCS11T.getStdMldsaName(
-            keyPairType.getVariant());
+        String stdMldsaName = PKCS11T.getStdMldsaName(keyPairType.getVariant());
         jceVerifySignature(stdMldsaName, generatedPublicKey, CKK_ML_DSA,
             dataToBeSigned, signatureValue);
 

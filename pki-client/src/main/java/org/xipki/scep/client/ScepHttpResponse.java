@@ -26,8 +26,7 @@ public class ScepHttpResponse {
 
   private String contentEncoding;
 
-  public ScepHttpResponse(String contentType, int contentLength,
-                          InputStream content) {
+  public ScepHttpResponse(String contentType, int contentLength, InputStream content) {
     this.contentType = Args.notNull(contentType, "contentType");
     this.content = Args.notNull(content, "content");
     this.contentLength = contentLength;

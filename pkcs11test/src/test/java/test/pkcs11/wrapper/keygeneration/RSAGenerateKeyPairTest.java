@@ -168,8 +168,7 @@ public class RSAGenerateKeyPairTest {
         Template exportRsaPublicKeyTemplate =
             newPublicKey(CKK_RSA).id(id);
 
-        long[] foundPublicKeys =
-            token.findObjects(exportRsaPublicKeyTemplate, 1);
+        long[] foundPublicKeys = token.findObjects(exportRsaPublicKeyTemplate, 1);
         if (foundPublicKeys.length != 1) {
           LOG.error("Error: Cannot find the public key under the given ID!");
         } else {

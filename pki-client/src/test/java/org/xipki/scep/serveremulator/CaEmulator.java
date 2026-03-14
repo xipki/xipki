@@ -11,21 +11,13 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
 import org.bouncycastle.cert.X509v2CRLBuilder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.bouncycastle.crypto.params.RSAKeyParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcECContentVerifierProviderBuilder;
-import org.bouncycastle.operator.bc.BcRSAContentVerifierProviderBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
@@ -34,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
 import java.io.IOException;
@@ -43,8 +36,6 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
@@ -64,13 +55,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class CaEmulator {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaEmulator.class);
-
-  private static final DefaultDigestAlgorithmIdentifierFinder
-      DFLT_DIGESTALG_IDENTIFIER_FINDER =
-      new DefaultDigestAlgorithmIdentifierFinder();
-
-  private static final Map<String, BcContentVerifierProviderBuilder>
-      VERIFIER_PROVIDER_BUILDER = new HashMap<>();
 
   private final PrivateKey caKey;
 
@@ -119,15 +103,12 @@ public class CaEmulator {
       throw new Exception("CSR invalid");
     }
     CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
-    return generateCert(reqInfo.getSubjectPublicKeyInfo(),
-        reqInfo.getSubject());
+    return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
   }
 
-  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo,
-                               X500Name subjectDn)
+  public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
       throws Exception {
-    return generateCert(pubKeyInfo, subjectDn,
-        Instant.now().minus(10, ChronoUnit.MINUTES));
+    return generateCert(pubKeyInfo, subjectDn, Instant.now().minus(10, ChronoUnit.MINUTES));
   }
 
   public X509Cert generateCert(
@@ -143,16 +124,15 @@ public class CaEmulator {
         caSubject, tmpSerialNumber, Date.from(notBefore), Date.from(notAfter),
         subjectDn, pubKeyInfo);
 
-    X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
-        | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
-        | X509KeyUsage.keyEncipherment);
+    KeyUsage ku = new KeyUsage(
+        KeyUsage.digitalSignature | KeyUsage.dataEncipherment |
+        KeyUsage.keyAgreement | KeyUsage.keyEncipherment);
     certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
     BasicConstraints bc = new BasicConstraints(false);
     certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
 
     String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
-    ContentSigner contentSigner =
-        new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
+    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
     serialCertMap.put(tmpSerialNumber, cert);
@@ -176,12 +156,10 @@ public class CaEmulator {
     return reqSubjectCertMap.get(Args.notNull(subject, "subject"));
   }
 
-  public synchronized CertificateList getCrl(
-      X500Name issuer, BigInteger serialNumber)
+  public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
       throws Exception {
     Instant thisUpdate = Instant.now();
-    X509v2CRLBuilder crlBuilder =
-        new X509v2CRLBuilder(caSubject, Date.from(thisUpdate));
+    X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, Date.from(thisUpdate));
     Instant nextUpdate = thisUpdate.plus(30, ChronoUnit.DAYS);
     crlBuilder.setNextUpdate(Date.from(nextUpdate));
     Instant caStartTime = caCert.notBefore();
@@ -195,8 +173,7 @@ public class CaEmulator {
         new ASN1Integer(crlNumber.getAndAdd(1)));
 
     String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
-    ContentSigner contentSigner =
-        new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
+    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
     X509CRLHolder crl = crlBuilder.build(contentSigner);
     return crl.toASN1Structure();
   } // method getCrl
@@ -218,36 +195,7 @@ public class CaEmulator {
 
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {
-    Args.notNull(publicKey, "publicKey");
-
-    String keyAlg = publicKey.getAlgorithm().toUpperCase();
-    if ("EC".equals(keyAlg)) {
-      keyAlg = "ECDSA";
-    }
-
-    BcContentVerifierProviderBuilder builder =
-        VERIFIER_PROVIDER_BUILDER.get(keyAlg);
-    if (builder == null) {
-      if ("RSA".equals(keyAlg)) {
-        builder = new BcRSAContentVerifierProviderBuilder(
-            DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else if ("ECDSA".equals(keyAlg)) {
-        builder = new BcECContentVerifierProviderBuilder(
-            DFLT_DIGESTALG_IDENTIFIER_FINDER);
-      } else {
-        throw new InvalidKeyException(
-            "unknown key algorithm of the public key " + keyAlg);
-      }
-      VERIFIER_PROVIDER_BUILDER.put(keyAlg, builder);
-    }
-
-    AsymmetricKeyParameter keyParam = generatePublicKeyParameter(publicKey);
-    try {
-      return builder.build(keyParam);
-    } catch (OperatorCreationException ex) {
-      throw new InvalidKeyException("could not build ContentVerifierProvider: "
-          + ex.getMessage(), ex);
-    }
+    return KeyUtil.getContentVerifierProvider(publicKey);
   } // method getContentVerifierProvider
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
@@ -281,21 +229,5 @@ public class CaEmulator {
 
     return kf.generatePublic(keyspec);
   } // method generatePublicKey
-
-  private static AsymmetricKeyParameter generatePublicKeyParameter(
-      PublicKey key)
-      throws InvalidKeyException {
-    Args.notNull(key, "key");
-
-    if (key instanceof RSAPublicKey) {
-      RSAPublicKey rsaKey = (RSAPublicKey) key;
-      return new RSAKeyParameters(false, rsaKey.getModulus(),
-          rsaKey.getPublicExponent());
-    } else if (key instanceof ECPublicKey) {
-      return ECUtil.generatePublicKeyParameter(key);
-    } else {
-      throw new InvalidKeyException("unknown key " + key.getClass().getName());
-    }
-  } // method generatePublicKeyParameter
 
 }

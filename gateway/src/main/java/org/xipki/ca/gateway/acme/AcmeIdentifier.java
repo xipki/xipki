@@ -11,6 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.misc.CompareUtil;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -39,8 +40,7 @@ public class AcmeIdentifier implements JsonEncodable {
   }
 
   public static AcmeIdentifier parse(JsonMap json) throws CodecException {
-    return new AcmeIdentifier(
-        json.getNnString("type"), json.getNnString("value"));
+    return new AcmeIdentifier(json.getNnString("type"), json.getNnString("value"));
   }
 
   public boolean equals(Object other) {
@@ -49,8 +49,7 @@ public class AcmeIdentifier implements JsonEncodable {
     }
 
     AcmeIdentifier b = (AcmeIdentifier) other;
-    return CompareUtil.equals(type, b.type)
-        && CompareUtil.equals(value, b.value);
+    return CompareUtil.equals(type, b.type) && CompareUtil.equals(value, b.value);
   }
 
   public Identifier toIdentifier() {

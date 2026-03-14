@@ -4,6 +4,8 @@
 package org.xipki.ca.api.profile.ctrl;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum CertLevel {

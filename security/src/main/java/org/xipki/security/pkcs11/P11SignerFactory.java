@@ -3,11 +3,16 @@
 
 package org.xipki.security.pkcs11;
 
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.composite.CompositeKemSuite;
 import org.xipki.security.composite.CompositeSigSuite;
+import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
@@ -33,24 +38,18 @@ import java.util.Set;
  *
  * @author Lijun Liao (xipki)
  */
+@Component(service = SignerFactory.class)
 public class P11SignerFactory implements SignerFactory {
 
   private static final String TYPE = "pkcs11";
 
-  private static final Set<String> types =
-      Set.copyOf(Collections.singletonList(TYPE));
+  private static final Set<String> types = Set.copyOf(Collections.singletonList(TYPE));
 
+  @Reference
   private P11CryptServiceFactory p11CryptServiceFactory;
 
-  private SecurityFactory securityFactory;
-
-  public void setP11CryptServiceFactory(
-      P11CryptServiceFactory p11CryptServiceFactory) {
+  public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {
     this.p11CryptServiceFactory = p11CryptServiceFactory;
-  }
-
-  public void setSecurityFactory(SecurityFactory securityFactory) {
-    this.securityFactory = securityFactory;
   }
 
   @Override
@@ -65,8 +64,7 @@ public class P11SignerFactory implements SignerFactory {
 
   private P11Key getKey(P11Slot slot, byte[] keyId, String keyLabel)
       throws ObjectCreationException {
-    String str2 = (keyId != null) ? "id " + Hex.encode(keyId)
-        : "label " + keyLabel;
+    String str2 = (keyId != null) ? "id " + Hex.encode(keyId) : "label " + keyLabel;
     P11Key key;
     try {
       key = slot.getKey(keyId, keyLabel);
@@ -83,7 +81,7 @@ public class P11SignerFactory implements SignerFactory {
 
   @Override
   public ConcurrentSigner newSigner(
-      String type, SignerConf conf, X509Cert[] certificateChain)
+      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (!TYPE.equalsIgnoreCase(type)) {
       throw new ObjectCreationException("unknown signer type " + type);
@@ -94,7 +92,7 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     if (securityFactory == null) {
-      throw new ObjectCreationException("securityFactory is not set");
+      throw new ObjectCreationException("securityFactory could not be null");
     }
 
     Integer iParallelism;
@@ -105,7 +103,7 @@ public class P11SignerFactory implements SignerFactory {
     }
 
     int parallelism = Objects.requireNonNullElseGet(iParallelism,
-        () -> securityFactory.dfltSignerParallelism());
+        securityFactory::dfltSignerParallelism);
 
     String moduleName = conf.module();
     Integer slotIndex = conf.slot();
@@ -121,8 +119,7 @@ public class P11SignerFactory implements SignerFactory {
     byte[] keyId = conf.keyId();
 
     if ((keyId == null) == (keyLabel == null)) {
-      throw new ObjectCreationException(
-          "exactly one of key-id and key-label must be specified");
+      throw new ObjectCreationException("exactly one of key-id and key-label must be specified");
     }
 
     P11Slot slot;
@@ -138,8 +135,7 @@ public class P11SignerFactory implements SignerFactory {
     // check whether it is a composite key
     boolean composite = false;
     if (keyLabel != null) {
-      composite = StringUtil.startsWithIgnoreCase(keyLabel,
-                    P11CompositeKey.COMPOSITE_LABEL_PREFIX);
+      composite = StringUtil.startsWithIgnoreCase(keyLabel, P11CompositeKey.COMPOSITE_LABEL_PREFIX);
     }
 
     try {
@@ -148,17 +144,23 @@ public class P11SignerFactory implements SignerFactory {
       P11Key key = null;
       P11CompositeKey compositeKey = null;
       if (composite) {
-        String coreLabel = keyLabel.substring(
-                            P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        String coreLabel = keyLabel.substring(P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
         P11Key pqcKey = getKey(slot, null,
                         P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
         P11Key tradKey = getKey(slot, null,
                         P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
-        CompositeSigSuite algoSuite =
-            algo == null ? null : algo.compositeSigAlgoSuite();
-        compositeKey = new P11CompositeKey(pqcKey, tradKey, algoSuite);
-        if (algo == null) {
-          algo = SignAlgo.getInstance(compositeKey, conf);
+        if (pqcKey.keySpec().isMldsa()) {
+          // composite MLDSA
+          CompositeSigSuite algoSuite = algo == null ? null : algo.compositeSigAlgoSuite();
+          compositeKey = new P11CompositeKey(pqcKey, tradKey, algoSuite);
+
+          if (algo == null) {
+            algo = SignAlgo.getInstance(compositeKey, conf);
+          }
+        } else if (pqcKey.keySpec().isMlkem()) {
+          // composite MLKEM
+          compositeKey = new P11CompositeKey(pqcKey, tradKey, (CompositeKemSuite) null);
+          algo = SignAlgo.KEM_HMAC_SHA256;
         }
       } else {
         key = getKey(slot, keyId, keyLabel);
@@ -176,24 +178,31 @@ public class P11SignerFactory implements SignerFactory {
       for (int i = 0; i < parallelism; i++) {
         Signer signer;
         if (compositeKey != null) {
-          signer = P11CompositeSigner.newInstance(compositeKey, algo,
-                    securityFactory.random4Sign(), publicKey);
+          if (compositeKey.sigAlgoSuite() != null) {
+            // Composite MLDSA
+            signer = P11CompositeMLDSASigner.newInstance(securityFactory,
+                compositeKey, conf, algo, securityFactory.random4Sign(), publicKey);
+          } else {
+            SubjectPublicKeyInfo publicKeyInfo =
+                SubjectPublicKeyInfo.getInstance(compositeKey.publicKey().getEncoded());
+            KemEncapKey encapKey = conf.callback()
+                .generateKemEncapKey(securityFactory, publicKeyInfo);
+            signer = new P11CompositeMLKEMSigner(compositeKey, algo, encapKey);
+          }
         } else {
-          signer = P11Signer.newInstance(key, algo,
-                    securityFactory.random4Sign(), publicKey);
+          signer = P11Signer.newInstance(securityFactory, key,
+              conf, algo, securityFactory.random4Sign(), publicKey);
         }
 
         signers.add(signer);
       }
 
-      DfltConcurrentSigner concurrentSigner =
-          new DfltConcurrentSigner(algo.isMac(), signers);
+      DfltConcurrentSigner concurrentSigner = new DfltConcurrentSigner(algo.isMac(), signers);
 
       if (certificateChain != null) {
         concurrentSigner.setX509CertChain(certificateChain);
       } else {
-        concurrentSigner.setPublicKey(
-            key != null ? key.publicKey() : compositeKey.publicKey());
+        concurrentSigner.setPublicKey(key != null ? key.publicKey() : compositeKey.publicKey());
       }
 
       if (algo.isMac()) {
@@ -204,7 +213,7 @@ public class P11SignerFactory implements SignerFactory {
 
       return concurrentSigner;
     } catch (TokenException | NoSuchAlgorithmException | InvalidConfException |
-             XiSecurityException ex) {
+            XiSecurityException ex) {
       throw new ObjectCreationException(ex.getMessage(), ex);
     }
   } // method newSigner

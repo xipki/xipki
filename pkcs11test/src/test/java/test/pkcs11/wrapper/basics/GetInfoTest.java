@@ -123,11 +123,9 @@ public class GetInfoTest {
         List<Long> supportedMechanisms = getMechanismList(tokens[i]);
         for (long supportedMechanism : supportedMechanisms) {
           LOG.info("--------------------------------------------------");
-          CkMechanismInfo mechanismInfo =
-              tokens[i].getMechanismInfo(supportedMechanism);
+          CkMechanismInfo mechanismInfo = tokens[i].getMechanismInfo(supportedMechanism);
           LOG.info("--------------------------------------------------");
-          LOG.info("Mechanism: {}\n{}",
-              ckmCodeToName(supportedMechanism), mechanismInfo);
+          LOG.info("Mechanism: {}\n{}", ckmCodeToName(supportedMechanism), mechanismInfo);
         }
         LOG.info("___________________________________________________");
       }

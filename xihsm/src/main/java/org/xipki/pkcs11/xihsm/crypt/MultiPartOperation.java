@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class MultiPartOperation {
@@ -31,15 +33,11 @@ public class MultiPartOperation {
 
   private final ByteArrayOutputStream buffer;
 
-  private boolean updated;
-
-  public MultiPartOperation(OperationType type, XiKey key,
-                            XiMechanism mechanism, SecureRandom rnd)
+  public MultiPartOperation(OperationType type, XiKey key, XiMechanism mechanism, SecureRandom rnd)
       throws HsmException {
     if (type == OperationType.DIGEST) {
       if (key != null) {
-        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-            "key is not allowed for C_Digest");
+        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "key is not allowed for C_Digest");
       }
     } else {
       boolean keyMatch;
@@ -53,7 +51,7 @@ public class MultiPartOperation {
         throw new HsmException(
             PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
             type.getMethod() + " is not supported for the given key type " +
-                key.getClass().getName());
+            key.getClass().getName());
       }
     }
 
@@ -68,8 +66,7 @@ public class MultiPartOperation {
     try {
       buffer.write(data);
     } catch (IOException e) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "error writing data to buffer", e);
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error writing data to buffer", e);
     }
   }
 
@@ -79,68 +76,15 @@ public class MultiPartOperation {
 
   public void update(byte[] part) throws HsmException {
     mechanism.assertUpdateSupported(type);
-    updated = true;
     writeBuffer(part);
-  }
-
-  public byte[] doFinal(byte[] data) throws HsmException {
-    assertNotUpdatedBefore();
-    writeBuffer(data);
-    return doFinal();
-  }
-
-  public byte[] doFinal() throws HsmException {
-    byte[] data = buffer.toByteArray();
-
-    switch (type) {
-      case DIGEST:
-        HashAlgo ha;
-        long ckm = mechanism.getCkm();
-        if (ckm == PKCS11T.CKM_SHA_1) {
-          ha = HashAlgo.SHA1;
-        } else if (ckm == PKCS11T.CKM_SHA224) {
-          ha = HashAlgo.SHA224;
-        } else if (ckm == PKCS11T.CKM_SHA256) {
-          ha = HashAlgo.SHA256;
-        } else if (ckm == PKCS11T.CKM_SHA384) {
-          ha = HashAlgo.SHA384;
-        } else if (ckm == PKCS11T.CKM_SHA512) {
-          ha = HashAlgo.SHA512;
-        } else if (ckm == PKCS11T.CKM_VENDOR_SM3) {
-          ha = HashAlgo.SM3;
-        } else {
-          throw new HsmException(PKCS11T.CKR_MECHANISM_INVALID,
-              "unsupported C_Digest algorithm " +
-                  PKCS11T.ckmCodeToName(ckm));
-        }
-        return ha.hash(data);
-      default:
-        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-            "shall not reach here");
-    }
-  }
-
-  public byte[] signFinal(byte[] data) throws HsmException {
-    assertNotUpdatedBefore();
-    writeBuffer(data);
-    return signFinal();
   }
 
   public byte[] signFinal() throws HsmException {
     byte[] data = buffer.toByteArray();
     if (type != OperationType.SIGN) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "shall not reach here");
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "shall not reach here");
     }
     return ((XiPrivateOrSecretKey) key).sign(mechanism, data, rnd);
-  }
-
-  private void assertNotUpdatedBefore() throws HsmException {
-    if (updated) {
-      throw new HsmException(PKCS11T.CKR_OPERATION_NOT_INITIALIZED,
-          type.getMethod() + "Update has been called before " +
-          type.getMethod());
-    }
   }
 
 }

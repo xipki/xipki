@@ -10,6 +10,8 @@ import org.xipki.pkcs11.wrapper.attrs.Template;
 import java.util.Objects;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class PKCS11KeyPairSpec extends PKCS11KeySpec {
@@ -65,15 +67,13 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
     return this;
   }
 
-  public PKCS11KeyPairSpec encapsulateTemplate(
-      PKCS11TemplateSpec encapsulateTemplate) {
+  public PKCS11KeyPairSpec encapsulateTemplate(PKCS11TemplateSpec encapsulateTemplate) {
     assertChangeable();
     this.encapsulateTemplate = encapsulateTemplate;
     return this;
   }
 
-  public PKCS11KeyPairSpec decapsulateTemplate(
-      PKCS11TemplateSpec decapsulateTemplate) {
+  public PKCS11KeyPairSpec decapsulateTemplate(PKCS11TemplateSpec decapsulateTemplate) {
     assertChangeable();
     this.decapsulateTemplate = decapsulateTemplate;
     return this;
@@ -114,8 +114,7 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
   public PKCS11KeyPairSpec labels(String label, String publicKeyLabel) {
     assertChangeable();
     this.label = label;
-    this.publicKeyLabel = Objects.equals(label, publicKeyLabel)
-        ? null : publicKeyLabel;
+    this.publicKeyLabel = Objects.equals(label, publicKeyLabel) ? null : publicKeyLabel;
     return this;
   }
 
@@ -249,8 +248,7 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
     return deEncapsulate(deEncapsulate, deEncapsulate);
   }
 
-  public PKCS11KeyPairSpec deEncapsulate(
-      Boolean encapsulate, Boolean decapsulate) {
+  public PKCS11KeyPairSpec deEncapsulate(Boolean encapsulate, Boolean decapsulate) {
     assertChangeable();
     this.encapsulate = encapsulate;
     this.decapsulate = decapsulate;
@@ -286,27 +284,16 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
   }
 
   public KeyPairTemplate toKeyPairTemplate() {
-    return new KeyPairTemplate(toPrivateKeyAttributeVector(),
-        toPublicKeyAttributeVector());
+    return new KeyPairTemplate(toPrivateKeyAttributeVector(), toPublicKeyAttributeVector());
   }
 
   public Template toPrivateKeyAttributeVector() {
-    Template ret = new Template()
-        .class_(PKCS11T.CKO_PRIVATE_KEY)
-        .decrypt(decrypt)
-        .derive(derive)
-        .extractable(extractable)
-        .id(id)
-        .label(label)
-        .private_(private_)
-        .modifiable(modifiable)
-        .sensitive(sensitive)
-        .sign(sign)
-        .signRecover(signRecover)
-        .token(token)
-        .trusted(trusted)
-        .unwrap(unwrap)
-        .decapsulate(decapsulate)
+    Template ret = new Template().class_(PKCS11T.CKO_PRIVATE_KEY)
+        .decrypt(decrypt).derive(derive).extractable(extractable)
+        .id(id).label(label).private_(private_)
+        .modifiable(modifiable).sensitive(sensitive)
+        .sign(sign).signRecover(signRecover).token(token)
+        .trusted(trusted).unwrap(unwrap).decapsulate(decapsulate)
         .wrapWithTrusted(wrapWithTrusted);
 
     if (keyPairType != null) {
@@ -329,18 +316,10 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
   }
 
   public Template toPublicKeyAttributeVector() {
-    Template ret = new Template()
-        .class_(PKCS11T.CKO_PUBLIC_KEY)
-        .encrypt(encrypt)
-        .id(id)
-        .label(publicKeyLabel != null ? publicKeyLabel : label)
-        .modifiable(modifiable)
-        .token(token)
-        .trusted(trusted)
-        .wrap(wrap)
-        .verify(verify)
-        .verify(verifyRecover)
-        .encapsulate(encapsulate);
+    Template ret = new Template().class_(PKCS11T.CKO_PUBLIC_KEY)
+        .encrypt(encrypt).id(id).label(publicKeyLabel != null ? publicKeyLabel : label)
+        .modifiable(modifiable).token(token).trusted(trusted)
+        .wrap(wrap).verify(verify).verify(verifyRecover).encapsulate(encapsulate);
 
     if (keyPairType != null) {
       keyPairType.fillPublicKey(ret);
@@ -358,8 +337,7 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
   }
 
   public boolean canGenerate(PKCS11Token token) {
-    return keyPairType != null
-        && token.canGenerateKeyPair(keyPairType);
+    return keyPairType != null && token.canGenerateKeyPair(keyPairType);
   }
 
   public PKCS11KeyPairSpec unchangeableCopy() {
@@ -369,16 +347,17 @@ public class PKCS11KeyPairSpec extends PKCS11KeySpec {
   }
 
   public PKCS11KeyPairSpec copy() {
-    return new PKCS11KeyPairSpec()
-        .decryptEncrypt(decrypt, encrypt).derive(derive)
-        .deriveTemplate(deriveTemplate).extractable(extractable)
+    return new PKCS11KeyPairSpec().decryptEncrypt(decrypt, encrypt)
+        .derive(derive).extractable(extractable)
         .generateId(generateId).id(id).keyPairType(keyPairType)
         .labels(label, publicKeyLabel).modifiable(modifiable).private_(private_)
         .sensitive(sensitive).signVerify(sign, verify).token(token)
         .trusted(trusted).unwrapWrap(unwrap, wrap)
-        .unwrapTemplate(unwrapTemplate)
         .signVerifyRecover(signRecover, verifyRecover)
-        .wrapTemplate(wrapTemplate).wrapWithTrusted(wrapWithTrusted);
+        .deEncapsulate(encapsulate, decapsulate).wrapWithTrusted(wrapWithTrusted)
+        .unwrapTemplate(unwrapTemplate).wrapTemplate(wrapTemplate)
+        .deriveTemplate(deriveTemplate).encapsulateTemplate(encapsulateTemplate)
+        .decapsulateTemplate(decapsulateTemplate);
   }
 
   @Override

@@ -65,8 +65,7 @@ public class ErrorEntry extends SdkEncodable {
 
       return new ErrorEntry(decoder.readInt(), decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, ErrorEntry.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, ErrorEntry.class), ex);
     }
   }
 

@@ -4,6 +4,8 @@
 package org.xipki.ca.api.profile.ctrl;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class AuthorityInfoAccessControl {
@@ -12,8 +14,7 @@ public class AuthorityInfoAccessControl {
 
   private final boolean includesOcsp;
 
-  public AuthorityInfoAccessControl(
-      boolean includesCaIssuers, boolean includesOcsp) {
+  public AuthorityInfoAccessControl(boolean includesCaIssuers, boolean includesOcsp) {
     this.includesCaIssuers = includesCaIssuers;
     this.includesOcsp = includesOcsp;
   }

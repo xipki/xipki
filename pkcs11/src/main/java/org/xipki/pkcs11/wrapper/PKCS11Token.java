@@ -10,7 +10,6 @@ import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.wrapper.jni.PKCS11;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairType;
-import org.xipki.pkcs11.wrapper.spec.PKCS11KeySpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
 import org.xipki.pkcs11.wrapper.type.CkMechanism;
 import org.xipki.pkcs11.wrapper.type.CkMechanismInfo;
@@ -78,8 +77,7 @@ public class PKCS11Token {
    * @param pin      The PIN of user type CKU_USER. May be null.
    * @throws TokenException If accessing the PKCS#11 device failed.
    */
-  public PKCS11Token(Token token, boolean readOnly, String pin)
-      throws TokenException {
+  public PKCS11Token(Token token, boolean readOnly, String pin) throws TokenException {
     this(token, readOnly, CKU_USER, null,
         (pin == null ? null : Collections.singletonList(pin)), null);
   }
@@ -93,14 +91,14 @@ public class PKCS11Token {
    * @param numSessions Number of sessions. May be null.
    * @throws TokenException If accessing the PKCS#11 device failed.
    */
-  public PKCS11Token(Token token, boolean readOnly, String pin,
-                     Integer numSessions) throws TokenException {
+  public PKCS11Token(Token token, boolean readOnly, String pin, Integer numSessions)
+      throws TokenException {
     this(token, readOnly, CKU_USER, null,
         (pin == null ? null : Collections.singletonList(pin)), numSessions);
   }
 
-  public PKCS11Token(Token token, boolean readOnly, byte[] pin,
-                     Integer numSessions) throws TokenException {
+  public PKCS11Token(Token token, boolean readOnly, byte[] pin, Integer numSessions)
+      throws TokenException {
     this(token, readOnly, pin == null ? null : new String(pin), numSessions);
   }
 
@@ -116,7 +114,7 @@ public class PKCS11Token {
    * @throws TokenException If accessing the PKCS#11 device failed.
    */
   public PKCS11Token(Token token, boolean readOnly, long userType,
-                     String userName, List<String> pins, Integer numSessions)
+                    String userName, List<String> pins, Integer numSessions)
       throws TokenException {
     this.token = Objects.requireNonNull(token, "token shall not be null");
     this.readOnly = readOnly;
@@ -126,16 +124,14 @@ public class PKCS11Token {
 
     CkTokenInfo tokenInfo = token.getTokenInfo();
     long lc = tokenInfo.maxSessionCount();
-    int tokenMaxSessionCount = lc > Integer.MAX_VALUE ? Integer.MAX_VALUE
-        : (int) lc;
+    int tokenMaxSessionCount = lc > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) lc;
 
     //this.isProtectedAuthenticationPath =
     //    tokenInfo.isProtectedAuthenticationPath();
 
     int maxNumSessions;
-    if (numSessions == null) {
-      maxNumSessions = (tokenMaxSessionCount < 1) ? 32
-          : Math.min(32, tokenMaxSessionCount);
+    if (numSessions == null) {maxNumSessions = (tokenMaxSessionCount < 1)
+                              ? 32 : Math.min(32, tokenMaxSessionCount);
     } else {
       if (tokenMaxSessionCount < 1) {
         maxNumSessions = numSessions;
@@ -179,12 +175,10 @@ public class PKCS11Token {
 
   public void setTimeOutWaitNewSession(int timeOutWaitNewSessionMs) {
     if (timeOutWaitNewSessionMs < 1000) {
-      throw new IllegalArgumentException(
-          "timeOutWaitNewSessionMs is not greater than 999");
+      throw new IllegalArgumentException("timeOutWaitNewSessionMs is not greater than 999");
     }
     this.timeOutWaitNewSessionMs = timeOutWaitNewSessionMs;
-    LOG.info("timeOutWaitNewSession = {} milli-seconds",
-        timeOutWaitNewSessionMs);
+    LOG.info("timeOutWaitNewSession = {} milli-seconds", timeOutWaitNewSessionMs);
   }
 
   /**
@@ -194,9 +188,8 @@ public class PKCS11Token {
    */
   public void setMaxMessageSize(int maxMessageSize) {
     if (maxMessageSize < 256) {
-      throw new IllegalArgumentException(
-          "maxMessageSize too small, at least 256 is required: " +
-              maxMessageSize);
+      throw new IllegalArgumentException("maxMessageSize too small, at least 256 is required: " +
+          maxMessageSize);
     }
     this.maxMessageSize = maxMessageSize;
   }
@@ -330,8 +323,7 @@ public class PKCS11Token {
    * @param pin      PIN.
    * @throws TokenException If logging in the session fails.
    */
-  public void loginSo(byte[] userName, byte[] pin)
-      throws TokenException {
+  public void loginSo(byte[] userName, byte[] pin) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       session.loginSo(userName, pin);
@@ -437,8 +429,7 @@ public class PKCS11Token {
     PKCS11Session session = borrowSession();
     try {
       fillTemplate(false, session, spec);
-      return session.importPublicKey(publicKey,
-          spec.toPublicKeyAttributeVector());
+      return session.importPublicKey(publicKey, spec.toPublicKeyAttributeVector());
     } finally {
       requiteSession(session);
     }
@@ -449,10 +440,8 @@ public class PKCS11Token {
       throws InvalidKeySpecException, TokenException {
     Args.notNull(pkcs8PrivateKey, "pkcs8PrivateKey");
 
-    return importPrivateKey(
-        new PrivateKeyChoice(pkcs8PrivateKey),
-        publicKey == null ? null : new PublicKeyChoice(publicKey),
-        spec);
+    return importPrivateKey(new PrivateKeyChoice(pkcs8PrivateKey),
+              publicKey == null ? null : new PublicKeyChoice(publicKey), spec);
   }
 
   public long importPrivateKey(
@@ -460,22 +449,19 @@ public class PKCS11Token {
       throws InvalidKeySpecException, TokenException {
     Args.notNull(privateKey, "privateKey");
 
-    return importPrivateKey(
-        new PrivateKeyChoice(privateKey),
-        publicKey == null ? null : new PublicKeyChoice(publicKey), spec);
+    return importPrivateKey(new PrivateKeyChoice(privateKey),
+              publicKey == null ? null : new PublicKeyChoice(publicKey), spec);
   }
 
   public long importPrivateKey(
-      PrivateKeyChoice privateKey, PublicKeyChoice publicKey,
-      PKCS11KeyPairSpec spec)
+      PrivateKeyChoice privateKey, PublicKeyChoice publicKey, PKCS11KeyPairSpec spec)
       throws InvalidKeySpecException, TokenException {
     Args.notNull(privateKey, "privateKey");
 
     PKCS11Session session = borrowSession();
     try {
       fillTemplate(true, session, spec);
-      return session.importPrivateKey(privateKey, publicKey,
-          spec.toPrivateKeyAttributeVector());
+      return session.importPrivateKey(privateKey, publicKey, spec.toPrivateKeyAttributeVector());
     } finally {
       requiteSession(session);
     }
@@ -487,10 +473,8 @@ public class PKCS11Token {
     Args.notNull(pkcs8PrivateKey, "pkcs8PrivateKey");
     Args.notNull(publicKey, "publicKey");
 
-    return importKeyPair(
-        new PrivateKeyChoice(pkcs8PrivateKey),
-        new PublicKeyChoice(publicKey),
-        spec);
+    return importKeyPair(new PrivateKeyChoice(pkcs8PrivateKey),
+              new PublicKeyChoice(publicKey), spec);
   }
 
   public PKCS11KeyPair importKeyPair(
@@ -499,15 +483,13 @@ public class PKCS11Token {
     Args.notNull(privateKey, "privateKey");
     Args.notNull(publicKey, "publicKey");
 
-    return importKeyPair(
-        new PrivateKeyChoice(privateKey),
-        new PublicKeyChoice(publicKey),
-        spec);
+    return importKeyPair(new PrivateKeyChoice(privateKey),
+              new PublicKeyChoice(publicKey), spec);
   }
 
   public PKCS11KeyPair importKeyPair(
-      PrivateKeyChoice privateKey, PublicKeyChoice publicKey,
-      PKCS11KeyPairSpec spec) throws InvalidKeySpecException, TokenException {
+      PrivateKeyChoice privateKey, PublicKeyChoice publicKey, PKCS11KeyPairSpec spec)
+      throws InvalidKeySpecException, TokenException {
     Args.notNull(privateKey, "privateKey");
     Args.notNull(publicKey, "publicKey");
 
@@ -515,8 +497,7 @@ public class PKCS11Token {
     try {
       fillTemplate(session, spec);
 
-      return session.importKeyPair(privateKey, publicKey,
-          spec.toKeyPairTemplate());
+      return session.importKeyPair(privateKey, publicKey, spec.toKeyPairTemplate());
     } finally {
       requiteSession(session);
     }
@@ -539,8 +520,7 @@ public class PKCS11Token {
    *         setting attributes to the values given by the template.
    * @throws TokenException If copying the object fails for some reason.
    */
-  public long copyObject(long hObject, Template template)
-      throws TokenException {
+  public long copyObject(long hObject, Template template) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return session.copyObject(hObject, template);
@@ -569,8 +549,7 @@ public class PKCS11Token {
    *         If updating the attributes fails. All or no attributes are
    *         updated.
    */
-  public void setAttributeValues(long hObject, Template template)
-      throws TokenException {
+  public void setAttributeValues(long hObject, Template template) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       session.setAttributeValues(hObject, template);
@@ -619,8 +598,7 @@ public class PKCS11Token {
     return ret;
   }
 
-  public List<Long> destroyObjects(List<Long> hObjects)
-      throws TokenException {
+  public List<Long> destroyObjects(List<Long> hObjects) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return session.destroyObjects(hObjects);
@@ -645,9 +623,7 @@ public class PKCS11Token {
    * @return the unique CKA_ID.
    * @throws TokenException If executing operation fails.
    */
-  public byte[] generateUniqueId(
-      Template template, int idLength)
-      throws TokenException {
+  public byte[] generateUniqueId(Template template, int idLength) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return session.generateUniqueId(template, idLength, random);
@@ -656,8 +632,7 @@ public class PKCS11Token {
     }
   }
 
-  private byte[] generateUniqueId(
-      PKCS11Session session, Template template, int idLength)
+  private byte[] generateUniqueId(PKCS11Session session, Template template, int idLength)
       throws TokenException {
     if (template != null && template.id() != null) {
       throw new IllegalArgumentException("template shall not have CKA_ID");
@@ -752,8 +727,7 @@ public class PKCS11Token {
    *         maxObjectCount, the minimum length is 0. Never returns null.
    * @throws TokenException if finding objects failed.
    */
-  public long[] findObjects(Template template, int maxObjectCount)
-      throws TokenException {
+  public long[] findObjects(Template template, int maxObjectCount) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return findObjects(session, template, maxObjectCount);
@@ -762,30 +736,9 @@ public class PKCS11Token {
     }
   }
 
-  private long[] findObjects(PKCS11Session session,
-                             Template template, int maxObjectCount)
+  private long[] findObjects(PKCS11Session session, Template template, int maxObjectCount)
       throws TokenException {
     return session.findObjects(template, maxObjectCount);
-  }
-
-  /**
-   * Digests the given data with the mechanism.
-   *
-   * @param mechanism
-   *        The mechanism to use
-   * @param data
-   *        the to-be-digested data
-   * @return the message digest. Never returns {@code null}.
-   * @throws TokenException If digesting the data failed.
-   */
-  public byte[] digest(CkMechanism mechanism, byte[] data)
-      throws TokenException {
-    PKCS11Session session = borrowSession();
-    try {
-      return session.digest(mechanism, data);
-    } finally {
-      requiteSession(session);
-    }
   }
 
   /**
@@ -795,14 +748,14 @@ public class PKCS11Token {
    * @param mechanism
    *        The mechanism to use.
    * @param hKey
-   *        handle of the to-be-digested key.
+   *        handle of the to-be-digested key. Set to 0 to ignore the hash over
+   *        the key.
    * @return the message digest. Never returns {@code null}.
    * @throws TokenException
    *         If digesting the data failed.
    */
-  public byte[] digestKey(CkMechanism mechanism, long hKey)
-      throws TokenException {
-    return digestKey(mechanism, null, hKey, null);
+  public byte[] digest(CkMechanism mechanism, long hKey) throws TokenException {
+    return digest(mechanism, null, hKey, null);
   }
 
   /**
@@ -815,7 +768,8 @@ public class PKCS11Token {
    *        The data inputted to the hash algorithm before
    *        the key data. May be null
    * @param hKey
-   *        handle of the to-be-digested key.
+   *        handle of the to-be-digested key. Set to 0 to ignore the hash over
+   *        the key.
    * @param suffix
    *        The data inputted to the hash algorithm after
    *        the key data. May be null.
@@ -823,20 +777,36 @@ public class PKCS11Token {
    * @throws TokenException
    *         If digesting the data failed.
    */
-  public byte[] digestKey(CkMechanism mechanism,
-                          byte[] prefix, long hKey, byte[] suffix)
+  public byte[] digest(CkMechanism mechanism, byte[] prefix, long hKey, byte[] suffix)
       throws TokenException {
     PKCS11Session session = borrowSession();
     try {
-      return session.digestKey(mechanism, prefix, hKey, suffix);
+      return session.digest(mechanism, prefix, hKey, suffix);
     } finally {
       requiteSession(session);
     }
   }
 
-  public byte[] sign(CkMechanism mechanism, long hKey, byte[] data)
-      throws TokenException {
+  public byte[] sign(CkMechanism mechanism, long hKey, byte[] data) throws TokenException {
     return sign(mechanism, hKey, data, PKCS11.MAX_SIZE_NULL);
+  }
+
+  /**
+   * Decrypts the given data with the key and mechanism.
+   *
+   * @param mechanism  The mechanism to use.
+   * @param hKey  The decryption key to use.
+   * @param ciphertext the to-be-decrypted data
+   * @return the decrypted data. Never returns {@code null}.
+   * @throws TokenException If encrypting failed.
+   */
+  public byte[] decrypt(CkMechanism mechanism, long hKey, byte[] ciphertext) throws TokenException {
+    PKCS11Session session = borrowSession();
+    try {
+      return session.decrypt(mechanism, hKey, ciphertext);
+    } finally {
+      requiteSession(session);
+    }
   }
 
   /**
@@ -874,8 +844,7 @@ public class PKCS11Token {
    * @throws TokenException
    *         If generating a new secret key or domain parameters failed.
    */
-  public PKCS11KeyId generateKey(PKCS11SecretKeySpec spec)
-      throws TokenException {
+  public PKCS11KeyId generateKey(PKCS11SecretKeySpec spec) throws TokenException {
     if (spec.keyType() == null) {
       throw new IllegalArgumentException("CKA_KEY_TYPE is not set");
     }
@@ -901,6 +870,35 @@ public class PKCS11Token {
   }
 
   /**
+   * Derives a new key from a specified base key using the given mechanism.
+   * After deriving a new key from the base key, a new key object is created
+   * and a representation of it is returned. The application can provide a
+   * template key to set certain attributes of the new key object.
+   *
+   * @param mechanism
+   *        The mechanism to use for deriving the new key from the base key.
+   * @param hBaseKey
+   *        The key to use as base for derivation.
+   * @param spec
+   *        The template for creating the new key object.
+   * @return A key object representing the newly derived (created) key object
+   *         or null, if the used mechanism uses other means to return its
+   *         values
+   * @throws TokenException
+   *         If deriving the key or creating a new key object failed.
+   */
+  public long deriveKey(CkMechanism mechanism, long hBaseKey, PKCS11SecretKeySpec spec)
+      throws TokenException {
+    PKCS11Session session = borrowSession();
+    try {
+      fillTemplate(session, spec);
+      return session.deriveKey(mechanism, hBaseKey, spec.toTemplate());
+    } finally {
+      requiteSession(session);
+    }
+  }
+
+  /**
    * Imports secret key object in the PKCS#11 token. The key itself will not be
    * generated within the PKCS#11 token.
    *
@@ -910,8 +908,7 @@ public class PKCS11Token {
    * @return the identifier of the key within the PKCS#11 token.
    * @throws TokenException if PKCS#11 token exception occurs.
    */
-  public PKCS11KeyId importSecretKey(
-      byte[] keyValue, PKCS11SecretKeySpec spec)
+  public PKCS11KeyId importSecretKey(byte[] keyValue, PKCS11SecretKeySpec spec)
       throws TokenException {
     PKCS11Session session = borrowSession();
     long hKey;
@@ -934,18 +931,12 @@ public class PKCS11Token {
   }
 
   public boolean canGenerateKeyPair(PKCS11KeyPairType keyPairType) {
-    CkMechanism mechanism;
-    try {
-      mechanism = getGenerateKeyPairCkm(keyPairType);
-    } catch (TokenException e) {
-      return false;
-    }
+    CkMechanism mechanism = getGenerateKeyPairCkm(keyPairType);
     return supportsMechanism(mechanism.getMechanism(),
         CKF_GENERATE_KEY_PAIR);
   }
 
-  private CkMechanism getGenerateKeyPairCkm(PKCS11KeyPairType keyPairType)
-      throws TokenException {
+  private CkMechanism getGenerateKeyPairCkm(PKCS11KeyPairType keyPairType) {
     CkMechanism mechanism = keyPairType.getGenerateMechanism();
     if (mechanism.getMechanism() == CKM_RSA_PKCS_KEY_PAIR_GEN) {
       if (supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN,
@@ -1016,8 +1007,7 @@ public class PKCS11Token {
    * @throws TokenException
    *         If generating a new key-pair failed.
    */
-  public PKCS11KeyId generateKeyPair(PKCS11KeyPairSpec spec)
-      throws TokenException {
+  public PKCS11KeyId generateKeyPair(PKCS11KeyPairSpec spec) throws TokenException {
     PKCS11Session session = borrowSession();
     PKCS11KeyPair handlePair;
     try {
@@ -1060,8 +1050,7 @@ public class PKCS11Token {
    * @throws TokenException
    *         if getting attributes failed.
    */
-  public Template getAttrValues(long hObject, AttributeTypes attributeTypes)
-      throws TokenException {
+  public Template getAttrValues(long hObject, AttributeTypes attributeTypes) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return session.getAttrValues(hObject, attributeTypes);
@@ -1078,8 +1067,7 @@ public class PKCS11Token {
    * @throws TokenException
    *         if getting attributes failed.
    */
-  public Template getDefaultAttrValues(long hObject)
-      throws TokenException {
+  public Template getDefaultAttrValues(long hObject) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return session.getDefaultAttrValues(hObject);
@@ -1114,8 +1102,7 @@ public class PKCS11Token {
 
       if (session == null) {
         try {
-          session = sessions.poll(timeOutWaitNewSessionMs,
-              TimeUnit.MILLISECONDS);
+          session = sessions.poll(timeOutWaitNewSessionMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
         }
       }
@@ -1127,18 +1114,15 @@ public class PKCS11Token {
       return session;
     } finally {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("borrowing session took {}ms",
-            clock.millis() - start);
+        LOG.debug("borrowing session took {}ms", clock.millis() - start);
       }
     }
   }
 
-  private PKCS11Session openSession(boolean login, boolean init)
-      throws PKCS11Exception {
+  private PKCS11Session openSession(boolean login, boolean init) throws PKCS11Exception {
     long start = clock.millis();
     if (!init) {
-      LOG.debug("openSession, #sessions={}, #maxSessions={}",
-          countSessions.get(), maxSessionCount);
+      LOG.debug("openSession, #sessions={}, #maxSessions={}", countSessions.get(), maxSessionCount);
     }
     Session session = null;
     try {
@@ -1152,8 +1136,7 @@ public class PKCS11Token {
       throw e;
     } finally {
       LOG.info("openSession with hSession {} took {}ms",
-          session == null ? "NULL" :  session.getSessionHandle(),
-          clock.millis() - start);
+          session == null ? "NULL" :  session.getSessionHandle(), clock.millis() - start);
     }
 
     return new PKCS11Session(session, this, maxMessageSize);
@@ -1185,8 +1168,7 @@ public class PKCS11Token {
     long hKey = keyId.getHandle();
 
     if (keyId.type() == PKCS11KeyId.KeyIdType.KEYPAIR) {
-      destroyKeyPairQuietly(new PKCS11KeyPair(
-          keyId.getPublicKeyHandle(), hKey));
+      destroyKeyPairQuietly(new PKCS11KeyPair(keyId.getPublicKeyHandle(), hKey));
       return;
     }
 
@@ -1197,8 +1179,7 @@ public class PKCS11Token {
     }
   }
 
-  public boolean objectExistsByIdLabel(byte[] id, String label)
-      throws TokenException {
+  public boolean objectExistsByIdLabel(byte[] id, String label) throws TokenException {
     if ((id == null || id.length == 0) && Args.isBlank(label)) {
       return false;
     }
@@ -1224,11 +1205,9 @@ public class PKCS11Token {
    * @return how many objects have been deleted
    * @throws TokenException If PKCS#11 error happens.
    */
-  public int destroyObjectsByIdLabel(byte[] id, String label)
-      throws TokenException {
+  public int destroyObjectsByIdLabel(byte[] id, String label) throws TokenException {
     if ((id == null || id.length == 0) && Args.isBlank(label)) {
-      throw new IllegalArgumentException(
-          "at least one of id and label may not be null");
+      throw new IllegalArgumentException("at least one of id and label may not be null");
     }
 
     Template template = new Template();
@@ -1240,8 +1219,7 @@ public class PKCS11Token {
       template.label(label);
     }
 
-    return removeObjects0(template,
-        "objects " + getDescription(id, label));
+    return removeObjects0(template, "objects " + getDescription(id, label));
   }
 
   public boolean labelExists(String keyLabel) throws TokenException {
@@ -1253,19 +1231,16 @@ public class PKCS11Token {
     }
   }
 
-  private boolean labelExists(PKCS11Session session, String keyLabel)
-      throws TokenException {
+  private boolean labelExists(PKCS11Session session, String keyLabel) throws TokenException {
     Args.notNull(keyLabel, "keyLabel");
     Template template = new Template().label(keyLabel);
     return !getObjects(session, template, 1).isEmpty();
   } // method labelExists
 
-  private boolean labelExists(PKCS11Session session, long objClass,
-                              String keyLabel)
+  private boolean labelExists(PKCS11Session session, long objClass, String keyLabel)
       throws TokenException {
     Args.notNull(keyLabel, "keyLabel");
-    Template template = new Template().class_(objClass)
-        .label(keyLabel);
+    Template template = new Template().class_(objClass).label(keyLabel);
     return !getObjects(session, template, 1).isEmpty();
   } // method labelExists
 
@@ -1273,8 +1248,7 @@ public class PKCS11Token {
     return getKey(null, keyId, keyLabel);
   }
 
-  public PKCS11Key getKey(Long objClass,
-                          byte[] keyId, String keyLabel) throws TokenException {
+  public PKCS11Key getKey(Long objClass, byte[] keyId, String keyLabel) throws TokenException {
     boolean isLabelBlank = Args.isBlank(keyLabel);
     if ((keyId == null || keyId.length == 0) && isLabelBlank) {
       return null;
@@ -1282,21 +1256,18 @@ public class PKCS11Token {
     return getKey(toAttributeVector(objClass, keyId, keyLabel));
   }
 
-  public PKCS11KeyId getKeyId(byte[] keyId, String keyLabel)
-      throws TokenException {
+  public PKCS11KeyId getKeyId(byte[] keyId, String keyLabel) throws TokenException {
     return getKeyId(null, keyId, keyLabel);
   }
 
-  public PKCS11KeyId getKeyId(Long objClass, byte[] keyId, String keyLabel)
-      throws TokenException {
+  public PKCS11KeyId getKeyId(Long objClass, byte[] keyId, String keyLabel) throws TokenException {
     if ((keyId == null || keyId.length == 0) && Args.isBlank(keyLabel)) {
       return null;
     }
     return getKeyId(toAttributeVector(objClass, keyId, keyLabel));
   }
 
-  private static Template toAttributeVector(
-      Long objClass, byte[] id, String label) {
+  private static Template toAttributeVector(Long objClass, byte[] id, String label) {
     Template attrs = new Template();
     if (id != null && id.length > 0) {
       attrs.id(id);
@@ -1313,8 +1284,7 @@ public class PKCS11Token {
     return attrs;
   }
 
-  public List<Long> getObjects(Template template, int maxNo)
-      throws TokenException {
+  public List<Long> getObjects(Template template, int maxNo) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       return getObjects(session, template, maxNo);
@@ -1327,8 +1297,7 @@ public class PKCS11Token {
    * PKCS#11 V3.0 Functions
    * ***************************************/
 
-  public void loginUser()
-      throws TokenException {
+  public void loginUser() throws TokenException {
     PKCS11Session session = borrowSession();
     try {
       session.login();
@@ -1359,22 +1328,13 @@ public class PKCS11Token {
    * @throws TokenException
    *         If unwrapping the key or creating a new key object failed.
    */
-  public long decapsulateKey(CkMechanism mechanism, long hPrivateKey,
-                             byte[] encapsulatedKey, PKCS11KeySpec keySpec)
-      throws TokenException {
+  public long decapsulateKey(
+      CkMechanism mechanism, long hPrivateKey,
+      byte[] encapsulatedKey, PKCS11SecretKeySpec keySpec) throws TokenException {
     PKCS11Session session = borrowSession();
     try {
-      Template template;
-      if (keySpec instanceof PKCS11SecretKeySpec) {
-        fillTemplate(session, (PKCS11SecretKeySpec) keySpec);
-        template = ((PKCS11SecretKeySpec) keySpec).toTemplate();
-      } else {
-        throw new TokenException("unknown keyTemplate " +
-            keySpec.getClass().getName());
-      }
-
-      return session.decapsulateKey(mechanism, hPrivateKey,
-          encapsulatedKey, template);
+      fillTemplate(session, (PKCS11SecretKeySpec) keySpec);
+      return session.decapsulateKey(mechanism, hPrivateKey, encapsulatedKey, keySpec.toTemplate());
     } finally {
       requiteSession(session);
     }
@@ -1384,8 +1344,7 @@ public class PKCS11Token {
    * Helper Functions
    * ***************************************/
 
-  private List<Long> getObjects(PKCS11Session session,
-                                Template template, int maxNo)
+  private List<Long> getObjects(PKCS11Session session, Template template, int maxNo)
       throws TokenException {
     List<Long> objList = new LinkedList<>();
 
@@ -1397,14 +1356,12 @@ public class PKCS11Token {
     return objList;
   }
 
-  private int removeObjects0(Template template, String desc)
-      throws TokenException {
+  private int removeObjects0(Template template, String desc) throws TokenException {
     try {
       List<Long> objects = getObjects(template, 9999);
       return destroyObjects(objects).size();
     } catch (TokenException ex) {
-      throw new TokenException(
-          "could not remove " + desc + ": " + ex.getMessage(), ex);
+      throw new TokenException("could not remove " + desc + ": " + ex.getMessage(), ex);
     }
   }
 
@@ -1414,8 +1371,7 @@ public class PKCS11Token {
     byte[] id = spec.id();
 
     if (label != null && labelExists(label)) {
-      throw new IllegalArgumentException("label " + label
-          + " exists, please specify another one");
+      throw new IllegalArgumentException("label " + label + " exists, please specify another one");
     }
 
     if (id == null && spec.generateId()) {
@@ -1423,14 +1379,13 @@ public class PKCS11Token {
     }
   }
 
-  private void fillTemplate(PKCS11Session session, PKCS11KeyPairSpec spec)
-      throws TokenException {
+  private void fillTemplate(PKCS11Session session, PKCS11KeyPairSpec spec) throws TokenException {
     // CKA_LABEL
     String label = spec.label();
     if (label != null) {
       if (labelExists(session, label)) {
-        throw new IllegalArgumentException("label " + label
-            + " exists, please specify another one");
+        throw new IllegalArgumentException("label " + label +
+            " exists, please specify another one");
       }
     }
 
@@ -1448,17 +1403,15 @@ public class PKCS11Token {
     }
   }
 
-  private void fillTemplate(boolean forPrivateKey, PKCS11Session session,
-                            PKCS11KeyPairSpec spec)
+  private void fillTemplate(boolean forPrivateKey, PKCS11Session session, PKCS11KeyPairSpec spec)
       throws TokenException {
     // CKA_LABEL
     String label = forPrivateKey ? spec.label() : spec.labelForPublicKey();
     long objClass = forPrivateKey ? CKO_PRIVATE_KEY : CKO_PUBLIC_KEY;
     if (label != null) {
       if (labelExists(session, objClass, label)) {
-        throw new IllegalArgumentException("label " + label +
-            " with CKO_CLASS=" + PKCS11T.ckoCodeToName(objClass) +
-            " exists, please specify another one");
+        throw new IllegalArgumentException("label " + label + " with CKO_CLASS=" +
+            PKCS11T.ckoCodeToName(objClass) + " exists, please specify another one");
       }
     }
 
@@ -1469,8 +1422,7 @@ public class PKCS11Token {
   }
 
   private static String getDescription(byte[] keyId, String keyLabel) {
-    return "id " + (keyId == null ? "<null>" : Functions.toHex(keyId)) +
-        " and label " + keyLabel;
+    return "id " + (keyId == null ? "<null>" : Functions.toHex(keyId)) + " and label " + keyLabel;
   }
 
 }

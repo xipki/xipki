@@ -15,7 +15,7 @@ import org.xipki.util.codec.Args;
 /**
  * Entry for benchmark enrollment test.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaEnrollBenchEntry {
@@ -51,8 +51,7 @@ public class CaEnrollBenchEntry {
     private IncreasableSubject(String subjectTemplate, RandomDn randomDn) {
       Args.notNull(randomDn, "randomDn");
 
-      this.subjectTemplate = new X500Name(Args.notBlank(subjectTemplate,
-          "subjectTemplate"));
+      this.subjectTemplate = new X500Name(Args.notBlank(subjectTemplate, "subjectTemplate"));
 
       switch (randomDn) {
         case GIVENNAME:
@@ -77,15 +76,12 @@ public class CaEnrollBenchEntry {
           this.subjectRdnForIncrement = OIDs.DN.commonName;
           break;
         default:
-          throw new IllegalStateException(
-              "should not reach here, unknown randomDn " + randomDn);
+          throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);
       }
 
-      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length
-          == 0) {
-        throw new IllegalArgumentException(
-            "subjectTemplate does not contain DN field "
-            + OIDs.oidToDisplayName(this.subjectRdnForIncrement));
+      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
+        throw new IllegalArgumentException("subjectTemplate does not contain DN field " +
+            OIDs.oidToDisplayName(this.subjectRdnForIncrement));
       }
     } // constructor
 
@@ -101,8 +97,7 @@ public class CaEnrollBenchEntry {
         if (!incremented) {
           if (rdn.getFirst().getType().equals(subjectRdnForIncrement)) {
             String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
-            rdn = new RDN(subjectRdnForIncrement,
-                  new DERUTF8String(text + index));
+            rdn = new RDN(subjectRdnForIncrement, new DERUTF8String(text + index));
             incremented = true;
           }
         }

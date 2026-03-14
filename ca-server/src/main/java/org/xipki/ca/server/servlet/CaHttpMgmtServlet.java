@@ -70,8 +70,7 @@ class CaHttpMgmtServlet {
 
   }
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CaHttpMgmtServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaHttpMgmtServlet.class);
 
   private static final String CT_RESPONSE = "application/json";
 
@@ -84,15 +83,14 @@ class CaHttpMgmtServlet {
   private final String reverseProxyMode;
 
   public CaHttpMgmtServlet(CaManager caManager, String reverseProxyMode,
-                           Collection<X509Cert> mgmtCerts, boolean logReqResp) {
+                          Collection<X509Cert> mgmtCerts, boolean logReqResp) {
     this.caManager = Args.notNull(caManager, "caManager");
     this.reverseProxyMode = reverseProxyMode;
     this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
     this.logReqResp = logReqResp;
   }
 
-  public void service(XiHttpRequest request, XiHttpResponse response)
-      throws IOException {
+  public void service(XiHttpRequest request, XiHttpResponse response) throws IOException {
     String method = request.getMethod();
     if (!"POST".equalsIgnoreCase(method)) {
       response.setStatus(HttpStatusCode.SC_METHOD_NOT_ALLOWED);
@@ -105,21 +103,17 @@ class CaHttpMgmtServlet {
       X509Cert clientCert = Optional.ofNullable(
           TlsHelper.getTlsClientCert(request, reverseProxyMode)).orElseThrow(
               () -> new MyException(HttpStatusCode.SC_UNAUTHORIZED,
-                  "remote management is not permitted if TLS client " +
-                      "certificate is not present"));
+                  "remote management is not permitted if TLS client certificate is not present"));
 
       if (!mgmtCerts.contains(clientCert)) {
         throw new MyException(HttpStatusCode.SC_UNAUTHORIZED,
-            "remote management is not permitted to the client without " +
-            "valid certificate");
+            "remote management is not permitted to the client without valid certificate");
       }
 
-      path = (String) request.getAttribute(
-          HttpConstants.ATTR_XIPKI_PATH);
+      path = (String) request.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
 
       if (path == null || path.length() < 2) {
-        throw new MyException(HttpStatusCode.SC_NOT_FOUND,
-            "no action is specified");
+        throw new MyException(HttpStatusCode.SC_NOT_FOUND, "no action is specified");
       }
 
       String actionStr = path.substring(1);
@@ -131,11 +125,9 @@ class CaHttpMgmtServlet {
 
       JsonMap json;
       try {
-        json = (reqBody.length == 0) ? null
-            : JsonParser.parseMap(reqBody, false);
+        json = (reqBody.length == 0) ? null : JsonParser.parseMap(reqBody, false);
       } catch (Exception e) {
-        throw new MyException(HttpStatusCode.SC_BAD_REQUEST,
-            "request is not well-formed json");
+        throw new MyException(HttpStatusCode.SC_BAD_REQUEST, "request is not well-formed json");
       }
 
       MgmtResponse resp = null;
@@ -146,14 +138,12 @@ class CaHttpMgmtServlet {
           break;
         }
         case addCaAlias: {
-          MgmtRequest.AddCaAlias req =
-              MgmtRequest.AddCaAlias.parse(nonNullReq(json));
+          MgmtRequest.AddCaAlias req = MgmtRequest.AddCaAlias.parse(nonNullReq(json));
           caManager.addCaAlias(req.aliasName(), req.caName());
           break;
         }
         case addCertprofile: {
-          MgmtRequest.AddCertprofile req =
-              MgmtRequest.AddCertprofile.parse(nonNullReq(json));
+          MgmtRequest.AddCertprofile req = MgmtRequest.AddCertprofile.parse(nonNullReq(json));
           caManager.addCertprofile(req.certprofileEntry());
           break;
         }
@@ -164,83 +154,68 @@ class CaHttpMgmtServlet {
           break;
         }
         case addPublisher: {
-          MgmtRequest.AddPublisher req =
-              MgmtRequest.AddPublisher.parse(nonNullReq(json));
+          MgmtRequest.AddPublisher req = MgmtRequest.AddPublisher.parse(nonNullReq(json));
           caManager.addPublisher(req.publisherEntry());
           break;
         }
         case addPublisherToCa: {
-          MgmtRequest.AddPublisherToCa req =
-              MgmtRequest.AddPublisherToCa.parse(nonNullReq(json));
+          MgmtRequest.AddPublisherToCa req = MgmtRequest.AddPublisherToCa.parse(nonNullReq(json));
           caManager.addPublisherToCa(req.publisherName(), req.caName());
           break;
         }
         case addRequestor: {
-          MgmtRequest.AddRequestor req =
-              MgmtRequest.AddRequestor.parse(nonNullReq(json));
+          MgmtRequest.AddRequestor req = MgmtRequest.AddRequestor.parse(nonNullReq(json));
           caManager.addRequestor(req.requestorEntry());
           break;
         }
         case addRequestorToCa: {
-          MgmtRequest.AddRequestorToCa req =
-              MgmtRequest.AddRequestorToCa.parse(nonNullReq(json));
+          MgmtRequest.AddRequestorToCa req = MgmtRequest.AddRequestorToCa.parse(nonNullReq(json));
           caManager.addRequestorToCa(req.requestor(), req.caName());
           break;
         }
         case addSigner: {
-          MgmtRequest.AddSigner req =
-              MgmtRequest.AddSigner.parse(nonNullReq(json));
+          MgmtRequest.AddSigner req = MgmtRequest.AddSigner.parse(nonNullReq(json));
           caManager.addSigner(req.signerEntry());
           break;
         }
         case changeCa: {
-          MgmtRequest.ChangeCa req =
-              MgmtRequest.ChangeCa.parse(nonNullReq(json));
+          MgmtRequest.ChangeCa req = MgmtRequest.ChangeCa.parse(nonNullReq(json));
           caManager.changeCa(req.changeCaEntry());
           break;
         }
         case changeCertprofile: {
           MgmtRequest.ChangeTypeConfEntity req =
               MgmtRequest.ChangeTypeConfEntity.parse(nonNullReq(json));
-          caManager.changeCertprofile(req.name(), req.type(),
-              req.conf());
+          caManager.changeCertprofile(req.name(), req.type(), req.conf());
           break;
         }
         case changePublisher: {
           MgmtRequest.ChangeTypeConfEntity req =
               MgmtRequest.ChangeTypeConfEntity.parse(nonNullReq(json));
-          caManager.changePublisher(req.name(), req.type(),
-              req.conf());
+          caManager.changePublisher(req.name(), req.type(), req.conf());
           break;
         }
         case changeRequestor: {
           MgmtRequest.ChangeTypeConfEntity req =
               MgmtRequest.ChangeTypeConfEntity.parse(nonNullReq(json));
-          caManager.changeRequestor(req.name(), req.type(),
-              req.conf());
+          caManager.changeRequestor(req.name(), req.type(), req.conf());
           break;
         }
         case changeSigner: {
-          MgmtRequest.ChangeSigner req =
-              MgmtRequest.ChangeSigner.parse(nonNullReq(json));
-          caManager.changeSigner(req.name(), req.type(), req.conf(),
-              req.base64Cert());
+          MgmtRequest.ChangeSigner req = MgmtRequest.ChangeSigner.parse(nonNullReq(json));
+          caManager.changeSigner(req.name(), req.type(), req.conf(), req.base64Cert());
           break;
         }
         case exportConf: {
-          MgmtRequest.ExportConf req =
-              MgmtRequest.ExportConf.parse(nonNullReq(json));
+          MgmtRequest.ExportConf req = MgmtRequest.ExportConf.parse(nonNullReq(json));
           InputStream confStream = caManager.exportConf(req.caNames());
-          resp = new MgmtResponse.ByteArray(
-                  IoUtil.readAllBytesAndClose(confStream));
+          resp = new MgmtResponse.ByteArray(IoUtil.readAllBytesAndClose(confStream));
           break;
         }
         case generateCertificate: {
-          MgmtRequest.GenerateCert req =
-              MgmtRequest.GenerateCert.parse(nonNullReq(json));
+          MgmtRequest.GenerateCert req = MgmtRequest.GenerateCert.parse(nonNullReq(json));
           X509Cert cert = caManager.generateCertificate(req.caName(),
-              req.profileName(), req.encodedCsr(),
-              req.notBefore(), req.notAfter());
+              req.profileName(), req.encodedCsr(), req.notBefore(), req.notAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -248,32 +223,26 @@ class CaHttpMgmtServlet {
           MgmtRequest.GenerateCrossCertificate req =
               MgmtRequest.GenerateCrossCertificate.parse(nonNullReq(json));
 
-          X509Cert cert = caManager.generateCrossCertificate(req.caName(),
-              req.profileName(),       req.encodedCsr(),
-              req.encodedTargetCert(), req.notBefore(),
-              req.notAfter());
+          X509Cert cert = caManager.generateCrossCertificate(req.caName(), req.profileName(),
+              req.encodedCsr(), req.encodedTargetCert(), req.notBefore(), req.notAfter());
           resp = toByteArray(cert);
           break;
         }
         case generateKeyCert: {
-          MgmtRequest.GenerateKeyCert req =
-              MgmtRequest.GenerateKeyCert.parse(nonNullReq(json));
-          KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(
-              req.caName(),  req.profileName(),
-              req.subject(), req.notBefore(), req.notAfter());
+          MgmtRequest.GenerateKeyCert req = MgmtRequest.GenerateKeyCert.parse(nonNullReq(json));
+          KeyCertBytesPair keyCertBytesPair = caManager.generateKeyCert(req.caName(),
+              req.profileName(), req.subject(), req.notBefore(), req.notAfter());
 
-          resp = new MgmtResponse.KeyCertBytes(keyCertBytesPair.key(),
-              keyCertBytesPair.cert());
+          resp = new MgmtResponse.KeyCertBytes(keyCertBytesPair.key(), keyCertBytesPair.cert());
           break;
         }
         case generateCrlOnDemand: {
-          resp = toByteArray(action, caManager.generateCrlOnDemand(
-              getNameFromRequest(nonNullReq(json))));
+          resp = toByteArray(action,
+                    caManager.generateCrlOnDemand(getNameFromRequest(nonNullReq(json))));
           break;
         }
         case generateRootCa: {
-          MgmtRequest.GenerateRootCa req =
-              MgmtRequest.GenerateRootCa.parse(nonNullReq(json));
+          MgmtRequest.GenerateRootCa req = MgmtRequest.GenerateRootCa.parse(nonNullReq(json));
 
           X509Cert cert = caManager.generateRootCa(req.caEntry(),
               req.profileName(), req.subject(),
@@ -283,7 +252,7 @@ class CaHttpMgmtServlet {
         }
         case getAliasesForCa: {
           resp = new MgmtResponse.StringSet(
-              caManager.getAliasesForCa(getNameFromRequest(nonNullReq(json))));
+                  caManager.getAliasesForCa(getNameFromRequest(nonNullReq(json))));
           break;
         }
         case getCa: {
@@ -308,8 +277,7 @@ class CaHttpMgmtServlet {
         }
         case getCaNameForAlias: {
           String aliasName = getNameFromRequest(nonNullReq(json));
-          resp = new MgmtResponse.StringResponse(
-              caManager.getCaNameForAlias(aliasName));
+          resp = new MgmtResponse.StringResponse(caManager.getCaNameForAlias(aliasName));
           break;
         }
         case getCaNames: {
@@ -317,8 +285,7 @@ class CaHttpMgmtServlet {
           break;
         }
         case getCaSystemStatus: {
-          resp = new MgmtResponse.GetCaSystemStatus(
-              caManager.getCaSystemStatus());
+          resp = new MgmtResponse.GetCaSystemStatus(caManager.getCaSystemStatus());
           break;
         }
         case getCert: {
@@ -333,8 +300,7 @@ class CaHttpMgmtServlet {
           }
 
           if (cert != null) {
-            resp = new MgmtResponse.GetCert(cert.cert().cert(),
-                null, null);
+            resp = new MgmtResponse.GetCert(cert.cert().cert(), null, null);
           } else {
             resp = new MgmtResponse.GetCert(null, null, null);
           }
@@ -364,19 +330,16 @@ class CaHttpMgmtServlet {
         }
         case getCrl: {
           MgmtRequest.GetCrl req = MgmtRequest.GetCrl.parse(nonNullReq(json));
-          X509Crl crl = Optional.ofNullable(
-              caManager.getCrl(req.caName(), req.crlNumber()))
-              .orElseThrow(() -> new CaMgmtException(
-                  "Found no CRL for CA " + req.caName() +
+          X509Crl crl = Optional.ofNullable(caManager.getCrl(req.caName(), req.crlNumber()))
+              .orElseThrow(() -> new CaMgmtException("Found no CRL for CA " + req.caName() +
                   " with CRL number 0x" + req.crlNumber().toString(16)));
           resp = toByteArray(action, crl);
           break;
         }
         case getCurrentCrl: {
           String caName = getNameFromRequest(nonNullReq(json));
-          X509Crl crl = Optional.ofNullable(
-              caManager.getCurrentCrl(caName)).orElseThrow(
-                  () -> new CaMgmtException("No current CRL for CA " + caName));
+          X509Crl crl = Optional.ofNullable(caManager.getCurrentCrl(caName))
+              .orElseThrow(() -> new CaMgmtException("No current CRL for CA " + caName));
           resp = toByteArray(action, crl);
           break;
         }
@@ -390,9 +353,8 @@ class CaHttpMgmtServlet {
         }
         case getPublisher: {
           String name = getNameFromRequest(nonNullReq(json));
-          PublisherEntry result = Optional.ofNullable(
-              caManager.getPublisher(name)).orElseThrow(
-                  () -> new CaMgmtException("Unknown publisher " + name));
+          PublisherEntry result = Optional.ofNullable(caManager.getPublisher(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown publisher " + name));
           resp = new MgmtResponse.GetPublisher(result);
           break;
         }
@@ -407,9 +369,8 @@ class CaHttpMgmtServlet {
         }
         case getRequestor: {
           String name = getNameFromRequest(nonNullReq(json));
-          RequestorEntry result = Optional.ofNullable(
-              caManager.getRequestor(name)).orElseThrow(
-                  () -> new CaMgmtException("Unknown requestor " + name));
+          RequestorEntry result = Optional.ofNullable(caManager.getRequestor(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown requestor " + name));
           resp = new MgmtResponse.GetRequestor(result);
           break;
         }
@@ -419,15 +380,13 @@ class CaHttpMgmtServlet {
         }
         case getRequestorsForCa: {
           resp = new MgmtResponse.GetRequestorsForCa(
-              caManager.getRequestorsForCa(
-                  getNameFromRequest(nonNullReq(json))));
+              caManager.getRequestorsForCa(getNameFromRequest(nonNullReq(json))));
           break;
         }
         case getSigner: {
           String name = getNameFromRequest(nonNullReq(json));
-          SignerEntry result = Optional.ofNullable(
-              caManager.getSigner(name)).orElseThrow(
-                  () -> new CaMgmtException("Unknown signer " + name));
+          SignerEntry result = Optional.ofNullable(caManager.getSigner(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown signer " + name));
           resp = new MgmtResponse.GetSigner(result);
           break;
         }
@@ -440,25 +399,20 @@ class CaHttpMgmtServlet {
           break;
         }
         case getSupportedCertprofileTypes: {
-          resp = new MgmtResponse.StringSet(
-              caManager.getSupportedCertprofileTypes());
+          resp = new MgmtResponse.StringSet(caManager.getSupportedCertprofileTypes());
           break;
         }
         case getSupportedPublisherTypes: {
-          resp = new MgmtResponse.StringSet(
-              caManager.getSupportedPublisherTypes());
+          resp = new MgmtResponse.StringSet(caManager.getSupportedPublisherTypes());
           break;
         }
         case getSupportedSignerTypes: {
-          resp = new MgmtResponse.StringSet(
-              caManager.getSupportedSignerTypes());
+          resp = new MgmtResponse.StringSet(caManager.getSupportedSignerTypes());
           break;
         }
         case listCertificates: {
-          MgmtRequest.ListCertificates req =
-              MgmtRequest.ListCertificates.parse(nonNullReq(json));
-          X500Name subjectPattern =
-              X500Name.getInstance(req.encodedSubjectDnPattern());
+          MgmtRequest.ListCertificates req = MgmtRequest.ListCertificates.parse(nonNullReq(json));
+          X500Name subjectPattern = X500Name.getInstance(req.encodedSubjectDnPattern());
           List<CertListInfo> result = caManager.listCertificates(
               req.caName(), subjectPattern, req.validFrom(),
               req.validTo(), req.orderBy(), req.numEntries());
@@ -466,8 +420,7 @@ class CaHttpMgmtServlet {
           break;
         }
         case loadConf: {
-          MgmtRequest.LoadConf req =
-              MgmtRequest.LoadConf.parse(nonNullReq(json));
+          MgmtRequest.LoadConf req = MgmtRequest.LoadConf.parse(nonNullReq(json));
           caManager.loadConf(req.confBytes());
           break;
         }
@@ -484,8 +437,7 @@ class CaHttpMgmtServlet {
           break;
         }
         case removeCertificate: {
-          MgmtRequest.RemoveCertificate req =
-              MgmtRequest.RemoveCertificate.parse(nonNullReq(json));
+          MgmtRequest.RemoveCertificate req = MgmtRequest.RemoveCertificate.parse(nonNullReq(json));
           caManager.removeCertificate(req.caName(), req.serialNumber());
           break;
         }
@@ -496,8 +448,7 @@ class CaHttpMgmtServlet {
         case removeCertprofileFromCa: {
           MgmtRequest.RemoveEntityFromCa req =
               MgmtRequest.RemoveEntityFromCa.parse(nonNullReq(json));
-          caManager.removeCertprofileFromCa(
-              req.entityName(), req.caName());
+          caManager.removeCertprofileFromCa(req.entityName(), req.caName());
           break;
         }
         case removePublisher: {
@@ -527,8 +478,7 @@ class CaHttpMgmtServlet {
         case republishCertificates: {
           MgmtRequest.RepublishCertificates req =
               MgmtRequest.RepublishCertificates.parse(nonNullReq(json));
-          caManager.republishCertificates(req.caName(),
-              req.publisherNames(), req.numThreads());
+          caManager.republishCertificates(req.caName(), req.publisherNames(), req.numThreads());
           break;
         }
         case restartCa: {
@@ -540,21 +490,18 @@ class CaHttpMgmtServlet {
           break;
         }
         case revokeCa: {
-          MgmtRequest.RevokeCa req =
-              MgmtRequest.RevokeCa.parse(nonNullReq(json));
+          MgmtRequest.RevokeCa req = MgmtRequest.RevokeCa.parse(nonNullReq(json));
           caManager.revokeCa(req.caName(), req.revocationInfo());
           break;
         }
         case revokeCertificate: {
-          MgmtRequest.RevokeCertificate req =
-              MgmtRequest.RevokeCertificate.parse(nonNullReq(json));
+          MgmtRequest.RevokeCertificate req = MgmtRequest.RevokeCertificate.parse(nonNullReq(json));
           caManager.revokeCertificate(req.caName(), req.serialNumber(),
               req.reason(), req.invalidityTime());
           break;
         }
         case tokenInfoP11: {
-          MgmtRequest.TokenInfoP11 req =
-              MgmtRequest.TokenInfoP11.parse(nonNullReq(json));
+          MgmtRequest.TokenInfoP11 req = MgmtRequest.TokenInfoP11.parse(nonNullReq(json));
           String info = caManager.getTokenInfoP11(
               req.moduleName(), req.slotIndex(), req.isVerbose());
           resp = new MgmtResponse.StringResponse(info);
@@ -571,8 +518,7 @@ class CaHttpMgmtServlet {
         case unsuspendCertificate: {
           MgmtRequest.UnsuspendCertificate req =
               MgmtRequest.UnsuspendCertificate.parse(nonNullReq(json));
-          caManager.unsuspendCertificate(req.caName(),
-              req.serialNumber());
+          caManager.unsuspendCertificate(req.caName(), req.serialNumber());
           break;
         }
         case addDbSchema: {
@@ -596,16 +542,14 @@ class CaHttpMgmtServlet {
           break;
         }
         case addKeypairGen: {
-          MgmtRequest.AddKeypairGen req =
-              MgmtRequest.AddKeypairGen.parse(nonNullReq(json));
+          MgmtRequest.AddKeypairGen req = MgmtRequest.AddKeypairGen.parse(nonNullReq(json));
           caManager.addKeypairGen(req.entry());
           break;
         }
         case changeKeypairGen: {
           MgmtRequest.ChangeTypeConfEntity req =
               MgmtRequest.ChangeTypeConfEntity.parse(nonNullReq(json));
-          caManager.changeKeypairGen(req.name(), req.type(),
-              req.conf());
+          caManager.changeKeypairGen(req.name(), req.type(), req.conf());
           break;
         }
         case removeKeypairGen: {
@@ -618,15 +562,13 @@ class CaHttpMgmtServlet {
         }
         case getKeypairGen: {
           String name = getNameFromRequest(nonNullReq(json));
-          KeypairGenEntry result = Optional.ofNullable(
-              caManager.getKeypairGen(name)).orElseThrow(
-                  () -> new CaMgmtException("Unknown KeypairGen " + name));
+          KeypairGenEntry result = Optional.ofNullable(caManager.getKeypairGen(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown KeypairGen " + name));
           resp = new MgmtResponse.GetKeypairGen(result);
           break;
         }
         default: {
-          throw new MyException(HttpStatusCode.SC_NOT_FOUND,
-              "unsupported action " + actionStr);
+          throw new MyException(HttpStatusCode.SC_NOT_FOUND, "unsupported action " + actionStr);
         }
       }
 
@@ -637,25 +579,21 @@ class CaHttpMgmtServlet {
       Map<String, String> headers = Collections.singletonMap(
           HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
 
-      new HttpResponse(ex.status(), null, headers, null)
-          .fillResponse(response);
+      new HttpResponse(ex.status(), null, headers, null).fillResponse(response);
     } catch (CaMgmtException | CodecException ex) {
       LOG.error("CaMgmtException", ex);
       Map<String, String> headers = Collections.singletonMap(
           HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
 
-      new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-          null, headers, null).fillResponse(response);
+      new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, headers, null)
+          .fillResponse(response);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
-      new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR)
-          .fillResponse(response);
+      new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR).fillResponse(response);
     } finally {
       if (logReqResp && LOG.isDebugEnabled()) {
-        String reqBodyStr = reqBody == null ? null
-            : Base64.encodeToString( reqBody, true);
-        String respBodyStr = respBody == null ? null
-            : Base64.encodeToString(respBody, true);
+        String reqBodyStr = reqBody == null ? null : Base64.encodeToString( reqBody, true);
+        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
         LOG.debug("HTTP CA-MGMT path: {}\nRequest:\n{}\nResponse:\n{}",
             path, reqBodyStr, respBodyStr);
       }
@@ -664,8 +602,7 @@ class CaHttpMgmtServlet {
 
   private static JsonMap nonNullReq(JsonMap req) throws MyException {
     if (req == null) {
-      throw new MyException(HttpStatusCode.SC_BAD_REQUEST,
-          "request body is empty");
+      throw new MyException(HttpStatusCode.SC_BAD_REQUEST, "request body is empty");
     }
     return req;
   }
@@ -679,8 +616,7 @@ class CaHttpMgmtServlet {
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
-  private static MgmtResponse.ByteArray toByteArray(
-      MgmtAction action, X509Crl crl) {
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Crl crl) {
     if (crl == null) {
       return new MgmtResponse.ByteArray(null);
     }
@@ -691,10 +627,8 @@ class CaHttpMgmtServlet {
   /**
    * The specified stream is closed after this method call.
    */
-  private static String getNameFromRequest(JsonMap json)
-      throws CodecException {
-    MgmtRequest.Name req = MgmtRequest.Name.parse(json);
-    return req.name();
+  private static String getNameFromRequest(JsonMap json) throws CodecException {
+    return MgmtRequest.Name.parse(json).name();
   } // method getNameFromRequest
 
 }

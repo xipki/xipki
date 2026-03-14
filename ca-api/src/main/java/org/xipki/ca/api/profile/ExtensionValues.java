@@ -20,8 +20,7 @@ import java.util.Set;
 
 public class ExtensionValues {
 
-  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions =
-      new HashMap<>();
+  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
   public void addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
       throws CertprofileException {

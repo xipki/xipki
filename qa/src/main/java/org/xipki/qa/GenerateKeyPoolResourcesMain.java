@@ -11,7 +11,6 @@ import org.xipki.util.io.IoUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.security.Security;
 
 /**
  * Generate keys to be store in src/main/resources/keypool.
@@ -21,7 +20,7 @@ import java.security.Security;
 public class GenerateKeyPoolResourcesMain {
 
   public static void main(String[] args) {
-    Security.addProvider(KeyUtil.newBouncyCastleProvider());
+    KeyUtil.addProviders();
     int n = 10;
 
     SecureRandom rnd = new SecureRandom();
@@ -30,28 +29,23 @@ public class GenerateKeyPoolResourcesMain {
         continue;
       }
 
-      if (!keySpec.isCompositeMLKEM()) { // TODO
-        continue;
-      }
-
       try {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
-          KeyPairWithSubjectPublicKeyInfo kp2 =
-              KeyUtil.generateKeypair2(keySpec, rnd);
+          KeyPairWithSubjectPublicKeyInfo kp2 = KeyUtil.generateKeyPair2(keySpec, rnd);
           byte[] encodedSk = kp2.keypair().getPrivate().getEncoded();
           byte[] encodedPk = kp2.subjectPublicKeyInfo().getEncoded();
           PrivateKeyInfo.getInstance(encodedSk);
           sb.append(Base64.encodeToString(encodedSk)).append(":")
               .append(Base64.encodeToString(encodedPk)).append("\n");
         }
+
         IoUtil.save("qa/target/keypool/" + keySpec.name() + ".txt",
             sb.toString().getBytes(StandardCharsets.UTF_8));
       } catch (Exception e) {
         e.printStackTrace();
       }
     }
-
   }
 
 }

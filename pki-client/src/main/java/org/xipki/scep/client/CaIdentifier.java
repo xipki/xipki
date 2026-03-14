@@ -24,8 +24,7 @@ public class CaIdentifier {
 
   private final String profile;
 
-  public CaIdentifier(String serverUrl, String profile)
-      throws MalformedURLException {
+  public CaIdentifier(String serverUrl, String profile) throws MalformedURLException {
     Args.notBlank(serverUrl, "serverUrl");
     URL tmpUrl = new URL(serverUrl);
     final String protocol = tmpUrl.getProtocol();
@@ -56,11 +55,9 @@ public class CaIdentifier {
   }
 
   public String buildGetUrl(Operation operation, String message) {
-    String str = url + "?operation=" +
-        Args.notNull(operation, "operation").code();
+    String str = url + "?operation=" + Args.notNull(operation, "operation").code();
     return StringUtil.isBlank(message) ? str
-        : str + "&message=" +
-            URLEncoder.encode(message, StandardCharsets.UTF_8);
+        : str + "&message=" + URLEncoder.encode(message, StandardCharsets.UTF_8);
   }
 
   public String buildPostUrl(Operation operation) {
@@ -69,9 +66,7 @@ public class CaIdentifier {
 
   @Override
   public String toString() {
-    return StringUtil.isBlank(profile)
-        ? "URL: " + url
-        : "URL: " + url + ", CA-Ident: " + profile;
+    return StringUtil.isBlank(profile) ? "URL: " + url : "URL: " + url + ", CA-Ident: " + profile;
   }
 
   @Override

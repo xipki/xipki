@@ -55,8 +55,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   private static class KeypoolQueryExecutor {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(KeypoolQueryExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeypoolQueryExecutor.class);
 
     private final DataSourceWrapper datasource;
 
@@ -96,8 +95,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       }
     } // method initIssuerStore
 
-    KeypoolKeypairGenerator.CipherData nextKeyData(int keyspecId)
-        throws DataAccessException {
+    KeypoolKeypairGenerator.CipherData nextKeyData(int keyspecId) throws DataAccessException {
       final String sql = sqlGetKeyData;
       PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -110,8 +108,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
         }
 
         int id = rs.getInt("ID");
-        KeypoolKeypairGenerator.CipherData cd =
-            new KeypoolKeypairGenerator.CipherData();
+        KeypoolKeypairGenerator.CipherData cd = new KeypoolKeypairGenerator.CipherData();
         cd.encAlg = rs.getInt("ENC_ALG");
         cd.encMeta = Base64.decodeFast(rs.getString("ENC_META"));
         cd.cipherText = Base64.decodeFast(rs.getString("DATA"));
@@ -193,8 +190,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     if (datasource == null) {
-      throw new XiSecurityException("no datasource named '" + datasourceName
-          + "' is specified");
+      throw new XiSecurityException("no datasource named '" + datasourceName + "' is specified");
     }
 
     try {
@@ -240,16 +236,13 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
         throw new XiSecurityException("Invalid PBE_ITERATION " + iteration);
       }
 
-      SecretKeyFactory factory = SecretKeyFactory.getInstance(
-          "PBKDF2WithHmacSHA256");
+      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
 
       int[] keyLengths = {128, 192, 256};
       for (int keyLength : keyLengths) {
-        PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, iteration,
-                            keyLength);
-        SecretKey key = new SecretKeySpec(
-            factory.generateSecret(spec).getEncoded(), "AES");
+        PBEKeySpec spec = new PBEKeySpec(passwordChars, salt, iteration, keyLength);
+        SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
         if (keyLength == 128) {
           aes128key = key;
         } else if (keyLength == 192) {
@@ -268,8 +261,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public KeyInfoPair generateKeypair(KeySpec keyspec)
-      throws XiSecurityException {
+  public KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException {
     Integer keyspecId = keyspecToId.get(keyspec);
     if (keyspecId == null) {
       return null;
@@ -286,8 +278,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     }
 
     if (cd == null) {
-      throw new XiSecurityException("found no keypair of spec " + keyspec
-          + " in the keypool");
+      throw new XiSecurityException("found no keypair of spec " + keyspec + " in the keypool");
     }
 
     GCMParameterSpec spec = new GCMParameterSpec(128, cd.encMeta);
@@ -299,8 +290,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
     } else if (cd.encAlg == 3) {
       key = aes256key;
     } else {
-      throw new XiSecurityException("unknown encryption algorithm "
-          + cd.encAlg);
+      throw new XiSecurityException("unknown encryption algorithm " + cd.encAlg);
     }
 
     byte[] plain;

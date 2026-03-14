@@ -5,11 +5,6 @@ package org.xipki.pkcs11.xihsm;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMKeyGenerationParameters;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMKeyPairGenerator;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.Category;
@@ -23,7 +18,6 @@ import org.xipki.pkcs11.xihsm.attr.XiAttribute;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 import org.xipki.pkcs11.xihsm.crypt.EdwardsCurveEnum;
 import org.xipki.pkcs11.xihsm.crypt.MontgomeryCurveEnum;
-import org.xipki.pkcs11.xihsm.crypt.WeierstraussCurveEnum;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.objects.*;
 import org.xipki.pkcs11.xihsm.store.FilePersistStore;
@@ -36,6 +30,12 @@ import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.pkcs11.xihsm.util.StorageMode;
+import org.xipki.security.KeyPairBytes;
+import org.xipki.security.KeySpec;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.Asn1Util;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.WeierstraussCurveEnum;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.misc.StringUtil;
@@ -44,6 +44,7 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateCrtKey;
 import java.util.Collections;
@@ -59,6 +60,8 @@ import static org.xipki.pkcs11.xihsm.util.XiConstants.P11MldsaVariant;
 import static org.xipki.pkcs11.xihsm.util.XiConstants.P11MlkemVariant;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class Backend {
@@ -83,8 +86,8 @@ public class Backend {
 
   private final Map<Long, XiSession> sessionMap = new ConcurrentHashMap<>();
 
-  public Backend(XiHsmVendor vendor, StorageMode storageMode,
-                 ConfPairs confPairs) throws HsmException {
+  public Backend(XiHsmVendor vendor, StorageMode storageMode, ConfPairs confPairs)
+      throws HsmException {
     Args.notNull(storageMode, "storageMode");
     Args.notNull(confPairs, "confPairs");
     this.vendor = Args.notNull(vendor, "vendor");
@@ -112,8 +115,7 @@ public class Backend {
       long slotId = info.getSlotId();
       CkSlotInfo ckInfo = info.getSlotInfo();
       XiSlot slot = new XiSlot(vendor, this, ckInfo.manufacturerID(),
-          info.getSlotIndex(), slotId, new AtomicLong(1),
-          info.getUserVerifier());
+          info.getSlotIndex(), slotId, new AtomicLong(1), info.getUserVerifier());
       slotMap.put(slotId, slot);
     }
   }
@@ -149,8 +151,7 @@ public class Backend {
     return getSlot(slotID).C_GetMechanismList();
   }
 
-  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type)
-      throws PKCS11Exception {
+  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type) throws PKCS11Exception {
     try {
       return getSlot(slotID).C_GetMechanismInfo(type);
     } catch (HsmException e) {
@@ -158,8 +159,7 @@ public class Backend {
     }
   }
 
-  public long C_OpenSession(long slotID, long flags)
-      throws PKCS11Exception {
+  public long C_OpenSession(long slotID, long flags) throws PKCS11Exception {
     XiSlot slot = getSlot(slotID);
     try {
       long hSession = slot.C_OpenSession(flags);
@@ -195,8 +195,7 @@ public class Backend {
     return token ? persistStore : volatileStore;
   }
 
-  public long[] findObjects(long slotId, LoginState loginState,
-                            XiTemplate criteria)
+  public long[] findObjects(long slotId, LoginState loginState, XiTemplate criteria)
       throws HsmException {
     List<Long> handles = new LinkedList<>();
     Boolean inToken = criteria.removeBool(CKA_TOKEN);
@@ -211,8 +210,7 @@ public class Backend {
     return HsmUtil.listToLongs(handles);
   }
 
-  public void destroyObject(long slotId, long hObject, boolean sessionRw,
-                            LoginState loginState)
+  public void destroyObject(long slotId, long hObject, boolean sessionRw, LoginState loginState)
     throws HsmException {
     boolean persist = isPersistHandle(hObject);
     if (isPersistHandle(hObject)) {
@@ -234,16 +232,14 @@ public class Backend {
 
   public long[] C_GenerateKeyPair(
       LoginState loginState, boolean sessionRw, long slotId,
-      XiMechanism mechanism, XiTemplate pkAttrs, XiTemplate skAttrs)
-      throws HsmException {
+      XiMechanism mechanism, XiTemplate pkAttrs, XiTemplate skAttrs) throws HsmException {
     long keyType = pkAttrs.removeNonNullLong(CKA_KEY_TYPE);
 
     long ckm = mechanism.getCkm();
     // remove the CKA_CLASS
     pkAttrs.removeAttributes(CKA_CLASS);
 
-    skAttrs.removeAttributes(CKA_CLASS, CKA_TOKEN, CKA_EC_PARAMS,
-        CKA_MODULUS_BITS, CKA_KEY_TYPE);
+    skAttrs.removeAttributes(CKA_CLASS, CKA_TOKEN, CKA_EC_PARAMS, CKA_MODULUS_BITS, CKA_KEY_TYPE);
 
     boolean inToken = checkInToken(sessionRw, pkAttrs);
     Store store = store(inToken);
@@ -258,11 +254,9 @@ public class Backend {
     Origin newObjectMethod = Origin.GENERATE;
 
     try {
-      if (ckm == CKM_RSA_X9_31_KEY_PAIR_GEN
-          || ckm == CKM_RSA_PKCS_KEY_PAIR_GEN) {
+      if (ckm == CKM_RSA_X9_31_KEY_PAIR_GEN || ckm == CKM_RSA_PKCS_KEY_PAIR_GEN) {
         if (keyType != CKK_RSA) {
-          throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-              "Key is not RSA");
+          throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "Key is not RSA");
         }
 
         int modulusBitSize = pkAttrs.removeNonNullInt(CKA_MODULUS_BITS);
@@ -284,23 +278,18 @@ public class Backend {
             handles[0], inToken, ckm, modulus, publicExponent);
 
         privateKey = new XiRSAPrivateKey(vendor, cku, newObjectMethod,
-            handles[1], inToken, ckm, modulus,
-            publicExponent, sk.getPrivateExponent(),
-            sk.getPrimeP(), sk.getPrimeQ(),
-            sk.getPrimeExponentP(), sk.getPrimeExponentQ(),
+            handles[1], inToken, ckm, modulus, publicExponent, sk.getPrivateExponent(),
+            sk.getPrimeP(), sk.getPrimeQ(), sk.getPrimeExponentP(), sk.getPrimeExponentQ(),
             sk.getCrtCoefficient());
-      } else if (ckm == CKM_EC_KEY_PAIR_GEN
-          || ckm == CKM_VENDOR_SM2_KEY_PAIR_GEN) {
+      } else if (ckm == CKM_EC_KEY_PAIR_GEN || ckm == CKM_VENDOR_SM2_KEY_PAIR_GEN) {
         if (ckm == CKM_VENDOR_SM2_KEY_PAIR_GEN) {
           if (keyType != CKK_VENDOR_SM2) {
             throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-                "The key is not SM2: " +
-                    PKCS11T.ckkCodeToName(keyType));
+                "The key is not SM2: " + PKCS11T.ckkCodeToName(keyType));
           }
         } else {
           if (keyType != CKK_VENDOR_SM2 && keyType != CKK_EC) {
-            throw new HsmException(
-                CKR_TEMPLATE_INCONSISTENT, "The key is not EC");
+            throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "The key is not EC");
           }
         }
 
@@ -311,11 +300,8 @@ public class Backend {
           byte[] ecParams = pkAttrs.removeByteArray(
               PKCS11T.CKA_EC_PARAMS);
           if (ecParams != null) {
-            if (WeierstraussCurveEnum.SM2 !=
-                WeierstraussCurveEnum.ofEcParams(ecParams)) {
-              throw new HsmException(
-                  PKCS11T.CKR_TEMPLATE_INCONSISTENT,
-                  "The key is not SM2");
+            if (WeierstraussCurveEnum.SM2 != WeierstraussCurveEnum.ofEcParams(ecParams)) {
+              throw new HsmException(PKCS11T.CKR_TEMPLATE_INCONSISTENT, "The key is not SM2");
             }
           }
         } else {
@@ -333,59 +319,52 @@ public class Backend {
 
         if (curve == WeierstraussCurveEnum.SM2) {
           publicKey  = new XiSm2ECPublicKey(vendor, cku, newObjectMethod,
-              handles[0], inToken, keyType, ckm, ecParams, ecPoint);
+                          handles[0], inToken, keyType, ckm, ecParams, ecPoint);
           privateKey = new XiSm2ECPrivateKey(vendor, cku, newObjectMethod,
-              handles[1], inToken, keyType, ckm, ecParams, sk, ecPoint);
+                          handles[1], inToken, keyType, ckm, ecParams, sk, ecPoint);
         } else {
-          publicKey  = new XiWeierstrassECPublicKey(
-              vendor, cku, newObjectMethod,
-              handles[0], inToken, keyType, ckm, ecParams, ecPoint);
-          privateKey = new XiWeierstrassECPrivateKey(
-              vendor, cku, newObjectMethod,
-              handles[1], inToken, keyType, ckm, ecParams, sk);
+          publicKey  = new XiWeierstrassECPublicKey(vendor, cku, newObjectMethod,
+                          handles[0], inToken, keyType, ckm, ecParams, ecPoint);
+          privateKey = new XiWeierstrassECPrivateKey(vendor, cku, newObjectMethod,
+                          handles[1], inToken, keyType, ckm, ecParams, sk);
         }
       } else if (ckm == CKM_EC_EDWARDS_KEY_PAIR_GEN) {
         if (keyType != CKK_EC_EDWARDS) {
-          throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-              "The key is not EC-Edwards");
+          throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "The key is not EC-Edwards");
         }
 
         if (mechanism.getParameter() != null) {
-          throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
-              "Mechanism.parameters != NULL");
+          throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "Mechanism.parameters != NULL");
         }
 
         byte[] ecParams = pkAttrs.removeNonNullByteArray(CKA_EC_PARAMS);
-        EdwardsCurveEnum curveEnum =
-            EdwardsCurveEnum.ofEcParamsNonNull(ecParams);
-        byte[][] keypair = curveEnum.generateKeyPair(rnd);
+        EdwardsCurveEnum curveEnum = EdwardsCurveEnum.ofEcParamsNonNull(ecParams);
+
+        byte[][] keypair = generateEdECKeyPair(curveEnum, rnd);
 
         handles = store.nextKeyPairHandles(slotId);
         publicKey = new XiEdwardsECPublicKey(vendor, cku, newObjectMethod,
-            handles[0], inToken, ckm, ecParams, keypair[1]);
+                          handles[0], inToken, ckm, ecParams, keypair[1]);
         privateKey = new XiEdwardsECPrivateKey(vendor, cku, newObjectMethod,
-            handles[1], inToken, ckm, ecParams, keypair[0]);
+                          handles[1], inToken, ckm, ecParams, keypair[0]);
       } else if (ckm == CKM_EC_MONTGOMERY_KEY_PAIR_GEN) {
         if (keyType != CKK_EC_MONTGOMERY) {
-          throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-              "The key is not EC-Montgomery");
+          throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "The key is not EC-Montgomery");
         }
 
         if (mechanism.getParameter() != null) {
-          throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
-              "Mechanism.parameters != NULL");
+          throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "Mechanism.parameters != NULL");
         }
 
         byte[] ecParams = pkAttrs.removeByteArray(CKA_EC_PARAMS);
-        MontgomeryCurveEnum curveEnum =
-            MontgomeryCurveEnum.ofEcParamsNonNull(ecParams);
+        MontgomeryCurveEnum curveEnum = MontgomeryCurveEnum.ofEcParamsNonNull(ecParams);
         byte[][] keypair = curveEnum.generateKeyPair(rnd);
 
         handles = store.nextKeyPairHandles(slotId);
         publicKey = new XiMontgomeryECPublicKey(vendor, cku, newObjectMethod,
-            handles[0], inToken, ckm, ecParams, keypair[1]);
+                      handles[0], inToken, ckm, ecParams, keypair[1]);
         privateKey = new XiMontgomeryECPrivateKey(vendor, cku, newObjectMethod,
-            handles[1], inToken, ckm, ecParams, keypair[0]);
+                      handles[1], inToken, ckm, ecParams, keypair[0]);
       } else if (ckm == CKM_ML_DSA_KEY_PAIR_GEN) {
         long variantCode = pkAttrs.removeNonNullLong(CKA_PARAMETER_SET);
         P11MldsaVariant variant = P11MldsaVariant.ofCode(variantCode);
@@ -393,42 +372,36 @@ public class Backend {
         KeyPair keyPair = variant.generateKeyPair();
         byte[] sk = PrivateKeyInfo.getInstance(
             keyPair.getPrivate().getEncoded()).getPrivateKey().getOctets();
-        byte[] pk = SubjectPublicKeyInfo.getInstance(
-            keyPair.getPublic().getEncoded()).getPublicKeyData().getBytes();
+        byte[] pk = Asn1Util.getPublicKeyData(
+            SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded()));
 
         handles = store.nextKeyPairHandles(slotId);
         publicKey  = new XiMLDSAPublicKey(vendor, cku, newObjectMethod,
-            handles[0], inToken, ckm, variant, pk);
+                        handles[0], inToken, ckm, variant, pk);
         privateKey = new XiMLDSAPrivateKey(vendor, cku, newObjectMethod,
-            handles[1], inToken, ckm, variant, sk);
+                        handles[1], inToken, ckm, variant, sk);
       } else if (ckm == CKM_ML_KEM_KEY_PAIR_GEN) {
         long variantCode = pkAttrs.removeNonNullLong(CKA_PARAMETER_SET);
         skAttrs.removeAttributes(CKA_PARAMETER_SET);
         P11MlkemVariant variant = P11MlkemVariant.ofCode(variantCode);
 
-        MLKEMKeyPairGenerator kpGen = new MLKEMKeyPairGenerator();
-        MLKEMKeyGenerationParameters params = new MLKEMKeyGenerationParameters(
-            getRandom(), XiMLKEMPublicKey.getParams(variant));
-        kpGen.init(params);
-        AsymmetricCipherKeyPair keyPair = kpGen.generateKeyPair();
-        MLKEMPublicKeyParameters pkParams =
-            (MLKEMPublicKeyParameters) keyPair.getPublic();
-        MLKEMPrivateKeyParameters skParams =
-            (MLKEMPrivateKeyParameters) keyPair.getPrivate();
+        KeySpec keySpec =
+              variant == P11MlkemVariant.MLKEM512 ? KeySpec.MLKEM512
+            : variant == P11MlkemVariant.MLKEM768 ? KeySpec.MLKEM768
+            : KeySpec.MLKEM1024;
+        KeyPairBytes keyPairBytes = KeyUtil.generateMlkemKeyPair(keySpec, getRandom());
 
         handles = store.nextKeyPairHandles(slotId);
         publicKey  = new XiMLKEMPublicKey(vendor, cku, newObjectMethod,
-            handles[0], inToken, ckm, variant, pkParams.getEncoded());
+                        handles[0], inToken, ckm, variant, keyPairBytes.publicKey());
         privateKey = new XiMLKEMPrivateKey(vendor, cku, newObjectMethod,
-            handles[1], inToken, ckm, variant, skParams.getEncoded());
+                        handles[1], inToken, ckm, variant, keyPairBytes.privateKey());
       } else {
         throw new HsmException(CKR_MECHANISM_INVALID,
-            "unsupported mechanism " +
-                PKCS11T.codeToName(Category.CKF_MECHANISM, ckm));
+            "unsupported mechanism " + PKCS11T.codeToName(Category.CKF_MECHANISM, ckm));
       }
-    } catch (GeneralSecurityException | RuntimeException e) {
-      throw new HsmException(CKR_GENERAL_ERROR,
-          "error generating keypair", e);
+    } catch (GeneralSecurityException | RuntimeException | XiSecurityException e) {
+      throw new HsmException(CKR_GENERAL_ERROR, "error generating keypair", e);
     }
 
     publicKey.updateAttributes(loginState, initMethod, pkAttrs);
@@ -450,8 +423,7 @@ public class Backend {
 
   public long C_GenerateKey(
       LoginState loginState, boolean sessionRw, long slotId,
-      XiMechanism mechanism, XiTemplate template)
-      throws HsmException {
+      XiMechanism mechanism, XiTemplate template) throws HsmException {
     long keyType = template.removeNonNullLong(CKA_KEY_TYPE);
 
     template.removeAttributes(CKA_CLASS);
@@ -462,16 +434,14 @@ public class Backend {
       valueLen = template.removeNonNullInt(CKA_VALUE_LEN);
 
       if (!(valueLen == 16 || valueLen == 24 || valueLen == 32)) {
-        throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-            "invalid CKA_VALUE_LEN " + valueLen);
+        throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "invalid CKA_VALUE_LEN " + valueLen);
       }
     } else if (keyType == CKK_DES3 || keyType == CKK_VENDOR_SM4) {
       Integer i = template.removeInt(CKA_VALUE_LEN);
       valueLen = (keyType == CKK_DES3) ? 24 : 16;
       if (i != null) {
         if (valueLen != i) {
-          throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-              "CKA_VALUE_LEN != " + valueLen);
+          throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "CKA_VALUE_LEN != " + valueLen);
         }
       }
     } else {
@@ -501,11 +471,9 @@ public class Backend {
     long handle = storage.nextObjectHandle(slotId);
 
     attributes.add(XiAttribute.ofBool(CKA_TOKEN, inToken));
-    attributes.add(XiAttribute.ofLong(
-        XiP11Storage.CKA_XIHSM_CKU, loginState.getUserType()));
-    attributes.add(XiAttribute.ofLong(
-        XiP11Storage.CKA_XIHSM_ORIGIN,
-        Origin.CREATE_OBJECT.getCode()));
+    attributes.add(XiAttribute.ofLong(XiAttribute.CKA_XIHSM_CKU, loginState.getUserType()));
+    attributes.add(XiAttribute.ofLong(XiAttribute.CKA_XIHSM_ORIGIN,
+                    Origin.CREATE_OBJECT.getCode()));
 
     // CKA_TOKEN will be used here
     XiP11Storage obj = XiP11Storage.fromAttributes(
@@ -517,15 +485,14 @@ public class Backend {
   public Template C_GetAttributeValue(
       long slotId, long hObject, LoginState loginState, long[] types)
       throws HsmException {
-    XiP11Storage obj = getStorageForHandle(hObject)
-        .getObject(slotId, hObject, loginState);
+    XiP11Storage obj = getStorageForHandle(hObject).getObject(slotId, hObject, loginState);
 
     return obj.getAttributes(types).toCkAttributeArray();
   }
 
   public void C_SetAttributeValue(
-      LoginState loginState, boolean sessionRw, long slotId, long hObject,
-      XiTemplate template) throws HsmException {
+      LoginState loginState, boolean sessionRw, long slotId, long hObject, XiTemplate template)
+      throws HsmException {
     Store storage = getStorageForHandle(sessionRw, hObject, sessionRw);
     storage.updateObject(slotId, hObject, loginState, template);
   }
@@ -541,8 +508,7 @@ public class Backend {
     return (XiKey) obj;
   }
 
-  public void destroyObject(boolean sessionRw, long slotId, long hObject,
-                            LoginState loginState)
+  public void destroyObject(boolean sessionRw, long slotId, long hObject, LoginState loginState)
       throws HsmException {
     Store storage = getStorageForHandle(sessionRw, hObject, true);
     storage.destroyObject(slotId, hObject, loginState);
@@ -592,8 +558,7 @@ public class Backend {
     return getStorageForHandle(false, hObject, false);
   }
 
-  private Store getStorageForHandle(
-      boolean sessionRw, long hObject, boolean forWrite)
+  private Store getStorageForHandle(boolean sessionRw, long hObject, boolean forWrite)
       throws HsmException {
     boolean token = isPersistHandle(hObject);
     if (token && forWrite && !sessionRw) {
@@ -601,6 +566,26 @@ public class Backend {
     }
 
     return store(token);
+  }
+
+  public static byte[][] generateEdECKeyPair(EdwardsCurveEnum curve, SecureRandom rnd) {
+    try {
+      KeyPairGenerator kpGen = KeyPairGenerator.getInstance(curve.getOid());
+      if (rnd != null) {
+        kpGen.initialize(curve == EdwardsCurveEnum.ED25519 ? 255 : 448, rnd);
+      }
+      KeyPair keypair = kpGen.generateKeyPair();
+      byte[] skEncoded = keypair.getPrivate().getEncoded();
+      byte[] pkEncoded = keypair.getPublic().getEncoded();
+
+      PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(skEncoded);
+      byte[] skData = Asn1Util.getOctetStringOctets(skInfo.getPrivateKey().getOctets());
+      byte[] pkData = Asn1Util.getPublicKeyData(SubjectPublicKeyInfo.getInstance(pkEncoded));
+
+      return new byte[][] {skData, pkData};
+    } catch (NoSuchAlgorithmException ex) {
+      throw new IllegalStateException("could not generate ED25519 keypair", ex);
+    }
   }
 
 }

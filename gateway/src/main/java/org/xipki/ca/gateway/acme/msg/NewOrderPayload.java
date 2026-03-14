@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -24,8 +25,7 @@ public class NewOrderPayload implements JsonEncodable {
 
   private final String notAfter;
 
-  public NewOrderPayload(List<Identifier> identifiers,
-                         String notBefore, String notAfter) {
+  public NewOrderPayload(List<Identifier> identifiers, String notBefore, String notAfter) {
     this.identifiers = identifiers;
     this.notBefore = notBefore;
     this.notAfter = notAfter;

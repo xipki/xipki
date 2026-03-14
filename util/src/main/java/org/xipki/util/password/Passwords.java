@@ -74,10 +74,8 @@ public class Passwords {
               String value = solveVariables(
                   passwordCfg.getProperty(propName).trim(), 0, sysProps);
               int idx = value.indexOf(' ');
-              String resolverClassName = (idx == -1) ? value
-                  : value.substring(0, idx);
-              String resolverConf = (idx == -1) ? null
-                  : value.substring(idx + 1);
+              String resolverClassName = (idx == -1) ? value : value.substring(0, idx);
+              String resolverConf = (idx == -1) ? null : value.substring(idx + 1);
 
               PasswordResolver resolver;
               try {
@@ -85,9 +83,8 @@ public class Passwords {
                             .getDeclaredConstructor().newInstance();
               } catch (ReflectiveOperationException ex) {
                 throw new PasswordResolverException(
-                    "error caught while initializing PasswordResolver "
-                    + resolverClassName + ": " + ex.getClass().getName()
-                    + ": " + ex.getMessage(), ex);
+                    "error caught while initializing PasswordResolver " + resolverClassName +
+                        ": " + ex.getClass().getName() + ": " + ex.getMessage(), ex);
               }
 
               resolver.init(resolverConf);
@@ -119,8 +116,7 @@ public class Passwords {
 
           text = passwordCfg.getProperty("pbeIterationCount");
           if (text != null && !text.isEmpty()) {
-            pbeIterationCount = Integer.parseInt(
-                solveVariables(text, 0, sysProps));
+            pbeIterationCount = Integer.parseInt(solveVariables(text, 0, sysProps));
           }
         }
       }
@@ -153,8 +149,7 @@ public class Passwords {
     }
   }
 
-  public static char[] resolvePassword(String passwordHint)
-      throws PasswordResolverException {
+  public static char[] resolvePassword(String passwordHint) throws PasswordResolverException {
     if (passwordHint == null) {
       return null;
     }
@@ -180,8 +175,7 @@ public class Passwords {
     if (OBFPasswordService.PROTOCOL_OBF.equalsIgnoreCase(protocol)
         || PBEPasswordService.PROTOCOL_PBE.equalsIgnoreCase(protocol)) {
       throw new PasswordResolverException(
-          "could not find password resolver to resolve password of protocol '"
-          + protocol + "'");
+          "could not find password resolver to resolve password of protocol '" + protocol + "'");
     } else {
       return passwordHint.toCharArray();
     }
@@ -202,12 +196,10 @@ public class Passwords {
     }
 
     throw new PasswordResolverException(
-        "could not find password resolver to protect password of protocol '"
-        + protocol + "'");
+        "could not find password resolver to protect password of protocol '" + protocol + "'");
   }
 
-  private static String solveVariables(
-      String line, int offset, Properties properties) {
+  private static String solveVariables(String line, int offset, Properties properties) {
     if (offset + 4 >= line.length()) {
       return line;
     }
@@ -235,8 +227,7 @@ public class Passwords {
 
     int newOffset;
     if (value != null) {
-      line = line.substring(0, startIndex) + value
-              + line.substring(endIndex + 1);
+      line = line.substring(0, startIndex) + value + line.substring(endIndex + 1);
       newOffset = startIndex + value.length() + 1;
     } else {
       newOffset = endIndex + 1;
@@ -301,8 +292,7 @@ public class Passwords {
         if (str != null && !str.isEmpty()) {
           iterationCount = Integer.parseInt(str);
           if (iterationCount < 1000) {
-            throw new PasswordResolverException(
-                "iterationCount less than 1000 is not allowed");
+            throw new PasswordResolverException("iterationCount less than 1000 is not allowed");
           }
         }
       }
@@ -310,13 +300,11 @@ public class Passwords {
       this.masterPasswordCallback = getPasswordCallback(callback);
     }
 
-    protected char[] getMasterPassword(String encryptedPassword)
-        throws PasswordResolverException {
+    protected char[] getMasterPassword(String encryptedPassword) throws PasswordResolverException {
       synchronized (masterPasswordLock) {
         if (masterPassword == null) {
           if (masterPasswordCallback == null) {
-            throw new PasswordResolverException(
-                "masterPasswordCallback is not initialized");
+            throw new PasswordResolverException("masterPasswordCallback is not initialized");
           }
           this.masterPassword = masterPasswordCallback.getPassword(
               "Please enter the master password", encryptedPassword);
@@ -331,15 +319,13 @@ public class Passwords {
     }
 
     @Override
-    public char[] resolvePassword(String passwordHint)
-        throws PasswordResolverException {
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
       return PBEPasswordService.decryptPassword(
           getMasterPassword(passwordHint), passwordHint);
     }
 
     @Override
-    public String protectPassword(char[] password)
-        throws PasswordResolverException {
+    public String protectPassword(char[] password) throws PasswordResolverException {
       return PBEPasswordService.encryptPassword(
           PBEAlgo.PBEWithHmacSHA256AndAES_256, iterationCount,
           getMasterPassword(null), password);
@@ -352,15 +338,13 @@ public class Passwords {
     private String passwordFile;
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       if (passwordFile == null) {
         throw new PasswordResolverException("please initialize me first");
       }
 
       String passwordHint = null;
-      try (BufferedReader reader = Files.newBufferedReader(
-          Paths.get(passwordFile))) {
+      try (BufferedReader reader = Files.newBufferedReader(Paths.get(passwordFile))) {
         String line;
         while ((line = reader.readLine()) != null) {
           line = line.trim();
@@ -370,17 +354,14 @@ public class Passwords {
           }
         }
       } catch (IOException ex) {
-        throw new PasswordResolverException(
-            "could not read file " + passwordFile, ex);
+        throw new PasswordResolverException("could not read file " + passwordFile, ex);
       }
 
       if (passwordHint == null) {
-        throw new PasswordResolverException(
-            "no password is specified in file " + passwordFile);
+        throw new PasswordResolverException("no password is specified in file " + passwordFile);
       }
 
-      return (StringUtil.startsWithIgnoreCase(passwordHint,
-          OBFPasswordService.PROTOCOL_OBF + ":"))
+      return (StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":"))
           ? OBFPasswordService.deobfuscate(passwordHint).toCharArray()
           : passwordHint.toCharArray();
     } // method getPassword
@@ -409,8 +390,7 @@ public class Passwords {
     }
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       String tmpPrompt = prompt;
       if (StringUtil.isBlank(tmpPrompt)) {
         tmpPrompt = "Password required";
@@ -421,13 +401,11 @@ public class Passwords {
         if (quorum == 1) {
           password = Optional.ofNullable(
               SecurePasswordInputPanel.readPassword(tmpPrompt))
-              .orElseThrow(() ->
-                  new PasswordResolverException("user has cancelled"));
+              .orElseThrow(() -> new PasswordResolverException("user has cancelled"));
         } else {
           char[][] passwordParts = new char[quorum][];
           for (int j = 0; j < quorum; j++) {
-            String promptPart =
-                tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
+            String promptPart = tmpPrompt + " (part " + (j + 1) + "/" + quorum + ")";
             passwordParts[j] = Optional.ofNullable(
                 SecurePasswordInputPanel.readPassword(promptPart)).orElseThrow(
                     () -> new PasswordResolverException("user has cancelled"));
@@ -440,8 +418,7 @@ public class Passwords {
         }
       }
 
-      throw new PasswordResolverException(
-          "Could not get the password after " + tries + " tries");
+      throw new PasswordResolverException("Could not get the password after " + tries + " tries");
     }
 
     @Override
@@ -455,8 +432,7 @@ public class Passwords {
       String str = pairs.value("quorum");
       quorum = Integer.parseInt(str);
       if (quorum < 1 || quorum > 10) {
-        throw new PasswordResolverException(
-            "quorum " + quorum + " is not in [1,10]");
+        throw new PasswordResolverException("quorum " + quorum + " is not in [1,10]");
       }
 
       str = pairs.value("tries");
@@ -475,8 +451,7 @@ public class Passwords {
     private char[] password;
 
     @Override
-    public char[] getPassword(String prompt, String testToken)
-        throws PasswordResolverException {
+    public char[] getPassword(String prompt, String testToken) throws PasswordResolverException {
       return Optional.ofNullable(password).orElseThrow(() ->
           new PasswordResolverException("please initialize me first"));
     }
@@ -532,9 +507,8 @@ public class Passwords {
         break;
       case OBFPasswordService.PROTOCOL_OBF:
         pwdCallback = new OBFPasswordCallback();
-        if (conf != null
-            && !StringUtil.startsWithIgnoreCase(conf,
-                OBFPasswordService.PROTOCOL_OBF + ":")) {
+        if (conf != null && !StringUtil.startsWithIgnoreCase(conf,
+                              OBFPasswordService.PROTOCOL_OBF + ":")) {
           conf = OBFPasswordService.PROTOCOL_OBF + ":" + conf;
         }
         break;

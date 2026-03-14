@@ -37,8 +37,7 @@ public abstract class DbWorker implements Runnable {
     ConfigurableProperties props = DbPorter.getDbConfProperties(
         Paths.get(IoUtil.expandFilepath(dbConfFile)));
 
-    this.datasource = datasourceFactory.createDataSource(
-        "ds-" + dbConfFile, props);
+    this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, props);
   }
 
   public final Exception exception() {

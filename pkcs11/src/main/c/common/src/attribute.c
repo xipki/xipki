@@ -9,8 +9,7 @@
 
 #define free_tmpl(TMPL, COUNT) \
   for (int i = 0; i < COUNT; i++) { \
-    if (TMPL[i].ulValueLen > 0 \
-         && TMPL[i].ulValueLen <= MAX_ATTR_VALUE_LEN) { \
+    if (TMPL[i].ulValueLen > 0 && TMPL[i].ulValueLen <= MAX_ATTR_VALUE_LEN) { \
       free_t_null(TMPL[i].pValue); \
     } \
   } \

@@ -3,10 +3,12 @@
 
 package org.xipki.security.pkcs11;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -54,7 +56,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 /**
  * PKCS#11 slot.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class P11Slot implements Closeable {
 
@@ -78,7 +80,7 @@ public class P11Slot implements Closeable {
   private String libDesc;
 
   public P11Slot(String moduleName, P11SlotId slotId, PKCS11Token token,
-                 P11MechanismFilter mechanismFilter)
+                P11MechanismFilter mechanismFilter)
       throws TokenException {
     this.moduleName = Args.notBlank(moduleName, "moduleName");
     this.slotId = Args.notNull(slotId, "slotId");
@@ -108,20 +110,17 @@ public class P11Slot implements Closeable {
 
   private static String getDescription(byte[] keyId, String keyLabel) {
     return StringUtil.concat("id ",
-        (keyId == null ? "null" : Hex.encode(keyId)), " and label ",
-        keyLabel);
+        (keyId == null ? "null" : Hex.encode(keyId)), " and label ", keyLabel);
   }
 
   private void initMechanisms(
-      Map<Long, CkMechanismInfo> supportedMechanisms,
-      P11MechanismFilter mechanismFilter) {
+      Map<Long, CkMechanismInfo> supportedMechanisms, P11MechanismFilter mechanismFilter) {
     mechanisms.clear();
 
     List<Long> ignoreMechs = new ArrayList<>();
     PKCS11Module pkcs11Module = token.getModule();
 
-    for (Map.Entry<Long, CkMechanismInfo> entry
-        : supportedMechanisms.entrySet()) {
+    for (Map.Entry<Long, CkMechanismInfo> entry : supportedMechanisms.entrySet()) {
       long mech = entry.getKey();
       if (mechanismFilter.isMechanismPermitted(slotId, mech, pkcs11Module)) {
         mechanisms.put(mech, entry.getValue());
@@ -154,8 +153,7 @@ public class P11Slot implements Closeable {
     }
   }
 
-  private void printMechanisms(
-      StringBuilder sb, Map<Long, CkMechanismInfo> mechanisms) {
+  private void printMechanisms(StringBuilder sb, Map<Long, CkMechanismInfo> mechanisms) {
     List<Long> sortedMechs = new ArrayList<>(mechanisms.keySet());
     Collections.sort(sortedMechs);
 
@@ -170,8 +168,7 @@ public class P11Slot implements Closeable {
     return Collections.unmodifiableMap(mechanisms);
   }
 
-  public void assertMechSupported(long mechanism, long flagBit)
-      throws TokenException {
+  public void assertMechSupported(long mechanism, long flagBit) throws TokenException {
     if (supportsMechanism(mechanism, flagBit)) {
       return;
     }
@@ -195,8 +192,7 @@ public class P11Slot implements Closeable {
     }
 
     if (objectExistsByIdLabel(id, label)) {
-      throw new TokenException("Objects with " + getDescription(id, label) +
-          " already exists");
+      throw new TokenException("Objects with " + getDescription(id, label) + " already exists");
     }
   }
 
@@ -210,8 +206,7 @@ public class P11Slot implements Closeable {
    * @return number of deleted objects.
    * @throws TokenException If PKCS#11 error happens.
    */
-  public int destroyObjectsByIdLabel(byte[] id, String label)
-      throws TokenException {
+  public int destroyObjectsByIdLabel(byte[] id, String label) throws TokenException {
     return token.destroyObjectsByIdLabel(id, label);
   }
 
@@ -224,8 +219,7 @@ public class P11Slot implements Closeable {
    * @return the identifier of the key within the PKCS#11 token.
    * @throws TokenException if PKCS#11 token exception occurs.
    */
-  public PKCS11KeyId generateSecretKey(
-      Integer keyBitLength, PKCS11SecretKeySpec spec)
+  public PKCS11KeyId generateSecretKey(Integer keyBitLength, PKCS11SecretKeySpec spec)
       throws TokenException {
     assertWritable("generateSecretKey");
     assertNoObjects(Args.notNull(spec, "spec").id(), spec.label());
@@ -237,8 +231,7 @@ public class P11Slot implements Closeable {
             ckkCodeToName(keyType) + " but is not specified");
       }
     } else if (keyBitLength % 8 != 0) {
-      throw new IllegalArgumentException(
-          "keyBitLength is not multiple of 8: " + keyBitLength);
+      throw new IllegalArgumentException("keyBitLength is not multiple of 8: " + keyBitLength);
     }
 
     boolean hasValueLen = true;
@@ -264,8 +257,7 @@ public class P11Slot implements Closeable {
    * @return the identifier of the key within the PKCS#11 token.
    * @throws TokenException if PKCS#11 token exception occurs.
    */
-  public PKCS11KeyId importSecretKey(
-      byte[] keyValue, PKCS11SecretKeySpec spec)
+  public PKCS11KeyId importSecretKey(byte[] keyValue, PKCS11SecretKeySpec spec)
       throws TokenException {
     assertWritable("createSecretKey");
     assertNoObjects(Args.notNull(spec, "spec").id(), spec.label());
@@ -296,15 +288,13 @@ public class P11Slot implements Closeable {
    * @throws XiSecurityException
    *         if exception occurs.
    */
-  public KeyInfoPair generateKeyPairOtf(KeySpec keySpec)
-      throws XiSecurityException {
+  public KeyInfoPair generateKeyPairOtf(KeySpec keySpec) throws XiSecurityException {
     PKCS11KeyId keypair = null;
 
     try {
       assertKeyPairGenerationAlgoSupported(keySpec);
       PKCS11KeyPairSpec template = new PKCS11KeyPairSpec()
-          .keyPairType(keySpec.type())
-          .sensitive(false).extractable(true).token(false);
+          .keyPairType(keySpec.type()).sensitive(false).extractable(true).token(false);
       keypair = token.generateKeyPair(template);
 
       if (keySpec.isRSA()) {
@@ -317,11 +307,9 @@ public class P11Slot implements Closeable {
                 attrs.privateExponent(), attrs.prime1(), attrs.prime2(),
                 attrs.exponent1(), attrs.exponent2(), attrs.coefficient()));
         SubjectPublicKeyInfo pubKeyInfo = new SubjectPublicKeyInfo(ALGID_RSA,
-            new org.bouncycastle.asn1.pkcs.RSAPublicKey(
-                attrs.modulus(), attrs.publicExponent()));
+            new org.bouncycastle.asn1.pkcs.RSAPublicKey(attrs.modulus(), attrs.publicExponent()));
         return new KeyInfoPair(pubKeyInfo, priKeyInfo);
-      } else if (keySpec.isWeierstrassEC() || keySpec.isEdwardsEC() ||
-          keySpec.isMontgomeryEC()) {
+      } else if (keySpec.isWeierstrassEC() || keySpec.isEdwardsEC() || keySpec.isMontgomeryEC()) {
         byte[] ecPoint = token.getAttrValues(keypair.getPublicKeyHandle(),
             new AttributeTypes().ecPoint()).ecPoint();
         byte[] privValue = token.getAttrValues(keypair.getHandle(),
@@ -331,8 +319,7 @@ public class P11Slot implements Closeable {
 
         PrivateKeyInfo priKeyInfo;
         if (keySpec.isEdwardsEC() || keySpec.isMontgomeryEC()) {
-          priKeyInfo = new PrivateKeyInfo(algId, new DEROctetString(privValue),
-              null, ecPoint);
+          priKeyInfo = new PrivateKeyInfo(algId, new DEROctetString(privValue), null, ecPoint);
         } else {
           if (ecPoint[0] != 4) {
             throw new TokenException("EcPoint does not start with 0x04");
@@ -346,14 +333,59 @@ public class P11Slot implements Closeable {
                   new DERBitString(ecPoint), null));
         }
 
-        return new KeyInfoPair(new SubjectPublicKeyInfo(algId, ecPoint),
-            priKeyInfo);
+        return new KeyInfoPair(new SubjectPublicKeyInfo(algId, ecPoint), priKeyInfo);
+      } else if (keySpec.isMldsa() || keySpec.isMlkem()) {
+        long parameterSet = token.getAttrValues(keypair.getPublicKeyHandle(),
+                new AttributeTypes().parameterSet().value()).parameterSet();
+        KeySpec jKeySpec = null;
+        if (keySpec.isMldsa()) {
+          if (parameterSet == CKP_ML_DSA_44) {
+            jKeySpec = KeySpec.MLDSA44;
+          } else if (parameterSet == CKP_ML_DSA_65) {
+            jKeySpec = KeySpec.MLDSA65;
+          } else if (parameterSet == CKP_ML_DSA_87) {
+            jKeySpec = KeySpec.MLDSA87;
+          }
+        } else {
+          if (parameterSet == CKP_ML_KEM_512) {
+            jKeySpec = KeySpec.MLKEM512;
+          } else if (parameterSet == CKP_ML_KEM_768) {
+            jKeySpec = KeySpec.MLKEM768;
+          } else if (parameterSet == CKP_ML_KEM_1024) {
+            jKeySpec = KeySpec.MLKEM1024;
+          }
+        }
+
+        if (jKeySpec == null) {
+          throw new TokenException("Invalid ParameterSet " + parameterSet);
+        }
+
+        byte[] skSeed = token.getAttrValues(keypair.getHandle(),
+                        new AttributeTypes().parameterSet().seed()).seed();
+        byte[] skValue;
+        ASN1Encodable privateKey;
+        if (skSeed != null) {
+          privateKey = new DERTaggedObject(false, 0, new DEROctetString(skSeed));
+        } else {
+          skValue = token.getAttrValues(keypair.getHandle(), new AttributeTypes().value()).value();
+          if (skValue == null) {
+            throw new TokenException("None of seed and value can be extracted");
+          }
+          privateKey = new DEROctetString(skValue);
+        }
+
+        AlgorithmIdentifier algId = keySpec.algorithmIdentifier();
+        PrivateKeyInfo priKeyInfo = new PrivateKeyInfo(algId, privateKey);
+
+        byte[] pkValue = token.getAttrValues(keypair.getPublicKeyHandle(),
+                            new AttributeTypes().value()).value();
+
+        return new KeyInfoPair(new SubjectPublicKeyInfo(algId, pkValue), priKeyInfo);
       } else {
         throw new XiSecurityException("unsupported keySpec " + keySpec);
       }
     } catch(TokenException | IOException ex){
-      throw new XiSecurityException(
-          "error generateKeypair for keySpec " + keySpec, ex);
+      throw new XiSecurityException("error generateKeypair for keySpec " + keySpec, ex);
     } finally{
       token.destroyKeyQuietly(keypair);
     }
@@ -363,8 +395,7 @@ public class P11Slot implements Closeable {
       throws TokenException {
     if (keySpec.isRSA()) {
       if (!(supportsMechanism(CKM_RSA_X9_31_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR)
-          || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN,
-              CKF_GENERATE_KEY_PAIR))) {
+          || supportsMechanism(CKM_RSA_PKCS_KEY_PAIR_GEN, CKF_GENERATE_KEY_PAIR))) {
         throw new TokenException(buildOrMechanismsUnsupportedMessage(
             CKM_RSA_X9_31_KEY_PAIR_GEN, CKM_RSA_PKCS_KEY_PAIR_GEN));
       }
@@ -386,8 +417,7 @@ public class P11Slot implements Closeable {
 
   private void assertWritable(String operationName) throws TokenException {
     if (readOnly) {
-      throw new TokenException("Writable operation " + operationName +
-          " is not permitted");
+      throw new TokenException("Writable operation " + operationName + " is not permitted");
     }
   }
 
@@ -422,8 +452,7 @@ public class P11Slot implements Closeable {
     for (Long mech : newList) {
       CkMechanismInfo info = token.getMechanismInfo(mech);
       if (info == null) {
-        LOG.warn("found not MechanismInfo for {}, ignore it",
-            ckmCodeToName(mech));
+        LOG.warn("found not MechanismInfo for {}, ignore it", ckmCodeToName(mech));
       } else {
         ret.put(mech, info);
       }
@@ -438,8 +467,7 @@ public class P11Slot implements Closeable {
   public boolean supportsMechanism(long mechanism, long flagBit) {
     CkMechanismInfo info = mechanisms.get(mechanism);
     if (info == null) {
-      long genericCode = token.getModule().vendorToGenericCode(
-          Category.CKM, mechanism);
+      long genericCode = token.getModule().vendorToGenericCode(Category.CKM, mechanism);
 
       if (genericCode != mechanism) {
         info = mechanisms.get(genericCode);
@@ -453,18 +481,47 @@ public class P11Slot implements Closeable {
     token.closeAllSessions();
   }
 
-  public byte[] digestSecretKey(long mech, long handle) throws TokenException {
+  public byte[] digestSecretKey(long mech, long hKey) throws TokenException {
     assertMechSupported(mech, CKF_DIGEST);
-    return token.digestKey(new CkMechanism(mech), handle);
+    return token.digest(new CkMechanism(mech), hKey);
   }
 
   public byte[] sign(long mechanism, P11Params params, ExtraParams extraParams,
-                     long keyHandle, byte[] content) throws TokenException {
+                    long keyHandle, byte[] content) throws TokenException {
     Args.notNull(content, "content");
     assertMechSupported(mechanism, CKF_SIGN);
     CkMechanism mech = (params == null) ? new CkMechanism(mechanism)
-                          : params.toMechanism(mechanism, extraParams);
+                                        : params.toMechanism(mechanism, extraParams);
     return token.sign(mech, keyHandle, content);
+  }
+
+  public long deriveKey(long mechanism, P11Params params, long hBaseKey,
+                        PKCS11SecretKeySpec template)
+      throws TokenException {
+    Args.notNull(template, "template");
+    assertMechSupported(mechanism, CKF_DERIVE);
+    CkMechanism mech = (params == null) ? new CkMechanism(mechanism)
+                          : params.toMechanism(mechanism, null);
+    return token.deriveKey(mech, hBaseKey, template);
+  }
+
+  public long decapsulateKey(long mechanism, P11Params params, long hPrivateKey,
+                            byte[] cipherText, PKCS11SecretKeySpec template)
+      throws TokenException {
+    Args.notNull(cipherText, "cipherText");
+    assertMechSupported(mechanism, CKF_DECAPSULATE);
+    CkMechanism mech = (params == null) ? new CkMechanism(mechanism)
+                          : params.toMechanism(mechanism, null);
+    return token.decapsulateKey(mech, hPrivateKey, cipherText, template);
+  }
+
+  public byte[] decrypt(long mechanism, P11Params params, long hKey, byte[] cipherText)
+      throws TokenException {
+    Args.notNull(cipherText, "cipherText");
+    assertMechSupported(mechanism, CKF_DECRYPT);
+    CkMechanism mech = (params == null) ? new CkMechanism(mechanism)
+                          : params.toMechanism(mechanism, null);
+    return token.decrypt(mech, hKey, cipherText);
   }
 
   public P11Key getKey(PKCS11KeyId keyId) throws TokenException {
@@ -477,8 +534,7 @@ public class P11Slot implements Closeable {
     return (pkcs11Key == null) ? null : toIdentity(pkcs11Key);
   }
 
-  public PKCS11KeyId getKeyId(byte[] keyId, String keyLabel)
-      throws TokenException {
+  public PKCS11KeyId getKeyId(byte[] keyId, String keyLabel) throws TokenException {
     return token.getKeyId(keyId, keyLabel);
   }
 
@@ -503,8 +559,7 @@ public class P11Slot implements Closeable {
   }
 
   public PublicKey getPublicKey(long handle) throws TokenException {
-    Template attrs = token.getAttrValues(handle,
-        new AttributeTypes().keyType().class_());
+    Template attrs = token.getAttrValues(handle, new AttributeTypes().keyType().class_());
 
     Long objClass = attrs.class_();
     Long keyType = attrs.keyType();
@@ -514,29 +569,26 @@ public class P11Slot implements Closeable {
     }
 
     if (!valid) {
-      throw new TokenException("object with " +  handle +
-          " is not a public key");
+      throw new TokenException("object with " +  handle + " is not a public key");
     }
 
     if (keyType == CKK_RSA) {
-      attrs = token.getAttrValues(handle,
-          new AttributeTypes().modulus().publicExponent());
+      attrs = token.getAttrValues(handle, new AttributeTypes().modulus().publicExponent());
 
       try {
         return KeyUtil.getRSAPublicKey(
-            new RSAPublicKeySpec(attrs.modulus(), attrs.publicExponent()));
+                new RSAPublicKeySpec(attrs.modulus(), attrs.publicExponent()));
       } catch (InvalidKeySpecException ex) {
         throw new TokenException(ex.getMessage(), ex);
       }
-    } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2
-        || keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
+    } else if (keyType == CKK_EC || keyType == CKK_VENDOR_SM2 ||
+        keyType == CKK_EC_EDWARDS || keyType == CKK_EC_MONTGOMERY) {
       EcCurveEnum curveEnum;
       if (keyType == CKK_VENDOR_SM2) {
         attrs = token.getAttrValues(handle, new AttributeTypes().ecPoint());
-        curveEnum = EcCurveEnum.SM2P256V1;
+        curveEnum = EcCurveEnum.SM2;
       } else {
-        attrs = token.getAttrValues(handle,
-            new AttributeTypes().ecPoint().ecParams());
+        attrs = token.getAttrValues(handle, new AttributeTypes().ecPoint().ecParams());
 
         curveEnum = EcCurveEnum.ofEncodedOid(attrs.ecParams());
       }
@@ -548,20 +600,16 @@ public class P11Slot implements Closeable {
         throw new TokenException(ex.getMessage(), ex);
       }
     } else if (keyType == CKK_ML_DSA) {
-      attrs = token.getAttrValues(handle,
-          new AttributeTypes().value().parameterSet());
+      attrs = token.getAttrValues(handle, new AttributeTypes().value().parameterSet());
 
       long variant = Optional.ofNullable(attrs.parameterSet())
-          .orElseThrow(()-> new IllegalStateException(
-              "found no CKP_PARAMETER_SET"));
+          .orElseThrow(()-> new IllegalStateException("found no CKP_PARAMETER_SET"));
 
       String oid = Optional.ofNullable(getStdMldsaOid(variant))
-          .orElseThrow(()-> new TokenException(
-              "invalid CKP_PARAMETER_SET " + variant));
+          .orElseThrow(()-> new TokenException("invalid CKP_PARAMETER_SET " + variant));
 
       SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
-          new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid)),
-          attrs.value());
+          new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid)), attrs.value());
 
       try {
         return KeyUtil.getPublicKey(pkInfo);
@@ -569,19 +617,15 @@ public class P11Slot implements Closeable {
         throw new TokenException(ex.getMessage(), ex);
       }
     } else if (keyType == CKK_ML_KEM) {
-      attrs = token.getAttrValues(handle,
-          new AttributeTypes().value().parameterSet());
+      attrs = token.getAttrValues(handle, new AttributeTypes().value().parameterSet());
       long variant = Optional.ofNullable(attrs.parameterSet())
-          .orElseThrow(() -> new IllegalStateException(
-              "found no CKP_PARAMETER_SET"));
+          .orElseThrow(() -> new IllegalStateException("found no CKP_PARAMETER_SET"));
 
       String oid = Optional.ofNullable(getStdMlkemOid(variant))
-          .orElseThrow(() -> new IllegalStateException(
-              "invalid CKP_PARAMETER_SET " + variant));
+          .orElseThrow(() -> new IllegalStateException("invalid CKP_PARAMETER_SET " + variant));
 
       SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
-          new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid)),
-          attrs.value());
+          new AlgorithmIdentifier(new ASN1ObjectIdentifier(oid)), attrs.value());
       try {
         return KeyUtil.getPublicKey(pkInfo);
       } catch (InvalidKeySpecException ex) {
@@ -592,8 +636,7 @@ public class P11Slot implements Closeable {
     }
   }
 
-  public boolean objectExistsByIdLabel(byte[] id, String label)
-      throws TokenException {
+  public boolean objectExistsByIdLabel(byte[] id, String label) throws TokenException {
     return token.objectExistsByIdLabel(id, label);
   }
 
@@ -618,7 +661,11 @@ public class P11Slot implements Closeable {
    * @param handles handles of objects to be destroyed.
    * @return handles of objects which could not been destroyed.
    */
-  public long[] destroyObjectsAndReturnFailedHandles(long[] handles) {
+  public long[] destroyObjectsAndReturnFailedHandles(long... handles) {
+    if (handles == null || handles.length == 0) {
+      return new long[0];
+    }
+
     List<Long> handleList = new ArrayList<>(handles.length);
     for (long handle : handles) {
       handleList.add(handle);
@@ -646,8 +693,7 @@ public class P11Slot implements Closeable {
     return failedHandles;
   }
 
-  Template getAttrValues(long hObject, AttributeTypes types)
-      throws TokenException {
+  Template getAttrValues(long hObject, AttributeTypes types) throws TokenException {
     return token.getAttrValues(hObject, types);
   }
 
@@ -660,8 +706,7 @@ public class P11Slot implements Closeable {
    * @param hObject If present, only details of this object will be shown.
    * @throws IOException if IO error occurs.
    */
-  public void showDetails(OutputStream stream, Long hObject, boolean verbose)
-      throws IOException {
+  public void showDetails(OutputStream stream, Long hObject, boolean verbose) throws IOException {
     Args.notNull(stream, "stream");
 
     CkTokenInfo tokenInfo0 = null;
@@ -670,16 +715,12 @@ public class P11Slot implements Closeable {
     } catch (PKCS11Exception e) {
     }
 
-    String slotInfo  = (this.slotInfo  == null) ? "ERROR"
-        : this.slotInfo .toString(null, "  ");
+    String slotInfo  = (this.slotInfo  == null) ? "ERROR" : this.slotInfo .toString(null, "  ");
 
-    String tokenInfo = (tokenInfo0 == null) ? "<ERROR>"
-        : tokenInfo0.toString(null, "  ");
+    String tokenInfo = (tokenInfo0 == null) ? "<ERROR>" : tokenInfo0.toString(null, "  ");
 
-    stream.write(("\nToken information:\n"  + tokenInfo)
-        .getBytes(StandardCharsets.UTF_8));
-    stream.write(("\n\nSlot information:\n" + slotInfo)
-        .getBytes(StandardCharsets.UTF_8));
+    stream.write(("\nToken information:\n"  + tokenInfo).getBytes(StandardCharsets.UTF_8));
+    stream.write(("\n\nSlot information:\n" + slotInfo).getBytes(StandardCharsets.UTF_8));
     stream.write('\n');
 
     if (verbose) {
@@ -694,8 +735,7 @@ public class P11Slot implements Closeable {
         stream.write(("\nDetails of object with handle " + hObject + "\n")
             .getBytes(StandardCharsets.UTF_8));
         Template attrs = token.getDefaultAttrValues(hObject);
-        stream.write(attrs.toString(false, "  ")
-            .getBytes(StandardCharsets.UTF_8));
+        stream.write(attrs.toString(false, "  ").getBytes(StandardCharsets.UTF_8));
       } else {
         stream.write("\nList of objects:\n".getBytes(StandardCharsets.UTF_8));
         long[] handles = token.findObjects(null, 9999);
@@ -730,8 +770,7 @@ public class P11Slot implements Closeable {
   }
 
   private String objectToString(long handle) throws TokenException {
-    Template attrs = token.getAttrValues(handle,
-        new AttributeTypes().id().label().class_());
+    Template attrs = token.getAttrValues(handle, new AttributeTypes().id().label().class_());
     long objClass = Optional.ofNullable(attrs.class_()).orElseThrow(
         () -> new TokenException("CKA_CLASS is not present."));
 
@@ -739,18 +778,15 @@ public class P11Slot implements Closeable {
     String label = attrs.label();
 
     String keySpec = null;
-    if (objClass == CKO_PRIVATE_KEY || objClass == CKO_PUBLIC_KEY
-        || objClass == CKO_SECRET_KEY) {
-      long keyType = token.getAttrValues(handle,
-          new AttributeTypes().keyType()).keyType();
+    if (objClass == CKO_PRIVATE_KEY || objClass == CKO_PUBLIC_KEY || objClass == CKO_SECRET_KEY) {
+      long keyType = token.getAttrValues(handle, new AttributeTypes().keyType()).keyType();
 
       if (objClass == CKO_SECRET_KEY) {
         int valueLen;
         if (keyType == CKK_VENDOR_SM4) {
           valueLen = 16;
         } else {
-          Integer len = token.getAttrValues(handle,
-              new AttributeTypes().valueLen()).valueLen();
+          Integer len = token.getAttrValues(handle, new AttributeTypes().valueLen()).valueLen();
           valueLen = (len == null) ? 0 : len;
         }
 
@@ -761,9 +797,8 @@ public class P11Slot implements Closeable {
               new AttributeTypes().modulus()).modulus();
           keySpec = "RSA/" + (modulus == null ? "<N/A>" : modulus.bitLength());
         } else if (keyType == CKK_EC || keyType == CKK_EC_EDWARDS ||
-            keyType == CKK_EC_MONTGOMERY) {
-          byte[] ecParams = token.getAttrValues(handle,
-              new AttributeTypes().ecParams()).ecParams();
+                  keyType == CKK_EC_MONTGOMERY) {
+          byte[] ecParams = token.getAttrValues(handle, new AttributeTypes().ecParams()).ecParams();
 
           String curveName;
           if (ecParams == null) {
@@ -781,16 +816,14 @@ public class P11Slot implements Closeable {
         } else if (keyType == CKK_ML_DSA) {
           Long variant = token.getAttrValues(handle,
               new AttributeTypes().parameterSet()).parameterSet();
-          keySpec = (variant == null) ? "MLDSA-NOT-PRESENT"
-              : PKCS11T.getStdMldsaName(variant);
+          keySpec = (variant == null) ? "MLDSA-NOT-PRESENT" : PKCS11T.getStdMldsaName(variant);
           if (keySpec == null) {
             keySpec = "MLDSA-UNKNOWN-" + variant;
           }
         } else if (keyType == CKK_ML_KEM) {
           Long variant = token.getAttrValues(handle,
               new AttributeTypes().parameterSet()).parameterSet();
-          keySpec = (variant == null) ? "MLKEM-NOT-PRESENT"
-              : PKCS11T.getStdMlkemName(variant);
+          keySpec = (variant == null) ? "MLKEM-NOT-PRESENT" : PKCS11T.getStdMlkemName(variant);
           if (keySpec == null) {
             keySpec = "MLKEM-UNKNOWN-" + variant;
           }
@@ -833,15 +866,10 @@ public class P11Slot implements Closeable {
   }
 
   static String getStdMlkemOid(long parameterSet) {
-    if (parameterSet == CKP_ML_KEM_512) {
-      return OIDs.Algo.id_ml_kem_512.getId();
-    } else if (parameterSet == CKP_ML_KEM_768) {
-      return OIDs.Algo.id_ml_kem_768.getId();
-    } else if (parameterSet == CKP_ML_KEM_1024) {
-      return OIDs.Algo.id_ml_kem_1024.getId();
-    } else {
-      return null;
-    }
+    return (parameterSet == CKP_ML_KEM_512)  ? OIDs.Algo.id_ml_kem_512.getId()
+        :  (parameterSet == CKP_ML_KEM_768)  ? OIDs.Algo.id_ml_kem_768.getId()
+        :  (parameterSet == CKP_ML_KEM_1024) ? OIDs.Algo.id_ml_kem_1024.getId()
+        :  null;
   }
 
 }

@@ -98,12 +98,10 @@ public class RSAPKCSSignRawDataTest {
           token.supportsMechanism(mechCode, CKF_SIGN));
 
       // be sure that your token can process the specified mechanism
-      CkMechanism signatureMechanism =
-          getSupportedMechanism(mechCode, CKF_SIGN);
+      CkMechanism signatureMechanism = getSupportedMechanism(mechCode, CKF_SIGN);
 
       final boolean inToken = false;
-      PKCS11KeyId generatedKeyPair =
-          generateKeypair(PKCS11KeyPairType.RSA2048, inToken);
+      PKCS11KeyId generatedKeyPair = generateKeypair(PKCS11KeyPairType.RSA2048, inToken);
       long generatedPrivateKey = generatedKeyPair.getHandle();
 
       int[] dataLens = {1057, 10570, 105700};
@@ -113,8 +111,7 @@ public class RSAPKCSSignRawDataTest {
         byte[] dataToBeSigned = randomBytes(dataLen); // hash value
 
         // This signing operation is implemented in most of the drivers
-        byte[] signatureValue = token.sign(signatureMechanism,
-            generatedPrivateKey, dataToBeSigned);
+        byte[] signatureValue = token.sign(signatureMechanism, generatedPrivateKey, dataToBeSigned);
 
         LOG.info("The signature value is: {}",
             new BigInteger(1, signatureValue).toString(16));

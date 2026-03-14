@@ -289,8 +289,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  KemEncapKey generateKemEncapKey(String caName, SubjectPublicKeyInfo publicKey,
-                                  ReqRespDebug debug)
+  KemEncapKey generateKemEncapKey(String caName, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
     throws CmpClientException, PkiErrorException;
 
 }

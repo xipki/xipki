@@ -32,18 +32,15 @@ public class PKCS11Loader {
    *        The path of the module; e.g. "/path/to/libhsm.so".
    */
   public PKCS11Loader(String pkcs11ModulePath) {
-    this.rawPkcs11ModulePath = Args.notNull(pkcs11ModulePath,
-        "pkcs11ModulePath");
+    this.rawPkcs11ModulePath = Args.notNull(pkcs11ModulePath, "pkcs11ModulePath");
 
     String path;
-    if (pkcs11ModulePath.startsWith("java:")
-        || pkcs11ModulePath.startsWith("xihsm:")) {
+    if (pkcs11ModulePath.startsWith("java:") || pkcs11ModulePath.startsWith("xihsm:")) {
       int pathBeginIndex;
       if (pkcs11ModulePath.startsWith("java:")) {
         final int prefixLen = "java:".length();
         int sepClassEndIndex = pkcs11ModulePath.indexOf(":", prefixLen);
-        this.className = pkcs11ModulePath.substring(
-            prefixLen, sepClassEndIndex);
+        this.className = pkcs11ModulePath.substring(prefixLen, sepClassEndIndex);
         pathBeginIndex = sepClassEndIndex + 1;
       } else {
         this.className = "org.xipki.pkcs11.xihsm.XiPKCS11";
@@ -81,10 +78,9 @@ public class PKCS11Loader {
     if (className != null) {
       try {
         pkcs11 = (PKCS11) PKCS11Module.class.getClassLoader()
-            .loadClass(className).getConstructor().newInstance();
+                  .loadClass(className).getConstructor().newInstance();
       } catch (Exception e) {
-        String message = "error initializing PKCS#11 module '"
-            + rawPkcs11ModulePath  + "'";
+        String message = "error initializing PKCS#11 module '" + rawPkcs11ModulePath  + "'";
         LOG.error(message, e);
         throw new IOException(message + ":" + e.getMessage(), e);
       }
@@ -100,8 +96,7 @@ public class PKCS11Loader {
       pkcs11.C_Initialize(flags);
     } catch (PKCS11Exception e) {
       if (e.errorCode() == PKCS11T.CKR_CRYPTOKI_ALREADY_INITIALIZED) {
-        LOG.error("pkcs11.C_Initialize with " +
-            "CKR_CRYPTOKI_ALREADY_INITIALIZED", e);
+        LOG.error("pkcs11.C_Initialize with CKR_CRYPTOKI_ALREADY_INITIALIZED", e);
       } else {
         try {
           pkcs11.C_Finalize();
@@ -111,8 +106,7 @@ public class PKCS11Loader {
       }
     }
 
-    LOG.info("LogPKCS11 initialized PKCS11: pkcs11ModulePath={}",
-        pkcs11ModulePath);
+    LOG.info("LogPKCS11 initialized PKCS11: pkcs11ModulePath={}", pkcs11ModulePath);
     return pkcs11;
   }
 

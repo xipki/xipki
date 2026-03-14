@@ -16,10 +16,8 @@ import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.pkix.X509Crl;
-import org.xipki.util.datasource.DataAccessException;
 
 import java.math.BigInteger;
-import java.security.cert.CRLException;
 import java.time.Instant;
 import java.util.List;
 
@@ -70,11 +68,9 @@ public interface CertStore {
 
   void addRequestor(NameId ident) throws CaMgmtException;
 
-  void addCa(NameId ident, X509Cert caCert, CertRevocationInfo caRevInfo)
-      throws CaMgmtException;
+  void addCa(NameId ident, X509Cert caCert, CertRevocationInfo caRevInfo) throws CaMgmtException;
 
-  void revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException;
+  void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
 
   void unrevokeCa(String caName) throws CaMgmtException;
 
@@ -84,68 +80,55 @@ public interface CertStore {
 
   long getMaxCrlNumber(NameId ca) throws OperationException;
 
-  long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl)
-      throws OperationException;
+  long getThisUpdateOfCurrentCrl(NameId ca, boolean deltaCrl) throws OperationException;
 
-  void addCrl(NameId ca, X509Crl crl) throws OperationException, CRLException;
+  void addCrl(NameId ca, X509Crl crl) throws OperationException;
 
   CertWithRevocationInfo revokeCert(
       NameId ca, BigInteger serialNumber, CertRevocationInfo revInfo,
-      boolean force, CaIdNameMap idNameMap)
-      throws OperationException;
+      boolean force, CaIdNameMap idNameMap) throws OperationException;
 
   CertWithRevocationInfo revokeSuspendedCert(
-      NameId ca, SerialWithId serialNumber, CrlReason reason,
-      CaIdNameMap idNameMap) throws OperationException;
+      NameId ca, SerialWithId serialNumber, CrlReason reason, CaIdNameMap idNameMap)
+      throws OperationException;
 
   CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber,
-                             boolean force, CaIdNameMap idNamMap)
-      throws OperationException;
+                            boolean force, CaIdNameMap idNamMap) throws OperationException;
 
   void removeCert(long id) throws OperationException;
 
-  long getCountOfCerts(NameId ca, boolean onlyRevoked)
-      throws OperationException;
+  long getCountOfCerts(NameId ca, boolean onlyRevoked) throws OperationException;
 
   long getCountOfCerts(long notBeforeSince) throws OperationException;
 
   List<SerialWithId> getSerialNumbers(
-      NameId ca,  long startId, int numEntries, boolean onlyRevoked)
+      NameId ca,  long startId, int numEntries, boolean onlyRevoked) throws OperationException;
+
+  List<SerialWithId> getExpiredUnrevokedSerialNumbers(NameId ca, long expiredAt, int numEntries)
       throws OperationException;
 
-  List<SerialWithId> getExpiredUnrevokedSerialNumbers(
-      NameId ca, long expiredAt, int numEntries)
+  List<SerialWithId> getSuspendedCertSerials(NameId ca, Instant latestLastUpdate, int numEntries)
       throws OperationException;
 
-  List<SerialWithId> getSuspendedCertSerials(
-      NameId ca, Instant latestLastUpdate, int numEntries)
-      throws OperationException;
-
-  byte[] getEncodedCrl(NameId ca, BigInteger crlNumber)
-      throws OperationException;
+  byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException;
 
   int cleanupCrls(NameId ca, int numCrls) throws OperationException;
 
-  CertificateInfo getCertForId(NameId ca, X509Cert caCert,
-                               long certId, CaIdNameMap idNameMap)
+  CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap)
+      throws OperationException;
+
+  CertWithRevocationInfo getCertWithRevocationInfo(long certId, CaIdNameMap idNameMap)
       throws OperationException;
 
   CertWithRevocationInfo getCertWithRevocationInfo(
-      long certId, CaIdNameMap idNameMap)
-      throws OperationException;
-
-  CertWithRevocationInfo getCertWithRevocationInfo(
-      int caId, BigInteger serial, CaIdNameMap idNameMap)
-      throws OperationException;
+      int caId, BigInteger serial, CaIdNameMap idNameMap) throws OperationException;
 
   CertWithRevocationInfo getCertWithRevocationInfoBySubject(
-      int caId, X500Name subject, byte[] san, CaIdNameMap idNameMap)
-      throws OperationException;
+      int caId, X500Name subject, byte[] san, CaIdNameMap idNameMap) throws OperationException;
 
   long getCertId(NameId ca, BigInteger serial) throws OperationException;
 
-  CertificateInfo getCertInfo(NameId ca, X509Cert caCert,
-                              BigInteger serial, CaIdNameMap idNameMap)
+  CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException;
 
   /**
@@ -157,27 +140,22 @@ public interface CertStore {
    * @throws OperationException
    *         If error occurs.
    */
-  X509Cert getCert(X500Name subjectName, String transactionId)
-      throws OperationException;
+  X509Cert getCert(X500Name subjectName, String transactionId) throws OperationException;
 
   List<CertListInfo> listCerts(
       NameId ca, X500Name subjectPattern, Instant validFrom,
-      Instant validTo, CertListOrderBy orderBy, int numEntries)
-      throws OperationException;
+      Instant validTo, CertListOrderBy orderBy, int numEntries) throws OperationException;
 
   List<CertRevInfoWithSerial> getRevokedCerts(
-      NameId ca, Instant notExpiredAt, long startId, int numEntries)
-      throws OperationException;
+      NameId ca, Instant notExpiredAt, long startId, int numEntries) throws OperationException;
 
   List<CertRevInfoWithSerial> getCertsForDeltaCrl(
-      NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt)
-      throws OperationException;
+      NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt) throws OperationException;
 
-  CertStatus getCertStatusForSubject(NameId ca, X500Name subject)
-      throws OperationException;
+  CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException;
 
   boolean isHealthy();
 
-  void updateDbInfo() throws DataAccessException, CaMgmtException;
+  void updateDbInfo() throws CaMgmtException;
 
 }

@@ -4,26 +4,21 @@
 package org.xipki.security.encap;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1Primitive;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.macs.KMAC;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMExtractor;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMGenerator;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMParameters;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
+import org.bouncycastle.crypto.SecretWithEncapsulation;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
+import org.xipki.security.bridge.BridgeKEMUtil;
+import org.xipki.security.bridge.BridgeMlkemVariant;
 import org.xipki.security.composite.CompositeKemSuite;
 import org.xipki.security.composite.CompositeKemUtil;
-import org.xipki.security.composite.kem.CompositeMLKEMPrivateKey;
+import org.xipki.security.composite.CompositeMLKEMPrivateKey;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.Asn1Util;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 
 import javax.crypto.Cipher;
@@ -36,52 +31,11 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class KEMUtil {
-
-  public static MLKEMParameters getMLKEMVariant(AlgorithmIdentifier algId) {
-    ASN1ObjectIdentifier oid = algId.getAlgorithm();
-    if (oid.equals(OIDs.Algo.id_ml_kem_512)) {
-      return MLKEMParameters.ml_kem_512;
-    } else if (oid.equals(OIDs.Algo.id_ml_kem_768)) {
-      return MLKEMParameters.ml_kem_768;
-    } else if (oid.equals(OIDs.Algo.id_ml_kem_1024)) {
-      return MLKEMParameters.ml_kem_1024;
-    } else {
-      throw new IllegalArgumentException("invalid MLKEM algId " + oid.getId());
-    }
-  }
-
-  public static MLKEMPublicKeyParameters toPublicParameters(
-      SubjectPublicKeyInfo pkInfo) {
-    MLKEMParameters variant = getMLKEMVariant(pkInfo.getAlgorithm());
-    return new MLKEMPublicKeyParameters(variant,
-            pkInfo.getPublicKeyData().getOctets());
-  }
-
-  public static MLKEMPrivateKeyParameters toPrivateParameters(
-      PrivateKeyInfo skInfo) {
-    MLKEMParameters variant = getMLKEMVariant(skInfo.getPrivateKeyAlgorithm());
-    byte[] skData = skInfo.getPrivateKey().getOctets();
-    byte tag = skData[0];
-
-    if (tag == (BERTags.CONSTRUCTED | BERTags.SEQUENCE))  {
-      ASN1Sequence seq = ASN1Sequence.getInstance(skData);
-      byte[] expanded = ((ASN1OctetString) seq.getObjectAt(1)).getOctets();
-      return new MLKEMPrivateKeyParameters(variant, expanded);
-    } else if (tag == BERTags.OCTET_STRING) {
-      byte[] expanded = ASN1OctetString.getInstance(skData).getOctets();
-      return new MLKEMPrivateKeyParameters(variant, expanded);
-    } else if (tag == 0x0) {
-      ASN1Primitive asn1Obj = ASN1TaggedObject.getInstance(skData)
-          .getBaseUniversal(false, BERTags.OCTET_STRING);
-      byte[] seed = ((ASN1OctetString) asn1Obj).getOctets();
-      return new MLKEMPrivateKeyParameters(variant, seed);
-    } else {
-      throw new IllegalArgumentException("invalid tag " + (0xFF & tag));
-    }
-  }
 
   // macKey          = derive(masterKey, spki)
   // encapKey        = encapsulateKey(spki)
@@ -90,31 +44,26 @@ public class KEMUtil {
   public static KemEncapKey generateKemEncapKey(
       SubjectPublicKeyInfo spki, SecretKeyWithAlias masterKey, SecureRandom rnd)
       throws XiSecurityException {
-    byte[] rawPkData = spki.getPublicKeyData().getOctets();
+    byte[] rawPkData = Asn1Util.getPublicKeyData(spki);
 
     // derive the MAC key
-    byte[] macKey = kmacDerive(masterKey.secretKey(), 32,
+    byte[] macKey = hmacDerive(masterKey.secretKey(), 32,
         "XIPKI-KEM".getBytes(StandardCharsets.US_ASCII), rawPkData);
-    return new KemEncapKey(masterKey.alias(),
-        kemEncryptSecret(spki, macKey, rnd));
+    return new KemEncapKey(masterKey.alias(), kemEncryptSecret(spki, macKey, rnd));
   }
 
   public static KemEncapsulation kemEncryptSecret(
-      SubjectPublicKeyInfo spki, byte[] secret, SecureRandom rnd)
-      throws XiSecurityException {
+      SubjectPublicKeyInfo spki, byte[] secret, SecureRandom rnd) throws XiSecurityException {
     AlgorithmIdentifier algId = spki.getAlgorithm();
     ASN1ObjectIdentifier algOid = algId.getAlgorithm();
 
     // Encapsulate a random key
     byte alg;
     SecretWithEncap skEncap;
-    if (OIDs.Algo.id_ml_kem_512.equals(algOid) ||
-        OIDs.Algo.id_ml_kem_768.equals(algOid) ||
+    if (OIDs.Algo.id_ml_kem_512.equals(algOid) || OIDs.Algo.id_ml_kem_768.equals(algOid) ||
         OIDs.Algo.id_ml_kem_1024.equals(algOid)) {
       alg = KemEncapsulation.ALG_KMAC_MLKEM_HMAC;
-      MLKEMGenerator gen = new MLKEMGenerator(rnd);
-      MLKEMPublicKeyParameters pkParams = toPublicParameters(spki);
-      skEncap = new SecretWithEncap(gen.generateEncapsulated(pkParams));
+      skEncap = new SecretWithEncap(BridgeKEMUtil.encapsulateKey(spki, rnd));
     } else {
       CompositeKemSuite suite = CompositeKemSuite.getAlgoSuite(algId);
       if (suite == null) {
@@ -123,8 +72,7 @@ public class KEMUtil {
       }
 
       alg = KemEncapsulation.ALG_KMAC_COMPOSITE_MLKEM_HMAC;
-      skEncap = CompositeKemUtil.encap(suite,
-                  spki.getPublicKeyData().getOctets(), rnd);
+      skEncap = CompositeKemUtil.encap(suite, Asn1Util.getPublicKeyData(spki), rnd);
     }
 
     try {
@@ -141,30 +89,48 @@ public class KEMUtil {
     }
   }
 
+  public static SecretWithEncapsulation encapsulateKey(
+      KeySpec keySpec, byte[] publicKeyData, SecureRandom rnd) {
+    BridgeMlkemVariant variant = toBridgeMlkemVariant(keySpec);
+    return BridgeKEMUtil.encapsulateKey(variant, publicKeyData, rnd);
+  }
+
+  public static BridgeMlkemVariant toBridgeMlkemVariant(KeySpec keySpec) {
+    switch (keySpec) {
+      case MLKEM512:
+        return BridgeMlkemVariant.mlkem512;
+      case MLKEM768:
+        return BridgeMlkemVariant.mlkem768;
+      case MLKEM1024:
+        return BridgeMlkemVariant.mlkem1024;
+      default:
+        throw new IllegalArgumentException("invalid keySpec " + keySpec);
+    }
+  }
+
   // returns the decapsulated secret. pkValue is needed for the composite KEM.
   public static byte[] mlkemDecryptSecret(
-      PrivateKey privateKey, KemEncapsulation kemEncapsulation)
-      throws XiSecurityException {
+      PrivateKey privateKey, KemEncapsulation kemEncapsulation) throws XiSecurityException {
     PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
     AlgorithmIdentifier algId = skInfo.getPrivateKeyAlgorithm();
     ASN1ObjectIdentifier algOid = algId.getAlgorithm();
 
-    if (OIDs.Algo.id_ml_kem_512.equals(algOid) ||
-        OIDs.Algo.id_ml_kem_768.equals(algOid) ||
+    if (OIDs.Algo.id_ml_kem_512.equals(algOid) || OIDs.Algo.id_ml_kem_768.equals(algOid) ||
         OIDs.Algo.id_ml_kem_1024.equals(algOid)) {
-      MLKEMPrivateKeyParameters params = KEMUtil.toPrivateParameters(skInfo);
-      MLKEMExtractor extractor = new MLKEMExtractor(params);
-      byte[] decapKey = extractor.extractSecret(kemEncapsulation.encapKey());
+      byte[] decapKey = BridgeKEMUtil.decapsulateKey(skInfo, kemEncapsulation.encapKey());
       return doKemDecryptSecret(decapKey, kemEncapsulation);
     } else {
-      throw new IllegalArgumentException(
-            "The given private key is not an MLKEM key.");
+      throw new IllegalArgumentException("The given private key is not an MLKEM key.");
     }
   }
 
+  public static byte[] decapsulateKey(KeySpec keySpec, byte[] skValue, byte[] encapKey) {
+    BridgeMlkemVariant variant = toBridgeMlkemVariant(keySpec);
+    return BridgeKEMUtil.decapsulateKey(variant, skValue, encapKey);
+  }
+
   public static byte[] compositeMlKemDecryptSecret(
-      PrivateKey privateKey, byte[] publicKeyData,
-      KemEncapsulation kemEncapsulation)
+      PrivateKey privateKey, byte[] publicKeyData, KemEncapsulation kemEncapsulation)
       throws XiSecurityException {
     byte[] sk;
     CompositeKemSuite suite;
@@ -173,10 +139,8 @@ public class KEMUtil {
       suite = ((CompositeMLKEMPrivateKey) privateKey).suite();
       sk = ((CompositeMLKEMPrivateKey) privateKey).keyValue();
     } else {
-      PrivateKeyInfo skInfo =
-          PrivateKeyInfo.getInstance(privateKey.getEncoded());
-      suite = CompositeKemSuite.getAlgoSuite(
-          skInfo.getPrivateKeyAlgorithm());
+      PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
+      suite = CompositeKemSuite.getAlgoSuite(skInfo.getPrivateKeyAlgorithm());
       if (suite == null) {
         throw new IllegalArgumentException("The given public key (spki) " +
             "is not an MLKEM or composite MLKEM key.");
@@ -184,18 +148,15 @@ public class KEMUtil {
       sk = skInfo.getPrivateKey().getOctets();
     }
 
-    byte[] decapKey = CompositeKemUtil.decap(suite, sk, publicKeyData,
-        kemEncapsulation.encapKey());
+    byte[] decapKey = CompositeKemUtil.decap(suite, sk, publicKeyData, kemEncapsulation.encapKey());
     return doKemDecryptSecret(decapKey, kemEncapsulation);
   }
 
-  private static byte[] doKemDecryptSecret(
-      byte[] decapKey, KemEncapsulation kemEncapsulation)
+  public static byte[] doKemDecryptSecret(byte[] decapKey, KemEncapsulation kemEncapsulation)
       throws XiSecurityException {
     try {
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-      cipher.init(Cipher.DECRYPT_MODE,
-          new SecretKeySpec(decapKey, "AES"),
+      cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(decapKey, "AES"),
           new GCMParameterSpec(128, new byte[12]));
     return cipher.doFinal(kemEncapsulation.encryptedSecret());
     } catch (GeneralSecurityException e) {
@@ -203,21 +164,12 @@ public class KEMUtil {
     }
   }
 
-  public static byte[] kmacDerive(
-      SecretKey ikm, int keyByteSize, byte[] info, byte[] data) {
-    return kmacDerive(ikm.getEncoded(), keyByteSize, info, data);
+  public static byte[] hmacDerive(SecretKey ikm, int keyByteSize, byte[] info, byte[] data) {
+    return hmacDerive(ikm.getEncoded(), keyByteSize, info, data);
   }
 
-  public static byte[] kmacDerive(
-      byte[] ikm, int keyByteSize, byte[] info, byte[] data) {
-    KMAC kmac = new KMAC(256, info);
-    KeyParameter keyParameter = new KeyParameter(ikm, 0, ikm.length);
-    kmac.init(keyParameter);
-    kmac.update(data, 0, data.length);
-
-    byte[] outKey = new byte[keyByteSize];
-    kmac.doFinal(outKey, 0, keyByteSize);
-    return outKey;
+  public static byte[] hmacDerive(byte[] ikm, int keyByteSize, byte[] info, byte[] data) {
+    return KeyUtil.hkdf(HashAlgo.SHA256, data, ikm, info, keyByteSize);
   }
 
 }

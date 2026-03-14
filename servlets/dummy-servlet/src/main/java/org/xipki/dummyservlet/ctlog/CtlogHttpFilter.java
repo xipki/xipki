@@ -19,8 +19,7 @@ import java.io.IOException;
  */
 public class CtlogHttpFilter implements XiHttpFilter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CtlogHttpFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtlogHttpFilter.class);
 
   private final CtLogServlet rsa;
 
@@ -29,6 +28,7 @@ public class CtlogHttpFilter implements XiHttpFilter {
   public CtlogHttpFilter() {
     this.rsa = new CtLogServlet.RSACtLogServlet();
     this.ec = new CtLogServlet.ECCtLogServlet();
+    LOG.info("started CtLogHttpFilter");
   }
 
   @Override
@@ -36,8 +36,7 @@ public class CtlogHttpFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if (!"POST".equalsIgnoreCase(method)) {
       LOG.warn("method {} not allowed", method);
@@ -46,9 +45,9 @@ public class CtlogHttpFilter implements XiHttpFilter {
     }
 
     String path = req.getServletPath();
-    if (path.startsWith("/ctlogrsa/ct/v1/add-pre-chain/")) {
+    if (path.startsWith("/ctlog/ctlogrsa/ct/v1/add-pre-chain/")) {
       rsa.doPost(req).fillResponse(resp);
-    } else if (path.startsWith("/ctlogec/ct/v1/add-pre-chain/")) {
+    } else if (path.startsWith("/ctlog/ctlogec/ct/v1/add-pre-chain/")) {
       ec.doPost(req).fillResponse(resp);
     } else {
       LOG.warn("unknown servlet path {}", path);

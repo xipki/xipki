@@ -12,12 +12,10 @@ package org.xipki.util.codec;
 public class Hex {
 
   private static final char[] DIGITS = {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
   private static final char[] UPPER_DIGITS = {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
   private static final int[] LINTS = new int['f' + 1];
   private static final int[] HINTS = new int[LINTS.length];
@@ -154,8 +152,7 @@ public class Hex {
 
     // two characters form the hex value.
     for (int i = 0, j = 0; j < len; i++) {
-      out[i] = (byte) (HINTS[assertValidHex(data[j++])]
-          | LINTS[assertValidHex(data[j++])]);
+      out[i] = (byte) (HINTS[assertValidHex(data[j++])] | LINTS[assertValidHex(data[j++])]);
     }
 
     return out;
@@ -181,7 +178,7 @@ public class Hex {
     // two characters form the hex value.
     for (int i = 0, j = 0; j < len; i++) {
       out[outOff + i] = (byte) (HINTS[assertValidHex(data[j++])]
-          | LINTS[assertValidHex(data[j++])]);
+                              | LINTS[assertValidHex(data[j++])]);
     }
 
     return outLen;
@@ -193,35 +190,29 @@ public class Hex {
   }
 
   private static int assertValidHex(char c) {
-    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')
-        || (c >= 'A' && c <= 'F'))) {
+    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
       throw new IllegalArgumentException("invalid character '" + c + "'");
     }
     return c;
   }
 
   private static int assertValidHex(int c) {
-    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')
-        || (c >= 'A' && c <= 'F'))) {
+    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
       throw new IllegalArgumentException("invalid character '" + c + "'");
     }
     return c;
   }
 
-  public static void append(StringBuilder buf, byte[] data,
-                            int numBytesPerLine, String indent) {
-    append(false, buf, data, 0, data.length, ":",
-        numBytesPerLine, indent);
+  public static void append(StringBuilder buf, byte[] data, int numBytesPerLine, String indent) {
+    append(false, buf, data, 0, data.length, ":", numBytesPerLine, indent);
   }
 
   public static void append(boolean uppercase, StringBuilder buf, byte[] data,
                             int numBytesPerLin, String indent) {
-    append(uppercase, buf, data, 0, data.length, ":",
-        numBytesPerLin, indent);
+    append(uppercase, buf, data, 0, data.length, ":", numBytesPerLin, indent);
   }
 
-  public static void append(StringBuilder buf, byte[] data, int offset,
-                            int len, String sep) {
+  public static void append(StringBuilder buf, byte[] data, int offset, int len, String sep) {
     append(false, buf, data, offset, len, sep, Integer.MAX_VALUE, "");
   }
 
@@ -235,8 +226,7 @@ public class Hex {
     append(false, buf, data, offset, len, sep, numBytesPerLin, indent);
   }
 
-  public static void append(boolean uppercase, StringBuilder buf,
-                            byte[] data, int offset, int len,
+  public static void append(boolean uppercase, StringBuilder buf, byte[] data, int offset, int len,
                             String sep, int numBytesPerLin, String indent) {
     Args.notNegative(offset, "offset");
     Args.notNegative(len, "len");

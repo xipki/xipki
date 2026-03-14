@@ -48,13 +48,9 @@ public class IssuerAndSubject extends ASN1Object {
   }
 
   public static IssuerAndSubject getInstance(Object obj) {
-    if (obj instanceof IssuerAndSubject) {
-      return (IssuerAndSubject) obj;
-    } else if (obj != null) {
-      return new IssuerAndSubject(ASN1Sequence.getInstance(obj));
-    } else {
-      return null;
-    }
+    return (obj instanceof IssuerAndSubject) ? (IssuerAndSubject) obj
+        : (obj != null) ? new IssuerAndSubject(ASN1Sequence.getInstance(obj))
+        : null;
   }
 
 }

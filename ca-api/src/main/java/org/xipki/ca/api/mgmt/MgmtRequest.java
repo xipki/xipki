@@ -55,10 +55,8 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static AddOrChangeDbSchema parse(JsonMap json)
-        throws CodecException {
-      return new AddOrChangeDbSchema(json.getString("name"),
-          json.getString("value"));
+    public static AddOrChangeDbSchema parse(JsonMap json) throws CodecException {
+      return new AddOrChangeDbSchema(json.getString("name"), json.getString("value"));
     }
 
   }
@@ -85,9 +83,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddCaAlias parse(JsonMap json) throws CodecException {
-      return new AddCaAlias(
-          json.getNnString("caName"),
-          json.getNnString("aliasName"));
+      return new AddCaAlias(json.getNnString("caName"), json.getNnString("aliasName"));
     }
 
   } // class AddCaAlias
@@ -121,8 +117,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     private final CertprofileEntry certprofileEntry;
 
     public AddCertprofile(CertprofileEntry certprofileEntry) {
-      this.certprofileEntry = Args.notNull(certprofileEntry,
-          "certprofileEntry");
+      this.certprofileEntry = Args.notNull(certprofileEntry, "certprofileEntry");
     }
 
     public CertprofileEntry certprofileEntry() {
@@ -166,8 +161,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     public static AddCertprofileToCa parse(JsonMap json)
         throws CodecException {
-      return new AddCertprofileToCa(
-          json.getNnString("caName"),
+      return new AddCertprofileToCa(json.getNnString("caName"),
           json.getNnString("profileName"));
     }
 
@@ -193,8 +187,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddKeypairGen parse(JsonMap json) throws CodecException {
-      return new AddKeypairGen(KeypairGenEntry.parse(
-          json.getNnMap("entry")));
+      return new AddKeypairGen(KeypairGenEntry.parse(json.getNnMap("entry")));
     }
 
   } // class AddKeypairGen
@@ -219,8 +212,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddPublisher parse(JsonMap json) throws CodecException {
-      return new AddPublisher(PublisherEntry.parse(
-          json.getNnMap("publisherEntry")));
+      return new AddPublisher(PublisherEntry.parse(json.getNnMap("publisherEntry")));
     }
 
   } // class AddPublisher
@@ -247,8 +239,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddPublisherToCa parse(JsonMap json) throws CodecException {
-      return new AddPublisherToCa(
-          json.getNnString("caName"),
+      return new AddPublisherToCa(json.getNnString("caName"),
           json.getNnString("publisherName"));
     }
   } // class AddPublisherToCa
@@ -273,8 +264,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddRequestor parse(JsonMap json) throws CodecException {
-      return new AddRequestor(RequestorEntry.parse(
-          json.getNnMap("requestorEntry")));
+      return new AddRequestor(RequestorEntry.parse(json.getNnMap("requestorEntry")));
     }
 
   } // class AddRequestor
@@ -327,8 +317,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static AddSigner parse(JsonMap json) throws CodecException {
-      return new AddSigner(SignerEntry.parse(
-          json.getNnMap("signerEntry")));
+      return new AddSigner(SignerEntry.parse(json.getNnMap("signerEntry")));
     }
 
   } // class AddSigner
@@ -371,8 +360,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static ChangeCa parse(JsonMap json) throws CodecException {
-      return new ChangeCa(ChangeCaEntry.parse(
-          json.getNnMap("changeCaEntry")));
+      return new ChangeCa(ChangeCaEntry.parse(json.getNnMap("changeCaEntry")));
     }
 
   } // class ChangeCa
@@ -474,8 +462,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static ChangeTypeConfEntity parse(JsonMap json)
-        throws CodecException {
+    public static ChangeTypeConfEntity parse(JsonMap json) throws CodecException {
       return new ChangeTypeConfEntity(json.getNnString("name"),
           json.getString("type"), json.getString("conf"));
     }
@@ -515,9 +502,8 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final Instant notAfter;
 
-    protected AbstractGenerateCert(
-        String caName, String profileName,
-        Instant notBefore, Instant notAfter) {
+    protected AbstractGenerateCert(String caName, String profileName,
+                                  Instant notBefore, Instant notAfter) {
       super(caName);
       this.profileName = Args.notBlank(profileName, "profileName");
       this.notBefore = notBefore;
@@ -549,9 +535,8 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final byte[] encodedCsr;
 
-    public GenerateCert(
-        String caName, String profileName, Instant notBefore,
-        Instant notAfter, byte[] encodedCsr) {
+    public GenerateCert(String caName, String profileName, Instant notBefore,
+                        Instant notAfter, byte[] encodedCsr) {
       super(caName, profileName, notBefore, notAfter);
       this.encodedCsr = Args.notNull(encodedCsr, "encodedCsr");
     }
@@ -582,9 +567,8 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final String subject;
 
-    public GenerateKeyCert(
-        String caName, String profileName, Instant notBefore,
-        Instant notAfter, String subject) {
+    public GenerateKeyCert(String caName, String profileName, Instant notBefore,
+                          Instant notAfter, String subject) {
       super(caName, profileName, notBefore, notAfter);
       this.subject = Args.notBlank(subject, "subject");
     }
@@ -666,8 +650,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static GenerateCrossCertificate parse(JsonMap json)
-        throws CodecException {
+    public static GenerateCrossCertificate parse(JsonMap json) throws CodecException {
       return new GenerateCrossCertificate(
           json.getNnString("caName"),
           json.getNnString("profileName"),
@@ -843,8 +826,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GetCrl parse(JsonMap json) throws CodecException {
-      return new GetCrl(json.getNnString("caName"),
-          json.getBigInteger("crlNumber"));
+      return new GetCrl(json.getNnString("caName"), json.getBigInteger("crlNumber"));
     }
 
   } // class GetCrl
@@ -920,8 +902,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static ListCertificates parse(JsonMap json) throws CodecException {
-      ListCertificates ret = new ListCertificates(
-          json.getNnString("caName"));
+      ListCertificates ret = new ListCertificates(json.getNnString("caName"));
       ret.setEncodedSubjectDnPattern(json.getBytes("encodedSubjectDnPattern"));
       ret.setValidFrom(json.getInstant("validFrom"));
       ret.setValidTo(json.getInstant("validTo"));
@@ -1007,8 +988,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static RemoveCertificate parse(JsonMap json) throws CodecException {
-      return new RemoveCertificate(
-          json.getNnString("caName"),
+      return new RemoveCertificate(json.getNnString("caName"),
           json.getNnBigInteger("serialNumber"));
     }
   } // class RemoveCertificate
@@ -1034,8 +1014,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static RemoveEntityFromCa parse(JsonMap json)
-        throws CodecException {
+    public static RemoveEntityFromCa parse(JsonMap json) throws CodecException {
       return new RemoveEntityFromCa(json.getNnString("caName"),
           json.getNnString("entityName"));
     }
@@ -1048,8 +1027,7 @@ public abstract class MgmtRequest extends MgmtMessage {
 
     private final int numThreads;
 
-    public RepublishCertificates(
-        String caName, List<String> publisherNames, int numThreads) {
+    public RepublishCertificates(String caName, List<String> publisherNames, int numThreads) {
       super(caName);
       this.publisherNames = publisherNames;
       this.numThreads = Args.positive(numThreads, "numThreads");
@@ -1072,11 +1050,9 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static RepublishCertificates parse(JsonMap json)
-        throws CodecException {
+    public static RepublishCertificates parse(JsonMap json) throws CodecException {
       return new RepublishCertificates(json.getNnString("caName"),
-          json.getStringList("publisherNames"),
-          json.getInt("numThreads", 1));
+          json.getStringList("publisherNames"), json.getInt("numThreads", 1));
     }
 
   } // class RepublishCertificates
@@ -1122,7 +1098,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     private final Instant invalidityTime;
 
     public RevokeCertificate(String caName, BigInteger serialNumber,
-                             CrlReason reason, Instant invalidityTime) {
+                            CrlReason reason, Instant invalidityTime) {
       super(caName);
       this.serialNumber = Args.notNull(serialNumber, "serialNumber");
       this.reason = reason;
@@ -1186,10 +1162,8 @@ public abstract class MgmtRequest extends MgmtMessage {
       return ret;
     }
 
-    public static UnsuspendCertificate parse(JsonMap json)
-        throws CodecException {
-      return new UnsuspendCertificate(
-          json.getNnString("caName"),
+    public static UnsuspendCertificate parse(JsonMap json) throws CodecException {
+      return new UnsuspendCertificate(json.getNnString("caName"),
           json.getNnBigInteger("serialNumber"));
     }
 
@@ -1231,10 +1205,8 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static TokenInfoP11 parse(JsonMap json) throws CodecException {
-      return new TokenInfoP11(
-          json.getString("moduleName"),
-          json.getInt("slotIndex"),
-          json.getBool("verbose", false));
+      return new TokenInfoP11(json.getString("moduleName"),
+          json.getInt("slotIndex"), json.getBool("verbose", false));
     }
   }
 

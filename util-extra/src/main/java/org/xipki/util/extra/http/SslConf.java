@@ -31,8 +31,7 @@ public class SslConf {
   private final String hostnameVerifier;
 
   public SslConf(String name, String storeType, String keystorePassword,
-                 FileOrBinary keystore, FileOrBinary[] trustanchors,
-                 String hostnameVerifier) {
+                FileOrBinary keystore, FileOrBinary[] trustanchors, String hostnameVerifier) {
     this.name = name;
     this.storeType = storeType;
     this.keystore = keystore;

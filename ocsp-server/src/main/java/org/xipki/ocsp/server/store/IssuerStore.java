@@ -35,8 +35,7 @@ class IssuerStore {
     for (IssuerEntry issuer : issuers) {
       int id = issuer.id();
       if (newIds.contains(id)) {
-        throw new IllegalArgumentException(
-            "issuer with the same id " + id + " duplicated");
+        throw new IllegalArgumentException("issuer with the same id " + id + " duplicated");
       }
       newIds.add(id);
     }
@@ -84,8 +83,7 @@ class IssuerStore {
   }
 
   public void setCrlInfos(Map<Integer, CrlInfo> crlInfos) {
-    this.crlInfos = crlInfos == null ? Collections.emptyMap()
-                    : new HashMap<>(crlInfos);
+    this.crlInfos = crlInfos == null ? Collections.emptyMap() : new HashMap<>(crlInfos);
   }
 
   public CrlInfo getCrlInfo(int crlInfoId) {

@@ -22,7 +22,8 @@ import java.util.Map;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Provides an encoder capable of encoding data into CBOR format to a given {@link OutputStream}.
+ * Provides an encoder capable of encoding data into CBOR format to a given
+ * {@link OutputStream}.
  */
 public abstract class CborEncoder {
 
@@ -37,14 +38,14 @@ public abstract class CborEncoder {
     write(bytes, 0, bytes.length);
   }
 
-  protected abstract void write(byte[] bytes, int off, int len)
-      throws CodecException;
+  protected abstract void write(byte[] bytes, int off, int len) throws CodecException;
 
   /**
    * Interprets a given float-value as a half-precision float value and
    * converts it to its raw integer form, as defined in IEEE 754.
    * <p>
-   * Taken from: <a href="http://stackoverflow.com/a/6162687/229140">this Stack Overflow answer</a>.
+   * Taken from: <a href="http://stackoverflow.com/a/6162687/229140">this Stack
+   * Overflow answer</a>.
    * </p>
    *
    * @param fval the value to convert.
@@ -62,7 +63,8 @@ public abstract class CborEncoder {
           // was value but too large, make it +/-Inf
           return sign | 0x7c00;
         }
-        return sign | 0x7c00 | (fbits & 0x007fffff) >>> 13; // keep NaN (and Inf) bits
+        // keep NaN (and Inf) bits
+        return sign | 0x7c00 | (fbits & 0x007fffff) >>> 13;
       }
       return sign | 0x7bff; // unrounded not quite Inf
     }
@@ -78,20 +80,23 @@ public abstract class CborEncoder {
     }
 
     val = (fbits & 0x7fffffff) >>> 23;
-    // add subnormal bit, round depending on cut off and div by 2^(1-(exp-127+15)) and >> 13 | exp=0
+    // add subnormal bit, round depending on cut off and div by
+    // 2^(1-(exp-127+15)) and >> 13 | exp=0
     return sign | ((fbits & 0x7fffff | 0x800000) + (0x800000 >>> val - 102) >>> 126 - val);
   }
 
   /**
    * Writes the start of an indefinite-length array.
    * <p>
-   * After calling this method, one is expected to write the given number of array elements, which can be of any type.
-   * No length checks are performed.<p>
-   * After all array elements are written, one should write a single break value to end the array,
-   * see {@link #writeBreak()}.
+   * After calling this method, one is expected to write the given number of
+   * array elements, which can be of any type. No length checks are performed.
+   * <p>
+   * After all array elements are written, one should write a single break
+   * value to end the array, see {@link #writeBreak()}.
    * </p>
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeArrayStart() throws CodecException {
     return writeSimpleType(TYPE_ARRAY, BREAK);
@@ -100,13 +105,14 @@ public abstract class CborEncoder {
   /**
    * Writes the start of a definite-length array.
    * <p>
-   * After calling this method, one is expected to write the given number of array elements, which can be of any type.
-   * No length checks are performed.
+   * After calling this method, one is expected to write the given number of
+   * array elements, which can be of any type. No length checks are performed.
    * </p>
    *
    * @param length the number of array elements to write, should &gt;= 0.
    * @throws IllegalArgumentException in case the given length was negative;
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeArrayStart(int length) throws CodecException {
     Args.notNegative(length, "array-length");
@@ -117,7 +123,8 @@ public abstract class CborEncoder {
    * Writes a boolean value in canonical CBOR format.
    *
    * @param value the boolean to write.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeBoolean(boolean value) throws CodecException {
     return writeSimpleType(TYPE_FLOAT_SIMPLE, value ? TRUE : FALSE);
@@ -126,7 +133,8 @@ public abstract class CborEncoder {
   /**
    * Writes a "break" stop-value in canonical CBOR format.
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeBreak() throws CodecException {
     return writeSimpleType(TYPE_FLOAT_SIMPLE, BREAK);
@@ -135,8 +143,10 @@ public abstract class CborEncoder {
   /**
    * Writes a byte string in canonical CBOR-format.
    *
-   * @param bytes the byte string to write, can be <code>null</code> in which case a null is written.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param bytes the byte string to write, can be <code>null</code> in which
+   *              case a null is written.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeByteString(byte[] bytes) throws CodecException {
     return (bytes == null) ? writeNull() : writeString(TYPE_BYTE_STRING, bytes);
@@ -150,14 +160,15 @@ public abstract class CborEncoder {
   /**
    * Writes the start of an indefinite-length byte string.
    * <p>
-   * After calling this method, one is expected to write the given number of string parts. No length checks are
-   * performed.
+   * After calling this method, one is expected to write the given number of
+   * string parts. No length checks are performed.
    * <p>
-   * After all string parts are written, one should write a single break value to end the string,
-   * see {@link #writeBreak()}.
+   * After all string parts are written, one should write a single break value
+   * to end the string, see {@link #writeBreak()}.
    * </p>
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeByteStringStart() throws CodecException {
     return writeSimpleType(TYPE_BYTE_STRING, BREAK);
@@ -166,35 +177,37 @@ public abstract class CborEncoder {
   /**
    * Writes a double-precision float value in canonical CBOR format.
    *
-   * @param value the value to write, values from {@link Double#MIN_VALUE} to {@link Double#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values from {@link Double#MIN_VALUE} to
+   *        {@link Double#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeDouble(double value) throws CodecException {
-    return writeUInt64(TYPE_FLOAT_SIMPLE << 5,
-        Double.doubleToRawLongBits(value));
+    return writeUInt64(TYPE_FLOAT_SIMPLE << 5, Double.doubleToRawLongBits(value));
   }
 
   /**
    * Writes a single-precision float value in canonical CBOR format.
    *
-   * @param value the value to write, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values from {@link Float#MIN_VALUE} to
+   *        {@link Float#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeFloat(float value) throws CodecException {
-    return writeUInt32(TYPE_FLOAT_SIMPLE << 5,
-        Float.floatToRawIntBits(value));
+    return writeUInt32(TYPE_FLOAT_SIMPLE << 5, Float.floatToRawIntBits(value));
   }
 
   /**
    * Writes a half-precision float value in canonical CBOR format.
    *
-   * @param value the value to write, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values from {@link Float#MIN_VALUE} to
+   *        {@link Float#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
-  public CborEncoder writeHalfPrecisionFloat(float value)
-      throws CodecException {
-    return writeUInt16(TYPE_FLOAT_SIMPLE << 5,
-        halfPrecisionToRawIntBits(value));
+  public CborEncoder writeHalfPrecisionFloat(float value) throws CodecException {
+    return writeUInt16(TYPE_FLOAT_SIMPLE << 5, halfPrecisionToRawIntBits(value));
   }
 
   public CborEncoder writeUint(BigInteger value) throws CodecException {
@@ -208,11 +221,13 @@ public abstract class CborEncoder {
   }
 
   /**
-   * Writes a signed or unsigned integer value in canonical CBOR format, that is, tries to encode it in a little
-   * bytes as possible.
+   * Writes a signed or unsigned integer value in canonical CBOR format, that
+   * is, tries to encode it in a little bytes as possible.
    *
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *        {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeInt(int value) throws CodecException {
     writeLong(value);
@@ -234,7 +249,8 @@ public abstract class CborEncoder {
    * Writes a signed or unsigned 16-bit integer value in CBOR format.
    *
    * @param value the value to write, values from [-65536..65535] are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeInt16(int value) throws CodecException {
     // extends the sign over all bits...
@@ -248,8 +264,10 @@ public abstract class CborEncoder {
   /**
    * Writes a signed or unsigned 32-bit integer value in CBOR format.
    *
-   * @param value the value to write, values in the range [-4294967296..4294967295] are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values in the range
+   *              [-4294967296..4294967295] are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeInt32(long value) throws CodecException {
     // extends the sign over all bits...
@@ -263,8 +281,10 @@ public abstract class CborEncoder {
   /**
    * Writes a signed or unsigned 64-bit integer value in CBOR format.
    *
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeInt64(long value) throws CodecException {
     // extends the sign over all bits...
@@ -306,8 +326,10 @@ public abstract class CborEncoder {
   /**
    * Writes a signed or unsigned 8-bit integer value in CBOR format.
    *
-   * @param value the value to write, values in the range [-256..255] are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values in the range [-256..255] are
+   *              supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeInt8(int value) throws CodecException {
     // extends the sign over all bits...
@@ -321,13 +343,16 @@ public abstract class CborEncoder {
   /**
    * Writes the start of an indefinite-length map.
    * <p>
-   * After calling this method, one is expected to write any number of map entries, as separate key and value.
-   * Keys and values can both be of any type. No length checks are performed.<p>
-   * After all map entries are written, one should write a single break value to end the map,
-   * see {@link #writeBreak()}.
+   * After calling this method, one is expected to write any number of map
+   * entries, as separate key and value.
+   * Keys and values can both be of any type. No length checks are performed.
+   * <p>
+   * After all map entries are written, one should write a single break value
+   * to end the map, see {@link #writeBreak()}.
    * </p>
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeMapStart() throws CodecException {
     return writeSimpleType(TYPE_MAP, BREAK);
@@ -336,13 +361,15 @@ public abstract class CborEncoder {
   /**
    * Writes the start of a finite-length map.
    * <p>
-   * After calling this method, one is expected to write any number of map entries, as separate key and value.
+   * After calling this method, one is expected to write any number of map
+   * entries, as separate key and value.
    * Keys and values can both be of any type. No length checks are performed.
    * </p>
    *
    * @param length the number of map entries to write, should &gt;= 0.
    * @throws IllegalArgumentException in case the given length was negative;
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeMapStart(int length) throws CodecException {
     Args.notNegative(length, "lengh of map");
@@ -352,17 +379,21 @@ public abstract class CborEncoder {
   /**
    * Writes a <code>null</code> value in canonical CBOR format.
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeNull() throws CodecException {
     return writeSimpleType(TYPE_FLOAT_SIMPLE, NULL);
   }
 
   /**
-   * Writes a simple value, i.e., an "atom" or "constant" value in canonical CBOR format.
+   * Writes a simple value, i.e., an "atom" or "constant" value in canonical
+   * CBOR format.
    *
-   * @param simpleValue the (unsigned byte) value to write, values from 32 to 255 are supported (though not enforced).
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param simpleValue the (unsigned byte) value to write, values from 32 to
+   *                    255 are supported (though not enforced).
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeSimpleValue(byte simpleValue) throws CodecException {
     // convert to unsigned value...
@@ -373,8 +404,10 @@ public abstract class CborEncoder {
   /**
    * Writes a signed or unsigned small (&lt;= 23) integer value in CBOR format.
    *
-   * @param value the value to write, values in the range [-24..23] are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the value to write, values in the range [-24..23] are
+   *              supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeSmallInt(int value) throws CodecException {
     // extends the sign over all bits...
@@ -427,12 +460,15 @@ public abstract class CborEncoder {
   /**
    * Writes an UTF-8 string in canonical CBOR-format.
    * <p>
-   * Note that this method is <em>platform</em> specific, as the given string value will be encoded in a byte array
-   * using the <em>platform</em> encoding! This means that the encoding must be standardized and known.
+   * Note that this method is <em>platform</em> specific, as the given string
+   * value will be encoded in a byte array using the <em>platform</em> encoding!
+   * This means that the encoding must be standardized and known.
    * </p>
    *
-   * @param value the UTF-8 string to write, can be <code>null</code> in case a <code>null</code> will be written.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param value the UTF-8 string to write, can be <code>null</code> in case a
+   *             <code>null</code> will be written.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeTextString(String value) throws CodecException {
     return (value == null) ? writeNull()
@@ -442,11 +478,14 @@ public abstract class CborEncoder {
   /**
    * Writes the start of an indefinite-length UTF-8 string.
    * <p>
-   * After calling this method, one is expected to write the given number of string parts. No length checks are performed.<p>
-   * After all string parts are written, one should write a single break value to end the string, see {@link #writeBreak()}.
+   * After calling this method, one is expected to write the given number of
+   * string parts. No length checks are performed.<p>
+   * After all string parts are written, one should write a single break value
+   * to end the string, see {@link #writeBreak()}.
    * </p>
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeTextStringStart() throws CodecException {
     return writeSimpleType(TYPE_TEXT_STRING, BREAK);
@@ -455,7 +494,8 @@ public abstract class CborEncoder {
   /**
    * Writes an "undefined" value in canonical CBOR format.
    *
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   public CborEncoder writeUndefined() throws CodecException {
     return writeSimpleType(TYPE_FLOAT_SIMPLE, UNDEFINED);
@@ -464,12 +504,13 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes the major type and value as a simple type.
    *
-   * @param majorType the major type of the value to write, denotes what semantics the written value has;
+   * @param majorType the major type of the value to write, denotes what
+   *                  semantics the written value has;
    * @param value the value to write, values from [0..31] are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
-  protected CborEncoder writeSimpleType(int majorType, int value)
-      throws CodecException {
+  protected CborEncoder writeSimpleType(int majorType, int value) throws CodecException {
     write((majorType << 5) | (value & 0x1f));
     return this;
   }
@@ -477,12 +518,14 @@ public abstract class CborEncoder {
   /**
    * Writes a byte string in canonical CBOR-format.
    *
-   * @param majorType the major type of the string, should be either 0x40 or 0x60;
-   * @param bytes the byte string to write, can be <code>null</code> in which case a null is written.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param majorType the major type of the string, should be either 0x40 or
+   *                  0x60;
+   * @param bytes the byte string to write, can be <code>null</code> in which
+   *              case a null is written.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
-  protected CborEncoder writeString(int majorType, byte[] bytes)
-      throws CodecException {
+  protected CborEncoder writeString(int majorType, byte[] bytes) throws CodecException {
     return writeString(majorType, bytes, 0, bytes.length);
   }
 
@@ -496,21 +539,27 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes the major type indicator with a given payload (length).
    *
-   * @param majorType the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param majorType the major type of the value to write, denotes what
+   *                  semantics the written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
-  protected CborEncoder writeType(int majorType, long value)
-      throws CodecException {
+  protected CborEncoder writeType(int majorType, long value) throws CodecException {
     return writeUInt((majorType << 5), value);
   }
 
   /**
-   * Encodes and writes an unsigned integer value, that is, tries to encode it in a little bytes as possible.
+   * Encodes and writes an unsigned integer value, that is, tries to encode it
+   * in a little bytes as possible.
    *
-   * @param mt the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param mt the major type of the value to write, denotes what semantics the
+   *           written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected CborEncoder writeUInt(int mt, long value) throws CodecException {
     if (value < 0x18L) {
@@ -531,9 +580,12 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes an unsigned 16-bit integer value
    *
-   * @param mt the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param mt the major type of the value to write, denotes what semantics the
+   *           written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected CborEncoder writeUInt16(int mt, int value) throws CodecException {
     write(mt | TWO_BYTES);
@@ -545,9 +597,12 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes an unsigned 32-bit integer value
    *
-   * @param mt the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param mt the major type of the value to write, denotes what semantics the
+   *           written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected CborEncoder writeUInt32(int mt, int value) throws CodecException {
     write(mt | FOUR_BYTES);
@@ -561,9 +616,12 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes an unsigned 64-bit integer value
    *
-   * @param mt the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param mt the major type of the value to write, denotes what semantics the
+   *           written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected CborEncoder writeUInt64(int mt, long value) throws CodecException {
     write(mt | EIGHT_BYTES);
@@ -581,9 +639,12 @@ public abstract class CborEncoder {
   /**
    * Encodes and writes an unsigned 8-bit integer value
    *
-   * @param mt the major type of the value to write, denotes what semantics the written value has;
-   * @param value the value to write, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @param mt the major type of the value to write, denotes what semantics the
+   *           written value has;
+   * @param value the value to write, values from {@link Long#MIN_VALUE} to
+   *              {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected CborEncoder writeUInt8(int mt, int value) throws CodecException {
     write(mt | ONE_BYTE);
@@ -655,8 +716,7 @@ public abstract class CborEncoder {
     return this;
   }
 
-  public CborEncoder writeUnwrappedBiguint(BigInteger value)
-      throws CodecException {
+  public CborEncoder writeUnwrappedBiguint(BigInteger value) throws CodecException {
     if (value == null) {
       return writeNull();
     }
@@ -741,8 +801,7 @@ public abstract class CborEncoder {
     return (value == null) ? writeNull() : writeTextString(value.name());
   }
 
-  public CborEncoder writeObject(CborEncodable object)
-      throws CodecException {
+  public CborEncoder writeObject(CborEncodable object) throws CodecException {
     if (object == null) {
       return writeNull();
     } else {
@@ -751,8 +810,7 @@ public abstract class CborEncoder {
     }
   }
 
-  public CborEncoder writeObjects(CborEncodable... objects)
-      throws CodecException {
+  public CborEncoder writeObjects(CborEncodable... objects) throws CodecException {
     if (objects == null) {
       return writeNull();
     }

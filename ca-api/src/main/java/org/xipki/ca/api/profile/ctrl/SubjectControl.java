@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class SubjectControl {

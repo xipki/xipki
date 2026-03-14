@@ -11,6 +11,8 @@ import org.xipki.util.codec.cbor.CborEncoder;
 import java.io.IOException;
 
 /**
+ * PBE cipher blob containing algorithm parameters and encrypted data.
+ *
  * @author Lijun Liao (xipki)
  */
 public class PBECipherBlob {
@@ -23,8 +25,7 @@ public class PBECipherBlob {
 
   private final byte[] cipherText;
 
-  public PBECipherBlob(int algo, int iterations, byte[] salt,
-                       byte[] cipherText) {
+  public PBECipherBlob(int algo, int iterations, byte[] salt, byte[] cipherText) {
     this.algo = algo;
     this.iterations = iterations;
     this.salt = salt;
@@ -65,15 +66,13 @@ public class PBECipherBlob {
     encoder.writeByteString(cipherText);
   }
 
-  public static PBECipherBlob decode(byte[] encoded)
-      throws CodecException {
+  public static PBECipherBlob decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       return decode(decoder);
     }
   }
 
-  public static PBECipherBlob decode(CborDecoder decoder)
-      throws CodecException {
+  public static PBECipherBlob decode(CborDecoder decoder) throws CodecException {
     int arrayLen = decoder.readArrayLength();
     int version = decoder.readInt();
     if (version != 1) {

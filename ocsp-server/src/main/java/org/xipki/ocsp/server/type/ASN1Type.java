@@ -24,17 +24,10 @@ public abstract class ASN1Type {
   }
 
   public static int getHeaderLen(int bodyLen) {
-    if (bodyLen <= 0x7F) {
-      return 2;
-    } else if (bodyLen <= 0xFF) {
-      return 3;
-    } else if (bodyLen <= 0xFFFF) {
-      return 4;
-    } else if (bodyLen <= 0xFFFFFF) {
-      return 5;
-    } else {
-      return 6;
-    }
+    return (bodyLen <= 0x7F)    ? 2
+        : (bodyLen <= 0xFF)     ? 3
+        : (bodyLen <= 0xFFFF)   ? 4
+        : (bodyLen <= 0xFFFFFF) ? 5 : 6;
   } // method getHeaderLen
 
   public static int writeHeader(byte tag, int bodyLen, byte[] out, int offset) {

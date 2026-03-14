@@ -52,8 +52,7 @@ public class DbToolBase implements Closeable {
 
   private final boolean connectionAutoCommit;
 
-  public DbToolBase(DataSourceWrapper datasource, String baseDir,
-                    AtomicBoolean stopMe)
+  public DbToolBase(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
       throws DataAccessException {
     Args.notBlank(baseDir, "baseDir");
     this.stopMe = Args.notNull(stopMe, "stopMe");
@@ -67,8 +66,7 @@ public class DbToolBase implements Closeable {
     this.baseDir = IoUtil.expandFilepath(baseDir);
   } // constructor
 
-  protected PreparedStatement prepareStatement(String sql)
-      throws DataAccessException {
+  protected PreparedStatement prepareStatement(String sql) throws DataAccessException {
     try {
       return connection.prepareStatement(sql);
     } catch (SQLException ex) {
@@ -76,10 +74,8 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  public boolean deleteFromTableWithLargerId(
-      String table, String idColumn, long id, Logger log) {
-    String sql = StringUtil.concatObjects("DELETE FROM ", table,
-        " WHERE ", idColumn, ">", id);
+  public boolean deleteFromTableWithLargerId(String table, String idColumn, long id, Logger log) {
+    String sql = StringUtil.concatObjects("DELETE FROM ", table, " WHERE ", idColumn, ">", id);
 
     PreparedStatement stmt;
     try {
@@ -93,8 +89,7 @@ public class DbToolBase implements Closeable {
       stmt.execute();
     } catch (Throwable th) {
       LogUtil.error(log, th, String.format(
-          "could not delete columns from table %s with %s > %s",
-          table, idColumn, id));
+          "could not delete columns from table %s with %s > %s", table, idColumn, id));
       return false;
     } finally {
       releaseResources(stmt, null);
@@ -159,8 +154,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setLong(PreparedStatement ps, int index, Long value)
-      throws SQLException {
+  protected static void setLong(PreparedStatement ps, int index, Long value) throws SQLException {
     if (value != null) {
       ps.setLong(index, value);
     } else {
@@ -168,8 +162,7 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setInt(PreparedStatement ps, int index, Integer value)
-      throws SQLException {
+  protected static void setInt(PreparedStatement ps, int index, Integer value) throws SQLException {
     if (value != null) {
       ps.setInt(index, value);
     } else {
@@ -177,14 +170,12 @@ public class DbToolBase implements Closeable {
     }
   }
 
-  protected static void setBoolean(
-      PreparedStatement ps, int index, boolean value)
+  protected static void setBoolean(PreparedStatement ps, int index, boolean value)
       throws SQLException {
     ps.setInt(index, value ? 1 : 0);
   }
 
-  public static ConfigurableProperties getDbConfProperties(Path path)
-      throws IOException {
+  public static ConfigurableProperties getDbConfProperties(Path path) throws IOException {
     ConfigurableProperties props = new ConfigurableProperties();
     try (InputStream is = Files.newInputStream(path)) {
       props.load(is);
@@ -192,7 +183,6 @@ public class DbToolBase implements Closeable {
 
     // adapt the configuration
     props.setProperty("minimumIdle", "1");
-
     return props;
   } // method getDbConfProperties
 
@@ -216,15 +206,13 @@ public class DbToolBase implements Closeable {
     }
   } // method deleteTmpFiles
 
-  protected static void writeLine(OutputStream os, String text)
-      throws IOException {
+  protected static void writeLine(OutputStream os, String text) throws IOException {
     os.write(StringUtil.toUtf8Bytes(text));
     os.write('\n');
   }
 
   public static String buildFilename(
-      String prefix, String suffix, long minIdOfCurrentFile,
-      long maxIdOfCurrentFile, long maxId) {
+      String prefix, String suffix, long minIdOfCurrentFile, long maxIdOfCurrentFile, long maxId) {
     Args.notNull(prefix, "prefix");
     Args.notNull(suffix, "suffix");
 
@@ -241,8 +229,7 @@ public class DbToolBase implements Closeable {
     return sb.toString();
   } // method buildFilename
 
-  public static ZipOutputStream getZipOutputStream(File zipFile)
-      throws IOException {
+  public static ZipOutputStream getZipOutputStream(File zipFile) throws IOException {
     BufferedOutputStream out = new BufferedOutputStream(
         Files.newOutputStream(zipFile.toPath()), STREAM_BUFFER_SIZE);
     ZipOutputStream zipOutStream = new ZipOutputStream(out);

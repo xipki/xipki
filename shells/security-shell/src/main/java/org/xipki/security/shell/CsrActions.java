@@ -8,9 +8,18 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
-import org.bouncycastle.asn1.*;
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -33,13 +42,16 @@ import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.BadInputException;
 import org.xipki.security.exception.NoIdleSignerException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.DHSigStaticKeyCertPair;
 import org.xipki.security.pkix.KeyUsage;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.sign.KemHmacSignature;
 import org.xipki.security.sign.SignAlgoMode;
 import org.xipki.security.sign.Signer;
 import org.xipki.security.sign.SignerConf;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -60,14 +72,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class CsrActions {
@@ -96,20 +108,17 @@ public class CsrActions {
     protected List<String> subjectInfoAccesses;
 
     @Option(name = "--cert", description =
-        "Certificate file, from which subject and extensions will be " +
-            "extracted.\n" +
+        "Certificate file, from which subject and extensions will be extracted.\n" +
             "Maximal one of cert and old-cert is allowed.")
     @Completion(FileCompleter.class)
     private String certFile;
 
     @Option(name = "--cert-ext-exclude", multiValued = true, description =
-        "OIDs of extension types which are not copied from the " +
-            "--cert option to CSR.")
+        "OIDs of extension types which are not copied from the --cert option to CSR.")
     private List<String> excludeCertExtns;
 
     @Option(name = "--cert-ext-include", multiValued = true, description =
-        "OIDs of extension types which are copied from the " +
-            "--cert option to CSR.")
+        "OIDs of extension types which are copied from the --cert option to CSR.")
     private List<String> includeCertExtns;
 
     @Option(name = "--old-cert", description =
@@ -122,12 +131,10 @@ public class CsrActions {
     private String oldCertFile;
 
     @Option(name = "--subject", aliases = "-s", description =
-        "subject in the CSR, if not set, use the subject in the signer's " +
-            "certificate ")
+        "subject in the CSR, if not set, use the subject in the signer's certificate ")
     private String subject;
 
-    @Option(name = "--dateOfBirth", description =
-        "Date of birth YYYYMMdd in subject")
+    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
     private String dateOfBirth;
 
     @Option(name = "--postalAddress", multiValued = true, description =
@@ -138,8 +145,7 @@ public class CsrActions {
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
-    @Option(name = "--out", aliases = "-o", required = true, description =
-        "CSR file")
+    @Option(name = "--out", aliases = "-o", required = true, description = "CSR file")
     @Completion(FileCompleter.class)
     private String outputFilename;
 
@@ -174,8 +180,7 @@ public class CsrActions {
     @Completion(FileCompleter.class)
     private String biometricUri;
 
-    @Option(name = "--extensions-file", description =
-        "File containing the DER-encoded Extensions.")
+    @Option(name = "--extensions-file", description = "File containing the DER-encoded Extensions.")
     @Completion(FileCompleter.class)
     private String extensionsFile;
 
@@ -194,16 +199,14 @@ public class CsrActions {
     @Override
     protected Object execute0() throws Exception {
       if (certFile != null && oldCertFile != null) {
-        throw new IllegalCmdParamException(
-            "maximal one of cert and old-cert is allowed");
+        throw new IllegalCmdParamException("maximal one of cert and old-cert is allowed");
       }
 
       ConcurrentSigner signer = getSigner();
 
-      SubjectPublicKeyInfo subjectPublicKeyInfo =
-          (signer.getX509Cert() == null)
-              ? KeyUtil.createSubjectPublicKeyInfo(signer.getPublicKey())
-              : signer.getX509Cert().subjectPublicKeyInfo();
+      SubjectPublicKeyInfo subjectPublicKeyInfo = (signer.x509Cert() == null)
+          ? KeyUtil.createSubjectPublicKeyInfo(signer.publicKey())
+          : signer.x509Cert().subjectPublicKeyInfo();
 
       if (extkeyusages != null) {
         List<String> list = new ArrayList<>(extkeyusages.size());
@@ -213,8 +216,7 @@ public class CsrActions {
             try {
               new ASN1ObjectIdentifier(m);
             } catch (Exception ex) {
-              throw new IllegalCmdParamException(
-                  "invalid extended key usage " + m);
+              throw new IllegalCmdParamException("invalid extended key usage " + m);
             }
           }
         }
@@ -226,8 +228,7 @@ public class CsrActions {
 
       // SubjectInfoAccess
       ASN1OctetString extnValue = isEmpty(subjectInfoAccesses) ? null
-          : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false)
-            .getExtnValue();
+          : X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false).getExtnValue();
 
       if (extnValue != null) {
         extensions.add(
@@ -247,8 +248,7 @@ public class CsrActions {
       // ExtendedKeyusage
       if (isNotEmpty(extkeyusages)) {
         extensions.add(new Extension(OIDs.Extn.extendedKeyUsage, false,
-            X509Util.createExtendedUsage(textToAsn1Oids(extkeyusages))
-                .getEncoded()));
+            X509Util.createExtendedUsage(textToAsn1Oids(extkeyusages)).getEncoded()));
       }
 
       // QcEuLimitValue
@@ -288,32 +288,24 @@ public class CsrActions {
         TypeOfBiometricData tmpBiometricType =
             StringUtil.isNumber(biometricType)
                 ? new TypeOfBiometricData(Integer.parseInt(biometricType))
-                : new TypeOfBiometricData(
-                    new ASN1ObjectIdentifier(biometricType));
+                : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
         HashAlgo ha = HashAlgo.getInstance(biometricHashAlgo);
         byte[] tmpBiometricDataHash = ha.hash(IoUtil.read(biometricFile));
 
-        DERIA5String tmpSourceDataUri = null;
-        if (biometricUri != null) {
-          tmpSourceDataUri = new DERIA5String(biometricUri);
-        }
-        BiometricData biometricData = new BiometricData(tmpBiometricType,
-            ha.algorithmIdentifier(),
-            new DEROctetString(tmpBiometricDataHash), tmpSourceDataUri);
+        BiometricData biometricData = Asn1Util.buildBiometricData(
+            tmpBiometricType, ha.algorithmIdentifier(), tmpBiometricDataHash, biometricUri);
 
         extensions.add(new Extension(OIDs.Extn.biometricInfo, false,
             new DERSequence(biometricData).getEncoded()));
-      } else if (biometricType == null && biometricHashAlgo == null
-          && biometricFile == null) {
+      } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
         throw new Exception("either all of biometric triples (type, hash " +
             "algo, file） must be set or none of them should be set");
       }
 
-      List<ASN1ObjectIdentifier> addedExtnTypes =
-          new ArrayList<>(extensions.size());
+      List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());
       for (Extension extn : extensions) {
         addedExtnTypes.add(extn.getExtnId());
       }
@@ -338,8 +330,7 @@ public class CsrActions {
           ? null : resolvePassword(challengePasswordHint);
 
       if (certFile != null) {
-        Certificate cert = Certificate.getInstance(
-            X509Util.toDerEncoded(IoUtil.read(certFile)));
+        Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
 
         if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(),
                 cert.getSubjectPublicKeyInfo().getEncoded())) {
@@ -376,8 +367,7 @@ public class CsrActions {
         }
 
         PKCS10CertificationRequest csr = generateRequest(signer,
-            subjectPublicKeyInfo, cert.getSubject(), challengePassword,
-            extensions);
+            subjectPublicKeyInfo, cert.getSubject(), challengePassword, extensions);
         saveVerbose("saved CSR to file", outputFilename,
             encodeCsr(csr.getEncoded(), outform));
         return null;
@@ -388,17 +378,15 @@ public class CsrActions {
       X500Name newSubjectDn = null;
       if (subject == null) {
         if (StringUtil.isNotBlank(dateOfBirth)) {
-          throw new IllegalCmdParamException(
-              "dateOfBirth cannot be set if subject is not set");
+          throw new IllegalCmdParamException("dateOfBirth cannot be set if subject is not set");
         }
 
         if (CollectionUtil.isNotEmpty(postalAddress)) {
-          throw new IllegalCmdParamException(
-              "postalAddress cannot be set if subject is not set");
+          throw new IllegalCmdParamException("postalAddress cannot be set if subject is not set");
         }
 
         if (!updateOldCert) {
-          X509Cert signerCert = signer.getX509Cert();
+          X509Cert signerCert = signer.x509Cert();
           if (signerCert == null) {
             throw new IllegalCmdParamException("subject must be set");
           }
@@ -408,7 +396,6 @@ public class CsrActions {
         newSubjectDn = getSubject(subject);
 
         List<RDN> list = new LinkedList<>();
-
         if (StringUtil.isNotBlank(dateOfBirth)) {
           ASN1ObjectIdentifier id = OIDs.DN.dateOfBirth;
           RDN[] rdns = newSubjectDn.getRDNs(id);
@@ -445,12 +432,10 @@ public class CsrActions {
 
       // SubjectAltNames
       extnValue = isEmpty(subjectAltNames) ? null
-          : X509Util.createExtnSubjectAltName(subjectAltNames, false)
-              .getExtnValue();
+          : X509Util.createExtnSubjectAltName(subjectAltNames, false).getExtnValue();
       Extension newSubjectAltNames = null;
       if (extnValue != null) {
-        newSubjectAltNames = new Extension(OIDs.Extn.subjectAlternativeName,
-            false, extnValue);
+        newSubjectAltNames = new Extension(OIDs.Extn.subjectAlternativeName, false, extnValue);
       }
 
       Attribute attrChangeSubjectName = null;
@@ -472,8 +457,7 @@ public class CsrActions {
 
           GeneralNames subjectAlt = null;
           if (newSubjectAltNames != null) {
-            subjectAlt = GeneralNames.getInstance(
-                newSubjectAltNames.getExtnValue().getOctets());
+            subjectAlt = GeneralNames.getInstance(newSubjectAltNames.getExtnValue().getOctets());
           } else if (oldSan != null) {
             subjectAlt = GeneralNames.getInstance(oldSan.getParsedValue());
           }
@@ -483,8 +467,7 @@ public class CsrActions {
           }
 
           attrChangeSubjectName = new Attribute(
-              OIDs.CMC.id_cmc_changeSubjectName,
-              new DERSet(new DERSequence(v)));
+              OIDs.CMC.id_cmc_changeSubjectName, new DERSet(new DERSequence(v)));
         }
       } else {
         subjectDn = newSubjectDn;
@@ -494,10 +477,8 @@ public class CsrActions {
       }
 
       PKCS10CertificationRequest csr = generateRequest(signer,
-          subjectPublicKeyInfo, subjectDn, challengePassword, extensions,
-          attrChangeSubjectName);
-      saveVerbose("saved CSR to file", outputFilename,
-          encodeCsr(csr.getEncoded(), outform));
+          subjectPublicKeyInfo, subjectDn, challengePassword, extensions, attrChangeSubjectName);
+      saveVerbose("saved CSR to file", outputFilename, encodeCsr(csr.getEncoded(), outform));
       return null;
     } // method execute0
 
@@ -505,13 +486,11 @@ public class CsrActions {
       return new X500Name(Args.notBlank(subjectText, "subjectText"));
     }
 
-    protected List<Extension> getAdditionalExtensions()
-        throws BadInputException {
+    protected List<Extension> getAdditionalExtensions() throws BadInputException {
       return Collections.emptyList();
     }
 
-    private static List<ASN1ObjectIdentifier> textToAsn1Oids(
-        List<String> oidTexts) {
+    private static List<ASN1ObjectIdentifier> textToAsn1Oids(List<String> oidTexts) {
       if (oidTexts == null) {
         return null;
       }
@@ -531,10 +510,9 @@ public class CsrActions {
     }
 
     private PKCS10CertificationRequest generateRequest(
-        ConcurrentSigner signer,
-        SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
-        char[] challengePassword, List<Extension> extensions,
-        Attribute... attrs) throws XiSecurityException {
+        ConcurrentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
+        char[] challengePassword, List<Extension> extensions, Attribute... attrs)
+        throws XiSecurityException {
       Args.notNull(signer, "signer");
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
       Args.notNull(subjectDn, "subjectDn");
@@ -551,11 +529,9 @@ public class CsrActions {
       }
 
       PKCS10CertificationRequestBuilder csrBuilder =
-          new PKCS10CertificationRequestBuilder(
-              subjectDn, subjectPublicKeyInfo);
+          new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
       if (CollectionUtil.isNotEmpty(attributes)) {
-        for (Map.Entry<ASN1ObjectIdentifier, ASN1Encodable> entry
-            : attributes.entrySet()) {
+        for (Map.Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : attributes.entrySet()) {
           csrBuilder.addAttribute(entry.getKey(), entry.getValue());
         }
       }
@@ -563,8 +539,7 @@ public class CsrActions {
       if (attrs != null) {
         for (Attribute attr : attrs) {
           if (attr != null) {
-            csrBuilder.addAttribute(attr.getAttrType(),
-                attr.getAttrValues().toArray());
+            csrBuilder.addAttribute(attr.getAttrType(), attr.getAttrValues().toArray());
           }
         }
       }
@@ -589,28 +564,24 @@ public class CsrActions {
         return securityFactory.csrControl().generateKemEncapKey(
             myPublicKey, securityFactory.random4Sign());
       } catch (XiSecurityException ex) {
-        throw new ObjectCreationException(
-            "error computing EncapKey: " + ex.getMessage(), ex);
+        throw new ObjectCreationException("error computing EncapKey: " + ex.getMessage(), ex);
       }
     }
 
   }
 
-  @Command(scope = "xi", name = "csr-jce", description =
-      "generate CSR request with JCE device")
+  @Command(scope = "xi", name = "csr-jce", description = "generate CSR request with JCE device")
   @Service
   public static class CsrJceAction extends CsrGen {
 
     @Option(name = "--type", required = true, description = "JCE signer type")
     private String type;
 
-    @Option(name = "--alias", required = true, description =
-        "alias of the key in the JCE device")
+    @Option(name = "--alias", required = true, description = "alias of the key in the JCE device")
     private String alias;
 
-    @Option(name = "--algo", required = true, description =
-        "signature algorithm")
-    @Completion(SecurityCompleters.SignAlgoCompleter.class)
+    @Option(name = "--algo", required = true, description = "signature algorithm")
+    @Completion(Completers.SigAlgCompleter.class)
     private String algo;
 
     @Override
@@ -618,34 +589,28 @@ public class CsrActions {
       return getSigner(type, alias, algo, securityFactory);
     }
 
-    static ConcurrentSigner getSigner(
-        String type, String alias, String algo,
-        SecurityFactory securityFactory) throws Exception {
-      SignerConf conf = getJceSignerConf(alias, 1,
-          SignAlgo.getInstance(algo));
+    static ConcurrentSigner getSigner(String type, String alias, String algo,
+                                      SecurityFactory securityFactory) throws Exception {
+      SignerConf conf = getJceSignerConf(alias, 1, SignAlgo.getInstance(algo));
       return securityFactory.createSigner(type, conf, (X509Cert) null);
     }
 
-    static SignerConf getJceSignerConf(String alias, int parallelism,
-                                       SignAlgo signAlgo) {
+    static SignerConf getJceSignerConf(String alias, int parallelism, SignAlgo signAlgo) {
       ConfPairs conf = new ConfPairs()
           .putPair("parallelism", Integer.toString(parallelism))
           .putPair("alias", alias)
           .putPair("algo", signAlgo.jceName());
       return new SignerConf(conf);
     }
-
   }
 
-  @Command(scope = "xi", name = "csr-p11", description =
-      "generate CSR request with PKCS#11 device")
+  @Command(scope = "xi", name = "csr-p11", description = "generate CSR request with PKCS#11 device")
   @Service
   public static class CsrP11Action extends CsrGen {
 
     @Option(name = "--slot", description = "slot index")
     private String slotIndex = "0";
-    // use String instead int so that the default value 0 will be shown in
-    // the help.
+    // use String instead int so that the default value 0 will be shown in the help.
 
     @Option(name = "--id", description =
         "id (hex) of the private key in the PKCS#11 device\n" +
@@ -668,8 +633,7 @@ public class CsrActions {
 
     @Override
     protected ConcurrentSigner getSigner() throws Exception {
-      SignAlgoMode mode = (rsaPss != null && rsaPss)
-          ? SignAlgoMode.RSAPSS : null;
+      SignAlgoMode mode = (rsaPss != null && rsaPss) ? SignAlgoMode.RSAPSS : null;
       return getSigner(moduleName, slotIndex, id, label, mode, securityFactory);
     }
 
@@ -688,13 +652,11 @@ public class CsrActions {
 
     private SignerConf getPkcs11SignerConf(
         String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
-        int parallelism, HashAlgo hashAlgo, SignAlgoMode mode)
-            throws ObjectCreationException {
+        int parallelism, HashAlgo hashAlgo, SignAlgoMode mode) {
       Args.positive(parallelism, "parallelism");
 
       if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException(
-            "at least one of keyId and keyLabel may not be null");
+        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
       }
 
       ConfPairs conf = new ConfPairs();
@@ -732,13 +694,11 @@ public class CsrActions {
 
   }
 
-  @Command(scope = "xi", name = "csr-p12", description =
-      "generate CSR with PKCS#12 keystore")
+  @Command(scope = "xi", name = "csr-p12", description = "generate CSR with PKCS#12 keystore")
   @Service
   public static class CsrP12Action extends CsrGen {
 
-    @Option(name = "--p12", required = true, description =
-        "PKCS#12 keystore file")
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FileCompleter.class)
     private String p12File;
 
@@ -755,34 +715,28 @@ public class CsrActions {
 
     private char[] getPassword() throws IOException, PasswordResolverException {
       if (password == null) {
-        password = readPasswordIfNotSet("Enter the keystore password",
-            passwordHint);
+        password = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       }
       return password;
     }
 
     @Override
-    protected ConcurrentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentSigner getSigner() throws ObjectCreationException {
       char[] pwd;
       try {
         pwd = getPassword();
       } catch (IOException | PasswordResolverException ex) {
-        throw new ObjectCreationException(
-            "could not read password: " + ex.getMessage(), ex);
+        throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
       }
 
-      SignerConf conf = new SignerConf()
-          .setPassword(new String(pwd))
-          .setParallelism(1)
-          .setKeystore("file:" + p12File);
+      SignerConf conf = new SignerConf().setPassword(new String(pwd))
+          .setParallelism(1).setKeystore("file:" + p12File);
       if (rsaPss != null && rsaPss) {
         conf.setMode(SignAlgoMode.RSAPSS);
       }
 
       conf.setPeerCertificates(getPeerCertificates());
-      return securityFactory.createSigner("PKCS12", conf,
-          (X509Cert) null);
+      return securityFactory.createSigner("PKCS12", conf, (X509Cert) null);
     }
 
   }
@@ -813,19 +767,16 @@ public class CsrActions {
 
       CertificationRequest csr = X509Util.parseCsr(encoded);
 
-      ASN1ObjectIdentifier sigAlgOid =
-          csr.getSignatureAlgorithm().getAlgorithm();
+      ASN1ObjectIdentifier sigAlgOid = csr.getSignatureAlgorithm().getAlgorithm();
 
       boolean isKemMac = OIDs.Xipki.id_alg_KEM_HMAC_SHA256.equals(sigAlgOid);
 
-      boolean isXdh =
-          OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid) ||
-              OIDs.Xipki.id_alg_dhPop_x448.equals(sigAlgOid);
+      boolean isXdh = OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid) ||
+                      OIDs.Xipki.id_alg_dhPop_x448.equals(sigAlgOid);
 
       if (isKemMac || isXdh) {
         if (keystoreFile == null || keystorePasswordHint == null) {
-          System.err.println("could not verify CSR, please specify the " +
-              "peer's master key keystore");
+          System.err.println("could not verify CSR, please specify the peer's master key keystore");
           return null;
         }
       }
@@ -839,29 +790,27 @@ public class CsrActions {
         /*
          * See org.xipki.security.kemgmac.P12KemMacContentSignerBuilder
          */
-        ASN1Sequence seq = ASN1Sequence.getInstance(
-            csr.getSignature().getBytes());
-
-        id = ASN1UTF8String.getInstance(seq.getObjectAt(0)).getString();
-        peerMasterKey = readSecretKeyFromKeystore(keystoreFile, id,
-            keystorePasswordHint);
+        KemHmacSignature kemHmacSig = KemHmacSignature.decode(csr.getSignature().getOctets());
+        id = kemHmacSig.id();
+        peerMasterKey = readSecretKeyFromKeystore(keystoreFile, id, keystorePasswordHint);
         if (peerMasterKey == null) {
-          System.err.println(
-              "could not find peer KEM key entry to verify the CSR");
+          System.err.println("could not find peer KEM key entry to verify the CSR");
           return null;
         }
       } else if (isXdh) {
-        EcCurveEnum requiredKeyAlg =
-            OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid)
-              ? EcCurveEnum.X25519 : EcCurveEnum.X448;
+        if (StringUtil.orEqualsIgnoreCase(keystoreType, "PKCS12", "PKCS#12")) {
+          throw new IllegalCmdParamException("keystoreType is not PKCS12: " + keystoreType);
+        }
+        EcCurveEnum requiredKeyAlg = OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid)
+            ? EcCurveEnum.X25519 : EcCurveEnum.X448;
 
         char[] password = readPasswordIfNotSet(
             "Enter the keystore password", keystorePasswordHint);
-        KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
+        PKCS12KeyStore ks;
 
         File file = IoUtil.expandFilepath(new File(keystoreFile));
         try (InputStream is = Files.newInputStream(file.toPath())) {
-          ks.load(is, password);
+          ks = KeyUtil.loadPKCS12KeyStore(is, password);
 
           Enumeration<String> aliases = ks.aliases();
           while (aliases.hasMoreElements()) {
@@ -870,10 +819,12 @@ public class CsrActions {
               continue;
             }
 
-            PrivateKey key = (PrivateKey) ks.getKey(alias, password);
-            if (EcCurveEnum.ofAlias(key.getAlgorithm()) == requiredKeyAlg) {
+            PrivateKeyInfo keyInfo = ks.getKey(alias);
+            if (requiredKeyAlg == EcCurveEnum.ofOid(
+                keyInfo.getPrivateKeyAlgorithm().getAlgorithm())) {
+              PrivateKey key = KeyUtil.getPrivateKey(keyInfo);
               peerKeyAndCert = new DHSigStaticKeyCertPair(key,
-                  new X509Cert((X509Certificate) ks.getCertificate(alias)));
+                                  new X509Cert(ks.getCertificate(alias)));
               break;
             }
           }
@@ -885,8 +836,7 @@ public class CsrActions {
         }
       }
 
-      boolean bo = securityFactory.verifyPop(csr, null,
-          peerKeyAndCert, peerMasterKey);
+      boolean bo = securityFactory.verifyPop(csr, null, peerKeyAndCert, peerMasterKey);
       SignAlgo signAlgo = SignAlgo.getInstance(csr.getSignatureAlgorithm());
       println("The POP is " + (bo ? "" : "in") + "valid (signature algorithm "
           + signAlgo.jceName() + ").");

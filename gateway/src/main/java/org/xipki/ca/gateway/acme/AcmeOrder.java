@@ -12,13 +12,13 @@ import org.xipki.ca.gateway.acme.type.OrderStatus;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -98,8 +98,7 @@ public class AcmeOrder {
       return null;
     }
 
-    certSha256 = Base64.getUrlNoPaddingEncoder().encodeToString(
-        HashAlgo.SHA256.hash(cert));
+    certSha256 = Base64.getUrlNoPaddingEncoder().encodeToString(HashAlgo.SHA256.hash(cert));
     return certSha256;
   }
 
@@ -113,8 +112,7 @@ public class AcmeOrder {
     if (cert == null) {
       this.certSha256 = null;
     } else {
-      this.certSha256 = Base64.getUrlNoPaddingEncoder().encodeToString(
-          HashAlgo.SHA256.hash(cert));
+      this.certSha256 = Base64.getUrlNoPaddingEncoder().encodeToString(HashAlgo.SHA256.hash(cert));
     }
   }
 
@@ -148,7 +146,7 @@ public class AcmeOrder {
     return authzs;
   }
 
-  public String getEncodedAuthzs() throws CodecException {
+  public String getEncodedAuthzs() {
     return AcmeAuthz.encodeAuthzs(authzs);
   }
 

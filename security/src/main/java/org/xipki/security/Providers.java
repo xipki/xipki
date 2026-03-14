@@ -3,38 +3,29 @@
 
 package org.xipki.security;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.xipki.security.util.KeyUtil;
 
 import java.io.Closeable;
-import java.security.Security;
 
 /**
- * Helper class to register providers {@link BouncyCastleProvider}.
+ * Helper class to register providers.
  *
  * @author Lijun Liao (xipki)
  */
+@Component
 public class Providers implements Closeable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Providers.class);
-
+  @Activate
   public void init() {
-    addBcProvider();
+    KeyUtil.addProviders();
   }
 
+  @Deactivate
   @Override
   public void close() {
-  }
-
-  private void addBcProvider() {
-    if (Security.getProvider("BC") == null) {
-      LOG.info("add BouncyCastleProvider");
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    } else {
-      LOG.info("BouncyCastleProvider already added");
-    }
   }
 
 }

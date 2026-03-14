@@ -37,8 +37,7 @@ public final class P12KeypairGenSpeed extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(P12KeypairGenSpeed.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P12KeypairGenSpeed.class);
 
   private final SecurityFactory securityFactory;
 
@@ -51,7 +50,7 @@ public final class P12KeypairGenSpeed extends BenchmarkExecutor {
   }
 
   private void generateKeypair(SecureRandom random) throws Exception {
-    KeyUtil.generateKeypair(keySpec, random);
+    KeyUtil.generateKeyPair(keySpec, random);
   }
 
   @Override

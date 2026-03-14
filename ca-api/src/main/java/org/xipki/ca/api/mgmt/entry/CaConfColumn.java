@@ -236,8 +236,7 @@ public class CaConfColumn implements JsonEncodable {
     return revokeSuspendedControl;
   }
 
-  public void setRevokeSuspendedControl(
-      RevokeSuspendedControl revokeSuspendedControl) {
+  public void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
@@ -257,8 +256,7 @@ public class CaConfColumn implements JsonEncodable {
     }
   }
 
-  public static CaConfColumn decode(String encoded)
-      throws InvalidConfException {
+  public static CaConfColumn decode(String encoded) throws InvalidConfException {
     try {
       return parse(JsonParser.parseMap(encoded, false));
     } catch (CodecException e) {
@@ -267,8 +265,7 @@ public class CaConfColumn implements JsonEncodable {
     }
   }
 
-  public static CaConfColumn parse(JsonMap json)
-      throws CodecException, InvalidConfException {
+  public static CaConfColumn parse(JsonMap json) throws CodecException, InvalidConfException {
     CaConfColumn ret = new CaConfColumn();
     Integer i = json.getInt("version");
     if (i != null) {
@@ -357,8 +354,7 @@ public class CaConfColumn implements JsonEncodable {
     baseCaInfo.setSaveCert(saveCert);
     baseCaInfo.setSnSize(snSize);
     baseCaInfo.setSaveKeypair(saveKeypair);
-    baseCaInfo.setValidityMode(validityMode == null
-        ? ValidityMode.STRICT : validityMode);
+    baseCaInfo.setValidityMode(validityMode == null ? ValidityMode.STRICT : validityMode);
     baseCaInfo.setCrlControl(crlControl);
     baseCaInfo.setCtlogControl(ctlogControl);
     baseCaInfo.setExtraControl(extraControl);

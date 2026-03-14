@@ -11,6 +11,7 @@ import org.xipki.util.codec.VariableResolver;
 
 import java.math.BigInteger;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -187,8 +188,7 @@ public class JsonMap {
     return this;
   }
 
-  public JsonMap putEncodables(String key,
-                               Collection<? extends JsonEncodable> value) {
+  public JsonMap putEncodables(String key, Collection<? extends JsonEncodable> value) {
     if (value != null) {
       JsonList list = new JsonList();
       for (JsonEncodable v : value) {
@@ -201,14 +201,36 @@ public class JsonMap {
     return this;
   }
 
-  public JsonMap putEnums(String key,
-                          Collection<? extends Enum<?>> value) {
+  public JsonMap putEnums(String key, Collection<? extends Enum<?>> value) {
     if (value != null) {
       JsonList list = new JsonList();
       for (Enum<?> v : value) {
         if (v != null) {
           list.add(v.name());
         }
+      }
+      putObject(key, list);
+    }
+    return this;
+  }
+
+  public JsonMap putEnums(String key, Collection<? extends Enum<?>> value, boolean sort) {
+    if (!sort) {
+      return putEnums(key, value);
+    }
+
+    if (value != null) {
+      List<String> names = new ArrayList<>(value.size());
+      for (Enum<?> v : value) {
+        if (v != null) {
+          names.add(v.name());
+        }
+      }
+      Collections.sort(names);
+
+      JsonList list = new JsonList();
+      for (String v : names) {
+        list.add(v);
       }
       putObject(key, list);
     }
@@ -224,6 +246,31 @@ public class JsonMap {
         }
       }
       putObject(key, list);
+    }
+    return this;
+  }
+
+  public JsonMap putStrings(String key, Collection<String> value, boolean sort) {
+    if (!sort) {
+      return putStrings(key, value);
+    }
+
+    if (value != null) {
+      List<String> list = new ArrayList<>(value.size());
+      for (String v : value) {
+        if (v != null) {
+          list.add(v);
+        }
+      }
+      Collections.sort(list);
+
+      JsonList jlist = new JsonList();
+      for (String v : list) {
+        if (v != null) {
+          jlist.add(v);
+        }
+      }
+      putObject(key, jlist);
     }
     return this;
   }
@@ -244,8 +291,7 @@ public class JsonMap {
   protected JsonMap putObject(String key, Object value) {
     if (value != null) {
       if (keys.contains(key)) {
-        throw new RuntimeException(
-            "duplicated key '" + key + "'");
+        throw new RuntimeException("duplicated key '" + key + "'");
       }
 
       keys.add(key);
@@ -369,24 +415,22 @@ public class JsonMap {
     return map.containsKey(key);
   }
 
-  public <T extends Enum<T>> List<T> getNnEnumList(
-      String key, Class<T> clazz) throws CodecException {
+  public <T extends Enum<T>> List<T> getNnEnumList(String key, Class<T> clazz)
+      throws CodecException {
     return nonNull(key, getEnumList(key, clazz));
   }
 
-  public <T extends Enum<T>> List<T> getEnumList(
-      String key, Class<T> clazz) throws CodecException {
+  public <T extends Enum<T>> List<T> getEnumList(String key, Class<T> clazz)
+      throws CodecException {
     JsonList list = getList(key);
     return list == null ? null : list.toEnumList(clazz);
   }
 
-  public <T extends Enum<T>> T getNnEnum(String key, Class<T> clazz)
-      throws CodecException {
+  public <T extends Enum<T>> T getNnEnum(String key, Class<T> clazz) throws CodecException {
     return nonNull(key, getEnum(key, clazz));
   }
 
-  public <T extends Enum<T>> T getEnum(String key, Class<T> clazz)
-      throws CodecException {
+  public <T extends Enum<T>> T getEnum(String key, Class<T> clazz) throws CodecException {
     String str = getString(key);
     return str == null ? null : Enum.valueOf(clazz, str);
   }
@@ -449,7 +493,7 @@ public class JsonMap {
 
     if (ret > Integer.MAX_VALUE || ret < Integer.MIN_VALUE) {
       throw new CodecException("The value of " + key +
-          " is out of the range of 32 bit integer");
+          " is out of the range of 32 bit integer: " + ret);
     }
 
     return (int) (long) ret;
@@ -463,8 +507,7 @@ public class JsonMap {
     return i;
   }
 
-  public boolean getBool(String key, boolean defaultValue)
-      throws CodecException {
+  public boolean getBool(String key, boolean defaultValue) throws CodecException {
     Boolean b = getBool(key);
     return b == null ? defaultValue : b;
   }

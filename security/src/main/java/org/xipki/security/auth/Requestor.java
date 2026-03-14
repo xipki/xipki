@@ -5,6 +5,8 @@ package org.xipki.security.auth;
 
 import org.xipki.security.pkix.X509Cert;
 
+import java.util.Locale;
+
 /**
  * Requestor interface.
  *
@@ -12,13 +14,31 @@ import org.xipki.security.pkix.X509Cert;
  */
 public interface Requestor {
 
+  enum Protocol {
+    CMP,
+    EST,
+    REST,
+    SCEP;
+
+    static Protocol of(String str) {
+      str = str.toUpperCase(Locale.ROOT);
+      return valueOf(str);
+    }
+  }
+
   enum Permission {
     ENROLL_CERT,
     REENROLL_CERT,
     GEN_KEYPAIR,
     ENROLL_CROSS,
     UNSUSPEND_CERT,
-    REVOKE_CERT
+    REVOKE_CERT;
+
+    static Permission of(String str) {
+      str = str.toUpperCase(Locale.ROOT).replace('_', '-');
+      return valueOf(str);
+    }
+
   }
 
   /**

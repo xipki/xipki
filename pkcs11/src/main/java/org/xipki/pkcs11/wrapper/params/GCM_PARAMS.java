@@ -54,8 +54,7 @@ public class GCM_PARAMS extends CkParams {
     this.type = ParamsType.GCM_PARAMS;
     this.iv = Args.notNull(iv, "iv");
     this.AAD = aad;
-    this.tagBits = Args.among(tagBits, "tagBits",
-        128, 120, 112, 104, 96, 64, 32);
+    this.tagBits = Args.among(tagBits, "tagBits", 128, 120, 112, 104, 96, 64, 32);
   }
 
   public byte[] iv() {
@@ -82,12 +81,10 @@ public class GCM_PARAMS extends CkParams {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    return toString(indent, module, "pIv", iv, "pAAD", AAD,
-        "ulTagBits", tagBits);
+    return toString(indent, module, "pIv", iv, "pAAD", AAD, "ulTagBits", tagBits);
   }
 
-  public static GCM_PARAMS decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static GCM_PARAMS decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.GCM_PARAMS);
     return new GCM_PARAMS(readByteArray(arch, encoded, off),

@@ -112,8 +112,7 @@ public class EdDSASignRawDataTest {
 
       final boolean inToken = false;
       PKCS11KeyId generatedKeyPair = generateKeypair(
-          ed25519 ? PKCS11KeyPairType.ED25519 : PKCS11KeyPairType.ED448,
-          inToken);
+          ed25519 ? PKCS11KeyPairType.ED25519 : PKCS11KeyPairType.ED448, inToken);
 
       int[] dataLens = {10570, 1057, 105700};
 
@@ -124,8 +123,7 @@ public class EdDSASignRawDataTest {
 
         // This signing operation is implemented in most of the drivers
         long generatedPrivateKey = generatedKeyPair.getHandle();
-        byte[] signatureValue = token.sign(sigMechanism,
-            generatedPrivateKey, dataToBeSigned);
+        byte[] signatureValue = token.sign(sigMechanism, generatedPrivateKey, dataToBeSigned);
         LOG.info("The signature value is: {}", Functions.toHex(signatureValue));
 
         // verify signature

@@ -88,11 +88,9 @@ public abstract class BenchmarkExecutor {
       }
     }
     sb.append("threads:  ").append(threads).append("\n");
-    sb.append("duration: ").append(
-        StringUtil.formatTime(duration, false)).append("\n");
+    sb.append("duration: ").append(StringUtil.formatTime(duration, false)).append("\n");
     sb.append("unit:     ").append(unit).append("\n");
-    sb.append("start at: ").append(
-        ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS));
+    sb.append("start at: ").append(ZonedDateTime.now().truncatedTo(ChronoUnit.MILLIS));
 
     System.out.println(sb);
 
@@ -189,8 +187,7 @@ public abstract class BenchmarkExecutor {
 
   protected boolean stop() {
     Duration dur = Duration.between(processLog.startTime(), Instant.now());
-    return interrupted || errorAccount.get() > 0
-        || dur.getSeconds() >= duration;
+    return interrupted || errorAccount.get() > 0 || dur.getSeconds() >= duration;
   }
 
   protected void printHeader() {
@@ -209,20 +206,14 @@ public abstract class BenchmarkExecutor {
   protected void printSummary() {
     processLog.printTrailer();
 
-    String averageText = StringUtil.formatAccount(
-        processLog.totalAverageSpeed(), 1);
+    String averageText = StringUtil.formatAccount(processLog.totalAverageSpeed(), 1);
 
     String msg = StringUtil.concatObjectsCap(400,
-        " started at: ",
-        processLog.startTime().atZone(ZoneOffset.systemDefault()),
-        "\nfinished at: ",
-        processLog.endTime().atZone(ZoneOffset.systemDefault()),
-        "\n   duration: ", StringUtil.formatTime(
-            processLog.totalElapsedTime().getSeconds(), false),
-        "\n    account: ",
-        StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
-        "\n     failed: ",
-        StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
+        " started at: ", processLog.startTime().atZone(ZoneOffset.systemDefault()),
+        "\nfinished at: ", processLog.endTime().atZone(ZoneOffset.systemDefault()),
+        "\n   duration: ", StringUtil.formatTime(processLog.totalElapsedTime().getSeconds(), false),
+        "\n    account: ", StringUtil.formatAccount(processLog.numProcessed(), 1), " ", unit,
+        "\n     failed: ", StringUtil.formatAccount(errorAccount.get(), 1), " ", unit,
         "\n    average: ", averageText, " ", unit, "/s\n");
 
     System.out.println(msg);

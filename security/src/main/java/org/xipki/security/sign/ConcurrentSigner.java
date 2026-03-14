@@ -20,23 +20,23 @@ import java.security.SignatureException;
  */
 public interface ConcurrentSigner {
 
-  String getName();
+  String name();
 
   /**
    * Returns the algorithm.
    * @return algorithm
    */
-  SignAlgo getAlgorithm();
+  SignAlgo algorithm();
 
   boolean isMac();
 
-  byte[] getSha1OfMacKey();
+  byte[] sha1OfMacKey();
 
   /**
    * Get the signing key.
    * @return the signing key if possible. {@code null} may be returned.
    */
-  Key getSigningKey();
+  Key signingKey();
 
   /**
    * Sets the public key.
@@ -45,9 +45,9 @@ public interface ConcurrentSigner {
    */
   void setPublicKey(PublicKey publicKey);
 
-  PublicKey getPublicKey();
+  PublicKey publicKey();
 
-  X509Cert getX509Cert();
+  X509Cert x509Cert();
 
   /**
    * Set the CertificateChain.
@@ -57,7 +57,7 @@ public interface ConcurrentSigner {
    */
   void setX509CertChain(X509Cert[] certchain);
 
-  X509Cert[] getX509CertChain();
+  X509Cert[] x509CertChain();
 
   /**
    * Initializes me.
@@ -78,8 +78,7 @@ public interface ConcurrentSigner {
    * @throws SignatureException
    *         If could not sign the data.
    */
-  byte[] x509sign(byte[] data)
-      throws NoIdleSignerException, SignatureException;
+  byte[] x509Sign(byte[] data) throws NoIdleSignerException, SignatureException;
 
   /**
    * Sign the data.
@@ -91,8 +90,7 @@ public interface ConcurrentSigner {
    * @throws SignatureException
    *         If could not sign the data.
    */
-  byte[][] x509sign(byte[][] data)
-      throws NoIdleSignerException, SignatureException;
+  byte[][] x509Sign(byte[][] data) throws NoIdleSignerException, SignatureException;
 
   /**
    * Borrows a signer with implementation-dependent default timeout.

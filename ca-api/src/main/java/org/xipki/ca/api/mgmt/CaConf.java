@@ -127,7 +127,7 @@ public class CaConf {
   } // method init
 
   private void init0(CaConfType.CaSystem root, Map<String, byte[]> zipEntries,
-                     SecurityFactory securityFactory)
+                    SecurityFactory securityFactory)
       throws IOException, InvalidConfException, CaMgmtException {
     if (root.dbSchemas() != null) {
       dbSchemas.putAll(root.dbSchemas());
@@ -137,8 +137,7 @@ public class CaConf {
     if (root.signers() != null) {
       for (CaConfType.Signer m : root.signers()) {
         SignerEntry en = new SignerEntry(m.name(), m.type(),
-            getValue(m.conf(), zipEntries), getBase64Binary(m.cert(),
-            zipEntries));
+            getValue(m.conf(), zipEntries), getBase64Binary(m.cert(), zipEntries));
         addSigner(en);
       }
     }
@@ -182,8 +181,7 @@ public class CaConf {
     if (root.profiles() != null) {
       for (CaConfType.NameTypeConf m : root.profiles()) {
         CertprofileEntry en = new CertprofileEntry(
-            new NameId(null, m.name()), m.type(),
-            getValue(m.conf(), zipEntries));
+            new NameId(null, m.name()), m.type(), getValue(m.conf(), zipEntries));
         addProfile(en);
       }
     }
@@ -232,29 +230,25 @@ public class CaConf {
               try {
                 caCert = X509Util.parseCert(bytes);
               } catch (CertificateException ex) {
-                throw new InvalidConfException(
-                    "invalid certificate of CA " + name, ex);
+                throw new InvalidConfException("invalid certificate of CA " + name, ex);
               }
             } else {
               // extract from the signer configuration
               try {
                 List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(
                     getValue(ci.signerConf(), zipEntries));
-                SignerConf signerConf =
-                    new SignerConf(signerConfs.get(0).conf());
+                SignerConf signerConf = new SignerConf(signerConfs.get(0).conf());
 
                 String signerType = ci.base().signerType();
                 ConcurrentSigner signer = securityFactory.createSigner(
                     signerType, signerConf, (X509Cert) null);
                 try {
-                  caCert = signer.getX509Cert();
+                  caCert = signer.x509Cert();
                 } finally {
                   signer.close();
                 }
-              } catch (IOException | ObjectCreationException
-                       | XiSecurityException ex) {
-                throw new InvalidConfException(
-                    "could not create CA signer for CA " + name, ex);
+              } catch (IOException | ObjectCreationException | XiSecurityException ex) {
+                throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
             }
 
@@ -268,8 +262,7 @@ public class CaConf {
                 try {
                   certchain.add(X509Util.parseCert(bytes));
                 } catch (CertificateException ex) {
-                  throw new InvalidConfException(
-                      "invalid certchain for CA " + name, ex);
+                  throw new InvalidConfException("invalid certchain for CA " + name, ex);
                 }
               }
 
@@ -283,8 +276,7 @@ public class CaConf {
           caHasRequestors = new LinkedList<>();
           for (CaConfType.CaHasRequestor req : m.requestors()) {
             CaHasRequestorEntry en = new CaHasRequestorEntry(
-                new NameId(null, req.requestorName()),
-                req.permissions(), req.profiles());
+                new NameId(null, req.requestorName()), req.permissions(), req.profiles());
             caHasRequestors.add(en);
           }
         }
@@ -397,8 +389,7 @@ public class CaConf {
     return cas.get(Args.notNull(name, "name"));
   }
 
-  private String getValue(FileOrValue fileOrValue,
-                          Map<String, byte[]> zipEntries)
+  private String getValue(FileOrValue fileOrValue, Map<String, byte[]> zipEntries)
       throws IOException {
     if (fileOrValue == null) {
       return null;
@@ -417,9 +408,8 @@ public class CaConf {
     return StringUtil.toUtf8String(binary);
   } // method getValue
 
-  private String getBase64Binary(FileOrBinary fileOrBinary,
-                                 Map<String, byte[]> zipEntries)
-      throws IOException {
+  private String getBase64Binary(
+      FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries) throws IOException {
     byte[] binary = getBinary(fileOrBinary, zipEntries);
     return (binary == null) ? null : Base64.encodeToString(binary);
   }
@@ -436,8 +426,7 @@ public class CaConf {
     }
   } // method read
 
-  private byte[] getBinary(FileOrBinary fileOrBinary,
-                           Map<String, byte[]> zipEntries)
+  private byte[] getBinary(FileOrBinary fileOrBinary, Map<String, byte[]> zipEntries)
       throws IOException {
     if (fileOrBinary == null) {
       return null;
@@ -469,7 +458,7 @@ public class CaConf {
     private final Instant notAfter;
 
     public GenSelfIssued(String profile, String subject, String serialNumber,
-                         Instant notBefore, Instant notAfter) {
+                        Instant notBefore, Instant notAfter) {
       this.profile = Args.notBlank(profile, "profile");
       this.subject = Args.notBlank(subject, "subject");
       this.serialNumber = serialNumber;
@@ -517,8 +506,7 @@ public class CaConf {
 
     public SingleCa(String name, GenSelfIssued genSelfIssued, CaEntry caEntry,
                     List<String> aliases, List<String> profileNames,
-                    List<CaHasRequestorEntry> requestors,
-                    List<String> publisherNames) {
+                    List<CaHasRequestorEntry> requestors, List<String> publisherNames) {
       this.name = Args.notBlank(name, "name");
       if (genSelfIssued != null) {
         if (caEntry == null) {

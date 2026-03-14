@@ -47,14 +47,12 @@ public class X509Csr {
     X509Cert.addIndent(sb, level).append("Certificate Request:\n");
     X509Cert.addIndent(sb, level + 1).append("Data:\n");
     printTbsCsr(sb, level + 2, csr);
-    X509Cert.printSignature(sb, level, csr.getSignatureAlgorithm(),
-        csr.getSignature().getOctets());
+    X509Cert.printSignature(sb, level, csr.getSignatureAlgorithm(), csr.getSignature().getOctets());
     sb.deleteCharAt(sb.length() - 1);
     return sb.toString();
   }
 
-  private static void printTbsCsr(
-      StringBuilder sb, int level, CertificationRequest csr) {
+  private static void printTbsCsr(StringBuilder sb, int level, CertificationRequest csr) {
     CertificationRequestInfo tbs = csr.getCertificationRequestInfo();
     int version = tbs.getVersion().getValue().intValueExact();
     X509Cert.addIndent(sb, level).append("Version: v").append(version + 1)
@@ -64,8 +62,7 @@ public class X509Csr {
     X509Cert.toString(sb, level, "Subject", tbs.getSubject());
 
     // Subject Public Key Info
-    X509Cert.printSubjectPublicKeyInfo(
-        sb, level, tbs.getSubjectPublicKeyInfo());
+    X509Cert.printSubjectPublicKeyInfo(sb, level, tbs.getSubjectPublicKeyInfo());
 
     // attributes
     X509Cert.addIndent(sb, level).append("Attributes:\n");
@@ -78,16 +75,14 @@ public class X509Csr {
       ASN1ObjectIdentifier attrOid = attr.getAttrType();
       if (attrOid.equals(OIDs.PKCS9.pkcs9_at_challengePassword)) {
         X509Cert.addIndent(sb, level + 1).append("challengePassword: ")
-            .append(((ASN1String) attr.getAttributeValues()[0]).getString())
-            .append("\n");
+            .append(((ASN1String) attr.getAttributeValues()[0]).getString()).append("\n");
       } else if (attrOid.equals(OIDs.PKCS9.pkcs9_at_extensionRequest)) {
         // extensions
         X509Cert.addIndent(sb, level + 1).append("X509v3 extensions:\n");
         X509Cert.printExtensions(sb, level + 2,
             Extensions.getInstance(attr.getAttributeValues()[0]));
       } else {
-        X509Cert.addIndent(sb, level + 1).append(attrOid.getId())
-            .append(": <unsupported>\n");
+        X509Cert.addIndent(sb, level + 1).append(attrOid.getId()).append(": <unsupported>\n");
       }
     }
   }

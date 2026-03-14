@@ -71,8 +71,7 @@ public class KeypairGenEntry extends MgmtEntry {
       if (ignoreSensitiveInfo) {
         try {
           sb.append(new ConfPairs(conf).toStringOmitSensitive(
-              Arrays.asList("key", "password"),
-              Collections.singletonList("keyspec")));
+              Arrays.asList("key", "password"), Collections.singletonList("keyspec")));
         } catch (Exception ex) {
           sb.append(conf);
         }

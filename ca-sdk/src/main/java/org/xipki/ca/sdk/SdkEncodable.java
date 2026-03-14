@@ -16,8 +16,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 
 public abstract class SdkEncodable implements CborEncodable {
 
-  protected abstract void encode0(CborEncoder encoder)
-      throws CodecException;
+  protected abstract void encode0(CborEncoder encoder) throws CodecException;
 
   @Override
   public final void encode(CborEncoder encoder) throws CodecException {
@@ -30,8 +29,7 @@ public abstract class SdkEncodable implements CborEncodable {
     return encoder.toByteArray();
   }
 
-  protected static void assertArrayStart(
-      String name, CborDecoder decoder, int size)
+  protected static void assertArrayStart(String name, CborDecoder decoder, int size)
       throws CodecException {
     if (decoder.readNullOrArrayLength(size)) {
       throw new CodecException(name + " must not be null.");

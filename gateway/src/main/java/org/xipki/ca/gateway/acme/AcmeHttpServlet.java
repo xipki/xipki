@@ -29,8 +29,7 @@ import java.io.IOException;
 
 public class AcmeHttpServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(AcmeHttpServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AcmeHttpServlet.class);
 
   private final boolean logReqResp;
 
@@ -45,8 +44,7 @@ public class AcmeHttpServlet {
     return responder;
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if (!("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
       resp.setStatus(HttpStatusCode.SC_METHOD_NOT_ALLOWED);
@@ -54,8 +52,7 @@ public class AcmeHttpServlet {
     service0(req, "POST".equalsIgnoreCase(method)).fillResponse(resp);
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean viaPost)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent("acme-gw");
 
@@ -75,8 +72,7 @@ public class AcmeHttpServlet {
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       LogUtil.logTextReqResp("ACME Gateway", LOG, logReqResp, viaPost,
-          req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.body());
+          req.getRequestURI(), requestBytes, httpResp == null ? null : httpResp.body());
 
       event.finish();
       auditService.logEvent(event);

@@ -3,6 +3,8 @@
 package org.xipki.pkcs11.wrapper.spec;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class PKCS11KeySpec extends PKCS11Spec {

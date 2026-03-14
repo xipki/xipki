@@ -13,14 +13,16 @@ import org.xipki.security.exception.XiSecurityException;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public interface CreateSignerCallback {
 
   CreateSignerCallback DEFAULT = new DefaultCallback();
 
-  KemEncapKey generateKemEncapKey(SecurityFactory securityFactory,
-                                  SubjectPublicKeyInfo publicKeyInfo)
+  KemEncapKey generateKemEncapKey(
+      SecurityFactory securityFactory, SubjectPublicKeyInfo publicKeyInfo)
       throws XiSecurityException;
 
   SignAlgo getSignAlgo(KeySpec keyspec, SignAlgoMode mode);
@@ -46,17 +48,17 @@ public interface CreateSignerCallback {
         case RSA4096:
           return (mode == SignAlgoMode.RSAPKCS1)
               ? SignAlgo.RSA_SHA256 : SignAlgo.RSAPSS_SHA256;
-        case SECP256R1:
+        case P256:
         case BRAINPOOLP256R1:
         case FRP256V1:
           return SignAlgo.ECDSA_SHA256;
-        case SECP384R1:
+        case P384:
         case BRAINPOOLP384R1:
           return SignAlgo.ECDSA_SHA384;
-        case SECP521R1:
+        case P521:
         case BRAINPOOLP512R1:
           return SignAlgo.ECDSA_SHA512;
-        case SM2P256V1:
+        case SM2:
           return SignAlgo.SM2_SM3;
         case ED25519:
           return SignAlgo.ED25519;
@@ -76,8 +78,7 @@ public interface CreateSignerCallback {
 
       if (keyspec.isCompositeMLDSA()) {
         try {
-          return SignAlgo.getInstance(
-              keyspec.algorithmIdentifier());
+          return SignAlgo.getInstance(keyspec.algorithmIdentifier());
         } catch (NoSuchAlgorithmException e) {
           return null;
         }

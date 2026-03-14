@@ -92,15 +92,13 @@
 #define OP_C_FindObjectsInit      21
 #define OP_C_FindObjects          22
 #define OP_C_FindObjectsFinal     23
-#define OP_C_DigestInit           24
-#define OP_C_Digest               25
-#define OP_C_DigestUpdate         26
-#define OP_C_DigestKey            27
-#define OP_C_DigestFinal          28
-#define OP_C_SignInit             29
-#define OP_C_Sign                 30
-#define OP_C_SignUpdate           31
-#define OP_C_SignFinal            32
+#define OP_C_DigestX              24
+#define OP_C_SignX                25
+#define OP_C_DecryptX             26
+#define OP_C_DeriveKey            27
+#define OP_C_SignInit             28
+#define OP_C_SignUpdate           29
+#define OP_C_SignFinal            30
 #define OP_C_GenerateKey          33
 #define OP_C_GenerateKeyPair      34
 
@@ -113,7 +111,7 @@
 #define OP_C_LoginUser            35
 #define OP_C_SessionCancel        36
 
-#define OP_V3_0_MAX               35
+#define OP_V3_0_MAX               36
 #define OP_V3_2_MIN               37
 
 // v3.2 functions
@@ -128,9 +126,11 @@
 #define MP_LongParams                               2
 #define MP_ByteArrayParams                          3
 #define MP_GCM_PARAMS                               6
+#define MP_ECDH1_DERIVE_PARAMS                      8
 #define MP_EDDSA_PARAMS                             11
 #define MP_SIGN_ADDITIONAL_CONTEXT                  12
 #define MP_HASH_SIGN_ADDITIONAL_CONTEXT             13
+#define MP_RSA_PKCS_OAEP_PARAMS                     18
 #define MP_RSA_PKCS_PSS_PARAMS                      19
 #define MP_XEDDSA_PARAMS                            27
 

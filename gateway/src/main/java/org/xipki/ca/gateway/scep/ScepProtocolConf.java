@@ -3,11 +3,7 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.ca.gateway.conf.CaNameSignersConf;
-import org.xipki.ca.gateway.conf.CaProfileConf;
-import org.xipki.ca.gateway.conf.CaProfilesControl;
-import org.xipki.ca.gateway.conf.PopControlConf;
-import org.xipki.ca.gateway.conf.ProtocolConf;
+import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -25,23 +21,23 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 
-public class ScepProtocolConf extends ProtocolConf {
+public class ScepProtocolConf extends GatewayConf.ProtocolConf {
 
   private final ScepControl scep;
 
   private final String authenticator;
 
-  private final List<CaProfileConf> caProfiles;
+  private final List<GatewayConf.CaProfileConf> caProfiles;
 
   /**
    * The signers.
    */
-  private final CaNameSignersConf signers;
+  private final GatewayConf.CaNameSignersConf signers;
 
-  public ScepProtocolConf(Boolean logReqResp, PopControlConf pop,
-                          SdkClientConf sdkClient, ScepControl scep,
-                          String authenticator, List<CaProfileConf> caProfiles,
-                          CaNameSignersConf signers) {
+  public ScepProtocolConf(
+      Boolean logReqResp, GatewayConf.PopControlConf pop, SdkClientConf sdkClient,
+      ScepControl scep, String authenticator, List<GatewayConf.CaProfileConf> caProfiles,
+      GatewayConf.CaNameSignersConf signers) {
     super(logReqResp, pop, sdkClient);
     this.scep = Args.notNull(scep, "scep");
     this.authenticator = Args.notBlank(authenticator, "authenticator");
@@ -49,7 +45,7 @@ public class ScepProtocolConf extends ProtocolConf {
     this.signers = Args.notNull(signers, "signers");
     if (caProfiles != null) {
       try {
-        new CaProfilesControl(caProfiles);
+        new GatewayConf.CaProfilesControl(caProfiles);
       } catch (InvalidConfException e) {
         throw new IllegalArgumentException(e);
       }
@@ -64,48 +60,44 @@ public class ScepProtocolConf extends ProtocolConf {
     return authenticator;
   }
 
-  public List<CaProfileConf> caProfiles() {
+  public List<GatewayConf.CaProfileConf> caProfiles() {
     return caProfiles;
   }
 
-  public CaNameSignersConf signers() {
+  public GatewayConf.CaNameSignersConf signers() {
     return signers;
   }
 
-  public static ScepProtocolConf parse(JsonMap json)
-      throws CodecException, InvalidConfException {
-    ProtocolConf pConf = ProtocolConf.parse0(json);
+  public static ScepProtocolConf parse(JsonMap json) throws CodecException {
+    GatewayConf.ProtocolConf pConf = GatewayConf.ProtocolConf.parse0(json);
 
     JsonMap map = json.getMap("scep");
     ScepControl scep = (map == null) ? null : ScepControl.parse(map);
 
     JsonList list = json.getList("caProfiles");
-    List<CaProfileConf> caProfiles = null;
+    List<GatewayConf.CaProfileConf> caProfiles = null;
     if (list != null) {
       caProfiles = new ArrayList<>(list.size());
       for (JsonMap v : list.toMapList()) {
-        caProfiles.add(CaProfileConf.parse(v));
+        caProfiles.add(GatewayConf.CaProfileConf.parse(v));
       }
     }
 
     map = json.getMap("signers");
-    CaNameSignersConf signers = (map == null) ? null
-        : CaNameSignersConf.parse(map);
+    GatewayConf.CaNameSignersConf signers = (map == null) ? null
+        : GatewayConf.CaNameSignersConf.parse(map);
 
     return new ScepProtocolConf(pConf.logReqResp(), pConf.pop(),
-        pConf.sdkClient(), scep, json.getString("authenticator"),
-        caProfiles, signers);
+        pConf.sdkClient(), scep, json.getString("authenticator"), caProfiles, signers);
   }
 
-  public static ScepProtocolConf readConfFromFile(String fileName)
-      throws InvalidConfException {
+  public static ScepProtocolConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
 
     try {
       return parse(JsonParser.parseMap(Paths.get(fileName), true));
     } catch (CodecException e) {
-      throw new InvalidConfException(
-          "error parsing ScepProtocolConf: " + e.getMessage(), e);
+      throw new InvalidConfException("error parsing ScepProtocolConf: " + e.getMessage(), e);
     }
   }
 

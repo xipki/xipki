@@ -11,10 +11,10 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -55,17 +55,14 @@ public class MyUtil {
       throws OperatorCreationException {
     Instant notAfter = startTime.plus(3650, ChronoUnit.DAYS);
     X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        issuer, serialNumber, Date.from(startTime), Date.from(notAfter),
-        subject, pubKeyInfo);
-    X509KeyUsage ku = new X509KeyUsage(
-        X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+        issuer, serialNumber, Date.from(startTime), Date.from(notAfter), subject, pubKeyInfo);
+    KeyUsage ku = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
     try {
       certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
       BasicConstraints bc = new BasicConstraints(0);
       certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
       String signatureAlgorithm = SignAlgo.getInstance(rcaKey).jceName();
-      ContentSigner contentSigner =
-          new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
+      ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
       return new X509Cert(certGenerator.build(contentSigner));
     } catch (CertIOException | NoSuchAlgorithmException ex) {
       throw new OperatorCreationException(ex.getMessage(), ex);
@@ -107,7 +104,7 @@ public class MyUtil {
     }
 
     ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName)
-                                  .setProvider("BC").build(privateKey);
+        .setProvider(KeyUtil.providerName(sigAlgName)).build(privateKey);
     return csrBuilder.build(contentSigner);
   } // method generateRequest
 
@@ -115,15 +112,13 @@ public class MyUtil {
       CertificationRequest csr, PrivateKey identityKey)
       throws CertificateException {
     return generateSelfsignedCert(
-        Args.notNull(csr, "csr").getCertificationRequestInfo()
-            .getSubject(),
+        Args.notNull(csr, "csr").getCertificationRequestInfo().getSubject(),
         csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(),
         identityKey);
   }
 
   public static X509Cert generateSelfsignedCert(
-      X500Name subjectDn, SubjectPublicKeyInfo pubKeyInfo,
-      PrivateKey identityKey)
+      X500Name subjectDn, SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey)
       throws CertificateException {
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(pubKeyInfo, "pubKeyInfo");
@@ -136,9 +131,9 @@ public class MyUtil {
         subjectDn, BigInteger.ONE, Date.from(notBefore), Date.from(notAfter),
         subjectDn, pubKeyInfo);
 
-    X509KeyUsage ku = new X509KeyUsage(X509KeyUsage.digitalSignature
-        | X509KeyUsage.dataEncipherment | X509KeyUsage.keyAgreement
-        | X509KeyUsage.keyEncipherment);
+    KeyUsage ku = new KeyUsage(KeyUsage.digitalSignature
+        | KeyUsage.dataEncipherment | KeyUsage.keyAgreement
+        | KeyUsage.keyEncipherment);
     try {
       certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
     } catch (CertIOException ex) {
@@ -150,7 +145,7 @@ public class MyUtil {
     try {
       String sigAlgorithm = SignAlgo.getInstance(identityKey).jceName();
       contentSigner = new JcaContentSignerBuilder(sigAlgorithm)
-          .setProvider("BC").build(identityKey);
+          .setProvider(KeyUtil.providerName(sigAlgorithm)).build(identityKey);
     } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }
@@ -158,8 +153,7 @@ public class MyUtil {
     return new X509Cert(certGenerator.build(contentSigner));
   } // method generateSelfsignedCert
 
-  public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(
-      PublicKey publicKey)
+  public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
       throws InvalidKeyException {
     return KeyUtil.createSubjectPublicKeyInfo(publicKey);
   } // method createSubjectPublicKeyInfo

@@ -94,8 +94,7 @@ public class MACTest {
 
     @Test
     public void execTest() throws TokenException {
-      CkMechanism signatureMechanism =
-          getSupportedMechanism(CKM_SHA256_HMAC, CKF_SIGN);
+      CkMechanism signatureMechanism = getSupportedMechanism(CKM_SHA256_HMAC, CKF_SIGN);
 
       LOG.info("##################################################");
       LOG.info("generate secret MAC key");
@@ -134,10 +133,8 @@ public class MACTest {
       LOG.info("##################################################");
       byte[] rawData = randomBytes(10570);
 
-      byte[] macValue = token.sign(signatureMechanism,
-          secretMACKey.getHandle(), rawData);
-      LOG.info("The MAC value is: {}",
-          new BigInteger(1, macValue).toString(16));
+      byte[] macValue = token.sign(signatureMechanism, secretMACKey.getHandle(), rawData);
+      LOG.info("The MAC value is: {}", new BigInteger(1, macValue).toString(16));
 
       LOG.info("##################################################");
       LOG.info("verification of the MAC... ");

@@ -10,14 +10,12 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
- *
  */
 public interface CborEncodable {
 
   void encode(CborEncoder encoder) throws CodecException;
 
-  default void unwrappedEncode(CborEncoder encoder)
-      throws CodecException {
+  default void unwrappedEncode(CborEncoder encoder) throws CodecException {
     throw new UnsupportedOperationException(
         "unwrappedEncode() is not supported in " + getClass().getName());
   }

@@ -22,8 +22,7 @@ public class AuditEventData {
     if (value == null) {
       this.value = "null";
     } else {
-      this.value = (value instanceof String) ? (String) value
-          : value.toString();
+      this.value = (value instanceof String) ? (String) value : value.toString();
     }
   } // constructor
 

@@ -3,11 +3,9 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1IA5String;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.util.encoders.Hex;
@@ -25,13 +23,13 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.pkix.KeyUsage;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.type.Validity;
 
-import java.io.Closeable;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -46,16 +44,15 @@ import java.util.Set;
 /**
  * CertProfile with identifier.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
-public class IdentifiedCertprofile implements Closeable {
+public class IdentifiedCertprofile {
 
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
-  public IdentifiedCertprofile(
-      CertprofileEntry dbEntry, Certprofile certprofile)
+  public IdentifiedCertprofile(CertprofileEntry dbEntry, Certprofile certprofile)
       throws CertprofileException {
     this.dbEntry = Args.notNull(dbEntry, "dbEntry");
     this.certprofile = Args.notNull(certprofile, "certprofile");
@@ -109,20 +106,12 @@ public class IdentifiedCertprofile implements Closeable {
   }
 
   public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
-      throws CertprofileException, BadCertTemplateException {
+      throws BadCertTemplateException {
     return certprofile.checkPublicKey(Args.notNull(publicKey, "publicKey"));
   }
 
-  public byte[] getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey)
-      throws CertprofileException {
+  public byte[] getSubjectKeyIdentifier(SubjectPublicKeyInfo publicKey) {
     return certprofile.subjectKeyIdentifier(publicKey);
-  }
-
-  @Override
-  public void close() {
-    if (certprofile != null) {
-      certprofile.close();
-    }
   }
 
   public ExtensionsControl extensionControls() {
@@ -169,11 +158,9 @@ public class IdentifiedCertprofile implements Closeable {
    *         if any error occurs.
    */
   public ExtensionValues getExtensions(
-      X500Name requestedSubject, X500Name grantedSubject,
-      Extensions requestedExtensions, SubjectPublicKeyInfo publicKeyInfo,
-      PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
-      Instant notBefore, Instant notAfter)
-      throws CertprofileException, BadCertTemplateException {
+      X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
+      SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
+      Instant notBefore, Instant notAfter) throws CertprofileException, BadCertTemplateException {
     Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
@@ -236,8 +223,7 @@ public class IdentifiedCertprofile implements Closeable {
     addExtnCertificatePolicies(values, types, controls);
 
     ExtensionValues subvalues = certprofile.getExtensions(types,
-        requestedSubject, grantedSubject, requestedExtns, notBefore,
-        notAfter, publicCaInfo);
+        requestedSubject, grantedSubject, requestedExtns, notBefore, notAfter, publicCaInfo);
 
     for (ASN1ObjectIdentifier type : new ArrayList<>(types)) {
       ExtensionControl extControl = controls.getControl(type);
@@ -250,8 +236,7 @@ public class IdentifiedCertprofile implements Closeable {
       }
 
       if (value != null) {
-        CertprofileUtil.addExtension(values, type, extControl,
-            value.value());
+        CertprofileUtil.addExtension(values, type, extControl, value.value());
         types.remove(type);
       }
     }
@@ -269,8 +254,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     // Check the SubjectAltNames
-    if (certprofile.certDomain() == CertDomain.CABForumBR
-        && certLevel() == CertLevel.EndEntity) {
+    if (certprofile.certDomain() == CertDomain.CABForumBR && certLevel() == CertLevel.EndEntity) {
       assertCommonNameInSAN(grantedSubject, values);
     }
 
@@ -278,9 +262,8 @@ public class IdentifiedCertprofile implements Closeable {
   } // method getExtensions
 
   private void addExtnSubjectKeyIdentifier(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, SubjectPublicKeyInfo publicKeyInfo)
-      throws CertprofileException {
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      SubjectPublicKeyInfo publicKeyInfo) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.subjectKeyIdentifier;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -289,14 +272,12 @@ public class IdentifiedCertprofile implements Closeable {
 
     types.remove(extType);
     byte[] value = certprofile.subjectKeyIdentifier(publicKeyInfo);
-    CertprofileUtil.addExtension(values, extType, extControl,
-          new SubjectKeyIdentifier(value));
+    CertprofileUtil.addExtension(values, extType, extControl, new SubjectKeyIdentifier(value));
   }
 
   private void addExtnAuthorityKeyIdentifier(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo)
-      throws CertprofileException {
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      PublicCaInfo publicCaInfo) throws CertprofileException {
     byte[] ikiValue = publicCaInfo.subjectKeyIdentifier();
     if (ikiValue == null) {
       return;
@@ -309,14 +290,12 @@ public class IdentifiedCertprofile implements Closeable {
     }
 
     types.remove(extType);
-    CertprofileUtil.addExtension(values, extType, extControl,
-          new AuthorityKeyIdentifier(ikiValue));
+    CertprofileUtil.addExtension(values, extType, extControl, new AuthorityKeyIdentifier(ikiValue));
   }
 
   private void addExtnIssuerAltName(
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo)
-      throws CertprofileException {
+      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.issuerAlternativeName;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -330,8 +309,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   private void addExtnAuthorityInfoAccess(
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo)
-      throws CertprofileException {
+      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.authorityInfoAccess;
     ExtensionControl extControl = controls.getControl(extType);
     CaUris caUris = publicCaInfo.caUris();
@@ -353,8 +331,7 @@ public class IdentifiedCertprofile implements Closeable {
       ocspUris = caUris.ocspUris();
     }
 
-    boolean noUri = CollectionUtil.isEmpty(caIssuers)
-        && CollectionUtil.isEmpty(ocspUris);
+    boolean noUri = CollectionUtil.isEmpty(caIssuers) && CollectionUtil.isEmpty(ocspUris);
 
     AuthorityInformationAccess value = noUri ? null
         : CaUtil.createAuthorityInformationAccess(caIssuers, ocspUris);
@@ -364,8 +341,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   private void addExtnCRLDistributionPoints(
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo)
-      throws CertprofileException {
+      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
     // CRLDistributionPoints
     ASN1ObjectIdentifier extType = OIDs.Extn.cRLDistributionPoints;
     ExtensionControl extControl = controls.getControl(extType);
@@ -375,23 +351,20 @@ public class IdentifiedCertprofile implements Closeable {
 
     types.remove(extType);
     X509Cert crlSignerCert = publicCaInfo.crlSignerCert();
-    X500Name crlSignerSubject = (crlSignerCert == null) ? null
-        : crlSignerCert.subject();
+    X500Name crlSignerSubject = (crlSignerCert == null) ? null : crlSignerCert.subject();
     X500Name x500CaPrincipal = publicCaInfo.subject();
 
     List<String> uris = publicCaInfo.caUris().crlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
     CRLDistPoint value = noUri ? null
-        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
-            crlSignerSubject);
+        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
 
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnFreshestCRL(
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo)
-      throws CertprofileException {
+      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.freshestCRL;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -400,24 +373,20 @@ public class IdentifiedCertprofile implements Closeable {
 
     types.remove(extType);
     X509Cert crlSignerCert = publicCaInfo.crlSignerCert();
-    X500Name crlSignerSubject = (crlSignerCert == null) ? null
-        : crlSignerCert.subject();
+    X500Name crlSignerSubject = (crlSignerCert == null) ? null : crlSignerCert.subject();
 
     X500Name x500CaPrincipal = publicCaInfo.subject();
 
     List<String> uris = publicCaInfo.caUris().deltaCrlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
     CRLDistPoint value = noUri ? null
-        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal,
-            crlSignerSubject);
+        : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnBasicConstraints(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
-      throws CertprofileException {
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.basicConstraints;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -439,8 +408,7 @@ public class IdentifiedCertprofile implements Closeable {
     Extension requestedExtn = requestedExtns.get(extType);
 
     if (requestedExtn != null) {
-      BasicConstraints requested =
-          BasicConstraints.getInstance(requestedExtn.getParsedValue());
+      BasicConstraints requested = BasicConstraints.getInstance(requestedExtn.getParsedValue());
       boolean requestedIsCa = requested.isCA();
       BigInteger bn = requested.getPathLenConstraint();
       Integer requestedPathLen = (bn == null) ? null : bn.intValueExact();
@@ -464,8 +432,7 @@ public class IdentifiedCertprofile implements Closeable {
   }
 
   private void addExtnKeyUsage(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls,
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
       Map<ASN1ObjectIdentifier, Extension> requestedExtns, KeySpec keySpec)
       throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.keyUsage;
@@ -485,8 +452,7 @@ public class IdentifiedCertprofile implements Closeable {
     Set<KeySingleUsage> usageOccs = new HashSet<>(thisKeyUsage);
 
     // Signature only key specs
-    if (keySpec.isMldsa() || keySpec.isEdwardsEC() ||
-        keySpec.isCompositeMLDSA()) {
+    if (keySpec.isMldsa() || keySpec.isEdwardsEC() || keySpec.isCompositeMLDSA()) {
       removeKeyUsage(keySpec, usageOccs, KeyUsage.keyAgreement,
           KeyUsage.dataEncipherment, KeyUsage.keyEncipherment,
           KeyUsage.decipherOnly,     KeyUsage.encipherOnly);
@@ -512,8 +478,7 @@ public class IdentifiedCertprofile implements Closeable {
       }
     } else {
       // make sure the CA certificate contains usage keyCertSign and cRLSign
-      boolean containsCaUsage =
-          containsKeyusage(usageOccs, KeyUsage.keyCertSign)
+      boolean containsCaUsage = containsKeyusage(usageOccs, KeyUsage.keyCertSign)
               || containsKeyusage(usageOccs, KeyUsage.cRLSign);
       if (!containsCaUsage) {
         throw new CertprofileException(
@@ -524,13 +489,11 @@ public class IdentifiedCertprofile implements Closeable {
     if (certDomain == CertDomain.CABForumBR) {
       if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
         if (!containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
-          throw new CertprofileException(
-              "CA profile does contain keyUsage cRLSign");
+          throw new CertprofileException("CA profile does contain keyUsage cRLSign");
         }
       } else if (certLevel == CertLevel.EndEntity) {
         if (containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
-          throw new CertprofileException(
-              "EndEntity profile must not contain keyUsage cRLSign");
+          throw new CertprofileException("EndEntity profile must not contain keyUsage cRLSign");
         }
       }
     }
@@ -548,8 +511,7 @@ public class IdentifiedCertprofile implements Closeable {
       throw new CertprofileException("KeyUsage does not allow empty usages.");
     }
 
-    CertprofileUtil.addExtension(values, extType, extControl,
-        X509Util.createKeyUsage(usages));
+    CertprofileUtil.addExtension(values, extType, extControl, X509Util.createKeyUsage(usages));
   }
 
   private static void removeKeyUsage(
@@ -575,8 +537,7 @@ public class IdentifiedCertprofile implements Closeable {
     }
   }
 
-  private static boolean containsKeyusage(
-      Set<KeySingleUsage> usageControls, KeyUsage usage) {
+  private static boolean containsKeyusage(Set<KeySingleUsage> usageControls, KeyUsage usage) {
     for (KeySingleUsage entry : usageControls) {
       if (usage == entry.keyUsage()) {
         return true;
@@ -586,10 +547,8 @@ public class IdentifiedCertprofile implements Closeable {
   }
 
   private void addExtnExtendedKeyUsage(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
-      throws CertprofileException {
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      Map<ASN1ObjectIdentifier, Extension> requestedExtns) throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.extendedKeyUsage;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -608,25 +567,21 @@ public class IdentifiedCertprofile implements Closeable {
     // the optional ExtKeyUsage will only be set if requested explicitly
     CertprofileUtil.addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
 
-    if (extControl.isCritical()
-        && usages.contains(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
+    if (extControl.isCritical() && usages.contains(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
       extControl = new ExtensionControl(extControl.type(), false,
           extControl.isRequired(), extControl.inRequest());
     }
 
-    if (!extControl.isCritical()
-        && usages.contains(OIDs.XKU.id_kp_timeStamping)) {
+    if (!extControl.isCritical() && usages.contains(OIDs.XKU.id_kp_timeStamping)) {
       extControl = new ExtensionControl(extControl.type(), true,
           extControl.isRequired(), extControl.inRequest());
     }
 
-    CertprofileUtil.addExtension(values, extType, extControl,
-          X509Util.createExtendedUsage(usages));
+    CertprofileUtil.addExtension(values, extType, extControl, X509Util.createExtendedUsage(usages));
   }
 
   private void addExtnPkixOcspNoCheck(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls)
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls)
       throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.id_pkix_ocsp_nocheck;
     ExtensionControl extControl = controls.getControl(extType);
@@ -641,8 +596,7 @@ public class IdentifiedCertprofile implements Closeable {
 
   private void addExtnSubjectInfoAccess(
       ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns)
+      ExtensionsControl controls, Map<ASN1ObjectIdentifier, Extension> requestedExtns)
       throws BadCertTemplateException, CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.subjectInfoAccess;
     types.remove(extType);
@@ -657,8 +611,7 @@ public class IdentifiedCertprofile implements Closeable {
   }
 
   private void addExtnCertificatePolicies(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls)
+      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls)
       throws CertprofileException {
     ASN1ObjectIdentifier extType = OIDs.Extn.certificatePolicies;
     ExtensionControl extControl = controls.getControl(extType);
@@ -677,20 +630,18 @@ public class IdentifiedCertprofile implements Closeable {
     String commonName = X509Util.getCommonName(subject);
     boolean commonNameInSan = commonName == null;
 
-    ExtensionValue extValue =
-        values.getExtensionValue(OIDs.Extn.subjectAlternativeName);
+    ExtensionValue extValue = values.getExtensionValue(OIDs.Extn.subjectAlternativeName);
 
     // No private IP address is permitted
-    GeneralName[] x509Names =
-        GeneralNames.getInstance(extValue.value()).getNames();
+    GeneralName[] x509Names = GeneralNames.getInstance(extValue.value()).getNames();
 
     for (GeneralName m : x509Names) {
       String domain = null;
       byte[] ipAddress = null;
       if (GeneralName.dNSName == m.getTagNo()) {
-        domain = ASN1IA5String.getInstance(m.getName()).getString();
+        domain = Asn1Util.getIA5String(m.getName());
       } else if (GeneralName.iPAddress == m.getTagNo()) {
-        ipAddress = DEROctetString.getInstance(m.getName()).getOctets();
+        ipAddress = Asn1Util.getOctetStringOctets(m.getName());
       }
 
       if (domain != null) {
@@ -711,7 +662,7 @@ public class IdentifiedCertprofile implements Closeable {
             String ipAddressText =
                 (0xFF & ipAddress[0]) + "." + (0xFF & ipAddress[1])
                 + "." + (0xFF & ipAddress[2]) + "." + (0xFF & ipAddress[3]);
-            if (ipAddressText.equals(commonName)) {
+            if (ipAddressText.equalsIgnoreCase(commonName)) {
               commonNameInSan = true;
             }
           }
@@ -720,7 +671,7 @@ public class IdentifiedCertprofile implements Closeable {
           //  throw new BadCertTemplateException(
           //      "invalid IPv4Address " + ipAddressText);
           //}
-        } else if (ipAddress.length == 8) { // IPv6 address
+        } else if (ipAddress.length == 16) { // IPv6 address
           if (!commonNameInSan) {
             // get the number of ":"
             List<Integer> positions = new ArrayList<>(7);
@@ -736,8 +687,7 @@ public class IdentifiedCertprofile implements Closeable {
               String[] blocks = new String[8];
               blocks[0] = commonName.substring(0, positions.get(0));
               for (int i = 0; i < 6; i++) {
-                blocks[i + 1] = commonName.substring(
-                    positions.get(i) + 1, positions.get(i + 1));
+                blocks[i + 1] = commonName.substring(positions.get(i) + 1, positions.get(i + 1));
               }
               blocks[7] = commonName.substring(positions.get(6) + 1);
 
@@ -746,8 +696,7 @@ public class IdentifiedCertprofile implements Closeable {
                 String block = blocks[i];
                 int blen = block.length();
                 if (blen == 1 | blen == 2) {
-                  commonNameBytes[i * 2 + 1] =
-                      (byte) Integer.parseInt(block, 16);
+                  commonNameBytes[i * 2 + 1] = (byte) Integer.parseInt(block, 16);
                 } else if (blen == 3 | blen == 4) {
                   commonNameBytes[i * 2] = (byte)
                       Integer.parseInt(block.substring(0, blen - 2), 16);
@@ -765,8 +714,7 @@ public class IdentifiedCertprofile implements Closeable {
             }
           }
         } else {
-          throw new BadCertTemplateException(
-              "invalid IP address " + Hex.toHexString(ipAddress));
+          throw new BadCertTemplateException("invalid IP address " + Hex.toHexString(ipAddress));
         }
       }
     }

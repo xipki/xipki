@@ -7,8 +7,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.SignedData;
@@ -21,6 +19,7 @@ import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 
 import java.security.cert.CRLException;
@@ -86,8 +85,7 @@ public class ScepUtil {
     return certs;
   } // method getCertsFromSignedData
 
-  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData)
-      throws CRLException {
+  public static X509CRLHolder getCrlFromPkiMessage(SignedData signedData) throws CRLException {
     ASN1Set set = Args.notNull(signedData, "signedData").getCRLs();
     if (set == null || set.size() == 0) {
       return null;
@@ -100,8 +98,7 @@ public class ScepUtil {
     }
   } // method getCrlFromPkiMessage
 
-  public static ASN1Encodable getFirstAttrValue(
-      AttributeTable attrs, ASN1ObjectIdentifier type) {
+  public static ASN1Encodable getFirstAttrValue(AttributeTable attrs, ASN1ObjectIdentifier type) {
     Args.notNull(attrs, "attrs");
     Args.notNull(type, "type");
     Attribute attr = attrs.get(type);
@@ -112,8 +109,7 @@ public class ScepUtil {
     return (set.size() == 0) ? null : set.getObjectAt(0);
   }
 
-  public static void addCmsCertSet(CMSSignedDataGenerator generator,
-                                   X509Cert[] cmsCertSet)
+  public static void addCmsCertSet(CMSSignedDataGenerator generator, X509Cert[] cmsCertSet)
       throws CertificateEncodingException, CMSException {
     if (cmsCertSet == null || cmsCertSet.length == 0) {
       return;
@@ -121,7 +117,7 @@ public class ScepUtil {
     Args.notNull(generator, "generator");
     Collection<X509CertificateHolder> certColl = new LinkedList<>();
     for (X509Cert m : cmsCertSet) {
-      certColl.add(m.toBcCert());
+      certColl.add(m.getCertHolder());
     }
 
     generator.addCertificates(new JcaCertStore(certColl));
@@ -133,9 +129,9 @@ public class ScepUtil {
       int tag = encoded[0] & 0xFF;
       try {
         if (tag == BERTags.UTC_TIME) {
-          return DERUTCTime.getInstance(encoded).getDate().toInstant();
+          return Asn1Util.getUTCTime(encoded);
         } else if (tag == BERTags.GENERALIZED_TIME) {
-          return DERGeneralizedTime.getInstance(encoded).getDate().toInstant();
+          return Asn1Util.getGeneralizedTime(encoded);
         } else {
           throw new IllegalArgumentException("invalid tag " + tag);
         }

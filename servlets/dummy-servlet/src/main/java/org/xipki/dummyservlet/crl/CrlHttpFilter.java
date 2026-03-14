@@ -31,8 +31,7 @@ import java.sql.ResultSet;
  */
 public class CrlHttpFilter implements XiHttpFilter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CrlHttpFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CrlHttpFilter.class);
 
   private static final String RESP_CONTENT_TYPE = "application/pkix-crl";
 
@@ -63,8 +62,7 @@ public class CrlHttpFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String hashalgo = req.getParameter("hashalgo");
     String caName = req.getParameter("name");
     String type = req.getParameter("type");
@@ -140,10 +138,8 @@ public class CrlHttpFilter implements XiHttpFilter {
         respContent = dbContent;
       }
 
-      String contentType = hashalgo == null ? RESP_CONTENT_TYPE
-          : "application/octet-stream";
-      new HttpResponse(HttpStatusCode.SC_OK, contentType, null, respContent)
-          .fillResponse(resp);
+      String contentType = hashalgo == null ? RESP_CONTENT_TYPE : "application/octet-stream";
+      new HttpResponse(HttpStatusCode.SC_OK, contentType, null, respContent).fillResponse(resp);
     } catch (Throwable th) {
       LogUtil.error(LOG, th);
       resp.sendError(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);

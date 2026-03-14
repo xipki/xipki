@@ -1,0 +1,133 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile tls enc"
+  },
+  "certLevel": "EndEntity",
+  "maxSize": 8400,
+  "validity": "5y",
+  "notBeforeTime": "current",
+  "keypairGeneration": "P256",
+  "keyAlgorithms": [
+    "BRAINPOOLP256R1",
+    "BRAINPOOLP384R1",
+    "BRAINPOOLP512R1",
+    "FRP256V1",
+    "MLKEM1024",
+    "MLKEM1024-BP384",
+    "MLKEM1024-P384",
+    "MLKEM1024-P521",
+    "MLKEM1024-RSA3072",
+    "MLKEM1024-X448",
+    "MLKEM512",
+    "MLKEM768",
+    "MLKEM768-BP256",
+    "MLKEM768-P256",
+    "MLKEM768-P384",
+    "MLKEM768-RSA2048",
+    "MLKEM768-RSA3072",
+    "MLKEM768-RSA4096",
+    "MLKEM768-X25519",
+    "P256",
+    "P384",
+    "P521",
+    "RSA2048",
+    "RSA3072",
+    "RSA4096",
+    "SM2",
+    "X25519",
+    "X448"
+  ],
+  "subject": [
+    {
+      "type": "country",
+      "minOccurs": 0
+    },
+    {
+      "type": "organization",
+      "minOccurs": 0
+    },
+    {
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },
+    {
+      "type": "serialNumber",
+      "minOccurs": 0
+    },
+    {
+      "type": "commonName",
+      "toSAN": "DNSName",
+      "regex": ":FQDN"
+    }
+  ],
+  "extensions": [
+    {
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "CRLDistributionPoints"
+    },
+    {
+      "type": "FreshestCRL"
+    },
+    {
+      "type": "SubjectAlternativeName",
+      "required": true,
+      "inRequest": "optional",
+      "subjectAltName": {
+        "modes": [
+          "DNSName",
+          "IPAddress"
+        ]
+      }
+    },
+    {
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },
+    {
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },
+    {
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [
+          {
+            "required": [
+              "dataEncipherment",
+              "keyEncipherment"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "ExtendedKeyUsage",
+      "required": true,
+      "inRequest": "optional",
+      "extendedKeyUsage": {
+        "required": [
+          "serverAuth"
+        ],
+        "optional": [
+          "clientAuth"
+        ]
+      }
+    }
+  ]
+}

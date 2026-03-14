@@ -39,7 +39,7 @@ public interface OcspRequestor {
    *         match the requested certificate.
    */
   OCSPResp ask(X509Cert issuerCert, X509Cert cert, URL responderUrl,
-               RequestOptions requestOptions, ReqRespDebug debug)
+              RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -63,7 +63,7 @@ public interface OcspRequestor {
    *         match the requested certificate.
    */
   OCSPResp ask(X509Cert issuerCert, X509Cert[] certs, URL responderUrl,
-               RequestOptions requestOptions, ReqRespDebug debug)
+              RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -87,7 +87,7 @@ public interface OcspRequestor {
    *         match the requested certificate.
    */
   OCSPResp ask(X509Cert issuerCert, BigInteger serialNumber, URL responderUrl,
-               RequestOptions requestOptions, ReqRespDebug debug)
+              RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -111,8 +111,7 @@ public interface OcspRequestor {
    *         match the requested certificates.
    */
   OCSPResp ask(X509Cert issuerCert, BigInteger[] serialNumbers,
-               URL responderUrl, RequestOptions requestOptions,
-               ReqRespDebug debug)
+              URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
 }

@@ -69,8 +69,7 @@ CK_RV cryptoki_query(ModuleData* module,
     // module management
     case OP_C_Initialize: {
       // flags = id2
-      CK_C_INITIALIZE_ARGS initArgs = {
-            NULL_PTR, NULL_PTR, NULL_PTR, NULL_PTR, id2, NULL_PTR};
+      CK_C_INITIALIZE_ARGS initArgs = {NULL_PTR, NULL_PTR, NULL_PTR, NULL_PTR, id2, NULL_PTR};
       return funcs->C_Initialize(&initArgs);
     }
     case OP_C_GetInfo: {
@@ -95,8 +94,7 @@ CK_RV cryptoki_query(ModuleData* module,
       rv = funcs->C_GetSlotList(tokenPresent, NULL_PTR, &num);
       if (isOK(rv) && num > 0) {
         mallocPayload(num * SIZE_LONG);
-        rv = funcs->C_GetSlotList(tokenPresent,
-                (CK_SLOT_ID_PTR) *pPayload, &num);
+        rv = funcs->C_GetSlotList(tokenPresent, (CK_SLOT_ID_PTR) *pPayload, &num);
       }
       return rv;
     }
@@ -131,8 +129,7 @@ CK_RV cryptoki_query(ModuleData* module,
       rv = funcs->C_GetMechanismList(id, NULL_PTR, &num);
       if (isOK(rv) && num > 0) {
         mallocPayload(num * SIZE_LONG);
-        rv = funcs->C_GetMechanismList(id,
-                (CK_MECHANISM_TYPE_PTR) *pPayload, &num);
+        rv = funcs->C_GetMechanismList(id, (CK_MECHANISM_TYPE_PTR) *pPayload, &num);
       }
       return rv;
     }
@@ -140,8 +137,7 @@ CK_RV cryptoki_query(ModuleData* module,
       // slotID = id, type = id2
       mallocPayload(3 * SIZE_LONG);
       // mechanism = id2
-      return funcs->C_GetMechanismInfo(id, id2,
-                (CK_MECHANISM_INFO_PTR) *pPayload);
+      return funcs->C_GetMechanismInfo(id, id2, (CK_MECHANISM_INFO_PTR) *pPayload);
     }
     // session management
     case OP_C_OpenSession: {
@@ -247,37 +243,65 @@ CK_RV cryptoki_query(ModuleData* module,
     case OP_C_SignInit:
       // hSession = id, hKey = id2
       return funcs->C_SignInit(id, pMech, id2);
-    case OP_C_DigestInit:
-      // hSession = id
-      return funcs->C_DigestInit(id, pMech);
-    // intermediate step functions
-    case OP_C_DigestUpdate:
-      // hSession = id
-      return funcs->C_DigestUpdate(id, pData, dataLen);
-    case OP_C_DigestKey:
-      // hSession = id, hKey = id2
-      return funcs->C_DigestKey(id, id2);
     case OP_C_SignUpdate:
       // hSession = id
       return funcs->C_SignUpdate(id, pData, dataLen);
-    case OP_C_Sign:
     case OP_C_SignFinal:
-    case OP_C_Digest:
-    case OP_C_DigestFinal:
       // last step functions
       // hSession = id
       PREPARE_OP_WITH_PAYLOAD;
-      if (op == OP_C_Sign) {
-        rv = funcs->C_Sign(id, pData, dataLen, *pPayload, payloadLen);
-      } else if (op == OP_C_SignFinal) {
-        rv = funcs->C_SignFinal(id, *pPayload, payloadLen);
-      } else if (op == OP_C_Digest) {
-        rv = funcs->C_Digest(id, pData, dataLen, *pPayload, payloadLen);
-      } else { // if (op == OP_C_DigestFinal) {
-        rv = funcs->C_DigestFinal(id, *pPayload, payloadLen);
-      }
+      rv = funcs->C_SignFinal(id, *pPayload, payloadLen);
       RETRY_OP_WITH_PAYLOAD;
       return rv;
+    case OP_C_DeriveKey: {
+      // hSession = id, hPrivateKey = id2, pTemplate = pAttrs
+      CK_OBJECT_HANDLE hNewKey;
+      rv = funcs->C_DeriveKey(id, pMech, id2, pAttrs, attrsCount, &hNewKey);
+      buildLongPayload(hNewKey);
+      return rv;
+    }
+    case OP_C_SignX: {
+      // hSession = id, hKey = id2
+      rv = funcs->C_SignInit(id, pMech, id2);
+      PREPARE_OP_WITH_PAYLOAD;
+      rv = funcs->C_Sign(id, pData, dataLen, *pPayload, payloadLen);
+      RETRY_OP_WITH_PAYLOAD;
+      return rv;
+    }
+    case OP_C_DecryptX: {
+      // hSession = id, hKey = id2
+      rv = funcs->C_DecryptInit(id, pMech, id2);
+      PREPARE_OP_WITH_PAYLOAD;
+      rv = funcs->C_Decrypt(id, pData, dataLen, *pPayload, payloadLen);
+      RETRY_OP_WITH_PAYLOAD;
+      return rv;
+    }
+    case OP_C_DigestX: {
+      // hSession = id
+      rv = funcs->C_DigestInit(id, pMech);
+
+      CK_RV rv2 = CKR_OK;
+      if (isOK(rv) && dataLen > 0) {
+        rv2 = funcs->C_DigestUpdate(id, pData, dataLen);
+      }
+
+      if (isOK(rv) && isOK(rv2) && id2 != 0) {
+        rv2 = funcs->C_DigestKey(id, id2);
+      }
+
+      if (isOK(rv) && isOK(rv2) && data2Len > 0) {
+        rv2 = funcs->C_DigestUpdate(id, pData2, data2Len);
+      }
+
+      PREPARE_OP_WITH_PAYLOAD;
+      rv = funcs->C_DigestFinal(id, *pPayload, payloadLen);
+      RETRY_OP_WITH_PAYLOAD;
+
+      if (isOK(rv) && isNOK(rv2)) {
+        rv = rv2;
+      }
+      return rv;
+    }
     /*********************************
      * Cryptoki v3.0 Functions
      *********************************/
@@ -293,8 +317,7 @@ CK_RV cryptoki_query(ModuleData* module,
     case OP_C_DecapsulateKey: {
       // hSession = id, hPrivateKey = id2, pTemplate = pAttrs
       CK_OBJECT_HANDLE hNewKey;
-      rv = funcs->C_DecapsulateKey(id, pMech, id2,
-              pAttrs, attrsCount, pData, dataLen, &hNewKey);
+      rv = funcs->C_DecapsulateKey(id, pMech, id2, pAttrs, attrsCount, pData, dataLen, &hNewKey);
       buildLongPayload(hNewKey);
       return rv;
     }

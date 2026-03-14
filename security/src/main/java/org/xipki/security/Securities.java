@@ -20,11 +20,9 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.misc.ReflectiveUtil;
 import org.xipki.util.io.FileOrValue;
-import org.xipki.util.password.PasswordResolverException;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.security.Security;
 import java.util.List;
 
 /**
@@ -88,26 +86,12 @@ public class Securities implements Closeable {
       this.pkcs11Conf = pkcs11Conf;
     }
 
-    @Deprecated
-    public void setPassword(Object password) {
-      LOG.warn("ignored password configuration");
-    }
-
     public List<String> signerFactories() {
       return signerFactories;
     }
 
     public void setSignerFactories(List<String> signerFactories) {
       this.signerFactories = signerFactories;
-    }
-
-    @Deprecated
-    public void setKeypairGeneratorFactories(
-        List<String> keypairGeneratorFactories) {
-      if (keypairGeneratorFactories != null &&
-          !keypairGeneratorFactories.isEmpty()) {
-        LOG.warn("keypairGeneratorFactories is not allowed");
-      }
     }
 
     public static SecurityConf parse(JsonMap json) throws CodecException {
@@ -157,24 +141,13 @@ public class Securities implements Closeable {
     init(null);
   }
 
-  public void init(SecurityConf conf) throws IOException, InvalidConfException {
-    if (Security.getProvider("BC") == null) {
-      LOG.info("add BouncyCastleProvider");
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    } else {
-      LOG.info("BouncyCastleProvider already added");
-    }
-
+  public void init(SecurityConf conf) throws InvalidConfException {
+    KeyUtil.addProviders();
     if (conf == null) {
       conf = SecurityConf.DEFAULT;
     }
 
-    try {
-      initSecurityFactory(conf);
-    } catch (PasswordResolverException e) {
-      LOG.error("could not initialize passwords", e);
-      throw new InvalidConfException(e.getMessage());
-    }
+    initSecurityFactory(conf);
   }
 
   @Override
@@ -190,25 +163,19 @@ public class Securities implements Closeable {
   } // method close
 
   private void initSecurityFactory(SecurityConf conf)
-      throws PasswordResolverException, InvalidConfException {
+      throws InvalidConfException {
     securityFactory = new SecurityFactoryImpl();
 
-    securityFactory.setStrongRandom4SignEnabled(
-        conf.isSignStrongrandomEnabled());
-    securityFactory.setStrongRandom4KeyEnabled(
-        conf.isKeyStrongrandomEnabled());
-    securityFactory.setDefaultSignerParallelism(
-        conf.defaultSignerParallelism());
+    securityFactory.setStrongRandom4SignEnabled(conf.isSignStrongrandomEnabled());
+    securityFactory.setStrongRandom4KeyEnabled(conf.isKeyStrongrandomEnabled());
+    securityFactory.setDefaultSignerParallelism(conf.defaultSignerParallelism());
 
     //----- Factories
-    SignerFactoryRegisterImpl signerFactoryRegister =
-        new SignerFactoryRegisterImpl();
+    SignerFactoryRegisterImpl signerFactoryRegister = new SignerFactoryRegisterImpl();
     securityFactory.setSignerFactoryRegister(signerFactoryRegister);
 
     // PKCS#12 (software)
-    P12SignerFactory p12SignerFactory = new P12SignerFactory();
-    p12SignerFactory.setSecurityFactory(securityFactory);
-    signerFactoryRegister.registFactory(p12SignerFactory);
+    signerFactoryRegister.registFactory(new P12SignerFactory());
 
     // PKCS#11
     if (conf.pkcs11Conf() != null) {
@@ -236,13 +203,10 @@ public class Securities implements Closeable {
 
     P11SystemConf pkcs11ConfObj = P11SystemConf.parse(pkcs11Conf);
     p11CryptServiceFactory.setPkcs11Conf(pkcs11ConfObj);
-
     p11CryptServiceFactory.init();
 
     P11SignerFactory p11SignerFactory = new P11SignerFactory();
-    p11SignerFactory.setSecurityFactory(securityFactory);
     p11SignerFactory.setP11CryptServiceFactory(p11CryptServiceFactory);
-
     signerFactoryRegister.registFactory(p11SignerFactory);
   }
 

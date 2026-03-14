@@ -4,6 +4,7 @@
 package org.xipki.util.extra.misc;
 
 import org.xipki.util.codec.Base64;
+import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 
 /**
@@ -82,16 +83,7 @@ public class PemEncoder {
 
   public static byte[] encode(byte[] data, PemLabel pemLabel) {
     byte[] base64 = Base64.encodeToPemByte(data);
-    byte[] out = new byte[pemLabel.prefix.length + base64.length
-        + pemLabel.postfix.length];
-    System.arraycopy(pemLabel.prefix, 0, out, 0,
-        pemLabel.prefix.length);
-    System.arraycopy(base64, 0, out, pemLabel.prefix.length,
-        base64.length);
-    System.arraycopy(pemLabel.postfix, 0, out,
-        pemLabel.prefix.length + base64.length,
-        pemLabel.postfix.length);
-    return out;
+    return IoUtil.concatenate(pemLabel.prefix, base64, pemLabel.postfix);
   }
 
 }

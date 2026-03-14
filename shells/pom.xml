@@ -21,5 +21,6 @@
     <module>pki-client-shell</module>
     <module>ca-mgmt-shell</module>
     <module>qa-shell</module>
+    <module>demo-shell</module>
   </modules>
 </project>

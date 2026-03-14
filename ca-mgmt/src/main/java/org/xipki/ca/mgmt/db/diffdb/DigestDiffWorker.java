@@ -40,10 +40,9 @@ public class DigestDiffWorker extends DbWorker {
   private final int numThreads;
 
   public DigestDiffWorker(
-      DataSourceFactory datasourceFactory, boolean revokedOnly,
-      String refDbConfFile, String targetDbConfFile, String reportDirName,
-      int numCertsPerSelect, int numThreads, Set<byte[]> includeCaCerts)
-      throws InvalidConfException, IOException {
+      DataSourceFactory datasourceFactory, boolean revokedOnly, String refDbConfFile,
+      String targetDbConfFile, String reportDirName, int numCertsPerSelect, int numThreads,
+      Set<byte[]> includeCaCerts) throws InvalidConfException, IOException {
     super(datasourceFactory, refDbConfFile);
     this.reportDir = reportDirName;
     this.numThreads = Args.positive(numThreads, "numThreads");

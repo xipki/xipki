@@ -5,13 +5,15 @@ package org.xipki.pkcs11.xihsm.store;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.xihsm.StoreSlotInfo;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
+import org.xipki.pkcs11.xihsm.attr.XiAttribute;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
-import org.xipki.pkcs11.xihsm.objects.XiP11Storage;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class PersistSlot {
@@ -25,10 +27,9 @@ public abstract class PersistSlot {
     this.slotInfo = Args.notNull(slotInfo, "slotInfo");
   }
 
-  public PersistObject from(XiTemplate attrs)
-      throws HsmException {
-    long cku = attrs.removeNonNullLong(XiP11Storage.CKA_XIHSM_CKU);
-    long originCode = attrs.removeNonNullLong(XiP11Storage.CKA_XIHSM_ORIGIN);
+  public PersistObject from(XiTemplate attrs) throws HsmException {
+    long cku = attrs.removeNonNullLong(XiAttribute.CKA_XIHSM_CKU);
+    long originCode = attrs.removeNonNullLong(XiAttribute.CKA_XIHSM_ORIGIN);
     Origin origin = Origin.ofCode(originCode);
     long objClass = attrs.removeLong(PKCS11T.CKA_CLASS);
     boolean private_ = attrs.removeBool(PKCS11T.CKA_PRIVATE, false);
@@ -37,9 +38,7 @@ public abstract class PersistSlot {
     byte[] id = attrs.removeByteArray(PKCS11T.CKA_ID);
     String label = attrs.removeChars(PKCS11T.CKA_LABEL);
 
-    byte[] encodedAttrs = attrs.encode();
-    return new PersistObject(cku, origin, private_, objClass,
-            keyType, id, label, encodedAttrs);
+    return new PersistObject(cku, origin, private_, objClass, keyType, id, label, attrs);
   }
 
 }

@@ -7,6 +7,8 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ExtKeyUsageControl {
@@ -15,8 +17,7 @@ public class ExtKeyUsageControl {
 
   private final boolean required;
 
-  public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage,
-                            boolean required) {
+  public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
     this.extKeyUsage = Args.notNull(extKeyUsage, "extKeyUsage");
     this.required = required;
   }
@@ -29,4 +30,4 @@ public class ExtKeyUsageControl {
     return required;
   }
 
-} // class ExtKeyUsageControl
+}

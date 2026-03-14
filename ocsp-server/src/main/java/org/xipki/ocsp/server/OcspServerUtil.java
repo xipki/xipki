@@ -51,8 +51,7 @@ import java.util.Set;
 
 public class OcspServerUtil {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(OcspServerUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspServerUtil.class);
 
   private static final String STORE_TYPE_XIPKI_DB = "xipki-db";
 
@@ -82,8 +81,7 @@ public class OcspServerUtil {
         }
       }
 
-      explicitCertificateChain = X509Util.buildCertPath(
-          explicitResponderCert, caCerts);
+      explicitCertificateChain = X509Util.buildCertPath(explicitResponderCert, caCerts);
     }
 
     String responderSignerType = signerType.type();
@@ -94,8 +92,7 @@ public class OcspServerUtil {
       sigAlgos = Collections.singletonList("");
     }
 
-    List<ConcurrentSigner> singleSigners =
-        new ArrayList<>(sigAlgos.size());
+    List<ConcurrentSigner> singleSigners = new ArrayList<>(sigAlgos.size());
 
     String name = signerType.name();
     List<String> succSigAlgos = new LinkedList<>();
@@ -103,13 +100,11 @@ public class OcspServerUtil {
 
     Set<String> errorMessages = new HashSet<>();
     for (String sigAlgo : sigAlgos) {
-      String signerConf = (sigAlgo.isEmpty() ? "" : "algo=" + sigAlgo + ",") +
-          responderKeyConf;
+      String signerConf = (sigAlgo.isEmpty() ? "" : "algo=" + sigAlgo + ",") + responderKeyConf;
 
       try {
-        ConcurrentSigner requestorSigner =
-            securityFactory.createSigner(responderSignerType,
-                new SignerConf(signerConf), explicitCertificateChain);
+        ConcurrentSigner requestorSigner = securityFactory.createSigner(
+            responderSignerType, new SignerConf(signerConf), explicitCertificateChain);
         singleSigners.add(requestorSigner);
         succSigAlgos.add(sigAlgo);
       } catch (Exception ex) {
@@ -132,16 +127,13 @@ public class OcspServerUtil {
     }
 
     if (singleSigners.isEmpty()) {
-      throw new InvalidConfException("could not create any signer group "
-          + name);
+      throw new InvalidConfException("could not create any signer group " + name);
     } else {
-      LOG.info("Create signers of sign algorithms {} for the signer group {}",
-          succSigAlgos, name);
+      LOG.info("Create signers of sign algorithms {} for the signer group {}", succSigAlgos, name);
     }
 
     if (!failSigAlgos.isEmpty()) {
-      LOG.info("ignore sign algorithms {} for the signer group {}",
-          failSigAlgos, name);
+      LOG.info("ignore sign algorithms {} for the signer group {}", failSigAlgos, name);
     }
 
     try {
@@ -151,8 +143,7 @@ public class OcspServerUtil {
     }
   } // method initSigner
 
-  static OcspStore newStore(OcspServerConf.Store conf,
-                            Map<String, DataSourceWrapper> datasources)
+  static OcspStore newStore(OcspServerConf.Store conf, Map<String, DataSourceWrapper> datasources)
       throws InvalidConfException {
     OcspStore store;
     try {
@@ -174,8 +165,7 @@ public class OcspServerUtil {
       } else if (type.startsWith("java:")) {
         // "java:".length() = 5
         String className = conf.source().type().substring(5).trim();
-        store = ReflectiveUtil.newInstance(className,
-            OcspServerUtil.class.getClassLoader());
+        store = ReflectiveUtil.newInstance(className, OcspServerUtil.class.getClassLoader());
       } else {
         throw new ObjectCreationException("unknown OCSP store type " + type);
       }
@@ -190,14 +180,10 @@ public class OcspServerUtil {
     store.setRetentionInterval(retentionInterval);
     store.setUnknownCertBehaviour(conf.unknownCertBehaviour());
 
-    store.setIncludeArchiveCutoff(
-        getBoolean(conf.includeArchiveCutoff(), true));
-    store.setIncludeCrlId(
-        getBoolean(conf.includeCrlId(), true));
-    store.setIgnoreExpiredCert(
-        getBoolean(conf.ignoreExpiredCert(), true));
-    store.setIgnoreNotYetValidCert(
-        getBoolean(conf.ignoreNotYetValidCert(), true));
+    store.setIncludeArchiveCutoff(getBoolean(conf.includeArchiveCutoff(), true));
+    store.setIncludeCrlId(getBoolean(conf.includeCrlId(), true));
+    store.setIgnoreExpiredCert(getBoolean(conf.ignoreExpiredCert(), true));
+    store.setIgnoreNotYetValidCert(getBoolean(conf.ignoreNotYetValidCert(), true));
 
     Validity minPeriod = (conf.minNextUpdatePeriod() == null)
             ? null : Validity.getInstance(conf.minNextUpdatePeriod());
@@ -210,17 +196,15 @@ public class OcspServerUtil {
     } else {
       String str = conf.updateInterval();
       Validity updateInterval = StringUtil.isBlank(str)
-          ? new Validity(5, Validity.Unit.MINUTE)
-          : Validity.getInstance(str);
+          ? new Validity(5, Validity.Unit.MINUTE) : Validity.getInstance(str);
       store.setUpdateInterval(updateInterval);
     }
 
     String datasourceName = conf.source().datasource();
     DataSourceWrapper datasource = null;
     if (datasourceName != null) {
-      datasource = Optional.ofNullable(datasources.get(datasourceName))
-          .orElseThrow(() -> new InvalidConfException(
-              "datasource named '" + datasourceName + "' not defined"));
+      datasource = Optional.ofNullable(datasources.get(datasourceName)).orElseThrow(
+          () -> new InvalidConfException("datasource named '" + datasourceName + "' not defined"));
     }
     try {
       JsonMap sourceConf = conf.source().conf();
@@ -234,8 +218,7 @@ public class OcspServerUtil {
   } // method newStore
 
   static boolean canBuildCertPath(
-      X509Cert[] certsInReq, RequestOption requestOption,
-      Instant referenceTime) {
+      X509Cert[] certsInReq, RequestOption requestOption, Instant referenceTime) {
     X509Cert target = certsInReq[0];
 
     Set<X509Cert> trustanchors = requestOption.trustanchors();
@@ -251,16 +234,14 @@ public class OcspServerUtil {
 
     if (model == null || model == CertPathValidationModel.PKIX) {
       for (X509Cert m : certpath) {
-        if (m.notBefore().isAfter(referenceTime)
-            || m.notAfter().isBefore(referenceTime)) {
+        if (m.notBefore().isAfter(referenceTime) || m.notAfter().isBefore(referenceTime)) {
           return false;
         }
       }
     } else if (model == CertPathValidationModel.CHAIN) {
       // do nothing
     } else {
-      throw new IllegalStateException("invalid CertPathValidationModel "
-          + model.name());
+      throw new IllegalStateException("invalid CertPathValidationModel " + model.name());
     }
 
     for (int i = certpath.length - 1; i >= 0; i--) {
@@ -279,8 +260,7 @@ public class OcspServerUtil {
     return (bo == null) ? defaultValue : bo;
   }
 
-  private static X509Cert parseCert(FileOrBinary certConf)
-      throws InvalidConfException {
+  private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
     try {
       return X509Util.parseCert(certConf.readContent());
     } catch (IOException | CertificateException ex) {
@@ -292,14 +272,11 @@ public class OcspServerUtil {
     }
   } // method parseCert
 
-  static OcspServerConf parseConf(String confFilename)
-      throws InvalidConfException {
-    return OcspServerConf.readConfFromFile(
-        IoUtil.expandFilepath(confFilename, true));
+  static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
+    return OcspServerConf.readConfFromFile(IoUtil.expandFilepath(confFilename, true));
   }
 
-  static ExtendedExtension removeExtension(
-      List<ExtendedExtension> extensions, OID extnType) {
+  static ExtendedExtension removeExtension(List<ExtendedExtension> extensions, OID extnType) {
     ExtendedExtension extn = null;
     for (ExtendedExtension m : extensions) {
       if (extnType == m.extnType()) {

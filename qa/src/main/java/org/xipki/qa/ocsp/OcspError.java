@@ -47,8 +47,7 @@ public enum OcspError {
       }
     }
 
-    throw new IllegalArgumentException(
-        "unknown OCSP error code '" + status + "'");
+    throw new IllegalArgumentException("unknown OCSP error code '" + status + "'");
   }
 
 }

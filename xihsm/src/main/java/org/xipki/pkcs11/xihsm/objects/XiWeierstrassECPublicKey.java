@@ -4,20 +4,24 @@
 package org.xipki.pkcs11.xihsm.objects;
 
 import org.bouncycastle.math.ec.ECPoint;
+import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.xihsm.LoginState;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
-import org.xipki.pkcs11.xihsm.crypt.WeierstraussCurveEnum;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.WeierstraussCurveEnum;
 
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_PARAMS;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_POINT;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKK_EC;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiWeierstrassECPublicKey extends XiECPublicKey {
@@ -34,8 +38,12 @@ public class XiWeierstrassECPublicKey extends XiECPublicKey {
     super(vendor, cku, newObjectMethod, handle, inToken, keyType,
         keyGenMechanism, ecParams, ecPoint);
 
-    this.curve = WeierstraussCurveEnum.ofEcParamsNonNull(ecParams);
-    this.publicPoint = curve.decodePoint(ecPoint);
+    try {
+      this.curve = WeierstraussCurveEnum.ofEcParamsNonNull(ecParams);
+      this.publicPoint = curve.decodePoint(ecPoint);
+    } catch (XiSecurityException e) {
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, e.getMessage(), e);
+    }
   }
 
   public static XiWeierstrassECPublicKey newInstance(
@@ -48,8 +56,7 @@ public class XiWeierstrassECPublicKey extends XiECPublicKey {
     byte[] ecPoint = HsmUtil.getOctetStringValue("EC_Point", derEcPoint);
 
     XiWeierstrassECPublicKey ret;
-    if (WeierstraussCurveEnum.ofEcParams(ecParams)
-        == WeierstraussCurveEnum.SM2) {
+    if (WeierstraussCurveEnum.ofEcParams(ecParams) == WeierstraussCurveEnum.SM2) {
       ret = new XiSm2ECPublicKey(vendor, cku, newObjectMethod,
           handle, inToken, CKK_EC, keyGenMechanism, ecParams, ecPoint);
     } else {

@@ -100,8 +100,7 @@ public class OldCertInfo extends SdkEncodable {
         return new OldCertInfo(usePublicKey, fsn);
       }
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
     }
   }
 
@@ -129,22 +128,18 @@ public class OldCertInfo extends SdkEncodable {
 
     @Override
     protected void encode0(CborEncoder encoder) throws CodecException {
-      encoder.writeArrayStart(2).writeObject(issuer)
-          .writeBigInt(serialNumber);
+      encoder.writeArrayStart(2).writeObject(issuer).writeBigInt(serialNumber);
     }
 
-    public static ByIssuerAndSerial decode(CborDecoder decoder)
-        throws CodecException {
+    public static ByIssuerAndSerial decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
-        return new ByIssuerAndSerial(
-            X500NameType.decode(decoder), decoder.readBigInt());
+        return new ByIssuerAndSerial(X500NameType.decode(decoder), decoder.readBigInt());
       } catch (RuntimeException ex) {
-        throw new CodecException(
-            buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
   }
@@ -173,22 +168,18 @@ public class OldCertInfo extends SdkEncodable {
 
     @Override
     protected void encode0(CborEncoder encoder) throws CodecException {
-      encoder.writeArrayStart(2).writeByteString(caCertSha1)
-          .writeBigInt(serialNumber);
+      encoder.writeArrayStart(2).writeByteString(caCertSha1).writeBigInt(serialNumber);
     }
 
-    public static BySha1FpAndSerial decode(CborDecoder decoder)
-        throws CodecException {
+    public static BySha1FpAndSerial decode(CborDecoder decoder) throws CodecException {
       try {
         if (decoder.readNullOrArrayLength(2)) {
           return null;
         }
 
-        return new BySha1FpAndSerial(
-            decoder.readByteString(), decoder.readBigInt());
+        return new BySha1FpAndSerial(decoder.readByteString(), decoder.readBigInt());
       } catch (RuntimeException ex) {
-        throw new CodecException(
-            buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, ByIssuerAndSerial.class), ex);
       }
     }
   }
@@ -214,8 +205,7 @@ public class OldCertInfo extends SdkEncodable {
 
     @Override
     protected void encode0(CborEncoder encoder) throws CodecException {
-      encoder.writeArrayStart(2).writeByteString(subject)
-          .writeByteString(san);
+      encoder.writeArrayStart(2).writeByteString(subject).writeByteString(san);
     }
 
     public static BySubject decode(CborDecoder decoder) throws CodecException {
@@ -224,11 +214,9 @@ public class OldCertInfo extends SdkEncodable {
           return null;
         }
 
-        return new BySubject(decoder.readByteString(),
-            decoder.readByteString());
+        return new BySubject(decoder.readByteString(), decoder.readByteString());
       } catch (RuntimeException ex) {
-        throw new CodecException(
-            buildDecodeErrMessage(ex, BySubject.class), ex);
+        throw new CodecException(buildDecodeErrMessage(ex, BySubject.class), ex);
       }
     }
 

@@ -23,8 +23,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class CertPublisherFactoryRegister {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CertPublisherFactoryRegister.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertPublisherFactoryRegister.class);
 
   private final ConcurrentLinkedDeque<CertPublisherFactory> factories =
       new ConcurrentLinkedDeque<>();
@@ -54,8 +53,7 @@ public class CertPublisherFactoryRegister {
    * @throws ObjectCreationException
    *           if publisher could not be created.
    */
-  public CertPublisher newPublisher(String type)
-      throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertPublisherFactory service : factories) {
@@ -64,8 +62,7 @@ public class CertPublisherFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException(
-        "could not find factory to create Publisher of type " + type);
+    throw new ObjectCreationException("could not find factory to create Publisher of type " + type);
   } // method newPublisher
 
   /**
@@ -112,8 +109,7 @@ public class CertPublisherFactoryRegister {
     if (factories.remove(factory)) {
       LOG.info("removed CertPublisherFactory binding for {}", factory);
     } else {
-      LOG.info("no CertPublisherFactory binding found to remove for {}",
-          factory);
+      LOG.info("no CertPublisherFactory binding found to remove for {}", factory);
     }
   } // method unregistFactory
 

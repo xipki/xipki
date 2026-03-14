@@ -4,15 +4,19 @@ package org.xipki.pkcs11.xihsm.mgr;
 
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
-import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.json.JsonBuilder;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class TenantInfo {
@@ -28,34 +32,41 @@ public class TenantInfo {
   }
 
   public byte[] encode() throws HsmException {
-    try (ByteArrayCborEncoder encoder = new ByteArrayCborEncoder()) {
-      encoder.writeArrayStart(2);
-      encoder.writeInt(1); // version
+    JsonMap map = new JsonMap();
+    map.put("version", 1);
 
-      encoder.writeMapStart(slotUsersMap.size());
-      for (Map.Entry<Long, SlotUsers> kv : slotUsersMap.entrySet()) {
-        encoder.writeLong(kv.getKey());
-        kv.getValue().encodeTo(encoder);
-      }
-      return encoder.toByteArray();
-    } catch (CodecException | IOException e) {
+    JsonList jSlotUsersMapList = new JsonList();
+    for (Map.Entry<Long, SlotUsers> kv : slotUsersMap.entrySet()) {
+      JsonMap subMap = new JsonMap();
+      subMap.put("slotId", kv.getKey());
+      subMap.put("users", kv.getValue().toCodec());
+      jSlotUsersMapList.add(subMap);
+    }
+
+    map.put("slots", jSlotUsersMapList);
+
+    try {
+      return JsonBuilder.toPrettyJson(map).getBytes(StandardCharsets.UTF_8);
+    } catch (RuntimeException e) {
       throw HsmException.newGeneralError("error encoding TenantInfo", e);
     }
   }
 
   public static TenantInfo decode(byte[] encoded) throws HsmException {
-    try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
-      decoder.readArrayLength(2);
-      int version = decoder.readInt();
+    try {
+      JsonMap jMap = JsonParser.parseMap(encoded, false);
+      int version = jMap.getInt("version");
       if (version != 1) {
         throw HsmException.newGeneralError("unknown version " + version);
       }
 
-      int size = decoder.readMapLength();
+      List<JsonMap> jList = jMap.getNnList("slots").toMapList();
+      int size = jList.size();
       Map<Long, SlotUsers> slotUsersMap = new HashMap<>(size);
-      for (int i = 0; i < size; i++) {
-        long slotId = decoder.readLong();
-        slotUsersMap.put(slotId, SlotUsers.decode(decoder));
+      for (JsonMap m : jList) {
+        long slotId = m.getNnLong("slotId");
+        SlotUsers slotUsers = SlotUsers.decode(m.getNnList("users"));
+        slotUsersMap.put(slotId, slotUsers);
       }
       return new TenantInfo(slotUsersMap);
     } catch (CodecException e) {

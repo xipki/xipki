@@ -148,8 +148,7 @@ public enum CrlReason {
   public static CrlReason forNameOrText(String text) {
     Args.notNull(text, "text");
     for (CrlReason value : values()) {
-      if (value.description.equalsIgnoreCase(text)
-          || value.name().equalsIgnoreCase(text)
+      if (value.description.equalsIgnoreCase(text) || value.name().equalsIgnoreCase(text)
           || Integer.toString(value.code).equals(text)) {
         return value;
       }

@@ -31,8 +31,7 @@ import java.util.Map;
  */
 public class CaConfType {
 
-  private static void putNameTypeConfs(
-      JsonMap map, String name, List<NameTypeConf> value) {
+  private static void putNameTypeConfs(JsonMap map, String name, List<NameTypeConf> value) {
     if (value != null) {
       JsonList list = new JsonList();
       for (NameTypeConf v : value) {
@@ -161,21 +160,18 @@ public class CaConfType {
       this.cas = cas;
     }
 
-    public static CaSystem parse(Path path)
-        throws InvalidConfException {
+    public static CaSystem parse(Path path) throws InvalidConfException {
       try {
         return parse(JsonParser.parseMap(path, true));
       } catch (CodecException e) {
-        throw new InvalidConfException(
-            "error parsing CaSystem: " + e.getMessage(), e);
+        throw new InvalidConfException("error parsing CaSystem: " + e.getMessage(), e);
       }
     }
 
     public static CaSystem parse(JsonMap json) throws CodecException {
       Map<String, String> properties = json.getStringMap("properties");
       if (CollectionUtil.isNotEmpty(properties)) {
-        json.setVariableResolver(
-            new VariableResolver.MapVariableResolver(properties));
+        json.setVariableResolver(new VariableResolver.MapVariableResolver(properties));
       }
 
       CaSystem ret = new CaSystem();
@@ -288,8 +284,7 @@ public class CaConfType {
 
     private final List<String> profiles;
 
-    public CaHasRequestor(String requestorName, Permissions permissions,
-                          List<String> profiles) {
+    public CaHasRequestor(String requestorName, Permissions permissions, List<String> profiles) {
       this.requestorName = StringUtil.lowercase(requestorName);
       this.permissions = Args.notNull(permissions, "permissions");
       this.profiles = profiles;
@@ -308,12 +303,9 @@ public class CaConfType {
     }
 
     public static CaHasRequestor parse(JsonMap json) throws CodecException {
-      Permissions permissions = Permissions.parseJson(
-          json.getNnObject("permissions"));
-      return new CaHasRequestor(
-          json.getString("requestorName"),
-          permissions,
-          json.getStringList("profiles"));
+      Permissions permissions = Permissions.parseJson(json.getNnObject("permissions"));
+      return new CaHasRequestor(json.getString("requestorName"),
+          permissions, json.getStringList("profiles"));
     }
 
     public JsonMap toCodec() {
@@ -348,8 +340,7 @@ public class CaConfType {
 
     private final FileOrValue signerConf;
 
-    public CaInfo(BaseCaInfo base, FileOrValue signerConf,
-                  GenSelfIssued genSelfIssued) {
+    public CaInfo(BaseCaInfo base, FileOrValue signerConf, GenSelfIssued genSelfIssued) {
       this.base = Args.notNull(base, "base");
       this.genSelfIssued = Args.notNull(genSelfIssued, "genSelfIssued");
       this.signerConf    = Args.notNull(signerConf, "signerConf");
@@ -425,9 +416,8 @@ public class CaConfType {
       if (map != null) {
         caInfo = new CaInfo(base, signerConf, GenSelfIssued.parse(map));
       } else {
-        caInfo = new CaInfo(base, signerConf,
-            FileOrBinary.parse(json.getMap("cert")),
-            FileOrBinary.parseList(json.getList("certchain")));
+        caInfo = new CaInfo(base, signerConf, FileOrBinary.parse(json.getMap("cert")),
+                  FileOrBinary.parseList(json.getList("certchain")));
       }
 
       return caInfo;
@@ -494,8 +484,7 @@ public class CaConfType {
     private final List<String> publishers;
 
     public Ca(Integer id, String name, CaInfo caInfo, List<String> aliases,
-              List<String> profiles, List<CaHasRequestor> requestors,
-              List<String> publishers) {
+              List<String> profiles, List<CaHasRequestor> requestors, List<String> publishers) {
       super(id, name);
       this.caInfo     = Args.notNull(caInfo, "caInfo");
       this.profiles   = (profiles   == null ? new LinkedList<>()
@@ -577,13 +566,9 @@ public class CaConfType {
         }
       }
 
-      return new Ca(
-          json.getInt("id"),
-          json.getNnString("name"),
-          CaInfo.parse(json.getNnMap("caInfo")),
-          json.getStringList("aliases"),
-          json.getStringList("profiles"),
-          requestors,
+      return new Ca(json.getInt("id"), json.getNnString("name"),
+          CaInfo.parse(json.getNnMap("caInfo")), json.getStringList("aliases"),
+          json.getStringList("profiles"), requestors,
           json.getStringList("publishers"));
     }
 
@@ -669,8 +654,7 @@ public class CaConfType {
 
     private final FileOrValue conf;
 
-    public NameTypeConf(Integer id, String name,
-                        String type, FileOrValue conf) {
+    public NameTypeConf(Integer id, String name, String type, FileOrValue conf) {
       super(id, name);
       this.type = Args.notBlank(type, "type");
       this.conf = conf;
@@ -720,8 +704,7 @@ public class CaConfType {
       this.binaryConf = null;
     }
 
-    public Requestor(Integer id, String name, String type,
-                     FileOrBinary binaryConf) {
+    public Requestor(Integer id, String name, String type, FileOrBinary binaryConf) {
       super(id, name);
       this.type = Args.notBlank(type, "type");
       this.binaryConf = Args.notNull(binaryConf, "binaryConf");
@@ -755,8 +738,7 @@ public class CaConfType {
       FileOrBinary binaryConf = FileOrBinary.parse(json.getMap("binaryConf"));
 
       if (conf == null && binaryConf == null) {
-        throw new IllegalArgumentException(
-            "conf and binaryConf may not be both null");
+        throw new IllegalArgumentException("conf and binaryConf may not be both null");
       } else if (conf != null && binaryConf != null) {
         throw new IllegalArgumentException(
             "conf and binaryConf may not be both non-null");

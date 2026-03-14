@@ -520,6 +520,8 @@ public final class PKCS11T {
   public static final long CKM_HASH_SLH_DSA_SHAKE128     = 0x0000003eL;
   public static final long CKM_HASH_SLH_DSA_SHAKE256     = 0x0000003fL;
 
+  public static final long CKM_ECDH1_DERIVE                   = 0x00001050L;
+
   public static final long CKM_VENDOR_DEFINED                 = 0x80000000L;
 
   /* The flags are defined as follows:
@@ -719,6 +721,9 @@ public final class PKCS11T {
   public static final long CKG_MGF1_SHA3_384                  = 0x00000008L;
   public static final long CKG_MGF1_SHA3_512                  = 0x00000009L;
 
+  public static final long CKZ_DATA_SPECIFIED                 = 0x00000001L;
+  public static final long CKD_NULL                           = 0x00000001L;
+
   /*
    * New PKCS 11 v3.0 data structures.
    */
@@ -781,6 +786,8 @@ public final class PKCS11T {
   public static final long CKH_HEDGE_REQUIRED         = 0x00000001L;
   public static final long CKH_DETERMINISTIC_REQUIRED = 0x00000002L;
 
+  public static final long CKZ_SALT_SPECIFIED                 = 0x00000001L;
+
   private PKCS11T() {
   }
 
@@ -822,20 +829,17 @@ public final class PKCS11T {
           nameCodeMap.put(codeNameMap.get(code), code);
         }
       } catch (Throwable t) {
-        throw new IllegalStateException("error reading configuration for " +
-            category, t);
+        throw new IllegalStateException("error reading configuration for " + category, t);
       }
 
       if (codeNameMap.isEmpty()) {
-        throw new IllegalStateException("no code to name map is defined for " +
-            category);
+        throw new IllegalStateException("no code to name map is defined for " + category);
       }
     }
 
     String codeToString(long code) {
       String name = codeNameMap.get(code);
-      return name != null ? name : category.getPrefix() + "_0X"
-          + Functions.toFullHexUpper(code);
+      return name != null ? name : category.getPrefix() + "_0X" + Functions.toFullHexUpper(code);
     }
 
     Long stringToCode(String name) {
@@ -870,6 +874,21 @@ public final class PKCS11T {
    * @param name The name to be converted to a code.
    * @return The code representation of the given name.
    */
+  public static long nonnullNameToCode(Category category, String name) {
+    Long v = nameToCode(category, name);
+    if (v == null) {
+      throw new IllegalArgumentException("found no code for name " + name);
+    }
+    return v;
+  }
+
+  /**
+   * Converts the name to code value.
+   *
+   * @param category The category of code.
+   * @param name The name to be converted to a code.
+   * @return The code representation of the given name.
+   */
   public static Long nameToCode(Category category, String name) {
     Long code = Functions.parseLong(name);
     if (code != null) {
@@ -880,7 +899,18 @@ public final class PKCS11T {
     if (map == null) {
       throw new IllegalArgumentException("Unknown category " + category);
     }
-    return map.stringToCode(name.toUpperCase(Locale.ROOT));
+    Long value = map.stringToCode(name.toUpperCase(Locale.ROOT));
+    if (value != null) {
+      return value;
+    }
+
+    String prefix = category.getPrefix();
+    if (name.startsWith(prefix + "_0X") || name.startsWith(prefix + "_0x")) {
+      String str = name.substring(prefix.length() + 3);
+      return Long.parseLong(str, 16);
+    }
+
+    return null;
   }
 
   public static String ckaCodeToName(long code) {
@@ -934,15 +964,13 @@ public final class PKCS11T {
   public static String getStdMldsaName(long mldsaVariant) {
     return (mldsaVariant == CKP_ML_DSA_44) ? "ML-DSA-44"
         :  (mldsaVariant == CKP_ML_DSA_65) ? "ML-DSA-65"
-        :  (mldsaVariant == CKP_ML_DSA_87) ? "ML-DSA-87"
-        :  null;
+        :  (mldsaVariant == CKP_ML_DSA_87) ? "ML-DSA-87" :  null;
   }
 
   public static String getStdMlkemName(long mlkemVariant) {
     return (mlkemVariant == CKP_ML_KEM_512)  ? "ML-KEM-512"
         :  (mlkemVariant == CKP_ML_KEM_768)  ? "ML-KEM-768"
-        :  (mlkemVariant == CKP_ML_KEM_1024) ? "ML-KEM-1024"
-        :  null;
+        :  (mlkemVariant == CKP_ML_KEM_1024) ? "ML-KEM-1024" :  null;
   }
 
   private static final Map<Category, CodeNameMap> codeNameMaps =
@@ -956,7 +984,7 @@ public final class PKCS11T {
 
   static {
     hashMechCodeToHashNames = new HashMap<>();
-    hashMechCodeToHashNames.put(CKM_SHA_1, "SHA1");
+    hashMechCodeToHashNames.put(CKM_SHA_1,  "SHA1");
     hashMechCodeToHashNames.put(CKM_SHA224, "SHA224");
     hashMechCodeToHashNames.put(CKM_SHA256, "SHA256");
     hashMechCodeToHashNames.put(CKM_SHA384, "SHA384");
@@ -969,8 +997,7 @@ public final class PKCS11T {
     hashMechCodeToHashNames.put(CKM_SHA3_512, "SHA3-512");
 
     String path = "org/xipki/pkcs11/wrapper/name-code.json";
-    try (InputStream is = PKCS11T.class.getClassLoader()
-        .getResourceAsStream(path)) {
+    try (InputStream is = PKCS11T.class.getClassLoader().getResourceAsStream(path)) {
       JsonMap json = JsonParser.parseMap(is, true);
       for (Category m : Category.values()) {
         JsonMap map = json.getMap(m.name().toUpperCase());

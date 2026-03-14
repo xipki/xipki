@@ -1,0 +1,21 @@
+{
+  "prefix": "$[",
+  "suffix": "]",
+  "basedir": "..",
+  "sections" : [
+    {
+      "description": "Demo Configuration",
+      "includes": {
+        "dirs": [
+          "xipki-mgmt-cli"
+        ],
+        "suffixes": [
+          "doDemo.script"
+        ]
+      },
+      "replacements": {
+        "demo.dir": "${sys:demo.dir}"
+      }
+    }
+  ]
+}

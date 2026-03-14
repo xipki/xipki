@@ -20,8 +20,7 @@ import java.util.Random;
  */
 public abstract class KeypairGenExecutor extends Pkcs11Executor {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(KeypairGenExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KeypairGenExecutor.class);
 
   public class MyRunnable implements Runnable {
 
@@ -34,8 +33,7 @@ public abstract class KeypairGenExecutor extends Pkcs11Executor {
         try {
           // generate keypair on token
           PKCS11KeyPairSpec template = getMinimalKeyPairTemplate()
-              .token(inToken).signVerify(true)
-              .sensitive(true).private_(true);
+              .token(inToken).signVerify(true).sensitive(true).private_(true);
 
           if (inToken) {
             byte[] id = new byte[20];
@@ -43,8 +41,7 @@ public abstract class KeypairGenExecutor extends Pkcs11Executor {
             template.id(id);
           }
 
-          PKCS11KeyId keypair = TestHSMs.getHsmForSpeed().getToken()
-              .generateKeyPair(template);
+          PKCS11KeyId keypair = TestHSMs.getHsmForSpeed().getToken().generateKeyPair(template);
           destroyKey(LOG, keypair);
 
           account(1, 0);
@@ -62,8 +59,7 @@ public abstract class KeypairGenExecutor extends Pkcs11Executor {
 
   private final boolean inToken;
 
-  public KeypairGenExecutor(String description, long mechanism,
-                            boolean inToken) {
+  public KeypairGenExecutor(String description, long mechanism, boolean inToken) {
     super(description);
     this.mechanism = new CkMechanism(mechanism);
     this.inToken = inToken;

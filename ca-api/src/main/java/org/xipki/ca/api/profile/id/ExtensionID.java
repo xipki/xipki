@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ExtensionID extends AbstractID {
@@ -27,8 +29,7 @@ public class ExtensionID extends AbstractID {
       initOf(OIDs.Extn.keyUsage, "KeyUsage");
 
   public static final ExtensionID subjectAltName =
-      initOf(OIDs.Extn.subjectAlternativeName,
-          "SubjectAlternativeName", "SubjectAltName");
+      initOf(OIDs.Extn.subjectAlternativeName, "SubjectAlternativeName", "SubjectAltName");
 
   public static final ExtensionID subjectAlternativeName = subjectAltName;
 
@@ -39,8 +40,7 @@ public class ExtensionID extends AbstractID {
       initOf(OIDs.Extn.biometricInfo, "BiometricInfo");
 
   public static final ExtensionID crlDistributionPoints =
-      initOf(OIDs.Extn.cRLDistributionPoints,
-          "CRLDistributionPoints", "CRLDPs");
+      initOf(OIDs.Extn.cRLDistributionPoints, "CRLDistributionPoints", "CRLDPs");
 
   public static final ExtensionID certificatePolicies =
       initOf(OIDs.Extn.certificatePolicies, "CertificatePolicies");
@@ -61,8 +61,7 @@ public class ExtensionID extends AbstractID {
           "SignedCertificateTimestampList", "SCTL");
 
   public static final ExtensionID issuerAltName =
-      initOf(OIDs.Extn.issuerAlternativeName,
-          "IssuerAlternativeName", "IssuerAltName");
+      initOf(OIDs.Extn.issuerAlternativeName, "IssuerAlternativeName", "IssuerAltName");
 
   public static final ExtensionID nameConstraints =
       initOf(OIDs.Extn.nameConstraints, "NameConstraints");
@@ -116,15 +115,13 @@ public class ExtensionID extends AbstractID {
       initOf(OIDs.Extn.id_ccc_P_VehicleOEM_Enc_Cert, "CCC-P-VehicleOEMEncCert");
 
   public static final ExtensionID CCC_Q_VehicleOEMSigCert =
-      initOf(OIDs.Extn.id_ccc_Q_VehicleOEM_Sig_Cert,
-          "CCC-Q-VehicleOEMSigCert");
+      initOf(OIDs.Extn.id_ccc_Q_VehicleOEM_Sig_Cert, "CCC-Q-VehicleOEMSigCert");
 
   public static final ExtensionID CCC_DeviceEncCert =
       initOf(OIDs.Extn.id_ccc_Device_Enc_Cert, "CCC-DeviceEncCert");
 
   public static final ExtensionID CCC_VehicleIntermediateCert =
-      initOf(OIDs.Extn.id_ccc_Vehicle_Intermediate_Cert,
-          "CCC-VehicleIntermediateCert");
+      initOf(OIDs.Extn.id_ccc_Vehicle_Intermediate_Cert, "CCC-VehicleIntermediateCert");
 
   public static final ExtensionID CCC_J_VehicleOEMCACert =
       initOf(OIDs.Extn.id_ccc_J_VehicleOEM_CA_Cert, "CCC-J-VehicleOEMCACert");
@@ -132,13 +129,11 @@ public class ExtensionID extends AbstractID {
   public static final ExtensionID CCC_M_VehicleOEMCACert =
       initOf(OIDs.Extn.id_ccc_M_VehicleOEM_CA_Cert, "CCC-M-VehicleOEMCACert");
 
-  private ExtensionID(
-      ASN1ObjectIdentifier x509, List<String> aliases) {
+  private ExtensionID(ASN1ObjectIdentifier x509, List<String> aliases) {
     super(x509, aliases);
   }
 
-  private static ExtensionID initOf(
-      ASN1ObjectIdentifier oid, String... aliases) {
+  private static ExtensionID initOf(ASN1ObjectIdentifier oid, String... aliases) {
     Args.notNull(oid, "oid");
     List<String> l = new ArrayList<>();
     if (aliases != null) {

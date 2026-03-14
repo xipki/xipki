@@ -9,20 +9,22 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.pkcs11.wrapper.PKCS11T;
+import org.xipki.pkcs11.wrapper.params.RSA_PKCS_OAEP_PARAMS;
 import org.xipki.pkcs11.wrapper.params.RSA_PKCS_PSS_PARAMS;
 import org.xipki.pkcs11.xihsm.LoginState;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiAttribute;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 import org.xipki.pkcs11.xihsm.attr.XiTemplateChecker;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
-import org.xipki.pkcs11.xihsm.crypt.PKCS1Util;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.util.PKCS1Util;
 import org.xipki.util.codec.Args;
+import org.xipki.util.io.IoUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -32,6 +34,8 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiRSAPrivateKey extends XiPrivateKey {
@@ -143,13 +147,11 @@ public class XiRSAPrivateKey extends XiPrivateKey {
   private final int modulusBitSize;
 
   public XiRSAPrivateKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod
-      , long handle, boolean inToken, Long keyGenMechanism,
-      BigInteger modulus, BigInteger publicExponent,
-      BigInteger privateExponent, BigInteger p, BigInteger q,
-      BigInteger dP, BigInteger dQ, BigInteger qInv) {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        PKCS11T.CKK_RSA, keyGenMechanism);
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle,
+      boolean inToken, Long keyGenMechanism, BigInteger modulus,
+      BigInteger publicExponent, BigInteger privateExponent,
+      BigInteger p, BigInteger q, BigInteger dP, BigInteger dQ, BigInteger qInv) {
+    super(vendor, cku, newObjectMethod, handle, inToken, PKCS11T.CKK_RSA, keyGenMechanism);
     this.modulus = Args.notNull(modulus, "modulus");
     this.publicExponent  = Args.notNull(publicExponent, "publicExponent");
     this.privateExponent = Args.notNull(privateExponent, "privateExponent");
@@ -168,8 +170,7 @@ public class XiRSAPrivateKey extends XiPrivateKey {
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, CKA_MODULUS, modulus);
@@ -225,38 +226,36 @@ public class XiRSAPrivateKey extends XiPrivateKey {
   public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random)
       throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     long ckm = mechanism.getCkm();
     Object param = mechanism.getParameter();
 
-    if (ckm == CKM_RSA_PKCS
-        || ckm == CKM_SHA256_RSA_PKCS
-        || ckm == CKM_SHA384_RSA_PKCS
-        || ckm == CKM_SHA512_RSA_PKCS) {
+    if (ckm == CKM_RSA_PKCS || ckm == CKM_SHA256_RSA_PKCS
+        || ckm == CKM_SHA384_RSA_PKCS || ckm == CKM_SHA512_RSA_PKCS) {
       HsmUtil.assertNullParameter(mechanism);
       if (ckm == CKM_RSA_PKCS) {
         byte[] em;
         try {
-          em = PKCS1Util.EMSA_PKCS1_v1_5_encode(data, modulusBitSize);
+          em = PKCS1Util.EMSA_PKCS1_V1_5_ENCODE(data, modulusBitSize);
         } catch (Exception e) {
-          throw new HsmException(CKR_GENERAL_ERROR,
-              "EMSA_PKCS1_v1_5_encode error", e);
+          throw new HsmException(CKR_GENERAL_ERROR, "EMSA_PKCS1_v1_5_encode error", e);
         }
 
         return decryptRaw(em);
       } else {
         HashAlgo hashAlgo = extractPkcs1v1d5HashAlgo(ckm);
         byte[] hash = hashAlgo.hash(data);
+        // construct digestInfo
+        byte[] digestInfoPrefix = PKCS1Util.getDigestPkcsPrefix(hashAlgo);
 
         byte[] em;
         try {
-          em = PKCS1Util.EMSA_PKCS1_v1_5_encode(hash, modulusBitSize, hashAlgo);
+          em = PKCS1Util.EMSA_PKCS1_V1_5_ENCODE(
+                IoUtil.concatenate(digestInfoPrefix, hash), modulusBitSize);
         } catch (Exception e) {
-          throw new HsmException(CKR_GENERAL_ERROR,
-              "EMSA_PKCS1_v1_5_encode error", e);
+          throw new HsmException(CKR_GENERAL_ERROR, "EMSA_PKCS1_v1_5_encode error", e);
         }
 
         return decryptRaw(em);
@@ -272,7 +271,7 @@ public class XiRSAPrivateKey extends XiPrivateKey {
 
       RSA_PKCS_PSS_PARAMS p = (RSA_PKCS_PSS_PARAMS) param;
       int saltLen = (int) p.sLen();
-      HashAlgo hashAlgo = extractHashAlgo(ckm, p);
+      HashAlgo hashAlgo = extractHashAlgo(ckm, p.hashAlg(), p.mgf());
 
       byte[] hashValue;
       if (ckm == CKM_RSA_PKCS_PSS) {
@@ -284,10 +283,9 @@ public class XiRSAPrivateKey extends XiPrivateKey {
       byte[] em;
       try {
         em = PKCS1Util.EMSA_PSS_ENCODE(hashAlgo, hashValue, hashAlgo,
-            saltLen, modulusBitSize, random);
+                saltLen, modulusBitSize, random);
       } catch (Exception e) {
-        throw new HsmException(CKR_GENERAL_ERROR,
-            "EMSA_PSS_ENCODE error", e);
+        throw new HsmException(CKR_GENERAL_ERROR, "EMSA_PSS_ENCODE error", e);
       }
 
       return decryptRaw(em);
@@ -297,6 +295,42 @@ public class XiRSAPrivateKey extends XiPrivateKey {
     }
   }
 
+  @Override
+  public byte[] decrypt(XiMechanism mechanism, byte[] encryptedData) throws HsmException {
+    if (!isDecrypt()) {
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_DECRYPT != TRUE");
+    }
+
+    long ckm = mechanism.getCkm();
+    Object param = mechanism.getParameter();
+
+    if (ckm == CKM_RSA_X_509) {
+      HsmUtil.assertNullParameter(mechanism);
+      return decryptRaw(encryptedData);
+    } else if (ckm == CKM_RSA_PKCS_OAEP) {
+      if (!(param instanceof RSA_PKCS_OAEP_PARAMS)) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
+            "Mechanism.parameters is not CK_RSA_PKCS_OAEP_PARAMS");
+      }
+
+      RSA_PKCS_OAEP_PARAMS p = (RSA_PKCS_OAEP_PARAMS) param;
+      if (!(p.source() == PKCS11T.CKZ_DATA_SPECIFIED &&
+          (p.sourceData() == null || p.sourceData().length == 0))) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "invalid source or sourceData");
+      }
+
+      HashAlgo hashAlgo = extractHashAlgo(ckm, p.hashAlg(), p.mgf());
+      try {
+        byte[] em = decryptRaw(encryptedData);
+        return PKCS1Util.RSAES_OAEP_DECODE(em, modulusBitSize, hashAlgo);
+      } catch (Exception e) {
+        throw new HsmException(CKR_GENERAL_ERROR, "error decoding em", e);
+      }
+    } else {
+      throw new HsmException(CKR_MECHANISM_INVALID,
+          "Invalid mechanism " + PKCS11T.ckmCodeToName(ckm));
+    }
+  }
   static HashAlgo extractPkcs1v1d5HashAlgo(long mechanism) {
     HashAlgo hashAlgo;
     if (mechanism == CKM_SHA1_RSA_PKCS) {
@@ -315,12 +349,8 @@ public class XiRSAPrivateKey extends XiPrivateKey {
     return hashAlgo;
   }
 
-  static HashAlgo extractHashAlgo(
-      long mechanism, RSA_PKCS_PSS_PARAMS params)
+  static HashAlgo extractHashAlgo(long mechanism, long hashAlg, long mgf)
       throws HsmException {
-    long hashAlg = params.hashAlg();
-    long mgf = params.mgf();
-
     HashAlgo hashAlgo = null;
     if (mechanism == CKM_SHA1_RSA_PKCS_PSS) {
       if (hashAlg == CKM_SHA_1 && mgf == CKG_MGF1_SHA1) {
@@ -369,21 +399,19 @@ public class XiRSAPrivateKey extends XiPrivateKey {
 
     if (hashAlgo == null) {
       throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
-          "Unsupported " + params.getClass().getSimpleName());
+          "Unsupported hashAlg " + ckmCodeToName(hashAlg));
     }
 
     return hashAlgo;
   }
 
   public static XiRSAPrivateKey newInstance(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
-      throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, LoginState loginState,
+      ObjectInitMethod initMethod, long handle, boolean inToken, XiTemplate attrs,
+      Long keyGenMechanism) throws HsmException {
     BigInteger modulus = attrs.removeNonNullBigInt(CKA_MODULUS);
     BigInteger publicExponent  = attrs.removeNonNullBigInt(CKA_PUBLIC_EXPONENT);
-    BigInteger privateExponent =
-        attrs.removeNonNullBigInt(CKA_PRIVATE_EXPONENT);
+    BigInteger privateExponent = attrs.removeNonNullBigInt(CKA_PRIVATE_EXPONENT);
     BigInteger p    = attrs.removeNonNullBigInt(CKA_PRIME_1);
     BigInteger q    = attrs.removeNonNullBigInt(CKA_PRIME_2);
     BigInteger dP   = attrs.removeNonNullBigInt(CKA_EXPONENT_1);

@@ -3,24 +3,31 @@
 
 package org.xipki.pkcs11.xihsm.attr;
 
+import org.xipki.pkcs11.wrapper.Category;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.attrs.Attribute;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.xihsm.util.HsmException;
+import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
-import org.xipki.util.codec.cbor.CborDecoder;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.codec.json.JsonBuilder;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
+import org.xipki.util.codec.json.JsonParser;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
-public class XiTemplate {
+public class XiTemplate implements JsonEncodable {
 
   private final List<XiAttribute> attributes;
 
@@ -112,8 +119,7 @@ public class XiTemplate {
     Long ret = getLong(type);
     if (ret == null) {
       throw new HsmException(PKCS11T.CKR_TEMPLATE_INCOMPLETE,
-          "mandatory " + PKCS11T.ckaCodeToName(type) +
-              " is not present");
+          "mandatory " + PKCS11T.ckaCodeToName(type) + " is not present");
     }
     return ret;
   }
@@ -139,8 +145,7 @@ public class XiTemplate {
     }
   }
 
-  public XiTemplate remove(long attrType, long attrType2,
-                           long... extraAttrTypes) {
+  public XiTemplate remove(long attrType, long attrType2, long... extraAttrTypes) {
     int size = 2 + (extraAttrTypes == null ? 0 : extraAttrTypes.length);
     List<Long> types = new ArrayList<>(size);
     types.add(attrType);
@@ -248,8 +253,7 @@ public class XiTemplate {
     return attr == null ? null : attr.getDateValue();
   }
 
-  public static XiTemplate fromCkAttributes(Template template)
-      throws HsmException {
+  public static XiTemplate fromCkAttributes(Template template) throws HsmException {
     if (template == null) {
       return new XiTemplate();
     }
@@ -264,18 +268,17 @@ public class XiTemplate {
     return new XiTemplate(list);
   }
 
-  public byte[] encode() throws HsmException {
-    try {
-      ByteArrayCborEncoder encoder = new ByteArrayCborEncoder();
-      encoder.writeArrayStart(attributes.size());
-      for (XiAttribute attr : attributes) {
-        attr.encode(encoder);
-      }
-      return encoder.toByteArray();
-    } catch (CodecException e) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "could not encode Attributes", e);
+  public byte[] encode() {
+    return JsonBuilder.toPrettyJson(toCodec()).getBytes(StandardCharsets.UTF_8);
+  }
+
+  @Override
+  public JsonMap toCodec() {
+    JsonMap map = new JsonMap();
+    for (XiAttribute attr : attributes) {
+      attr.encode(map);
     }
+    return map;
   }
 
   @Override
@@ -285,16 +288,78 @@ public class XiTemplate {
 
   public static XiTemplate decode(byte[] encoded) throws HsmException {
     try {
-      CborDecoder decoder = new ByteArrayCborDecoder(encoded);
-      int size = decoder.readArrayLength();
-      List<XiAttribute> attrs = new ArrayList<>(size);
-      for (int i = 0; i < size; i++) {
-        attrs.add(XiAttribute.decode(decoder));
+      return decode(JsonParser.parseMap(encoded, false));
+    } catch (CodecException e) {
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "could not decode Attributes", e);
+    }
+  }
+
+  public static XiTemplate decode(JsonMap map) throws HsmException {
+    try {
+      List<XiAttribute> attrs = new ArrayList<>(map.size());
+      for (String name : map.getKeys()) {
+        long cka = XiAttribute.ckaNameToCode(name);
+
+        XiAttribute attr;
+        if (cka == XiAttribute.CKA_XIHSM_CKU) {
+          attr = XiAttribute.ofLong(cka, PKCS11T.nonnullNameToCode(
+                    Category.CKU, map.getNnString(name)));
+        } else if (cka == XiAttribute.CKA_XIHSM_ORIGIN) {
+          Origin origin = Origin.valueOf(map.getNnString(name));
+          attr = XiAttribute.ofLong(cka, origin.getCode());
+        } else {
+          Attribute.DataType dataType = XiAttribute.getCkaDataType(cka);
+          switch (dataType) {
+            case CkBool:
+              attr = XiAttribute.ofBool(cka, map.getNnBool(name));
+              break;
+            case CkLong:
+              attr = XiAttribute.ofLong(cka, map.getNnLong(name));
+              break;
+            case CkMechanism:
+              attr = XiAttribute.ofLong(cka,
+                      PKCS11T.nonnullNameToCode(Category.CKM, map.getNnString(name)));
+              break;
+            case CkString:
+              attr = XiAttribute.ofChars(cka, map.getNnString(name));
+              break;
+            case CkDate:
+              attr = XiAttribute.ofDate(cka, map.getNnLong(name));
+              break;
+            case CkLongArray: {
+              List<Long> list = map.getNnLongList(name);
+              long[] la = new long[list.size()];
+              for (int i = 0; i < la.length; i++) {
+                la[i] = list.get(i);
+              }
+              attr = XiAttribute.ofLongArray(cka, la);
+              break;
+            }
+            case CkMechanismArray: {
+              List<String> list = map.getNnStringList(name);
+              long[] la = new long[list.size()];
+              for (int i = 0; i < la.length; i++) {
+                la[i] = PKCS11T.nonnullNameToCode(Category.CKM, list.get(i));
+              }
+              attr = XiAttribute.ofLongArray(cka, la);
+              break;
+            }
+            case CkByteArray:
+              attr = XiAttribute.ofByteArray(cka, Hex.decode(map.getNnString(name)));
+              break;
+            case CkTemplate:
+              attr = XiAttribute.ofAttributes(cka, XiTemplate.decode(map.getNnMap(name)));
+              break;
+            default:
+              throw new CodecException("unsupported attribute " + name);
+          }
+        }
+
+        attrs.add(attr);
       }
       return new XiTemplate(attrs);
-    } catch (CodecException e) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "could not decode Attributes", e);
+    } catch (CodecException | RuntimeException e) {
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "could not decode Attributes", e);
     }
   }
 

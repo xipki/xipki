@@ -5,6 +5,8 @@ package org.xipki.qa.ca;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.ASN1UTCTime;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -33,6 +35,7 @@ import org.xipki.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -42,7 +45,7 @@ import java.util.List;
 /**
  * QA for Certprofile.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class X509CertprofileQa implements CertprofileQa {
@@ -100,8 +103,7 @@ public class X509CertprofileQa implements CertprofileQa {
     List<ValidationIssue> resultIssues = new LinkedList<>();
 
     // certificate size
-    ValidationIssue issue = new ValidationIssue("X509.SIZE",
-        "certificate size");
+    ValidationIssue issue = new ValidationIssue("X509.SIZE", "certificate size");
     resultIssues.add(issue);
 
     certBytes = X509Util.toDerEncoded(certBytes);
@@ -132,8 +134,7 @@ public class X509CertprofileQa implements CertprofileQa {
     }
 
     // serialNumber
-    issue = new ValidationIssue("X509.serialNumber",
-        "certificate serial number");
+    issue = new ValidationIssue("X509.serialNumber", "certificate serial number");
     resultIssues.add(issue);
     BigInteger serialNumber = tbsCert.getSerialNumber().getValue();
     if (serialNumber.signum() != 1) {
@@ -162,8 +163,7 @@ public class X509CertprofileQa implements CertprofileQa {
           SignAlgo signAlgo = SignAlgo.getInstance(sigAlgId);
 
           if (!signatureAlgorithms.contains(signAlgo)) {
-            issue.setFailureMessage(
-                "signatureAlgorithm '" + signAlgo + "' is not allowed");
+            issue.setFailureMessage("signatureAlgorithm '" + signAlgo + "' is not allowed");
           }
 
           if (!issue.isFailed()) {
@@ -179,28 +179,23 @@ public class X509CertprofileQa implements CertprofileQa {
     }
 
     // notBefore encoding
-    issue = new ValidationIssue("X509.NOTBEFORE.ENCODING",
-        "notBefore encoding");
+    issue = new ValidationIssue("X509.NOTBEFORE.ENCODING", "notBefore encoding");
     checkTime(tbsCert.getStartDate(), issue);
 
     // notAfter encoding
-    issue = new ValidationIssue("X509.NOTAFTER.ENCODING",
-        "notAfter encoding");
+    issue = new ValidationIssue("X509.NOTAFTER.ENCODING", "notAfter encoding");
     checkTime(tbsCert.getStartDate(), issue);
 
     if (certprofile.notBeforeOption().midNightTimeZone() != null) {
-      issue = new ValidationIssue("X509.NOTBEFORE",
-          "notBefore midnight");
+      issue = new ValidationIssue("X509.NOTBEFORE", "notBefore midnight");
       resultIssues.add(issue);
-      ZonedDateTime cal = ZonedDateTime.ofInstant(cert.notBefore(),
-          ZoneOffset.UTC);
+      ZonedDateTime cal = ZonedDateTime.ofInstant(cert.notBefore(), ZoneOffset.UTC);
 
       int minute = cal.getMinute();
       int second = cal.getSecond();
 
       if (minute != 0 || second != 0) {
-        issue.setFailureMessage(" '" + cert.notBefore() +
-            "' is not midnight time");
+        issue.setFailureMessage(" '" + cert.notBefore() + "' is not midnight time");
       }
     }
 
@@ -214,8 +209,7 @@ public class X509CertprofileQa implements CertprofileQa {
       issue.setFailureMessage("notBefore may not be before CA's notBefore");
     } else {
       if (certprofile.hasNoWellDefinedExpirationDate()) {
-        if (MAX_CERT_TIME.getEpochSecond()
-            != cert.notAfter().getEpochSecond()) {
+        if (MAX_CERT_TIME.getEpochSecond() != cert.notAfter().getEpochSecond()) {
           issue.setFailureMessage("cert notAfter != 99991231235959Z");
         }
       } else {
@@ -225,31 +219,28 @@ public class X509CertprofileQa implements CertprofileQa {
           expectedNotAfter = MAX_CERT_TIME;
         }
 
-        if (issuerInfo.isCutoffNotAfter()
-            && expectedNotAfter.isAfter(issuerInfo.getCaNotAfter())) {
+        if (issuerInfo.isCutoffNotAfter() && expectedNotAfter.isAfter(issuerInfo.getCaNotAfter())) {
           expectedNotAfter = issuerInfo.getCaNotAfter();
         }
 
-        if (Math.abs(expectedNotAfter.getEpochSecond() - cert.notAfter()
-            .getEpochSecond()) > 60) {
+        if (Math.abs(expectedNotAfter.getEpochSecond() - cert.notAfter().getEpochSecond()) > 60) {
           issue.setFailureMessage("cert validity is not within " + validity);
         }
       }
     }
 
     // subjectPublicKeyInfo
-    resultIssues.addAll(checkPublicKey(
-        bcCert.getSubjectPublicKeyInfo(), requestedPublicKey));
+    resultIssues.addAll(checkPublicKey(bcCert.getSubjectPublicKeyInfo(), requestedPublicKey));
 
     // Signature
-    issue = new ValidationIssue("X509.SIG",
-        "whether certificate is signed by CA");
+    issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
     resultIssues.add(issue);
+    PublicKey publicKey = issuerInfo.getCert().publicKey();
     try {
-      cert.verify(issuerInfo.getCert().publicKey(), "BC");
+      cert.verify(publicKey);
     } catch (NoSuchAlgorithmException ex) {
       try {
-        cert.verify(issuerInfo.getCert().publicKey());
+        cert.verify(publicKey);
       } catch (Exception ex1) {
         issue.setFailureMessage("invalid signature");
       }
@@ -261,32 +252,25 @@ public class X509CertprofileQa implements CertprofileQa {
     issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
     resultIssues.add(issue);
     if (!cert.issuer().equals(issuerInfo.getCert().subject())) {
-      issue.setFailureMessage("issue in certificate does not equal the " +
-          "subject of CA certificate");
+      issue.setFailureMessage("issue in certificate does not equal the subject of CA certificate");
     }
 
     // subject
-    resultIssues.addAll(subjectChecker.checkSubject(bcCert.getSubject(),
-        requestedSubject));
+    resultIssues.addAll(subjectChecker.checkSubject(bcCert.getSubject(), requestedSubject));
 
-    // issuerUniqueID
-    issue = new ValidationIssue("X509.IssuerUniqueID", "issuerUniqueID");
+    // issuerUniqueID / subjectUniqueID
+    issue = new ValidationIssue("X509.UniqueID", "issuerUniqueID/subjectUniqueID");
     resultIssues.add(issue);
-    if (tbsCert.getIssuerUniqueId() != null) {
-      issue.setFailureMessage("is present but not permitted");
-    }
 
-    // subjectUniqueID
-    issue = new ValidationIssue("X509.SubjectUniqueID", "subjectUniqueID");
-    resultIssues.add(issue);
-    if (tbsCert.getSubjectUniqueId() != null) {
-      issue.setFailureMessage("is present but not permitted");
+    ASN1Sequence seq = ASN1Sequence.getInstance(tbsCert.toASN1Primitive());
+    if (seq.size() > 7) {
+      ASN1TaggedObject asn1TaggedElem = ASN1TaggedObject.getInstance(seq.getObjectAt(7));
+      if (asn1TaggedElem.getTagNo() != 3) {
+        issue.setFailureMessage("is present but not permitted");
+      }
     }
 
     // extensions
-    issue = new ValidationIssue("X509.GrantedSubject", "grantedSubject");
-    resultIssues.add(issue);
-
     resultIssues.addAll(extensionsChecker.checkExtensions(
         bcCert, issuerInfo, requestedExtensions, requestedSubject, keySpec));
 
@@ -324,11 +308,9 @@ public class X509CertprofileQa implements CertprofileQa {
         "whether public key matches the request one");
     resultIssues.add(issue);
 
-    SubjectPublicKeyInfo c14nRequestedPublicKey =
-        X509Util.toRfc3279Style(requestedPublicKey);
+    SubjectPublicKeyInfo c14nRequestedPublicKey = X509Util.toRfc3279Style(requestedPublicKey);
     if (!c14nRequestedPublicKey.equals(publicKey)) {
-      issue.setFailureMessage("public key in the certificate does not " +
-          "equal the requested one");
+      issue.setFailureMessage("public key in the certificate does not equal the requested one");
     }
 
     return resultIssues;

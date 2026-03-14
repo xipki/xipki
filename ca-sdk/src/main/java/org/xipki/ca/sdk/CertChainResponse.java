@@ -31,14 +31,12 @@ public class CertChainResponse extends SdkResponse {
     encoder.writeArrayStart(1).writeByteStrings(certificates);
   }
 
-  public static CertChainResponse decode(byte[] encoded)
-      throws CodecException {
+  public static CertChainResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CertChainResponse", decoder, 1);
       return new CertChainResponse(decoder.readByteStrings());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CertChainResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CertChainResponse.class), ex);
     }
   }
 

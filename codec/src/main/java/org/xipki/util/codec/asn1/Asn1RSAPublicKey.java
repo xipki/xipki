@@ -36,14 +36,12 @@ public class Asn1RSAPublicKey {
     return publicExponent;
   }
 
-  public static Asn1RSAPublicKey getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1RSAPublicKey getInstance(byte[] encoded) throws InvalidKeySpecException {
     byte[][] bns;
     try {
       bns = Asn1Util.readBigInts(encoded, 2);
     } catch (CodecException e) {
-      throw new InvalidKeySpecException(
-          "invalid RSAPublicKey: " + e.getMessage(), e);
+      throw new InvalidKeySpecException("invalid RSAPublicKey: " + e.getMessage(), e);
     }
     return new Asn1RSAPublicKey(bns[0], bns[1]);
   }

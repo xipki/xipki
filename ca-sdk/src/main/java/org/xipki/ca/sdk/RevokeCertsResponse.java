@@ -31,15 +31,12 @@ public class RevokeCertsResponse extends SdkResponse {
     encoder.writeArrayStart(1).writeObjects(entries);
   }
 
-  public static RevokeCertsResponse decode(byte[] encoded)
-      throws CodecException {
+  public static RevokeCertsResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("RevokeCertsResponse", decoder, 1);
-      return new RevokeCertsResponse(
-          SingleCertSerialEntry.decodeArray(decoder));
+      return new RevokeCertsResponse(SingleCertSerialEntry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, RevokeCertsResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, RevokeCertsResponse.class), ex);
     }
   }
 

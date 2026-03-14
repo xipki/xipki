@@ -134,8 +134,7 @@ public class CaCaps {
   }
 
   public boolean supportsPost() {
-    return containsCapability(POSTPKIOperation)
-        || containsCapability(SCEPStandard);
+    return containsCapability(POSTPKIOperation) || containsCapability(SCEPStandard);
   }
 
   public HashAlgo mostSecureHashAlgo() {

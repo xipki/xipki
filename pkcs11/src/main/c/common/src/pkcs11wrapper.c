@@ -221,8 +221,7 @@ static CK_RV p11_init_module(CK_ULONG mid, char* libPath) {
     CK_INTERFACE iface = pInterface[i];
     CK_VERSION *version = (CK_VERSION*) iface.pFunctionList;
 
-    if (!strcmp((const char*) iface.pInterfaceName, "PKCS 11") &&
-        version->major == 3) {
+    if (!strcmp((const char*) iface.pInterfaceName, "PKCS 11") && version->major == 3) {
       module->pFuncList = iface.pFunctionList;
       module->version = (version->major * 256UL + version->minor);
       break;
@@ -463,8 +462,7 @@ Java_org_xipki_pkcs11_wrapper_jni_Libpkcs11_query(
 
   if (isOK(rv)) {
     CK_BBOOL withMech = mechParamsType != MP_NO_MECH;
-    rv = checkInParams(op, dataLen, data2Len, withMech,
-            attrsBLen > 0, attrs2BLen > 0);
+    rv = checkInParams(op, dataLen, data2Len, withMech, attrsBLen > 0, attrs2BLen > 0);
   }
 
   if (isNOK(rv)) {
@@ -479,8 +477,7 @@ Java_org_xipki_pkcs11_wrapper_jni_Libpkcs11_query(
       rv = CKR_JNI_MEM_ERROR;
     } else {
       pMech->mechanism = ckm;
-      rv = parseMechParams(&(pMech->pParameter), &(pMech->ulParameterLen),
-              pBParams, bParamsLen);
+      rv = parseMechParams(&(pMech->pParameter), &(pMech->ulParameterLen), pBParams, bParamsLen);
     }
   }
 

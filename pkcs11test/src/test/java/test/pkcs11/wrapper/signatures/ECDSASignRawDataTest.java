@@ -103,16 +103,14 @@ public class ECDSASignRawDataTest {
       final boolean inToken = false;
 
       // be sure that your token can process the specified mechanism
-      CkMechanism signatureMechanism =
-          getSupportedMechanism(mechCode, CKF_SIGN);
+      CkMechanism signatureMechanism = getSupportedMechanism(mechCode, CKF_SIGN);
       // Some HSM vendors return the ECDSA signature in X.962 format, we need
       // to provide the order bit to covert it to R || S.
       signatureMechanism = new CkMechanism(signatureMechanism.getMechanism(),
           signatureMechanism.getParameters());
       signatureMechanism.setExtraParams(new ExtraParams().ecOrderBitSize(256));
 
-      PKCS11KeyId generatedKeyPair =
-          generateKeypair(PKCS11KeyPairType.P256, inToken);
+      PKCS11KeyId generatedKeyPair = generateKeypair(PKCS11KeyPairType.P256, inToken);
       long generatedPrivateKey = generatedKeyPair.getHandle();
 
       int[] dataLens = {1057, 10570, 105700};
@@ -125,8 +123,7 @@ public class ECDSASignRawDataTest {
         byte[] hashValue = md.digest(dataToBeSigned);
 
         // This signing operation is implemented in most of the drivers
-        byte[] signatureValue = token.sign(signatureMechanism,
-            generatedPrivateKey, hashValue);
+        byte[] signatureValue = token.sign(signatureMechanism, generatedPrivateKey, hashValue);
 
         LOG.info("The signature value is: {}", Functions.toHex(signatureValue));
 

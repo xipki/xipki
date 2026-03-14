@@ -10,6 +10,8 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum StringType {
@@ -28,8 +30,7 @@ public enum StringType {
     } else if (ia5String == this) {
       return new DERIA5String(text, true);
     } else {
-      throw new IllegalStateException(
-          "should not reach here, unknown StringType " + this.name());
+      throw new IllegalStateException("should not reach here, unknown StringType " + this.name());
     }
   }
 

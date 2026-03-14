@@ -35,7 +35,6 @@ public interface CertificateValidator {
 
     public CollectionCertificateValidator(Collection<X509Cert> certs) {
       Args.notEmpty(certs, "certs");
-
       certHashes = new HashSet<>(certs.size());
       for (X509Cert cert : certs) {
         String hash = HashAlgo.SHA256.hexHash(cert.getEncoded());
@@ -45,17 +44,14 @@ public interface CertificateValidator {
 
     public CollectionCertificateValidator(X509Cert cert) {
       Args.notNull(cert, "cert");
-
       certHashes = new HashSet<>(2);
       String hash = HashAlgo.SHA256.hexHash(cert.getEncoded());
       certHashes.add(hash);
     }
 
     @Override
-    public boolean trustCertificate(
-        X509Cert signerCert, X509Cert[] otherCerts) {
+    public boolean trustCertificate(X509Cert signerCert, X509Cert[] otherCerts) {
       Args.notNull(signerCert, "signerCert");
-
       String hash = HashAlgo.SHA256.hexHash(signerCert.getEncoded());
       return certHashes.contains(hash);
     }

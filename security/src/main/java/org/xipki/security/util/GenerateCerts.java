@@ -23,6 +23,7 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.Signer;
 import org.xipki.util.codec.Args;
@@ -50,8 +51,6 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.Security;
-import java.security.cert.Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -74,14 +73,10 @@ public class GenerateCerts {
 
     public Conf(List<SecretKeyConf> secretkeys, List<KeyCertConf> keycerts,
                 List<KeyCertConf2>  keycerts2,  List<CertStore>   certstores) {
-      this.secretkeys = (secretkeys == null) ? Collections.emptyList()
-          : secretkeys;
-      this.keycerts = (keycerts == null) ? Collections.emptyList()
-          : keycerts;
-      this.keycerts2 = (keycerts2 == null) ? Collections.emptyList()
-          : keycerts2;
-      this.certstores = (certstores == null) ? Collections.emptyList()
-          : certstores;
+      this.secretkeys = (secretkeys == null) ? Collections.emptyList() : secretkeys;
+      this.keycerts   = (keycerts == null)   ? Collections.emptyList() : keycerts;
+      this.keycerts2  = (keycerts2 == null)  ? Collections.emptyList() : keycerts2;
+      this.certstores = (certstores == null) ? Collections.emptyList() : certstores;
       validate();
     }
 
@@ -92,8 +87,7 @@ public class GenerateCerts {
       for (KeyCertConf m : this.keycerts) {
         String name = m.name;
         if ("certstore".equalsIgnoreCase(name)) {
-          throw new IllegalArgumentException(
-              "Name 'keystore' is reserved and can not be used");
+          throw new IllegalArgumentException("Name 'keystore' is reserved and can not be used");
         }
 
         if (keyCertNames.contains(name)) {
@@ -105,8 +99,7 @@ public class GenerateCerts {
           caKeyCertNames.add(name);
         } else if (m.issuerName != null) {
           if (!caKeyCertNames.contains(m.issuerName)) {
-            throw new IllegalArgumentException(
-                "Unknown issuer '" + m.issuerName + "'");
+            throw new IllegalArgumentException("Unknown issuer '" + m.issuerName + "'");
           }
         }
       }
@@ -114,8 +107,7 @@ public class GenerateCerts {
       for (KeyCertConf2 m : this.keycerts2) {
         String name = m.name;
         if ("certstore".equalsIgnoreCase(name)) {
-          throw new IllegalArgumentException(
-              "Name 'keystore' is reserved and can not be used");
+          throw new IllegalArgumentException("Name 'keystore' is reserved and can not be used");
         }
 
         if (keyCertNames.contains(name)) {
@@ -125,8 +117,7 @@ public class GenerateCerts {
 
         if (m.issuerName() != null) {
           if (!caKeyCertNames.contains(m.issuerName())) {
-            throw new IllegalArgumentException(
-                "Unknown issuer '" + m.issuerName() + "'");
+            throw new IllegalArgumentException("Unknown issuer '" + m.issuerName() + "'");
           }
         }
       }
@@ -136,15 +127,13 @@ public class GenerateCerts {
         for (CertStore m : certstores) {
           String name = m.name;
           if (keystoreNameSet.contains(name)) {
-            throw new IllegalArgumentException(
-                "Duplicated certstore name " + name);
+            throw new IllegalArgumentException("Duplicated certstore name " + name);
           }
           keystoreNameSet.add(name);
 
           for (String certName : m.keyCertNames) {
             if (!keyCertNames.contains(certName)) {
-              throw new IllegalArgumentException(
-                  "Unknown keycert name " + certName);
+              throw new IllegalArgumentException("Unknown keycert name " + certName);
             }
           }
         }
@@ -154,8 +143,7 @@ public class GenerateCerts {
         Set<String> keystoreNames = new HashSet<>();
         for (SecretKeyConf m : secretkeys) {
           if (keystoreNames.contains(m.name)) {
-            throw new IllegalArgumentException(
-                "Duplicated secretkey name " + m.name);
+            throw new IllegalArgumentException("Duplicated secretkey name " + m.name);
           }
           keystoreNames.add(m.name);
         }
@@ -164,20 +152,16 @@ public class GenerateCerts {
 
     public static Conf parse(JsonMap json) throws CodecException {
       JsonList list = json.getList("secretkeys");
-      List<SecretKeyConf> secretkeys = (list == null) ? null
-          : SecretKeyConf.parseList(list);
+      List<SecretKeyConf> secretkeys = (list == null) ? null : SecretKeyConf.parseList(list);
 
       list = json.getList("keycerts");
-      List<KeyCertConf> keycerts = (list == null) ? null
-          : KeyCertConf.parseList(list);
+      List<KeyCertConf> keycerts = (list == null) ? null : KeyCertConf.parseList(list);
 
       list = json.getList("keycerts2");
-      List<KeyCertConf2> keycerts2 = (list == null) ? null
-          : KeyCertConf2.parseList(list);
+      List<KeyCertConf2> keycerts2 = (list == null) ? null : KeyCertConf2.parseList(list);
 
       list = json.getList("certstores");
-      List<CertStore> cerstores = (list == null) ? null
-          : CertStore.parseList(list);
+      List<CertStore> cerstores = (list == null) ? null : CertStore.parseList(list);
 
       return new Conf(secretkeys, keycerts, keycerts2, cerstores);
     }
@@ -192,8 +176,7 @@ public class GenerateCerts {
 
     private final List<String> keyCertNames;
 
-    public CertStore(String name, String p12Password,
-                     List<String> keyCertNames) {
+    public CertStore(String name, String p12Password, List<String> keyCertNames) {
       this.name = Args.notBlank(name, "name");
       this.p12Password = Args.notBlank(p12Password, "p12Password");
       this.keyCertNames = notEmpty(keyCertNames, "keyCertNames");
@@ -201,12 +184,10 @@ public class GenerateCerts {
 
     public static CertStore parse(JsonMap json) throws CodecException {
       return new CertStore(json.getNnString("name"),
-          json.getString("p12Password"),
-          json.getStringList("keyCertNames"));
+          json.getString("p12Password"), json.getStringList("keyCertNames"));
     }
 
-    public static List<CertStore> parseList(JsonList json)
-        throws CodecException {
+    public static List<CertStore> parseList(JsonList json) throws CodecException {
       List<CertStore> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -228,8 +209,7 @@ public class GenerateCerts {
     private final String p12Password;
 
     public KeyCertConf(String name, String issuerName, String keyType,
-                       String certType, String subject, String validity,
-                       String p12Password) {
+                      String certType, String subject, String validity, String p12Password) {
       this.name = Args.notBlank(name, "name");
       this.keyType = Args.notBlank(keyType, "keyType");
       this.certType = Args.notBlank(certType, "certType");
@@ -239,24 +219,18 @@ public class GenerateCerts {
       this.issuerName = issuerName;
 
       if ("CA".equalsIgnoreCase(certType) && issuerName != null) {
-        throw new IllegalArgumentException(
-            "CA shall not have non-null issuerName");
+        throw new IllegalArgumentException("CA shall not have non-null issuerName");
       }
     }
 
     public static KeyCertConf parse(JsonMap json) throws CodecException {
-      return new KeyCertConf(
-          json.getString("name"),
-          json.getString("issuerName"),
-          json.getString("keyType"),
-          json.getString("certType"),
-          json.getString("subject"),
-          json.getString("validity"),
+      return new KeyCertConf(json.getString("name"), json.getString("issuerName"),
+          json.getString("keyType"), json.getString("certType"),
+          json.getString("subject"), json.getString("validity"),
           json.getString("p12Password"));
     }
 
-    public static List<KeyCertConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<KeyCertConf> parseList(JsonList json) throws CodecException {
       List<KeyCertConf> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -292,14 +266,11 @@ public class GenerateCerts {
         entries = SingleKeyCert.parseList(list);
       }
 
-      return new KeyCertConf2(json.getString("name"),
-          json.getString("issuerName"),
-          json.getString("p12Password"),
-          entries);
+      return new KeyCertConf2(json.getString("name"), json.getString("issuerName"),
+          json.getString("p12Password"), entries);
     }
 
-    public static List<KeyCertConf2> parseList(JsonList json)
-        throws CodecException {
+    public static List<KeyCertConf2> parseList(JsonList json) throws CodecException {
       List<KeyCertConf2> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -317,8 +288,7 @@ public class GenerateCerts {
     private final String subject;
     private final String validity;
 
-    public SingleKeyCert(String keyType, String certType,
-                         String subject, String validity) {
+    public SingleKeyCert(String keyType, String certType, String subject, String validity) {
       this.keyType = Args.notBlank(keyType, "keyType");
       this.certType = certType;
       this.subject = Args.notBlank(subject, "subject");
@@ -329,15 +299,11 @@ public class GenerateCerts {
     }
 
     public static SingleKeyCert parse(JsonMap json) throws CodecException {
-      return new SingleKeyCert(
-          json.getString("keyType"),
-          json.getString("certType"),
-          json.getString("subject"),
-          json.getString("validity"));
+      return new SingleKeyCert(json.getString("keyType"), json.getString("certType"),
+          json.getString("subject"), json.getString("validity"));
     }
 
-    public static List<SingleKeyCert> parseList(JsonList json)
-        throws CodecException {
+    public static List<SingleKeyCert> parseList(JsonList json) throws CodecException {
       List<SingleKeyCert> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -378,12 +344,10 @@ public class GenerateCerts {
     }
 
     public static SecretKeyEntry parse(JsonMap json) throws CodecException {
-      return new SecretKeyEntry(
-          json.getString("keyType"), json.getString("alias"));
+      return new SecretKeyEntry(json.getString("keyType"), json.getString("alias"));
     }
 
-    public static List<SecretKeyEntry> parseList(JsonList json)
-        throws CodecException {
+    public static List<SecretKeyEntry> parseList(JsonList json) throws CodecException {
       List<SecretKeyEntry> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -398,8 +362,7 @@ public class GenerateCerts {
     private final String password;
     private final List<SecretKeyEntry> keys;
 
-    public SecretKeyConf(String name, String password,
-                         List<SecretKeyEntry> keys) {
+    public SecretKeyConf(String name, String password, List<SecretKeyEntry> keys) {
       this.name = Args.notBlank(name, "name");
       this.password = Args.notBlank(password, "p12Password");
       this.keys = Args.notEmpty(keys, "keys");
@@ -424,12 +387,10 @@ public class GenerateCerts {
         keys = SecretKeyEntry.parseList(list);
       }
 
-      return new SecretKeyConf(json.getString("name"),
-          json.getString("password"), keys);
+      return new SecretKeyConf(json.getString("name"), json.getString("password"), keys);
     }
 
-    public static List<SecretKeyConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<SecretKeyConf> parseList(JsonList json) throws CodecException {
       List<SecretKeyConf> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -456,8 +417,7 @@ public class GenerateCerts {
   public static void main(String[] args) {
     boolean argsValid = args != null && args.length == 2;
     if (argsValid) {
-      argsValid = StringUtil.isNotBlank(args[0]) &&
-                  StringUtil.isNotBlank(args[1]);
+      argsValid = StringUtil.isNotBlank(args[0]) && StringUtil.isNotBlank(args[1]);
     }
 
     if (!argsValid) {
@@ -477,21 +437,16 @@ public class GenerateCerts {
 
   private static void printUsage() {
     System.out.println("Usage:");
-    System.out.println("  java " + GenerateCerts.class.getName() +
-        " <conf file> <target dir>");
+    System.out.println("  java " + GenerateCerts.class.getName() + " <conf file> <target dir>");
   }
 
-  private static void generateKeyCerts(String confFile, String targetDirPath)
-      throws Exception {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+  private static void generateKeyCerts(String confFile, String targetDirPath) throws Exception {
+    KeyUtil.addProviders();
 
     File targetDir = new File(targetDirPath);
     if (targetDir.exists()) {
       if (!targetDir.isDirectory()) {
-        throw new InvalidConfException("The path " + targetDirPath +
-            " is not a directory.");
+        throw new InvalidConfException("The path " + targetDirPath + " is not a directory.");
       }
     }
 
@@ -509,15 +464,13 @@ public class GenerateCerts {
 
       for (SecretKeyConf skConf : conf.secretkeys) {
         char[] password = skConf.password.toCharArray();
-        KeyStore ks = KeyUtil.getOutKeyStore("JCEKS");
-        ks.load(null, null);
+        KeyStore ks = KeyUtil.loadKeyStore("JCEKS", null, null);
         for (SecretKeyEntry entry : skConf.keys()) {
           SecretKey key = generateSecretKey(entry.keyType);
           ks.setKeyEntry(entry.alias, key, password, null);
         }
 
-        try (OutputStream out = new FileOutputStream(
-            new File(baseDir, skConf.name + ".jceks"))) {
+        try (OutputStream out = new FileOutputStream(new File(baseDir, skConf.name + ".jceks"))) {
           ks.store(out, password);
         }
       }
@@ -529,38 +482,30 @@ public class GenerateCerts {
 
       File baseDir = new File(targetDir, isCA ? "CA-" + name : name);
       if (baseDir.exists()) {
-        X509Cert cert = X509Util.parseCert(
-            new File(baseDir, name + "-cert.pem"));
+        X509Cert cert = X509Util.parseCert(new File(baseDir, name + "-cert.pem"));
         nameCertMap.put(name, new X509Cert[]{cert});
 
         PrivateKeyInfo pkInfo = PrivateKeyInfo.getInstance(
-            X509Util.toDerEncoded(IoUtil.read(
-                new File(baseDir, name + "-key.pem"))));
+            X509Util.toDerEncoded(IoUtil.read(new File(baseDir, name + "-key.pem"))));
         PrivateKey privateKey = KeyUtil.getPrivateKey(pkInfo);
 
         if (isCA) {
           caKeyAndCertPairMap.put(name, new KeyWithCert(cert, privateKey));
         }
 
-        System.out.println("keypair and certificate for " + name +
-            " already exist, skipping it");
+        System.out.println("keypair and certificate for " + name + " already exist, skipping it");
         continue;
       }
 
       System.out.println("Start generating key and certificates of " + name);
       KeySpec keySpec = KeySpec.ofKeySpec(keyCertConf.keyType);
 
-      KeyPairWithSubjectPublicKeyInfo keyPairInfo =
-          KeyUtil.generateKeypair2(keySpec, null);
-
-      SubjectPublicKeyInfo subjectPublicKeyInfo =
-          keyPairInfo.subjectPublicKeyInfo();
-
+      KeyPairWithSubjectPublicKeyInfo keyPairInfo = KeyUtil.generateKeyPair2(keySpec, null);
+      SubjectPublicKeyInfo subjectPublicKeyInfo = keyPairInfo.subjectPublicKeyInfo();
       KeyPair keyPair = keyPairInfo.keypair();
 
       char[] password = keyCertConf.p12Password.toCharArray();
-      KeystoreGenerationParameters genParams =
-          new KeystoreGenerationParameters(password);
+      KeystoreGenerationParameters genParams = new KeystoreGenerationParameters(password);
 
       Validity validity = Validity.getInstance(keyCertConf.validity);
       X500Name subject = new X500Name(keyCertConf.subject);
@@ -569,41 +514,33 @@ public class GenerateCerts {
       KeyStoreAndCert keyStoreAndCert;
 
       if (keyCertConf.issuerName == null) {
-        Signer signer = KeyUtil.getSigner(
-            keyPair.getPrivate(), keyPair.getPublic(), random);
+        Signer signer = KeyUtil.getSigner(keyPair.getPrivate(), keyPair.getPublic(), random);
 
-        keyStoreAndCert = generateSelfSignedCertificate(certType,
-            signer.x509Signer(), keyPair.getPrivate(), subjectPublicKeyInfo,
-            genParams, subject, validity);
+        keyStoreAndCert = generateSelfSignedCertificate(certType, signer.x509Signer(),
+            keyPair.getPrivate(), subjectPublicKeyInfo, genParams, subject, validity);
       } else {
-        KeyWithCert caKeyCertPair =
-            caKeyAndCertPairMap.get(keyCertConf.issuerName);
+        KeyWithCert caKeyCertPair = caKeyAndCertPairMap.get(keyCertConf.issuerName);
         if (caKeyCertPair == null) {
-          throw new InvalidConfException(
-              "unknown CA " + keyCertConf.issuerName);
+          throw new InvalidConfException("unknown CA " + keyCertConf.issuerName);
         }
         Signer signer = KeyUtil.getSigner(
-            caKeyCertPair.key(), caKeyCertPair.cert().publicKey(),
-            random);
-        keyStoreAndCert = generateCertificate(certType, signer.x509Signer(),
-            caKeyCertPair.cert(), keyPair.getPrivate(),
-            subjectPublicKeyInfo, genParams, subject, validity);
+            caKeyCertPair.key(), caKeyCertPair.cert().publicKey(), random);
+        keyStoreAndCert = generateCertificate(certType, signer.x509Signer(), caKeyCertPair.cert(),
+            keyPair.getPrivate(), subjectPublicKeyInfo, genParams, subject, validity);
       }
 
       X509Cert cert = keyStoreAndCert.cert;
       nameCertMap.put(name, new X509Cert[]{cert});
 
       if (isCA) {
-        caKeyAndCertPairMap.put(name,
-            new KeyWithCert(cert, keyPair.getPrivate()));
+        caKeyAndCertPairMap.put(name, new KeyWithCert(cert, keyPair.getPrivate()));
       }
 
       byte[] certBytes = cert.getEncoded();
       IoUtil.save(new File(baseDir, name + "-cert.pem"),
           PemEncoder.encode(certBytes, PemEncoder.PemLabel.CERTIFICATE));
 
-      IoUtil.save(new File(baseDir, name + ".p12"),
-          keyStoreAndCert.keystoreBytes);
+      IoUtil.save(new File(baseDir, name + ".p12"), keyStoreAndCert.keystoreBytes);
       byte[] keyBytes = keyPair.getPrivate().getEncoded();
       IoUtil.save(new File(baseDir, name + "-key.pem"),
           PemEncoder.encode(keyBytes, PemEncoder.PemLabel.PRIVATE_KEY));
@@ -617,8 +554,7 @@ public class GenerateCerts {
 
       File baseDir = new File(targetDir, name);
       if (baseDir.exists()) {
-        List<X509Cert> certs0 = X509Util.parseCerts(
-            new File(baseDir, name + "-certs.pem"));
+        List<X509Cert> certs0 = X509Util.parseCerts(new File(baseDir, name + "-certs.pem"));
 
         List<PrivateKey> keys = new LinkedList<>();
         try (PemReader pemReader = new PemReader(new FileReader(
@@ -629,29 +565,25 @@ public class GenerateCerts {
               break;
             }
 
-            PrivateKeyInfo pkInfo =
-                PrivateKeyInfo.getInstance(pemObject.getContent());
+            PrivateKeyInfo pkInfo = PrivateKeyInfo.getInstance(pemObject.getContent());
             keys.add(KeyUtil.getPrivateKey(pkInfo));
           }
         }
 
         if (certs0.size() != keys.size()) {
-          throw new InvalidConfException(
-              "number of existing certificate (" + certs0.size() +
+          throw new InvalidConfException("number of existing certificate (" + certs0.size() +
               ") != number of existing keys (" + keys.size() + ") for " + name);
         }
 
         nameCertMap.put(name, certs0.toArray(new X509Cert[0]));
 
-        System.out.println("keypair and certificate for " + name +
-            " already exist, skipping it");
+        System.out.println("keypair and certificate for " + name + " already exist, skipping it");
         continue;
       }
 
       System.out.println("Start generating key and certificates of " + name);
       char[] password = keyCertConf.p12Password.toCharArray();
-      KeystoreGenerationParameters genParams =
-          new KeystoreGenerationParameters(password);
+      KeystoreGenerationParameters genParams = new KeystoreGenerationParameters(password);
 
       int size = keyCertConf.entries.size();
       X509Cert[] thisCerts = new X509Cert[size];
@@ -661,11 +593,9 @@ public class GenerateCerts {
       for (SingleKeyCert entry : keyCertConf.entries) {
         KeySpec keySpec = KeySpec.ofKeySpec(entry.keyType);
 
-        KeyPairWithSubjectPublicKeyInfo keyPairInfo =
-            KeyUtil.generateKeypair2(keySpec, null);
+        KeyPairWithSubjectPublicKeyInfo keyPairInfo = KeyUtil.generateKeyPair2(keySpec, null);
 
-        SubjectPublicKeyInfo subjectPublicKeyInfo =
-            keyPairInfo.subjectPublicKeyInfo();
+        SubjectPublicKeyInfo subjectPublicKeyInfo = keyPairInfo.subjectPublicKeyInfo();
         KeyPair keyPair = keyPairInfo.keypair();
 
         Validity validity = Validity.getInstance(entry.validity);
@@ -678,21 +608,17 @@ public class GenerateCerts {
           Signer signer = KeyUtil.getSigner(
               keyPair.getPrivate(), keyPair.getPublic(), random, true);
 
-          keyStoreAndCert = generateSelfSignedCertificate(certType,
-              signer.x509Signer(), keyPair.getPrivate(), subjectPublicKeyInfo,
-              genParams, subject, validity);
+          keyStoreAndCert = generateSelfSignedCertificate(certType, signer.x509Signer(),
+              keyPair.getPrivate(), subjectPublicKeyInfo, genParams, subject, validity);
         } else {
-          KeyWithCert caKeyCertPair =
-              caKeyAndCertPairMap.get(keyCertConf.issuerName());
+          KeyWithCert caKeyCertPair = caKeyAndCertPairMap.get(keyCertConf.issuerName());
           if (caKeyCertPair == null) {
-            throw new InvalidConfException(
-                "unknown CA " + keyCertConf.issuerName());
+            throw new InvalidConfException("unknown CA " + keyCertConf.issuerName());
           }
           Signer signer = KeyUtil.getSigner(caKeyCertPair.key(),
               caKeyCertPair.cert().publicKey(), random);
-          keyStoreAndCert = generateCertificate(certType, signer.x509Signer(),
-              caKeyCertPair.cert(), keyPair.getPrivate(),
-              subjectPublicKeyInfo, genParams, subject, validity);
+          keyStoreAndCert = generateCertificate(certType, signer.x509Signer(), caKeyCertPair.cert(),
+              keyPair.getPrivate(), subjectPublicKeyInfo, genParams, subject, validity);
         }
 
         X509Cert cert = keyStoreAndCert.cert;
@@ -707,16 +633,14 @@ public class GenerateCerts {
           Objects.requireNonNull(X509Util.encodeCertificates(thisCerts))
               .getBytes(StandardCharsets.UTF_8));
 
-      KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
-      ks.load(null, null);
+      PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, null);
 
       for (int i = 0; i < size; i++) {
-        ks.setKeyEntry(name + "-" + (i + 1), thisKeys[i],
-            password, new Certificate[]{thisCerts[i].toJceCert()});
+        ks.setKeyEntry(name + "-" + (i + 1),
+            PrivateKeyInfo.getInstance(thisKeys[i].getEncoded()), thisCerts[i].getCert());
       }
 
-      try (OutputStream keystoreOs = new FileOutputStream(
-          new File(baseDir, name + ".p12"))) {
+      try (OutputStream keystoreOs = new FileOutputStream(new File(baseDir, name + ".p12"))) {
         ks.store(keystoreOs, password);
       }
 
@@ -726,8 +650,7 @@ public class GenerateCerts {
             PemEncoder.PemLabel.PRIVATE_KEY));
       }
 
-      IoUtil.save(new File(baseDir, name + "-keys.pem"),
-          pemKeyStreams.toByteArray());
+      IoUtil.save(new File(baseDir, name + "-keys.pem"), pemKeyStreams.toByteArray());
 
       System.out.println("Finished generating key and certificates of " + name);
       namesOfGeneratedKeyCerts.add(name);
@@ -749,12 +672,11 @@ public class GenerateCerts {
         }
 
         if (!containsNewGeneratedCerts) {
-          System.out.println("No change to certificate keystore " +
-              name + ", skipping it");
+          System.out.println("No change to certificate keystore " + name + ", skipping it");
           continue;
         }
 
-        KeyStore certP12Ks = KeyUtil.getOutKeyStore("PKCS12");
+        PKCS12KeyStore certP12Ks = KeyUtil.loadPKCS12KeyStore(null, null);
         certP12Ks.load(null, null);
 
         List<X509Cert> certs = new ArrayList<>(certstore.keyCertNames.size());
@@ -763,17 +685,15 @@ public class GenerateCerts {
           X509Cert[] certs0 = nameCertMap.get(certName);
           certs.addAll(Arrays.asList(certs0));
 
-          certP12Ks.setCertificateEntry(certName, certs0[0].toJceCert());
+          certP12Ks.setCertificateEntry(certName, certs0[0].getCert());
           if (certs0.length > 1) {
             for (int i = 1; i < certs0.length; i++) {
-              certP12Ks.setCertificateEntry(certName + "-" + i,
-                  certs0[i].toJceCert());
+              certP12Ks.setCertificateEntry(certName + "-" + i, certs0[i].getCert());
             }
           }
         }
 
-        try (OutputStream out = new FileOutputStream(
-            new File(baseDir, name + "-certstore.p12"))) {
+        try (OutputStream out = new FileOutputStream(new File(baseDir, name + "-certstore.p12"))) {
           certP12Ks.store(out, certstore.p12Password.toCharArray());
         }
 
@@ -786,19 +706,17 @@ public class GenerateCerts {
   }
 
   private static KeyStoreAndCert generateSelfSignedCertificate(
-      String certType, ContentSigner signer,
-      PrivateKey privateKey, SubjectPublicKeyInfo subjectPublicKeyInfo,
-      KeystoreGenerationParameters params, X500Name subject, Validity validity)
-      throws Exception {
+      String certType, ContentSigner signer, PrivateKey privateKey,
+      SubjectPublicKeyInfo subjectPublicKeyInfo, KeystoreGenerationParameters params,
+      X500Name subject, Validity validity) throws Exception {
     return generateCertificate(certType, signer, null, privateKey,
         subjectPublicKeyInfo, params, subject, validity);
   }
 
   private static KeyStoreAndCert generateCertificate(
-      String certType, ContentSigner signer, X509Cert issuerCert,
-      PrivateKey privateKey, SubjectPublicKeyInfo subjectPublicKeyInfo,
-      KeystoreGenerationParameters params, X500Name subject, Validity validity)
-      throws Exception {
+      String certType, ContentSigner signer, X509Cert issuerCert, PrivateKey privateKey,
+      SubjectPublicKeyInfo subjectPublicKeyInfo, KeystoreGenerationParameters params,
+      X500Name subject, Validity validity) throws Exception {
     certType = certType.toUpperCase(Locale.ROOT);
 
     // 10 minutes past
@@ -819,16 +737,15 @@ public class GenerateCerts {
     }
 
     // Generate keystore
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        issuer, serialNumber, Date.from(notBefore),
-        Date.from(notAfter), subject, subjectPublicKeyInfo);
+    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(issuer, serialNumber,
+        Date.from(notBefore), Date.from(notAfter), subject, subjectPublicKeyInfo);
 
     if (issuerCert != null) {
       certGenerator.addExtension(OIDs.Extn.authorityKeyIdentifier, false,
           new AuthorityKeyIdentifier(issuerCert.subjectKeyId()));
     }
 
-    byte[] encodedSpki = subjectPublicKeyInfo.getPublicKeyData().getBytes();
+    byte[] encodedSpki = Asn1Util.getPublicKeyData(subjectPublicKeyInfo);
     byte[] skiValue = HashAlgo.SHA1.hash(encodedSpki);
     certGenerator.addExtension(OIDs.Extn.subjectKeyIdentifier, false,
         new SubjectKeyIdentifier(skiValue));
@@ -836,32 +753,26 @@ public class GenerateCerts {
     boolean isCA = "CA".equalsIgnoreCase(certType);
     BasicConstraints basicConstraints = isCA ? new BasicConstraints(0)
         : new BasicConstraints(false);
-    certGenerator.addExtension(OIDs.Extn.basicConstraints,
-        true, basicConstraints);
+    certGenerator.addExtension(OIDs.Extn.basicConstraints, true, basicConstraints);
 
     KeyUsage keyUsage = isCA
         ? new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign)
         : new KeyUsage(KeyUsage.digitalSignature);
     certGenerator.addExtension(OIDs.Extn.keyUsage, true, keyUsage);
 
-    if ("TLS-SERVER".equals(certType) ||
-        "TLS-CLIENT".equals(certType) ||
-        "TLS".equals(certType)) {
+    if ("TLS-SERVER".equals(certType) || "TLS-CLIENT".equals(certType) || "TLS".equals(certType)) {
       List<KeyPurposeId> purposeIds = new LinkedList<>();
       if ("TLS-SERVER".equals(certType) || "TLS".equals(certType)) {
         purposeIds.add(KeyPurposeId.id_kp_serverAuth);
         String commonName = X509Util.getCommonName(subject);
         if (commonName == null) {
-          throw new InvalidConfException(
-              "common name of a TLS certificate must not be null");
+          throw new InvalidConfException("common name of a TLS certificate must not be null");
         }
 
-        GeneralName generalName;
-        if (IPAddress.isValid(commonName)) {
-          generalName = new GeneralName(GeneralName.iPAddress, commonName);
-        } else {
-          generalName = new GeneralName(GeneralName.dNSName, commonName);
-        }
+        GeneralName generalName = IPAddress.isValid(commonName)
+            ? new GeneralName(GeneralName.iPAddress, commonName)
+            : new GeneralName(GeneralName.dNSName,   commonName);
+
         certGenerator.addExtension(OIDs.Extn.subjectAlternativeName,
             false, new GeneralNames(new GeneralName[]{generalName}));
       }
@@ -874,14 +785,11 @@ public class GenerateCerts {
           new ExtendedKeyUsage(purposeIds.toArray(new KeyPurposeId[0])));
     }
 
-    KeyWithCert identity = new KeyWithCert(
-        new X509Cert(certGenerator.build(signer)), privateKey);
+    KeyWithCert identity = new KeyWithCert(new X509Cert(certGenerator.build(signer)), privateKey);
 
-    KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
-    ks.load(null, params.password());
-
-    ks.setKeyEntry("main", privateKey, params.password(),
-        new java.security.cert.Certificate[]{identity.cert().toJceCert()});
+    PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, null);
+    ks.setKeyEntry("main", PrivateKeyInfo.getInstance(privateKey.getEncoded()),
+        identity.cert().getCert());
 
     ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
     try {
@@ -896,8 +804,7 @@ public class GenerateCerts {
   private static SecretKey generateSecretKey(String keyType) throws Exception {
     keyType = keyType.toUpperCase(Locale.ROOT);
     if (keyType.startsWith("AES")) {
-      int keySize = Integer.parseUnsignedInt(keyType, "AES/".length(),
-          keyType.length(), 10);
+      int keySize = Integer.parseUnsignedInt(keyType, "AES/".length(), keyType.length(), 10);
       if (keySize != 128 && keySize != 192 && keySize != 256) {
         throw new InvalidConfException("invalid keyType '" + keyType + "'");
       }

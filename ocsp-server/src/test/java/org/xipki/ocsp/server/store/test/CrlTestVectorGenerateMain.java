@@ -46,7 +46,7 @@ public class CrlTestVectorGenerateMain {
 
       ConcurrentSigner csigner = securities.securityFactory()
           .createSigner("PKCS12", conf, (X509Cert) null);
-      X509Cert caCert = csigner.getX509Cert();
+      X509Cert caCert = csigner.x509Cert();
 
       Signer signer = csigner.borrowSigner();
       // no revoked certs
@@ -59,54 +59,43 @@ public class CrlTestVectorGenerateMain {
 
       // with revoked certs
       builder = getBuilder(caCert, true, true);
-      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate,
-          CRLReason.unspecified);
-      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate,
-          CRLReason.keyCompromise);
+      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate, CRLReason.unspecified);
+      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise);
       buildCrl(builder, signer, "revoked-certs.crl");
 
       // with invalidity date
       builder = getBuilder(caCert, true, true);
-      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate,
-          CRLReason.keyCompromise, invalidityDate);
+      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise,
+          invalidityDate);
       buildCrl(builder, signer, "invaliditydate.crl");
 
       // no crlnumber
       builder = getBuilder(caCert, false, true);
-      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate,
-          CRLReason.unspecified);
-      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate,
-          CRLReason.keyCompromise);
+      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate, CRLReason.unspecified);
+      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise);
       buildCrl(builder, signer, "no-crlnumber.crl");
 
       // no extension
       builder = getBuilder(caCert, false, false);
-      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate,
-          CRLReason.unspecified);
-      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate,
-          CRLReason.keyCompromise);
+      builder.addCRLEntry(BigInteger.valueOf(254), revokedDate, CRLReason.unspecified);
+      builder.addCRLEntry(BigInteger.valueOf(255), revokedDate, CRLReason.keyCompromise);
       buildCrl(builder, signer, "no-extensions.crl");
     }
   }
 
-  private static void buildCrl(
-      X509v2CRLBuilder builder, Signer signer, String fn)
+  private static void buildCrl(X509v2CRLBuilder builder, Signer signer, String fn)
       throws Exception {
     byte[] encoded = builder.build(signer.x509Signer()).getEncoded();
     IoUtil.save("output/" + fn, encoded);
   }
 
-  private static X509v2CRLBuilder getBuilder(
-      X509Cert caCert, boolean addCrlNumber, boolean addAki)
+  private static X509v2CRLBuilder getBuilder(X509Cert caCert, boolean addCrlNumber, boolean addAki)
       throws Exception {
     Instant thisUpdate = Instant.now();
-    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.subject(),
-        Date.from(thisUpdate));
-    builder.setNextUpdate(Date.from(thisUpdate.plus(50 * 365,
-        ChronoUnit.DAYS)));
+    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.subject(), Date.from(thisUpdate));
+    builder.setNextUpdate(Date.from(thisUpdate.plus(50 * 365, ChronoUnit.DAYS)));
     if (addCrlNumber) {
-      builder.addExtension(OIDs.Extn.cRLNumber, false,
-          new ASN1Integer(BigInteger.ONE));
+      builder.addExtension(OIDs.Extn.cRLNumber, false, new ASN1Integer(BigInteger.ONE));
     }
 
     if (addAki) {

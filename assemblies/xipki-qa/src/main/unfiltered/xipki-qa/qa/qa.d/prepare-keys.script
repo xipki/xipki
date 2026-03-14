@@ -1,0 +1,45 @@
+xi:rm -r -f output
+
+xi:mkdir output
+
+xi:rm -r -f error-output
+
+xi:mkdir error-output
+
+xi:copy-dir qa/p12/shared output
+xi:copy-dir qa/p12/${KEYSPEC} output
+
+# OCSP uses the same key type as the CA
+list = [ rootca1 subca1 subcawithcrl1 ocsp99 ]
+
+SLOT = "0"
+
+if { "$TOKEN_TYPE" equals "PKCS11" } then {
+
+  OCSP_KEYCONF = "slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}ocsp99"
+
+  each ($list) {
+    label = ${CA_P11_LABEL_PREFIX}${it}
+
+    xi:delete-key-p11 --force --slot $SLOT --label ${label}
+    xi:keypair-p11 --keyspec $CA_KEYSPEC --slot $SLOT --label ${label}
+  }
+
+} elif { "$TOKEN_TYPE" equals "PKCS12" } then {
+
+  OCSP_KEYCONF = "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
+
+  each ($list) {
+    xi:keypair-p12 --password CHANGEIT --keyspec $CA_KEYSPEC --out output/${it}.p12
+  }
+
+}
+
+list = [ p11-tls-cmp p11-tls-rest ]
+each ($list) {
+  label = ${EE_P11_LABEL_PREFIX}${it}
+
+  xi:delete-key-p11 --force --slot $SLOT --label ${label}
+    xi:keypair-p11 --keyspec $KEYSPEC --slot $SLOT --label ${label}
+}
+

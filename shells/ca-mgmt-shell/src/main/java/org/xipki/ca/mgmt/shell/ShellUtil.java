@@ -23,8 +23,7 @@ public class ShellUtil {
   }
 
   public static String canonicalizeSignerConf(
-      String keystoreType, String signerConf, SecurityFactory securityFactory)
-      throws Exception {
+      String keystoreType, String signerConf, SecurityFactory securityFactory) throws Exception {
     Args.notBlank(keystoreType, "keystoreType");
     Args.notBlank(signerConf, "signerConf");
     Args.notNull(securityFactory, "securityFactory");
@@ -37,8 +36,7 @@ public class ShellUtil {
     ConfPairs pairs = new ConfPairs(signerConf);
     String keystoreConf = pairs.value("keystore");
     Optional.ofNullable(pairs.value("password")).orElseThrow(
-        () -> new IllegalArgumentException(
-            "password is not set in " + signerConf));
+        () -> new IllegalArgumentException("password is not set in " + signerConf));
 
     byte[] keystoreBytes;
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {

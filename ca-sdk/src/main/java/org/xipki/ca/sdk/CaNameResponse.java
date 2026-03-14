@@ -34,18 +34,15 @@ public class CaNameResponse extends SdkResponse {
 
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(2).writeTextString(name)
-        .writeTextStrings(aliases);
+    encoder.writeArrayStart(2).writeTextString(name).writeTextStrings(aliases);
   }
 
   public static CaNameResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CaNameResponse", decoder, 2);
-      return new CaNameResponse(
-          decoder.readTextString(), decoder.readTextStrings());
+      return new CaNameResponse(decoder.readTextString(), decoder.readTextStrings());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CaNameResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CaNameResponse.class), ex);
     }
   }
 

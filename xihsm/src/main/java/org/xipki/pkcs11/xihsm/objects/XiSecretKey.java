@@ -3,8 +3,6 @@
 
 package org.xipki.pkcs11.xihsm.objects;
 
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.vendor.VendorEnum;
 import org.xipki.pkcs11.xihsm.LoginState;
@@ -12,23 +10,28 @@ import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiAttribute;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 import org.xipki.pkcs11.xihsm.attr.XiTemplateChecker;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.HashAlgo;
 import org.xipki.util.codec.Args;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
 
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
-public class XiSecretKey extends XiPrivateOrSecretKey
-    implements XiPublicOrSecretKey {
+public class XiSecretKey extends XiPrivateOrSecretKey implements XiPublicOrSecretKey {
 
   private final byte[] value;
 
@@ -99,8 +102,7 @@ public class XiSecretKey extends XiPrivateOrSecretKey
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, long keyType,
       Long keyGenMechanism, byte[] value) {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        CKO_SECRET_KEY, keyType, keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, CKO_SECRET_KEY, keyType, keyGenMechanism);
     this.value = Args.notNull(value, "value");
   }
 
@@ -135,8 +137,7 @@ public class XiSecretKey extends XiPrivateOrSecretKey
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertSecretKeyAttributesSettable(attrs);
   }
 
@@ -155,12 +156,10 @@ public class XiSecretKey extends XiPrivateOrSecretKey
   }
 
   @Override
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                            SecureRandom random)
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random)
       throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     return computeMac(mechanism, data);
@@ -178,13 +177,14 @@ public class XiSecretKey extends XiPrivateOrSecretKey
           : (ckm == CKM_SHA384_HMAC) ? HashAlgo.SHA384
           : HashAlgo.SHA512;
 
-      HMac mac = new HMac(ha.createDigest());
-      mac.init(new KeyParameter(value));
-      mac.update(data, 0, data.length);
-
-      byte[] macValue = new byte[mac.getMacSize()];
-      mac.doFinal(macValue, 0);
-      return macValue;
+      String hmacAlgName = "HMAC-" + ha.jceName();
+      try {
+        Mac mac = Mac.getInstance(hmacAlgName);
+        mac.init(new SecretKeySpec(value, hmacAlgName));
+        return mac.doFinal(data);
+      } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error computing HMAC", e);
+      }
     }
 
     throw new HsmException(CKR_MECHANISM_INVALID,
@@ -192,8 +192,7 @@ public class XiSecretKey extends XiPrivateOrSecretKey
   }
 
   @Override
-  protected void doGetAttributes(
-      List<XiAttribute> res, long[] types, boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
 
@@ -218,10 +217,9 @@ public class XiSecretKey extends XiPrivateOrSecretKey
   }
 
   public static XiSecretKey newInstance(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, long keyType,
-      Long keyGenMechanism) throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, LoginState loginState,
+      ObjectInitMethod initMethod, long handle, boolean inToken, XiTemplate attrs,
+      long keyType, Long keyGenMechanism) throws HsmException {
     byte[] value = attrs.removeNonNullByteArray(CKA_VALUE);
     attrs.removeAttributes(CKA_VALUE_LEN);
     XiSecretKey secretKey = new XiSecretKey(vendor, cku, newObjectMethod,

@@ -63,8 +63,7 @@ public class CertListInfo implements JsonEncodable {
 
   public static CertListInfo parse(JsonMap json) throws CodecException {
     return new CertListInfo(json.getNnBigInteger("serialNumber"),
-        json.getNnString("subject"),
-        json.getNnInstant("notBefore"),
+        json.getNnString("subject"), json.getNnInstant("notBefore"),
         json.getNnInstant("notAfter"));
   }
 }

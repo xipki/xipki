@@ -5,12 +5,17 @@ package org.xipki.security;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.composite.CompositeMLDSAPublicKey;
+import org.xipki.security.composite.CompositeSigUtil;
 import org.xipki.security.pkix.DHSigStaticKeyCertPair;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
@@ -37,6 +42,8 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Set;
 
 /**
@@ -44,20 +51,22 @@ import java.util.Set;
  *
  * @author Lijun Liao (xipki)
  */
+@Component(service = SecurityFactory.class, immediate = true,
+    configurationPid = "org.xipki.security")
 public class SecurityFactoryImpl implements SecurityFactory {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SecurityFactoryImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
   private int defaultSignerParallelism = 32;
 
+  @Reference
   private SignerFactoryRegister signerFactoryRegister;
 
-  private boolean strongRandom4KeyEnabled;
+  private boolean strongRandom4KeyEnabled = false;
 
-  private boolean strongRandom4SignEnabled;
+  private boolean strongRandom4SignEnabled = false;
 
-  private String csrConfFile;
+  private String csrConfFile = "xipki/etc/csr.json";
 
   private CsrControl csrControl;
 
@@ -67,6 +76,37 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   public SecurityFactoryImpl() {
+  }
+
+  @Activate
+  public void activate(ComponentContext context) {
+    KeyUtil.addProviders();
+
+    Dictionary<String, Object> properties = context.getProperties();
+    Enumeration<String> keys = properties.keys();
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      Object value = properties.get(key);
+      if (!(value instanceof String)) {
+        continue;
+      }
+
+      String sValue = (String) value;
+
+      switch (key) {
+        case "key.strongrandom.enabled":
+          setStrongRandom4KeyEnabled(Boolean.getBoolean(sValue));
+          break;
+        case "sign.strongrandom.enabled":
+          setStrongRandom4SignEnabled(Boolean.getBoolean(sValue));
+          break;
+        case "defaultSignerParallelism":
+          setDefaultSignerParallelism(Integer.parseInt(sValue));
+          break;
+        case "csr.confFile":
+          setCsrConfFile(sValue);
+      }
+    }
   }
 
   @Override
@@ -105,12 +145,10 @@ public class SecurityFactoryImpl implements SecurityFactory {
       if (confFilePath != null) {
         try {
           JsonMap root = JsonParser.parseMap(confFilePath, true);
-          CsrControl.CsrControlConf conf =
-              CsrControl.CsrControlConf.parse(root);
+          CsrControl.CsrControlConf conf = CsrControl.CsrControlConf.parse(root);
           this.csrControl = new CsrControl(conf);
         } catch (Exception e) {
-          LogUtil.error(LOG, e,
-              "error initializing CsrControl with conf file " + csrConfFile);
+          LogUtil.error(LOG, e, "error initializing CsrControl with conf file " + csrConfFile);
         }
       }
 
@@ -127,8 +165,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   @Override
-  public ConcurrentSigner createSigner(
-      String type, SignerConf conf, X509Cert[] certificateChain)
+  public ConcurrentSigner createSigner(String type, SignerConf conf, X509Cert[] certificateChain)
       throws ObjectCreationException {
     if (csrControl() != null && conf.peerCertificates() == null) {
       conf.setPeerCertificates(csrControl().peerCerts());
@@ -136,18 +173,29 @@ public class SecurityFactoryImpl implements SecurityFactory {
 
     ConcurrentSigner signer = signerFactoryRegister.newSigner(
         this, type, conf, certificateChain);
-    if (!signer.isMac()) {
-      validateSigner(signer, type, conf);
+    if (signer.isMac()) {
+      return signer;
     }
+
+    SignAlgo signAlgo = signer.algorithm();
+    if (signAlgo == SignAlgo.KEM_HMAC_SHA256) {
+      return signer;
+    }
+
+    if (signer.publicKey() == null) {
+      return signer;
+    }
+
+    validateSigner(signer, type, conf);
+
     return signer;
   }
 
   @Override
   public ContentVerifierProvider getContentVerifierProvider(
-      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert,
-      SecretKey ownerMasterKey) throws InvalidKeyException {
-    return KeyUtil.getContentVerifierProvider(publicKey, ownerKeyAndCert,
-        ownerMasterKey);
+      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert, SecretKey ownerMasterKey)
+      throws InvalidKeyException {
+    return KeyUtil.getContentVerifierProvider(publicKey, ownerKeyAndCert, ownerMasterKey);
   }
 
   @Override
@@ -186,8 +234,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
 
     try {
       PublicKey pk = KeyUtil.getPublicKey(pkInfo);
-      ContentVerifierProvider cvp = getContentVerifierProvider(
-          pk, ownerKeyAndCert, ownerMasterKey);
+      ContentVerifierProvider cvp = getContentVerifierProvider(pk, ownerKeyAndCert, ownerMasterKey);
       return csr.isSignatureValid(cvp);
     } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
       LogUtil.error(LOG, ex, "could not validate POP of CSR");
@@ -205,8 +252,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
         defaultSignerParallelism, "defaultSignerParallelism");
   }
 
-  public void setSignerFactoryRegister(
-      SignerFactoryRegister signerFactoryRegister) {
+  public void setSignerFactoryRegister(SignerFactoryRegister signerFactoryRegister) {
     this.signerFactoryRegister = signerFactoryRegister;
   }
 
@@ -228,33 +274,41 @@ public class SecurityFactoryImpl implements SecurityFactory {
     try {
       return SecureRandom.getInstanceStrong();
     } catch (NoSuchAlgorithmException ex) {
-      throw new RuntimeCryptoException(
-          "could not get strong SecureRandom: " + ex.getMessage());
+      throw new IllegalStateException("could not get strong SecureRandom: " + ex.getMessage());
     }
   } // method getSecureRandom
 
   private static void validateSigner(
       ConcurrentSigner signer, String signerType, SignerConf signerConf)
       throws ObjectCreationException {
-    if (signer.getPublicKey() == null) {
-      return;
-    }
-
     try {
-      SignAlgo signatureAlgo = signer.getAlgorithm();
-
+      PublicKey publicKey = signer.publicKey();
+      SignAlgo signatureAlgo = signer.algorithm();
       byte[] dummyContent = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-      Signature verifier;
-      try {
-        verifier = Signature.getInstance(signatureAlgo.jceName(), "BC");
-      } catch (NoSuchAlgorithmException ex) {
-        verifier = Signature.getInstance(signatureAlgo.jceName());
-      }
+      byte[] signatureValue = signer.x509Sign(dummyContent);
 
-      byte[] signatureValue = signer.x509sign(dummyContent);
-      verifier.initVerify(signer.getPublicKey());
-      verifier.update(dummyContent);
-      boolean valid = verifier.verify(signatureValue);
+      boolean valid;
+      if (publicKey instanceof CompositeMLDSAPublicKey) {
+        CompositeMLDSAPublicKey mKey = (CompositeMLDSAPublicKey) publicKey;
+        byte[] digestValue = mKey.suite().ph().hash(dummyContent);
+        valid = CompositeSigUtil.verifyHash((CompositeMLDSAPublicKey) publicKey,
+                  new byte[0], digestValue, signatureValue);
+      } else {
+        String provName =
+            signatureAlgo.isMLDSASigAlgo() || signatureAlgo.isCompositeMLDSA()
+            ? KeyUtil.pqcProviderName() : KeyUtil.tradProviderName();
+
+        Signature verifier;
+        try {
+          verifier = Signature.getInstance(signatureAlgo.jceName(), provName);
+        } catch (NoSuchAlgorithmException ex) {
+          verifier = Signature.getInstance(signatureAlgo.jceName());
+        }
+
+        verifier.initVerify(publicKey);
+        verifier.update(dummyContent);
+        valid = verifier.verify(signatureValue);
+      }
 
       if (!valid) {
         SignerConf copy = signerConf.copy();
@@ -267,10 +321,9 @@ public class SecurityFactoryImpl implements SecurityFactory {
         }
         copy.setAlgo(signatureAlgo);
         sb.append("conf='").append(copy.conf());
-        X509Cert cert = signer.getX509Cert();
+        X509Cert cert = signer.x509Cert();
         if (cert != null) {
-          sb.append("', certificate subject='").append(cert.subjectText())
-              .append("'");
+          sb.append("', certificate subject='").append(cert.subjectText()).append("'");
         }
 
         throw new ObjectCreationException(sb.toString());

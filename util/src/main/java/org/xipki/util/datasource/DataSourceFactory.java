@@ -30,8 +30,7 @@ public class DataSourceFactory {
   public DataSourceWrapper createDataSource(String name, FileOrValue conf)
       throws IOException, InvalidConfException {
     ConfigurableProperties props;
-    try (Reader reader = new StringReader(
-        Args.notNull(conf, "conf").readContent())) {
+    try (Reader reader = new StringReader(Args.notNull(conf, "conf").readContent())) {
       props = new ConfigurableProperties();
       props.load(reader);
     }
@@ -60,8 +59,7 @@ public class DataSourceFactory {
       String name, ConfigurableProperties conf)
       throws InvalidConfException {
     DatabaseType databaseType;
-    String className = Args.notNull(conf, "conf")
-                        .getProperty("dataSourceClassName");
+    String className = Args.notNull(conf, "conf").getProperty("dataSourceClassName");
     if (className != null) {
       databaseType = DatabaseType.forDataSourceClass(className);
     } else {
@@ -70,9 +68,8 @@ public class DataSourceFactory {
         databaseType = DatabaseType.forDriver(className);
       } else {
         String jdbcUrl = Optional.ofNullable(conf.getProperty("jdbcUrl"))
-            .orElseThrow(() -> new IllegalArgumentException(
-                "none of the properties dataSourceClassName, "
-                + "driverClassName and jdbcUrl is configured"));
+            .orElseThrow(() -> new IllegalArgumentException("none of the properties " +
+                "dataSourceClassName, driverClassName and jdbcUrl is configured"));
 
         databaseType = DatabaseType.forJdbcUrl(jdbcUrl);
       }
@@ -110,8 +107,7 @@ public class DataSourceFactory {
           port = "3306";
         }
         String databaseName = conf.remove("dataSource.databaseName");
-        dataSourceUrl = "jdbc:mariadb://" + serverName + ":" + port
-                        + "/" + databaseName;
+        dataSourceUrl = "jdbc:mariadb://" + serverName + ":" + port + "/" + databaseName;
         conf.setProperty("dataSource.url", dataSourceUrl);
       }
     } else {
@@ -121,11 +117,10 @@ public class DataSourceFactory {
       final String hsqldb_prefix = "jdbc:hsqldb:file:";
 
       if (dataSourceUrl.startsWith(h2_prefix + "~")) {
-        newUrl = h2_prefix + IoUtil.expandFilepath(
-                  dataSourceUrl.substring(h2_prefix.length()));
+        newUrl = h2_prefix + IoUtil.expandFilepath(dataSourceUrl.substring(h2_prefix.length()));
       } else if (dataSourceUrl.startsWith(hsqldb_prefix + "~")) {
-        newUrl = hsqldb_prefix + IoUtil.expandFilepath(
-                  dataSourceUrl.substring(hsqldb_prefix.length()));
+        newUrl = hsqldb_prefix +
+                    IoUtil.expandFilepath(dataSourceUrl.substring(hsqldb_prefix.length()));
       }
       if (newUrl != null) {
         conf.setProperty("dataSource.url", newUrl);
@@ -141,11 +136,9 @@ public class DataSourceFactory {
     return DataSourceWrapper.createDataSource(name, conf, databaseType);
   } // method createDataSource
 
-  public DataSourceWrapper createDataSourceForFile(
-      String name, String confFile)
+  public DataSourceWrapper createDataSourceForFile(String name, String confFile)
       throws IOException, InvalidConfException {
-    String path = IoUtil.expandFilepath(
-        Args.notBlank(confFile, "confFile"));
+    String path = IoUtil.expandFilepath(Args.notBlank(confFile, "confFile"));
     try (InputStream fileIn = Files.newInputStream(Paths.get(path))) {
       return createDataSource(name, fileIn);
     }

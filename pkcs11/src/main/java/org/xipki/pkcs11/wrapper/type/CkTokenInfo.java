@@ -83,15 +83,12 @@ public class CkTokenInfo extends AbstractInfo {
    */
   private final String utcTime;
 
-  public CkTokenInfo(String label, String manufacturerID,
-                     String model, String serialNumber, long flags,
-                     long maxSessionCount, long sessionCount,
-                     long maxRwSessionCount, long rwSessionCount,
-                     long maxPinLen, long minPinLen,
-                     long totalPublicMemory, long freePublicMemory,
-                     long totalPrivateMemory, long freePrivateMemory,
-                     CkVersion hardwareVersion, CkVersion firmwareVersion,
-                     String utcTime) {
+  public CkTokenInfo(
+      String label, String manufacturerID, String model, String serialNumber, long flags,
+      long maxSessionCount, long sessionCount, long maxRwSessionCount, long rwSessionCount,
+      long maxPinLen, long minPinLen, long totalPublicMemory, long freePublicMemory,
+      long totalPrivateMemory, long freePrivateMemory,
+      CkVersion hardwareVersion, CkVersion firmwareVersion, String utcTime) {
     this.label = label;
     this.manufacturerID = manufacturerID.trim();
     this.model = model.trim();
@@ -328,8 +325,7 @@ public class CkTokenInfo extends AbstractInfo {
 
   private static String mct(long count) {
     return isUnavailableInformation(count) ? "N/A"
-        : (count == CK_EFFECTIVELY_INFINITE) ? "unlimited"
-        : Long.toString(count);
+        : (count == CK_EFFECTIVELY_INFINITE) ? "unlimited" : Long.toString(count);
   }
 
   private static String ct(long count) {

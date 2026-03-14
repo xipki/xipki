@@ -5,6 +5,8 @@ package org.xipki.pkcs11.xihsm.store;
 import org.xipki.pkcs11.xihsm.StoreSlotInfo;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public interface PersistStore extends Store {

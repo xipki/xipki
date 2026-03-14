@@ -18,6 +18,8 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
@@ -65,8 +67,7 @@ public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
   public XiPrivateKey(
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, long keyType, Long keyGenMechanism) {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        CKO_PRIVATE_KEY, keyType, keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, CKO_PRIVATE_KEY, keyType, keyGenMechanism);
   }
 
   public boolean isDecapsulate() {
@@ -74,8 +75,8 @@ public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll) throws HsmException {
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
+      throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, CKA_SUBJECT, subject);
     addAttr(res, types, CKA_SIGN_RECOVER, signRecover);
@@ -86,8 +87,7 @@ public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
 
   @Override
   protected void doSetAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     super.doSetAttributes(loginState, initMethod, attrs);
 
     this.signRecover = attrs.removeBool(CKA_SIGN_RECOVER);
@@ -106,18 +106,15 @@ public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
     this.publicKeyInfo = attrs.removeByteArray(CKA_PUBLIC_KEY_INFO);
   }
 
-  public byte[] decapsulateKey(
-        XiMechanism mechanism, byte[] encapsulatedKey)
-      throws HsmException {
+  public byte[] decapsulateKey(XiMechanism mechanism, byte[] encapsulatedKey) throws HsmException {
     throw new HsmException(CKR_KEY_FUNCTION_NOT_PERMITTED,
         getClass() + " does not support C_DecapsulateKey");
   }
 
   public static XiPrivateKey newInstance(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, long keyType,
-      Long keyGenMechanism) throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, LoginState loginState,
+      ObjectInitMethod initMethod, long handle, boolean inToken, XiTemplate attrs,
+      long keyType, Long keyGenMechanism) throws HsmException {
     if (keyType == CKK_RSA) {
       return XiRSAPrivateKey.newInstance(vendor, cku, newObjectMethod,
           loginState, initMethod, handle, inToken, attrs, keyGenMechanism);
@@ -141,8 +138,7 @@ public abstract class XiPrivateKey extends XiPrivateOrSecretKey {
           loginState, initMethod, handle, inToken, attrs, keyGenMechanism);
     } else {
       throw new HsmException(CKR_GENERAL_ERROR,
-          "unsupported public key type " +
-              PKCS11T.ckkCodeToName(keyType));
+          "unsupported public key type " + PKCS11T.ckkCodeToName(keyType));
     }
   }
 

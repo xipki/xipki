@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class NopOutputStream extends OutputStream {

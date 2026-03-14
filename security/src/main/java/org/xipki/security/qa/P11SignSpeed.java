@@ -49,7 +49,7 @@ public class P11SignSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.x509sign(data);
+          signer.x509Sign(data);
           account(batch, 0);
         } catch (Exception ex) {
           LOG.error("P11SignSpeed.Tester.run()", ex);
@@ -80,12 +80,10 @@ public class P11SignSpeed extends BenchmarkExecutor {
 
     P11SlotId slotId = slot.slotId();
     SignerConf signerConf = getPkcs11SignerConf(slot.moduleName(),
-        slotId.id(), keyId.getId(),
-        Args.notNull(signAlgo, "signAlgo"),
+        slotId.id(), keyId.getId(), Args.notNull(signAlgo, "signAlgo"),
         threads + Math.max(2, threads * 5 / 4));
     try {
-      this.signer = securityFactory.createSigner("PKCS11", signerConf,
-          (X509Cert) null);
+      this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert) null);
     } catch (ObjectCreationException ex) {
       close();
       throw ex;
@@ -108,11 +106,8 @@ public class P11SignSpeed extends BenchmarkExecutor {
   }
 
   private static SignerConf getPkcs11SignerConf(
-      String pkcs11ModuleName, Long slotId, byte[] keyId,
-      SignAlgo signAlgo, int parallelism) {
-    SignerConf conf = new SignerConf()
-        .setAlgo(signAlgo)
-        .setParallelism(parallelism);
+      String pkcs11ModuleName, Long slotId, byte[] keyId, SignAlgo signAlgo, int parallelism) {
+    SignerConf conf = new SignerConf().setAlgo(signAlgo).setParallelism(parallelism);
 
     if (pkcs11ModuleName != null && !pkcs11ModuleName.isEmpty()) {
       conf.setModule(pkcs11ModuleName);
@@ -131,13 +126,11 @@ public class P11SignSpeed extends BenchmarkExecutor {
 
   private PKCS11KeyId generateKey(SignAlgo signAlgo, KeySpec keySpec)
       throws ObjectCreationException {
-
     try {
       Integer keysize = P12SignSpeed.getSymmKeyBitSize(signAlgo);
       if (keysize != null) {
         if (keySpec != null) {
-          throw new IllegalArgumentException(
-              "keySpec shall not be non-null: " + keySpec);
+          throw new IllegalArgumentException("keySpec shall not be non-null: " + keySpec);
         }
 
         // symmetric key
@@ -171,6 +164,19 @@ public class P11SignSpeed extends BenchmarkExecutor {
         String label = "speed-" + Clock.systemUTC().millis();
         PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
             .id(RandomUtil.nextBytes(8)).label(label);
+        if (keySpec.isRSA()) {
+          spec.decryptEncrypt(true).signVerify(true).unwrapWrap(true);
+        } else if (keySpec.isWeierstrassEC()) {
+          spec.derive(true).signVerify(true);
+        } else if (keySpec.isEdwardsEC()) {
+          spec.signVerify(true);
+        } else if (keySpec.isMontgomeryEC()) {
+          spec.derive(true);
+        } else if (keySpec.isMldsa() || keySpec.isCompositeMLDSA()) {
+          spec.sign(true);
+        } else if (keySpec.isMlkem() || keySpec.isCompositeMLKEM()) {
+          spec.deEncapsulate(true);
+        }
 
         return slot.generateKeyPair(keySpec, spec);
       }

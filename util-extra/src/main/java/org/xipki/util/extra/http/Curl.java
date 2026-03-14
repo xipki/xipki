@@ -76,22 +76,19 @@ public interface Curl {
 
   }
 
-  CurlResult curlGet(String url, boolean verbose, Map<String, String> headers,
-                     String userPassword)
+  CurlResult curlGet(String url, boolean verbose, Map<String, String> headers, String userPassword)
       throws Exception;
 
-  CurlResult curlGet(String url, OutputStream respContentStream,
-                     boolean verbose, Map<String, String> headers,
-                     String userPassword)
+  CurlResult curlGet(String url, OutputStream respContentStream, boolean verbose,
+                    Map<String, String> headers, String userPassword)
       throws Exception;
 
   CurlResult curlPost(String url, boolean verbose, Map<String, String> headers,
                       String userPassword, byte[] content)
       throws Exception;
 
-  CurlResult curlPost(String url, OutputStream respContentStream,
-                      boolean verbose, Map<String, String> headers,
-                      String userPassword, byte[] content)
+  CurlResult curlPost(String url, OutputStream respContentStream, boolean verbose,
+                      Map<String, String> headers, String userPassword, byte[] content)
       throws Exception;
 
 }

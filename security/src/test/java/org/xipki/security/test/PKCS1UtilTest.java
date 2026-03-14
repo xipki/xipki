@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.PKCS1Util;
 
 import java.security.SecureRandom;
@@ -32,6 +33,7 @@ public class PKCS1UtilTest {
 
   @Test
   public void testShakePssEncodeDecode() throws XiSecurityException {
+    KeyUtil.addProviders();
     HashAlgo ha = HashAlgo.SHAKE128;
     byte[] mHash = ha.hash("hello world".getBytes());
     int modulusBits = 2048;

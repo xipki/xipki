@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -57,8 +58,7 @@ public class Problem implements JsonEncodable {
       }
     }
 
-    return new Problem(json.getString("type"),
-        json.getString("detail"), subproblems);
+    return new Problem(json.getString("type"), json.getString("detail"), subproblems);
   }
 
 }

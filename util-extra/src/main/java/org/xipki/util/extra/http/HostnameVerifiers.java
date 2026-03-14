@@ -40,8 +40,7 @@ public class HostnameVerifiers {
    * @return HostnameVerifier instance
    * @throws ObjectCreationException If could not create HostnameVerifier
    */
-  public static HostnameVerifier createHostnameVerifier(
-      String hostnameVerifierType)
+  public static HostnameVerifier createHostnameVerifier(String hostnameVerifierType)
       throws ObjectCreationException {
     if (StringUtil.isBlank(hostnameVerifierType)
         || "default".equalsIgnoreCase(hostnameVerifierType)) {
@@ -51,11 +50,9 @@ public class HostnameVerifiers {
       return NO_OP;
     } else if (hostnameVerifierType.startsWith("java:")) {
       String className = hostnameVerifierType.substring("java:".length());
-      return ReflectiveUtil.newInstance(className,
-          HostnameVerifiers.class.getClassLoader());
+      return ReflectiveUtil.newInstance(className, HostnameVerifiers.class.getClassLoader());
     } else {
-      throw new IllegalArgumentException(
-          "invalid hostnameVerifierType " + hostnameVerifierType);
+      throw new IllegalArgumentException("invalid hostnameVerifierType " + hostnameVerifierType);
     }
   } // method createHostnameVerifier
 

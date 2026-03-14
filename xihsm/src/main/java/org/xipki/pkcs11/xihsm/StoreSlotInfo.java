@@ -9,6 +9,8 @@ import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class StoreSlotInfo {
@@ -23,9 +25,8 @@ public class StoreSlotInfo {
 
   private final UserVerifier userVerifier;
 
-  public StoreSlotInfo(XiHsmVendor vendor, int slotIndex, long slotId,
-                       String serialNumber, String description,
-                       UserVerifier userVerifier) {
+  public StoreSlotInfo(XiHsmVendor vendor, int slotIndex, long slotId, String serialNumber,
+                      String description, UserVerifier userVerifier) {
     this.slotIndex = Args.notNegative(slotIndex, "slotIndex");
     this.slotId = slotId;
     this.serialNumber = serialNumber;

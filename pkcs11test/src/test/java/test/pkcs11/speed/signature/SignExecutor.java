@@ -35,8 +35,7 @@ public abstract class SignExecutor extends Pkcs11Executor {
       while (!stop()) {
         try {
           byte[] data = TestBase.randomBytes(inputLen);
-          TestHSMs.getHsmForSpeed().getToken()
-              .sign(signMechanism, keypair.getHandle(), data);
+          TestHSMs.getHsmForSpeed().getToken().sign(signMechanism, keypair.getHandle(), data);
           account(1, 0);
         } catch (Throwable th) {
           System.err.println(th.getMessage());
@@ -54,9 +53,8 @@ public abstract class SignExecutor extends Pkcs11Executor {
 
   private final PKCS11KeyId keypair;
 
-  public SignExecutor(String description, CkMechanism signMechanism,
-                      int inputLen)
-          throws TokenException {
+  public SignExecutor(String description, CkMechanism signMechanism, int inputLen)
+      throws TokenException {
     super(description);
     this.signMechanism = signMechanism;
     this.inputLen = inputLen;

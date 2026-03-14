@@ -36,8 +36,7 @@ public class BooleanAttribute extends Attribute {
 
   @Override
   protected String getValueString() {
-    return isNullValue() ? "<NULL_PTR>"
-        : (boolean) value ? "TRUE" : "FALSE";
+    return isNullValue() ? "<NULL_PTR>" : (boolean) value ? "TRUE" : "FALSE";
   }
 
 }

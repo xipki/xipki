@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 abstract class AbstractInfo extends CkType {
@@ -59,8 +61,7 @@ abstract class AbstractInfo extends CkType {
     return JniUtil.readVersion(encoded, off);
   }
 
-  protected static String readFixedLenString(
-      int len, byte[] encoded, AtomicInteger off) {
+  protected static String readFixedLenString(int len, byte[] encoded, AtomicInteger off) {
     byte[] bytes = JniUtil.readFixedLenByteArray(encoded, len, off);
     return new String(bytes, StandardCharsets.UTF_8);
   }

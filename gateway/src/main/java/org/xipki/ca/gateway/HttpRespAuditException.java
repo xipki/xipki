@@ -24,8 +24,7 @@ public class HttpRespAuditException extends Exception {
   private final AuditStatus auditStatus;
 
   public HttpRespAuditException(
-      int httpStatus, String auditMessage, AuditLevel auditLevel,
-      AuditStatus auditStatus) {
+      int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
     this.httpStatus = httpStatus;
     this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
     this.auditLevel = Args.notNull(auditLevel, "auditLevel");

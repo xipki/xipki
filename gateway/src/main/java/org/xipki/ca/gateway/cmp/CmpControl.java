@@ -1,6 +1,3 @@
-// Copyright (c) 2013-2026 xipki. All rights reserved.
-// License Apache License 2.0
-
 package org.xipki.ca.gateway.cmp;
 
 import org.xipki.security.HashAlgo;
@@ -25,11 +22,9 @@ import java.util.List;
 
 public class CmpControl {
 
-  private static final Duration DFLT_MESSAGE_TIME_BIAS =
-      Duration.ofSeconds(300); // 300 seconds
+  private static final Duration DFLT_MESSAGE_TIME_BIAS = Duration.ofSeconds(300); // 300 seconds
 
-  private static final Duration DFLT_CONFIRM_WAIT_TIME =
-      Duration.ofSeconds(300); // 300 seconds
+  private static final Duration DFLT_CONFIRM_WAIT_TIME = Duration.ofSeconds(300); // 300 seconds
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
 
@@ -59,19 +54,16 @@ public class CmpControl {
 
   private final CollectionAlgorithmValidator sigAlgoValidator;
 
-  public CmpControl(CmpControlConf conf) throws InvalidConfException {
+  public CmpControl(CmpProtocolConf.CmpControlConf conf) throws InvalidConfException {
     this.confirmCert = getBoolean(conf.confirmCert(), false);
     this.sendCaCert = getBoolean(conf.sendCaCert(), false);
     this.sendCertChain = getBoolean(conf.sendCertChain(), false);
     this.sendResponderCert = getBoolean(conf.sendResponderCert(), true);
-    this.messageTimeRequired = getBoolean(
-        conf.messageTimeRequired(), true);
-    this.messageTimeBias = conf.messageTimeBias() == null
-        ? DFLT_MESSAGE_TIME_BIAS
-        : Duration.ofSeconds(Math.abs(conf.messageTimeBias()));
-    this.confirmWaitTime = conf.confirmWaitTime() == null
-        ? DFLT_CONFIRM_WAIT_TIME
-        : Duration.ofSeconds(Math.abs(conf.confirmWaitTime()));
+    this.messageTimeRequired = getBoolean(conf.messageTimeRequired(), true);
+    this.messageTimeBias = conf.messageTimeBias() == null ? DFLT_MESSAGE_TIME_BIAS :
+        Duration.ofSeconds(Math.abs(conf.messageTimeBias()));
+    this.confirmWaitTime = conf.confirmWaitTime() == null ? DFLT_CONFIRM_WAIT_TIME :
+        Duration.ofSeconds(Math.abs(conf.confirmWaitTime()));
 
     // protection algorithms
     List<String> requestSigAlgos = conf.requestSigAlgos();
@@ -79,8 +71,7 @@ public class CmpControl {
       throw new InvalidConfException("requestSigAlgos is not set");
     }
     try {
-      this.sigAlgoValidator = CollectionAlgorithmValidator
-          .buildAlgorithmValidator(requestSigAlgos);
+      this.sigAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(requestSigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid signature algorithm", ex);
     }
@@ -108,8 +99,7 @@ public class CmpControl {
     }
 
     if (pbmIterationCount <= 0) {
-      throw new InvalidConfException(
-          "invalid pbmIterationCount " + pbmIterationCount);
+      throw new InvalidConfException("invalid pbmIterationCount " + pbmIterationCount);
     }
     this.responsePbmIterationCount = pbmIterationCount;
 

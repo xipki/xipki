@@ -4,11 +4,14 @@
 package org.xipki.ocsp.server.store;
 
 import org.bouncycastle.asn1.x509.Certificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.CompareUtil;
 
@@ -27,6 +30,8 @@ import java.util.Map;
 
 public class IssuerEntry {
 
+  private static final Logger LOG = LoggerFactory.getLogger(IssuerEntry.class);
+
   private final int id;
 
   private final Map<HashAlgo, byte[]> issuerHashMap;
@@ -39,8 +44,7 @@ public class IssuerEntry {
 
   private CertRevocationInfo revocationInfo;
 
-  public IssuerEntry(int id, X509Cert cert)
-      throws CertificateEncodingException {
+  public IssuerEntry(int id, X509Cert cert) throws CertificateEncodingException {
     this.id = id;
     this.cert = Args.notNull(cert, "cert");
     this.notBefore = cert.notBefore();
@@ -54,27 +58,30 @@ public class IssuerEntry {
     try {
       Certificate bcCert = Certificate.getInstance(encodedCert);
       encodedName = bcCert.getSubject().getEncoded("DER");
-      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData()
-                    .getBytes();
+      encodedKey  = Asn1Util.getPublicKeyData(bcCert.getSubjectPublicKeyInfo());
     } catch (IllegalArgumentException | IOException ex) {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }
 
     Map<HashAlgo, byte[]> hashes = new HashMap<>();
     for (HashAlgo ha : HashAlgo.values()) {
-      int hlen = ha.length();
-      byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
-      int offset = 0;
-      nameAndKeyHash[offset++] = 0x04;
-      nameAndKeyHash[offset++] = (byte) hlen;
-      System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
-      offset += hlen;
+      try {
+        int hlen = ha.length();
+        byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
+        int offset = 0;
+        nameAndKeyHash[offset++] = 0x04;
+        nameAndKeyHash[offset++] = (byte) hlen;
+        System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
+        offset += hlen;
 
-      nameAndKeyHash[offset++] = 0x04;
-      nameAndKeyHash[offset++] = (byte) hlen;
-      System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
+        nameAndKeyHash[offset++] = 0x04;
+        nameAndKeyHash[offset++] = (byte) hlen;
+        System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
 
-      hashes.put(ha, nameAndKeyHash);
+        hashes.put(ha, nameAndKeyHash);
+      } catch (Exception e) {
+        LOG.warn("could not compute hash of {}", ha, e);
+      }
     }
     return hashes;
   } // method getIssuerHashAndKeys

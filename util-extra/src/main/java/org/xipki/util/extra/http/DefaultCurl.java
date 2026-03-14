@@ -71,8 +71,7 @@ public class DefaultCurl implements Curl {
       }
     }
 
-    private static CurlConf parse(File file)
-        throws CodecException {
+    private static CurlConf parse(File file) throws CodecException {
       try {
         JsonMap root = JsonParser.parseMap(file.toPath(), true);
 
@@ -88,8 +87,7 @@ public class DefaultCurl implements Curl {
               sslConf = SslConf.parse(map);
             }
 
-            HostConf host = new HostConf(
-                hostConf.getStringList("urlPattern"), sslConf);
+            HostConf host = new HostConf(hostConf.getStringList("urlPattern"), sslConf);
             hosts.add(host);
           }
         }
@@ -196,8 +194,7 @@ public class DefaultCurl implements Curl {
 
   private SslContextConf sslContextConf;
 
-  private final Map<UrlPattern, SslContextConf> sslContextConfs =
-      new HashMap<>();
+  private final Map<UrlPattern, SslContextConf> sslContextConfs = new HashMap<>();
 
   private UrlPattern[] urlPatterns;
 
@@ -230,8 +227,7 @@ public class DefaultCurl implements Curl {
           try {
             sslContextConf.init();
             sslContextConfs.put(urlPattern, sslContextConf);
-            LOG.info("initialized SslContextConf for UrlPattern {}",
-                urlPattern);
+            LOG.info("initialized SslContextConf for UrlPattern {}", urlPattern);
           } catch (ObjectCreationException ex) {
             LogUtil.error(LOG, ex, "error initializing sslContextConf");
           }
@@ -239,24 +235,21 @@ public class DefaultCurl implements Curl {
           CurlConf conf = CurlConf.parse(new File(confFile));
 
           for (HostConf m : conf.hostConfs) {
-            SslContextConf sslContextConf =
-                SslContextConf.ofSslConf(m.sslContext);
+            SslContextConf sslContextConf = SslContextConf.ofSslConf(m.sslContext);
 
             try {
               sslContextConf.init();
               for (String p : m.urlPattern) {
                 sslContextConfs.put(new UrlPattern(p), sslContextConf);
               }
-              LOG.info("initialized SslContextConf for UrlPattern {}",
-                  m.urlPattern);
+              LOG.info("initialized SslContextConf for UrlPattern {}", m.urlPattern);
             } catch (ObjectCreationException ex) {
               LogUtil.error(LOG, ex, "error initializing " +
                   "SslContextConf for URL pattern " + m.urlPattern);
             }
           }
         } else {
-          LOG.info("neither confFile nor sslContextConf is configured, " +
-              "skipping.");
+          LOG.info("neither confFile nor sslContextConf is configured, skipping.");
         }
 
         List<UrlPattern> patterns = new ArrayList<>(sslContextConfs.keySet());
@@ -264,8 +257,7 @@ public class DefaultCurl implements Curl {
       }
     } catch (CodecException | RuntimeException ex) {
       LogUtil.error(LOG, ex, "error initializing DefaultCurl");
-      throw new ObjectCreationException("error initializing DefaultCurl: "
-          + ex.getMessage());
+      throw new ObjectCreationException("error initializing DefaultCurl: " + ex.getMessage());
     } finally {
       initialized = true;
     }
@@ -277,10 +269,9 @@ public class DefaultCurl implements Curl {
 
   @Override
   public CurlResult curlGet(
-      String url, boolean verbose, Map<String, String> headers,
-      String userPassword) throws Exception {
+      String url, boolean verbose, Map<String, String> headers, String userPassword)
+      throws Exception {
     checkUserPassword(userPassword);
-
     return curlGet(url, null, verbose, headers, userPassword);
   }
 
@@ -288,16 +279,14 @@ public class DefaultCurl implements Curl {
   public CurlResult curlGet(
       String url, OutputStream respContentStream, boolean verbose,
       Map<String, String> headers, String userPassword) throws Exception {
-    return curl(false, url, respContentStream, verbose, headers,
-        userPassword, null);
+    return curl(false, url, respContentStream, verbose, headers, userPassword, null);
   }
 
   @Override
   public CurlResult curlPost(
       String url, boolean verbose, Map<String, String> headers,
       String userPassword, byte[] content) throws Exception {
-    return curlPost(url, null, verbose, headers,
-        userPassword, content);
+    return curlPost(url, null, verbose, headers, userPassword, content);
   }
 
   /**
@@ -308,8 +297,7 @@ public class DefaultCurl implements Curl {
       String url, OutputStream respContentStream, boolean verbose,
       Map<String, String> headers, String userPassword, byte[] content)
       throws Exception {
-    return curl(true, url, respContentStream, verbose, headers,
-        userPassword, content);
+    return curl(true, url, respContentStream, verbose, headers, userPassword, content);
   }
 
   private CurlResult curl(
@@ -317,8 +305,7 @@ public class DefaultCurl implements Curl {
       Map<String, String> headers, String userPassword, byte[] content)
       throws Exception {
     if (!post && content != null) {
-      throw new IllegalArgumentException(
-          "method GET cannot be used to transfer non-empty content");
+      throw new IllegalArgumentException("method GET cannot be used to transfer non-empty content");
     }
 
     checkUserPassword(userPassword);
@@ -364,8 +351,7 @@ public class DefaultCurl implements Curl {
 
       if (userPassword != null) {
         httpConn.setRequestProperty("Authorization", "Basic "
-            + Base64.getEncoder().encodeToString(
-                StringUtil.toUtf8Bytes(userPassword)));
+            + Base64.getEncoder().encodeToString(StringUtil.toUtf8Bytes(userPassword)));
       }
 
       Map<String, List<String>> properties;
@@ -374,8 +360,7 @@ public class DefaultCurl implements Curl {
         properties = httpConn.getRequestProperties();
       } else {
         httpConn.setDoOutput(true);
-        httpConn.setRequestProperty("Content-Length",
-            Integer.toString(content.length));
+        httpConn.setRequestProperty("Content-Length", Integer.toString(content.length));
         properties = httpConn.getRequestProperties();
 
         OutputStream outputstream = httpConn.getOutputStream();
@@ -398,8 +383,7 @@ public class DefaultCurl implements Curl {
       int respCode = httpConn.getResponseCode();
       if (verbose) {
         println("=====response=====");
-        println("  response code: " + respCode + " "
-            + httpConn.getResponseMessage());
+        println("  response code: " + respCode + " " + httpConn.getResponseMessage());
         properties = httpConn.getHeaderFields();
         for (Entry<String, List<String>> entry : properties.entrySet()) {
           String key = entry.getKey();

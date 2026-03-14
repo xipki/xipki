@@ -31,8 +31,7 @@ public class Asn1Util {
   /**
    * @return the end index (exclusive) of the SEQUENCE.
    */
-  static int readSeqPrefix(
-      byte[] encoded, AtomicInteger offset, String errMsg)
+  static int readSeqPrefix(byte[] encoded, AtomicInteger offset, String errMsg)
       throws CodecException {
     return readTagLen(encoded, TAG_SEQUENCE, offset, errMsg);
   }
@@ -50,8 +49,7 @@ public class Asn1Util {
 
     int len = readDerLen(encoded, offset);
     int endIndex = offset.get() + len;
-    boolean valid = outmost ? endIndex == encoded.length
-        : endIndex <= encoded.length;
+    boolean valid = outmost ? endIndex == encoded.length : endIndex <= encoded.length;
 
     if (!valid) {
       throw new CodecException(errMsg);
@@ -68,8 +66,7 @@ public class Asn1Util {
     return encodeOid(new ByteArrayOutputStream(10), oid, false);
   }
 
-  private static byte[] encodeOid(ByteArrayOutputStream out, String oid,
-                                  boolean addTagLen) {
+  private static byte[] encodeOid(ByteArrayOutputStream out, String oid, boolean addTagLen) {
     out.reset();
     String[] nodes = oid.split("\\.");
     if (addTagLen) {
@@ -162,8 +159,7 @@ public class Asn1Util {
   /*
    * returns the new offset.
    */
-  private static int readNode(StringBuilder sb, byte[] values,
-                              int off, boolean start) {
+  private static int readNode(StringBuilder sb, byte[] values, int off, boolean start) {
     int nodeValue = 0;
     while (true) {
       int v = 0xff & values[off++];
@@ -190,21 +186,18 @@ public class Asn1Util {
     return off;
   }
 
-  public static byte[] readTLV(byte[] encoded, AtomicInteger offset)
-      throws CodecException {
+  public static byte[] readTLV(byte[] encoded, AtomicInteger offset) throws CodecException {
     int origOfs = offset.getAndIncrement();
     int len = readDerLen(encoded, offset);
     return Arrays.copyOfRange(encoded, origOfs, offset.addAndGet(len));
   }
 
-  public static byte[] readValue(byte[] encoded, AtomicInteger offset)
-      throws CodecException {
+  public static byte[] readValue(byte[] encoded, AtomicInteger offset) throws CodecException {
     int len = readDerLen(encoded, offset);
     return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(len));
   }
 
-  public static byte[] readValue(byte[] encoded, AtomicInteger offset,
-                                 boolean bitString)
+  public static byte[] readValue(byte[] encoded, AtomicInteger offset, boolean bitString)
       throws CodecException {
     int len = readDerLen(encoded, offset);
     if (bitString) {
@@ -258,8 +251,7 @@ public class Asn1Util {
     return dsaSigX962ToPlain(sig, rs, rOrSLen);
   }
 
-  private static byte[] dsaSigX962ToPlain(
-      byte[] sig, byte[][] rs, int rOrSLen) {
+  private static byte[] dsaSigX962ToPlain(byte[] sig, byte[][] rs, int rOrSLen) {
     byte[] ret = new byte[2 * rOrSLen];
 
     for (int i = 0, off = 0; i < 2; i++, off += rOrSLen) {
@@ -279,8 +271,7 @@ public class Asn1Util {
     return ret;
   }
 
-  public static byte[][] readBigInts(byte[] encoded, int num)
-      throws CodecException {
+  public static byte[][] readBigInts(byte[] encoded, int num) throws CodecException {
     Args.min(num, "num", 1);
     String errMsg = "encodedSeq is not a SEQUENCE";
 
@@ -295,8 +286,7 @@ public class Asn1Util {
     }
 
     if (i < num) {
-      throw new CodecException("expected " + num +
-          ", but read only " + i + " INTEGERs");
+      throw new CodecException("expected " + num + ", but read only " + i + " INTEGERs");
     }
 
     offset.set(endIndex);
@@ -308,12 +298,10 @@ public class Asn1Util {
     return readBigInt(encoded, new AtomicInteger());
   }
 
-  public static byte[] readBigInt(byte[] encoded, AtomicInteger offset)
-      throws CodecException {
+  public static byte[] readBigInt(byte[] encoded, AtomicInteger offset) throws CodecException {
     int off = offset.get();
     if (encoded[off] != TAG_INTEGER) {
-      throw new CodecException(
-          "encoded[" + off + "] is not an INTEGER");
+      throw new CodecException("encoded[" + off + "] is not an INTEGER");
     }
 
     offset.incrementAndGet();
@@ -322,13 +310,11 @@ public class Asn1Util {
     return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(eLen));
   }
 
-  public static String readStringFromASN1String(byte[] encoded)
-      throws CodecException {
+  public static String readStringFromASN1String(byte[] encoded) throws CodecException {
     return readStringFromASN1String(encoded, new AtomicInteger());
   }
 
-  public static String readStringFromASN1String(
-      byte[] encoded, AtomicInteger offset)
+  public static String readStringFromASN1String(byte[] encoded, AtomicInteger offset)
       throws CodecException {
     String errMsg = "encoded is not a valid PrintableString or UTF8String";
 
@@ -345,17 +331,14 @@ public class Asn1Util {
     // ignore the first byte after the length.
     byte[] bytes = Arrays.copyOfRange(encoded, offset.get(), endIndex);
     boolean utf8 = tag == TAG_UTF8_STRING;
-    return new String(bytes,
-        utf8 ? StandardCharsets.UTF_8 : StandardCharsets.US_ASCII);
+    return new String(bytes, utf8 ? StandardCharsets.UTF_8 : StandardCharsets.US_ASCII);
   }
 
-  public static byte[] readOctetsFromASN1OctetString(byte[] encoded)
-      throws CodecException {
+  public static byte[] readOctetsFromASN1OctetString(byte[] encoded) throws CodecException {
     return readOctetsFromASN1OctetString(encoded, new AtomicInteger());
   }
 
-  public static byte[] readOctetsFromASN1OctetString(
-      byte[] encoded, AtomicInteger offset)
+  public static byte[] readOctetsFromASN1OctetString(byte[] encoded, AtomicInteger offset)
       throws CodecException {
     if (encoded[offset.getAndIncrement()] != TAG_OCTET_STRING) {
       throw new CodecException("encoded is not a valid ASN.1 octet string");
@@ -369,13 +352,11 @@ public class Asn1Util {
     return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(len));
   }
 
-  public static byte[] readOctetsFromASN1BitString(byte[] encoded)
-      throws CodecException {
+  public static byte[] readOctetsFromASN1BitString(byte[] encoded) throws CodecException {
     return readOctetsFromASN1BitString(encoded, new AtomicInteger());
   }
 
-  public static byte[] readOctetsFromASN1BitString(
-      byte[] encoded, AtomicInteger offset)
+  public static byte[] readOctetsFromASN1BitString(byte[] encoded, AtomicInteger offset)
       throws CodecException {
     if (encoded[offset.getAndIncrement()] != TAG_BIT_STRING) {
       throw new CodecException("encoded is not a valid ASN.1 bit string");
@@ -407,7 +388,7 @@ public class Asn1Util {
       len++;
     }
 
-    byte[] lenBytes = toDerLen(len);;
+    byte[] lenBytes = toDerLen(len);
     byte[] ret = new byte[1 + lenBytes.length + len];
 
     int off = 0;
@@ -424,8 +405,7 @@ public class Asn1Util {
     return ret;
   }
 
-  public static void skipCurrentTLV(byte[] bytes, AtomicInteger offset)
-      throws CodecException {
+  public static void skipCurrentTLV(byte[] bytes, AtomicInteger offset) throws CodecException {
     offset.getAndIncrement(); // tag
     int len = readDerLen(bytes, offset);
     offset.addAndGet(len);
@@ -479,8 +459,7 @@ public class Asn1Util {
     return tlv;
   }
 
-  public static int readDerLen(byte expectedTag, byte[] bytes,
-                               AtomicInteger offset)
+  public static int readDerLen(byte expectedTag, byte[] bytes, AtomicInteger offset)
       throws CodecException {
     byte tag = bytes[offset.get()];
     if (expectedTag != bytes[offset.get()]) {
@@ -492,8 +471,7 @@ public class Asn1Util {
   }
 
   // length
-  public static int readDerLen(byte[] bytes, AtomicInteger offset)
-      throws CodecException {
+  public static int readDerLen(byte[] bytes, AtomicInteger offset) throws CodecException {
     int ofs = offset.get();
 
     int b = 0xFF & bytes[ofs++];

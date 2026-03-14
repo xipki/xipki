@@ -65,8 +65,7 @@ public class AttributeTypes {
       return true;
     }
 
-    return obj instanceof AttributeTypes &&
-        this.types.equals(((AttributeTypes) obj).types);
+    return obj instanceof AttributeTypes && this.types.equals(((AttributeTypes) obj).types);
   }
 
   @Override
@@ -84,8 +83,7 @@ public class AttributeTypes {
     Collections.sort(copy);
 
     for (long type : copy) {
-      sb.append(indent2).append(PKCS11T.ckaCodeToName(type))
-          .append("\n");
+      sb.append(indent2).append(PKCS11T.ckaCodeToName(type)).append("\n");
     }
 
     return sb.toString();

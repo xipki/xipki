@@ -14,12 +14,12 @@ import org.bouncycastle.cms.SignerInfoGenerator;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.util.ScepUtil;
+import org.xipki.security.scep.util.XiDigestCalculatorProvider;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.extra.misc.CollectionUtil;
@@ -57,23 +57,20 @@ public class NextCaMessage {
   }
 
   public void setRaCerts(List<X509Cert> raCerts) {
-    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null
-        : List.copyOf(raCerts);
+    this.raCerts = CollectionUtil.isEmpty(raCerts) ? null : List.copyOf(raCerts);
   }
 
-  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert,
-                            X509Cert[] cmsCertSet)
+  public ContentInfo encode(PrivateKey signingKey, X509Cert signerCert, X509Cert[] cmsCertSet)
       throws CodecException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
 
     try {
-      CMSSignedDataGenerator degenerateSignedData =
-          new CMSSignedDataGenerator();
-      degenerateSignedData.addCertificate(caCert.toBcCert());
+      CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();
+      degenerateSignedData.addCertificate(caCert.getCertHolder());
       if (CollectionUtil.isNotEmpty(raCerts)) {
         for (X509Cert m : raCerts) {
-          degenerateSignedData.addCertificate(m.toBcCert());
+          degenerateSignedData.addCertificate(m.getCertHolder());
         }
       }
 
@@ -84,18 +81,15 @@ public class NextCaMessage {
 
       // I don't know which hash algorithm is supported by the client, use SHA-1
       String signatureAlgo = getSignatureAlgorithm(signingKey, HashAlgo.SHA1);
-      ContentSigner signer = new JcaContentSignerBuilder(
-          signatureAlgo).build(signingKey);
+      ContentSigner signer = new JcaContentSignerBuilder(signatureAlgo).build(signingKey);
 
       // signerInfo
       JcaSignerInfoGeneratorBuilder signerInfoBuilder =
-          new JcaSignerInfoGeneratorBuilder(new BcDigestCalculatorProvider());
+          new JcaSignerInfoGeneratorBuilder(new XiDigestCalculatorProvider());
 
-      signerInfoBuilder.setSignedAttributeGenerator(
-          new DefaultSignedAttributeTableGenerator());
+      signerInfoBuilder.setSignedAttributeGenerator(new DefaultSignedAttributeTableGenerator());
 
-      SignerInfoGenerator signerInfo =
-          signerInfoBuilder.build(signer, signerCert.toBcCert());
+      SignerInfoGenerator signerInfo = signerInfoBuilder.build(signer, signerCert.getCertHolder());
       generator.addSignerInfoGenerator(signerInfo);
 
       CMSTypedData cmsContent = new CMSProcessableByteArray(
@@ -104,14 +98,13 @@ public class NextCaMessage {
       // certificateSet
       ScepUtil.addCmsCertSet(generator, cmsCertSet);
       return generator.generate(cmsContent, true).toASN1Structure();
-    } catch (CMSException | CertificateEncodingException
-             | IOException | OperatorCreationException ex) {
+    } catch (CMSException | CertificateEncodingException | IOException |
+            OperatorCreationException ex) {
       throw new CodecException(ex);
     }
   } // method encode
 
-  private static String getSignatureAlgorithm(
-      PrivateKey key, HashAlgo hashAlgo) {
+  private static String getSignatureAlgorithm(PrivateKey key, HashAlgo hashAlgo) {
     if ("RSA".equalsIgnoreCase(key.getAlgorithm())) {
       return hashAlgo.jceName() + "withRSA";
     }

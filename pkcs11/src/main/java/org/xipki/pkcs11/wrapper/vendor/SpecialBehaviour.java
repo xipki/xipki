@@ -4,6 +4,8 @@
 package org.xipki.pkcs11.wrapper.vendor;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum SpecialBehaviour {

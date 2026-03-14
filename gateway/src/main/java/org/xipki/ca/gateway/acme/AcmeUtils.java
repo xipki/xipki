@@ -12,12 +12,14 @@ import org.bouncycastle.util.Pack;
 import org.xipki.ca.gateway.acme.type.AcmeError;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.extra.http.HttpStatusCode;
 import org.xipki.util.extra.misc.DateUtil;
 
+import java.net.IDN;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
@@ -43,8 +45,7 @@ final class AcmeUtils {
     // Utility class without constructor
   }
 
-  public static Instant parseTimestamp(String timestamp)
-    throws AcmeProtocolException {
+  public static Instant parseTimestamp(String timestamp) throws AcmeProtocolException {
     try {
       return DateUtil.parseRFC3339Timestamp(timestamp);
     } catch (DateTimeParseException ex) {
@@ -53,8 +54,7 @@ final class AcmeUtils {
     }
   }
 
-  public static PublicKey jwkPublicKey(Map<String, String> jwk)
-    throws InvalidKeySpecException {
+  public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
     String kty = jwk.get("kty");
     if ("RSA".equalsIgnoreCase(kty)) {
       return KeyUtil.getRSAPublicKey(new RSAPublicKeySpec(
@@ -73,8 +73,7 @@ final class AcmeUtils {
     throw new InvalidKeySpecException("unsupported kty " + kty);
   }
 
-  public static boolean matchKey(Map<String, String> jwk,
-                   SubjectPublicKeyInfo pkInfo)
+  public static boolean matchKey(Map<String, String> jwk, SubjectPublicKeyInfo pkInfo)
     throws InvalidKeySpecException {
     AlgorithmIdentifier pkInfoAlgo = pkInfo.getAlgorithm();
     ASN1ObjectIdentifier pkKeyAlgo = pkInfoAlgo.getAlgorithm();
@@ -94,12 +93,9 @@ final class AcmeUtils {
       BigInteger n = new BigInteger(1, decodeFast(jwk.get("n")));
       BigInteger e = new BigInteger(1, decodeFast(jwk.get("e")));
 
-      ASN1Sequence seq = ASN1Sequence.getInstance(
-        pkInfo.getPublicKeyData().getOctets());
-      BigInteger n2 = ASN1Integer.getInstance(
-        seq.getObjectAt(0)).getPositiveValue();
-      BigInteger e2 = ASN1Integer.getInstance(
-        seq.getObjectAt(1)).getPositiveValue();
+      ASN1Sequence seq = ASN1Sequence.getInstance(Asn1Util.getPublicKeyData(pkInfo));
+      BigInteger n2 = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
+      BigInteger e2 = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
       return n.equals(n2) && e.equals(e2);
     } else if ("EC".equalsIgnoreCase(kty)) {
       if (!OIDs.Algo.id_ecPublicKey.equals(pkKeyAlgo)) {
@@ -108,8 +104,7 @@ final class AcmeUtils {
 
       ASN1ObjectIdentifier curveOid2;
       try {
-        curveOid2 = ASN1ObjectIdentifier.getInstance(
-          pkInfoAlgo.getParameters());
+        curveOid2 = ASN1ObjectIdentifier.getInstance(pkInfoAlgo.getParameters());
       } catch (IllegalArgumentException ex) {
         return false;
       }
@@ -122,15 +117,13 @@ final class AcmeUtils {
 
       byte[] encodedPoint = buildECPublicKeyData(curve,
         decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
-      return Arrays.equals(pkInfo.getPublicKeyData().getBytes(),
-        encodedPoint);
+      return Arrays.equals(Asn1Util.getPublicKeyData(pkInfo), encodedPoint);
     } else {
       throw new RuntimeException("unsupported kty " + kty);
     }
   }
 
-  private static byte[] buildECPublicKeyData(
-    EcCurveEnum curve, byte[] x, byte[] y)
+  private static byte[] buildECPublicKeyData(EcCurveEnum curve, byte[] x, byte[] y)
     throws InvalidKeySpecException {
     int fieldSize = curve.fieldByteSize();
     byte[] res = new byte[1 + 2 * fieldSize];
@@ -158,15 +151,14 @@ final class AcmeUtils {
       }
       System.arraycopy(y, y.length - fieldSize, res, off, fieldSize);
     } else {
-      System.arraycopy(y, 0, res, off + fieldSize - y.length, x.length);
+      System.arraycopy(y, 0, res, off + fieldSize - y.length, y.length);
     }
 
     return res;
   }
 
   public static String toBase64(long label) {
-    return Base64.getUrlNoPaddingEncoder().encodeToString(
-      Pack.longToLittleEndian(label));
+    return Base64.getUrlNoPaddingEncoder().encodeToString(Pack.longToLittleEndian(label));
   }
 
   public static String jwkSha256(Map<String, String> jwk) {
@@ -175,16 +167,124 @@ final class AcmeUtils {
     StringBuilder canonJwk = new StringBuilder();
     canonJwk.append("{");
     for (String jwkName : jwkNames) {
-      canonJwk.append("\"").append(jwkName).append("\":\"")
-        .append(jwk.get(jwkName)).append("\",");
+      canonJwk.append("\"").append(jwkName).append("\":\"").append(jwk.get(jwkName)).append("\",");
     }
     // remove the last ","
     canonJwk.deleteCharAt(canonJwk.length() - 1);
     canonJwk.append("}");
 
     return Base64.getUrlNoPaddingEncoder().encodeToString(
-        HashAlgo.SHA256.hash(
-            canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
+        HashAlgo.SHA256.hash(canonJwk.toString().getBytes(StandardCharsets.UTF_8)));
+  }
+
+  public static String normalizeAndValidateDnsIdentifier(String value)
+      throws AcmeProtocolException {
+    if (value == null) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "identifier must not be null");
+    }
+
+    String text = value.trim();
+    boolean wildcard = text.startsWith("*.");
+    String host = wildcard ? text.substring(2) : text;
+    host = host.toLowerCase();
+
+    if (host.isEmpty()) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "identifier host is empty");
+    }
+
+    if (host.endsWith(".")) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "identifier must not end with '.'");
+    }
+
+    if ("localhost".equals(host) || host.endsWith(".localhost")) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "localhost identifiers are not permitted");
+    }
+
+    if (isIpLiteral(host)) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "IP literal identifiers are not permitted");
+    }
+
+    String asciiHost;
+    try {
+      asciiHost = IDN.toASCII(host, IDN.USE_STD3_ASCII_RULES);
+    } catch (IllegalArgumentException ex) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "invalid identifier '" + value + "'");
+    }
+
+    if (asciiHost.length() > 253) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "identifier is too long");
+    }
+
+    String[] labels = asciiHost.split("\\.");
+    if (labels.length < 2) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+          AcmeError.unsupportedIdentifier, "identifier must be a fully qualified domain name");
+    }
+
+    for (String label : labels) {
+      int n = label.length();
+      if (n < 1 || n > 63) {
+        throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+            AcmeError.unsupportedIdentifier, "invalid identifier label length");
+      }
+
+      if (label.charAt(0) == '-' || label.charAt(n - 1) == '-') {
+        throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+            AcmeError.unsupportedIdentifier, "identifier label must not start or end with '-'");
+      }
+
+      for (int i = 0; i < n; i++) {
+        char ch = label.charAt(i);
+        boolean ok = (ch >= 'a' && ch <= 'z')
+            || (ch >= '0' && ch <= '9')
+            || ch == '-';
+        if (!ok) {
+          throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,
+              AcmeError.unsupportedIdentifier, "identifier contains invalid character");
+        }
+      }
+    }
+
+    return wildcard ? "*." + asciiHost : asciiHost;
+  }
+
+  private static boolean isIpLiteral(String host) {
+    if (host.startsWith("[") || host.endsWith("]") || host.indexOf(':') != -1) {
+      return true;
+    }
+
+    String[] blocks = host.split("\\.");
+    if (blocks.length != 4) {
+      return false;
+    }
+
+    for (String block : blocks) {
+      if (block.isEmpty() || block.length() > 3) {
+        return false;
+      }
+
+      int v = 0;
+      for (int i = 0; i < block.length(); i++) {
+        char ch = block.charAt(i);
+        if (ch < '0' || ch > '9') {
+          return false;
+        }
+        v = v * 10 + (ch - '0');
+      }
+
+      if (v > 255) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
 }

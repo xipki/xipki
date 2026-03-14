@@ -40,8 +40,7 @@ abstract class Responder {
 
     private final List<SignAlgo> macAlgos;
 
-    PbmMacCmpResponder(List<String> owfs, List<String> macs)
-        throws NoSuchAlgorithmException {
+    PbmMacCmpResponder(List<String> owfs, List<String> macs) throws NoSuchAlgorithmException {
       super(new X500Name(new RDN[0]));
 
       this.owfAlgos = new ArrayList<>(owfs.size());
@@ -76,8 +75,7 @@ abstract class Responder {
     SignatureCmpResponder(X509Cert cert, AlgorithmValidator sigAlgoValidator) {
       super(Args.notNull(cert, "cert").subject());
       this.cert = cert;
-      this.sigAlgoValidator = Args.notNull(sigAlgoValidator,
-          "sigAlgoValidator");
+      this.sigAlgoValidator = Args.notNull(sigAlgoValidator, "sigAlgoValidator");
     }
 
     X509Cert getCert() {

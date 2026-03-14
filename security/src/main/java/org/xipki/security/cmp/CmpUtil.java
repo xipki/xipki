@@ -122,16 +122,14 @@ public class CmpUtil {
     STATUS_TEXT_MAP.put(PKIStatus.REJECTION, "rejection");
     STATUS_TEXT_MAP.put(PKIStatus.WAITING, "waiting");
     STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
-    STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_NOTIFICATION,
-        "revocationNotification");
+    STATUS_TEXT_MAP.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
     STATUS_TEXT_MAP.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
   }
 
   private CmpUtil() {
   }
 
-  public static String formatPkiStatusInfo(
-      int status, int failureInfo, String statusMessage) {
+  public static String formatPkiStatusInfo(int status, int failureInfo, String statusMessage) {
     BigInteger bi = BigInteger.valueOf(failureInfo);
     final int n = Math.min(bi.bitLength(), FAILUREINFO_TEXTS.length);
 
@@ -145,8 +143,7 @@ public class CmpUtil {
     String failInfoText = (sb.length() < 3) ? "" : sb.substring(2);
 
     return StringUtil.concatObjectsCap(200,
-        "PKIStatusInfo {status = ", status, " (",
-        STATUS_TEXT_MAP.get(status), "), ",
+        "PKIStatusInfo {status = ", status, " (", STATUS_TEXT_MAP.get(status), "), ",
         "failureInfo = ", failureInfo, " (", failInfoText, "), ",
         "statusMessage = ", statusMessage, "}");
   }
@@ -162,9 +159,8 @@ public class CmpUtil {
     if (signerName != null) {
       tmpSignerName = signerName;
     } else {
-      X500Name x500Name = Optional.ofNullable(signer.getX509Cert())
-          .orElseThrow(() -> new IllegalArgumentException(
-              "signer without certificate is not allowed"))
+      X500Name x500Name = Optional.ofNullable(signer.x509Cert()).orElseThrow(
+          () -> new IllegalArgumentException("signer without certificate is not allowed"))
           .subject();
       tmpSignerName = new GeneralName(x500Name);
     }
@@ -173,7 +169,7 @@ public class CmpUtil {
         pkiMessage, tmpSignerName, null);
 
     if (addSignerCert) {
-      X509CertificateHolder signerCert = signer.getX509Cert().toBcCert();
+      X509CertificateHolder signerCert = signer.x509Cert().getCertHolder();
       builder.addCMPCertificate(signerCert);
     }
 
@@ -189,14 +185,12 @@ public class CmpUtil {
 
   public static PKIMessage addProtection(
       PKIMessage pkiMessage, char[] password, PBMParameter pbmParameter,
-      GeneralName signerName, byte[] senderKid)
-      throws CMPException {
+      GeneralName signerName, byte[] senderKid) throws CMPException {
     ProtectedPKIMessageBuilder builder =
         newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
 
     try {
-      PKMACBuilder pkMacBuilder =
-          new PKMACBuilder(new JcePKMACValuesCalculator());
+      PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
       pkMacBuilder.setParameters(pbmParameter);
       return builder.build(pkMacBuilder.build(password)).toASN1Structure();
     } catch (CRMFException ex) {
@@ -207,8 +201,8 @@ public class CmpUtil {
   private static ProtectedPKIMessageBuilder newProtectedPKIMessageBuilder(
       PKIMessage pkiMessage, GeneralName sender, byte[] senderKid) {
     PKIHeader header = pkiMessage.getHeader();
-    ProtectedPKIMessageBuilder builder =
-        new ProtectedPKIMessageBuilder(sender, header.getRecipient());
+    ProtectedPKIMessageBuilder builder = new ProtectedPKIMessageBuilder(
+        header.getPvno().intValueExact(), sender, header.getRecipient());
     PKIFreeText freeText = header.getFreeText();
     if (freeText != null) {
       builder.setFreeText(freeText);
@@ -254,8 +248,7 @@ public class CmpUtil {
   } // method newProtectedPKIMessageBuilder
 
   public static boolean isImplicitConfirm(PKIHeader header) {
-    InfoTypeAndValue[] regInfos = Args.notNull(header, "header")
-        .getGeneralInfo();
+    InfoTypeAndValue[] regInfos = Args.notNull(header, "header").getGeneralInfo();
     if (regInfos != null) {
       for (InfoTypeAndValue regInfo : regInfos) {
         if (OIDs.CMP.it_implicitConfirm.equals(regInfo.getInfoType())) {
@@ -272,30 +265,31 @@ public class CmpUtil {
   }
 
   public static CmpUtf8Pairs extractUtf8Pairs(InfoTypeAndValue[] generalInfo) {
-    if (generalInfo != null) {
-      for (InfoTypeAndValue itv : generalInfo) {
-        if (OIDs.CMP.regInfo_utf8Pairs.equals(itv.getInfoType())) {
-          return new CmpUtf8Pairs(((ASN1String) itv.getInfoValue())
-              .getString());
-        }
-      }
+    if (generalInfo == null) {
+      return null;
     }
 
+    for (InfoTypeAndValue itv : generalInfo) {
+      if (OIDs.CMP.regInfo_utf8Pairs.equals(itv.getInfoType())) {
+        return new CmpUtf8Pairs(((ASN1String) itv.getInfoValue()).getString());
+      }
+    }
     return null;
   }
 
   public static String[] extractCertProfile(InfoTypeAndValue[] generalInfo) {
-    if (generalInfo != null) {
-      for (InfoTypeAndValue itv : generalInfo) {
-        if (OIDs.CMP.id_it_certProfile.equals(itv.getInfoType())) {
-          ASN1Sequence seq = ASN1Sequence.getInstance(itv.getInfoValue());
-          List<String> list = new ArrayList<>(seq.size());
-          for (int i = 0; i < seq.size(); i++) {
-            list.add(((ASN1String) seq.getObjectAt(i)).getString()
-                .toLowerCase(Locale.ROOT));
-          }
-          return list.isEmpty() ? null : list.toArray(new String[0]);
+    if (generalInfo == null) {
+      return null;
+    }
+
+    for (InfoTypeAndValue itv : generalInfo) {
+      if (OIDs.CMP.id_it_certProfile.equals(itv.getInfoType())) {
+        ASN1Sequence seq = ASN1Sequence.getInstance(itv.getInfoValue());
+        List<String> list = new ArrayList<>(seq.size());
+        for (int i = 0; i < seq.size(); i++) {
+          list.add(((ASN1String) seq.getObjectAt(i)).getString().toLowerCase(Locale.ROOT));
         }
+        return list.isEmpty() ? null : list.toArray(new String[0]);
       }
     }
 
@@ -304,8 +298,7 @@ public class CmpUtil {
 
   public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs) {
     Args.notNull(utf8Pairs, "utf8Pairs");
-    return new InfoTypeAndValue(OIDs.CMP.regInfo_utf8Pairs,
-        new DERUTF8String(utf8Pairs.encoded()));
+    return new InfoTypeAndValue(OIDs.CMP.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.encoded()));
   }
 
 }

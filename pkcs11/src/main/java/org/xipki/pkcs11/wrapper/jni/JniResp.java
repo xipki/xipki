@@ -38,8 +38,7 @@ public abstract class JniResp {
 
   public abstract byte[] getEncoded(Arch arch);
 
-  public static JniResp decodeSucc(Arch arch, byte[] encoded)
-      throws PKCS11Exception {
+  public static JniResp decodeSucc(Arch arch, byte[] encoded) throws PKCS11Exception {
     JniResp resp = decode(arch, encoded);
     if (resp instanceof JniErrResp) {
       throw ((JniErrResp) resp).asException();
@@ -47,8 +46,7 @@ public abstract class JniResp {
     return resp;
   }
 
-  public static JniResp decode(Arch arch, byte[] encoded)
-      throws PKCS11Exception {
+  public static JniResp decode(Arch arch, byte[] encoded) throws PKCS11Exception {
     if (encoded == null || encoded.length < 1) {
       throw new PKCS11Exception(JniErrResp.CKR_JNI_BAD_RESP);
     }

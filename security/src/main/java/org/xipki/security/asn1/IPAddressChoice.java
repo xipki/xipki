@@ -42,8 +42,7 @@ public class IPAddressChoice extends ASN1Object {
 
     addressesOrRanges = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
-      addressesOrRanges.add(IPAddressOrRange.getInstance(
-          sequence.getObjectAt(i)));
+      addressesOrRanges.add(IPAddressOrRange.getInstance(sequence.getObjectAt(i)));
     }
   }
 
@@ -73,8 +72,7 @@ public class IPAddressChoice extends ASN1Object {
       return new IPAddressChoice();
     } else if (obj instanceof byte[]) {
       try {
-        return getInstance(
-            new ASN1StreamParser((byte[]) obj).readObject());
+        return getInstance(new ASN1StreamParser((byte[]) obj).readObject());
       } catch (IOException e) {
         throw new IllegalArgumentException(e);
       }

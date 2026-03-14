@@ -24,8 +24,7 @@ public abstract class OcspStore implements Closeable {
 
   protected String name;
 
-  protected UnknownCertBehaviour unknownCertBehaviour =
-      UnknownCertBehaviour.unknown;
+  protected UnknownCertBehaviour unknownCertBehaviour = UnknownCertBehaviour.unknown;
 
   protected int retentionInterval;
 
@@ -92,11 +91,10 @@ public abstract class OcspStore implements Closeable {
    *           If OCSP store failed to retrieve the status.
    */
   public final CertStatusInfo getCertStatus(
-      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber,
-      boolean includeCertHash, boolean includeRit, boolean inheritCaRevocation)
-      throws OcspStoreException {
+      Instant time, RequestIssuer reqIssuer, BigInteger serialNumber, boolean includeCertHash,
+      boolean includeRit, boolean inheritCaRevocation) throws OcspStoreException {
     CertStatusInfo info = getCertStatus0(time, reqIssuer, serialNumber,
-        includeCertHash, includeRit, inheritCaRevocation);
+                              includeCertHash, includeRit, inheritCaRevocation);
 
     if (info == null) {
       return null;
@@ -172,8 +170,7 @@ public abstract class OcspStore implements Closeable {
     return unknownCertBehaviour;
   }
 
-  public void setUnknownCertBehaviour(
-      UnknownCertBehaviour unknownCertBehaviour) {
+  public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
     this.unknownCertBehaviour = unknownCertBehaviour;
   }
 
@@ -226,8 +223,8 @@ public abstract class OcspStore implements Closeable {
     if (minNextUpdatePeriod != null && maxNextUpdatePeriod != null) {
       if (minNextUpdatePeriod.compareTo(maxNextUpdatePeriod) > 0) {
         throw new IllegalArgumentException(String.format(
-            "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is " +
-            "not allowed", minNextUpdatePeriod, maxNextUpdatePeriod));
+            "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+            minNextUpdatePeriod, maxNextUpdatePeriod));
       }
     }
 

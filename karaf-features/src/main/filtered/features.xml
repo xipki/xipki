@@ -3,39 +3,136 @@
           name="pki-${project.version}"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0 http://karaf.apache.org/xmlns/features/v1.4.0">
-  <feature name="xipki-pki-client"
-           version="${project.version}"
-           description="PKI client shell">
-    <bundle>mvn:org.bouncycastle/bcutil-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcprov-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.bouncycastle/bcpkix-jdk18on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/pkcs11/${project.version}</bundle>
+  <!-- this feature contain all bundles needed but not defined in other features -->
+  <feature version="${karaf.version}"
+           description="contains bundles needed by etc/startup.properties"
+           name="hidden-do-not-call-me" hidden="true">
+    <!-- in etc/config.properties: property karaf.framework.felix -->
+    <bundle>mvn:org.apache.felix/org.apache.felix.framework/7.0.5</bundle>
+    <!-- defined below in feature jaas-boot as library -->
+    <bundle>mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.boot/${karaf.version}</bundle>
+  </feature>
+
+  <!-- apache karaf features -->
+
+  <!-- match etc/startup.properties -->
+  <feature version="${karaf.version}" description="Karaf core feature" name="framework" hidden="true">
+    <bundle start-level="1">mvn:org.apache.karaf.features/org.apache.karaf.features.extension/${karaf.version}</bundle>
+    <bundle start-level="5">mvn:org.ops4j.pax.url/pax-url-aether/2.6.17</bundle>
+    <bundle start-level="8">mvn:org.fusesource.jansi/jansi/2.4.2</bundle>
+    <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/2.3.0</bundle>
+    <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-logback/2.3.0</bundle>
+    <bundle start-level="9">mvn:org.osgi/org.osgi.util.function/1.2.0</bundle>
+    <bundle start-level="9">mvn:org.osgi/org.osgi.util.promise/1.3.0</bundle>
+    <!--bundle start-level="9">mvn:org.apache.felix/org.apache.felix.metatype/1.2.4</bundle-->
+    <!--bundle start-level="9">mvn:org.apache.felix/org.apache.felix.coordinator/1.0.2</bundle-->
+    <bundle start-level="9">mvn:org.apache.felix/org.apache.felix.converter/1.0.14</bundle>
+    <bundle start-level="10">mvn:org.apache.felix/org.apache.felix.configadmin/1.9.26</bundle>
+    <!--bundle start-level="11">mvn:org.apache.felix/org.apache.felix.configadmin.plugin.interpolation/1.2.8</bundle-->
+    <bundle start-level="11">mvn:org.apache.felix/org.apache.felix.cm.json/1.0.8</bundle>
+    <bundle start-level="11">mvn:org.apache.sling/org.apache.sling.commons.johnzon/1.2.16</bundle>
+    <!--bundle start-level="11">mvn:org.apache.felix/org.apache.felix.configurator/1.0.16</bundle-->
+    <!--bundle start-level="11">mvn:org.apache.karaf.config/org.apache.karaf.config.core/${karaf.version}</bundle-->
+    <bundle start-level="12">mvn:org.apache.felix/org.apache.felix.fileinstall/3.7.4</bundle>
+    <bundle start-level="15">mvn:org.apache.karaf.features/org.apache.karaf.features.core/${karaf.version}</bundle>
+  </feature>
+
+  <feature name="feature" description="Features Support" version="${karaf.version}">
+    <bundle start-level="1">mvn:org.apache.karaf.features/org.apache.karaf.features.extension/${karaf.version}</bundle>
+    <bundle start-level="15">mvn:org.apache.karaf.features/org.apache.karaf.features.core/${karaf.version}</bundle>
+    <bundle start-level="30">mvn:org.apache.karaf.features/org.apache.karaf.features.command/${karaf.version}</bundle>
+  </feature>
+
+  <feature name="jaas-boot" hidden="true" version="${karaf.version}">
+    <library export="true" delegate="true" type="boot">
+      mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.boot/${karaf.version}
+    </library>
+  </feature>
+
+  <feature name="shell" description="Karaf Shell" version="${karaf.version}">
+    <feature>jaas-boot</feature>
+    <bundle start-level="30">mvn:org.jline/jline/3.21.0</bundle>
+    <bundle start-level="30">mvn:org.apache.karaf.shell/org.apache.karaf.shell.core/${karaf.version}</bundle>
+    <bundle start-level="30">mvn:org.apache.karaf.shell/org.apache.karaf.shell.commands/${karaf.version}</bundle>
+  </feature>
+
+  <feature name="scr" description="Declarative Service support" version="${karaf.version}">
+    <bundle dependency="true" start-level="30">mvn:org.osgi/org.osgi.util.function/1.2.0</bundle>
+    <bundle dependency="true" start-level="30">mvn:org.osgi/org.osgi.util.promise/1.3.0</bundle>
+    <bundle dependency="true" start-level="30">mvn:org.osgi/org.osgi.service.component/1.5.1</bundle>
+    <bundle start-level="30">mvn:org.apache.felix/org.apache.felix.scr/2.2.6</bundle>
+    <conditional>
+      <condition>bundle</condition>
+      <bundle start-level="30">mvn:org.apache.karaf.scr/org.apache.karaf.scr.state/${karaf.version}</bundle>
+    </conditional>
+    <capability>
+      osgi.service;effective:=active;objectClass=org.apache.felix.scr.ScrService,
+      osgi.extender;osgi.extender="osgi.component";uses:="org.osgi.service.component";version:Version="1.2.1"
+    </capability>
+  </feature>
+
+  <feature name="bundle" description="Provide Bundle support" version="${karaf.version}">
+    <feature>jaas-boot</feature>
+    <bundle start-level="30">mvn:org.apache.karaf.bundle/org.apache.karaf.bundle.core/${karaf.version}</bundle>
+  </feature>
+
+  <feature name="log" description="Provide Log support" version="${karaf.version}">
+      <config name="org.apache.karaf.log">
+size = "500"
+color.fatal = "bright red"
+color.error = "bright red"
+color.warn = "bright yellow"
+color.info = "bright green"
+color.debug = "cyan"
+color.trace = "cyan"
+pattern = "\u001b[90m%d{HH:mm:ss.SSS}\u001b[0m %h{%p}{FATAL=${color.fatal}, ERROR=${color.error}, WARN=${color.warn}, INFO=${color.info}, DEBUG=${color.debug}, TRACE=${color.trace}} \u001b[90m[%t]\u001b[0m %m%n"
+      </config>
+      <bundle start-level="30">mvn:org.apache.karaf.log/org.apache.karaf.log.core/${karaf.version}</bundle>
+  </feature>
+
+  <!-- BEGIN XiPKI own features -->
+  <feature name="xipki-bc-lts" version="${project.version}" description="BouncyCastle LTS">
+    <bundle>mvn:org.bouncycastle/bcprov-lts8on/${bc-lts.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-lts8on/${bc-lts.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-lts8on/${bc-lts.version}</bundle>
+    <bundle>mvn:org.xipki/bcbridge-lts8on/${project.version}</bundle>
+  </feature>
+
+  <feature name="xipki-bc-fips" version="${project.version}" description="BouncyCastle FIPS">
+    <bundle>mvn:org.bouncycastle/bc-fips/${bc-fips.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpqc-fips/${bcpqc-fips.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcutil-fips/${bcutil-fips.version}</bundle>
+    <bundle>mvn:org.bouncycastle/bcpkix-fips/${bcpkix-fips.version}</bundle>
+    <bundle>mvn:org.xipki/bcbridge-fips/${project.version}</bundle>
+  </feature>
+
+  <feature name="xipki-pki-client" version="${project.version}" description="PKI client shell">
+    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.xipki/codec/${project.version}</bundle>
     <bundle>mvn:org.xipki/util/${project.version}</bundle>
-    <bundle>mvn:org.xipki/xihsm/${project.version}</bundle>
-    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
+    <bundle>mvn:org.xipki/pkcs11/${project.version}</bundle>
     <bundle>mvn:org.xipki/util-extra/${project.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
+    <bundle>mvn:org.xipki/xihsm/${project.version}</bundle>
     <bundle>mvn:org.xipki/pki-client/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/security-shell/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/pki-client-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-ca-mgmt"
-           version="${project.version}"
-           description="CA management shell">
+  <feature name="xipki-ca-mgmt" version="${project.version}" description="CA management shell">
     <feature>xipki-pki-client</feature>
-    <bundle>mvn:net.lingala.zip4j/zip4j/${zip4j.version}</bundle>
-    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.0.0</bundle>
+    <bundle>mvn:org.osgi/org.osgi.service.jdbc/1.1.0</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt/${project.version}</bundle>
-    <bundle>mvn:org.xipki/certprofile-xijson/${project.version}</bundle>
+    <bundle>mvn:org.xipki/certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/ca-mgmt-shell/${project.version}</bundle>
   </feature>
-  <feature name="xipki-qa"
-           version="${project.version}"
-           description="QA">
+  <feature name="xipki-demo" version="${project.version}" description="Demo">
+    <bundle>mvn:org.xipki.shell/demo-shell/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-qa" version="${project.version}" description="QA">
     <feature>xipki-ca-mgmt</feature>
+    <feature>xipki-demo</feature>
     <bundle>mvn:org.xipki/ca-sdk/${project.version}</bundle>
     <bundle>mvn:org.xipki/qa/${project.version}</bundle>
     <bundle>mvn:org.xipki.shell/qa-shell/${project.version}</bundle>

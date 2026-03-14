@@ -6,6 +6,8 @@ import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class PKCS11Spec {
@@ -18,8 +20,7 @@ public abstract class PKCS11Spec {
 
   protected void assertChangeable() {
     if (!changeable) {
-      throw new UnsupportedOperationException(
-          "This PKCS11Spec is not changeable");
+      throw new UnsupportedOperationException("This PKCS11Spec is not changeable");
     }
   }
 

@@ -102,8 +102,7 @@ public class KeyPairVisibilityTest {
       testVisibility(false, true);
     }
 
-    private void testVisibility(boolean inToken, boolean privateObj)
-        throws Exception {
+    private void testVisibility(boolean inToken, boolean privateObj) throws Exception {
       TestHSMs.TestHSM hsm = getHSM();
       byte[] soPin = hsm.getSoPin();
       Assume.assumeNotNull((Object) soPin);
@@ -127,8 +126,7 @@ public class KeyPairVisibilityTest {
 
         VendorEnum vendorEnum = vendor.getVendorEnum();
         boolean expectedFoundKeyPair = !privateObj
-            || (vendorEnum == VendorEnum.CLOUDHSM
-                || vendorEnum == VendorEnum.TASS);
+            || (vendorEnum == VendorEnum.CLOUDHSM || vendorEnum == VendorEnum.TASS);
 
         PKCS11KeyId.KeyIdType type = newKeyId.type();
         if (expectedFoundKeyPair) {

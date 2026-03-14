@@ -1,0 +1,49 @@
+{
+  // optional
+  "passwords": [
+    {
+      // rqquired
+      "user": "",
+      // required, may be in clear text, obfuscated, or PBE-encrypted.
+      "password": "",
+      // required, valid values: ALL, CMP, EST, REST, SCEP
+      "protocols":[],
+      // required: valid values: ALL, ENROLL_CERT, REENROLL_CERT, GEN_KEYPAIR,
+      //                         ENROLL_CROSS, UNSUSPEND_CERT, REVOKE_CERT
+      "permissions":[],
+      // required
+      "caProfiles": [
+        {
+          // CA name or ALL for all CAs.
+          "ca":"",
+          // Certificate profile name or ALL for all profiles.
+          "profiles":[]
+        }
+      ]
+    }
+  ],
+  // optional
+  "certs": [
+    {
+      // required
+      "cert": {
+        // either "file" or "binary"
+        "file": ""
+      },
+      // required, valid values: ALL, CMP, EST, REST, SCEP
+      "protocols":[],
+      // required: valid values: ALL, ENROLL_CERT, REENROLL_CERT, GEN_KEYPAIR,
+      //                         ENROLL_CROSS, UNSUSPEND_CERT, REVOKE_CERT
+      "permissions":[],
+      // required
+      "caProfiles": [
+        {
+          // CA name or ALL for all CAs.
+          "ca":"",
+          // Certificate profile name or ALL for all profiles.
+          "profiles":[]
+        }
+      ]
+    }
+  ]
+}

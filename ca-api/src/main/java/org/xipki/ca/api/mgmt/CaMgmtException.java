@@ -11,9 +11,6 @@ package org.xipki.ca.api.mgmt;
 
 public class CaMgmtException extends Exception {
 
-  public CaMgmtException() {
-  }
-
   public CaMgmtException(String message, Throwable cause) {
     super(message, cause);
   }

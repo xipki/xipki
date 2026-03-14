@@ -3,8 +3,7 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.xipki.ca.gateway.conf.PopControlConf;
-import org.xipki.ca.gateway.conf.ProtocolConf;
+import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -18,14 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
-public class AcmeProtocolConf extends ProtocolConf {
+public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
 
   private final Acme acme;
 
-  public AcmeProtocolConf(Boolean logReqResp, PopControlConf pop,
+  public AcmeProtocolConf(Boolean logReqResp, GatewayConf.PopControlConf pop,
                           SdkClientConf sdkClient, Acme acme) {
     super(logReqResp, pop, sdkClient);
     this.acme = Args.notNull(acme, "acme");
@@ -35,26 +35,22 @@ public class AcmeProtocolConf extends ProtocolConf {
     return acme;
   }
 
-  public static AcmeProtocolConf parse(JsonMap json)
-      throws CodecException, InvalidConfException {
-    ProtocolConf pConf = ProtocolConf.parse0(json);
+  public static AcmeProtocolConf parse(JsonMap json) throws CodecException, InvalidConfException {
+    GatewayConf.ProtocolConf pConf = GatewayConf.ProtocolConf.parse0(json);
 
     Acme acme = Acme.parse(json);
     acme.validate();
 
-    return new AcmeProtocolConf(pConf.logReqResp(),
-        pConf.pop(), pConf.sdkClient(), acme);
+    return new AcmeProtocolConf(pConf.logReqResp(), pConf.pop(), pConf.sdkClient(), acme);
   }
 
-  public static AcmeProtocolConf readConfFromFile(String fileName)
-      throws InvalidConfException {
+  public static AcmeProtocolConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
 
     try {
       return parse(JsonParser.parseMap(Paths.get(fileName), true));
     } catch (CodecException e) {
-      throw new InvalidConfException(
-          "error parsing AcmeProtocolConf: " + e.getMessage(), e);
+      throw new InvalidConfException("error parsing AcmeProtocolConf: " + e.getMessage(), e);
     }
   }
 
@@ -238,23 +234,19 @@ public class AcmeProtocolConf extends ProtocolConf {
       }
 
       if (nonceNumBytes < 12) {
-        throw new InvalidConfException(
-            "nonceNumBytes must be not less than 12");
+        throw new InvalidConfException("nonceNumBytes must be not less than 12");
       }
 
       if (tokenNumBytes < 12) {
-        throw new InvalidConfException(
-            "tokenNumBytes must be not less than 12");
+        throw new InvalidConfException("tokenNumBytes must be not less than 12");
       }
 
       if (baseUrl == null || baseUrl.isEmpty()) {
-        throw new InvalidConfException(
-            "baseUrl must be present and not blank.");
+        throw new InvalidConfException("baseUrl must be present and not blank.");
       }
 
       if (caProfiles == null || caProfiles.isEmpty()) {
-        throw new InvalidConfException(
-            "profiles must be present and not empty.");
+        throw new InvalidConfException("profiles must be present and not empty.");
       }
     }
 

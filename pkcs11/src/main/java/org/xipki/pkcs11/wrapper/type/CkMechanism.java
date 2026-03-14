@@ -162,8 +162,7 @@ public class CkMechanism extends CkType {
 
   @Override
   public int hashCode() {
-    return Long.hashCode(mechanism) * 31 +
-        (parameters == null ? 0 : parameters.hashCode());
+    return Long.hashCode(mechanism) * 31 + (parameters == null ? 0 : parameters.hashCode());
   }
 
   @Override
@@ -175,8 +174,7 @@ public class CkMechanism extends CkType {
     }
 
     CkMechanism b = (CkMechanism) other;
-    return mechanism == b.mechanism
-        && Objects.equals(parameters, b.parameters);
+    return mechanism == b.mechanism && Objects.equals(parameters, b.parameters);
   }
 
   @Override
@@ -185,8 +183,7 @@ public class CkMechanism extends CkType {
         getCkmName(module), "pParameter", parameters);
   }
 
-  public static CkMechanism decode(Arch arch, byte[] encoded)
-      throws PKCS11Exception {
+  public static CkMechanism decode(Arch arch, byte[] encoded) throws PKCS11Exception {
     AtomicInteger off = new AtomicInteger();
     long mechanism = JniUtil.readLong(arch, encoded, off);
     CkParams params = CkParams.decodeParams(arch, encoded, off);

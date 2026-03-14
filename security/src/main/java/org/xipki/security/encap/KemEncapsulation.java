@@ -6,6 +6,8 @@ package org.xipki.security.encap;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class KemEncapsulation {

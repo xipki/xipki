@@ -4,6 +4,7 @@
 package org.xipki.security.pkix;
 
 import org.xipki.security.HashAlgo;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 
 import java.io.IOException;
@@ -23,8 +24,7 @@ public class IssuerHash {
 
   private final byte[] issuerKeyHash;
 
-  public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash,
-                    byte[] issuerKeyHash) {
+  public IssuerHash(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
     this.issuerNameHash = Args.notNull(issuerNameHash, "issuerNameHash");
     this.issuerKeyHash = Args.notNull(issuerKeyHash, "issuerKeyHash");
@@ -36,10 +36,8 @@ public class IssuerHash {
 
   public IssuerHash(HashAlgo hashAlgo, X509Cert issuerCert) throws IOException {
     this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
-    byte[] encodedName = Args.notNull(issuerCert, "issuerCert")
-        .subject().getEncoded();
-    byte[] encodedKey  = issuerCert.subjectPublicKeyInfo()
-        .getPublicKeyData().getBytes();
+    byte[] encodedName = Args.notNull(issuerCert, "issuerCert").subject().getEncoded();
+    byte[] encodedKey = Asn1Util.getPublicKeyData(issuerCert.subjectPublicKeyInfo());
     this.issuerNameHash = hashAlgo.hash(encodedName);
     this.issuerKeyHash  = hashAlgo.hash(encodedKey);
   }
@@ -56,13 +54,10 @@ public class IssuerHash {
     return Arrays.copyOf(issuerKeyHash, issuerKeyHash.length);
   }
 
-  public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash,
-                       byte[] issuerKeyHash) {
+  public boolean match(HashAlgo hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash) {
     return this.hashAlgo == Args.notNull(hashAlgo, "hashAlgo")
-        && Arrays.equals(this.issuerNameHash,
-              Args.notNull(issuerNameHash, "issuerNameHash"))
-        && Arrays.equals(this.issuerKeyHash,
-              Args.notNull(issuerKeyHash, "issuerKeyHash"));
+        && Arrays.equals(this.issuerNameHash, Args.notNull(issuerNameHash, "issuerNameHash"))
+        && Arrays.equals(this.issuerKeyHash, Args.notNull(issuerKeyHash, "issuerKeyHash"));
   }
 
 }

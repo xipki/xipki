@@ -224,8 +224,7 @@ public class TestHSMs {
         throw new IllegalArgumentException("slotIndex outOfRange.");
       } else {
         Token token = slots[slotIndex].getToken();
-        if (!token.getTokenInfo().hasFlagBit(
-            PKCS11T.CKF_TOKEN_INITIALIZED)) {
+        if (!token.getTokenInfo().hasFlagBit(PKCS11T.CKF_TOKEN_INITIALIZED)) {
           throw new IllegalArgumentException("token is not initialized");
         } else {
           return token;
@@ -234,8 +233,7 @@ public class TestHSMs {
     } else {
       // return the first initialized token
       for (Slot slot : slots) {
-        if (slot.getToken().getTokenInfo().hasFlagBit(
-            PKCS11T.CKF_TOKEN_INITIALIZED)) {
+        if (slot.getToken().getTokenInfo().hasFlagBit(PKCS11T.CKF_TOKEN_INITIALIZED)) {
           return slot.getToken();
         }
       }
@@ -255,8 +253,7 @@ public class TestHSMs {
     private TestHSM(PKCS11Token token, PKCS11Module module, String soPin) {
       this.token = token;
       this.module = module;
-      this.soPin = soPin == null ? null
-          : soPin.getBytes(StandardCharsets.UTF_8);
+      this.soPin = soPin == null ? null : soPin.getBytes(StandardCharsets.UTF_8);
     }
 
     public PKCS11Token getToken() {

@@ -7,6 +7,7 @@ import org.xipki.ca.gateway.acme.type.AcmeError;
 import org.xipki.util.codec.Args;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -18,8 +19,7 @@ public class AcmeProtocolException extends Exception {
 
     private final String acmeDetail;
 
-    public AcmeProtocolException(int httpError, AcmeError acmeError,
-                                 String acmeDetail) {
+    public AcmeProtocolException(int httpError, AcmeError acmeError, String acmeDetail) {
         super(acmeError + ": " + acmeDetail);
         this.httpError = httpError;
         this.acmeError = Args.notNull(acmeError, "acmeError");

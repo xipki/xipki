@@ -28,11 +28,10 @@ public abstract class CkType {
   }
 
   public String toString(String indent, String name, PKCS11Module module,
-                         Object... fieldNameValues) {
+                        Object... fieldNameValues) {
     final int n2 = fieldNameValues.length;
     if ((n2 & 1) != 0) {
-      throw new IllegalArgumentException(
-          "fieldNameValues.length is not even: " + n2);
+      throw new IllegalArgumentException("fieldNameValues.length is not even: " + n2);
     }
 
     final int n = n2 >> 1;
@@ -73,8 +72,7 @@ public abstract class CkType {
     return sb.toString();
   }
 
-  private static String ptr2str(int maxFieldNameLen, String indent,
-                                String name, Object value) {
+  private static String ptr2str(int maxFieldNameLen, String indent, String name, Object value) {
     String prefix = "\n" + indent + "  ";
     if (!name.isEmpty()) {
       prefix += formatFieldName(maxFieldNameLen, name) + ": ";
@@ -96,8 +94,7 @@ public abstract class CkType {
     }
   }
 
-  private static String val2Str(int maxFieldNameLen, String indent,
-                                String name, Object value) {
+  private static String val2Str(int maxFieldNameLen, String indent, String name, Object value) {
     String prefix = "\n" + indent + "  ";
     if (!name.isEmpty()) {
       prefix += formatFieldName(maxFieldNameLen, name) + ": ";
@@ -134,8 +131,7 @@ public abstract class CkType {
     return codeToName(Category.CKG_GENERATOR, code, module);
   }
 
-  protected static String codeToName(
-      Category category, long code, PKCS11Module module) {
+  protected static String codeToName(Category category, long code, PKCS11Module module) {
     String name = PKCS11T.codeToName(category, code);
     if (module != null) {
       long code2 = module.genericToVendorCode(category, code);

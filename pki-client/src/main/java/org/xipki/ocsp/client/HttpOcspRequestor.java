@@ -3,6 +3,11 @@
 
 package org.xipki.ocsp.client;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.xipki.security.SecurityFactory;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.io.IoUtil;
@@ -15,13 +20,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Dictionary;
+import java.util.Enumeration;
 
 /**
  * HTTP OCSP requestor.
  *
  * @author Lijun Liao (xipki)
  */
-
+@Component(service = OcspRequestor.class, immediate = true,
+    configurationPid = "org.xipki.pki.client")
 public class HttpOcspRequestor extends AbstractOcspRequestor {
 
   // result in maximal 254 Base-64 encoded octets
@@ -31,26 +39,53 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
 
   private static final String CT_RESPONSE = "application/ocsp-response";
 
+  @Reference
+  private SecurityFactory securityFactory;
+
   public HttpOcspRequestor() {
   }
 
+  public SecurityFactory securityFactory() {
+    return securityFactory;
+  }
+
+  public void setSecurityFactory(SecurityFactory securityFactory) {
+    this.securityFactory = securityFactory;
+  }
+
+  @Activate
+  public void activate(ComponentContext context) {
+    Dictionary<String, Object> properties = context.getProperties();
+    Enumeration<String> keys = properties.keys();
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      Object value = properties.get(key);
+      if (!(value instanceof String)) {
+        continue;
+      }
+
+      String sValue = (String) value;
+      if (key.equals("confFile")) {
+        setConfFile(sValue);
+      }
+    }
+
+    init();
+  }
+
   @Override
-  protected byte[] send(byte[] request, URL responderUrl,
-                        RequestOptions requestOptions)
+  protected byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
       throws IOException {
     Args.notNull(responderUrl, "responderUrl");
 
     int size = Args.notNull(request, "request").length;
     HttpURLConnection httpUrlConnection;
-    if (size <= MAX_LEN_GET
-        && Args.notNull(requestOptions, "requestOptions")
-            .isUseHttpGetForRequest()) {
+    if (size <= MAX_LEN_GET &&
+        Args.notNull(requestOptions, "requestOptions").isUseHttpGetForRequest()) {
       String b64Request = Base64.getEncoder().encodeToString(request);
-      String urlEncodedReq = URLEncoder.encode(b64Request,
-          StandardCharsets.UTF_8);
+      String urlEncodedReq = URLEncoder.encode(b64Request, StandardCharsets.UTF_8);
       String baseUrl = responderUrl.toString();
-      String url = StringUtil.concat(baseUrl,
-          (baseUrl.endsWith("/") ? "" : "/"), urlEncodedReq);
+      String url = StringUtil.concat(baseUrl, (baseUrl.endsWith("/") ? "" : "/"), urlEncodedReq);
 
       URL newUrl = new URL(url);
       httpUrlConnection = IoUtil.openHttpConn(newUrl);
@@ -62,8 +97,7 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
 
       httpUrlConnection.setRequestMethod("POST");
       httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
-      httpUrlConnection.setRequestProperty("Content-Length",
-          Integer.toString(size));
+      httpUrlConnection.setRequestProperty("Content-Length", Integer.toString(size));
       OutputStream outputstream = httpUrlConnection.getOutputStream();
       outputstream.write(request);
       outputstream.flush();
@@ -87,8 +121,7 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
 
     if (!isValidContentType) {
       inputstream.close();
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return IoUtil.readAllBytesAndClose(inputstream);

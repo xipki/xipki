@@ -8,12 +8,12 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.HmacSigner;
 import org.xipki.security.sign.Signer;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -46,12 +46,10 @@ public class P12MacContentSignerBuilder {
    * @throws XiSecurityException if security error occurs.
    */
   public P12MacContentSignerBuilder(
-      String keystoreType, InputStream keystoreStream,
-      char[] keystorePassword, String keyname, char[] keyPassword)
-      throws XiSecurityException {
+      String keystoreType, InputStream keystoreStream, char[] keystorePassword,
+      String keyname, char[] keyPassword) throws XiSecurityException {
     if (!"JCEKS".equalsIgnoreCase(keystoreType)) {
-      throw new IllegalArgumentException(
-          "unsupported keystore type: " + keystoreType);
+      throw new IllegalArgumentException("unsupported keystore type: " + keystoreType);
     }
 
     Args.notNull(keystoreStream, "keystoreStream");
@@ -59,8 +57,7 @@ public class P12MacContentSignerBuilder {
     Args.notNull(keyPassword, "keyPassword");
 
     try {
-      KeyStore ks = KeyUtil.getInKeyStore(keystoreType);
-      ks.load(keystoreStream, keystorePassword);
+      KeyStore ks = KeyUtil.loadKeyStore(keystoreType, keystoreStream, keystorePassword);
 
       String tmpKeyname = keyname;
       if (tmpKeyname == null) {
@@ -79,7 +76,7 @@ public class P12MacContentSignerBuilder {
       }
 
       this.key = (SecretKey) ks.getKey(tmpKeyname, keyPassword);
-    } catch (GeneralSecurityException | IOException | ClassCastException ex) {
+    } catch (GeneralSecurityException | ClassCastException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
   } // constructor
@@ -87,13 +84,11 @@ public class P12MacContentSignerBuilder {
   public ConcurrentSigner createSigner(SignAlgo sigAlgo, int parallelism)
       throws XiSecurityException {
     Args.notNull(sigAlgo, "sigAlgo");
-    List<Signer> signers = new ArrayList<>(
-        Args.positive(parallelism, "parallelism"));
+    List<Signer> signers = new ArrayList<>(Args.positive(parallelism, "parallelism"));
 
     for (int i = 0; i < parallelism; i++) {
       Signer signer = sigAlgo.isGmac()
-          ? new AESGmacContentSigner(sigAlgo, key)
-          : new HmacSigner(sigAlgo, key);
+          ? new AESGmacContentSigner(sigAlgo, key) : new HmacSigner(sigAlgo, key);
       signers.add(signer);
     }
 
@@ -104,8 +99,7 @@ public class P12MacContentSignerBuilder {
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
-    concurrentSigner.setSha1DigestOfMacKey(
-        HashAlgo.SHA1.hash(key.getEncoded()));
+    concurrentSigner.setSha1DigestOfMacKey(HashAlgo.SHA1.hash(key.getEncoded()));
 
     return concurrentSigner;
   } // method createSigner

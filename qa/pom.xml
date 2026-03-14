@@ -13,11 +13,12 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <skipDeploy>true</skipDeploy>
+    <Import-Package>org.bouncycastle.*;version="${bc.versions}",*</Import-Package>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>certprofile-xijson</artifactId>
+      <artifactId>certprofile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

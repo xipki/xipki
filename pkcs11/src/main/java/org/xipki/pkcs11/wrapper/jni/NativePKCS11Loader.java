@@ -23,8 +23,12 @@ import java.util.Locale;
 
 public class NativePKCS11Loader {
 
-  private static final Logger log =
-      LoggerFactory.getLogger(NativePKCS11Loader.class);
+  private static final String archdir_arm64 = "arm64";
+  private static final String archdir_amd64 = "amd64";
+  private static final String archdir_riscv64 = "riscv64";
+  private static final String archdir_x86 = "x86";
+
+  private static final Logger log = LoggerFactory.getLogger(NativePKCS11Loader.class);
 
   /**
    * Indicates, if the static linking and initialization of the library is
@@ -59,8 +63,7 @@ public class NativePKCS11Loader {
           loadWrapperFromJar();
         } catch (IOException ioe) {
           throw new UnsatisfiedLinkError(
-              "no pkcs11wrapper in library path or jar file. "
-                  + ioe.getMessage());
+              "no pkcs11wrapper in library path or jar file. " + ioe.getMessage());
         }
       }
       linkedAndInitialized = NativePKCS11.initializeLibrary();
@@ -90,38 +93,35 @@ public class NativePKCS11Loader {
     if (osName.contains("mac")) {
       system  = "macosx";
       libName = "libpkcs11wrapper.jnilib";
-      archPaths.add("universal");
+      String archDir = getArchDir(archName);
+      if (archDir != null) {
+        archPaths.add(archDir);
+      } else {
+        archPaths.add(archdir_amd64);
+        archPaths.add(archdir_arm64);
+      }
     } else if (osName.contains("win")) {
       system  = "windows";
       libName = "pkcs11wrapper.dll";
-      if (archName.contains("aarch64") || archName.contains("arm64")) {
-        archPaths.add("arm64");
-      } else if (archName.contains("64")) {
-        archPaths.add("x86_64");
-      } else if (archName.contains("32") || archName.contains("86")) {
-        archPaths.add("x86");
+      String archDir = getArchDir(archName);
+      if (archDir != null) {
+        archPaths.add(archDir);
       } else {
-        archPaths.add("x86_64");
-        archPaths.add("x86");
-        archPaths.add("arm64");
+        archPaths.add(archdir_amd64);
+        archPaths.add(archdir_x86);
+        archPaths.add(archdir_arm64);
       }
     } else {
       system  = "linux";
       libName = "libpkcs11wrapper.so";
-
-      if (archName.contains("aarch64") || archName.contains("arm64")) {
-        archPaths.add("arm64");
-      } else if (archName.contains("riscv")) {
-          archPaths.add("riscv64");
-      } else if (archName.contains("64")) {
-        archPaths.add("x86_64");
-      } else if (archName.contains("32") || archName.contains("86")) {
-        archPaths.add("x86");
+      String archDir = getArchDir(archName);
+      if (archDir != null) {
+        archPaths.add(archDir);
       } else {
-        archPaths.add("x86_64");
-        archPaths.add("arm64");
-        archPaths.add("x86");
-        archPaths.add("riscv64");
+        archPaths.add(archdir_amd64);
+        archPaths.add(archdir_arm64);
+        archPaths.add(archdir_x86);
+        archPaths.add(archdir_riscv64);
       }
     }
 
@@ -131,8 +131,7 @@ public class NativePKCS11Loader {
       tempWrapperDir = new File(propValue);
 
       if (!tempWrapperDir.exists()) {
-        throw new IOException("Specified local temp directory '"
-            + propValue + "' does not exist!");
+        throw new IOException("Specified local temp directory '" + propValue + "' does not exist!");
       }
     }
 
@@ -141,32 +140,27 @@ public class NativePKCS11Loader {
     for (String archPath : archPaths) {
       String jarFilePath = "natives/" + system + "/" + archPath + "/" + libName;
 
-      try (InputStream wrapperLibrary =
-               classLoader.getResourceAsStream(jarFilePath)) {
+      try (InputStream wrapperLibrary = classLoader.getResourceAsStream(jarFilePath)) {
         if (wrapperLibrary == null) {
           log.error("found no native library file {}", jarFilePath);
           continue;
         }
 
-        File tempWrapperFile =
-            File.createTempFile(libName, null, tempWrapperDir);
+        File tempWrapperFile = File.createTempFile(libName, null, tempWrapperDir);
         if (!tempWrapperFile.canWrite()) {
           throw new IOException("Can't copy wrapper native library to local " +
-              "temporary directory - no write permission in " +
-              tempWrapperFile.getAbsolutePath());
+              "temporary directory - no write permission in " + tempWrapperFile.getAbsolutePath());
         }
 
         tempWrapperFile.deleteOnExit();
 
-        log.info("PKCS11Module.loadWrapperFromJar: copy file {} " +
-            "to a temporary file", jarFilePath);
+        log.info("PKCS11Module.loadWrapperFromJar: copy file {} to a temporary file", jarFilePath);
 
-        Files.copy(wrapperLibrary, tempWrapperFile.toPath(),
-            StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(wrapperLibrary, tempWrapperFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
         try {
           System.load(tempWrapperFile.getAbsolutePath());
-          log.info("Using the library " + jarFilePath);
+          log.info("Using the library {}", jarFilePath);
           success = true;
           break;
         } catch (UnsatisfiedLinkError e) {
@@ -178,6 +172,20 @@ public class NativePKCS11Loader {
     if (!success) {
       throw new IOException("No suitable wrapper native library found " +
           "in jar file. " + osName + " " + archName + " not supported.");
+    }
+  }
+
+  private static String getArchDir(String archName) {
+    if (archName.contains("riscv")) {
+      return archdir_riscv64;
+    } else if (archName.contains("aarch64") || archName.contains("arm64")) {
+      return archdir_arm64;
+    } else if (archName.contains("64")) {
+      return archdir_amd64;
+    } else if (archName.contains("32") || archName.contains("86")) {
+      return archdir_x86;
+    } else {
+      return null;
     }
   }
 

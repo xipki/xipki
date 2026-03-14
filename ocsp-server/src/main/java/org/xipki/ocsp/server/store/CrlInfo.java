@@ -74,7 +74,7 @@ public class CrlInfo {
   }
 
   public CrlInfo(BigInteger crlNumber, BigInteger baseCrlNumber,
-                 Instant thisUpdate, Instant nextUpdate, CrlID crlId) {
+                Instant thisUpdate, Instant nextUpdate, CrlID crlId) {
     this.crlNumber = Args.notNull(crlNumber, "crlNumber");
     this.baseCrlNumber = baseCrlNumber;
     this.thisUpdate = Args.notNull(thisUpdate, "thisUpdate");

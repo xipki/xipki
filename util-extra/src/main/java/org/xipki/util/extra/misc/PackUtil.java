@@ -69,8 +69,7 @@ public abstract class PackUtil {
     }
   }
 
-  public static void intToBigEndian(
-      int[] ns, int nsOff, int nsLen, byte[] bs, int bsOff) {
+  public static void intToBigEndian(int[] ns, int nsOff, int nsLen, byte[] bs, int bsOff) {
     for (int i = 0; i < nsLen; ++i) {
       intToBigEndian(ns[nsOff + i], bs, bsOff);
       bsOff += 4;
@@ -90,8 +89,7 @@ public abstract class PackUtil {
     }
   }
 
-  public static void bigEndianToLong(
-      byte[] bs, int bsOff, long[] ns, int nsOff, int nsLen) {
+  public static void bigEndianToLong(byte[] bs, int bsOff, long[] ns, int nsOff, int nsLen) {
     for (int i = 0; i < nsLen; ++i) {
       ns[nsOff + i] = bigEndianToLong(bs, bsOff);
       bsOff += 8;
@@ -122,8 +120,7 @@ public abstract class PackUtil {
     }
   }
 
-  public static void longToBigEndian(
-      long[] ns, int nsOff, int nsLen, byte[] bs, int bsOff) {
+  public static void longToBigEndian(long[] ns, int nsOff, int nsLen, byte[] bs, int bsOff) {
     for (int i = 0; i < nsLen; ++i) {
       longToBigEndian(ns[nsOff + i], bs, bsOff);
       bsOff += 8;

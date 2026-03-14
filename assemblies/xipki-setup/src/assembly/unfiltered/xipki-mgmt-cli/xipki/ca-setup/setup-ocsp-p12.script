@@ -1,0 +1,52 @@
+# Please adapt me
+SUBJECT="O=$[organization],CN=OCSP Responder 1"
+
+OCSP_KEYCERTS_DIR = xipki/ocsp-setup/keycerts
+CACERT_FILE = xipki/ca-setup/keycerts/$[ca.name].pem
+
+printUsage = "false"
+if { "$1" equals "" | "$1" equals "help" } then {
+  printUsage = "true"
+} else {
+  keyspec = $1
+  source xipki/ca-setup/c14n-keyspec.script
+  if { "$sigalg" equals "" } then {
+    printUsage = true
+  }
+}
+
+echo "key spec: $keyspec"
+
+if { "$printUsage" equals "true" } then {
+  echo "Usage: "
+  echo ""
+  echo "source file:./xipki/ocsp/setup-ocsp-p12.script <key spec>"
+  source xipki/ca-setup/print-keyspecs.script
+} else {
+  echo "#################################################################"
+  echo "#                 Generate Key, CSR and Certificate             #"
+  echo "#################################################################"
+
+  echo "# Generate PKCS#12 key and certificate for OCSP Responder"
+
+  OCSP_FILE_PREFIX = ${OCSP_KEYCERTS_DIR}/ocsp1
+  PASSWORD_P12 = $[ocsp.keyPassword]
+
+  xi:keypair-p12 --keyspec ${keyspec} --password ${PASSWORD_P12} \
+     --out ${OCSP_FILE_PREFIX}.p12
+
+  xi:csr-p12 --password ${PASSWORD_P12} --p12 ${OCSP_FILE_PREFIX}.p12 \
+     --out ${OCSP_FILE_PREFIX}.csr --subject "${SUBJECT}"
+
+  ca:enroll-cert --ca myca1 --csr ${OCSP_FILE_PREFIX}.csr \
+     --out ${OCSP_FILE_PREFIX}.crt --profile ocsp
+
+  echo "# Update the certificate in the PKCS#12 file"
+  xi:update-cert-p12 --p12 ${OCSP_FILE_PREFIX}.p12 --password ${PASSWORD_P12} \
+     --cert ${OCSP_FILE_PREFIX}.crt --ca-cert ${CACERT_FILE}
+
+  echo "Please"
+  echo "  1. Copy ${OCSP_FILE_PREFIX}.p12 to replace"
+  echo "     the <OCSP\'s tomcat.dir>/xipki/keycerts/ocsp1.p12"
+  echo "  2. Restart OCSP\'s tomcat."
+}

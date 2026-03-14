@@ -45,8 +45,7 @@ public class CaProfileEntry {
       this.profileAliases = new ArrayList<>(profileAliases.size());
       for (String alias : profileAliases) {
         String lcAlias = alias.toLowerCase(Locale.ROOT);
-        if (! (this.profileName.equals(lcAlias)
-                || this.profileAliases.contains(lcAlias))) {
+        if (! (this.profileName.equals(lcAlias) || this.profileAliases.contains(lcAlias))) {
           this.profileAliases.add(lcAlias);
         }
       }
@@ -70,8 +69,7 @@ public class CaProfileEntry {
 
   public boolean containsNameOrAlias(String nameOrAlias) {
     String lcNameOrAlias = Args.toNonBlankLower(nameOrAlias, "nameOrAlias");
-    return profileName.equals(lcNameOrAlias)
-            || profileAliases.contains(lcNameOrAlias);
+    return profileName.equals(lcNameOrAlias) || profileAliases.contains(lcNameOrAlias);
   }
 
   public String containedNameOrAlias(CaProfileEntry other) {

@@ -18,6 +18,8 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiPrivateOrSecretKey extends XiKey {
@@ -140,11 +142,9 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
   private XiTemplate deriveTemplate;
 
   public XiPrivateOrSecretKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, long objectClass,
-      long keyType, Long keyGenMechanism) {
-    super(vendor, cku, newObjectMethod, handle, inToken, objectClass,
-        keyType, keyGenMechanism);
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle,
+      boolean inToken, long objectClass, long keyType, Long keyGenMechanism) {
+    super(vendor, cku, newObjectMethod, handle, inToken, objectClass, keyType, keyGenMechanism);
   }
 
   public abstract byte[] getEncoded() throws HsmException;
@@ -181,10 +181,18 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
     return deriveTemplate;
   }
 
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                     SecureRandom random) throws HsmException {
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random) throws HsmException {
+    throw new HsmException(CKR_KEY_FUNCTION_NOT_PERMITTED, getClass() + " does not support C_Sign");
+  }
+
+  public byte[] deriveKey(XiMechanism mechanism, XiTemplate template) throws HsmException {
     throw new HsmException(CKR_KEY_FUNCTION_NOT_PERMITTED,
-        getClass() + " does not support C_Sign");
+        getClass().getName() + " does not support C_DeriveKey");
+  }
+
+  public byte[] decrypt(XiMechanism mechanism, byte[] encryptedData) throws HsmException {
+    throw new HsmException(CKR_KEY_FUNCTION_NOT_PERMITTED,
+        getClass() + " does not support C_Decrypt");
   }
 
   @Override
@@ -193,8 +201,7 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
 
@@ -212,8 +219,7 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
 
   @Override
   protected void doSetAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     super.doSetAttributes(loginState, initMethod, attrs);
 
     decrypt = attrs.removeBool(CKA_DECRYPT);
@@ -221,16 +227,14 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
     // CKA_EXTRACTABLE
     Boolean attrB = attrs.removeBool(CKA_EXTRACTABLE);
     if (attrB != null) {
-      assertNotFalseToTrue(initMethod, CKA_WRAP_WITH_TRUSTED,
-          attrB, isWrapWithTrusted());
+      assertNotFalseToTrue(initMethod, CKA_WRAP_WITH_TRUSTED, attrB, isWrapWithTrusted());
       this.extractable = attrB;
     }
 
     // CKA_SENSITIVE
     attrB = attrs.removeBool(CKA_SENSITIVE);
     if (attrB != null) {
-      assertNotTrueToFalse(initMethod, CKA_WRAP_WITH_TRUSTED,
-          attrB, isWrapWithTrusted());
+      assertNotTrueToFalse(initMethod, CKA_WRAP_WITH_TRUSTED, attrB, isWrapWithTrusted());
       this.sensitive = attrB;
     }
 
@@ -242,8 +246,7 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
     // CKA_WRAP_WITH_TRUSTED
     attrB = attrs.removeBool(CKA_WRAP_WITH_TRUSTED);
     if (attrB != null) {
-      assertNotTrueToFalse(initMethod, CKA_WRAP_WITH_TRUSTED,
-          attrB, isWrapWithTrusted());
+      assertNotTrueToFalse(initMethod, CKA_WRAP_WITH_TRUSTED, attrB, isWrapWithTrusted());
       this.wrapWithTrusted = attrB;
     }
 
@@ -252,8 +255,7 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
       if (initMethod != ObjectInitMethod.RESTORE) {
         this.alwaysSensitive = attrB;
       } else {
-        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY,
-            "CKA_ALWAYS_SENSITIVE is read-only");
+        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY, "CKA_ALWAYS_SENSITIVE is read-only");
       }
     } else {
       if (!boolValue(sensitive, true)) {
@@ -266,8 +268,7 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
       if (initMethod != ObjectInitMethod.RESTORE) {
         this.neverExtractable = attrB;
       } else {
-        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY,
-            "CKA_NEVER_EXTRACTABLE is read-only");
+        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY, "CKA_NEVER_EXTRACTABLE is read-only");
       }
     } else {
       if (boolValue(extractable, false)) {

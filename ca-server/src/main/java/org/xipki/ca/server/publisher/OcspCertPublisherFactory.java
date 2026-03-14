@@ -20,8 +20,7 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
 
   private static final String TYPE = "ocsp";
 
-  private static final Set<String> types =
-      Set.copyOf(Collections.singletonList(TYPE));
+  private static final Set<String> types = Set.copyOf(Collections.singletonList(TYPE));
 
   @Override
   public Set<String> getSupportedTypes() {
@@ -34,8 +33,7 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
   }
 
   @Override
-  public CertPublisher newPublisher(String type)
-      throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws ObjectCreationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new OcspCertPublisher();
     } else {

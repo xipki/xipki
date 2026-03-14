@@ -28,8 +28,7 @@ public class CertprofileInfoResponse extends SdkResponse {
   private final KeySpec[] keyTypes;
 
   public CertprofileInfoResponse(
-      String[] requiredExtensionTypes, String[] optionalExtensionTypes,
-      KeySpec[] keyTypes) {
+      String[] requiredExtensionTypes, String[] optionalExtensionTypes, KeySpec[] keyTypes) {
     this.requiredExtensionTypes = requiredExtensionTypes;
     this.optionalExtensionTypes = optionalExtensionTypes;
     this.keyTypes = Args.notNull(keyTypes, "keyTypes");
@@ -59,8 +58,7 @@ public class CertprofileInfoResponse extends SdkResponse {
     encoder.writeTextStrings(keyTypeStrs);
   }
 
-  public static CertprofileInfoResponse decode(byte[] encoded)
-      throws CodecException {
+  public static CertprofileInfoResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CertprofileInfoResponse", decoder, 3);
 
@@ -80,10 +78,9 @@ public class CertprofileInfoResponse extends SdkResponse {
       }
 
       return new CertprofileInfoResponse(requiredTypes, optionalTypes,
-          keyTypes.toArray(new KeySpec[0]));
+                keyTypes.toArray(new KeySpec[0]));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CertprofileInfoResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CertprofileInfoResponse.class), ex);
     }
   }
 

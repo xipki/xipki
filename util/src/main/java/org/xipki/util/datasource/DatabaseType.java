@@ -79,8 +79,7 @@ public enum DatabaseType {
       return DatabaseType.MARIADB;
     } else if (className.contains("oracle.")) {
       return DatabaseType.ORACLE;
-    } else if (className.contains("postgres.")
-        || className.contains("postgresql.")) {
+    } else if (className.contains("postgres.") || className.contains("postgresql.")) {
       return DatabaseType.POSTGRES;
     } else {
       return DatabaseType.UNKNOWN;

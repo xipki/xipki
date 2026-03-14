@@ -33,8 +33,7 @@ public class HASH_SIGN_ADDITIONAL_CONTEXT extends CkParams {
 
   private final long hash;
 
-  public HASH_SIGN_ADDITIONAL_CONTEXT(
-      long hedgeVariant, byte[] context, long hash) {
+  public HASH_SIGN_ADDITIONAL_CONTEXT(long hedgeVariant, byte[] context, long hash) {
     this.hedgeVariant = hedgeVariant;
     this.context = context;
     this.hash = hash;
@@ -78,8 +77,7 @@ public class HASH_SIGN_ADDITIONAL_CONTEXT extends CkParams {
         "pContext", context, "hash", PKCS11T.ckmCodeToName(hash));
   }
 
-  public static HASH_SIGN_ADDITIONAL_CONTEXT decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static HASH_SIGN_ADDITIONAL_CONTEXT decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.HASH_SIGN_ADDITIONAL_CONTEXT);
     return new HASH_SIGN_ADDITIONAL_CONTEXT(readLong(arch, encoded, off),

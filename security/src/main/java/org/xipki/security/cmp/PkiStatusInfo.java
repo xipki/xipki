@@ -3,7 +3,9 @@
 
 package org.xipki.security.cmp;
 
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 
 /**
@@ -31,16 +33,18 @@ public class PkiStatusInfo {
     this.statusMessage = null;
   }
 
-  public PkiStatusInfo(
-      org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
-    this.status = Args.notNull(bcPkiStatusInfo, "bcPkiStatusInfo")
-        .getStatus().intValue();
+  public PkiStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPkiStatusInfo) {
+    this.status = Args.notNull(bcPkiStatusInfo, "bcPkiStatusInfo").getStatus().intValue();
     this.pkiFailureInfo = (bcPkiStatusInfo.getFailInfo() == null) ? 0
-        : bcPkiStatusInfo.getFailInfo().intValue();
+                            : bcPkiStatusInfo.getFailInfo().intValue();
 
     PKIFreeText text = bcPkiStatusInfo.getStatusString();
-    this.statusMessage = (text == null) ? null
-        : text.getStringAtUTF8(0).getString();
+    if (text == null) {
+      this.statusMessage = null;
+    } else {
+      this.statusMessage = Asn1Util.getUTF8String(
+          ASN1Sequence.getInstance(text.toASN1Primitive()).getObjectAt(0));
+    }
   }
 
   public int status() {

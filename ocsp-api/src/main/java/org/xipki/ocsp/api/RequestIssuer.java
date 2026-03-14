@@ -53,13 +53,11 @@ public class RequestIssuer {
     this(data, 0, data.length);
   } // constructor
 
-  public RequestIssuer(byte[] data, int from, int length)
-      throws NoSuchAlgorithmException {
+  public RequestIssuer(byte[] data, int from, int length) throws NoSuchAlgorithmException {
     this.data = data;
     this.from = from;
     this.length = length;
-    this.hashAlgo = HashAlgo.getInstanceForEncoded(data, from + 2,
-        2 + data[from + 3]);
+    this.hashAlgo = HashAlgo.getInstanceForEncoded(data, from + 2, 2 + data[from + 3]);
 
     int hashAlgoFieldLen = 0xFF & data[from + 1];
     this.nameHashFrom = from + 2 + hashAlgoFieldLen;
@@ -79,8 +77,7 @@ public class RequestIssuer {
       return hashAlgo.oid().getId();
     } else {
       final int start = from + 2;
-      byte[] bytes = Arrays.copyOfRange(data, start,
-          start + 2 + (0xFF & data[from + 3]));
+      byte[] bytes = Arrays.copyOfRange(data, start, start + 2 + (0xFF & data[from + 3]));
       return ASN1ObjectIdentifier.getInstance(bytes).getId();
     }
   }
@@ -121,8 +118,7 @@ public class RequestIssuer {
 
     RequestIssuer other = (RequestIssuer) obj;
     return (this.length == other.length)
-        && CompareUtil.areEqual(this.data, this.from,
-            other.data, other.from, this.length);
+        && CompareUtil.areEqual(this.data, this.from, other.data, other.from, this.length);
   }
 
   @Override

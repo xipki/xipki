@@ -14,16 +14,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class CertificatePolicyID extends AbstractID {
 
-  private static final Map<String, CertificatePolicyID> typeMap =
-      new HashMap<>();
+  private static final Map<String, CertificatePolicyID> typeMap = new HashMap<>();
 
   // 2.5.29.32.0, Any Policy
-  public static final CertificatePolicyID any =
-      initOf("2.5.29.32.0", "any");
+  public static final CertificatePolicyID any = initOf("2.5.29.32.0", "any");
 
   // 2.23.140.1.2.1, Domain Validation (DV)
   public static final CertificatePolicyID domainValidated =
@@ -78,8 +78,7 @@ public class CertificatePolicyID extends AbstractID {
       l.addAll(Arrays.asList(aliases));
     }
     l.add(oid);
-    return addToMap(new CertificatePolicyID(new ASN1ObjectIdentifier(oid), l),
-        typeMap);
+    return addToMap(new CertificatePolicyID(new ASN1ObjectIdentifier(oid), l), typeMap);
   }
 
   public static CertificatePolicyID ofOid(ASN1ObjectIdentifier oid) {
@@ -101,8 +100,7 @@ public class CertificatePolicyID extends AbstractID {
 
     try {
       ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(c14n);
-      return new CertificatePolicyID(oid,
-          Collections.singletonList(oid.getId()));
+      return new CertificatePolicyID(oid, Collections.singletonList(oid.getId()));
     } catch (RuntimeException e) {
       return null;
     }

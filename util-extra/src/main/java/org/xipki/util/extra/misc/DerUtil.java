@@ -2,6 +2,8 @@
 // License Apache License 2.0
 package org.xipki.util.extra.misc;
 
+import org.xipki.util.io.IoUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -72,12 +74,7 @@ public class DerUtil {
   public static byte[] encodeDerBytes(byte tag, byte[] data) {
     int len = data.length;
     byte[] lenBytes = encodeLength(len);
-
-    byte[] bytes = new byte[1 + lenBytes.length + len];
-    bytes[0] = tag;
-    System.arraycopy(lenBytes, 0, bytes, 1, lenBytes.length);
-    System.arraycopy(data, 0, bytes, 1 + lenBytes.length, len);
-    return bytes;
+    return IoUtil.concatenate(new byte[]{tag}, lenBytes, data);
   }
 
   public static byte[] encodeLength(int len) {
@@ -88,8 +85,7 @@ public class DerUtil {
     } else if (len < 0xFFFF) {
       return new byte[] {(byte) 0x82, (byte) (len >> 8), (byte) len};
     } else if (len < 0xFFFFFF) {
-      return new byte[] {(byte) 0x83, (byte) (len >> 16),
-          (byte) (len >> 8), (byte) len};
+      return new byte[] {(byte) 0x83, (byte) (len >> 16), (byte) (len >> 8), (byte) len};
     } else if (len < 0x7FFFFFFF) {
       return new byte[] {(byte) 0x84, (byte) (len >> 24),
           (byte) (len >> 16), (byte) (len >> 8), (byte) len};
@@ -110,11 +106,9 @@ public class DerUtil {
     int len = ((b & 0x80) == 0) ? b
         : (b == 0x81) ?  0xFF & bytes[ofs++]
         : (b == 0x82) ? (0xFF & bytes[ofs++]) <<  8 | (0xFF & bytes[ofs++])
-        : (b == 0x83) ? (0xFF & bytes[ofs++]) << 16
-                       | 0xFF & (0xFF & bytes[ofs++]) << 8
-                       | (0xFF & bytes[ofs++])
-        : (b == 0x84) ? (0xFF & bytes[ofs++]) << 24
-                      | (0xFF & bytes[ofs++]) << 16
+        : (b == 0x83) ? (0xFF & bytes[ofs++]) << 16 | 0xFF & (0xFF & bytes[ofs++]) << 8
+                      | (0xFF & bytes[ofs++])
+        : (b == 0x84) ? (0xFF & bytes[ofs++]) << 24 | (0xFF & bytes[ofs++]) << 16
         | 0xFF & (0xFF & bytes[ofs++]) << 8 | (0xFF & bytes[ofs++])
         : -1;
     if (len == -1) {
@@ -134,8 +128,7 @@ public class DerUtil {
    * @param ofs the offset
    * @return array with two elements a and b as byte[].
    */
-  public static byte[][] readTwoBigIntBytes(
-      byte[] encoded, int ofs, int endOffset)
+  public static byte[][] readTwoBigIntBytes(byte[] encoded, int ofs, int endOffset)
       throws IOException {
     AtomicInteger numLenBytes = new AtomicInteger();
 
@@ -189,8 +182,7 @@ public class DerUtil {
     byte[] oidBytes = new byte[1 + lenBytes.length + rawOidBytes.length];
     oidBytes[0] = 0x06;
     System.arraycopy(lenBytes, 0, oidBytes, 1, lenBytes.length);
-    System.arraycopy(rawOidBytes, 0,
-        oidBytes, 1 + lenBytes.length, rawOidBytes.length);
+    System.arraycopy(rawOidBytes, 0, oidBytes, 1 + lenBytes.length, rawOidBytes.length);
     return oidBytes;
   }
 
@@ -261,8 +253,7 @@ public class DerUtil {
       throw new IllegalArgumentException("invalid OID bytes");
     }
 
-    return decodeRawOid(Arrays.copyOfRange(
-        encoded, encoded.length - len, encoded.length));
+    return decodeRawOid(Arrays.copyOfRange(encoded, encoded.length - len, encoded.length));
   }
 
   public static String decodeRawOid(byte[] encoded) {
@@ -293,8 +284,7 @@ public class DerUtil {
   /*
    * returns the new offset.
    */
-  private static int readOidNode(
-      StringBuilder sb, byte[] values, int off, boolean start) {
+  private static int readOidNode(StringBuilder sb, byte[] values, int off, boolean start) {
     int nodeValue = 0;
     while (true) {
       int v = 0xff & values[off++];

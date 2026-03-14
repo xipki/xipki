@@ -27,9 +27,8 @@ public class CaIdentifierRequest extends SdkRequest{
 
   private final byte[] authorityKeyIdentifier;
 
-  protected CaIdentifierRequest(
-      byte[] issuerCertSha1Fp, X500NameType issuer,
-      byte[] authorityKeyIdentifier) {
+  protected CaIdentifierRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
+                                byte[] authorityKeyIdentifier) {
     this.issuerCertSha1Fp = issuerCertSha1Fp;
     this.issuer = issuer;
     this.authorityKeyIdentifier = authorityKeyIdentifier;
@@ -62,13 +61,11 @@ public class CaIdentifierRequest extends SdkRequest{
     }
 
     if (issuerCertSha1Fp != null) {
-      sb.append("SHA1(cert)=").append(Hex.toHexString(issuerCertSha1Fp))
-          .append(",");
+      sb.append("SHA1(cert)=").append(Hex.toHexString(issuerCertSha1Fp)).append(",");
     }
 
     if (authorityKeyIdentifier != null) {
-      sb.append("AKI=").append(Hex.toHexString(authorityKeyIdentifier))
-          .append(",");
+      sb.append("AKI=").append(Hex.toHexString(authorityKeyIdentifier)).append(",");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append(")");
@@ -81,23 +78,18 @@ public class CaIdentifierRequest extends SdkRequest{
     encode0(encoder, 0);
   }
 
-  protected void encode0(CborEncoder encoder, int subClassFieldSize)
-      throws CodecException {
-    encoder.writeArrayStart(3 + subClassFieldSize)
-        .writeByteString(issuerCertSha1Fp)
+  protected void encode0(CborEncoder encoder, int subClassFieldSize) throws CodecException {
+    encoder.writeArrayStart(3 + subClassFieldSize).writeByteString(issuerCertSha1Fp)
         .writeObject(issuer).writeByteString(authorityKeyIdentifier);
   }
 
-  public static CaIdentifierRequest decode(byte[] encoded)
-      throws CodecException {
+  public static CaIdentifierRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("CaIdentifierRequest", decoder, 3);
       return new CaIdentifierRequest(
-          decoder.readByteString(), X500NameType.decode(decoder),
-          decoder.readByteString());
+          decoder.readByteString(), X500NameType.decode(decoder), decoder.readByteString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CaIdentifierRequest.class), ex);
     }
   }
 

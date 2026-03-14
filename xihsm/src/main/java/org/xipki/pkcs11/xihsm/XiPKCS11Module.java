@@ -3,7 +3,6 @@
 
 package org.xipki.pkcs11.xihsm;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.Category;
@@ -25,22 +24,23 @@ import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.StorageMode;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.misc.StringUtil;
 
-import java.security.Security;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiPKCS11Module {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(XiPKCS11Module.class);
+  private static final Logger LOG = LoggerFactory.getLogger(XiPKCS11Module.class);
 
   private static final CkVersion V3_0 = new CkVersion((byte) 3, (byte) 0);
   private static final CkVersion V3_2 = new CkVersion((byte) 3, (byte) 2);
@@ -56,10 +56,7 @@ public class XiPKCS11Module {
   private XiHsmVendor vendor;
 
   static {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
-    }
-
+    KeyUtil.addProviders();
     String version = StringUtil.getBundleVersion(XiPKCS11Module.class);
     LOG.info("xihsm version {}", version);
   }
@@ -106,9 +103,8 @@ public class XiPKCS11Module {
       throw new PKCS11Exception(CKR_DEVICE_ERROR);
     }
 
-    info = new CkInfo(vendor.getCryptokiVersion(),
-        vendor.getManufactureID(), 0, vendor.getLibraryDescription(),
-        vendor.getLibraryVersion());
+    info = new CkInfo(vendor.getCryptokiVersion(), vendor.getManufactureID(), 0,
+        vendor.getLibraryDescription(), vendor.getLibraryVersion());
 
     try {
       this.backend = new Backend(vendor, storageMode, confPairs);
@@ -132,8 +128,7 @@ public class XiPKCS11Module {
     return e.toPKCS11Exception();
   }
 
-  public void C_Initialize(long flags)
-      throws PKCS11Exception {
+  public void C_Initialize(long flags) throws PKCS11Exception {
     synchronized (initialized) {
       if (initialized.get()) {
         throw new PKCS11Exception(CKR_CRYPTOKI_ALREADY_INITIALIZED);
@@ -175,13 +170,11 @@ public class XiPKCS11Module {
     return backend.C_GetMechanismList(slotID);
   }
 
-  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type)
-      throws PKCS11Exception {
+  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type) throws PKCS11Exception {
     return backend.C_GetMechanismInfo(slotID, type);
   }
 
-  public long C_OpenSession(long slotID, long flags)
-      throws PKCS11Exception {
+  public long C_OpenSession(long slotID, long flags) throws PKCS11Exception {
     assertInitialized();
     return backend.C_OpenSession(slotID, flags);
   }
@@ -195,8 +188,7 @@ public class XiPKCS11Module {
     backend.C_CloseAllSessions(slotID);
   }
 
-  public CkSessionInfo C_GetSessionInfo(long hSession)
-      throws PKCS11Exception {
+  public CkSessionInfo C_GetSessionInfo(long hSession) throws PKCS11Exception {
     try {
       return session(hSession).C_GetSessionInfo();
     } catch (HsmException e) {
@@ -204,8 +196,7 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_SessionCancel(long hSession, long flags)
-      throws PKCS11Exception {
+  public void C_SessionCancel(long hSession, long flags) throws PKCS11Exception {
     try {
       vendor.assertCryptokiVersionSupported(V3_0);
       session(hSession).C_SessionCancel(flags);
@@ -214,8 +205,7 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_Login(long hSession, long userType, byte[] pin)
-      throws PKCS11Exception {
+  public void C_Login(long hSession, long userType, byte[] pin) throws PKCS11Exception {
     try {
       XiSession session = session(hSession);
       session.C_Login(userType, pin);
@@ -233,11 +223,9 @@ public class XiPKCS11Module {
     }
   }
 
-  public long C_CreateObject(long hSession, Template template)
-      throws PKCS11Exception {
+  public long C_CreateObject(long hSession, Template template) throws PKCS11Exception {
     try {
-      XiTemplate attrs = vendorToGenericCka2(
-          FunctionEnum.CREATE_OBJECT, template, null);
+      XiTemplate attrs = vendorToGenericCka2(FunctionEnum.CREATE_OBJECT, template, null);
       long objClass = attrs.getNonNullLong(CKA_CLASS);
 
       if (objClass == CKO_PRIVATE_KEY) {
@@ -256,8 +244,7 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_DestroyObject(long hSession, long hObject)
-      throws PKCS11Exception {
+  public void C_DestroyObject(long hSession, long hObject) throws PKCS11Exception {
     try {
       session(hSession).C_DestroyObject(hObject);
     } catch (HsmException e) {
@@ -265,12 +252,10 @@ public class XiPKCS11Module {
     }
   }
 
-  public Template C_GetAttributeValue(
-      long hSession, long hObject, long[] attrTypes)
+  public Template C_GetAttributeValue(long hSession, long hObject, long[] attrTypes)
       throws PKCS11Exception {
     try {
-      Template template = session(hSession).C_GetAttributeValue(
-          hObject, attrTypes);
+      Template template = session(hSession).C_GetAttributeValue(hObject, attrTypes);
       genericToVendorCka(template);
       return template;
     } catch (HsmException e) {
@@ -278,8 +263,7 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_SetAttributeValue(long hSession, long hObject,
-                                  Template template)
+  public void C_SetAttributeValue(long hSession, long hObject, Template template)
       throws PKCS11Exception {
     try {
       XiTemplate template2 = vendorToGenericCka2(
@@ -290,19 +274,16 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_FindObjectsInit(long hSession, Template template)
-      throws PKCS11Exception {
+  public void C_FindObjectsInit(long hSession, Template template) throws PKCS11Exception {
     try {
       vendorToGenericCka(template, true);
-      session(hSession)
-          .C_FindObjectsInit(XiTemplate.fromCkAttributes(template));
+      session(hSession).C_FindObjectsInit(XiTemplate.fromCkAttributes(template));
     } catch (HsmException e) {
       throw logAndGet("C_FindObjectsInit", e);
     }
   }
 
-  public long[] C_FindObjects(long hSession, int maxObjectCount)
-      throws PKCS11Exception {
+  public long[] C_FindObjects(long hSession, int maxObjectCount) throws PKCS11Exception {
     try {
       return session(hSession).C_FindObjects(maxObjectCount);
     } catch (HsmException e) {
@@ -318,53 +299,49 @@ public class XiPKCS11Module {
     }
   }
 
-  public void C_DigestInit(long hSession, CkMechanism mechanism)
+  public byte[] C_DigestX(
+      long hSession, CkMechanism mechanism, byte[] prefix, long hKey, byte[] suffix)
       throws PKCS11Exception {
     try {
       XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_DIGEST);
-      session(hSession).C_DigestInit(xiMech);
+      return session(hSession).C_DigestKeyX(xiMech, prefix, hKey, suffix);
     } catch (HsmException e) {
-      throw logAndGet("C_DigestInit", e);
+      throw logAndGet("C_DigestKeyX", e);
     }
   }
 
-  public byte[] C_Digest(long hSession, byte[] data) throws PKCS11Exception {
-    try {
-      vendor.assertFrameSize(data.length);
-      return session(hSession).C_Digest(data);
-    } catch (HsmException e) {
-      throw logAndGet("C_Digest", e);
-    }
-  }
-
-  public void C_DigestUpdate(long hSession, byte[] part)
+  public byte[] C_SignX(long hSession, CkMechanism mechanism, long hKey, byte[] data)
       throws PKCS11Exception {
     try {
-      vendor.assertFrameSize(part.length);
-      session(hSession).C_DigestUpdate(part);
+      XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_SIGN);
+      return session(hSession).C_SignX(xiMech, hKey, data);
     } catch (HsmException e) {
-      throw logAndGet("C_DigestUpdate", e);
+      throw logAndGet("C_SignX", e);
     }
   }
 
-  public void C_DigestKey(long hSession, long hKey) throws PKCS11Exception {
-    try {
-      session(hSession).C_DigestKey(hKey);
-    } catch (HsmException e) {
-      throw logAndGet("C_DigestKey", e);
-    }
-  }
-
-  public byte[] C_DigestFinal(long hSession) throws PKCS11Exception {
-    try {
-      return session(hSession).C_DigestFinal();
-    } catch (HsmException e) {
-      throw logAndGet("C_DigestFinal", e);
-    }
-  }
-
-  public void C_SignInit(long hSession, CkMechanism mechanism, long hKey)
+  public byte[] C_DecryptX(long hSession, CkMechanism mechanism, long hKey, byte[] cipherText)
       throws PKCS11Exception {
+    try {
+      XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_DECRYPT);
+      return session(hSession).C_DecryptX(xiMech, hKey, cipherText);
+    } catch (HsmException e) {
+      throw logAndGet("C_DecryptX", e);
+    }
+  }
+
+  public long C_DeriveKey(long hSession, CkMechanism mechanism, long hBaseKey, Template template)
+      throws PKCS11Exception {
+    try {
+      XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_DERIVE);
+      XiTemplate template2 = vendorToGenericCka2(FunctionEnum.DERIVE_KEY, template, null);
+      return session(hSession).C_DeriveKey(xiMech, hBaseKey, template2);
+    } catch (HsmException e) {
+      throw logAndGet("C_DeriveKey", e);
+    }
+  }
+
+  public void C_SignInit(long hSession, CkMechanism mechanism, long hKey) throws PKCS11Exception {
     try {
       XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_SIGN);
       session(hSession).C_SignInit(xiMech, hKey);
@@ -372,16 +349,6 @@ public class XiPKCS11Module {
       throw logAndGet("C_SignInit", e);
     }
   }
-
-  public byte[] C_Sign(long hSession, byte[] data)
-      throws PKCS11Exception {
-    try {
-      vendor.assertFrameSize(data.length);
-      return session(hSession).C_Sign(data);
-    } catch (HsmException e) {
-      throw logAndGet("C_Sign", e);
-    }
-}
 
   public void C_SignUpdate(long hSession, byte[] part) throws PKCS11Exception {
     try {
@@ -411,15 +378,13 @@ public class XiPKCS11Module {
       XiTemplate pubTemplate = vendorToGenericCka2(
           FunctionEnum.GENERATE_KEY_PAIR, publicKeyTemplate,  CKO_PUBLIC_KEY);
 
-      return session(hSession)
-          .C_GenerateKeyPair(xiMech, pubTemplate, priTemplate);
+      return session(hSession).C_GenerateKeyPair(xiMech, pubTemplate, priTemplate);
     } catch (HsmException e) {
       throw logAndGet("C_GenerateKeyPair", e);
     }
   }
 
-  public long C_GenerateKey(long hSession, CkMechanism mechanism,
-                            Template template)
+  public long C_GenerateKey(long hSession, CkMechanism mechanism, Template template)
       throws PKCS11Exception {
     try {
       XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_GENERATE);
@@ -436,37 +401,32 @@ public class XiPKCS11Module {
     return backend.getSession(hSession);
   }
 
-  public void C_LoginUser(long hSession, long userType, byte[] pin,
-                          byte[] username)
+  public void C_LoginUser(long hSession, long userType, byte[] pin, byte[] username)
       throws PKCS11Exception {
     throw new PKCS11Exception(CKR_FUNCTION_NOT_SUPPORTED);
   }
 
-  public long C_CopyObject(
-      long hSession, long hObject, Template template)
+  public long C_CopyObject(long hSession, long hObject, Template template)
       throws PKCS11Exception {
     throw new PKCS11Exception(CKR_FUNCTION_NOT_SUPPORTED);
   }
 
   public long C_DecapsulateKey(
-      long hSession, CkMechanism mechanism, long hPrivateKey,
-      byte[] cipherText, Template template)
+      long hSession, CkMechanism mechanism, long hPrivateKey, byte[] cipherText, Template template)
       throws PKCS11Exception {
     try {
       vendor.assertCryptokiVersionSupported(V3_2);
-      XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_ENCAPSULATE);
+      XiMechanism xiMech = vendorToGenericCkm(mechanism, CKF_DECAPSULATE);
       XiTemplate template2 = vendorToGenericCka2(
           FunctionEnum.ENCAPSULATE_KEY, template, null);
 
-      return session(hSession).C_DecapsulateKey(xiMech, hPrivateKey,
-          cipherText, template2);
+      return session(hSession).C_DecapsulateKey(xiMech, hPrivateKey, cipherText, template2);
     } catch (HsmException e) {
       throw logAndGet("C_GenerateRandom", e);
     }
   }
 
-  private XiMechanism vendorToGenericCkm(CkMechanism mechanism, long flagBit)
-      throws HsmException {
+  private XiMechanism vendorToGenericCkm(CkMechanism mechanism, long flagBit) throws HsmException {
     long ckm = mechanism.getMechanism();
     vendor.assertCkmSupported(ckm, flagBit);
 
@@ -484,8 +444,7 @@ public class XiPKCS11Module {
   }
 
   private XiTemplate vendorToGenericCka2(
-      FunctionEnum functionEnum, Template ckAttrs, Long objClass)
-      throws HsmException {
+      FunctionEnum functionEnum, Template ckAttrs, Long objClass) throws HsmException {
     vendorToGenericCka(ckAttrs, false);
     XiTemplate attrs = XiTemplate.fromCkAttributes(ckAttrs);
 
@@ -540,16 +499,13 @@ public class XiPKCS11Module {
 
     boolean needEcPoint = false;
     if (keyType == CKK_EC) {
-      needEcPoint = vendor.hasSpecialBehaviour(
-          SpecialBehaviour.EC_PRIVATEKEY_ECPOINT);
+      needEcPoint = vendor.hasSpecialBehaviour(SpecialBehaviour.EC_PRIVATEKEY_ECPOINT);
     } else if (keyType == CKK_VENDOR_SM2) {
-      needEcPoint = vendor.hasSpecialBehaviour(
-          SpecialBehaviour.SM2_PRIVATEKEY_ECPOINT);
+      needEcPoint = vendor.hasSpecialBehaviour(SpecialBehaviour.SM2_PRIVATEKEY_ECPOINT);
     }
 
     if (needEcPoint) {
-      throw new HsmException(CKR_TEMPLATE_INCOMPLETE,
-          "CKA_EC_POINT is not present");
+      throw new HsmException(CKR_TEMPLATE_INCOMPLETE, "CKA_EC_POINT is not present");
     }
   }
 

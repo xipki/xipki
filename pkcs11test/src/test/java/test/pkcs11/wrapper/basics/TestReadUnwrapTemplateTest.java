@@ -88,11 +88,9 @@ public class TestReadUnwrapTemplateTest {
       PKCS11SecretKeySpec template = newSecretKey(PKCS11T.CKK_AES)
           .valueLen(32)
           .unwrapTemplate(
-              new PKCS11TemplateSpec()
-                  .sensitive(true).wrapWithTrusted(true).sign(false))
+              new PKCS11TemplateSpec().sensitive(true).wrapWithTrusted(true).sign(false))
           .wrapTemplate(
-              new PKCS11TemplateSpec()
-                  .keyType(PKCS11T.CKK_AES).wrapWithTrusted(true));
+              new PKCS11TemplateSpec().keyType(PKCS11T.CKK_AES).wrapWithTrusted(true));
 
       System.out.println("Template before generation\n" + template);
       PKCS11KeyId keyId = token.generateKey(template);

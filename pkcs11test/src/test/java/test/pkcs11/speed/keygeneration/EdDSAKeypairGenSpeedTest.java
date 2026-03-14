@@ -49,8 +49,7 @@ public class EdDSAKeypairGenSpeedTest extends TestBase {
   public void execTest() throws PKCS11Exception {
     PKCS11Token token = getToken();
 
-    Assume.assumeTrue(ckmCodeToName(mechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(mechanism) + " is not supported, skip test",
         token.supportsMechanism(mechanism, CKF_GENERATE_KEY_PAIR));
 
     boolean[] inTokens = new boolean[] {false, true};

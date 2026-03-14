@@ -44,15 +44,13 @@ public class Asn1DSAParams {
     return g;
   }
 
-  public static Asn1DSAParams getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1DSAParams getInstance(byte[] encoded) throws InvalidKeySpecException {
     try {
       byte[][] bns = Asn1Util.readBigInts(encoded, 3);
       int off = 1;
-    return new Asn1DSAParams(bns[off++], bns[off++], bns[off]);
+      return new Asn1DSAParams(bns[off++], bns[off++], bns[off]);
     } catch (CodecException e) {
-      throw new InvalidKeySpecException(
-          "invalid DSAParams: " + e.getMessage(), e);
+      throw new InvalidKeySpecException("invalid DSAParams: " + e.getMessage(), e);
     }
   }
 

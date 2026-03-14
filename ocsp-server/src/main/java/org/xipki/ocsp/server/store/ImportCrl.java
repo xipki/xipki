@@ -75,8 +75,7 @@ class ImportCrl {
     private long invalidityTime;
 
     boolean isDifferent(RevokedCert revokedCert, int crlId) {
-      return this.crlId != crlId
-          || !revoked
+      return this.crlId != crlId || !revoked
           || revocationReason != revokedCert.reason()
           || revocationTime != revokedCert.revocationDate()
           || invalidityTime != revokedCert.invalidityDate();
@@ -108,9 +107,8 @@ class ImportCrl {
 
     private final File crlFile;
 
-    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe,
-               boolean deleteMe, boolean crlDownloaded, File updatemeFile,
-               File crlFile) {
+    CrlDirInfo(int crlId, String crlName, File crlDir, boolean updateMe, boolean deleteMe,
+              boolean crlDownloaded, File updatemeFile, File crlFile) {
       this.crlId = crlId;
       this.crlName = crlName;
       this.crlDir = crlDir;
@@ -166,8 +164,7 @@ class ImportCrl {
 
   private static final String KEY_CA_INVALIDITY_TIME = "ca.invalidity.time";
 
-  private static final String SQL_UPDATE_CRL_INFO =
-      "UPDATE CRL_INFO SET INFO=? WHERE ID=?";
+  private static final String SQL_UPDATE_CRL_INFO = "UPDATE CRL_INFO SET INFO=? WHERE ID=?";
 
   private static final String SQL_INSERT_CRL_INFO =
       SqlUtil.buildInsertSql("CRL_INFO", "ID,NAME,INFO");
@@ -176,18 +173,14 @@ class ImportCrl {
       = "UPDATE CERT SET REV=?,RR=?,RT=?,RIT=?,LUPDATE=?,CRL_ID=? WHERE ID=?";
 
   private static final String SQL_INSERT_CERT_REV =
-      SqlUtil.buildInsertSql("CERT",
-          "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,CRL_ID");
+      SqlUtil.buildInsertSql("CERT", "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,CRL_ID");
 
-  private static final String SQL_DELETE_CERT =
-      "DELETE FROM CERT WHERE IID=? AND SN=?";
+  private static final String SQL_DELETE_CERT = "DELETE FROM CERT WHERE IID=? AND SN=?";
 
-  private static final String SQL_UPDATE_CERT_LUPDATE =
-      "UPDATE CERT SET LUPDATE=? WHERE ID=?";
+  private static final String SQL_UPDATE_CERT_LUPDATE = "UPDATE CERT SET LUPDATE=? WHERE ID=?";
 
   private static final String SQL_UPDATE_CERT
-      = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,CRL_ID=?,HASH=? " +
-      "WHERE ID=?";
+      = "UPDATE CERT SET LUPDATE=?,NBEFORE=?,NAFTER=?,CRL_ID=?,HASH=? WHERE ID=?";
 
   private static final String SQL_INSERT_CERT = SqlUtil.buildInsertSql("CERT",
       "ID,IID,SN,REV,RR,RT,RIT,LUPDATE,NBEFORE,NAFTER,CRL_ID,HASH");
@@ -224,15 +217,14 @@ class ImportCrl {
   private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
   public ImportCrl(DataSourceWrapper datasource, String basedir,
-                   int sqlBatchCommit, boolean ignoreExpiredCrls)
+                  int sqlBatchCommit, boolean ignoreExpiredCrls)
       throws DataAccessException, NoSuchAlgorithmException {
     this.sqlBatchCommit = Args.min(sqlBatchCommit, "sqlBatchCommit", 1);
     this.ignoreExpiredCrls = ignoreExpiredCrls;
     this.datasource = Args.notNull(datasource, "datasource");
     this.basedir = Args.notNull(basedir, "basedir");
     this.certhashAlgo = DbCertStatusStore.getCertHashAlgo(datasource);
-    this.sqlSelectIdCert = datasource.buildSelectFirstSql(1,
-        CORE_SQL_SELECT_ID_CERT);
+    this.sqlSelectIdCert = datasource.buildSelectFirstSql(1, CORE_SQL_SELECT_ID_CERT);
   }
 
   public boolean importCrlToOcspDb() {
@@ -272,8 +264,7 @@ class ImportCrl {
 
       boolean crlDownloaded = new File(crlDir, "crl.download").exists();
       File generatedDir = new File(crlDir, ".generated");
-      File updatemeFile = new File(crlDownloaded ? generatedDir : crlDir,
-          "UPDATEME");
+      File updatemeFile = new File(crlDownloaded ? generatedDir : crlDir, "UPDATEME");
       File crlFile = crlDownloaded ? new File(generatedDir, "new-ca.crl")
           : new File(crlDir, "ca.crl");
 
@@ -284,8 +275,7 @@ class ImportCrl {
 
       File caCertFile = new File(crlDir, "ca.crt");
       if (!caCertFile.exists()) {
-        LOG.error("CA certificate file {} does not exist",
-            caCertFile.getPath());
+        LOG.error("CA certificate file {} does not exist", caCertFile.getPath());
         return false;
       }
 
@@ -310,8 +300,7 @@ class ImportCrl {
             invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
           }
 
-          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED,
-              revocationTime, invalidityTime);
+          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
         }
       }
 
@@ -349,8 +338,7 @@ class ImportCrl {
         // make sure that unrevoked CA to be updated has the file ca.crl.
         if (m.updateMe) {
           if (!(m.crlFile.exists() && m.crlFile.isFile())) {
-            LOG.error("{} has UPDATEME but no {}",
-                crlDir.getPath(), m.crlFile.getName());
+            LOG.error("{} has UPDATEME but no {}", crlDir.getPath(), m.crlFile.getName());
             return false;
           }
         }
@@ -384,8 +372,7 @@ class ImportCrl {
       psSelectIdCert  = datasource.prepareStatement(conn, sqlSelectIdCert);
       psUpdateCert    = datasource.prepareStatement(conn, SQL_UPDATE_CERT);
       psUpdateCertRev = datasource.prepareStatement(conn, SQL_UPDATE_CERT_REV);
-      psUpdateCertLastupdate = datasource.prepareStatement(conn,
-          SQL_UPDATE_CERT_LUPDATE);
+      psUpdateCertLastupdate = datasource.prepareStatement(conn, SQL_UPDATE_CERT_LUPDATE);
 
       for (CrlDirInfo crlDirInfo : crlDirInfos) {
         if (crlDirInfo.updateMe) {
@@ -451,16 +438,14 @@ class ImportCrl {
     CertWrapper caCert = null;
 
     try {
-      LOG.info("Importing CRL (id={}, name={}) in the folder {}",
-          id, crlName, crlDir.getPath());
+      LOG.info("Importing CRL (id={}, name={}) in the folder {}", id, crlName, crlDir.getPath());
 
       File caCertFile = new File(crlDir, "ca.crt");
       try {
         X509Cert cert = X509Util.parseCert(caCertFile);
         caCert = new CertWrapper(cert);
       } catch (CertificateException ex) {
-        LOG.error("could not parse CA certificate {}",
-            caCertFile.getPath(), ex);
+        LOG.error("could not parse CA certificate {}", caCertFile.getPath(), ex);
         return;
       }
 
@@ -516,33 +501,26 @@ class ImportCrl {
         ASN1EncodableVector vec = new ASN1EncodableVector();
         if (crlDirInfo.crlDownloded) {
           File crlDownloadFile = new File(basedir, "crl.download");
-          Properties props =
-              CrlDbCertStatusStore.loadProperties(crlDownloadFile);
+          Properties props = CrlDbCertStatusStore.loadProperties(crlDownloadFile);
           String crldp = props.getProperty("crldp");
           if (StringUtil.isNotBlank(crldp)) {
-            vec.add(new DERTaggedObject(true, 0,
-                new DERIA5String(crldp, true)));
+            vec.add(new DERTaggedObject(true, 0, new DERIA5String(crldp, true)));
           }
 
           if (urlFile.exists()) {
-            LOG.warn("use {} only, ignore {}", crlDownloadFile.getPath(),
-                urlFile.getPath());
+            LOG.warn("use {} only, ignore {}", crlDownloadFile.getPath(), urlFile.getPath());
           }
         } else {
           if (urlFile.exists()) {
-            String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile))
-                .trim();
+            String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
             if (StringUtil.isNotBlank(crlUrl)) {
-              vec.add(new DERTaggedObject(true, 0,
-                  new DERIA5String(crlUrl, true)));
+              vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
             }
           }
         }
 
-        vec.add(new DERTaggedObject(true, 1,
-            new ASN1Integer(crl.crlNumber())));
-        vec.add(new DERTaggedObject(true, 2,
-            new ASN1GeneralizedTime(Date.from(crl.thisUpdate()))));
+        vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.crlNumber())));
+        vec.add(new DERTaggedObject(true, 2, new ASN1GeneralizedTime(Date.from(crl.thisUpdate()))));
         CrlID crlId = CrlID.getInstance(new DERSequence(vec));
 
         BigInteger crlNumber = crl.crlNumber();
@@ -587,8 +565,7 @@ class ImportCrl {
           return;
         }
 
-        crlInfo = new CrlInfo(crlNumber, baseCrlNumber, crl.thisUpdate(),
-                    crl.nextUpdate(), crlId);
+        crlInfo = new CrlInfo(crlNumber, baseCrlNumber, crl.thisUpdate(), crl.nextUpdate(), crlId);
       }
 
       if (crlDirInfo.deleteMe) {
@@ -607,8 +584,7 @@ class ImportCrl {
             crlDirInfo.shareCaWithOtherCrl, caCert.base64Sha1Fp);
         commit(conn);
 
-        importCrlRevokedCertificates(conn, id, caCert, crl, crlDir,
-            startTimeSec);
+        importCrlRevokedCertificates(conn, id, caCert, crl, crlDir, startTimeSec);
         commit(conn);
 
         if (!crl.isDeltaCrl()) {
@@ -619,8 +595,7 @@ class ImportCrl {
 
       if (crlDirInfo.crlDownloded) {
         if (crlInfo == null) {
-          throw new IllegalStateException(
-              "should not reach here (crlInfo == null)");
+          throw new IllegalStateException("should not reach here (crlInfo == null)");
         }
 
         IoUtil.renameTo(crlDirInfo.crlFile, new File(generatedDir, "ca.crl"));
@@ -634,12 +609,10 @@ class ImportCrl {
         String info;
         if (hashInfo == null) {
           info = "crlnumber=" + crlNumber.toString()
-              + "\nnextupdate=" +
-                  DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.nextUpdate());
+              + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.nextUpdate());
         } else {
           info = "crlnumber=" + crlNumber.toString()
-              + "\nnextupdate=" +
-                  DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.nextUpdate())
+              + "\nnextupdate=" + DateUtil.toUtcTimeyyyyMMddhhmmss(crlInfo.nextUpdate())
               + "\nhash=" + hashInfo;
         }
         IoUtil.save(new File(generatedDir, "ca.crl.info"),
@@ -652,22 +625,19 @@ class ImportCrl {
       updateSucc = true;
       LOG.info("Imported CRL (id={}) in the folder {}", id, crlDir.getPath());
     } catch (Throwable th) {
-      LOG.error(String.format("Importing CRL (id=%s) in the folder %s FAILED",
-          id, crlDir.getPath()), th);
+      LOG.error("Importing CRL (id={}) in the folder {} FAILED", id, crlDir.getPath(), th);
     } finally {
       try {
         commit(conn);
       } catch (Throwable th) {
-        LOG.error(String.format(
-            "Importing CRL (id=%s) in the folder %s FAILED (Connect.commit)",
-            id, crlDir.getPath()), th);
+        LOG.error("Importing CRL (id={}) in the folder {} FAILED (Connect.commit)",
+            id, crlDir.getPath(), th);
       }
 
       crlDirInfo.updatemeFile.setLastModified(Instant.now().toEpochMilli());
       try {
         IoUtil.renameTo(crlDirInfo.updatemeFile,
-            new File(generatedDir,
-                "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
+            new File(generatedDir, "UPDATEME." + (updateSucc ? "SUCC" : "FAIL")));
       } catch (IOException ex) {
         LOG.error("error renaming file", ex);
       }
@@ -676,20 +646,16 @@ class ImportCrl {
         if (!crlDirInfo.shareCaWithOtherCrl && caCert.databaseId != null) {
           // try to delete the issuer if no certificate is associated with it
           try {
-            datasource.deleteFromTableWithException(conn, "ISSUER", "ID",
-                caCert.databaseId);
+            datasource.deleteFromTableWithException(conn, "ISSUER", "ID", caCert.databaseId);
           } catch (Throwable th) {
-            LOG.warn("error deleting from table ISSUER for ID {}",
-                caCert.databaseId);
+            LOG.warn("error deleting from table ISSUER for ID {}", caCert.databaseId);
           }
         }
       }
 
-      if (!updateSucc && crlDirInfo.crlDownloded
-          && crlDirInfo.crlFile.exists()) {
+      if (!updateSucc && crlDirInfo.crlDownloded && crlDirInfo.crlFile.exists()) {
         try {
-          IoUtil.renameTo(crlDirInfo.crlFile,
-              new File(generatedDir, "INVALID-new-ca.crl"));
+          IoUtil.renameTo(crlDirInfo.crlFile, new File(generatedDir, "INVALID-new-ca.crl"));
         } catch (IOException ex) {
           LOG.error("error renaming file", ex);
         }
@@ -705,8 +671,7 @@ class ImportCrl {
    * @throws DataAccessException
    *         If database exception occurs.
    */
-  private void deleteCa(Connection conn, CrlDirInfo crlDirInfo,
-                        CertWrapper caCert)
+  private void deleteCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
       throws DataAccessException {
     Integer issuerId = datasource.getFirstIntValue(conn, "ISSUER", "ID",
                         "S1C='" + caCert.base64Sha1Fp + "'");
@@ -731,8 +696,7 @@ class ImportCrl {
    * @throws DataAccessException
    *         If database exception occurs.
    */
-  private void importCa(Connection conn, CrlDirInfo crlDirInfo,
-                        CertWrapper caCert)
+  private void importCa(Connection conn, CrlDirInfo crlDirInfo, CertWrapper caCert)
       throws DataAccessException {
     CertRevocationInfo revInfo = crlDirInfo.revocationinfo;
 
@@ -852,8 +816,7 @@ class ImportCrl {
         // Since all entries in the database whose Last-Update is before
         // startTime will be deleted, we must ensure that the Last-Update is
         // not before startTime.
-        long updateTimeSec = Math.max(Instant.now().getEpochSecond(),
-            startTimeSec);
+        long updateTimeSec = Math.max(Instant.now().getEpochSecond(), startTimeSec);
 
         RevokedCert revCert = revokedCertList.next();
         BigInteger serial = revCert.serialNumber();
@@ -862,8 +825,7 @@ class ImportCrl {
         int reason = revCert.reason();
         X500Name issuer = revCert.certificateIssuer();
         if (issuer != null && !issuer.equals(caCert.subject)) {
-          throw new ImportCrlException(
-              "invalid CRLEntry for certificate number " + serial);
+          throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
         }
 
         String sql = null;
@@ -876,8 +838,7 @@ class ImportCrl {
               psDeleteCert.setString(2, serial.toString(16));
               psDeleteCert.executeUpdate();
             } else {
-              LOG.warn("ignore CRL entry with reason removeFromCRL in " +
-                  "non-Delta CRL");
+              LOG.warn("ignore CRL entry with reason removeFromCRL in non-Delta CRL");
             }
             continue;
           }
@@ -954,8 +915,7 @@ class ImportCrl {
     }
 
     if (!certsDir.isDirectory()) {
-      LOG.warn("the path {} does not point to a folder, ignore it",
-          certsDir.getPath());
+      LOG.warn("the path {} does not point to a folder, ignore it", certsDir.getPath());
       return;
     }
 
@@ -976,10 +936,8 @@ class ImportCrl {
         X509Cert cert;
         try {
           cert = X509Util.parseCert(certFile);
-        } catch (IllegalArgumentException | IOException
-                 | CertificateException ex) {
-          LOG.warn("could not parse certificate {}, ignore it",
-              certFile.getPath());
+        } catch (IllegalArgumentException | IOException | CertificateException ex) {
+          LOG.warn("could not parse certificate {}, ignore it", certFile.getPath());
           continue;
         }
 
@@ -1003,8 +961,7 @@ class ImportCrl {
       int num = 0;
       for (File serialNumbersFile : serialNumbersFiles) {
         num++;
-        try (BufferedReader reader = new BufferedReader(
-            new FileReader(serialNumbersFile))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(serialNumbersFile))) {
           String line;
           while ((line = reader.readLine()) != null) {
             BigInteger serialNumber = new BigInteger(line.trim(), 16);
@@ -1035,8 +992,7 @@ class ImportCrl {
     }
   } // method parseCert
 
-  private CertInfo getCertInfo(int caId, BigInteger serialNumber)
-      throws DataAccessException {
+  private CertInfo getCertInfo(int caId, BigInteger serialNumber) throws DataAccessException {
     ResultSet rs = null;
     try {
       psSelectIdCert.setInt(1, caId);
@@ -1063,14 +1019,13 @@ class ImportCrl {
   } // method getCertInfo
 
   private void addCertificate(
-      AtomicLong maxId, int crlInfoId, CertWrapper caCert, X509Cert cert,
-      String certLogId) throws DataAccessException {
+      AtomicLong maxId, int crlInfoId, CertWrapper caCert, X509Cert cert, String certLogId)
+      throws DataAccessException {
     int caId = caCert.databaseId;
 
     // not issued by the given issuer
     if (!caCert.subject.equals(cert.issuer())) {
-      LOG.warn("certificate {} is not issued by the given CA, ignore it",
-          certLogId);
+      LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
       return;
     }
 
@@ -1083,8 +1038,7 @@ class ImportCrl {
       byte[] aki = cert.authorityKeyId();
 
       if (aki == null || !Arrays.equals(caCert.subjectKeyIdentifier, aki)) {
-        LOG.warn("certificate {} is not issued by the given CA, ignore it",
-            certLogId);
+        LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
         return;
       }
     } // end if
@@ -1118,14 +1072,11 @@ class ImportCrl {
         // last update LUPDATE
         ps.setLong(offset++, Instant.now().getEpochSecond());
 
-        TBSCertificate tbsCert =
-            cert.toBcCert().toASN1Structure().getTBSCertificate();
+        TBSCertificate tbsCert = cert.getCertHolder().toASN1Structure().getTBSCertificate();
         // not before NBEFORE
-        ps.setLong(offset++,
-            tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
+        ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
         // not after NAFTER
-        ps.setLong(offset++,
-            tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
+        ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
         ps.setInt(offset++, crlInfoId);
 
         ps.setString(offset, b64CertHash);
@@ -1138,14 +1089,11 @@ class ImportCrl {
           // last update LUPDATE
           ps.setLong(offset++, Instant.now().getEpochSecond());
 
-          TBSCertificate tbsCert =
-              cert.toBcCert().toASN1Structure().getTBSCertificate();
+          TBSCertificate tbsCert = cert.getCertHolder().toASN1Structure().getTBSCertificate();
           // not before NBEFORE
-          ps.setLong(offset++,
-              tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
+          ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
           // not after NAFTER
-          ps.setLong(offset++,
-              tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
+          ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
           ps.setInt(offset++, crlInfoId);
 
           ps.setString(offset++, b64CertHash);
@@ -1239,12 +1187,10 @@ class ImportCrl {
     LOG.info(" Imported certificate by serial number {}", serialNumber);
   } // method addCertificateBySerialNumber
 
-  private void deleteEntriesNotUpdatedSince(
-      Connection conn, int crlInfoId, long timeSec)
+  private void deleteEntriesNotUpdatedSince(Connection conn, int crlInfoId, long timeSec)
       throws DataAccessException {
     // remove the unmodified entries
-    String sql = "DELETE FROM CERT WHERE CRL_ID=" + crlInfoId +
-        " AND LUPDATE<" + timeSec;
+    String sql = "DELETE FROM CERT WHERE CRL_ID=" + crlInfoId + " AND LUPDATE<" + timeSec;
     PreparedStatement stmt = datasource.prepareStatement(conn, sql);
     try {
       stmt.executeUpdate();

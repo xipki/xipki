@@ -28,8 +28,7 @@ import java.util.List;
  */
 public class CtLogPublicKeyFinder {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CtLogPublicKeyFinder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CtLogPublicKeyFinder.class);
 
   private final byte[][] logIds;
 
@@ -44,8 +43,8 @@ public class CtLogPublicKeyFinder {
       keydirName = IoUtil.expandFilepath(keydirName, true);
       keyFiles = new File(keydirName).listFiles(pathname -> {
         String name = pathname.getName();
-        return pathname.isFile()
-            && (name.endsWith(".pem") || name.endsWith(".der")
+        return pathname.isFile() &&
+            (name.endsWith(".pem") || name.endsWith(".der")
                 || name.endsWith(".key") || name.endsWith(".publickey"));
       });
     }
@@ -73,8 +72,7 @@ public class CtLogPublicKeyFinder {
         publicKeyList.add(key);
         LOG.info("loaded CtLog public key {}", m.getName());
       } catch (IOException | InvalidKeySpecException ex) {
-        LogUtil.error(LOG, ex,
-            "could not load CtLog public key " + m.getName());
+        LogUtil.error(LOG, ex, "could not load CtLog public key " + m.getName());
       }
     }
 

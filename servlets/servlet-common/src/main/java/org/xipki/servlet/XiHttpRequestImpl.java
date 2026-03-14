@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate;
 
 /**
  * HTTP request wrapper.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class XiHttpRequestImpl implements XiHttpRequest {
@@ -59,8 +59,7 @@ public class XiHttpRequestImpl implements XiHttpRequest {
 
   @Override
   public X509Certificate[] getCertificateChain() {
-    return (X509Certificate[]) req.getAttribute(
-        "jakarta.servlet.request.X509Certificate");
+    return (X509Certificate[]) req.getAttribute("jakarta.servlet.request.X509Certificate");
   }
 
   @Override

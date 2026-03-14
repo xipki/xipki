@@ -5,9 +5,8 @@ package org.xipki.security.asn1;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.x509.Time;
+import org.xipki.security.util.Asn1Util;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -36,20 +35,15 @@ public class Asn1StreamParser {
 
   } // class MyInt
 
-  public static final int TAG_CONSTRUCTED_SEQUENCE =
-      BERTags.CONSTRUCTED | BERTags.SEQUENCE;
+  public static final int TAG_CONSTRUCTED_SEQUENCE = BERTags.CONSTRUCTED | BERTags.SEQUENCE;
 
-  public static final int TAG_CONSTRUCTED_SET =
-      BERTags.CONSTRUCTED | BERTags.SET;
+  public static final int TAG_CONSTRUCTED_SET = BERTags.CONSTRUCTED | BERTags.SET;
 
-  public static byte[] readBlock(
-      BufferedInputStream instream, String name)
-      throws IOException {
+  public static byte[] readBlock(BufferedInputStream instream, String name) throws IOException {
     return readBlock(Integer.MAX_VALUE, instream, name);
   }
 
-  public static byte[] readBlock(
-      int expectedTag, BufferedInputStream instream, String name)
+  public static byte[] readBlock(int expectedTag, BufferedInputStream instream, String name)
       throws IOException {
     instream.mark(10);
     int tag = instream.read();
@@ -68,8 +62,7 @@ public class Asn1StreamParser {
     return bytes;
   }
 
-  public static byte[] readValue(
-      int expectedTag, BufferedInputStream instream, String name)
+  public static byte[] readValue(int expectedTag, BufferedInputStream instream, String name)
       throws IOException {
     instream.mark(10);
     int tag = instream.read();
@@ -97,8 +90,7 @@ public class Asn1StreamParser {
     return tag;
   }
 
-  public static int readLength(MyInt lenBytesSize, InputStream instream)
-      throws IOException {
+  public static int readLength(MyInt lenBytesSize, InputStream instream) throws IOException {
     // Length SEQUENCE of CertificateList
     int b = instream.read();
     if ((b & 0x80) == 0) {
@@ -126,8 +118,7 @@ public class Asn1StreamParser {
   public static void assertTag(int expectedTag, int tag, String name) {
     if (expectedTag != tag) {
       throw new IllegalArgumentException(String.format(
-          "invalid %s: tag is %d, but not expected %d",
-          name, tag, expectedTag));
+          "invalid %s: tag is %d, but not expected %d", name, tag, expectedTag));
     }
   }
 
@@ -138,28 +129,25 @@ public class Asn1StreamParser {
         : Time.getInstance(obj).getDate().toInstant();
   }
 
-  public static Instant readTime(
-      MyInt bytesLen, BufferedInputStream instream, String name)
+  public static Instant readTime(MyInt bytesLen, BufferedInputStream instream, String name)
       throws IOException {
     int tag = peekTag(instream);
     byte[] bytes = readBlock(instream, name);
     bytesLen.set(bytes.length);
     try {
       if (tag == BERTags.UTC_TIME) {
-        return DERUTCTime.getInstance(bytes).getDate().toInstant();
+        return Asn1Util.getUTCTime(bytes);
       } else if (tag == BERTags.GENERALIZED_TIME) {
-        return DERGeneralizedTime.getInstance(bytes).getDate().toInstant();
+        return Asn1Util.getGeneralizedTime(bytes);
       } else {
-        throw new IllegalArgumentException(
-            "invalid tag for " + name + ": " + tag);
+        throw new IllegalArgumentException("invalid tag for " + name + ": " + tag);
       }
     } catch (ParseException ex) {
       throw new IllegalArgumentException("error parsing time", ex);
     }
   } // method readTime
 
-  public static void skip(InputStream instream, long count)
-      throws IOException {
+  public static void skip(InputStream instream, long count) throws IOException {
     long remaining = count;
     while (remaining > 0) {
       remaining -= instream.skip(remaining);

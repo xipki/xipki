@@ -7,14 +7,16 @@ to one tomcat instance.
 Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ## Prepare Tomcat Configuration, Keys and certificates for the Communication between XiPKI Components
-1. (Optional) Only if you use existing Keys and Certificates
+1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL:
+   Download the JDBC driver to the folder `xipki-ca/tomcat/lib`.
+2. (Optional) Only if you use existing Keys and Certificates
    Copy the file `setup/keycerts.json` and folder `setup/keycerts` from old XiPKI folder to `setup`.
    Make sure the file `setup/keycerts.json` in the old XiPKI folder is the same as the new one.
-2. Adapt the file `setup/conf.json`
+3. Adapt the file `setup/conf.json`
    - all passwords shall be changed
    - organization, ca.name, ca.alias should be changed
    - others: changed if differs from your settings.
-3. Execute:  
+4. Execute:  
     `./prepare.sh`
 
 ## Install CA Server
@@ -87,8 +89,8 @@ is used. **Note that this step should be applied to all components (tomcat, xipk
 * Set the `reverseProxyMode` field in the json configuration file to `APACHE`:
     - CA: `xipki/etc/ca/ca.json`
     - CA Gateway
-        - CMP: `xipki/gatway/cmp-gateway.json`
-        - EST: `xipki/gatway/est-gateway.json`
+        - CMP:  `xipki/gatway/cmp-gateway.json`
+        - EST:  `xipki/gatway/est-gateway.json`
         - REST: `xipki/gatway/rest-gateway.json`
 
 * configure the proxy to forward the headers via mod_proxy with the following

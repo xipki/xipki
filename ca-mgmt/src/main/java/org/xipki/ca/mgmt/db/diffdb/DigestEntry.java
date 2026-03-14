@@ -32,9 +32,8 @@ class DigestEntry {
 
   private final String base64HashValue;
 
-  public DigestEntry(BigInteger serialNumber, boolean revoked,
-                     Integer revReason, Long revTime, Long revInvTime,
-                     String base64HashValue) {
+  public DigestEntry(BigInteger serialNumber, boolean revoked, Integer revReason,
+                    Long revTime, Long revInvTime, String base64HashValue) {
     this.base64HashValue = Args.notNull(base64HashValue, "base64HashValue");
     this.serialNumber = serialNumber;
     this.revoked = revoked;
@@ -83,20 +82,15 @@ class DigestEntry {
   private String encoded(boolean withSerialNumber) {
     return StringUtil.concatObjects(
         (withSerialNumber ? serialNumber.toString(16) + ";" : ""),
-        base64HashValue, ";",
-        (revoked ? "1" : "0"), ";",
-        (revReason != null ? revReason : ""), ";",
-        (revTime != null ? revTime : ""), ";",
+        base64HashValue, ";", (revoked ? "1" : "0"), ";",
+        (revReason != null ? revReason : ""), ";", (revTime != null ? revTime : ""), ";",
         (revInvTime != null ? revInvTime : ""));
   }
 
   public boolean contentEquals(DigestEntry obj) {
-    return obj != null
-        && serialNumber.equals(obj.serialNumber)
-        && (revoked == obj.revoked)
-        && equals(revReason,  obj.revReason)
-        && equals(revTime, obj.revTime)
-        && equals(revInvTime, obj.revInvTime)
+    return obj != null && serialNumber.equals(obj.serialNumber)
+        && (revoked == obj.revoked)     && equals(revReason,  obj.revReason)
+        && equals(revTime, obj.revTime) && equals(revInvTime, obj.revInvTime)
         && equals(base64HashValue, obj.base64HashValue);
   } // method contentEquals
 
@@ -131,8 +125,7 @@ class DigestEntry {
       }
     }
 
-    return new DigestEntry(serialNumber, revoked, revReason, revTime,
-        revInvTime, sha1Fp);
+    return new DigestEntry(serialNumber, revoked, revReason, revTime, revInvTime, sha1Fp);
   } // method decode
 
   private static List<Integer> getIndexes(String encoded) {

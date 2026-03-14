@@ -11,6 +11,9 @@
   <artifactId>ca-sdk</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>bundle</packaging>
+  <properties>
+    <Import-Package>org.bouncycastle.*;version="${bc.versions}",*</Import-Package>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

@@ -17,16 +17,13 @@ import java.util.Random;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 class PKCS11Session {
 
-  private enum OP {
-    DIGEST, SIGN
-  }
-
-  private static final Logger LOG =
-      LoggerFactory.getLogger(PKCS11Session.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PKCS11Session.class);
 
   private final Session session;
 
@@ -75,34 +72,27 @@ class PKCS11Session {
     return session.importObject(template);
   }
 
-  long importPrivateKey(
-      PrivateKeyChoice privateKey, PublicKeyChoice publicKey,
-      Template template)
+  long importPrivateKey(PrivateKeyChoice privateKey, PublicKeyChoice publicKey, Template template)
       throws InvalidKeySpecException, TokenException {
     return session.importPrivateKey(privateKey, publicKey, template);
   }
 
-  long importPublicKey(
-      PublicKeyChoice publicKey, Template template)
+  long importPublicKey(PublicKeyChoice publicKey, Template template)
       throws InvalidKeySpecException, TokenException {
     return session.importPublicKey(publicKey, template);
   }
 
   PKCS11KeyPair importKeyPair(
-      PrivateKeyChoice privateKey, PublicKeyChoice publicKey,
-      KeyPairTemplate template)
+      PrivateKeyChoice privateKey, PublicKeyChoice publicKey, KeyPairTemplate template)
       throws InvalidKeySpecException, TokenException {
     return session.importKeyPair(privateKey, publicKey, template);
   }
 
-  long copyObject(long hSourceObject, Template template)
-      throws TokenException {
+  long copyObject(long hSourceObject, Template template) throws TokenException {
     return session.copyObject(hSourceObject, template);
   }
 
-  void setAttributeValues(
-      long hObjectToUpdate, Template template)
-      throws TokenException {
+  void setAttributeValues(long hObjectToUpdate, Template template) throws TokenException {
     session.setAttributeValues(hObjectToUpdate, template);
   }
 
@@ -117,16 +107,14 @@ class PKCS11Session {
         session.destroyObject(hObject);
         hDestroyeds.add(hObject);
       } catch (PKCS11Exception e) {
-        LOG.warn("error destroying object {}: {}",
-            hObject, e.getMessage());
+        LOG.warn("error destroying object {}: {}", hObject, e.getMessage());
       }
     }
 
     return hDestroyeds;
   }
 
-  byte[] generateUniqueId(Template template, int idLength, Random random)
-      throws TokenException {
+  byte[] generateUniqueId(Template template, int idLength, Random random) throws TokenException {
     byte[] keyId = new byte[idLength];
     template.id(keyId);
 
@@ -170,9 +158,10 @@ class PKCS11Session {
           ckaTypes.ecParams().ecPoint();
         } else if (keyType == CKK_DSA) {
           ckaTypes.prime().subprime().base();
-        } else if (keyType == CKK_ML_DSA || keyType == CKK_ML_KEM
-          || keyType == CKK_SLH_DSA) {
+        } else if (keyType == CKK_ML_DSA || keyType == CKK_SLH_DSA) {
           ckaTypes.parameterSet();
+        } else if (keyType == CKK_ML_KEM) {
+          ckaTypes.parameterSet().decapsulate();
         }
       }
     } else { // if (objClass == CKO_PUBLIC_KEY) {
@@ -184,9 +173,10 @@ class PKCS11Session {
         ckaTypes.ecParams().ecPoint();
       } else if (keyType == CKK_DSA) {
         ckaTypes.prime().subprime().base();
-      } else if (keyType == CKK_ML_DSA || keyType == CKK_ML_KEM
-        || keyType == CKK_SLH_DSA) {
+      } else if (keyType == CKK_ML_DSA || keyType == CKK_SLH_DSA) {
         ckaTypes.parameterSet();
+      } else if (keyType == CKK_ML_KEM) {
+        ckaTypes.parameterSet().encapsulate();
       }
     }
 
@@ -227,8 +217,7 @@ class PKCS11Session {
     Long oClass = criteria.class_();
     if (oClass != null) {
       // CKA_CLASS is set in criteria
-      if (!(CKO_PRIVATE_KEY == oClass || CKO_PUBLIC_KEY == oClass
-          || CKO_SECRET_KEY == oClass)) {
+      if (!(CKO_PRIVATE_KEY == oClass || CKO_PUBLIC_KEY == oClass || CKO_SECRET_KEY == oClass)) {
         return null;
       }
 
@@ -236,8 +225,7 @@ class PKCS11Session {
       if (handles.length == 0) {
         return null;
       } else if (handles.length > 1) {
-        throw new TokenException(
-            "found more than 1 key for the criteria " + criteria);
+        throw new TokenException("found more than 1 key for the criteria " + criteria);
       } else {
         return getKeyIdByHandle(handles[0]);
       }
@@ -260,8 +248,7 @@ class PKCS11Session {
       return null;
     } else if (handles.length > 1) {
       throw new TokenException(("found more than 1 key of " +
-          ckoCodeToName(oClass) + " for the criteria " +
-          criteria.class_(null)));
+          ckoCodeToName(oClass) + " for the criteria " + criteria.class_(null)));
     } else {
       return getKeyIdByHandle(handles[0]);
     }
@@ -269,7 +256,7 @@ class PKCS11Session {
 
   private PKCS11KeyId getKeyIdByHandle(long hKey) throws TokenException {
     Template attrs = session.getAttrValues(hKey,
-        new AttributeTypes().class_().keyType().id().label());
+                      new AttributeTypes().class_().keyType().id().label());
     Long oClass = attrs.class_();
     Long keyType = attrs.keyType();
     if (oClass == null || keyType == null) {
@@ -286,8 +273,7 @@ class PKCS11Session {
       if (pubKeyHandles.length == 1) {
         pubKeyHandle = pubKeyHandles[0];
       } else if (pubKeyHandles.length > 1) {
-        LOG.warn("found more than 1 public key for the private " +
-            "key {}, ignore them.", hKey);
+        LOG.warn("found more than 1 public key for the private key {}, ignore them.", hKey);
       }
 
       PKCS11KeyId.KeyIdType type = (pubKeyHandle == null)
@@ -296,74 +282,32 @@ class PKCS11Session {
       ret.setPublicKeyHandle(pubKeyHandle);
       return ret;
     } else if (oClass == CKO_SECRET_KEY) {
-      return new PKCS11KeyId(PKCS11KeyId.KeyIdType.SECRET_KEY,
-          hKey, keyType, id, attrs.label());
+      return new PKCS11KeyId(PKCS11KeyId.KeyIdType.SECRET_KEY, hKey, keyType, id, attrs.label());
     } else if (oClass == CKO_PUBLIC_KEY) {
-      return new PKCS11KeyId(PKCS11KeyId.KeyIdType.PUBLIC_KEY,
-          hKey, keyType, id, attrs.label());
+      return new PKCS11KeyId(PKCS11KeyId.KeyIdType.PUBLIC_KEY, hKey, keyType, id, attrs.label());
     } else {
-      throw new TokenException("invalid key class " +
-          ckoCodeToName(oClass));
+      throw new TokenException("invalid key class " + ckoCodeToName(oClass));
     }
   }
 
-  long[] findObjects(Template template, int maxObjectCount)
-      throws TokenException {
+  long[] findObjects(Template template, int maxObjectCount) throws TokenException {
     return session.findObjectsSingle(template, maxObjectCount);
   }
 
-  byte[] digest(CkMechanism mechanism, byte[] data) throws TokenException {
-    int len = data.length;
-    boolean useMulti = len > maxMessageSize
-            && slot.supportsMultipart(mechanism, CKF_DIGEST);
-
-    if (!useMulti) {
-      return session.digestSingle(mechanism, data);
-    } else {
-      opInit(OP.DIGEST, session, mechanism, 0);
-      byte[] digest;
-      try {
-        for (int ofs = 0; ofs < len; ofs += maxMessageSize) {
-          session.signUpdate(data, ofs, Math.min(maxMessageSize, len - ofs));
-        }
-      } finally {
-        digest = session.digestFinal();
-      }
-      return digest;
-    }
+  byte[] digest(CkMechanism mechanism, byte[] prefix, long hKey, byte[] suffix)
+      throws TokenException {
+    return session.digestX(mechanism, prefix, hKey, suffix);
   }
 
-  byte[] digestKey(CkMechanism mechanism, byte[] prefix,
-                   long hKey, byte[] suffix)
-      throws TokenException {
-    opInit(OP.DIGEST, session, mechanism, 0);
-    byte[] digest;
-    try {
-      if (prefix != null) {
-        session.digestUpdate(prefix);
-      }
-      session.digestKey(hKey);
-      if (suffix != null) {
-        session.digestUpdate(suffix);
-      }
-    } finally {
-      digest = session.digestFinal();
-    }
-    return digest;
-  }
-
-  byte[] sign(CkMechanism mechanism, long hKey, byte[] data, int maxSize)
-      throws TokenException {
+  byte[] sign(CkMechanism mechanism, long hKey, byte[] data, int maxSize) throws TokenException {
     int len = data.length;
-    boolean useMulti = len > maxMessageSize
-            && slot.supportsMultipart(mechanism, CKF_SIGN);
+    boolean useMulti = len > maxMessageSize && slot.supportsMultipart(mechanism, CKF_SIGN);
 
     byte[] sig;
     if (!useMulti) {
-      sig = session.signSingle(mechanism, hKey, data, maxSize);
+      return session.signX(mechanism, hKey, data, maxSize);
     } else {
-      opInit(OP.SIGN, session, mechanism, hKey);
-
+      session.signInit(mechanism, hKey);
       try {
         for (int ofs = 0; ofs < len; ofs += maxMessageSize) {
           session.signUpdate(data, ofs, Math.min(maxMessageSize, len - ofs));
@@ -376,15 +320,21 @@ class PKCS11Session {
     return sig;
   }
 
-  long generateKey(CkMechanism mechanism, Template template)
-      throws TokenException {
+  byte[] decrypt(CkMechanism mechanism, long hKey, byte[] cipherText) throws TokenException {
+    return session.decryptX(mechanism, hKey, cipherText);
+  }
+
+  long generateKey(CkMechanism mechanism, Template template) throws TokenException {
     return session.generateKey(mechanism, template);
   }
 
-  PKCS11KeyPair generateKeyPair(
-      CkMechanism mechanism, KeyPairTemplate template)
+  PKCS11KeyPair generateKeyPair(CkMechanism mechanism, KeyPairTemplate template)
       throws TokenException {
     return session.generateKeyPair(mechanism, template);
+  }
+
+  long deriveKey(CkMechanism mechanism, long hBaseKey, Template template) throws TokenException {
+    return session.deriveKey(mechanism, hBaseKey, template);
   }
 
   /**
@@ -398,36 +348,18 @@ class PKCS11Session {
    * @throws TokenException
    *         if getting attributes failed.
    */
-  Template getAttrValues(long hObject, AttributeTypes attributeTypes)
-      throws TokenException {
+  Template getAttrValues(long hObject, AttributeTypes attributeTypes) throws TokenException {
     return session.getAttrValues(hObject, attributeTypes);
   }
 
-  Template getDefaultAttrValues(long hObject)
-      throws TokenException {
+  Template getDefaultAttrValues(long hObject) throws TokenException {
     return session.getDefaultAttrValues(hObject);
-  }
-
-  private void opInit(OP op, Session session, CkMechanism mechanism,
-                      long hKey)
-      throws TokenException {
-    switch (op) {
-      case SIGN:
-        session.signInit(mechanism, hKey);
-        break;
-      case DIGEST:
-        session.digestInit(mechanism);
-        break;
-      default:
-        throw new IllegalStateException("unknown OP " + op);
-    }
   }
 
   /* ***************************************
    * PKCS#11 V3.0 Functions
    * ***************************************/
-  void loginSo(byte[] userName, byte[] pin)
-      throws TokenException {
+  void loginSo(byte[] userName, byte[] pin) throws TokenException {
     session.loginUser(CKU_SO, userName, pin == null ? new byte[0] : pin);
     LOG.info("login CKU_SO with userName");
   }
@@ -445,11 +377,9 @@ class PKCS11Session {
    * PKCS#11 V3.2 Functions
    * ***************************************/
 
-  long decapsulateKey(CkMechanism mechanism, long hPrivateKey,
-                      byte[] encapsulatedKey, Template template)
-      throws TokenException {
-    return session.decapsulateKey(mechanism, hPrivateKey,
-        encapsulatedKey, template);
+  long decapsulateKey(CkMechanism mechanism, long hPrivateKey, byte[] encapsulatedKey,
+                      Template template) throws TokenException {
+    return session.decapsulateKey(mechanism, hPrivateKey, encapsulatedKey, template);
   }
 
 }

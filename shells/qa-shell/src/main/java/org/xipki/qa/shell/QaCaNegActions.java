@@ -25,8 +25,7 @@ import org.xipki.shell.CmdFailure;
 
 public class QaCaNegActions {
 
-  @Command(scope = "caqa", name = "neg-ca-add", description =
-      "add CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-ca-add", description = "add CA (negative, QA)")
   @Service
   public static class NegCaAdd extends CaActions.CaAdd {
 
@@ -45,8 +44,7 @@ public class QaCaNegActions {
 
   } // class NegCaAdd
 
-  @Command(scope = "caqa", name = "neg-caalias-add", description =
-      "add CA alias (negative, QA)")
+  @Command(scope = "caqa", name = "neg-caalias-add", description = "add CA alias (negative, QA)")
   @Service
   public static class NegCaaliasAdd extends CaActions.CaaliasAdd {
 
@@ -65,8 +63,7 @@ public class QaCaNegActions {
 
   } // class NegCaaliasAdd
 
-  @Command(scope = "caqa", name = "neg-caalias-rm", description =
-      "remove CA alias (negative, QA)")
+  @Command(scope = "caqa", name = "neg-caalias-rm", description = "remove CA alias (negative, QA)")
   @Service
   public static class NegCaaliasRm extends CaActions.CaaliasRm {
 
@@ -165,8 +162,7 @@ public class QaCaNegActions {
 
   } // class NegCapubRm
 
-  @Command(scope = "caqa", name = "neg-ca-rm", description =
-      "remove CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-ca-rm", description = "remove CA (negative, QA)")
   @Service
   public static class NegCaRm extends CaActions.CaRm {
 
@@ -225,8 +221,7 @@ public class QaCaNegActions {
 
   } // class NegCareqRm
 
-  @Command(scope = "caqa", name = "neg-ca-revoke", description =
-      "revoke CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-ca-revoke", description = "revoke CA (negative, QA)")
   @Service
   public static class NegCaRevoke extends CaActions.CaRevoke {
 
@@ -245,8 +240,7 @@ public class QaCaNegActions {
 
   } // class NegCaRevoke
 
-  @Command(scope = "caqa", name = "neg-ca-unrevoke", description =
-      "unrevoke CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-ca-unrevoke", description = "unrevoke CA (negative, QA)")
   @Service
   public static class NegCaUnrevoke extends CaActions.CaUnrevoke {
 
@@ -265,8 +259,7 @@ public class QaCaNegActions {
 
   } // class NegCaUnrevoke
 
-  @Command(scope = "caqa", name = "neg-ca-up", description =
-      "update CA (negative, QA)")
+  @Command(scope = "caqa", name = "neg-ca-up", description = "update CA (negative, QA)")
   @Service
   public static class NegCaUp extends CaActions.CaUp {
 
@@ -345,8 +338,7 @@ public class QaCaNegActions {
 
   } // class NegProfileAdd
 
-  @Command(scope = "caqa", name = "neg-profile-rm", description =
-      "remove Profile (negative, QA)")
+  @Command(scope = "caqa", name = "neg-profile-rm", description = "remove Profile (negative, QA)")
   @Service
   public static class NegProfileRm extends ProfileActions.ProfileRm {
 
@@ -385,8 +377,7 @@ public class QaCaNegActions {
 
   } // class NegProfileUp
 
-  @Command(scope = "caqa", name = "neg-publisher-add", description =
-      "add publisher (negative, QA)")
+  @Command(scope = "caqa", name = "neg-publisher-add", description = "add publisher (negative, QA)")
   @Service
   public static class NegPublisherAdd extends PublisherActions.PublisherAdd {
 
@@ -465,8 +456,7 @@ public class QaCaNegActions {
 
   } // class NegRepublish
 
-  @Command(scope = "caqa", name = "neg-requestor-add", description =
-      "add requestor (negative, QA)")
+  @Command(scope = "caqa", name = "neg-requestor-add", description = "add requestor (negative, QA)")
   @Service
   public static class NegRequestorAdd extends RequestorActions.RequestorAdd {
 
@@ -525,8 +515,7 @@ public class QaCaNegActions {
 
   } // class NegRequestorUp
 
-  @Command(scope = "caqa", name = "neg-rm-cert", description =
-      "remove certificate (negative, QA)")
+  @Command(scope = "caqa", name = "neg-rm-cert", description = "remove certificate (negative, QA)")
   @Service
   public static class NegRmCert extends RmCert {
 
@@ -565,8 +554,7 @@ public class QaCaNegActions {
 
   } // class NegRevokeCert
 
-  @Command(scope = "caqa", name = "neg-signer-add", description =
-      "add signer (negative, QA)")
+  @Command(scope = "caqa", name = "neg-signer-add", description = "add signer (negative, QA)")
   @Service
   public static class NegSignerAdd extends SignerActions.SignerAdd {
 
@@ -585,8 +573,7 @@ public class QaCaNegActions {
 
   } // class NegSignerAdd
 
-  @Command(scope = "caqa", name = "neg-signer-rm", description =
-      "remove signer (negative, QA)")
+  @Command(scope = "caqa", name = "neg-signer-rm", description = "remove signer (negative, QA)")
   @Service
   public static class NegSignerRm extends SignerActions.SignerRm {
 
@@ -605,8 +592,7 @@ public class QaCaNegActions {
 
   } // class NegSignerRm
 
-  @Command(scope = "caqa", name = "neg-signer-up", description =
-      "update signer (negative, QA)")
+  @Command(scope = "caqa", name = "neg-signer-up", description = "update signer (negative, QA)")
   @Service
   public static class NegSignerUp extends SignerActions.SignerUp {
 

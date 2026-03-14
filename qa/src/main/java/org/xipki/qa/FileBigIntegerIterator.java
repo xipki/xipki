@@ -33,8 +33,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
 
   private BufferedReader reader;
 
-  private final ConcurrentLinkedQueue<BigInteger> nextNumbers =
-      new ConcurrentLinkedQueue<>();
+  private final ConcurrentLinkedQueue<BigInteger> nextNumbers = new ConcurrentLinkedQueue<>();
 
   private BigInteger currentNumber;
 
@@ -83,8 +82,7 @@ public class FileBigIntegerIterator implements Iterator<BigInteger>, Closeable {
         return null;
       }
     } catch (IOException ex) {
-      throw new NoSuchElementException("could not read next number from file "
-          + fileName);
+      throw new NoSuchElementException("could not read next number from file " + fileName);
     }
 
     if (line.indexOf(',') == -1) {

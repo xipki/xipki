@@ -75,8 +75,7 @@ public abstract class CertPublisher implements Closeable {
    * @return whether the revocation is published.
    */
   public abstract boolean certificateRevoked(
-      X509Cert caCert, CertWithDbId cert, String certprofile,
-      CertRevocationInfo revInfo);
+      X509Cert caCert, CertWithDbId cert, String certprofile, CertRevocationInfo revInfo);
 
   /**
    * Publishes the unrevocation of a certificate.
@@ -87,8 +86,7 @@ public abstract class CertPublisher implements Closeable {
    *          Target certificate. Must not be {@code null}.
    * @return whether the unrevocation is published.
    */
-  public abstract boolean certificateUnrevoked(
-      X509Cert caCert, CertWithDbId cert);
+  public abstract boolean certificateUnrevoked(X509Cert caCert, CertWithDbId cert);
 
   /**
    * Publishes the remove of a certificate.
@@ -99,8 +97,7 @@ public abstract class CertPublisher implements Closeable {
    *          Target certificate. Must not be {@code null}.
    * @return whether the remove is published.
    */
-  public abstract boolean certificateRemoved(
-      X509Cert caCert, CertWithDbId cert);
+  public abstract boolean certificateRemoved(X509Cert caCert, CertWithDbId cert);
 
   /**
    * Publishes a CRL.
@@ -122,8 +119,7 @@ public abstract class CertPublisher implements Closeable {
    *          Revocation information. Must not be {@code null}.
    * @return whether the CA revocation is published.
    */
-  public abstract boolean caRevoked(
-      X509Cert caCert, CertRevocationInfo revInfo);
+  public abstract boolean caRevoked(X509Cert caCert, CertRevocationInfo revInfo);
 
   /**
    * Publishes the unrevocation of a CA.

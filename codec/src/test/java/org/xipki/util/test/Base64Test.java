@@ -22,14 +22,12 @@ public class Base64Test extends AbstractBase64Test {
   }
 
   @Override
-  protected byte[] encodeToByte(byte[] data, boolean wrapLongLine,
-                                boolean withPadding) {
+  protected byte[] encodeToByte(byte[] data, boolean wrapLongLine, boolean withPadding) {
     return getEncoder(withPadding).encodeToByte(data, wrapLongLine);
   }
 
   @Override
-  protected String encodeToString(byte[] data, boolean wrapLongLine,
-                                  boolean withPadding) {
+  protected String encodeToString(byte[] data, boolean wrapLongLine, boolean withPadding) {
     return getEncoder(withPadding).encodeToString(data, wrapLongLine);
   }
 

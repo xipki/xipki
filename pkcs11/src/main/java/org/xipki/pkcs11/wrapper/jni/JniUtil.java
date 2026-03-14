@@ -38,8 +38,7 @@ public class JniUtil {
   public static long[] readLongs(Arch arch, byte[] encoded) {
     int n = encoded.length / arch.longSize();
     if (encoded.length != n * arch.longSize()) {
-      throw new IllegalArgumentException(
-          encoded.length + " is not multiple of " + arch.longSize());
+      throw new IllegalArgumentException(encoded.length + " is not multiple of " + arch.longSize());
     }
 
     long[] ret = new long[n];
@@ -50,8 +49,7 @@ public class JniUtil {
     return ret;
   }
 
-  public static void writeLong(Arch arch, long src, byte[] dest,
-                               AtomicInteger off) {
+  public static void writeLong(Arch arch, long src, byte[] dest, AtomicInteger off) {
     int offset = off.get();
     int n = arch.longSize();
     boolean le = arch.littleEndian();
@@ -63,8 +61,7 @@ public class JniUtil {
 
   public static long readLong(Arch arch, byte[] encoded) {
     if (encoded.length != arch.longSize()) {
-      throw new IllegalArgumentException(
-          encoded.length + " is not multiple of " + arch.longSize());
+      throw new IllegalArgumentException(encoded.length + " is not multiple of " + arch.longSize());
     }
 
     return readLong(arch, encoded, new AtomicInteger(0));
@@ -92,30 +89,25 @@ public class JniUtil {
     return (int) v;
   }
 
-  public static void writeVersion(
-      CkVersion version, byte[] dest, AtomicInteger off) {
+  public static void writeVersion(CkVersion version, byte[] dest, AtomicInteger off) {
     dest[off.getAndIncrement()] = version.major();
     dest[off.getAndIncrement()] = version.minor();
   }
 
   public static CkVersion readVersion(byte[] src, AtomicInteger off) {
-    return new CkVersion(src[off.getAndIncrement()],
-                         src[off.getAndIncrement()]);
+    return new CkVersion(src[off.getAndIncrement()], src[off.getAndIncrement()]);
   }
 
-  public static void writeFixedLenByteArray(
-      byte[] src, byte[] dest, AtomicInteger off) {
+  public static void writeFixedLenByteArray(byte[] src, byte[] dest, AtomicInteger off) {
     System.arraycopy(src, 0, dest, off.get(), src.length);
     off.addAndGet(src.length);
   }
 
-  public static byte[] readFixedLenByteArray(
-      byte[] src, int len, AtomicInteger off) {
+  public static byte[] readFixedLenByteArray(byte[] src, int len, AtomicInteger off) {
     return Arrays.copyOfRange(src, off.get(), off.addAndGet(len));
   }
 
-  public static void writeByteArray(Arch arch, byte[] src, byte[] dest,
-                                    AtomicInteger off) {
+  public static void writeByteArray(Arch arch, byte[] src, byte[] dest, AtomicInteger off) {
     int len = src == null ? 0 : src.length;
     writeLong(arch, len, dest, off);
     if (len > 0) {
@@ -124,8 +116,7 @@ public class JniUtil {
     off.addAndGet(len);
   }
 
-  public static byte[] readByteArray(Arch arch, byte[] src,
-                                     AtomicInteger off) {
+  public static byte[] readByteArray(Arch arch, byte[] src, AtomicInteger off) {
     int len = readInt(arch, src, off);
     return Arrays.copyOfRange(src, off.get(), off.addAndGet(len));
   }
@@ -144,15 +135,13 @@ public class JniUtil {
     return len;
   }
 
-  public static void encodeTo(
-      Arch arch, byte[] dest, AtomicInteger off,
-      long[] longs, byte[]... bytesList) {
+  public static void encodeTo(Arch arch, byte[] dest, AtomicInteger off,
+                              long[] longs, byte[]... bytesList) {
     encodeTo(arch, dest, off, null, longs, bytesList);
   }
 
-  public static void encodeTo(
-      Arch arch, byte[] dest, AtomicInteger off,
-      byte[] byteList, long[] longs, byte[]... bytesList) {
+  public static void encodeTo(Arch arch, byte[] dest, AtomicInteger off,
+                              byte[] byteList, long[] longs, byte[]... bytesList) {
     if (byteList != null) {
       JniUtil.writeFixedLenByteArray(byteList, dest, off);
     }

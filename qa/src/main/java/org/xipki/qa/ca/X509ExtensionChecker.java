@@ -20,23 +20,17 @@ import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
 import org.xipki.ca.certprofile.xijson.XijsonExtensions;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
-import org.xipki.ca.certprofile.xijson.conf.extn.CertificatePolicies;
-import org.xipki.ca.certprofile.xijson.conf.extn.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.xijson.conf.extn.NameConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyConstraints;
-import org.xipki.ca.certprofile.xijson.conf.extn.PolicyMappings;
-import org.xipki.ca.certprofile.xijson.conf.extn.QcStatements;
-import org.xipki.ca.certprofile.xijson.conf.extn.TlsFeature;
 import org.xipki.qa.CheckerUtil;
 import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.pkix.CtLog;
 import org.xipki.security.pkix.KeyUsage;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.extra.misc.LogUtil;
 import org.xipki.util.extra.type.Validity;
@@ -49,7 +43,7 @@ import static org.xipki.qa.CheckerUtil.addViolation;
 
 /**
  * Extension checker.
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 class X509ExtensionChecker {
 
@@ -82,38 +76,32 @@ class X509ExtensionChecker {
   void checkExtnAuthorityInfoAccess(
       StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     AuthorityInfoAccessControl aiaControl = getCertprofile().aiaControl();
-    Set<String> expCaIssuerUris =
-        (aiaControl == null || aiaControl.isIncludesCaIssuers())
+    Set<String> expCaIssuerUris = (aiaControl == null || aiaControl.isIncludesCaIssuers())
             ? issuerInfo.getCaIssuerUrls() : Collections.emptySet();
 
-    Set<String> expOcspUris =
-        (aiaControl == null || aiaControl.isIncludesOcsp())
+    Set<String> expOcspUris = (aiaControl == null || aiaControl.isIncludesOcsp())
             ? issuerInfo.getOcspUrls() : Collections.emptySet();
 
-    if (CollectionUtil.isEmpty(expCaIssuerUris)
-        && CollectionUtil.isEmpty(expOcspUris)) {
+    if (CollectionUtil.isEmpty(expCaIssuerUris) && CollectionUtil.isEmpty(expOcspUris)) {
       failureMsg.append("AIA is present but expected is 'none'; ");
       return;
     }
 
-    AuthorityInformationAccess isAia =
-        AuthorityInformationAccess.getInstance(extnValue);
+    AuthorityInformationAccess isAia = AuthorityInformationAccess.getInstance(extnValue);
     checkAia(failureMsg, isAia, OIDs.X509.id_ad_caIssuers, expCaIssuerUris);
     checkAia(failureMsg, isAia, OIDs.X509.id_ad_ocsp, expOcspUris);
   } // method checkExtnAuthorityInfoAccess
 
-  void checkExtnAuthorityKeyId(StringBuilder failureMsg, byte[] extnValue,
-                               IssuerInfo issuerInfo) {
+  void checkExtnAuthorityKeyId(StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extnValue);
-    byte[] keyIdentifier = asn1.getKeyIdentifierOctets();
+    byte[] keyIdentifier = Asn1Util.getKeyIdentifier(asn1);
 
     if (keyIdentifier == null) {
       failureMsg.append("keyIdentifier is 'absent', but expected 'present'; ");
     } else {
       if (!Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier)) {
         addViolation(failureMsg, "keyIdentifier",
-            Hex.encode(keyIdentifier),
-            Hex.encode(issuerInfo.getSubjectKeyIdentifier()));
+            Hex.encode(keyIdentifier), Hex.encode(issuerInfo.getSubjectKeyIdentifier()));
       }
     }
   } // method checkExtnAuthorityKeyId
@@ -149,46 +137,41 @@ class X509ExtensionChecker {
   void checkExtnCertificatePolicies(
       StringBuilder failureMsg, byte[] extnValue,
       Extensions requestedExtns, ExtensionControl extnControl) {
-    CertificatePolicies certificatePolicies = caller.getCertificatePolicies();
+    ExtensionValueConf.CertificatePolicies certificatePolicies = caller.getCertificatePolicies();
     if (certificatePolicies == null) {
       caller.checkConstantExtnValue(OIDs.Extn.certificatePolicies, failureMsg,
           extnValue, requestedExtns, extnControl);
       return;
     }
 
-    Map<String, CertificatePolicies.CertificatePolicyInformationType>
-        expPoliciesMap = new HashMap<>();
+    Map<String, ExtensionValueConf.CertificatePolicyInformationType> expPoliciesMap =
+        new HashMap<>();
 
-    for (CertificatePolicies.CertificatePolicyInformationType cp
+    for (ExtensionValueConf.CertificatePolicyInformationType cp
         : caller.getCertificatePolicies().certificatePolicyInformations()) {
       expPoliciesMap.put(cp.policyIdentifier().oid().getId(), cp);
     }
 
     Set<String> expPolicyIds = new HashSet<>(expPoliciesMap.keySet());
 
-    org.bouncycastle.asn1.x509.CertificatePolicies asn1 =
-        org.bouncycastle.asn1.x509.CertificatePolicies.getInstance(extnValue);
+    CertificatePolicies asn1 = CertificatePolicies.getInstance(extnValue);
     PolicyInformation[] isPolicyInformations = asn1.getPolicyInformation();
 
     for (PolicyInformation isPolicyInformation : isPolicyInformations) {
       String isPolicyId = isPolicyInformation.getPolicyIdentifier().getId();
       expPolicyIds.remove(isPolicyId);
-      CertificatePolicies.CertificatePolicyInformationType expCp =
-          expPoliciesMap.get(isPolicyId);
+      ExtensionValueConf.CertificatePolicyInformationType expCp = expPoliciesMap.get(isPolicyId);
       if (expCp == null) {
-        failureMsg.append("certificate policy '").append(isPolicyId)
-            .append("' is not expected; ");
+        failureMsg.append("certificate policy '").append(isPolicyId).append("' is not expected; ");
         continue;
       }
 
-      List<CertificatePolicies.PolicyQualifier> expCpPq =
-          expCp.policyQualifiers();
+      List<ExtensionValueConf.PolicyQualifier> expCpPq = expCp.policyQualifiers();
       if (CollectionUtil.isEmpty(expCpPq)) {
         continue;
       }
 
-      ASN1Sequence isPolicyQualifiers =
-          isPolicyInformation.getPolicyQualifiers();
+      ASN1Sequence isPolicyQualifiers = isPolicyInformation.getPolicyQualifiers();
       List<String> isCpsUris = new LinkedList<>();
       List<String> isUserNotices = new LinkedList<>();
 
@@ -197,14 +180,12 @@ class X509ExtensionChecker {
         PolicyQualifierInfo isPolicyQualifierInfo =
             PolicyQualifierInfo.getInstance(isPolicyQualifiers.getObjectAt(i));
 
-        ASN1ObjectIdentifier isPolicyQualifierId =
-            isPolicyQualifierInfo.getPolicyQualifierId();
+        ASN1ObjectIdentifier isPolicyQualifierId = isPolicyQualifierInfo.getPolicyQualifierId();
         ASN1Encodable isQualifier = isPolicyQualifierInfo.getQualifier();
         if (PolicyQualifierId.id_qt_cps.equals(isPolicyQualifierId)) {
-          String isCpsUri = ASN1IA5String.getInstance(isQualifier).getString();
+          String isCpsUri = Asn1Util.getIA5String(isQualifier);
           isCpsUris.add(isCpsUri);
-        } else if (PolicyQualifierId.id_qt_unotice.equals(
-            isPolicyQualifierId)) {
+        } else if (PolicyQualifierId.id_qt_unotice.equals(isPolicyQualifierId)) {
           UserNotice isUserNotice = UserNotice.getInstance(isQualifier);
           if (isUserNotice.getExplicitText() != null) {
             isUserNotices.add(isUserNotice.getExplicitText().getString());
@@ -212,13 +193,12 @@ class X509ExtensionChecker {
         }
       }
 
-      for (CertificatePolicies.PolicyQualifier qualifierInfo : expCpPq) {
+      for (ExtensionValueConf.PolicyQualifier qualifierInfo : expCpPq) {
         String value = qualifierInfo.value();
         switch (qualifierInfo.type()) {
           case cpsUri:
             if (!isCpsUris.contains(value)) {
-              failureMsg.append("CPSUri '").append(value)
-                  .append("' is absent but is required; ");
+              failureMsg.append("CPSUri '").append(value).append("' is absent but is required; ");
             }
             continue;
           case userNotice:
@@ -241,22 +221,18 @@ class X509ExtensionChecker {
 
   void checkExtnDeltaCrlDistributionPoints(
       StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
-    checkExtnCrlDistributionPoints(true, failureMsg,
-        extnValue, issuerInfo);
+    checkExtnCrlDistributionPoints(true, failureMsg, extnValue, issuerInfo);
   }
 
   void checkExtnCrlDistributionPoints(
       StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
-    checkExtnCrlDistributionPoints(false, failureMsg,
-        extnValue, issuerInfo);
+    checkExtnCrlDistributionPoints(false, failureMsg, extnValue, issuerInfo);
   }
 
   private void checkExtnCrlDistributionPoints(
-      boolean deltaCrl, StringBuilder failureMsg, byte[] extnValue,
-      IssuerInfo issuerInfo) {
+      boolean deltaCrl, StringBuilder failureMsg, byte[] extnValue, IssuerInfo issuerInfo) {
     CRLDistPoint isCrlDistPoints = CRLDistPoint.getInstance(extnValue);
-    DistributionPoint[] isDistributionPoints =
-        isCrlDistPoints.getDistributionPoints();
+    DistributionPoint[] isDistributionPoints = isCrlDistPoints.getDistributionPoints();
 
     String type = deltaCrl ? "deltaCRL" : "CRL";
 
@@ -266,8 +242,7 @@ class X509ExtensionChecker {
     } else {
       int len = isDistributionPoints.length;
       if (len != 1) {
-        addViolation(failureMsg, "size of DistributionPoints of " + type,
-            len, 1);
+        addViolation(failureMsg, "size of DistributionPoints of " + type, len, 1);
         return;
       }
     }
@@ -317,8 +292,7 @@ class X509ExtensionChecker {
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
     Set<String> isUsages = new HashSet<>();
-    org.bouncycastle.asn1.x509.ExtendedKeyUsage keyusage =
-        org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extnValue);
+    ExtendedKeyUsage keyusage = ExtendedKeyUsage.getInstance(extnValue);
     KeyPurposeId[] usages = keyusage.getUsages();
     if (usages != null) {
       for (KeyPurposeId usage : usages) {
@@ -335,19 +309,14 @@ class X509ExtensionChecker {
     }
 
     Set<ExtKeyUsageControl> optionalExtKeyusage = caller.getExtKeyusage(false);
-    if (requestedExtns != null
-        && extnControl.isPermittedInRequest()
+    if (requestedExtns != null && extnControl.isPermittedInRequest()
         && CollectionUtil.isNotEmpty(optionalExtKeyusage)) {
-      Extension extension =
-          requestedExtns.getExtension(OIDs.Extn.extendedKeyUsage);
+      Extension extension = requestedExtns.getExtension(OIDs.Extn.extendedKeyUsage);
 
       if (extension != null) {
-        org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
-            org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(
-                extension.getParsedValue());
+        ExtendedKeyUsage reqKeyUsage = ExtendedKeyUsage.getInstance(extension.getParsedValue());
         for (ExtKeyUsageControl k : optionalExtKeyusage) {
-          if (reqKeyUsage.hasKeyPurposeId(
-              KeyPurposeId.getInstance(k.extKeyUsage()))) {
+          if (reqKeyUsage.hasKeyPurposeId(KeyPurposeId.getInstance(k.extKeyUsage()))) {
             expectedUsages.add(k.extKeyUsage().getId());
           }
         }
@@ -355,8 +324,7 @@ class X509ExtensionChecker {
     }
 
     if (CollectionUtil.isEmpty(expectedUsages)) {
-      byte[] constantExtValue =
-          caller.getConstantExtensionValue(OIDs.Extn.extendedKeyUsage);
+      byte[] constantExtValue = caller.getConstantExtensionValue(OIDs.Extn.extendedKeyUsage);
       if (constantExtValue != null) {
         expectedUsages = getExtKeyUsage(constantExtValue);
       }
@@ -364,21 +332,19 @@ class X509ExtensionChecker {
 
     Set<String> diffs = CheckerUtil.elementInBnotInA(expectedUsages, isUsages);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs)
-          .append(" are present but not expected; ");
+      failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = CheckerUtil.elementInBnotInA(isUsages, expectedUsages);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs)
-          .append(" are absent but are required; ");
+      failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnExtendedKeyUsage
 
   void checkExtnInhibitAnyPolicy(
       StringBuilder failureMsg, byte[] extensionValue,
       Extensions requestedExtns, ExtensionControl extControl) {
-    InhibitAnyPolicy conf = caller.getInhibitAnyPolicy();
+    ExtensionValueConf.InhibitAnyPolicy conf = caller.getInhibitAnyPolicy();
     if (conf == null) {
       caller.checkConstantExtnValue(OIDs.Extn.inhibitAnyPolicy, failureMsg,
           extensionValue, requestedExtns, extControl);
@@ -395,11 +361,9 @@ class X509ExtensionChecker {
   void checkExtnIssuerAltNames(
       StringBuilder failureMsg, byte[] extensionValue, IssuerInfo issuerInfo) {
     byte[] caSubjectAltExtensionValue =
-        issuerInfo.getCert().getExtensionCoreValue(
-            OIDs.Extn.subjectAlternativeName);
+        issuerInfo.getCert().getExtensionCoreValue(OIDs.Extn.subjectAlternativeName);
     if (caSubjectAltExtensionValue == null) {
-      failureMsg.append(
-          "issuerAlternativeName is present but expected 'none'; ");
+      failureMsg.append("issuerAlternativeName is present but expected 'none'; ");
       return;
     }
 
@@ -415,8 +379,7 @@ class X509ExtensionChecker {
     int len = usages.length;
 
     if (len > 9) {
-      failureMsg
-          .append("invalid syntax: size of valid bits is larger than 9: ")
+      failureMsg.append("invalid syntax: size of valid bits is larger than 9: ")
           .append(len).append("; ");
     }
 
@@ -439,8 +402,7 @@ class X509ExtensionChecker {
       Extension extension = requestedExtns.getExtension(OIDs.Extn.keyUsage);
       if (extension != null) {
         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
-            org.bouncycastle.asn1.x509.KeyUsage.getInstance(
-                extension.getParsedValue());
+            org.bouncycastle.asn1.x509.KeyUsage.getInstance(extension.getParsedValue());
         for (KeySingleUsage k : optionalKeyusage) {
           if (reqKeyUsage.hasUsages(k.keyUsage().bcUsage())) {
             expectedUsages.add(k.keyUsage().getName());
@@ -450,8 +412,7 @@ class X509ExtensionChecker {
     }
 
     if (CollectionUtil.isEmpty(expectedUsages)) {
-      byte[] constantExtValue =
-          caller.getConstantExtensionValue(OIDs.Extn.keyUsage);
+      byte[] constantExtValue = caller.getConstantExtensionValue(OIDs.Extn.keyUsage);
       if (constantExtValue != null) {
         expectedUsages = getKeyUsage(constantExtValue);
       }
@@ -459,22 +420,19 @@ class X509ExtensionChecker {
 
     Set<String> diffs = CheckerUtil.elementInBnotInA(expectedUsages, isUsages);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs)
-          .append(" are present but not expected; ");
+      failureMsg.append("usages ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = CheckerUtil.elementInBnotInA(isUsages, expectedUsages);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("usages ").append(diffs)
-          .append(" are absent but are required; ");
+      failureMsg.append("usages ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnKeyUsage
 
   Set<KeySingleUsage> getKeyusage(boolean required, KeySpec keySpec) {
     Set<KeySingleUsage> ret = new HashSet<>();
 
-    Set<KeySingleUsage> controls =
-        getCertprofile().extensions().getKeyUsage(keySpec);
+    Set<KeySingleUsage> controls = getCertprofile().extensions().getKeyUsage(keySpec);
     if (controls != null) {
       for (KeySingleUsage control : controls) {
         if (control.isRequired() == required) {
@@ -488,7 +446,7 @@ class X509ExtensionChecker {
   void checkExtnNameConstraints(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
-    NameConstraints nameConstraints = caller.getNameConstraints();
+    ExtensionValueConf.NameConstraints nameConstraints = caller.getNameConstraints();
 
     if (nameConstraints == null) {
       caller.checkConstantExtnValue(OIDs.Extn.nameConstraints,
@@ -496,15 +454,12 @@ class X509ExtensionChecker {
       return;
     }
 
-    org.bouncycastle.asn1.x509.NameConstraints tmpNameConstraints =
-        org.bouncycastle.asn1.x509.NameConstraints.getInstance(extnValue);
+    NameConstraints tmpNameConstraints = NameConstraints.getInstance(extnValue);
 
     checkExtnNameConstraintsSubtrees(failureMsg, "PermittedSubtrees",
-        tmpNameConstraints.getPermittedSubtrees(),
-        nameConstraints.permittedSubtrees());
+        tmpNameConstraints.getPermittedSubtrees(), nameConstraints.permittedSubtrees());
     checkExtnNameConstraintsSubtrees(failureMsg, "ExcludedSubtrees",
-        tmpNameConstraints.getExcludedSubtrees(),
-        nameConstraints.excludedSubtrees());
+        tmpNameConstraints.getExcludedSubtrees(), nameConstraints.excludedSubtrees());
   } // method checkExtnNameConstraints
 
   private void checkExtnNameConstraintsSubtrees(
@@ -530,23 +485,17 @@ class X509ExtensionChecker {
 
       GeneralName expBase;
       if (expSubtree.directoryName() != null) {
-        expBase = new GeneralName(X509Util.reverse(
-            new X500Name(expSubtree.directoryName())));
+        expBase = new GeneralName(X509Util.reverse(new X500Name(expSubtree.directoryName())));
       } else if (expSubtree.dnsName() != null) {
-        expBase = new GeneralName(GeneralName.dNSName,
-            expSubtree.dnsName());
+        expBase = new GeneralName(GeneralName.dNSName, expSubtree.dnsName());
       } else if (expSubtree.ipAddress() != null) {
-        expBase = new GeneralName(GeneralName.iPAddress,
-            expSubtree.ipAddress());
+        expBase = new GeneralName(GeneralName.iPAddress, expSubtree.ipAddress());
       } else if (expSubtree.rfc822Name() != null) {
-        expBase = new GeneralName(GeneralName.rfc822Name,
-            expSubtree.rfc822Name());
+        expBase = new GeneralName(GeneralName.rfc822Name, expSubtree.rfc822Name());
       } else if (expSubtree.uri() != null) {
-        expBase = new GeneralName(GeneralName.uniformResourceIdentifier,
-            expSubtree.uri());
+        expBase = new GeneralName(GeneralName.uniformResourceIdentifier, expSubtree.uri());
       } else {
-        throw new IllegalStateException(
-            "should not reach here, unknown child of GeneralName");
+        throw new IllegalStateException("should not reach here, unknown child of GeneralName");
       }
 
       if (!isBase.equals(expBase)) {
@@ -564,19 +513,17 @@ class X509ExtensionChecker {
   void checkExtnPolicyConstraints(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
-    PolicyConstraints conf = caller.getPolicyConstraints();
+    ExtensionValueConf.PolicyConstraints conf = caller.getPolicyConstraints();
     if (conf == null) {
       caller.checkConstantExtnValue(OIDs.Extn.policyConstraints,
           failureMsg, extnValue, requestedExtns, extnControl);
       return;
     }
 
-    org.bouncycastle.asn1.x509.PolicyConstraints isPolicyConstraints =
-        org.bouncycastle.asn1.x509.PolicyConstraints.getInstance(extnValue);
+    PolicyConstraints isPolicyConstraints = PolicyConstraints.getInstance(extnValue);
     Integer expRequireExplicitPolicy = conf.requireExplicitPolicy();
     BigInteger bigInt = isPolicyConstraints.getRequireExplicitPolicyMapping();
-    Integer isRequireExplicitPolicy = (bigInt == null) ? null
-        : bigInt.intValue();
+    Integer isRequireExplicitPolicy = (bigInt == null) ? null : bigInt.intValue();
 
     boolean match = true;
     if (expRequireExplicitPolicy == null) {
@@ -594,8 +541,7 @@ class X509ExtensionChecker {
 
     Integer expInhibitPolicyMapping = conf.inhibitPolicyMapping();
     bigInt = isPolicyConstraints.getInhibitPolicyMapping();
-    Integer isInhibitPolicyMapping = (bigInt == null) ? null
-        : bigInt.intValue();
+    Integer isInhibitPolicyMapping = (bigInt == null) ? null : bigInt.intValue();
 
     match = true;
     if (expInhibitPolicyMapping == null) {
@@ -615,27 +561,24 @@ class X509ExtensionChecker {
   void checkExtnPolicyMappings(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
-    PolicyMappings conf = caller.getPolicyMappings();
+    ExtensionValueConf.PolicyMappings conf = caller.getPolicyMappings();
     if (conf == null) {
       caller.checkConstantExtnValue(OIDs.Extn.policyMappings, failureMsg,
           extnValue, requestedExtns, extnControl);
       return;
     }
 
-    ASN1Sequence isPolicyMappings = DERSequence.getInstance(extnValue);
+    ASN1Sequence isPolicyMappings = ASN1Sequence.getInstance(extnValue);
     Map<String, String> isMap = new HashMap<>();
     int size = isPolicyMappings.size();
     for (int i = 0; i < size; i++) {
-      ASN1Sequence seq = ASN1Sequence.getInstance(
-          isPolicyMappings.getObjectAt(i));
-      CertPolicyId issuerDomainPolicy = CertPolicyId.getInstance(
-          seq.getObjectAt(0));
-      CertPolicyId subjectDomainPolicy = CertPolicyId.getInstance(
-          seq.getObjectAt(1));
+      ASN1Sequence seq = ASN1Sequence.getInstance(isPolicyMappings.getObjectAt(i));
+      CertPolicyId issuerDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(0));
+      CertPolicyId subjectDomainPolicy = CertPolicyId.getInstance(seq.getObjectAt(1));
       isMap.put(issuerDomainPolicy.getId(), subjectDomainPolicy.getId());
     }
 
-    for (PolicyMappings.PolicyIdMappingType m : conf.mappings()) {
+    for (ExtensionValueConf.PolicyIdMappingType m : conf.mappings()) {
       String expIssuerDomainPolicy = m.issuerDomainPolicy().textOid();
       String expSubjectDomainPolicy = m.subjectDomainPolicy().textOid();
 
@@ -658,71 +601,61 @@ class X509ExtensionChecker {
   void checkSmimeCapabilities(StringBuilder failureMsg, byte[] extnValue) {
     byte[] expected = caller.getSmimeCapabilities().getValue();
     if (!Arrays.equals(expected, extnValue)) {
-      addViolation(failureMsg, "extension valus",
-          Hex.encode(extnValue), Hex.encode(expected));
+      addViolation(failureMsg, "extension valus", Hex.encode(extnValue), Hex.encode(expected));
     }
   } // method checkSmimeCapabilities
 
   void checkScts(StringBuilder failureMsg, byte[] extensionValue) {
     // just check the syntax
     try {
-      ASN1OctetString octet = DEROctetString.getInstance(extensionValue);
+      ASN1OctetString octet = Asn1Util.toASN1OctetString(extensionValue);
       CtLog.SignedCertificateTimestampList sctList =
           CtLog.SignedCertificateTimestampList.getInstance(octet.getOctets());
       int size = sctList.sctList().size();
       for (int i = 0; i < size; i++) {
-        CtLog.getSignatureObject(
-            sctList.sctList().get(i).digitallySigned());
+        CtLog.getSignatureObject(sctList.sctList().get(i).digitallySigned());
       }
     } catch (Exception ex) {
-      failureMsg.append("invalid syntax: ").append(ex.getMessage())
-          .append("; ");
+      failureMsg.append("invalid syntax: ").append(ex.getMessage()).append("; ");
     }
   } // method checkScts
 
   void checkExtnPrivateKeyUsagePeriod(
-      StringBuilder failureMsg, byte[] extnValue,
-      Date certNotBefore, Date certNotAfter) {
+      StringBuilder failureMsg, byte[] extnValue, Date certNotBefore, Date certNotAfter) {
     ASN1GeneralizedTime notBefore = new ASN1GeneralizedTime(certNotBefore);
     Date dateNotAfter;
-    Validity privateKeyUsagePeriod =
-        getCertprofile().extensions().privateKeyUsagePeriod();
+    Validity privateKeyUsagePeriod = getCertprofile().extensions().privateKeyUsagePeriod();
     if (privateKeyUsagePeriod == null) {
       dateNotAfter = certNotAfter;
     } else {
-      dateNotAfter = Date.from(
-          privateKeyUsagePeriod.add(certNotBefore.toInstant()));
-
+      dateNotAfter = Date.from(privateKeyUsagePeriod.add(certNotBefore.toInstant()));
       if (dateNotAfter.after(certNotAfter)) {
         dateNotAfter = certNotAfter;
       }
     }
     ASN1GeneralizedTime notAfter = new ASN1GeneralizedTime(dateNotAfter);
 
-    org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod extValue =
-        org.bouncycastle.asn1.x509.PrivateKeyUsagePeriod.getInstance(extnValue);
+    PrivateKeyUsagePeriod extValue = PrivateKeyUsagePeriod.getInstance(extnValue);
 
     ASN1GeneralizedTime time = extValue.getNotBefore();
     if (time == null) {
       failureMsg.append("notBefore is absent but expected present; ");
     } else if (!time.equals(notBefore)) {
-      addViolation(failureMsg, "notBefore", time.getTimeString(),
-          notBefore.getTimeString());
+      addViolation(failureMsg, "notBefore", time.getTimeString(), notBefore.getTimeString());
     }
 
     time = extValue.getNotAfter();
     if (time == null) {
       failureMsg.append("notAfter is absent but expected present; ");
     } else if (!time.equals(notAfter)) {
-      addViolation(failureMsg, "notAfter", time.getTimeString(),
-          notAfter.getTimeString());
+      addViolation(failureMsg, "notAfter", time.getTimeString(), notAfter.getTimeString());
     }
   } // method checkExtnPrivateKeyUsagePeriod
 
   void checkExtnQcStatements(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
-    QcStatements qcStatements = caller.getQcStatements();
+    ExtensionValueConf.QcStatements qcStatements = caller.getQcStatements();
     if (qcStatements == null) {
       caller.checkConstantExtnValue(OIDs.Extn.qCStatements, failureMsg,
           extnValue, requestedExtns, extnControl);
@@ -742,15 +675,13 @@ class X509ExtensionChecker {
     Extension reqExtension = (requestedExtns == null) ? null
         : requestedExtns.getExtension(OIDs.Extn.qCStatements);
     if (reqExtension != null) {
-      ASN1Sequence seq = ASN1Sequence.getInstance(
-          reqExtension.getParsedValue());
+      ASN1Sequence seq = ASN1Sequence.getInstance(reqExtension.getParsedValue());
 
       final int n = seq.size();
       for (int j = 0; j < n; j++) {
         QCStatement stmt = QCStatement.getInstance(seq.getObjectAt(j));
         if (OIDs.QCS.id_etsi_qcs_QcLimitValue.equals(stmt.getStatementId())) {
-          MonetaryValue monetaryValue =
-              MonetaryValue.getInstance(stmt.getStatementInfo());
+          MonetaryValue monetaryValue = MonetaryValue.getInstance(stmt.getStatementInfo());
           int amount = monetaryValue.getAmount().intValue();
           int exponent = monetaryValue.getExponent().intValue();
           Iso4217CurrencyCode currency = monetaryValue.getCurrency();
@@ -764,34 +695,30 @@ class X509ExtensionChecker {
 
     for (int i = 0; i < expSize; i++) {
       QCStatement is = QCStatement.getInstance(extValue.getObjectAt(i));
-      QcStatements.QcStatementType exp = qcStatements.qcStatements().get(i);
+      ExtensionValueConf.QcStatementType exp = qcStatements.qcStatements().get(i);
       if (!is.getStatementId().equals(exp.statementId().oid())) {
-        addViolation(failureMsg, "statmentId[" + i + "]",
+        addViolation(failureMsg, "statementId[" + i + "]",
             is.getStatementId().getId(), exp.statementId().oid());
         continue;
       }
 
       if (exp.statementValue() == null) {
         if (is.getStatementInfo() != null) {
-          addViolation(failureMsg, "statmentInfo[" + i + "]",
-              "present", "absent");
+          addViolation(failureMsg, "statementInfo[" + i + "]", "present", "absent");
         }
         continue;
       }
 
       if (is.getStatementInfo() == null) {
-        addViolation(failureMsg, "statmentInfo[" + i + "]",
-            "absent", "present");
+        addViolation(failureMsg, "statementInfo[" + i + "]", "absent", "present");
         continue;
       }
 
-      QcStatements.QcStatementValueType expStatementValue =
-          exp.statementValue();
+      ExtensionValueConf.QcStatementValueType expStatementValue = exp.statementValue();
 
       try {
         if (expStatementValue.constant() != null) {
-          byte[] expValue = expStatementValue.constant().toASN1()
-              .toASN1Primitive().getEncoded();
+          byte[] expValue = expStatementValue.constant().toASN1().toASN1Primitive().getEncoded();
           byte[] isValue = is.getStatementInfo().toASN1Primitive().getEncoded();
 
           if (!Arrays.equals(isValue, expValue)) {
@@ -799,66 +726,53 @@ class X509ExtensionChecker {
                 Hex.encode(isValue), Hex.encode(expValue));
           }
         } else if (expStatementValue.qcRetentionPeriod() != null) {
-          String isValue = ASN1Integer.getInstance(
-              is.getStatementInfo()).toString();
+          String isValue = ASN1Integer.getInstance(is.getStatementInfo()).toString();
 
           String expValue = expStatementValue.qcRetentionPeriod().toString();
           if (!isValue.equals(expValue)) {
-            addViolation(failureMsg, "statementInfo[" + i + "]",
-                isValue, expValue);
+            addViolation(failureMsg, "statementInfo[" + i + "]", isValue, expValue);
           }
         } else if (expStatementValue.pdsLocations() != null) {
           Set<String> pdsLocations = new HashSet<>();
-          ASN1Sequence pdsLocsSeq =
-              ASN1Sequence.getInstance(is.getStatementInfo());
+          ASN1Sequence pdsLocsSeq = ASN1Sequence.getInstance(is.getStatementInfo());
 
           int size = pdsLocsSeq.size();
           for (int k = 0; k < size; k++) {
-            ASN1Sequence pdsLocSeq =
-                ASN1Sequence.getInstance(pdsLocsSeq.getObjectAt(k));
+            ASN1Sequence pdsLocSeq = ASN1Sequence.getInstance(pdsLocsSeq.getObjectAt(k));
 
             int size2 = pdsLocSeq.size();
             if (size2 != 2) {
-              throw new IllegalArgumentException(
-                  "sequence size is " + size2 + " but expected 2");
+              throw new IllegalArgumentException("sequence size is " + size2 + " but expected 2");
             }
-            String url = ASN1IA5String.getInstance(
-                pdsLocSeq.getObjectAt(0)).getString();
 
-            String lang = ASN1PrintableString.getInstance(
-                pdsLocSeq.getObjectAt(1)).getString();
-
+            String url = Asn1Util.getIA5String(pdsLocSeq.getObjectAt(0));
+            String lang = Asn1Util.getPrintableString(pdsLocSeq.getObjectAt(1));
             pdsLocations.add("url=" + url + ",lang=" + lang);
           }
 
           Set<String> expectedPdsLocations = new HashSet<>();
-          for (QcStatements.PdsLocationType m
-              : expStatementValue.pdsLocations()) {
-            expectedPdsLocations.add("url=" + m.url() +
-                ",lang=" + m.language());
+          for (ExtensionValueConf.PdsLocationType m : expStatementValue.pdsLocations()) {
+            expectedPdsLocations.add("url=" + m.url() + ",lang=" + m.language());
           }
 
-          Set<String> diffs = CheckerUtil.elementInBnotInA(
-              expectedPdsLocations, pdsLocations);
+          Set<String> diffs = CheckerUtil.elementInBnotInA(expectedPdsLocations, pdsLocations);
 
           if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ")
                 .append(diffs).append(" are present but not expected; ");
           }
 
-          diffs = CheckerUtil.elementInBnotInA(
-              pdsLocations, expectedPdsLocations);
+          diffs = CheckerUtil.elementInBnotInA(pdsLocations, expectedPdsLocations);
           if (CollectionUtil.isNotEmpty(diffs)) {
             failureMsg.append("statementInfo[").append(i).append("]: ")
                 .append(diffs).append(" are absent but are required; ");
           }
         } else if (expStatementValue.qcEuLimitValue() != null) {
-          QcStatements.QcEuLimitValueType euLimitConf =
-              expStatementValue.qcEuLimitValue();
+          ExtensionValueConf.QcEuLimitValueType euLimitConf = expStatementValue.qcEuLimitValue();
           String expCurrency = euLimitConf.currency().toUpperCase();
           int[] expAmountExp = reqQcEuLimits.get(expCurrency);
 
-          QcStatements.Range2Type range = euLimitConf.amount();
+          ExtensionValueConf.Range2Type range = euLimitConf.amount();
           int value;
           if (range.min() == range.max()) {
             value = range.min();
@@ -883,12 +797,10 @@ class X509ExtensionChecker {
           }
           String expExponent = Integer.toString(value);
 
-          MonetaryValue monterayValue =
-              MonetaryValue.getInstance(is.getStatementInfo());
+          MonetaryValue monterayValue = MonetaryValue.getInstance(is.getStatementInfo());
           Iso4217CurrencyCode currency = monterayValue.getCurrency();
           String isCurrency = currency.isAlphabetic()
-              ? currency.getAlphabetic()
-              : Integer.toString(currency.getNumeric());
+              ? currency.getAlphabetic() : Integer.toString(currency.getNumeric());
           String isAmount = monterayValue.getAmount().toString();
           String isExponent = monterayValue.getExponent().toString();
           if (!isCurrency.equals(expCurrency)) {
@@ -904,12 +816,10 @@ class X509ExtensionChecker {
                     "].qcEuLimit.exponent", isExponent, expExponent);
           }
         } else {
-          throw new IllegalStateException("statementInfo[" + i +
-              "]should not reach here");
+          throw new IllegalStateException("statementInfo[" + i + "]should not reach here");
         }
       } catch (IOException ex) {
-        failureMsg.append("statementInfo[").append(i)
-            .append("] has incorrect syntax; ");
+        failureMsg.append("statementInfo[").append(i).append("] has incorrect syntax; ");
       }
     }
   } // method checkExtnQcStatements
@@ -922,8 +832,7 @@ class X509ExtensionChecker {
 
     GeneralName[] requested;
     try {
-      GeneralNames sanExtnValue = (requestedExtns == null)
-          ? null
+      GeneralNames sanExtnValue = (requestedExtns == null) ? null
           : GeneralNames.getInstance(requestedExtns.getExtensionParsedValue(
               OIDs.Extn.subjectAlternativeName));
       GeneralNames gns = XijsonExtensions.createRequestedSubjectAltNames(
@@ -956,23 +865,20 @@ class X509ExtensionChecker {
     }
 
     if (is.length != expected.length) {
-      addViolation(failureMsg, "size of GeneralNames",
-          is.length, expected.length);
+      addViolation(failureMsg, "size of GeneralNames", is.length, expected.length);
       return;
     }
 
     for (int i = 0; i < is.length; i++) {
       if (!is[i].equals(expected[i])) {
-        failureMsg.append(i + 1)
-            .append("-th name does not match the requested one; ");
+        failureMsg.append(i + 1).append("-th name does not match the requested one; ");
       }
     }
   } // method checkExtnSubjectAltNames
 
   void checkExtnSubjectInfoAccess(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns) {
-    Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> conf
-        = getCertprofile().subjectInfoAccessModes();
+    Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> conf = getCertprofile().subjectInfoAccessModes();
     if (conf == null) {
       failureMsg.append("extension is present but not expected; ");
       return;
@@ -980,8 +886,7 @@ class X509ExtensionChecker {
 
     ASN1Encodable requestExtValue = null;
     if (requestedExtns != null) {
-      requestExtValue = requestedExtns.getExtensionParsedValue(
-          OIDs.Extn.subjectInfoAccess);
+      requestExtValue = requestedExtns.getExtensionParsedValue(OIDs.Extn.subjectInfoAccess);
     }
     if (requestExtValue == null) {
       failureMsg.append("extension is present but not expected; ");
@@ -994,14 +899,12 @@ class X509ExtensionChecker {
     int size = requestSeq.size();
 
     if (certSeq.size() != size) {
-      addViolation(failureMsg, "size of GeneralNames",
-          certSeq.size(), size);
+      addViolation(failureMsg, "size of GeneralNames", certSeq.size(), size);
       return;
     }
 
     for (int i = 0; i < size; i++) {
-      AccessDescription ad = AccessDescription.getInstance(
-          requestSeq.getObjectAt(i));
+      AccessDescription ad = AccessDescription.getInstance(requestSeq.getObjectAt(i));
       ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
       Set<GeneralNameTag> generalNameModes = conf.get(accessMethod);
 
@@ -1011,8 +914,7 @@ class X509ExtensionChecker {
         continue;
       }
 
-      AccessDescription certAccessDesc =
-          AccessDescription.getInstance(certSeq.getObjectAt(i));
+      AccessDescription certAccessDesc = AccessDescription.getInstance(certSeq.getObjectAt(i));
       ASN1ObjectIdentifier certAccessMethod = certAccessDesc.getAccessMethod();
 
       boolean bo = Objects.equals(accessMethod, certAccessMethod);
@@ -1026,11 +928,9 @@ class X509ExtensionChecker {
 
       GeneralName accessLocation;
       try {
-        accessLocation = createGeneralName(ad.getAccessLocation(),
-            generalNameModes);
+        accessLocation = createGeneralName(ad.getAccessLocation(), generalNameModes);
       } catch (BadCertTemplateException ex) {
-        failureMsg.append("invalid requestedExtension: ")
-            .append(ex.getMessage()).append("; ");
+        failureMsg.append("invalid requestedExtension: ").append(ex.getMessage()).append("; ");
         continue;
       }
 
@@ -1042,31 +942,22 @@ class X509ExtensionChecker {
   } // method checkExtnSUbjectInfoAccess
 
   void checkExtnSubjectKeyIdentifier(
-      StringBuilder failureMsg, byte[] extnValue,
-      SubjectPublicKeyInfo subjectPublicKeyInfo) {
+      StringBuilder failureMsg, byte[] extnValue, SubjectPublicKeyInfo subjectPublicKeyInfo) {
     // subjectKeyIdentifier
     SubjectKeyIdentifier asn1 = SubjectKeyIdentifier.getInstance(extnValue);
     byte[] ski = asn1.getKeyIdentifier();
 
-    byte[] expectedSki;
-    try {
-      expectedSki = getCertprofile().subjectKeyIdentifier(
-          subjectPublicKeyInfo);
-    } catch (CertprofileException e) {
-      failureMsg.append("error computing expected SubjectKeyIdentifier");
-      return;
-    }
+    byte[] expectedSki = getCertprofile().subjectKeyIdentifier(subjectPublicKeyInfo);
 
     if (!Arrays.equals(expectedSki, ski)) {
-      addViolation(failureMsg, "SKI", Hex.encode(ski),
-          Hex.encode(expectedSki));
+      addViolation(failureMsg, "SKI", Hex.encode(ski), Hex.encode(expectedSki));
     }
   } // method checkExtnSubjectKeyIdentifier
 
   void checkExtnTlsFeature(
       StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
       ExtensionControl extnControl) {
-    TlsFeature tlsFeature = caller.getTlsFeature();
+    ExtensionValueConf.TlsFeature tlsFeature = caller.getTlsFeature();
     if (tlsFeature == null) {
       caller.checkConstantExtnValue(OIDs.Extn.id_pe_tlsfeature,
           failureMsg, extnValue, requestedExtns, extnControl);
@@ -1085,14 +976,12 @@ class X509ExtensionChecker {
 
     Set<Integer> diffs = CheckerUtil.elementInBnotInA(expFeatures, isFeatures);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("features ").append(diffs)
-          .append(" are present but not expected; ");
+      failureMsg.append("features ").append(diffs).append(" are present but not expected; ");
     }
 
     diffs = CheckerUtil.elementInBnotInA(isFeatures, expFeatures);
     if (CollectionUtil.isNotEmpty(diffs)) {
-      failureMsg.append("features ").append(diffs)
-          .append(" are absent but are required; ");
+      failureMsg.append("features ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnTlsFeature
 
@@ -1111,8 +1000,7 @@ class X509ExtensionChecker {
 
   static Set<String> getExtKeyUsage(byte[] extensionValue) {
     Set<String> usages = new HashSet<>();
-    org.bouncycastle.asn1.x509.ExtendedKeyUsage reqKeyUsage =
-        org.bouncycastle.asn1.x509.ExtendedKeyUsage.getInstance(extensionValue);
+    ExtendedKeyUsage reqKeyUsage = ExtendedKeyUsage.getInstance(extensionValue);
     for (KeyPurposeId usage : reqKeyUsage.getUsages()) {
       usages.add(usage.getId());
     }
@@ -1148,13 +1036,11 @@ class X509ExtensionChecker {
     Set<String> isUris = new HashSet<>();
     for (AccessDescription isAccessDescription : isAccessDescriptions) {
       GeneralName isAccessLocation = isAccessDescription.getAccessLocation();
-      if (isAccessLocation.getTagNo() !=
-          GeneralName.uniformResourceIdentifier) {
+      if (isAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier) {
         CheckerUtil.addViolation(failureMsg, "tag of accessLocation of AIA ",
             isAccessLocation.getTagNo(), GeneralName.uniformResourceIdentifier);
       } else {
-        String isOcspUri =
-            ((ASN1String) isAccessLocation.getName()).getString();
+        String isOcspUri = ((ASN1String) isAccessLocation.getName()).getString();
         isUris.add(isOcspUri);
       }
     }
@@ -1172,8 +1058,7 @@ class X509ExtensionChecker {
     }
   } // method checkAia
 
-  static GeneralName createGeneralName(
-      GeneralName reqName, Set<GeneralNameTag> modes)
+  static GeneralName createGeneralName(GeneralName reqName, Set<GeneralNameTag> modes)
       throws BadCertTemplateException {
     int tag = reqName.getTagNo();
     GeneralNameTag mode = null;
@@ -1186,8 +1071,7 @@ class X509ExtensionChecker {
       }
 
       if (mode == null) {
-        throw new BadCertTemplateException(
-            "generalName tag " + tag + " is not allowed");
+        throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
       }
     }
 
@@ -1201,11 +1085,10 @@ class X509ExtensionChecker {
         return new GeneralName(tag, reqName.getName());
       case GeneralName.otherName: {
         ASN1Sequence reqSeq = ASN1Sequence.getInstance(reqName.getName());
-        ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(
-            reqSeq.getObjectAt(0));
+        ASN1ObjectIdentifier type = ASN1ObjectIdentifier.getInstance(reqSeq.getObjectAt(0));
 
-        ASN1Encodable value = ASN1TaggedObject.getInstance(
-            reqSeq.getObjectAt(1)).getBaseObject();
+        ASN1Encodable value = Asn1Util.getBaseObject(
+            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(1)));
 
         String text;
         if (!(value instanceof ASN1String)) {
@@ -1228,29 +1111,23 @@ class X509ExtensionChecker {
         int idx = 0;
         if (size > 1) {
           DirectoryString ds = DirectoryString.getInstance(
-              ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++))
-                  .getBaseObject());
+              Asn1Util.getBaseObject(ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++))));
           nameAssigner = ds.getString();
         }
 
         DirectoryString ds = DirectoryString.getInstance(
-            ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx))
-                .getBaseObject());
+            Asn1Util.getBaseObject(ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx))));
         String partyName = ds.getString();
 
         ASN1EncodableVector vector = new ASN1EncodableVector();
         if (nameAssigner != null) {
-          vector.add(new DERTaggedObject(false, 0,
-              new DirectoryString(nameAssigner)));
+          vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
         }
-        vector.add(new DERTaggedObject(false, 1,
-            new DirectoryString(partyName)));
-        return new GeneralName(GeneralName.ediPartyName,
-            new DERSequence(vector));
+        vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
+        return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
       }
       default:
-        throw new IllegalStateException(
-            "should not reach here, unknown GeneralName tag " + tag);
+        throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
     } // end switch
   } // method createGeneralName
 

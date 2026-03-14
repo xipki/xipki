@@ -3,9 +3,9 @@
 
 package org.xipki.pkcs11.xihsm.objects;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -13,19 +13,23 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.BigIntegers;
+import org.xipki.pkcs11.wrapper.Category;
 import org.xipki.pkcs11.wrapper.PKCS11T;
+import org.xipki.pkcs11.wrapper.params.ECDH1_DERIVE_PARAMS;
 import org.xipki.pkcs11.wrapper.vendor.SpecialBehaviour;
 import org.xipki.pkcs11.wrapper.vendor.VendorEnum;
 import org.xipki.pkcs11.xihsm.LoginState;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
-import org.xipki.pkcs11.xihsm.crypt.WeierstraussCurveEnum;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.WeierstraussCurveEnum;
+import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.asn1.Asn1Util;
 
 import java.io.IOException;
@@ -33,7 +37,18 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_VALUE_LEN;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKD_NULL;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_ENCRYPTED_DATA_INVALID;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_ENCRYPTED_DATA_LEN_RANGE;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_FUNCTION_FAILED;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_MECHANISM_INVALID;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_MECHANISM_PARAM_INVALID;
+
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
@@ -50,12 +65,15 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
     super(vendor, cku, newObjectMethod, handle, inToken, keyType,
         keyGenMechanism, ecParams, value);
 
-    this.curve = WeierstraussCurveEnum.ofEcParamsNonNull(ecParams);
+    try {
+      this.curve = WeierstraussCurveEnum.ofEcParamsNonNull(ecParams);
+    } catch (XiSecurityException e) {
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error detecting curve of EC key", e);
+    }
     this.sk = new BigInteger(1, value);
   }
 
-  private byte[] ecdsaSignHash(XiHsmVendor vendor,
-                               byte[] hashValue, SecureRandom random) {
+  private byte[] ecdsaSignHash(XiHsmVendor vendor, byte[] hashValue, SecureRandom random) {
     int fieldByteSize = curve.getFieldByteSize();
 
     if (fieldByteSize < hashValue.length) {
@@ -99,9 +117,10 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
   protected org.bouncycastle.asn1.sec.ECPrivateKey getASN1ECPrivateKey() {
     if (vendor.getVendorEnum() == VendorEnum.UTIMACO) {
       byte[] bytes = BigIntegers.asUnsignedByteArray(sk);
-      ASN1Sequence seq = new DERSequence(
-          new ASN1Integer(1), new DEROctetString(bytes));
-      return org.bouncycastle.asn1.sec.ECPrivateKey.getInstance(seq);
+      ASN1EncodableVector v = new ASN1EncodableVector(2);
+      v.add(new ASN1Integer(1));
+      v.add(new DEROctetString(bytes));
+      return org.bouncycastle.asn1.sec.ECPrivateKey.getInstance(new DERSequence(v));
     } else {
       return new org.bouncycastle.asn1.sec.ECPrivateKey(
           curve.getOrder().bitLength(), new BigInteger(1, value));
@@ -111,8 +130,7 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
   @Override
   public byte[] getEncoded() throws HsmException {
     AlgorithmIdentifier algId = new AlgorithmIdentifier(
-        X9ObjectIdentifiers.id_ecPublicKey,
-        new ASN1ObjectIdentifier(curve.getOid()));
+        X9ObjectIdentifiers.id_ecPublicKey, new ASN1ObjectIdentifier(curve.getOid()));
     org.bouncycastle.asn1.sec.ECPrivateKey asn1Key = getASN1ECPrivateKey();
     try {
       return new PrivateKeyInfo(algId, asn1Key).getEncoded();
@@ -123,12 +141,10 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
   }
 
   @Override
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                            SecureRandom random)
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random)
       throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     HsmUtil.assertNullParameter(mechanism);
@@ -154,18 +170,88 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
     return ecdsaSignHash(mechanism.getVendor(), hashAlgo.hash(data), random);
   }
 
+  @Override
+  public byte[] deriveKey(XiMechanism mechanism, XiTemplate template) throws HsmException {
+    if (!isDerive()) {
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_DERIVE != TRUE");
+    }
+
+    long ckm = mechanism.getCkm();
+    Object params = mechanism.getParameter();
+    if (ckm == PKCS11T.CKM_ECDH1_DERIVE) {
+      int valueLen = template.removeNonNullInt(CKA_VALUE_LEN);
+      if (!(valueLen >= 1 && valueLen <= curve.getFieldByteSize())) {
+        throw new HsmException(CKR_ATTRIBUTE_VALUE_INVALID, "invalid CKA_VALUE_LEN " + valueLen);
+      }
+
+      if (!(params instanceof ECDH1_DERIVE_PARAMS)) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
+            "params not allowed: " + params.getClass().getName());
+      }
+
+      if (vendor.getVendorEnum() == VendorEnum.CLOUDHSM) {
+        throw new HsmException(CKR_FUNCTION_FAILED, "simulate CloudHSM's behavior");
+      }
+
+      ECDH1_DERIVE_PARAMS p = (ECDH1_DERIVE_PARAMS) params;
+      long kdf = p.kdf();
+      if (kdf != CKD_NULL) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID,
+            "parameter.kdf not allowed: " + PKCS11T.codeToName(Category.CKD, kdf));
+      }
+
+      byte[] sharedData = p.sharedData();
+      if (!(sharedData == null || sharedData.length == 0)) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "parameter.sharedData != NULL");
+      }
+
+      int size = curve.getFieldByteSize();
+      byte[] publicData = p.publicData();
+
+      if (vendor.hasSpecialBehaviour(SpecialBehaviour.ECDH_DER_ECPOINT)) {
+        try {
+          publicData = Asn1Util.readOctetsFromASN1OctetString(publicData);
+        } catch (CodecException e) {
+          throw new HsmException(CKR_ENCRYPTED_DATA_INVALID, "publicData is not DER-encoded", e);
+        }
+      }
+
+      if (publicData.length != 1 + size * 2) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "invalid parameters.publicData");
+      }
+
+      int expLen = 1 + 2 * curve.getFieldByteSize();
+      if (publicData.length != expLen) {
+        throw new HsmException(CKR_ENCRYPTED_DATA_LEN_RANGE,
+            "publicData.length != " + expLen + ": " + publicData.length);
+      }
+
+      ECPoint peerPoint ;
+      try {
+        peerPoint = curve.decodePoint(publicData);
+      } catch (XiSecurityException e) {
+        throw new HsmException(CKR_MECHANISM_PARAM_INVALID, "invalid publicData", e);
+      }
+      BigInteger bnX = peerPoint.multiply(sk).normalize().getXCoord().toBigInteger();
+      byte[] bytes = BigIntegers.asUnsignedByteArray(size, bnX);
+      return valueLen == bytes.length ? bytes
+          : Arrays.copyOfRange(bytes, bytes.length - valueLen, bytes.length);
+    } else {
+      throw new HsmException(CKR_MECHANISM_INVALID, "Mechanism " +
+          PKCS11T.ckmCodeToName(ckm) + " is not supported");
+    }
+  }
+
   public static XiWeierstrassECPrivateKey newInstance(
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       LoginState loginState, ObjectInitMethod initMethod,
       long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
       throws HsmException {
-    byte[] ecParams = attrs.removeNonNullByteArray(
-        PKCS11T.CKA_EC_PARAMS);
+    byte[] ecParams = attrs.removeNonNullByteArray(PKCS11T.CKA_EC_PARAMS);
     byte[] value = attrs.removeNonNullByteArray(PKCS11T.CKA_VALUE);
     long keyType = PKCS11T.CKK_EC;
     XiWeierstrassECPrivateKey ret;
-    if (WeierstraussCurveEnum.ofEcParams(ecParams) ==
-        WeierstraussCurveEnum.SM2) {
+    if (WeierstraussCurveEnum.ofEcParams(ecParams) == WeierstraussCurveEnum.SM2) {
       byte[] ecPoint = attrs.removeByteArray(PKCS11T.CKA_EC_POINT);
       ret = new XiSm2ECPrivateKey(vendor, cku, newObjectMethod,
           handle, inToken, keyType, keyGenMechanism, ecParams, value, ecPoint);

@@ -72,8 +72,7 @@ public class ASIdentifierChoice extends ASN1Object {
       return new ASIdentifierChoice();
     } else if (obj instanceof byte[]) {
       try {
-        return getInstance(
-            new ASN1StreamParser((byte[]) obj).readObject());
+        return getInstance(new ASN1StreamParser((byte[]) obj).readObject());
       } catch (IOException e) {
         throw new IllegalArgumentException(e);
       }

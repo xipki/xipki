@@ -10,6 +10,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairType;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.EcCurveEnum;
 
 import java.security.NoSuchAlgorithmException;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum KeySpec {
@@ -26,16 +29,16 @@ public enum KeySpec {
   RSA3072("RSA3072", PKCS11KeyPairType.RSA3072),
   RSA4096("RSA4096", PKCS11KeyPairType.RSA4096),
   // EC
-  SECP256R1("SECP256R1", PKCS11KeyPairType.P256),
-  SECP384R1("SECP384R1", PKCS11KeyPairType.P384),
-  SECP521R1("SECP521R1", PKCS11KeyPairType.P521),
+  P256("P256", PKCS11KeyPairType.P256),
+  P384("P384", PKCS11KeyPairType.P384),
+  P521("P521", PKCS11KeyPairType.P521),
   /** BrainPool P256R1 EC Key */
   BRAINPOOLP256R1("BRAINPOOLP256R1", PKCS11KeyPairType.BRAINPOOLP256R1),
   /** BrainPool P384R1 EC Key */
   BRAINPOOLP384R1("BRAINPOOLP384R1", PKCS11KeyPairType.BRAINPOOLP384R1),
   /** BrainPool P512R1 EC Key */
   BRAINPOOLP512R1("BRAINPOOLP512R1", PKCS11KeyPairType.BRAINPOOLP512R1),
-  SM2P256V1("SM2P256V1", PKCS11KeyPairType.SM2),
+  SM2("SM2", PKCS11KeyPairType.SM2),
   FRP256V1 ("FRP256V1", PKCS11KeyPairType.FRP256V1),
   // Edwards and Montgomery EC key
   X25519 ("X25519",  PKCS11KeyPairType.X25519),
@@ -52,68 +55,37 @@ public enum KeySpec {
   MLKEM1024("MLKEM1024", PKCS11KeyPairType.MLKEM1024),
 
   // Composite MLDSA + Trad key
-  MLDSA44_RSA2048(MLDSA44, RSA2048,
-      OIDs.Composite.id_MLDSA44_RSA2048_PSS_SHA256),
-  MLDSA44_RSA2048_PKCS15(MLDSA44, RSA2048,
-      OIDs.Composite.id_MLDSA44_RSA2048_PKCS15_SHA256),
-  MLDSA44_ED25519(MLDSA44, ED25519,
-      OIDs.Composite.id_MLDSA44_Ed25519_SHA512),
-  MLDSA44_P256(MLDSA44, SECP256R1,
-      OIDs.Composite.id_MLDSA44_ECDSA_P256_SHA256),
-  MLDSA65_RSA3072(MLDSA65, RSA3072,
-      OIDs.Composite.id_MLDSA65_RSA3072_PSS_SHA512),
-  MLDSA65_RSA3072_PKCS15(MLDSA65, RSA3072,
-      OIDs.Composite.id_MLDSA65_RSA3072_PKCS15_SHA512),
-  MLDSA65_RSA4096(MLDSA65, RSA4096,
-      OIDs.Composite.id_MLDSA65_RSA4096_PSS_SHA512),
-  MLDSA65_RSA4096_PKCS15(MLDSA65, RSA4096,
-      OIDs.Composite.id_MLDSA65_RSA4096_PKCS15_SHA512),
-  MLDSA65_P256(MLDSA65, SECP256R1,
-      OIDs.Composite.id_MLDSA65_ECDSA_P256_SHA512),
-  MLDSA65_P384(MLDSA65, SECP384R1,
-      OIDs.Composite.id_MLDSA65_ECDSA_P384_SHA512),
-  MLDSA65_BRAINPOOLP256R1(MLDSA65, BRAINPOOLP256R1,
-      OIDs.Composite.id_MLDSA65_ECDSA_brainpoolP256r1_SHA512),
-  MLDSA65_ED25519(MLDSA65, ED25519,
-      OIDs.Composite.id_MLDSA65_Ed25519_SHA512),
-  MLDSA87_P384(MLDSA87, SECP384R1,
-      OIDs.Composite.id_MLDSA87_ECDSA_P384_SHA512),
-  MLDSA87_BRAINPOOLP384R1(MLDSA87, BRAINPOOLP384R1,
-      OIDs.Composite.id_MLDSA87_ECDSA_brainpoolP384r1_SHA512),
-  MLDSA87_ED448(MLDSA87, ED448,
-      OIDs.Composite.id_MLDSA87_Ed448_SHAKE256),
-  MLDSA87_RSA3072(MLDSA87, RSA3072,
-      OIDs.Composite.id_MLDSA87_RSA3072_PSS_SHA512),
-  MLDSA87_RSA4096(MLDSA87, RSA4096,
-      OIDs.Composite.id_MLDSA87_RSA4096_PSS_SHA512),
-  MLDSA87_P521(MLDSA87, SECP521R1,
-      OIDs.Composite.id_MLDSA87_ECDSA_P521_SHA512),
+  MLDSA44_RSA2048(MLDSA44, RSA2048, OIDs.Composite.id_MLDSA44_RSA2048_PSS_SHA256),
+  MLDSA44_ED25519(MLDSA44, ED25519, OIDs.Composite.id_MLDSA44_Ed25519_SHA512),
+  MLDSA44_P256(MLDSA44, P256, OIDs.Composite.id_MLDSA44_ECDSA_P256_SHA256),
+  MLDSA65_RSA3072(MLDSA65, RSA3072, OIDs.Composite.id_MLDSA65_RSA3072_PSS_SHA512),
+  MLDSA65_RSA4096(MLDSA65, RSA4096, OIDs.Composite.id_MLDSA65_RSA4096_PSS_SHA512),
+  MLDSA65_P256(MLDSA65, P256, OIDs.Composite.id_MLDSA65_ECDSA_P256_SHA512),
+  MLDSA65_P384(MLDSA65, P384, OIDs.Composite.id_MLDSA65_ECDSA_P384_SHA512),
+  MLDSA65_BP256(MLDSA65, BRAINPOOLP256R1, OIDs.Composite.id_MLDSA65_ECDSA_brainpoolP256r1_SHA512),
+  MLDSA65_ED25519(MLDSA65, ED25519, OIDs.Composite.id_MLDSA65_Ed25519_SHA512),
+  MLDSA87_P384(MLDSA87, P384, OIDs.Composite.id_MLDSA87_ECDSA_P384_SHA512),
+  MLDSA87_BP384(MLDSA87, BRAINPOOLP384R1, OIDs.Composite.id_MLDSA87_ECDSA_brainpoolP384r1_SHA512),
+  MLDSA87_ED448(MLDSA87, ED448, OIDs.Composite.id_MLDSA87_Ed448_SHAKE256),
+  MLDSA87_RSA3072(MLDSA87, RSA3072, OIDs.Composite.id_MLDSA87_RSA3072_PSS_SHA512),
+  MLDSA87_RSA4096(MLDSA87, RSA4096, OIDs.Composite.id_MLDSA87_RSA4096_PSS_SHA512),
+  MLDSA87_P521(MLDSA87, P521, OIDs.Composite.id_MLDSA87_ECDSA_P521_SHA512),
 
   // Composite KEM + Trad key
-  MLKEM768_RSA2048(MLKEM768, RSA2048,
-      OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256),
-  MLKEM768_RSA3072(MLKEM768, RSA3072,
-      OIDs.Composite.id_MLKEM768_RSA3072_SHA3_256),
-  MLKEM768_RSA4096(MLKEM768, RSA4096,
-      OIDs.Composite.id_MLKEM768_RSA4096_SHA3_256),
-  MLKEM768_X25519(MLKEM768, X25519,
-      OIDs.Composite.id_MLKEM768_X25519_SHA3_256),
-  MLKEM768_P256(MLKEM768, SECP256R1,
-      OIDs.Composite.id_MLKEM768_ECDH_P256_SHA3_256),
-  MLKEM768_P384(MLKEM768, SECP384R1,
-      OIDs.Composite.id_MLKEM768_ECDH_P384_SHA3_256),
-  MLKEM768_BRAINPOOLP256R1(MLKEM768, BRAINPOOLP256R1,
+  MLKEM768_RSA2048(MLKEM768, RSA2048, OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256),
+  MLKEM768_RSA3072(MLKEM768, RSA3072, OIDs.Composite.id_MLKEM768_RSA3072_SHA3_256),
+  MLKEM768_RSA4096(MLKEM768, RSA4096, OIDs.Composite.id_MLKEM768_RSA4096_SHA3_256),
+  MLKEM768_X25519(MLKEM768, X25519, OIDs.Composite.id_MLKEM768_X25519_SHA3_256),
+  MLKEM768_P256(MLKEM768, P256, OIDs.Composite.id_MLKEM768_ECDH_P256_SHA3_256),
+  MLKEM768_P384(MLKEM768, P384, OIDs.Composite.id_MLKEM768_ECDH_P384_SHA3_256),
+  MLKEM768_BP256(MLKEM768, BRAINPOOLP256R1,
       OIDs.Composite.id_MLKEM768_ECDH_brainpoolP256r1_SHA3_256),
-  MLKEM1024_RSA3072(MLKEM1024, RSA3072,
-      OIDs.Composite.id_MLKEM1024_RSA3072_SHA3_256),
-  MLKEM1024_P384(MLKEM1024, SECP384R1,
-      OIDs.Composite.id_MLKEM1024_ECDH_P384_SHA3_256),
-  MLKEM1024_BRAINPOOLP384R1(MLKEM1024, BRAINPOOLP384R1,
+  MLKEM1024_RSA3072(MLKEM1024, RSA3072, OIDs.Composite.id_MLKEM1024_RSA3072_SHA3_256),
+  MLKEM1024_P384(MLKEM1024, P384, OIDs.Composite.id_MLKEM1024_ECDH_P384_SHA3_256),
+  MLKEM1024_BP384(MLKEM1024, BRAINPOOLP384R1,
       OIDs.Composite.id_MLKEM1024_ECDH_brainpoolP384r1_SHA3_256),
-  MLKEM1024_X448(MLKEM1024, X448,
-      OIDs.Composite.id_MLKEM1024_X448_SHA3_256),
-  MLKEM1024_P521(MLKEM1024, SECP521R1,
-      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256);
+  MLKEM1024_X448(MLKEM1024, X448, OIDs.Composite.id_MLKEM1024_X448_SHA3_256),
+  MLKEM1024_P521(MLKEM1024, P521, OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256);
 
   private final String text;
 
@@ -125,8 +97,7 @@ public enum KeySpec {
 
   private final KeySpec compositeTradVariant;
 
-  KeySpec(KeySpec compositePqcVariant,
-          KeySpec compositeTradVariant, ASN1ObjectIdentifier oid) {
+  KeySpec(KeySpec compositePqcVariant, KeySpec compositeTradVariant, ASN1ObjectIdentifier oid) {
     this.text = name().replace('_', '-');
     this.compositePqcVariant  = compositePqcVariant;
     this.compositeTradVariant = compositeTradVariant;
@@ -140,15 +111,12 @@ public enum KeySpec {
     this.text = text;
     this.type = type;
     if (type instanceof PKCS11KeyPairType.RSA) {
-      this.algId = new AlgorithmIdentifier(
-          OIDs.Algo.id_rsaEncryption, DERNull.INSTANCE);
+      this.algId = new AlgorithmIdentifier(OIDs.Algo.id_rsaEncryption, DERNull.INSTANCE);
     } else if (type instanceof PKCS11KeyPairType.GenericEC){
       ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(
           ((PKCS11KeyPairType.GenericEC) type).getCurveOid());
-      if (type instanceof PKCS11KeyPairType.EC
-          || type instanceof PKCS11KeyPairType.SM2) {
-        this.algId = new AlgorithmIdentifier(
-            OIDs.Algo.id_ecPublicKey, curveOid);
+      if (type instanceof PKCS11KeyPairType.EC || type instanceof PKCS11KeyPairType.SM2) {
+        this.algId = new AlgorithmIdentifier(OIDs.Algo.id_ecPublicKey, curveOid);
       } else {
         this.algId = new AlgorithmIdentifier(curveOid);
       }
@@ -163,10 +131,8 @@ public enum KeySpec {
     } else if (type instanceof PKCS11KeyPairType.MLKEM) {
       long variant = ((PKCS11KeyPairType.MLKEM) type).getVariant();
       ASN1ObjectIdentifier oid =
-            variant == PKCS11T.CKP_ML_KEM_512
-                ? OIDs.Algo.id_ml_kem_512
-          : variant == PKCS11T.CKP_ML_KEM_768
-                ? OIDs.Algo.id_ml_kem_768
+            variant == PKCS11T.CKP_ML_KEM_512 ? OIDs.Algo.id_ml_kem_512
+          : variant == PKCS11T.CKP_ML_KEM_768 ? OIDs.Algo.id_ml_kem_768
           : OIDs.Algo.id_ml_kem_1024;
 
       this.algId = new AlgorithmIdentifier(oid);
@@ -180,16 +146,12 @@ public enum KeySpec {
   }
 
   public Integer RSAKeyBitSize() {
-    if (type instanceof PKCS11KeyPairType.RSA) {
-      return ((PKCS11KeyPairType.RSA) type).getModulusBits();
-    } else {
-      return null;
-    }
+    return (type instanceof PKCS11KeyPairType.RSA)
+        ? ((PKCS11KeyPairType.RSA) type).getModulusBits() : null;
   }
 
   public boolean isWeierstrassEC() {
-    return type instanceof PKCS11KeyPairType.EC
-        || type instanceof PKCS11KeyPairType.SM2;
+    return type instanceof PKCS11KeyPairType.EC || type instanceof PKCS11KeyPairType.SM2;
   }
 
   public boolean isEdwardsEC() {
@@ -212,8 +174,7 @@ public enum KeySpec {
     String name = name();
     if (name.startsWith("MLDSA")) {
       return name.startsWith("MLDSA44_") ||
-          name.startsWith("MLDSA65_") ||
-          name.startsWith("MLDSA87_");
+          name.startsWith("MLDSA65_") || name.startsWith("MLDSA87_");
     }
     return false;
   }
@@ -222,8 +183,7 @@ public enum KeySpec {
     String name = name();
     if (name.startsWith("MLKEM")) {
       return name.startsWith("MLKEM512_") ||
-          name.startsWith("MLKEM768_") ||
-          name.startsWith("MLKEM1024_");
+          name.startsWith("MLKEM768_") || name.startsWith("MLKEM1024_");
     }
     return false;
   }
@@ -234,20 +194,20 @@ public enum KeySpec {
 
   public EcCurveEnum ecCurve() {
     switch (this) {
-      case SECP256R1:
-        return EcCurveEnum.SECP256R1;
-      case SECP384R1:
-        return EcCurveEnum.SECP384R1;
-      case SECP521R1:
-        return EcCurveEnum.SECP521R1;
+      case P256:
+        return EcCurveEnum.P256;
+      case P384:
+        return EcCurveEnum.P384;
+      case P521:
+        return EcCurveEnum.P521;
       case BRAINPOOLP256R1:
         return EcCurveEnum.BRAINPOOLP256R1;
       case BRAINPOOLP384R1:
         return EcCurveEnum.BRAINPOOLP384R1;
       case BRAINPOOLP512R1:
         return EcCurveEnum.BRAINPOOLP512R1;
-      case SM2P256V1:
-        return EcCurveEnum.SM2P256V1;
+      case SM2:
+        return EcCurveEnum.SM2;
       case FRP256V1:
         return EcCurveEnum.FRP256V1;
       case ED25519:
@@ -265,7 +225,7 @@ public enum KeySpec {
 
   public Integer ecCurveFieldByteSize() {
     EcCurveEnum curve = ecCurve();
-    return curve == null ? null : ecCurveFieldByteSize();
+    return curve == null ? null : curve.fieldByteSize();
   }
 
   public String text() {
@@ -292,8 +252,7 @@ public enum KeySpec {
     AlgorithmIdentifier keyAlgId = keyInfo.getAlgorithm();
 
     if (keyAlgId.getAlgorithm().equals(OIDs.Algo.id_rsaEncryption)) {
-      RSAPublicKey rsa = RSAPublicKey.getInstance(
-          keyInfo.getPublicKeyData().getOctets());
+      RSAPublicKey rsa = RSAPublicKey.getInstance(Asn1Util.getPublicKeyData(keyInfo));
 
       return ofRSA(rsa.getModulus().bitLength());
     } else {
@@ -305,8 +264,7 @@ public enum KeySpec {
     ASN1ObjectIdentifier keyAlgOid = keyAlgId.getAlgorithm();
 
     if (keyAlgOid.equals(OIDs.Algo.id_ecPublicKey)) {
-      ASN1ObjectIdentifier curveOid =
-          ASN1ObjectIdentifier.getInstance(keyAlgId.getParameters());
+      ASN1ObjectIdentifier curveOid = ASN1ObjectIdentifier.getInstance(keyAlgId.getParameters());
 
       for (KeySpec spec : KeySpec.values()) {
         if (spec.isWeierstrassEC()) {
@@ -341,13 +299,13 @@ public enum KeySpec {
 
   public static KeySpec ofEcCurve(EcCurveEnum curve) {
     switch (curve) {
-      case SECP256R1: return KeySpec.SECP256R1;
-      case SECP384R1: return KeySpec.SECP384R1;
-      case SECP521R1: return KeySpec.SECP521R1;
+      case P256: return KeySpec.P256;
+      case P384: return KeySpec.P384;
+      case P521: return KeySpec.P521;
       case BRAINPOOLP256R1: return KeySpec.BRAINPOOLP256R1;
       case BRAINPOOLP384R1: return KeySpec.BRAINPOOLP384R1;
       case BRAINPOOLP512R1: return KeySpec.BRAINPOOLP512R1;
-      case SM2P256V1: return KeySpec.SM2P256V1;
+      case SM2:       return KeySpec.SM2;
       case FRP256V1:  return KeySpec.FRP256V1;
       case ED25519:   return KeySpec.ED25519;
       case ED448:     return KeySpec.ED448;
@@ -357,8 +315,7 @@ public enum KeySpec {
     }
   }
 
-  public static List<KeySpec> ofKeySpecs(List<String> names)
-      throws NoSuchAlgorithmException {
+  public static List<KeySpec> ofKeySpecs(List<String> names) throws NoSuchAlgorithmException {
     List<KeySpec> list = new ArrayList<>(names.size());
     for (String name : names) {
       list.add(ofKeySpec(name));
@@ -370,6 +327,17 @@ public enum KeySpec {
     name = name.trim().toUpperCase(Locale.ROOT);
     String name2 = name.replace('_', '-');
     String name3 = name2.replaceAll("-", "").replace("/", "");
+
+    switch (name3) {
+      case "SECP256R1":
+        return P256;
+      case "SECP384R1":
+        return P384;
+      case "SECP521R1":
+        return P521;
+      case "SM2P256V1":
+        return SM2;
+    }
 
     for (KeySpec m : KeySpec.values()) {
       String n = m.name();

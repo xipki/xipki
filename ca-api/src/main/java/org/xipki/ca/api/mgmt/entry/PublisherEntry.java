@@ -71,10 +71,8 @@ public class PublisherEntry extends MgmtEntry {
   }
 
   public boolean equals(PublisherEntry obj, boolean ignoreId) {
-    return (obj != null)
-        && ident.equals(obj.ident, ignoreId)
-        && type.equals(obj.type)
-        && CompareUtil.equals(conf, obj.conf);
+    return (obj != null) && ident.equals(obj.ident, ignoreId)
+        && type.equals(obj.type) && CompareUtil.equals(conf, obj.conf);
   }
 
   @Override
@@ -84,8 +82,7 @@ public class PublisherEntry extends MgmtEntry {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().put("ident", ident.toCodec())
-        .put("type", type).put("conf", conf);
+    return new JsonMap().put("ident", ident.toCodec()).put("type", type).put("conf", conf);
   }
 
   public static PublisherEntry parse(JsonMap json) throws CodecException {

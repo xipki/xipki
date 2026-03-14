@@ -52,8 +52,7 @@ public class JsonTxtBuilder {
     }
 
     @Override
-    public Appendable append(CharSequence csq, int start, int end)
-        throws IOException {
+    public Appendable append(CharSequence csq, int start, int end) throws IOException {
       for (int i = start; i < end; i++) {
         append(csq.charAt(i));
       }
@@ -109,8 +108,7 @@ public class JsonTxtBuilder {
   }
 
   public JsonTxtBuilder(String indent, int maxCharsPerLine) {
-    this.maxCharsPerLine = Args.min(maxCharsPerLine,
-        "maxCharsPerLine", 40);
+    this.maxCharsPerLine = Args.min(maxCharsPerLine, "maxCharsPerLine", 40);
     this.indent = (indent == null) ? "  " : indent;
   }
 
@@ -122,7 +120,7 @@ public class JsonTxtBuilder {
       throw new RuntimeException(e);
     }
     return builder.doFinal();
-   }
+  }
 
   public String toJson(JsonList root) {
     MyAppendable builder = new MyAppendable(maxCharsPerLine);
@@ -142,8 +140,7 @@ public class JsonTxtBuilder {
    * @throws CodecException if output error occurs.
    * @throws NullPointerException if value or out == null.
    */
-  private void writeList(JsonList value, Appendable out, int level)
-      throws CodecException {
+  private void writeList(JsonList value, Appendable out, int level) throws CodecException {
     final int size = value.size();
 
     append(out, '[');
@@ -164,8 +161,7 @@ public class JsonTxtBuilder {
     append(out, ']');
   }
 
-  private void writeMap(JsonMap value, Appendable out, int level)
-      throws CodecException {
+  private void writeMap(JsonMap value, Appendable out, int level) throws CodecException {
     append(out, "{\n");
 
     List<String> keys = value.getKeys();
@@ -189,8 +185,7 @@ public class JsonTxtBuilder {
     append(out, "}");
   }
 
-  protected void writeValue(Object value, Appendable out, int level)
-      throws CodecException {
+  protected void writeValue(Object value, Appendable out, int level) throws CodecException {
     if (value == null) {
       append(out, "null");
       return;
@@ -204,7 +199,7 @@ public class JsonTxtBuilder {
         write(d, out);
       }
       return;
-   }
+  }
 
     if (value instanceof Float) {
       final Float f = (Float) value;
@@ -245,15 +240,13 @@ public class JsonTxtBuilder {
     append(out, '\"');
   }
 
-  private void writeKey(String key, Appendable out)
-      throws CodecException {
+  private void writeKey(String key, Appendable out) throws CodecException {
     append(out, '\"');
     writeEscaped(key, out);
     append(out, "\": ");
   }
 
-  private static void writeEscaped(String s, Appendable out)
-      throws CodecException {
+  private static void writeEscaped(String s, Appendable out) throws CodecException {
     final int length = s.length();
     for (int i = 0; i < length; i++) {
       final char ch = s.charAt(i);
@@ -282,8 +275,7 @@ public class JsonTxtBuilder {
     }//for
   }
 
-  private void write(long value, Appendable out)
-      throws CodecException {
+  private void write(long value, Appendable out) throws CodecException {
     if (value == 0) {
       append(out, '0');
       return;
@@ -306,8 +298,7 @@ public class JsonTxtBuilder {
     }
   }
 
-  private void write(double value, Appendable out)
-      throws CodecException {
+  private void write(double value, Appendable out) throws CodecException {
     write((long) value, out);
     if (value < 0) {
       value *= -1;
@@ -327,8 +318,7 @@ public class JsonTxtBuilder {
     }
   }
 
-  private void appendIndent(Appendable out, int level)
-      throws CodecException {
+  private void appendIndent(Appendable out, int level) throws CodecException {
     for (int i = 0; i < level; i++) {
       append(out, indent);
     }
@@ -342,8 +332,7 @@ public class JsonTxtBuilder {
     }
   }
 
-  private static void append(Appendable out, String str)
-      throws CodecException {
+  private static void append(Appendable out, String str) throws CodecException {
     try {
       out.append(str);
     } catch (IOException e) {

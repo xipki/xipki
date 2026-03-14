@@ -35,19 +35,16 @@ class PendingCertificatePool {
 
     private final byte[] certHash;
 
-    MyEntry(BigInteger certReqId, long waitForConfirmTill,
-            CertificateInfo certInfo) {
+    MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
       this.certReqId = Args.notNull(certReqId, "certReqId");
       this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
-      this.certHash = HashAlgo.SHA1.hash(
-          certInfo.cert().cert().getEncoded());
+      this.certHash = HashAlgo.SHA1.hash(certInfo.cert().cert().getEncoded());
     } // constructor
 
     @Override
     public int hashCode() {
-      return certReqId.hashCode() + 961 * (int) waitForConfirmTill
-          + 31 * certInfo.hashCode();
+      return certReqId.hashCode() + 961 * (int) waitForConfirmTill + 31 * certInfo.hashCode();
     }
 
     @Override
@@ -58,16 +55,13 @@ class PendingCertificatePool {
         return false;
       }
 
-      PendingCertificatePool.MyEntry another =
-          (PendingCertificatePool.MyEntry) obj;
-      return certReqId.equals(another.certReqId)
-          && certInfo.equals(another.certInfo);
+      PendingCertificatePool.MyEntry another = (PendingCertificatePool.MyEntry) obj;
+      return certReqId.equals(another.certReqId) && certInfo.equals(another.certInfo);
     } // method equals
 
   } // class MyEntry
 
-  private final Map<String, Set<PendingCertificatePool.MyEntry>> map =
-      new HashMap<>();
+  private final Map<String, Set<PendingCertificatePool.MyEntry>> map = new HashMap<>();
 
   PendingCertificatePool() {
   }
@@ -79,8 +73,7 @@ class PendingCertificatePool {
       return;
     }
 
-    PendingCertificatePool.MyEntry myEntry =
-        new MyEntry(certReqId, waitForConfirmTill, certInfo);
+    PendingCertificatePool.MyEntry myEntry = new MyEntry(certReqId, waitForConfirmTill, certInfo);
     synchronized (map) {
       Set<PendingCertificatePool.MyEntry> entries =
           map.computeIfAbsent(transactionId, k -> new HashSet<>());
@@ -88,8 +81,7 @@ class PendingCertificatePool {
     }
   } // method addCertificate
 
-  CertificateInfo removeCertificate(
-      String transactionId, BigInteger certReqId, byte[] certHash) {
+  CertificateInfo removeCertificate(String transactionId, BigInteger certReqId, byte[] certHash) {
     Args.notBlank(transactionId, "transactionId");
     Args.notNull(certReqId, "certReqId");
     Args.notNull(certHash, "certHash");

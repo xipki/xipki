@@ -5,8 +5,17 @@
 
 
 # XiPKI
-XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure) is
-a highly scalable and high-performance open source PKI (CA and OCSP responder).
+XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure)
+is a high-performance, open source PKI (CA, RA, OCSP) designed for critical infrastructure. 
+Built with minimal dependencies and a compact codebase of ~120,000 lines, it offers native support
+for post-quantum algorithms (ML-DSA, ML-KEM, composite), HSM integration via PKCS#11, 
+SM2/SM3 for Chinese national standards, and fast OCSP at scale. 
+Bouncy Castle can be switched between LTS and FIPS variants to meet different compliance 
+requirements. 
+
+The project author actively contributes to IETF standardization, including co-authoring the 
+C509 specification (CBOR-encoded X.509 certificates) and its test vectors in the COSE Working 
+Group.
 
 ## License
 * The Apache Software License, Version 2.0
@@ -20,38 +29,52 @@ JRE/JDK, and the steps to reproduce the bug.
 ## Get Started
 
 ### Binaries
-The binary `xipki-setup-<version>.zip` can be retrieved using one of the following methods
- - Download the binary from https://github.com/xipki/xipki/releases
- - Download the binary from the maven repositories
-   - Directly via HTTP download
-     - Release version: https://repo.maven.apache.org/maven2/org/xipki/assembly/xipki-setup/ 
-     - SNASPSHOT version: https://oss.sonatype.org/content/repositories/snapshots/org/xipki/assembly/xipki-setup/
-   - Via the `maven-dependency-plugin`
-     ```
-     <artifactItem>
-       <groupId>org.xipki.assembly</groupId>
-       <artifactId>xipki-setup</artifactId>
-       <version>..version..</version>
-       <type>zip</type>
-     </artifactItem>
-     ```
+The binaries `xipki-setup-<version>-bclts.tar.gz` (using bouncycastle LTS libraries) and 
+`xipki-setup-<version>-bcfips.tar.gz` (using bouncycastle FIPS libraries) can be retrieved using 
+one of the following methods
+  - Download the binary from https://github.com/xipki/xipki/releases
   - Build it from source code
     - Get a copy of project code, e.g.
       ```sh
       git clone https://github.com/xipki/xipki
       ```
-    - Build the project
 
-      In folder `xipki`
-      ```sh
-      ./install.sh
-      ```
+    - Build the project
+      * In folder `xipki`
+        ```sh
+        ./install.sh
+        ```
  
-      Then you will find the binary `assemblies/xipki-setup/target/xipki-setup-<version>.zip`
+      Then you will find the binaries in the folder `assemblies/xipki-setup/target/`
+
+### Just Try The Demo
+
+1. Unpack `xipki-setup-<version>-bclts.tar.gz` or `xipki-setup-<version>-fips.tar.gz`,
+2. In the unpacked folder `xipki-setup-<version>`:  
+   Call `./demo.sh` to prepare the systems and start the karaf console.
+   
+   Once the systems have been prepared, you need only to start the karaf 
+   console by calling `./xipki-setup-<version>/xipki-mgmt-cli/bin/karaf`.
+3. In the karaf console:  
+   Call `source demo/demo-single.script` to print the usage, and 
+   then follow the usage, e.g.
+   `source demo/demo-single.script DB PKCS12 RSA2048`
+4. (Optional) Point the browser to http://localhost:8282 to open the H2 database
+   console. You can view the database content using username `root` and 
+   password `123456` with following JDBC URLs:
+   - Database CA configuration: `jdbc:h2:~/.xipki/db/h2/caconf`
+   - Database CA data: `jdbc:h2:~/.xipki/db/h2/ca`
+   - Database OCSP data: `jdbc:h2:~/.xipki/db/h2/ocsp`
+
+The generated keys, certificate requests (CSR) and certificates are in
+the folder `xipki-mgmt-cli/output`. The CA, OCSP, gateway instances are in
+the folders `~/xipki_demo/ca-tomcat`, `~/xipki_demo/ocsp-tomcat`, and 
+`~/xipki_demo/gateway-tomcat` respectively.
 
 ### Install and Setup
 
-Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL.md`.
+Unpack `xipki-setup-<version>-lts.tar.gz` or `xipki-setup-<version>-fips.tar.gz` and follow 
+the `xipki-setup-<version>/INSTALL.md`.
 
 ## Features
 
@@ -80,7 +103,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 ### CA Protocol Gateway
   - EST (RFC 7030)
   - SCEP (RFC 8894)
-  - CMP (RFC 4210, 4211, 9045, 9480)
+  - CMP (RFC 4210, RFC 4211, RFC 9045, RFC 9480, RFC 9810, RFC 9811)
   - ACME (RFC 8555, RFC 8737)
     - Challenge types: dns-01, http-01, tls-apln-01
   - RESTful API (XiPKI own API)
@@ -99,8 +122,8 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
   - Support of publisher for OCSP responder
   - Public key types of certificates: RSA, EC, Ed25519, Ed448, SM2, X25519, X448,
-    MLDSA (CRYSTALS‑Dilithium) / ML-DSA (ML-DSA-44, ML-DSA-65, ML-DSA-87),
-    MLKEM (CRYSTALS‑Kyber) / ML-KEM (ML-KEM-512, ML-KEM-768, ML-KEM-1024),
+    MLDSA / ML-DSA / CRYSTALS‑Dilithium (ML-DSA-44, ML-DSA-65, ML-DSA-87),
+    MLKEM / ML-KEM / CRYSTALS‑Kyber (ML-KEM-512, ML-KEM-768, ML-KEM-1024),
     composite MLDSA (in draft-ietf-lamps-pq-composite-sigs),
     composite MLKEM (in draft-ietf-lamps-pq-composite-kem)
   - Signature algorithms of certificates
@@ -149,6 +172,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
 
 ### OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
+  - Lightweight OCSP Profile for High-Volume Environments (RFC 5019)
   - Configurable Length of Nonce (RFC 8954)
   - Support of Common PKI 2.0
   - Management of multiple certificate status sources
@@ -181,3 +205,7 @@ Unpack `xipki-setup-<version>.zip` and follow the `xipki-setup-<version>/INSTALL
   - Updating certificates in token
   - Generating CSR (PKCS#10 request)
   - Exporting certificate from token
+
+### TODO
+  - Write a simple and strictly trusted RequestorAuthenticator used default.
+    Remove the DummyRequestorAuthenticator.

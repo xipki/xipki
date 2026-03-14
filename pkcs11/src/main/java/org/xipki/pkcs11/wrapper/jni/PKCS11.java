@@ -65,18 +65,14 @@ public abstract class PKCS11 {
 
   protected abstract Arch arch();
 
-  protected abstract void initModule(int moduleId, String modulePath)
-      throws PKCS11Exception;
+  protected abstract void initModule(int moduleId, String modulePath) throws PKCS11Exception;
 
-  protected abstract void closeModule(int moduleId)
-      throws PKCS11Exception;
+  protected abstract void closeModule(int moduleId) throws PKCS11Exception;
 
   protected abstract byte[] doQuery(
-      int moduleId, int opCode, byte[] resp,
-      long id, long id2, long id3, int size,
-      byte[] data, byte[] data2,
-      long ckm, byte[] mechParams,
-      byte[] template, byte[] template2);
+      int moduleId, int opCode, byte[] resp, long id, long id2, long id3,
+      int size, byte[] data, byte[] data2,
+      long ckm, byte[] mechParams, byte[] template, byte[] template2);
 
   public abstract CkVersion getVersion(int moduleId) throws PKCS11Exception;
 
@@ -99,8 +95,7 @@ public abstract class PKCS11 {
    */
   public void C_Initialize(long flags) throws PKCS11Exception {
     synchronized (syncObj) {
-      QueryParams qParams = new QueryParams(C_Initialize).flags(flags);
-      query(qParams);
+      query(new QueryParams(C_Initialize).flags(flags));
     }
   }
 
@@ -119,8 +114,7 @@ public abstract class PKCS11 {
    */
   public void C_Finalize() throws PKCS11Exception {
     synchronized (syncObj) {
-      QueryParams qParams = new QueryParams(C_Finalize);
-      query(qParams);
+      query(new QueryParams(C_Finalize));
     }
   }
 
@@ -137,8 +131,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public CkInfo C_GetInfo() throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_GetInfo);
-    return query(qParams).infoPayload();
+    return query(new QueryParams(C_GetInfo)).infoPayload();
   }
 
   /**
@@ -161,8 +154,7 @@ public abstract class PKCS11 {
    */
   public long[] C_GetSlotList(boolean tokenPresent) throws PKCS11Exception {
     long flags = tokenPresent ? 1 : 0;
-    QueryParams qParams = new QueryParams(C_GetSlotList).flags(flags);
-    return query(qParams).longArrayPayload();
+    return query(new QueryParams(C_GetSlotList).flags(flags)).longArrayPayload();
   }
 
   /**
@@ -183,8 +175,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public CkSlotInfo C_GetSlotInfo(long slotID) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_GetSlotInfo, slotID);
-    return query(qParams).slotInfoPayload();
+    return query(new QueryParams(C_GetSlotInfo, slotID)).slotInfoPayload();
   }
 
   /**
@@ -205,8 +196,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public CkTokenInfo C_GetTokenInfo(long slotID) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_GetTokenInfo, slotID);
-    return query(qParams).tokenInfoPayload();
+    return query(new QueryParams(C_GetTokenInfo, slotID)).tokenInfoPayload();
   }
 
   /**
@@ -228,8 +218,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public long[] C_GetMechanismList(long slotID) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_GetMechanismList, slotID);
-    return query(qParams).longArrayPayload();
+    return query(new QueryParams(C_GetMechanismList, slotID)).longArrayPayload();
   }
 
   /**
@@ -253,10 +242,8 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    *
    */
-  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type)
-      throws PKCS11Exception {
-    QueryParams params = new QueryParams(C_GetMechanismInfo, slotID).id2(type);
-    return query(params).mechanismInfoPayload();
+  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type) throws PKCS11Exception {
+    return query(new QueryParams(C_GetMechanismInfo, slotID).id2(type)).mechanismInfoPayload();
   }
 
   /* *****************************
@@ -287,8 +274,7 @@ public abstract class PKCS11 {
    */
   public long C_OpenSession(long slotID, long flags) throws PKCS11Exception {
     synchronized (syncObj) {
-      QueryParams qParams = new QueryParams(C_OpenSession, slotID).flags(flags);
-      return query(qParams).longPayload();
+      return query(new QueryParams(C_OpenSession, slotID).flags(flags)).longPayload();
     }
   }
 
@@ -310,8 +296,7 @@ public abstract class PKCS11 {
    */
   public void C_CloseSession(long hSession) throws PKCS11Exception {
     synchronized (syncObj) {
-      QueryParams qParams = new QueryParams(C_CloseSession, hSession);
-      query(qParams);
+      query(new QueryParams(C_CloseSession, hSession));
     }
   }
 
@@ -330,8 +315,7 @@ public abstract class PKCS11 {
    */
   public void C_CloseAllSessions(long slotID) throws PKCS11Exception {
     synchronized (syncObj) {
-      QueryParams qParams = new QueryParams(C_CloseAllSessions, slotID);
-      query(qParams);
+      query(new QueryParams(C_CloseAllSessions, slotID));
     }
   }
 
@@ -353,8 +337,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public CkSessionInfo C_GetSessionInfo(long hSession) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_GetSessionInfo, hSession);
-    return query(qParams).sessionInfoPayload();
+    return query(new QueryParams(C_GetSessionInfo, hSession)).sessionInfoPayload();
   }
 
   /**
@@ -378,11 +361,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_Login(long hSession, long userType, byte[] pin)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_Login, hSession)
-        .data(pin).id2(userType);
-    query(qParams);
+  public void C_Login(long hSession, long userType, byte[] pin) throws PKCS11Exception {
+    query(new QueryParams(C_Login, hSession).data(pin).id2(userType));
   }
 
   /**
@@ -400,8 +380,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public void C_Logout(long hSession) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_Logout, hSession);
-    query(qParams);
+    query(new QueryParams(C_Logout, hSession));
   }
 
   /* *******************************
@@ -428,11 +407,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public long C_CreateObject(long hSession, Template template)
-      throws PKCS11Exception {
-    QueryParams params = new QueryParams(C_CreateObject, hSession)
-        .template(template);
-    return query(params).longPayload();
+  public long C_CreateObject(long hSession, Template template) throws PKCS11Exception {
+    return query(new QueryParams(C_CreateObject, hSession).template(template)).longPayload();
   }
 
   /**
@@ -459,10 +435,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public long C_CopyObject(long hSession, long hObject, Template template)
-      throws PKCS11Exception {
-    QueryParams params = new QueryParams(C_CreateObject, hSession)
-                .id2(hObject).template(template);
+  public long C_CopyObject(long hSession, long hObject, Template template) throws PKCS11Exception {
+    QueryParams params = new QueryParams(C_CreateObject, hSession).id2(hObject).template(template);
     return query(params).longPayload();
   }
 
@@ -483,11 +457,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_DestroyObject(long hSession, long hObject)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_DestroyObject, hSession)
-        .id2(hObject);
-    query(qParams);
+  public void C_DestroyObject(long hSession, long hObject) throws PKCS11Exception {
+    query(new QueryParams(C_DestroyObject, hSession).id2(hObject));
   }
 
   /**
@@ -549,8 +520,7 @@ public abstract class PKCS11 {
       ret = new Template();
     } else {
       byte[] data1 = JniUtil.encodeLongs(arch, simpleTypes);
-      QueryParams params = new QueryParams(C_GetAttributeValue, hSession)
-          .data(data1).id2(hObject);
+      QueryParams params = new QueryParams(C_GetAttributeValue, hSession).data(data1).id2(hObject);
       JniResult res = query(params);
       ret = res.templatePayload();
       long ckr = ((JniResp.JniLongResp) res.resp()).value();
@@ -580,7 +550,7 @@ public abstract class PKCS11 {
           }
 
           params = new QueryParams(C_GetAttributeValue, hSession)
-              .data(JniUtil.encodeLong(arch, type)).id2(hObject);
+                    .data(JniUtil.encodeLong(arch, type)).id2(hObject);
           JniResult res2 = query(params);
           if (res2.hasPayload()) {
             Attribute attr2 = res2.templatePayload().getAttribute(type);
@@ -598,14 +568,17 @@ public abstract class PKCS11 {
 
     if (templateTypes != null) {
       for (long type : templateTypes) {
-        QueryParams params = new QueryParams(C_GetAttributeValueX, hSession)
-                .id2(hObject).id3(type);
+        QueryParams params = new QueryParams(C_GetAttributeValueX, hSession).id2(hObject).id3(type);
         JniResult res = query(params);
+        Template temp = null;
         if (res.hasPayload()) {
-          ret.attr(type, res.templatePayload());
+          temp = res.templatePayload();
+        }
+
+        if (temp != null && temp.getSize() > 0) {
+          ret.attr(type, temp);
         } else {
-          Attribute attr = Attribute.getInstance(type);
-          ret.attr(attr);
+          ret.attr(Attribute.getInstance(type));
         }
       }
     }
@@ -641,8 +614,7 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_SetAttributeValue(long hSession, long hObject,
-                                  Template template)
+  public void C_SetAttributeValue(long hSession, long hObject, Template template)
       throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_SetAttributeValue, hSession)
               .id2(hObject).template(template);
@@ -668,10 +640,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_FindObjectsInit(long hSession, Template template)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_FindObjectsInit, hSession)
-        .template(template);
+  public void C_FindObjectsInit(long hSession, Template template) throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_FindObjectsInit, hSession).template(template);
     query(qParams);
   }
 
@@ -698,10 +668,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public long[] C_FindObjects(long hSession, int maxObjectCount)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_FindObjects, hSession)
-                .size(maxObjectCount);
+  public long[] C_FindObjects(long hSession, int maxObjectCount) throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_FindObjects, hSession).size(maxObjectCount);
     return query(qParams).longArrayPayload();
   }
 
@@ -735,9 +703,11 @@ public abstract class PKCS11 {
    * ******************************/
 
   /**
-   * C_DigestInit initializes a message-digesting operation.
+   * Combination of C_DigestInit, C_DigestUpdate, C_DigestKey,
+   * and C_DigestFinal.
    * (Message digesting)
-   *
+   * <p>
+   * Step 1:
    * <pre>
    * CK_PKCS11_FUNCTION_INFO(C_DigestInit)
    * (
@@ -746,55 +716,7 @@ public abstract class PKCS11 {
    * );
    * </pre>
    *
-   * @param hSession
-   *        the session's handle
-   * @param mechanism
-   *        the digesting mechanism
-   * @throws PKCS11Exception
-   *         If function returns other value than CKR_OK.
-   */
-  public void C_DigestInit(long hSession, CkMechanism mechanism)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_DigestInit, hSession)
-        .mech(mechanism);
-    query(qParams);
-  }
-
-  /**
-   * C_Digest digests data in a single part. (Message digesting)
-   *
-   * <pre>
-   * CK_PKCS11_FUNCTION_INFO(C_Digest)
-   * (
-   *   CK_SESSION_HANDLE hSession,     // the session's handle
-   *   CK_BYTE_PTR       pData,        // data to be digested
-   *   CK_ULONG          ulDataLen,    // bytes of data to digest
-   *   CK_BYTE_PTR       pDigest,      // gets the message digest
-   *   CK_ULONG_PTR      pulDigestLen  // gets digest length
-   * );
-   * </pre>
-   *
-   * @param hSession
-   *        the session's handle
-   * @param data
-   *        the data to get digested and the data's length
-   * @param maxSize
-   *        the maximal size of the digest.
-   * @return the message digest and the length of the message digest
-   * @throws PKCS11Exception
-   *         If function returns other value than CKR_OK.
-   */
-  public byte[] C_Digest(long hSession, byte[] data, int maxSize)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_Digest, hSession)
-        .data(data).size(maxSize);
-    return query(qParams).payload();
-  }
-
-  /**
-   * C_DigestUpdate continues a multiple-part message-digesting operation.
-   * (Message digesting)
-   *
+   * Step 2 (if prefix is not empty):
    * <pre>
    * CK_PKCS11_FUNCTION_INFO(C_DigestUpdate)
    * (
@@ -803,24 +725,8 @@ public abstract class PKCS11 {
    *   CK_ULONG          ulPartLen  // bytes of data to be digested
    * );
    * </pre>
-   * @param hSession
-   *        the session's handle
-   * @param part
-   *        the data to get digested and the data's length
-   * @throws PKCS11Exception
-   *         If function returns other value than CKR_OK.
-   */
-  public void C_DigestUpdate(long hSession, byte[] part)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_DigestUpdate, hSession).data(part);
-    query(qParams);
-  }
-
-  /**
-   * C_DigestKey continues a multipart message-digesting operation, by
-   * digesting the value of a secret key as part of the data already digested.
-   * (Message digesting)
    *
+   * Step 3:
    * <pre>
    * CK_PKCS11_FUNCTION_INFO(C_DigestKey)
    * (
@@ -828,22 +734,13 @@ public abstract class PKCS11 {
    *   CK_OBJECT_HANDLE  hKey       // secret key to digest
    * );
    * </pre>
-   * @param hSession
-   *        the session's handle
-   * @param hKey
-   *        the handle of the secret key to be digested
-   * @throws PKCS11Exception
-   *         If function returns other value than CKR_OK.
-   */
-  public void C_DigestKey(long hSession, long hKey) throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_DigestKey, hSession).id2(hKey);
-    query(qParams);
-  }
-
-  /**
-   * C_DigestFinal finishes a multiple-part message-digesting operation.
-   * (Message digesting)
    *
+   * Step 4 (if suffix is not empty):
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_DigestUpdate)
+   * </pre>
+   *
+   * Step 5:
    * <pre>
    * CK_PKCS11_FUNCTION_INFO(C_DigestFinal)
    * (
@@ -855,22 +752,122 @@ public abstract class PKCS11 {
    *
    * @param hSession
    *        the session's handle
+   * @param mechanism
+   *        the digesting mechanism
+   * @param prefix
+   *        the data to get digested before hashing the key
+   * @param hKey
+   *        the handle of the secret key to be digested. Set to 0 to skip the
+   *        hash of the key.
+   * @param suffix
+   *        the data to get digested after hashing the key
    * @param maxSize
    *        the maximal size of the digest.
    * @return the message digest and the length of the message digest
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public byte[] C_DigestFinal(long hSession, int maxSize)
+  public byte[] C_DigestX(long hSession, CkMechanism mechanism,
+                          byte[] prefix, long hKey, byte[] suffix, int maxSize)
       throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_DigestFinal, hSession)
-        .size(maxSize);
+    QueryParams qParams = new QueryParams(C_DigestX, hSession)
+        .id2(hKey).size(maxSize).data(prefix).data2(suffix).mech(mechanism);
     return query(qParams).payload();
   }
 
   /* **************************
    * Sign and MAC
    * **************************/
+
+  /**
+   * Combination fo C_SignInt and C_Sign.
+   * (Sign and MAC)
+   *
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_SignInit)
+   * (
+   *   CK_SESSION_HANDLE hSession,    // the session's handle
+   *   CK_MECHANISM_PTR  pMechanism,  // the signature mechanism
+   *   CK_OBJECT_HANDLE  hKey         // handle of signature key
+   * );
+   * </pre>
+   *
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_Sign)
+   * (
+   *   CK_SESSION_HANDLE hSession,        // the session's handle
+   *   CK_BYTE_PTR       pData,           // the data to sign
+   *   CK_ULONG          ulDataLen,       // count of bytes to sign
+   *   CK_BYTE_PTR       pSignature,      // gets the signature
+   *   CK_ULONG_PTR      pulSignatureLen  // gets signature length
+   * );
+   * </pre>
+   *
+   * @param hSession
+   *        the session's handle
+   * @param mechanism
+   *        the signature mechanism
+   * @param hKey
+   *        the handle of the signature key
+   * @param data
+   *        the data to sign and the data's length
+   * @param maxSize
+   *        the maximal size of the signature.
+   * @return the signature and the signature's length
+   * @throws PKCS11Exception
+   *         If function returns other value than CKR_OK.
+   */
+  public byte[] C_SignX(long hSession, CkMechanism mechanism, long hKey, byte[] data, int maxSize)
+      throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_SignX, hSession)
+        .id2(hKey).data(data).size(maxSize).mech(mechanism);
+    return query(qParams).payload();
+  }
+
+  /**
+   * Combination fo C_DecryptInt and C_Decrypt.
+   *
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_DecryptInit)
+   * (
+   *   CK_SESSION_HANDLE hSession,    // the session's handle
+   *   CK_MECHANISM_PTR  pMechanism,  // the decryption mechanism
+   *   CK_OBJECT_HANDLE  hKey         // handle of decryption key
+   * );
+   * </pre>
+   *
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_Decrypt)
+   * (
+   *   CK_SESSION_HANDLE hSession,           // session's handle
+   *   CK_BYTE_PTR       pEncryptedData,     // ciphertext
+   *   CK_ULONG          ulEncryptedDataLen, // ciphertext length
+   *   CK_BYTE_PTR       pData,              // gets plaintext
+   *   CK_ULONG_PTR      pulDataLen          // gets p-text size
+   * );
+   * </pre>
+   *
+   * @param hSession
+   *        the session's handle
+   * @param mechanism
+   *        the decryption mechanism
+   * @param hKey
+   *        the handle of the decryption key
+   * @param ciphertext
+   *        the encrypted data to get decrypted and the encrypted data's length
+   * @param maxSize
+   *        the maximal size of the decrypted data.
+   * @return the decrypted data and the data's length
+   * @throws PKCS11Exception
+   *         If function returns other value than CKR_OK.
+   */
+  public byte[] C_DecryptX(
+      long hSession, CkMechanism mechanism, long hKey, byte[] ciphertext, int maxSize)
+      throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_DecryptX, hSession)
+        .data(ciphertext).id2(hKey).mech(mechanism).size(maxSize);
+    return query(qParams).payload();
+  }
 
   /**
    * C_SignInit initializes a signature (private key encryption) operation,
@@ -898,43 +895,8 @@ public abstract class PKCS11 {
    */
   public void C_SignInit(long hSession, CkMechanism mechanism, long hKey)
       throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_SignInit, hSession)
-        .id2(hKey).mech(mechanism);
+    QueryParams qParams = new QueryParams(C_SignInit, hSession).id2(hKey).mech(mechanism);
     query(qParams);
-  }
-
-  /**
-   * C_Sign signs (encrypts with private key) data in a single part, where
-   * the signature is (will be) an appendix to the data, and plaintext cannot
-   * be recovered from the signature.
-   * (Sign and MAC)
-   *
-   * <pre>
-   * CK_PKCS11_FUNCTION_INFO(C_Sign)
-   * (
-   *   CK_SESSION_HANDLE hSession,        // the session's handle
-   *   CK_BYTE_PTR       pData,           // the data to sign
-   *   CK_ULONG          ulDataLen,       // count of bytes to sign
-   *   CK_BYTE_PTR       pSignature,      // gets the signature
-   *   CK_ULONG_PTR      pulSignatureLen  // gets signature length
-   * );
-   * </pre>
-   *
-   * @param hSession
-   *        the session's handle
-   * @param data
-   *        the data to sign and the data's length
-   * @param maxSize
-   *        the maximal size of the signature.
-   * @return the signature and the signature's length
-   * @throws PKCS11Exception
-   *         If function returns other value than CKR_OK.
-   */
-  public byte[] C_Sign(long hSession, byte[] data, int maxSize)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_Sign, hSession)
-        .data(data).size(maxSize);
-    return query(qParams).payload();
   }
 
   /**
@@ -959,8 +921,7 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_SignUpdate(long hSession, byte[] part)
-      throws PKCS11Exception {
+  public void C_SignUpdate(long hSession, byte[] part) throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_SignUpdate, hSession).data(part);
     query(qParams);
   }
@@ -986,16 +947,10 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public byte[] C_SignFinal(long hSession, int maxSize)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_SignFinal, hSession)
-        .size(maxSize);
+  public byte[] C_SignFinal(long hSession, int maxSize) throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_SignFinal, hSession).size(maxSize);
     return query(qParams).payload();
   }
-
-  /* *****************************************
-   * Dual-function cryptographic operations  *
-   * *****************************************/
 
   /* **************************************
    * Key management
@@ -1027,11 +982,10 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public long C_GenerateKey(
-      long hSession, CkMechanism mechanism, Template template)
+  public long C_GenerateKey(long hSession, CkMechanism mechanism, Template template)
       throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_GenerateKey, hSession)
-                .mech(mechanism).template(template);
+        .mech(mechanism).template(template);
     return query(qParams).longPayload();
   }
 
@@ -1069,13 +1023,46 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public long[] C_GenerateKeyPair(
-      long hSession, CkMechanism mechanism,
-      Template publicKeyTemplate, Template privateKeyTemplate)
+      long hSession, CkMechanism mechanism, Template publicKeyTemplate, Template privateKeyTemplate)
       throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_GenerateKeyPair, hSession)
-                .mech(mechanism).template(publicKeyTemplate)
-                .template2(privateKeyTemplate);
+                .mech(mechanism).template(publicKeyTemplate).template2(privateKeyTemplate);
     return query(qParams).longArrayPayload();
+  }
+
+  /**
+   * C_DeriveKey derives a key from a base key, creating a new key object.
+   * (Key management)
+   *
+   * <pre>
+   * CK_PKCS11_FUNCTION_INFO(C_DeriveKey)
+   * (
+   *   CK_SESSION_HANDLE    hSession,          // session's handle
+   *   CK_MECHANISM_PTR     pMechanism,        // key deriv. mech.
+   *   CK_OBJECT_HANDLE     hBaseKey,          // base key
+   *   CK_ATTRIBUTE_PTR     pTemplate,         // new key template
+   *   CK_ULONG             ulAttributeCount,  // template length
+   *   CK_OBJECT_HANDLE_PTR phKey              // gets new handle
+   * );
+   * </pre>
+   * @param hSession
+   *        the session's handle
+   * @param mechanism
+   *        the key derivation mechanism
+   * @param hBaseKey
+   *        the handle of the base key
+   * @param template
+   *        the template for the new key and the number of attributes in the
+   *        template
+   * @return the handle of the derived key
+   * @throws PKCS11Exception
+   *         If function returns other value than CKR_OK.
+   */
+  public long C_DeriveKey(long hSession, CkMechanism mechanism, long hBaseKey, Template template)
+      throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_DeriveKey, hSession)
+        .id2(hBaseKey).mech(mechanism).template(template);
+    return query(qParams).longPayload();
   }
 
   /* *****************************
@@ -1106,8 +1093,7 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_LoginUser(long hSession, long userType, byte[] pin,
-                          byte[] username)
+  public void C_LoginUser(long hSession, long userType, byte[] pin, byte[] username)
       throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_LoginUser, hSession)
         .id2(userType).data(pin).data2(username);
@@ -1131,10 +1117,8 @@ public abstract class PKCS11 {
    * @throws PKCS11Exception
    *         If function returns other value than CKR_OK.
    */
-  public void C_SessionCancel(long hSession, long flags)
-      throws PKCS11Exception {
-    QueryParams qParams = new QueryParams(C_SessionCancel, hSession)
-        .flags(flags);
+  public void C_SessionCancel(long hSession, long flags) throws PKCS11Exception {
+    QueryParams qParams = new QueryParams(C_SessionCancel, hSession).flags(flags);
     query(qParams);
   }
 
@@ -1164,8 +1148,7 @@ public abstract class PKCS11 {
    *         If function returns other value than CKR_OK.
    */
   public long C_DecapsulateKey(
-      long hSession, CkMechanism mechanism, long hPrivateKey,
-      byte[] cipherText, Template template)
+      long hSession, CkMechanism mechanism, long hPrivateKey, byte[] cipherText, Template template)
       throws PKCS11Exception {
     QueryParams qParams = new QueryParams(C_DecapsulateKey, hSession)
         .data(cipherText).id2(hPrivateKey).mech(mechanism).template(template);
@@ -1210,10 +1193,8 @@ public abstract class PKCS11 {
       mechParamsBytes = mechParams.getEncoded(arch);
     }
 
-    byte[] templateBytes = params.template == null ? null
-        : params.template.getEncoded(arch);
-    byte[] template2Bytes = params.template2 == null ? null
-        : params.template2.getEncoded(arch);
+    byte[] templateBytes = params.template == null ? null : params.template.getEncoded(arch);
+    byte[] template2Bytes = params.template2 == null ? null : params.template2.getEncoded(arch);
 
     byte[] payload = doQuery(moduleId, params.op.getCode(), params.resp,
         params.id, params.id2, params.id3, params.size, params.data,

@@ -7,6 +7,7 @@ import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonList;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.codec.json.JsonParser;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -151,7 +152,6 @@ public class BatchReplace {
             sections.add(section);
 
             section.setDescription(sectionConf.getString("description"));
-
             section.setReplacements(sectionConf.getStringMap("replacements"));
 
             JsonMap cludesConf = sectionConf.getMap("includes");
@@ -219,16 +219,14 @@ public class BatchReplace {
           includeDirs = toCanonicalPaths(basedir, includeDirs);
         }
 
-        Set<String> excludeDirs = section.excludes == null ? null
-            : section.excludes.dirs;
+        Set<String> excludeDirs = section.excludes == null ? null : section.excludes.dirs;
         if (excludeDirs == null) {
           excludeDirs = Collections.emptySet();
         } else {
           excludeDirs = toCanonicalPaths(basedir, excludeDirs);
         }
 
-        Set<String> excludesFiles = section.excludes == null ? null
-            : section.excludes.files;
+        Set<String> excludesFiles = section.excludes == null ? null : section.excludes.files;
         if (excludesFiles == null) {
           excludesFiles = Collections.emptySet();
         } else {
@@ -252,8 +250,7 @@ public class BatchReplace {
     }
   }
 
-  private static Set<String> toCanonicalPaths(File base, Set<String> subPaths)
-      throws IOException {
+  private static Set<String> toCanonicalPaths(File base, Set<String> subPaths) throws IOException {
     String basePath = base.getPath();
     if (!basePath.endsWith("/")) {
       basePath += "/";
@@ -267,9 +264,8 @@ public class BatchReplace {
   }
 
   private static void replaceDir(
-      String baseDirPath, File dir, Set<String> includeSuffixes,
-      Set<String> excludeDirs, Set<String> excludeFiles,
-      Map<String, String> replacements, String prefix, String suffix)
+      String baseDirPath, File dir, Set<String> includeSuffixes, Set<String> excludeDirs,
+      Set<String> excludeFiles, Map<String, String> replacements, String prefix, String suffix)
       throws IOException {
     File[] files = dir.listFiles();
     if (files == null) {
@@ -313,7 +309,8 @@ public class BatchReplace {
         for (Map.Entry<String, String> m : replacements.entrySet()) {
           String pattern = prefix + m.getKey() + suffix;
           if (line.contains(pattern)) {
-            line = line.replace(pattern, m.getValue());
+            String targetValue = StringUtil.resolveVariables(m.getValue());
+            line = line.replace(pattern, targetValue);
           }
         }
 
@@ -326,8 +323,7 @@ public class BatchReplace {
     }
 
     if (changed) {
-      System.out.println("    Changed the file " +
-          file.getPath().substring(baseDirPath.length()));
+      System.out.println("    Changed the file " + file.getPath().substring(baseDirPath.length()));
       try (OutputStream out = new FileOutputStream(file)) {
         out.write(target.toString().getBytes(StandardCharsets.UTF_8));
       }

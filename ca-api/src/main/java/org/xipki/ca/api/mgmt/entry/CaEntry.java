@@ -99,8 +99,7 @@ public class CaEntry extends MgmtEntry {
     return ret;
   }
 
-  public static List<CaSignerConf> splitCaSignerConfs(String conf)
-      throws XiSecurityException {
+  public static List<CaSignerConf> splitCaSignerConfs(String conf) throws XiSecurityException {
     ConfPairs pairs = new ConfPairs(conf);
     String str = pairs.value("algo");
     if (str == null) {
@@ -164,8 +163,7 @@ public class CaEntry extends MgmtEntry {
         "id:                   ", ident.id(),
         "\nname:                 ", ident.name(),
         "\nsigner conf:          ", (signerConf == null ? "-"
-            : SignerEntry.signerConfToString(signerConf, verbose,
-                ignoreSensitiveInfo)),
+            : SignerEntry.signerConfToString(signerConf, verbose, ignoreSensitiveInfo)),
         base.toString(verbose),
         "\ncert: \n", X509Util.formatCert(cert, verbose),
         "\ncertchain: ", certchainStr.toString());
@@ -182,8 +180,7 @@ public class CaEntry extends MgmtEntry {
     return equals((CaEntry) obj, false, false);
   } // method equals(Object)
 
-  public boolean equals(CaEntry obj, boolean ignoreDynamicFields,
-                        boolean ignoreId) {
+  public boolean equals(CaEntry obj, boolean ignoreDynamicFields, boolean ignoreId) {
     return base.equals(obj.base, ignoreDynamicFields)
         && CompareUtil.equals(cert, obj.cert)
         && CompareUtil.equals(certchain, obj.certchain)
@@ -203,8 +200,7 @@ public class CaEntry extends MgmtEntry {
       this.hexSha1OfCert = null;
     } else {
       if (!cert.hasKeyusage(KeyUsage.keyCertSign)) {
-        throw new CaMgmtException(
-            "CA certificate does not have keyusage keyCertSign");
+        throw new CaMgmtException("CA certificate does not have keyusage keyCertSign");
       }
       this.cert = cert;
       this.pathLenConstraint = cert.basicConstraints();
@@ -261,8 +257,7 @@ public class CaEntry extends MgmtEntry {
       ret.put("certchain", list);
     }
 
-    return ret.put("signerConf", signerConf)
-        .put("pathLenConstraint", pathLenConstraint);
+    return ret.put("signerConf", signerConf).put("pathLenConstraint", pathLenConstraint);
   }
 
   public static CaEntry parse(JsonMap json) throws CodecException {
@@ -270,8 +265,7 @@ public class CaEntry extends MgmtEntry {
     String signerConf = json.getNnString("signerConf");
 
     CaEntry ret = new CaEntry(base,
-        new NameId(json.getInt("id"), json.getNnString("name")),
-        signerConf);
+        new NameId(json.getInt("id"), json.getNnString("name")), signerConf);
 
     try {
       byte[] bytes = json.getBytes("cert");
@@ -289,8 +283,7 @@ public class CaEntry extends MgmtEntry {
         }
       }
     } catch (CaMgmtException | CertificateException e) {
-      throw new CodecException(
-          "could not decode certificate: " + e.getMessage(), e);
+      throw new CodecException("could not decode certificate: " + e.getMessage(), e);
     }
 
     Integer i = json.getInt("pathLenConstraint");

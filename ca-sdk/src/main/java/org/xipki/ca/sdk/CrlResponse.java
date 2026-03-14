@@ -36,8 +36,7 @@ public class CrlResponse extends SdkResponse {
       assertArrayStart("CrlResponse", decoder, 1);
       return new CrlResponse(decoder.readByteString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, CrlResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, CrlResponse.class), ex);
     }
   }
 

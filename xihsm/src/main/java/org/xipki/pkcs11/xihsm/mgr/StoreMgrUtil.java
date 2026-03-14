@@ -3,9 +3,7 @@
 package org.xipki.pkcs11.xihsm.mgr;
 
 import org.xipki.pkcs11.wrapper.PKCS11T;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
 import org.xipki.pkcs11.xihsm.util.HsmException;
-import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.util.io.IoUtil;
 
 import java.io.File;
@@ -17,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class StoreMgrUtil {
@@ -29,8 +29,7 @@ public class StoreMgrUtil {
     return new ModuleInitConf(slots);
   }
 
-  public static void initFileModule(File dir, ModuleInitConf conf)
-      throws HsmException {
+  public static void initFileModule(File dir, ModuleInitConf conf) throws HsmException {
     TenantInfo info = generateTenantInfo(conf);
 
     try {
@@ -59,13 +58,10 @@ public class StoreMgrUtil {
       List<User> users = new ArrayList<>(2);
 
       Map<Long, String> userTypePinMap = Map.of(
-          PKCS11T.CKU_SO,   slot.getSoPin(),
-          PKCS11T.CKU_USER, slot.getUserPin());
+          PKCS11T.CKU_SO, slot.getSoPin(), PKCS11T.CKU_USER, slot.getUserPin());
       for (Map.Entry<Long, String> kv : userTypePinMap.entrySet()) {
-        byte[] salt = HsmUtil.randomBytes(12);
-        byte[] hash = HashAlgo.SHA256.hash(salt,
-            kv.getValue().getBytes(StandardCharsets.UTF_8));
-        users.add(new User(kv.getKey(), salt, hash));
+        byte[] pin = kv.getValue().getBytes(StandardCharsets.UTF_8);
+        users.add(new User(kv.getKey(), pin));
       }
 
       slotUsersMap.put(slot.getId(), new SlotUsers(users));

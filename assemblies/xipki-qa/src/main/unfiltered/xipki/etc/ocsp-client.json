@@ -1,5 +1,0 @@
-{
-  "signerType": "PKCS12",
-  "signerConf": "password=CHANGEIT,keystore=file:xipki/keycerts/ocsp-client.p12"
-}
-

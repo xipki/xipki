@@ -29,8 +29,7 @@ public class CmpClientConf {
 
     private final FileOrBinary dhPopCerts;
 
-    public Responder(String url, PbmMac pbmMac, Signature signature,
-                     FileOrBinary dhPopCerts) {
+    public Responder(String url, PbmMac pbmMac, Signature signature, FileOrBinary dhPopCerts) {
       if (pbmMac == null && signature == null) {
         throw new IllegalArgumentException(
             "at least one of pbmMac and signature must be specified");

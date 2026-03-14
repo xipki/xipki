@@ -59,8 +59,7 @@ public class CtlogControl implements JsonEncodable {
     sslContextName = pairs.value(KEY_SSLCONTEXT_NAME);
 
     String serverList = pairs.value(KEY_SERVERS);
-    servers = serverList == null ? null
-        : Arrays.asList(serverList.split(";"));
+    servers = serverList == null ? null : Arrays.asList(serverList.split(";"));
     if (servers == null || servers.isEmpty()) {
       throw new InvalidConfException(KEY_SERVERS + " is not specified");
     }
@@ -68,8 +67,7 @@ public class CtlogControl implements JsonEncodable {
     this.confPairs = pairs;
   } // constructor
 
-  public CtlogControl(Boolean enabled, List<String> servers,
-                      String sslContextName) {
+  public CtlogControl(Boolean enabled, List<String> servers, String sslContextName) {
     Args.notEmpty(servers, "servers");
 
     ConfPairs pairs = new ConfPairs();
@@ -159,11 +157,9 @@ public class CtlogControl implements JsonEncodable {
     return new JsonMap(confPairs().asMap());
   }
 
-  private static boolean getBoolean(
-      ConfPairs pairs, String key, boolean defaultValue) {
+  private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
     String str = pairs.value(key);
-    boolean ret = StringUtil.isBlank(str) ? defaultValue
-        : Boolean.parseBoolean(str);
+    boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
     pairs.putPair(key, Boolean.toString(ret));
     return ret;
   } // method getBoolean

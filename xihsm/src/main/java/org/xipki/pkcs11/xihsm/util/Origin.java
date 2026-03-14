@@ -3,6 +3,8 @@
 package org.xipki.pkcs11.xihsm.util;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum Origin {

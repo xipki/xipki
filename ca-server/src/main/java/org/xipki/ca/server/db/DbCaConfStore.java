@@ -82,8 +82,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     CA
   }
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DbCaConfStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbCaConfStore.class);
 
   private final String sqlSelectProfileId;
   private final String sqlSelectProfile;
@@ -118,39 +117,28 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     if (dbSchemaVersion < 7) {
-      throw new CaMgmtException(
-          "DB version < 7 is not supported: " + dbSchemaVersion);
+      throw new CaMgmtException("DB version < 7 is not supported: " + dbSchemaVersion);
     }
 
     for (Table m : Table.values()) {
       cachedIdMap.put(m, new AtomicLong(0));
     }
 
-    this.sqlSelectProfileId   = buildSelectFirstSql(
-        "ID FROM PROFILE WHERE NAME=?");
-    this.sqlSelectCaId        = buildSelectFirstSql(
-        "ID FROM CA WHERE NAME=?");
-    this.sqlSelectPublisherId = buildSelectFirstSql(
-        "ID FROM PUBLISHER WHERE NAME=?");
-    this.sqlSelectRequestorId = buildSelectFirstSql(
-        "ID FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectProfileId   = buildSelectFirstSql("ID FROM PROFILE WHERE NAME=?");
+    this.sqlSelectCaId        = buildSelectFirstSql("ID FROM CA WHERE NAME=?");
+    this.sqlSelectPublisherId = buildSelectFirstSql("ID FROM PUBLISHER WHERE NAME=?");
+    this.sqlSelectRequestorId = buildSelectFirstSql("ID FROM REQUESTOR WHERE NAME=?");
 
-    this.sqlSelectProfile     = buildSelectFirstSql(
-        "ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
-    this.sqlSelectPublisher   = buildSelectFirstSql(
-        "ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
-    this.sqlSelectRequestor   = buildSelectFirstSql(
-        "ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
-    this.sqlSelectSigner      = buildSelectFirstSql(
-        "TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
-    this.sqlSelectKeypairGen  = buildSelectFirstSql(
-        "TYPE,CONF FROM KEYPAIR_GEN WHERE NAME=?");
+    this.sqlSelectProfile    = buildSelectFirstSql("ID,TYPE,CONF FROM PROFILE WHERE NAME=?");
+    this.sqlSelectPublisher  = buildSelectFirstSql("ID,TYPE,CONF FROM PUBLISHER WHERE NAME=?");
+    this.sqlSelectRequestor  = buildSelectFirstSql("ID,TYPE,CONF FROM REQUESTOR WHERE NAME=?");
+    this.sqlSelectSigner     = buildSelectFirstSql("TYPE,CERT,CONF FROM SIGNER WHERE NAME=?");
+    this.sqlSelectKeypairGen = buildSelectFirstSql("TYPE,CONF FROM KEYPAIR_GEN WHERE NAME=?");
 
     this.sqlSelectCa = buildSelectFirstSql(
         "ID,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT,REV_INFO," +
         "SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF FROM CA WHERE NAME=?");
-    this.sqlNextSelectCrlNo = buildSelectFirstSql(
-        "NEXT_CRLNO FROM CA WHERE ID=?");
+    this.sqlNextSelectCrlNo = buildSelectFirstSql("NEXT_CRLNO FROM CA WHERE ID=?");
     this.sqlSelectSystemEvent = buildSelectFirstSql(
         "EVENT_TIME,EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME=?");
   } // constructor
@@ -168,31 +156,27 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
    *            If error occurs.
    */
   public SystemEvent getSystemEvent(String eventName) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent,
-        col2Str(eventName));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent, col2Str(eventName));
 
     return (rs == null) ? null
-        : new SystemEvent(eventName, rs.getString("EVENT_OWNER"),
-            getLong(rs, "EVENT_TIME"));
+        : new SystemEvent(eventName,
+            rs.getString("EVENT_OWNER"), getLong(rs, "EVENT_TIME"));
   } // method getSystemEvent
 
   private void deleteSystemEvent(String eventName) throws CaMgmtException {
-    execUpdatePrepStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME=?",
-        col2Str(eventName));
+    execUpdatePrepStmt0("DELETE FROM SYSTEM_EVENT WHERE NAME=?", col2Str(eventName));
   }
 
   private void addSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     final String sql = SqlUtil.buildInsertSql("SYSTEM_EVENT",
         "NAME,EVENT_TIME,EVENT_TIME2,EVENT_OWNER");
 
+    Timestamp ts = new Timestamp(systemEvent.eventTime() * 1000L);
     int num = execUpdatePrepStmt0(sql, col2Str(systemEvent.name()),
-        col2Long(systemEvent.eventTime()),
-        col2Timestamp(new Timestamp(systemEvent.eventTime() * 1000L)),
-        col2Str(systemEvent.owner()));
+        col2Long(systemEvent.eventTime()), col2Timestamp(ts), col2Str(systemEvent.owner()));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add system event " + systemEvent.name());
+      throw new CaMgmtException("could not add system event " + systemEvent.name());
     }
 
     LOG.info("added system event {}", systemEvent.name());
@@ -204,8 +188,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   }
 
   @Override
-  public void changeSystemEvent(SystemEvent systemEvent)
-      throws CaMgmtException {
+  public void changeSystemEvent(SystemEvent systemEvent) throws CaMgmtException {
     deleteSystemEvent(systemEvent.name());
     addSystemEvent(systemEvent);
   } // method changeSystemEvent
@@ -222,11 +205,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method createCaAliases
 
   @Override
-  public CertprofileEntry createCertprofile(String name)
-      throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(
-        execQuery1PrepStmt0(sqlSelectProfile, col2Str(name))).orElseThrow(
-            () -> new CaMgmtException("unknown Certprofile " + name));
+  public CertprofileEntry createCertprofile(String name) throws CaMgmtException {
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectProfile, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown Certprofile " + name));
 
     return new CertprofileEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
@@ -234,9 +215,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public PublisherEntry createPublisher(String name) throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(
-        execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name))).orElseThrow(
-            () -> new CaMgmtException("unknown Publisher " + name));
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectPublisher, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown Publisher " + name));
 
     return new PublisherEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
@@ -244,16 +224,14 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public Integer getRequestorId(String requestorName) throws CaMgmtException {
-    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId,
-                    col2Str(requestorName));
+    ResultRow rs = execQuery1PrepStmt0(sqlSelectRequestorId, col2Str(requestorName));
     return (rs == null) ? null : getInt(rs, "ID");
   } // method getRequestorId
 
   @Override
   public RequestorEntry createRequestor(String name) throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectRequestor,
-                    col2Str(name))).orElseThrow(
-                        () -> new CaMgmtException("unknown Requestor " + name));
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectRequestor, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown Requestor " + name));
 
     return new RequestorEntry(new NameId(getInt(rs, "ID"), name),
         rs.getString("TYPE"), rs.getString("CONF"));
@@ -261,8 +239,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public SignerEntry createSigner(String name) throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(
-        execQuery1PrepStmt0(sqlSelectSigner, col2Str(name)))
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectSigner, col2Str(name)))
         .orElseThrow(() -> new CaMgmtException("unknown signer " + name));
 
     return new SignerEntry(name, rs.getString("TYPE"), rs.getString("CONF"),
@@ -271,21 +248,16 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public KeypairGenEntry createKeypairGen(String name) throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(
-        execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name)))
-        .orElseThrow(
-            () -> new CaMgmtException("unknown keypair generation " + name));
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectKeypairGen, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown keypair generation " + name));
 
-    return new KeypairGenEntry(name, rs.getString("TYPE"),
-        rs.getString("CONF"));
+    return new KeypairGenEntry(name, rs.getString("TYPE"), rs.getString("CONF"));
   } // method createSigner
 
   @Override
-  public CaInfo createCaInfo(String name, CertStore certstore)
-      throws CaMgmtException {
-    ResultRow rs = Optional.ofNullable(
-        execQuery1PrepStmt0(sqlSelectCa, col2Str(name))).orElseThrow(
-            () -> new CaMgmtException("unknown CA " + name));
+  public CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException {
+    ResultRow rs = Optional.ofNullable(execQuery1PrepStmt0(sqlSelectCa, col2Str(name)))
+        .orElseThrow(() -> new CaMgmtException("unknown CA " + name));
 
     String encodedConf = rs.getString("CONF");
     CaConfColumn conf;
@@ -295,8 +267,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       throw new CaMgmtException("invalid CONF column in table CA", e);
     }
 
-    BaseCaInfo base = new BaseCaInfo(
-        rs.getString("SIGNER_TYPE"), conf.permissions());
+    BaseCaInfo base = new BaseCaInfo(rs.getString("SIGNER_TYPE"), conf.permissions());
     conf.fillBaseCaInfo(base);
 
     base.setMaxValidity(conf.maxValidity());
@@ -336,8 +307,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method createCaInfo
 
   @Override
-  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca)
-      throws CaMgmtException {
+  public Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException {
     Map<Integer, String> idNameMap = getIdNameMap("REQUESTOR");
 
     final String sql = "SELECT REQUESTOR_ID,PERMISSION,PROFILES FROM " +
@@ -361,12 +331,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method createCaHasRequestors
 
   @Override
-  public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca)
-      throws CaMgmtException {
-    final String sql =
-        "SELECT PROFILE_ID,ALIASES FROM CA_HAS_PROFILE WHERE CA_ID=?";
+  public Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException {
+    final String sql = "SELECT PROFILE_ID,ALIASES FROM CA_HAS_PROFILE WHERE CA_ID=?";
     List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.id()));
-
     Set<CaProfileIdAliases> ret = new HashSet<>();
 
     for (ResultRow row : rows) {
@@ -383,14 +350,10 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return createCaHasEntities("CA_HAS_PUBLISHER", "PUBLISHER_ID", ca);
   }
 
-  private Set<Integer> createCaHasEntities(
-      String table, String column, NameId ca)
+  private Set<Integer> createCaHasEntities(String table, String column, NameId ca)
       throws CaMgmtException {
-    final String sql = "SELECT " + column + " FROM " + table +
-                        " WHERE CA_ID=?";
-
+    final String sql = "SELECT " + column + " FROM " + table + " WHERE CA_ID=?";
     List<ResultRow> rows = execQueryPrepStmt0(sql, col2Int(ca.id()));
-
     Set<Integer> ret = new HashSet<>();
     for (ResultRow rs : rows) {
       ret.add(getInt(rs, column));
@@ -413,9 +376,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   @Override
   public void addCa(CaEntry caEntry) throws CaMgmtException {
-    Args.notNull(caEntry, "caEntry");
-
-    caEntry.ident().setId((int) getNextId(Table.CA));
+    Args.notNull(caEntry, "caEntry").ident().setId((int) getNextId(Table.CA));
 
     String colNames ="ID,NAME,STATUS,NEXT_CRLNO,CRL_SIGNER_NAME,SUBJECT," +
         "REV_INFO,SIGNER_TYPE,SIGNER_CONF,CERT,CERTCHAIN,CONF";
@@ -457,8 +418,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added CA '{}':\n{}", caEntry.ident(),
-          caEntry.toString(false, true));
+      LOG.info("added CA '{}':\n{}", caEntry.ident(), caEntry.toString(false, true));
     }
   } // method addCa
 
@@ -481,27 +441,21 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     dbEntry.ident().setId((int) getNextId(Table.PROFILE));
 
-    int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.ident().id()),
-        col2Str(dbEntry.ident().name()),
-        col2Str(dbEntry.type()),
-        col2Str(dbEntry.conf()));
+    int num = execUpdatePrepStmt0(sql, col2Int(dbEntry.ident().id()),
+        col2Str(dbEntry.ident().name()), col2Str(dbEntry.type()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add certprofile " + dbEntry.ident());
+      throw new CaMgmtException("could not add certprofile " + dbEntry.ident());
     }
 
     LOG.info("added profile '{}':\n{}", dbEntry.ident(), dbEntry);
   } // method addCertprofile
 
   @Override
-  public void addCertprofileToCa(
-      NameId profile, NameId ca, List<String> aliases)
+  public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases)
       throws CaMgmtException {
     notNulls(profile, "profile", ca, "ca");
-    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE",
-        "CA_ID,PROFILE_ID,ALIASES");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PROFILE", "CA_ID,PROFILE_ID,ALIASES");
 
     String aliasesStr;
     if (CollectionUtil.isEmpty(aliases)) {
@@ -519,34 +473,29 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     int num = execUpdatePrepStmt0(sql, col2Int(ca.id()),
-        col2Int(profile.id()), col2Str(aliasesStr));
+                col2Int(profile.id()), col2Str(aliasesStr));
 
     if (num == 0) {
       throw new CaMgmtException("could not add profile " + profile
           + " (aliases " + aliases + ") to CA " +  ca);
     }
 
-    LOG.info("added profile '{}' (aliases {}) to CA '{}'",
-        profile, aliases, ca);
+    LOG.info("added profile '{}' (aliases {}) to CA '{}'", profile, aliases, ca);
   } // method addCertprofileToCa
 
   @Override
-  public void addPublisherToCa(NameId publisher, NameId ca)
-      throws CaMgmtException {
+  public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
     notNulls(publisher, "publisher", ca, "ca");
 
-    final String sql = SqlUtil.buildInsertSql("CA_HAS_PUBLISHER",
-        "CA_ID,PUBLISHER_ID");
+    final String sql = SqlUtil.buildInsertSql("CA_HAS_PUBLISHER", "CA_ID,PUBLISHER_ID");
     addEntityToCa("publisher", publisher, ca, sql);
   } // method addPublisherToCa
 
   private void addEntityToCa(String desc, NameId entity, NameId ca, String sql)
       throws CaMgmtException {
-    int num = execUpdatePrepStmt0(sql, col2Int(ca.id()),
-              col2Int(entity.id()));
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.id()), col2Int(entity.id()));
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add " + desc + " " + entity + " to CA " +  ca);
+      throw new CaMgmtException("could not add " + desc + " " + entity + " to CA " +  ca);
     }
 
     LOG.info("added {} '{}' to CA '{}'", desc, entity, ca);
@@ -558,33 +507,25 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     dbEntry.ident().setId((int) getNextId(Table.REQUESTOR));
 
-    final String sql = SqlUtil.buildInsertSql(
-        "REQUESTOR", "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
 
-    int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.ident().id()),
-        col2Str(dbEntry.ident().name()),
-        col2Str(dbEntry.type()),
-        col2Str(dbEntry.conf()));
+    int num = execUpdatePrepStmt0(sql, col2Int(dbEntry.ident().id()),
+        col2Str(dbEntry.ident().name()), col2Str(dbEntry.type()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add requestor " + dbEntry.ident());
+      throw new CaMgmtException("could not add requestor " + dbEntry.ident());
     }
 
     if (LOG.isInfoEnabled()) {
-      LOG.info("added requestor '{}':\n{}", dbEntry.ident(),
-          dbEntry.toString(false));
+      LOG.info("added requestor '{}':\n{}", dbEntry.ident(), dbEntry.toString(false));
     }
   } // method addRequestor
 
   @Override
-  public NameId addEmbeddedRequestor(String requestorName)
-      throws CaMgmtException {
+  public NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException {
     requestorName = requestorName.toLowerCase();
 
-    final String sql = SqlUtil.buildInsertSql("REQUESTOR",
-        "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("REQUESTOR", "ID,NAME,TYPE,CONF");
     int nextId = (int) getNextId(Table.REQUESTOR);
     String name = "EMBEDDED";
 
@@ -600,64 +541,48 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method addEmbeddedRequestor
 
   @Override
-  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca)
-      throws CaMgmtException {
+  public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
     notNulls(requestor, "requestor", ca, "ca");
 
     final String sql = SqlUtil.buildInsertSql("CA_HAS_REQUESTOR",
         "CA_ID,REQUESTOR_ID,PERMISSION,PROFILES");
 
-    String profilesText = StringUtil.collectionAsString(
-                          requestor.profiles(), ",");
+    String profilesText = StringUtil.collectionAsString(requestor.profiles(), ",");
     final NameId requestorIdent = requestor.requestorIdent();
 
-    int num = execUpdatePrepStmt0(sql,
-        col2Int(ca.id()),
-        col2Int(requestorIdent.id()),
-        col2Int(requestor.permissions().value()),
-        col2Str(profilesText));
+    int num = execUpdatePrepStmt0(sql, col2Int(ca.id()), col2Int(requestorIdent.id()),
+        col2Int(requestor.permissions().value()), col2Str(profilesText));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add requestor " + requestorIdent + " to CA " + ca);
+      throw new CaMgmtException("could not add requestor " + requestorIdent + " to CA " + ca);
     }
 
-    LOG.info(
-        "added requestor '{}' to CA '{}': permission: {} ({}); profile: {}",
-        requestorIdent, ca, requestor.permissions().value(),
-        requestor.permissions(), profilesText);
+    LOG.info("added requestor '{}' to CA '{}': permission: {} ({}); profile: {}",
+        requestorIdent, ca, requestor.permissions().value(), requestor.permissions(), profilesText);
   } // method addRequestorToCa
 
   @Override
   public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
-    final String sql = SqlUtil.buildInsertSql("PUBLISHER",
-        "ID,NAME,TYPE,CONF");
+    final String sql = SqlUtil.buildInsertSql("PUBLISHER", "ID,NAME,TYPE,CONF");
 
     dbEntry.ident().setId((int) getNextId(Table.PUBLISHER));
     String name = dbEntry.ident().name();
 
-    int num = execUpdatePrepStmt0(sql,
-        col2Int(dbEntry.ident().id()),
-        col2Str(name),
-        col2Str(dbEntry.type()),
-        col2Str(dbEntry.conf()));
+    int num = execUpdatePrepStmt0(sql, col2Int(dbEntry.ident().id()),
+        col2Str(name), col2Str(dbEntry.type()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add publisher " + dbEntry.ident());
+      throw new CaMgmtException("could not add publisher " + dbEntry.ident());
     }
 
     LOG.info("added publisher '{}':\n{}", dbEntry.ident(), dbEntry);
   } // method addPublisher
 
   @Override
-  public void changeCa(ChangeCaEntry changeCaEntry,
-                       BaseCaInfo currentCaConf,
-                       SecurityFactory securityFactory)
-      throws CaMgmtException {
-    notNulls(changeCaEntry, "changeCaEntry",
-        currentCaConf, "currentCaConf",
+  public void changeCa(ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConf,
+                      SecurityFactory securityFactory) throws CaMgmtException {
+    notNulls(changeCaEntry, "changeCaEntry", currentCaConf, "currentCaConf",
         securityFactory, "securityFactory");
 
     byte[] encodedCert = changeCaEntry.encodedCert();
@@ -671,8 +596,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
 
       if (anyCertIssued) {
-        throw new CaMgmtException(
-            "Cannot change certificate of CA which has issued certificates");
+        throw new CaMgmtException("Cannot change certificate of CA which has issued certificates");
       }
     }
 
@@ -691,8 +615,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
         ResultRow rs = Optional.ofNullable(
             execQuery1PrepStmt0(sql, col2Int(changeCaEntry.ident().id())))
-            .orElseThrow(() -> new CaMgmtException(
-                "unknown CA '" + changeCaEntry.ident()));
+            .orElseThrow(() -> new CaMgmtException("unknown CA '" + changeCaEntry.ident()));
 
         caCert = parseCert(Base64.decode(rs.getString("CERT")));
       }
@@ -703,20 +626,17 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
         ResultRow rs = Optional.ofNullable(
             execQuery1PrepStmt0(sql, col2Int(changeCaEntry.ident().id())))
-            .orElseThrow(() -> new CaMgmtException(
-                "unknown CA '" + changeCaEntry.ident()));
+            .orElseThrow(() -> new CaMgmtException("unknown CA '" + changeCaEntry.ident()));
 
         if (signerType == null) {
           signerType = rs.getString("SIGNER_TYPE");
         }
 
         signerConf = (signerConf == null)
-            ? rs.getString("SIGNER_CONF")
-            : CaUtil.canonicalizeSignerConf(signerConf);
+            ? rs.getString("SIGNER_CONF") : CaUtil.canonicalizeSignerConf(signerConf);
 
         try {
-          List<CaSignerConf> signerConfs =
-              CaEntry.splitCaSignerConfs(signerConf);
+          List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
 
           for (CaSignerConf m : signerConfs) {
             ConcurrentSigner ignored = securityFactory.createSigner(
@@ -757,17 +677,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
     }
 
-    String status = (changeCaEntry.status() == null) ? null
-        : changeCaEntry.status().name();
+    String status = (changeCaEntry.status() == null) ? null : changeCaEntry.status().name();
 
     List<SqlColumn> cols = CaUtil.asModifiableList(
-        colStr("STATUS", status),
-        colStr("CRL_SIGNER_NAME", changeCaEntry.crlSignerName()),
-        colStr("SUBJECT", subject),
-        colStr("SIGNER_TYPE", signerType),
-        colStr("SIGNER_CONF", signerConf, false, true),
-        colStr("CERT", base64Cert),
-        colStr("CERTCHAIN", certchainStr));
+        colStr("STATUS", status), colStr("CRL_SIGNER_NAME", changeCaEntry.crlSignerName()),
+        colStr("SUBJECT", subject), colStr("SIGNER_TYPE", signerType),
+        colStr("SIGNER_CONF",       signerConf, false, true),
+        colStr("CERT", base64Cert), colStr("CERTCHAIN", certchainStr));
 
     SqlColumn colConfColumn;
     try {
@@ -780,14 +696,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       cols.add(colConfColumn);
     }
 
-    changeIfNotNull("CA",
-        colInt("ID", changeCaEntry.ident().id()),
+    changeIfNotNull("CA", colInt("ID", changeCaEntry.ident().id()),
         cols.toArray(new SqlColumn[0]));
   } // method changeCa
 
-  private SqlColumn buildChangeCaConfColumn(
-      ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConf)
-          throws InvalidConfException {
+  private SqlColumn buildChangeCaConfColumn(ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConf)
+      throws InvalidConfException {
     CaConfColumn CC = CaConfColumn.fromBaseCaInfo(currentCaConf);
     CaConfColumn newCC = CC.copy();
 
@@ -797,8 +711,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     String str = changeCaEntry.extraControl();
     if (str != null) {
-      newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null
-          : new ConfPairs(str));
+      newCC.setExtraControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new ConfPairs(str));
     }
 
     if (changeCaEntry.validityMode() != null) {
@@ -836,8 +749,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     List<String> names = changeCaEntry.keypairGenNames();
     if (names != null) {
       newCC.setKeypairGenNames(
-          names.isEmpty() || names.get(0).equalsIgnoreCase(CaManager.NULL)
-              ? null : names);
+          names.isEmpty() || names.get(0).equalsIgnoreCase(CaManager.NULL) ? null : names);
     }
 
     // serial number size
@@ -848,15 +760,13 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     // CRL control
     str = changeCaEntry.crlControl();
     if (str != null) {
-      newCC.setCrlControl(CaManager.NULL.equalsIgnoreCase(str)
-          ? null : new CrlControl(str));
+      newCC.setCrlControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new CrlControl(str));
     }
 
     // CTLog control
     str = changeCaEntry.ctlogControl();
     if (str != null) {
-      newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str)
-          ? null : new CtlogControl(str));
+      newCC.setCtlogControl(CaManager.NULL.equalsIgnoreCase(str) ? null : new CtlogControl(str));
     }
 
     if (changeCaEntry.saveCert() != null) {
@@ -869,8 +779,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     List<String> list = changeCaEntry.permissions();
     if (list != null && !list.isEmpty()) {
-      newCC.setPermissions(
-          new Permissions(PermissionConstants.toIntPermission(list)));
+      newCC.setPermissions(new Permissions(PermissionConstants.toIntPermission(list)));
     }
 
     if (changeCaEntry.numCrls() != null) {
@@ -892,8 +801,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     String encodedConf = newCC.encode();
-    String encodedOrigConf = CC.encode();
-    if (encodedConf.equals(encodedOrigConf)) {
+    if (encodedConf.equals(CC.encode())) {
       return null;
     }
 
@@ -902,8 +810,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   }
 
   @Override
-  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo)
-      throws CaMgmtException {
+  public void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlNextSelectCrlNo, col2Int(ca.id()));
     long nextCrlNoInDb = getLong(rs, "NEXT_CRLNO");
 
@@ -919,34 +826,22 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       throws CaMgmtException {
     CertprofileEntry currentDbEntry = createCertprofile(nameId.name());
     CertprofileEntry newDbEntry = new CertprofileEntry(
-        currentDbEntry.ident(),
-        str(type, currentDbEntry.type()),
-        str(conf, currentDbEntry.conf()));
+        currentDbEntry.ident(), str(type, currentDbEntry.type()), str(conf, currentDbEntry.conf()));
 
     IdentifiedCertprofile profile = Optional.ofNullable(
         certprofileManager.createCertprofile(newDbEntry)).orElseThrow(
             () -> new CaMgmtException("could not create certprofile object"));
 
-    boolean failed = true;
-    try {
-      changeIfNotNull("PROFILE", colInt("ID", nameId.id()),
-          colStr("TYPE", type), colStr("CONF", conf));
-      failed = false;
-      return profile;
-    } finally {
-      if (failed) {
-        profile.close();
-      }
-    }
+    changeIfNotNull("PROFILE", colInt("ID", nameId.id()),
+        colStr("TYPE", type), colStr("CONF", conf));
+    return profile;
   } // method changeCertprofile
 
   @Override
-  public RequestorEntryWrapper changeRequestor(
-      NameId nameId, String type, String conf)
+  public RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf)
       throws CaMgmtException {
     Args.notNull(nameId, "nameId");
     RequestorEntryWrapper requestor = new RequestorEntryWrapper();
-
     requestor.setDbEntry(new RequestorEntry(nameId, type, conf));
 
     if (requestor.dbEntry().faulty()) {
@@ -959,10 +854,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method changeRequestor
 
   @Override
-  public SignerEntry changeSigner(
-      String name, String type, String conf, String base64Cert,
-      CaManagerImpl signerManager)
-      throws CaMgmtException {
+  public SignerEntry changeSigner(String name, String type, String conf, String base64Cert,
+                                  CaManagerImpl signerManager) throws CaMgmtException {
     Args.notNull(signerManager, "signerManager");
 
     SignerEntry dbEntry = createSigner(Args.notBlank(name, "name"));
@@ -971,27 +864,21 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       conf = CaUtil.canonicalizeSignerConf(conf);
     }
 
-    SignerEntry signer = new SignerEntry(name, tmpType,
-        (conf == null ? dbEntry.conf() : conf),
+    SignerEntry signer = new SignerEntry(name, tmpType, (conf == null ? dbEntry.conf() : conf),
         (base64Cert == null ? dbEntry.base64Cert() : base64Cert));
     signerManager.createSigner(signer);
 
-    changeIfNotNull("SIGNER",
-        colStr("NAME", name),
-        colStr("TYPE", type),
-        colStr("CERT", base64Cert),
-        colStr("CONF", conf, false, true));
+    changeIfNotNull("SIGNER", colStr("NAME", name), colStr("TYPE", type),
+        colStr("CERT", base64Cert), colStr("CONF", conf, false, true));
     return signer;
   } // method changeSigner
 
   @Override
   public KeypairGenEntryWrapper changeKeypairGen(
-      String name, String type, String conf, CaManagerImpl manager)
-      throws CaMgmtException {
+      String name, String type, String conf, CaManagerImpl manager) throws CaMgmtException {
     Args.notNull(manager, "manager");
 
-    KeypairGenEntry dbEntry =
-        createKeypairGen(Args.notBlank(name, "name"));
+    KeypairGenEntry dbEntry = createKeypairGen(Args.notBlank(name, "name"));
     String tmpType = (type == null ? dbEntry.type() : type);
 
     KeypairGenEntry newDbEntry = new KeypairGenEntry(name, tmpType,
@@ -999,10 +886,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     KeypairGenEntryWrapper wrapper = manager.createKeypairGenerator(newDbEntry);
 
-    changeIfNotNull("KEYPAIR_GEN",
-        colStr("NAME", name),
-        colStr("TYPE", type),
-        colStr("CONF", conf, true, false));
+    changeIfNotNull("KEYPAIR_GEN", colStr("NAME", name),
+        colStr("TYPE", type), colStr("CONF", conf, true, false));
     return wrapper;
   } // method changeKeypairGen
 
@@ -1012,34 +897,28 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       throws CaMgmtException {
     Args.notNull(publisherManager, "publisherManager");
 
-    PublisherEntry currentDbEntry =
-        createPublisher(Args.notBlank(name, "name"));
+    PublisherEntry currentDbEntry = createPublisher(Args.notBlank(name, "name"));
     PublisherEntry dbEntry = new PublisherEntry(currentDbEntry.ident(),
         (type == null ? currentDbEntry.type() : type),
         (conf == null ? currentDbEntry.conf() : conf));
-    IdentifiedCertPublisher publisher =
-        publisherManager.createPublisher(dbEntry);
+    IdentifiedCertPublisher publisher = publisherManager.createPublisher(dbEntry);
 
     changeIfNotNull("PUBLISHER",
-        colStr("NAME", name),
-        colStr("TYPE", type),
-        colStr("CONF", conf));
+        colStr("NAME", name), colStr("TYPE", type), colStr("CONF", conf));
     return publisher;
   } // method changePublisher
 
   @Override
   public void removeCaAlias(String aliasName) throws CaMgmtException {
     Args.notBlank(aliasName, "aliasName");
-    int num = execUpdatePrepStmt0(
-        "DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
+    int num = execUpdatePrepStmt0("DELETE FROM CAALIAS WHERE NAME=?", col2Str(aliasName));
     if (num == 0) {
       throw new CaMgmtException("could not remove CA Alias " + aliasName);
     }
   } // method removeCaAlias
 
   @Override
-  public void removeCertprofileFromCa(String profileName, String caName)
-      throws CaMgmtException {
+  public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     Args.notBlank(profileName, "profileName");
     Args.notBlank(caName, "caName");
 
@@ -1048,23 +927,18 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method removeCertprofileFromCa
 
   @Override
-  public void removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException {
+  public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
     Args.notBlank(requestorName, "requestorName");
     Args.notBlank(caName, "caName");
 
-    removeEntityFromCa("requestor", requestorName, caName,
-        sqlSelectRequestorId,
+    removeEntityFromCa("requestor", requestorName, caName, sqlSelectRequestorId,
         "DELETE FROM CA_HAS_REQUESTOR WHERE CA_ID=? AND REQUESTOR_ID=?");
   } // method removeRequestorFromCa
 
   @Override
-  public void removePublisherFromCa(String publisherName, String caName)
-      throws CaMgmtException {
-    removeEntityFromCa("publisher",
-        Args.notBlank(publisherName, "publisherName"),
-        Args.notBlank(caName, "caName"),
-        sqlSelectPublisherId,
+  public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
+    removeEntityFromCa("publisher", Args.notBlank(publisherName, "publisherName"),
+        Args.notBlank(caName, "caName"), sqlSelectPublisherId,
         "DELETE FROM CA_HAS_PUBLISHER WHERE CA_ID=? AND PUBLISHER_ID=?");
   } // method removePublisherFromCa
 
@@ -1083,20 +957,17 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
                                   String sqlSelectId, String sqlRemove)
       throws CaMgmtException {
     Integer id = Optional.ofNullable(getIdForName(sqlSelectId, name))
-        .orElseThrow(() -> new CaMgmtException(
-            String.format("unknown %s %s ", desc, name)));
+        .orElseThrow(() -> new CaMgmtException(String.format("unknown %s %s ", desc, name)));
 
     int caId = getNonNullIdForName(sqlSelectCaId, caName);
     int num = execUpdatePrepStmt0(sqlRemove, col2Int(caId), col2Int(id));
     if (num == 0) {
-      throw new CaMgmtException(
-          String.format("could not remove %s from CA %s", name, caName));
+      throw new CaMgmtException(String.format("could not remove %s from CA %s", name, caName));
     }
   } // method removeEntityFromCa
 
   @Override
-  public void revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException {
+  public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
     Args.notBlank(caName, "caName");
     Args.notNull(revocationInfo, "revocationInfo");
     int num = execUpdatePrepStmt0("UPDATE CA SET REV_INFO=? WHERE NAME=?",
@@ -1112,12 +983,10 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     int num = execUpdatePrepStmt0(
         "INSERT INTO KEYPAIR_GEN (NAME,TYPE,CONF) VALUES (?,?,?)",
-        col2Str(dbEntry.name()), col2Str(dbEntry.type()),
-        col2Str(dbEntry.conf()));
+        col2Str(dbEntry.name()), col2Str(dbEntry.type()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
-      throw new CaMgmtException(
-          "could not add keypair generation " + dbEntry.name());
+      throw new CaMgmtException("could not add keypair generation " + dbEntry.name());
     }
 
     LOG.info("added keypair generation: \n{}", dbEntry.toString(true));
@@ -1127,10 +996,10 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
     Args.notNull(dbEntry, "dbEntry");
 
-    int num = execUpdatePrepStmt0(SqlUtil.buildInsertSql("SIGNER",
-            "NAME,TYPE,CERT,CONF"),
-            col2Str(dbEntry.name()),    col2Str(dbEntry.type()),
-            col2Str(dbEntry.base64Cert()), col2Str(dbEntry.conf()));
+    int num = execUpdatePrepStmt0(
+        SqlUtil.buildInsertSql("SIGNER", "NAME,TYPE,CERT,CONF"),
+        col2Str(dbEntry.name()),       col2Str(dbEntry.type()),
+        col2Str(dbEntry.base64Cert()), col2Str(dbEntry.conf()));
 
     if (num == 0) {
       throw new CaMgmtException("could not add signer " + dbEntry.name());
@@ -1259,8 +1128,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return (b64Cert == null) ? null : parseCert(Base64.decode(b64Cert));
   } // method generateCert
 
-  private static List<X509Cert> generateCertchain(String encodedCertchain)
-      throws CaMgmtException {
+  private static List<X509Cert> generateCertchain(String encodedCertchain) throws CaMgmtException {
     if (StringUtil.isBlank(encodedCertchain)) {
       return null;
     }
@@ -1285,8 +1153,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return maxX500nameLen;
   }
 
-  private PreparedStatement prepareStatement(String sql)
-      throws CaMgmtException {
+  private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
     try {
       return datasource.prepareStatement(sql);
     } catch (DataAccessException ex) {
@@ -1295,8 +1162,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
   } // method prepareStatement
 
   public List<String> namesFromTable(String table) throws CaMgmtException {
-    final String sql = "SELECT NAME FROM " + table;
-    List<ResultRow> rows = execQueryStmt0(sql);
+    List<ResultRow> rows = execQueryStmt0("SELECT NAME FROM " + table);
 
     List<String> names = new LinkedList<>();
     for (ResultRow rs : rows) {
@@ -1309,11 +1175,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return names;
   } // method namesFromTable
 
-  public boolean deleteRowWithName(String name, String table)
-      throws CaMgmtException {
-    final String sql = "DELETE FROM " + table + " WHERE NAME=?";
-    int num = execUpdatePrepStmt0(sql, col2Str(name));
-    return num > 0;
+  public boolean deleteRowWithName(String name, String table) throws CaMgmtException {
+    return execUpdatePrepStmt0("DELETE FROM " + table + " WHERE NAME=?", col2Str(name)) > 0;
   } // method deleteRowWithName
 
   private static String str(String sa, String sb) {
@@ -1328,8 +1191,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
   }
 
-  private int execUpdatePrepStmt0(String sql, SqlColumn2... params)
-      throws CaMgmtException {
+  private int execUpdatePrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
     try {
       return execUpdatePrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -1345,8 +1207,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
   }
 
-  private ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params)
-      throws CaMgmtException {
+  private ResultRow execQuery1PrepStmt0(String sql, SqlColumn2... params) throws CaMgmtException {
     try {
       return execQuery1PrepStmt(sql, params);
     } catch (DataAccessException ex) {
@@ -1363,8 +1224,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
   }
 
-  private void changeIfNotNull(String tableName, SqlColumn whereColumn,
-                               SqlColumn... columns)
+  private void changeIfNotNull(String tableName, SqlColumn whereColumn, SqlColumn... columns)
       throws CaMgmtException {
     StringBuilder buf = new StringBuilder("UPDATE ");
     buf.append(tableName).append(" SET ");
@@ -1403,16 +1263,14 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       }
 
       LOG.info("updated table {} WHERE {}={}: {}",
-          tableName, whereColumn.name(),
-          whereColumn.value(), changedColumns);
+          tableName, whereColumn.name(), whereColumn.value(), changedColumns);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
     }
   } // method changeIfNotNull
 
   private void setColumn(Map<String, String> changedColumns,
-                         PreparedStatement ps, int index, SqlColumn column)
-      throws SQLException {
+                        PreparedStatement ps, int index, SqlColumn column) throws SQLException {
     String name = column.name();
     ColumnType type = column.type();
     Object value = column.value();
@@ -1469,8 +1327,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         valText = val.toString();
       }
     } else {
-      throw new IllegalStateException(
-          "should not reach here, unknown type " + column.type());
+      throw new IllegalStateException("should not reach here, unknown type " + column.type());
     }
 
     if (changedColumns != null) {
@@ -1482,8 +1339,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return CaManager.NULL.equalsIgnoreCase(str) ? null : str;
   }
 
-  private int getNonNullIdForName(String sql, String name)
-      throws CaMgmtException {
+  private int getNonNullIdForName(String sql, String name) throws CaMgmtException {
     Integer id = getIdForName(sql, name);
     if (id != null) {
       return id;
@@ -1511,8 +1367,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
   } // method getIdForName
 
-  private Map<Integer, String> getIdNameMap(String tableName)
-      throws CaMgmtException {
+  private Map<Integer, String> getIdNameMap(String tableName) throws CaMgmtException {
     final String sql = "SELECT ID,NAME FROM " + tableName;
     PreparedStatement ps = null;
     ResultSet rs = null;

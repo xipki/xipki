@@ -17,8 +17,7 @@ import org.xipki.util.codec.Args;
  */
 class SessionPkcs11 {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SessionPkcs11.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SessionPkcs11.class);
 
   /**
    * A reference to the underlying PKCS#11 module to perform the operations.
@@ -80,8 +79,7 @@ class SessionPkcs11 {
     recover(false, e);
   }
 
-  private void recover(boolean loginAllowed, PKCS11Exception e)
-      throws PKCS11Exception {
+  private void recover(boolean loginAllowed, PKCS11Exception e) throws PKCS11Exception {
     long err = e.errorCode();
     if (err == PKCS11T.CKR_USER_NOT_LOGGED_IN) {
       if (!loginAllowed || auth == null) {
@@ -99,12 +97,9 @@ class SessionPkcs11 {
 
         throw ex;
       }
-    } else if (err == PKCS11T.CKR_SESSION_CLOSED
-        || err == PKCS11T.CKR_SESSION_HANDLE_INVALID
-        || err == PKCS11T.CKR_DEVICE_ERROR
-        || err == PKCS11T.CKR_DEVICE_MEMORY
-        || err == PKCS11T.CKR_DEVICE_REMOVED
-        || err == PKCS11T.CKR_HOST_MEMORY
+    } else if (err == PKCS11T.CKR_SESSION_CLOSED || err == PKCS11T.CKR_SESSION_HANDLE_INVALID
+        || err == PKCS11T.CKR_DEVICE_ERROR   || err == PKCS11T.CKR_DEVICE_MEMORY
+        || err == PKCS11T.CKR_DEVICE_REMOVED || err == PKCS11T.CKR_HOST_MEMORY
     ) {
       try {
         pkcs11.C_CloseSession(hSession);
@@ -244,44 +239,33 @@ class SessionPkcs11 {
     }
   }
 
-  void C_DigestInit(CkMechanism mechanism) throws PKCS11Exception {
+  byte[] C_DigestX(CkMechanism mechanism, byte[] prefix, long hKey,
+                  byte[] suffix, int maxSize) throws PKCS11Exception {
     try {
-      pkcs11.C_DigestInit(hSession, mechanism);
+      return pkcs11.C_DigestX(hSession, mechanism, prefix, hKey, suffix, maxSize);
     } catch (PKCS11Exception e) {
       recoverAtomicOp(e);
-      pkcs11.C_DigestInit(hSession, mechanism);
+      return pkcs11.C_DigestX(hSession, mechanism, prefix, hKey, suffix, maxSize);
     }
   }
 
-  byte[] C_Digest(byte[] data, int maxSize) throws PKCS11Exception {
+  byte[] C_SignX(CkMechanism mechanism, long hKey, byte[] data, int maxSize)
+      throws PKCS11Exception {
     try {
-      return pkcs11.C_Digest(hSession, data, maxSize);
+      return pkcs11.C_SignX(hSession, mechanism, hKey, data, maxSize);
     } catch (PKCS11Exception e) {
-      throw recoverMultiOp(e);
+      recoverAtomicOp(e);
+      return pkcs11.C_SignX(hSession, mechanism, hKey, data, maxSize);
     }
   }
 
-  void C_DigestUpdate(byte[] part) throws PKCS11Exception {
+  byte[] C_DecryptX(CkMechanism mechanism, long hKey, byte[] cipherText, int maxSize)
+      throws PKCS11Exception {
     try {
-      pkcs11.C_DigestUpdate(hSession, part);
+      return pkcs11.C_DecryptX(hSession, mechanism, hKey, cipherText, maxSize);
     } catch (PKCS11Exception e) {
-      throw recoverMultiOp(e);
-    }
-  }
-
-  void C_DigestKey(long hKey) throws PKCS11Exception {
-    try {
-      pkcs11.C_DigestKey(hSession, hKey);
-    } catch (PKCS11Exception e) {
-      throw recoverMultiOp(e);
-    }
-  }
-
-  byte[] C_DigestFinal(int maxSize) throws PKCS11Exception {
-    try {
-      return pkcs11.C_DigestFinal(hSession, maxSize);
-    } catch (PKCS11Exception e) {
-      throw recoverMultiOp(e);
+      recoverAtomicOp(e);
+      return pkcs11.C_DecryptX(hSession, mechanism, hKey, cipherText, maxSize);
     }
   }
 
@@ -294,15 +278,6 @@ class SessionPkcs11 {
     }
   }
 
-  byte[] C_Sign(byte[] data, int maxSize)
-      throws PKCS11Exception {
-    try {
-      return pkcs11.C_Sign(hSession, data, maxSize);
-    } catch (PKCS11Exception e) {
-      throw recoverMultiOp(e);
-    }
-  }
-
   void C_SignUpdate(byte[] part) throws PKCS11Exception {
     try {
       pkcs11.C_SignUpdate(hSession, part);
@@ -311,8 +286,7 @@ class SessionPkcs11 {
     }
   }
 
-  byte[] C_SignFinal(int maxSize)
-      throws PKCS11Exception {
+  byte[] C_SignFinal(int maxSize) throws PKCS11Exception {
     try {
       return pkcs11.C_SignFinal(hSession, maxSize);
     } catch (PKCS11Exception e) {
@@ -320,8 +294,7 @@ class SessionPkcs11 {
     }
   }
 
-  long C_GenerateKey(CkMechanism mechanism, Template template)
-      throws PKCS11Exception {
+  long C_GenerateKey(CkMechanism mechanism, Template template) throws PKCS11Exception {
     try {
       return pkcs11.C_GenerateKey(hSession, mechanism, template);
     } catch (PKCS11Exception e) {
@@ -330,17 +303,23 @@ class SessionPkcs11 {
     }
   }
 
-  PKCS11KeyPair C_GenerateKeyPair(
-      CkMechanism mechanism, Template publicKeyTemplate,
-      Template privateKeyTemplate)
-      throws PKCS11Exception {
+  long C_DeriveKey(CkMechanism mechanism, long hBaseKey, Template template) throws PKCS11Exception {
     try {
-      return pkcs11.C_GenerateKeyPair(hSession, mechanism,
-          publicKeyTemplate, privateKeyTemplate);
+      return pkcs11.C_DeriveKey(hSession, mechanism, hBaseKey, template);
     } catch (PKCS11Exception e) {
       recoverAtomicOp(e);
-      return pkcs11.C_GenerateKeyPair(hSession, mechanism,
-          publicKeyTemplate, privateKeyTemplate);
+      return pkcs11.C_DeriveKey(hSession, mechanism, hBaseKey, template);
+    }
+  }
+
+  PKCS11KeyPair C_GenerateKeyPair(
+      CkMechanism mechanism, Template publicKeyTemplate, Template privateKeyTemplate)
+      throws PKCS11Exception {
+    try {
+      return pkcs11.C_GenerateKeyPair(hSession, mechanism, publicKeyTemplate, privateKeyTemplate);
+    } catch (PKCS11Exception e) {
+      recoverAtomicOp(e);
+      return pkcs11.C_GenerateKeyPair(hSession, mechanism, publicKeyTemplate, privateKeyTemplate);
     }
   }
 
@@ -348,8 +327,7 @@ class SessionPkcs11 {
    * PKCS#11 V3.0 Functions
    * ***************************************/
 
-  void C_LoginUser(long userType, byte[] pin, byte[] username)
-      throws PKCS11Exception {
+  void C_LoginUser(long userType, byte[] pin, byte[] username) throws PKCS11Exception {
     synchronized (loginSync) {
       try {
         pkcs11.C_LoginUser(hSession, userType, pin, username);
@@ -374,15 +352,12 @@ class SessionPkcs11 {
    * ***************************************/
 
   long C_DecapsulateKey(CkMechanism mechanism, long hPrivateKey,
-                        byte[] encapsulatedKey, Template template)
-      throws PKCS11Exception {
+                        byte[] encapsulatedKey, Template template) throws PKCS11Exception {
     try {
-      return pkcs11.C_DecapsulateKey(hSession, mechanism, hPrivateKey,
-          encapsulatedKey, template);
+      return pkcs11.C_DecapsulateKey(hSession, mechanism, hPrivateKey, encapsulatedKey, template);
     } catch (PKCS11Exception e) {
       recoverAtomicOp(e);
-      return pkcs11.C_DecapsulateKey(hSession, mechanism, hPrivateKey,
-          encapsulatedKey, template);
+      return pkcs11.C_DecapsulateKey(hSession, mechanism, hPrivateKey, encapsulatedKey, template);
     }
   }
 

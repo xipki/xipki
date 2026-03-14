@@ -5,6 +5,8 @@ package org.xipki.pkcs11.xihsm.mgr;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ModuleInitConf {

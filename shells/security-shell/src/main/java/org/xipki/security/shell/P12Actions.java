@@ -8,11 +8,15 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.apache.karaf.shell.support.completers.FileCompleter;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.security.KeySpec;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeypairWithCert;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
+import org.xipki.security.pkcs12.PKCS12KeyStoreWrapper;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.shell.SecurityActions.SecurityAction;
 import org.xipki.security.sign.SignerConf;
@@ -33,14 +37,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Key;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -62,7 +59,7 @@ public class P12Actions {
     @Option(name = "--key-type", required = true,
         description = "keytype, valid values are AES, DES3, GENERIC, SM4, ...")
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
-     private String keyType;
+    private String keyType;
 
     @Option(name = "--key-size", description = "keysize in bit")
     private Integer keysize;
@@ -93,8 +90,7 @@ public class P12Actions {
   @Service
   public static class ExportCertP12 extends P12SecurityAction {
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -105,7 +101,7 @@ public class P12Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      KeyStore ks = getInKeyStore();
+      PKCS12KeyStore ks = getInKeyStore();
 
       String keyname = null;
       Enumeration<String> aliases = ks.aliases();
@@ -121,7 +117,7 @@ public class P12Actions {
         throw new CmdFailure("could not find private key");
       }
 
-      X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
+      Certificate cert = ks.getCertificate(keyname);
       saveVerbose("saved certificate to file", outFile,
           encodeCert(cert.getEncoded(), outform));
 
@@ -139,14 +135,13 @@ public class P12Actions {
     @Completion(FileCompleter.class)
     private String certFile;
 
-    @Option(name = "--ca-cert", multiValued = true, description =
-        "CA Certificate file")
+    @Option(name = "--ca-cert", multiValued = true, description = "CA Certificate file")
     @Completion(FileCompleter.class)
     private Set<String> caCertFiles;
 
     @Override
     protected Object execute0() throws Exception {
-      KeyStore inKs = getInKeyStore();
+      PKCS12KeyStore inKs = getInKeyStore();
 
       char[] pwd = getPassword();
       X509Cert newCert = X509Util.parseCert(new File(certFile));
@@ -167,7 +162,7 @@ public class P12Actions {
         throw new XiSecurityException("could not find private key");
       }
 
-      Key key = inKs.getKey(keyname, pwd);
+      PrivateKeyInfo key = inKs.getKey(keyname);
       Set<X509Cert> caCerts = new HashSet<>();
       if (isNotEmpty(caCertFiles)) {
         for (String caCertFile : caCertFiles) {
@@ -177,40 +172,35 @@ public class P12Actions {
       X509Cert[] certChain = X509Util.buildCertPath(newCert, caCerts);
       Certificate[] jceCertChain = new Certificate[certChain.length];
       for (int i = 0; i < certChain.length; i++) {
-        jceCertChain[i] = certChain[i].toJceCert();
+        jceCertChain[i] = certChain[i].getCert();
       }
 
-      KeyStore outKs = KeyUtil.getOutKeyStore("PKCS12");
-      outKs.load(null, null);
+      PKCS12KeyStore outKs = KeyUtil.loadPKCS12KeyStore(null, null);
 
       aliases = inKs.aliases();
       while (aliases.hasMoreElements()) {
         String alias = aliases.nextElement();
         if (alias.equalsIgnoreCase(keyname)) {
-          outKs.setKeyEntry(keyname, key, pwd, jceCertChain);
+          outKs.setKeyEntry(keyname, key, jceCertChain);
         } else {
           if (inKs.isKeyEntry(alias)) {
-            outKs.setKeyEntry(alias, inKs.getKey(alias, pwd), pwd,
-                inKs.getCertificateChain(alias));
+            outKs.setKeyEntry(alias, inKs.getKey(alias), inKs.getCertificateChain(alias));
           } else {
             outKs.setCertificateEntry(alias, inKs.getCertificate(alias));
           }
         }
       }
 
-      try (OutputStream out =
-               Files.newOutputStream(Paths.get(expandFilepath(p12File)))) {
+      try (OutputStream out = Files.newOutputStream(Paths.get(expandFilepath(p12File)))) {
         outKs.store(out, pwd);
         println("updated certificate");
         return null;
       }
     } // method execute0
 
-    private void assertMatch(KeyStore ks, X509Cert cert, String password)
-        throws Exception {
+    private void assertMatch(PKCS12KeyStore ks, X509Cert cert, String password) throws Exception {
       KeySpec keySpec = KeySpec.ofPublicKey(cert.subjectPublicKeyInfo());
-      if (keySpec.isMontgomeryEC() || keySpec.isMlkem() ||
-          keySpec.isCompositeMLKEM()) {
+      if (keySpec.isMontgomeryEC() || keySpec.isMlkem() || keySpec.isCompositeMLKEM()) {
         // cannot be checked via creating dummy signature, just compare the
         // public keys
         char[] pwd = password.toCharArray();
@@ -218,13 +208,11 @@ public class P12Actions {
         byte[] expectedEncoded = kp.publicKey().getEncoded();
         byte[] encoded = cert.publicKey().getEncoded();
         if (!Arrays.equals(expectedEncoded, encoded)) {
-          throw new XiSecurityException(
-              "the certificate and private do not match");
+          throw new XiSecurityException("the certificate and private do not match");
         }
       } else {
         SignerConf conf = new SignerConf();
-        conf.setKeystore("file:" + expandFilepath(p12File))
-            .setParallelism(1);
+        conf.setKeystore("file:" + expandFilepath(p12File)).setParallelism(1);
         if (password != null) {
           conf.setPassword(password);
         }
@@ -235,8 +223,7 @@ public class P12Actions {
 
   } // class UpdateCertP12
 
-  @Command(scope = "xi", name = "keypair-p12", description =
-      "generate keypair in PKCS#12 keystore")
+  @Command(scope = "xi", name = "keypair-p12", description = "generate keypair in PKCS#12 keystore")
   @Service
   public static class KeypairP12 extends P12KeyGenAction {
 
@@ -256,7 +243,7 @@ public class P12Actions {
       if (unsigned != null) {
         keyGenParams.setUnsigned(unsigned);
       }
-      KeyStoreWrapper keypair = KeyUtil.generateKeypair3(keySpec, keyGenParams);
+      PKCS12KeyStoreWrapper keypair = KeyUtil.generateKeyPair3(keySpec, keyGenParams);
       saveKey(keypair);
       return null;
     }
@@ -265,8 +252,7 @@ public class P12Actions {
 
   public abstract static class P12KeyGenAction extends SecurityAction {
 
-    @Option(name = "--out", aliases = "-o", required = true, description =
-        "where to save the key")
+    @Option(name = "--out", aliases = "-o", required = true, description = "where to save the key")
     @Completion(FileCompleter.class)
     protected String keyOutFile;
 
@@ -274,16 +260,19 @@ public class P12Actions {
         "password of the keystore file, as plaintext or PBE-encrypted.")
     protected String passwordHint;
 
-    protected void saveKey(KeyStoreWrapper keyGenerationResult)
-        throws IOException {
+    protected void saveKey(PKCS12KeyStoreWrapper keyGenerationResult) throws IOException {
       saveVerbose("saved PKCS#12 keystore to file", keyOutFile,
+          Args.notNull(keyGenerationResult, "keyGenerationResult").keystore());
+    }
+
+    protected void saveKey(KeyStoreWrapper keyGenerationResult) throws IOException {
+      saveVerbose("saved keystore to file", keyOutFile,
           Args.notNull(keyGenerationResult, "keyGenerationResult").keystore());
     }
 
     protected KeystoreGenerationParameters getKeyGenParameters()
       throws IOException, PasswordResolverException {
-      KeystoreGenerationParameters params =
-          new KeystoreGenerationParameters(getPassword());
+      KeystoreGenerationParameters params = new KeystoreGenerationParameters(getPassword());
 
       SecureRandom random = securityFactory.random4Key();
       if (random != null) {
@@ -293,10 +282,8 @@ public class P12Actions {
       return params;
     }
 
-    private char[] getPassword()
-        throws IOException, PasswordResolverException {
-      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password",
-          passwordHint);
+    private char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
         passwordHint = new String(pwdInChar);
       }
@@ -307,8 +294,7 @@ public class P12Actions {
 
   public abstract static class P12SecurityAction extends SecurityAction {
 
-    @Option(name = "--p12", required = true, description =
-        "PKCS#12 keystore file")
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FileCompleter.class)
     protected String p12File;
 
@@ -316,24 +302,18 @@ public class P12Actions {
         "password of the PKCS#12 file, as plaintext or PBE-encrypted.")
     protected String passwordHint;
 
-    protected char[] getPassword()
-        throws IOException, PasswordResolverException {
-      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password",
-          passwordHint);
+    protected char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
         passwordHint = new String(pwdInChar);
       }
       return pwdInChar;
     }
 
-    protected KeyStore getInKeyStore()
-        throws IOException, NoSuchAlgorithmException, CertificateException,
-        KeyStoreException, PasswordResolverException {
-      try (InputStream in =
-               Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
-        KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
-        ks.load(in, getPassword());
-        return ks;
+    protected PKCS12KeyStore getInKeyStore()
+        throws IOException, XiSecurityException, PasswordResolverException {
+      try (InputStream in = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
+        return KeyUtil.loadPKCS12KeyStore(in, getPassword());
       }
     }
 
@@ -344,25 +324,21 @@ public class P12Actions {
   @Service
   public static class Pkcs12 extends P12SecurityAction {
 
-    @Option(name = "--key-out", required = true, description =
-        "where to save the key")
+    @Option(name = "--key-out", required = true, description = "where to save the key")
     @Completion(FileCompleter.class)
     private String keyOutFile;
 
-    @Option(name = "--cert-out", required = true, description =
-        "where to save the certificate")
+    @Option(name = "--cert-out", required = true, description = "where to save the certificate")
     @Completion(FileCompleter.class)
     private String certOutFile;
 
     @Override
     protected Object execute0() throws Exception {
       char[] password = getPassword();
-      try (InputStream keystoreStream =
-               Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
-        KeypairWithCert kp = KeypairWithCert.fromKeystore("PKCS12",
+      try (InputStream keystoreStream = Files.newInputStream(Paths.get(expandFilepath(p12File)))) {
+        KeypairWithCert kp = KeypairWithCert.fromPKCS12Keystore(
             keystoreStream, password, null, password, (X509Cert) null);
-        byte[] encodedKey = PemEncoder.encode(
-            kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
+        byte[] encodedKey = PemEncoder.encode(kp.getKey().getEncoded(), PemLabel.PRIVATE_KEY);
         byte[] encodedCert = PemEncoder.encode(
             kp.x509CertChain()[0].getEncoded(), PemLabel.CERTIFICATE);
 

@@ -7,6 +7,8 @@ import org.xipki.util.codec.Args;
 import java.security.PrivateKey;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class PrivateKeyChoice {

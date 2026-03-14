@@ -43,8 +43,7 @@ public class P11SlotId {
 
   @Override
   public String toString() {
-    return StringUtil.concatObjectsCap(30, "(index = ", index,
-        ", id = ", id, ")");
+    return StringUtil.concatObjectsCap(30, "(index = ", index, ", id = ", id, ")");
   }
 
   @Override

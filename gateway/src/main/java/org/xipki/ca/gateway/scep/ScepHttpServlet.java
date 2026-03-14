@@ -27,8 +27,7 @@ import java.io.IOException;
 
 public class ScepHttpServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(ScepHttpServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ScepHttpServlet.class);
 
   private final boolean logReqResp;
 
@@ -39,8 +38,7 @@ public class ScepHttpServlet {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       service0(req, false).fillResponse(resp);
@@ -51,8 +49,7 @@ public class ScepHttpServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean viaPost)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
 
     byte[] requestBytes = null;
@@ -64,8 +61,7 @@ public class ScepHttpServlet {
       return httpResp;
     } finally {
       LogUtil.logReqResp("SCEP Gateway", LOG, logReqResp, viaPost,
-          req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.body());
+          req.getRequestURI(), requestBytes, httpResp == null ? null : httpResp.body());
     }
   }
 

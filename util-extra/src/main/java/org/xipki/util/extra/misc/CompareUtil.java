@@ -16,8 +16,7 @@ public class CompareUtil {
   private CompareUtil() {
   }
 
-  public static boolean areEqual(
-      byte[] a1, int a1Pos, byte[] a2, int a2Pos, int len) {
+  public static boolean areEqual(byte[] a1, int a1Pos, byte[] a2, int a2Pos, int len) {
     if (a1Pos + len > a1.length || a2Pos + len > a2.length) {
       throw new IndexOutOfBoundsException("len is too large");
     }

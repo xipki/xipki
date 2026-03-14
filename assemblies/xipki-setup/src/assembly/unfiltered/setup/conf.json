@@ -22,6 +22,24 @@
       }
     },
     {
+      "description": "Gateway Requestor Passwords",
+      "includes": {
+        "dirs": [
+          "xipki-gateway/tomcat/xipki/etc/",
+          "xipki-cli/client-script/"
+        ],
+        "suffixes": [
+          ".json",
+          ".script",
+          ".sh"
+        ]
+      },
+      "replacements": {
+        "gateway.requestor.user1": "changeme-user1",
+        "gateway.requestor.password1": "chanegeme-password1"
+      }
+    },
+    {
       "description": "XiPKI Configuration",
       "includes": {
         "dirs": [
@@ -46,6 +64,7 @@
         "ocsp.host": "localhost",
         // CA
         "ca.https.keyPassword": "changeit-ca",
+        "ca.https.certstorePassword": "changeit-ca-certstore",
         "ca.shutdown.port": "8006",
         "ca.https.port": "8444",
         "ca.host": "localhost",
@@ -53,6 +72,7 @@
         "ca.alias": "myca",
         // Gateway
         "gateway.https.keyPassword": "changeit-gateway",
+        "gateway.https.certstorePassword": "changeit-gateway-certstore",
         "gateway.shutdown.port": "8007",
         "gateway.http.port": "8082",
         "gateway.https.port": "8445",
@@ -71,6 +91,206 @@
         "rest.client.keyPassword": "changeit-restclient",
         // MGMT CLI
         "ca.mgmt.client.keyPassword": "changeit-camgmtclient"
+      }
+    },
+    {
+      "description": "XiPKI Database Configuration: MySQL",
+      "includes": {
+        "dirs": [
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/"
+        ],
+        "suffixes": [
+          "-db.properties"
+        ]
+      },
+      "replacements": {
+        // ca
+        "mysql:ca.host": "127.0.0.1",
+        "mysql:ca.port": "3306",
+        "mysql:ca.user": "root",
+        "mysql:ca.password": "123456",
+        // caconf
+        "mysql:caconf.host": "127.0.0.1",
+        "mysql:caconf.port": "3306",
+        "mysql:caconf.user": "root",
+        "mysql:caconf.password": "123456",
+        // keypool
+        "mysql:keypool.host": "127.0.0.1",
+        "mysql:keypool.port": "3306",
+        "mysql:keypool.user": "root",
+        "mysql:keypool.password": "123456",
+        // ocsp
+        "mysql:ocsp.host": "127.0.0.1",
+        "mysql:ocsp.port": "3306",
+        "mysql:ocsp.user": "root",
+        "mysql:ocsp.password": "123456",
+        // ocspcache
+        "mysql:ocspcache.host": "127.0.0.1",
+        "mysql:ocspcache.port": "3306",
+        "mysql:ocspcache.user": "root",
+        "mysql:ocspcache.password": "123456",
+        // ocspcrl
+        "mysql:ocspcrl.host": "127.0.0.1",
+        "mysql:ocspcrl.port": "3306",
+        "mysql:ocspcrl.user": "root",
+        "mysql:ocspcrl.password": "123456",
+        // acme
+        "mysql:acme.host": "127.0.0.1",
+        "mysql:acme.port": "3306",
+        "mysql:acme.user": "root",
+        "mysql:acme.password": "123456"
+      }
+    },
+    {
+      "description": "XiPKI Database Configuration: DB2",
+      "includes": {
+        "dirs": [
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/"
+        ],
+        "suffixes": [
+          "-db.properties"
+        ]
+      },
+      "replacements": {
+        // ca
+        "db2:ca.host": "127.0.0.1",
+        "db2:ca.port": "50000",
+        "db2:ca.user": "db2inst1",
+        "db2:ca.password": "123456",
+        // caconf
+        "db2:caconf.host": "127.0.0.1",
+        "db2:caconf.port": "50000",
+        "db2:caconf.user": "db2inst1",
+        "db2:caconf.password": "123456",
+        // keypool
+        "db2:keypool.host": "127.0.0.1",
+        "db2:keypool.port": "50000",
+        "db2:keypool.user": "db2inst1",
+        "db2:keypool.password": "123456",
+        // ocsp
+        "db2:ocsp.host": "127.0.0.1",
+        "db2:ocsp.port": "50000",
+        "db2:ocsp.user": "db2inst1",
+        "db2:ocsp.password": "123456",
+        // ocspcache
+        "db2:ocspcache.host": "127.0.0.1",
+        "db2:ocspcache.port": "50000",
+        "db2:ocspcache.user": "db2inst1",
+        "db2:ocspcache.password": "123456",
+        // ocspcrl
+        "db2:ocspcrl.host": "127.0.0.1",
+        "db2:ocspcrl.port": "50000",
+        "db2:ocspcrl.user": "db2inst1",
+        "db2:ocspcrl.password": "123456",
+        // acme
+        "db2:acme.host": "127.0.0.1",
+        "db2:acme.port": "50000",
+        "db2:acme.user": "db2inst1",
+        "db2:acme.password": "123456"
+      }
+    },
+    {
+      "description": "XiPKI Database Configuration: Oracle",
+      "includes": {
+        "dirs": [
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/"
+        ],
+        "suffixes": [
+          "-db.properties"
+        ]
+      },
+      "replacements": {
+        // ca
+        "oracle:ca.host": "127.0.0.1",
+        "oracle:ca.port": "1521",
+        "oracle:ca.user": "orauserca",
+        "oracle:ca.password": "123456",
+        // caconf
+        "oracle:caconf.host": "127.0.0.1",
+        "oracle:caconf.port": "1521",
+        "oracle:caconf.user": "orausercaconf",
+        "oracle:caconf.password": "123456",
+        // keypool
+        "oracle:keypool.host": "127.0.0.1",
+        "oracle:keypool.port": "1521",
+        "oracle:keypool.user": "orauserkeypool",
+        "oracle:keypool.password": "123456",
+        // ocsp
+        "oracle:ocsp.host": "127.0.0.1",
+        "oracle:ocsp.port": "1521",
+        "oracle:ocsp.user": "orauserocsp",
+        "oracle:ocsp.password": "123456",
+        // ocspcache
+        "oracle:ocspcache.host": "127.0.0.1",
+        "oracle:ocspcache.port": "1521",
+        "oracle:ocspcache.user": "orauserocspcache",
+        "oracle:ocspcache.password": "123456",
+        // ocspcrl
+        "oracle:ocspcrl.host": "127.0.0.1",
+        "oracle:ocspcrl.port": "1521",
+        "oracle:ocspcrl.user": "orauserocspcrl",
+        "oracle:ocspcrl.password": "123456",
+        // acme
+        "oracle:acme.host": "127.0.0.1",
+        "oracle:acme.port": "1521",
+        "oracle:acme.user": "orauseracme",
+        "oracle:acme.password": "123456"
+      }
+    },
+    {
+      "description": "XiPKI Database Configuration: PostgreSQL",
+      "includes": {
+        "dirs": [
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/"
+        ],
+        "suffixes": [
+          "-db.properties"
+        ]
+      },
+      "replacements": {
+        // ca
+        "pgsql:ca.host": "127.0.0.1",
+        "pgsql:ca.port": "5432",
+        "pgsql:ca.user": "pguser1",
+        "pgsql:ca.password": "123456",
+        // caconf
+        "pgsql:caconf.host": "127.0.0.1",
+        "pgsql:caconf.port": "5432",
+        "pgsql:caconf.user": "pguser1",
+        "pgsql:caconf.password": "123456",
+        // keypool
+        "pgsql:keypool.host": "127.0.0.1",
+        "pgsql:keypool.port": "5432",
+        "pgsql:keypool.user": "pguser1",
+        "pgsql:keypool.password": "123456",
+        // ocsp
+        "pgsql:ocsp.host": "127.0.0.1",
+        "pgsql:ocsp.port": "5432",
+        "pgsql:ocsp.user": "pguser1",
+        "pgsql:ocsp.password": "123456",
+        // ocspcache
+        "pgsql:ocspcache.host": "127.0.0.1",
+        "pgsql:ocspcache.port": "5432",
+        "pgsql:ocspcache.user": "pguser1",
+        "pgsql:ocspcache.password": "123456",
+        // ocspcrl
+        "pgsql:ocspcrl.host": "127.0.0.1",
+        "pgsql:ocspcrl.port": "5432",
+        "pgsql:ocspcrl.user": "pguser1",
+        "pgsql:ocspcrl.password": "123456",
+        // acme
+        "pgsql:acme.host": "127.0.0.1",
+        "pgsql:acme.port": "5432",
+        "pgsql:acme.user": "pguser1",
+        "pgsql:acme.password": "123456"
       }
     }
   ]

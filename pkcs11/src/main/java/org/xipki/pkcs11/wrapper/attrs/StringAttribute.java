@@ -34,8 +34,7 @@ public class StringAttribute extends Attribute {
   }
 
   public void setValue(String value) {
-    this.value = (value == null) ? null
-        : value.getBytes(StandardCharsets.UTF_8);
+    this.value = (value == null) ? null : value.getBytes(StandardCharsets.UTF_8);
   }
 
   public void setValue(byte[] value) {
@@ -48,8 +47,7 @@ public class StringAttribute extends Attribute {
    * @return The char-array value of this attribute or null.
    */
   public String getValue() {
-    return isNullValue() ? null
-                         : new String((byte[]) value, StandardCharsets.UTF_8);
+    return isNullValue() ? null : new String((byte[]) value, StandardCharsets.UTF_8);
   }
 
   public byte[] getByteArrayValue() {

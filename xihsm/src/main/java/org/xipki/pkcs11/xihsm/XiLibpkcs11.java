@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 class XiLibpkcs11 {
@@ -34,8 +36,7 @@ class XiLibpkcs11 {
     return arch;
   }
 
-  static void initModule(int moduleId, String modulePath)
-      throws PKCS11Exception {
+  static void initModule(int moduleId, String modulePath) throws PKCS11Exception {
     if (moduleMap.containsKey(moduleId)) {
       LOG.error("module with module id {} already exists", moduleId);
       throw new PKCS11Exception(JniResp.CKR_JNI_NO_MODULE);
@@ -77,22 +78,22 @@ class XiLibpkcs11 {
       case C_DecapsulateKey:
       // attribute value
       case C_GetAttributeValue:
-      case C_GetAttributeValueX:
       // Digest
-      case C_Digest:
-      case C_DigestUpdate:
       // sign & verify
-      case C_Sign:
+      case C_SignX:
       case C_SignUpdate:
+        if (data == null) {
+          LOG.error("data shall not be null");
+          throw new PKCS11Exception(JniResp.CKR_JNI_BAD_ARG);
+        }
     }
 
     // data2:
-    switch (op) {
-      case C_LoginUser:
-        if (data2 == null) {
-          LOG.error("data2 shall not be null");
-          throw new PKCS11Exception(JniResp.CKR_JNI_BAD_ARG);
-        }
+    if (op == JniOperation.C_LoginUser) {
+      if (data2 == null) {
+        LOG.error("data2 shall not be null");
+        throw new PKCS11Exception(JniResp.CKR_JNI_BAD_ARG);
+      }
     }
 
     XiPKCS11Module m = moduleMap.get(moduleId);
@@ -148,10 +149,8 @@ class XiLibpkcs11 {
       mech = new CkMechanism(ckm, params);
     }
 
-    Template template = (pTemplate == null) ? null
-        : Template.decode(arch, pTemplate);
-    Template template2 = (pTemplate2 == null) ? null
-        : Template.decode(arch, pTemplate2);
+    Template template  = (pTemplate == null)  ? null : Template.decode(arch, pTemplate);
+    Template template2 = (pTemplate2 == null) ? null : Template.decode(arch, pTemplate2);
 
     switch (op) {
       // key management
@@ -159,8 +158,9 @@ class XiLibpkcs11 {
       case C_GenerateKeyPair:
       case C_DecapsulateKey:
       // Digest
-      case C_DigestInit:
+      case C_DigestX:
       // sign & verify
+      case C_SignX:
       case C_SignInit:
         if (mech == null) {
           LOG.error("mechanism shall not be null");
@@ -212,14 +212,19 @@ class XiLibpkcs11 {
         break;
       }
       case C_GenerateKeyPair: {
-        long[] hKeys = m.C_GenerateKeyPair(hSession, mech,
-            template, template2);
+        long[] hKeys = m.C_GenerateKeyPair(hSession, mech, template, template2);
         payload = JniUtil.encodeLongs(arch, hKeys);
         break;
       }
       case C_DecapsulateKey: {
         long hKey = m.C_DecapsulateKey(hSession, mech, id2, // hPrivateKey
                       data, template);
+        payload = JniUtil.encodeLong(arch, hKey);
+        break;
+      }
+      case C_DeriveKey: {
+        long hKey = m.C_DeriveKey(hSession, mech, id2, // hBaseKey
+                      template);
         payload = JniUtil.encodeLong(arch, hKey);
         break;
       }
@@ -231,7 +236,7 @@ class XiLibpkcs11 {
       }
       case C_CopyObject: {
         long hNewObj = m.C_CopyObject(hSession, id2, // hObject
-            template);
+                        template);
         payload = JniUtil.encodeLong(arch, hNewObj);
         break;
       }
@@ -265,14 +270,14 @@ class XiLibpkcs11 {
       case C_GetAttributeValue: {
         long[] types = JniUtil.readLongs(arch, data);
         Template temp = m.C_GetAttributeValue(hSession, id2, // hObject
-            types);
+                          types);
         buildLongResp(PKCS11T.CKR_OK, resp);
         payload = temp.getEncoded(arch());
         break;
       }
       case C_GetAttributeValueX: {
         Template temp = m.C_GetAttributeValue(hSession, id2, // hObject
-            new long[] {id3});
+                          new long[] {id3});
         buildLongResp(PKCS11T.CKR_OK, resp);
         payload = temp.getEncoded(arch());
         break;
@@ -282,27 +287,19 @@ class XiLibpkcs11 {
             template);
         break;
       // Digest
-      case C_DigestInit:
-        m.C_DigestInit(hSession, mech);
+      case C_DigestX:
+        payload = m.C_DigestX(hSession, mech, data, id2, data2);
         break;
-      case C_Digest:
-        payload = m.C_Digest(hSession, data);
+      // Sign
+      case C_SignX:
+        payload = m.C_SignX(hSession, mech, id2, data); // hKey: id2
         break;
-      case C_DigestUpdate:
-        m.C_DigestUpdate(hSession, data);
+      // Sign
+      case C_DecryptX:
+        payload = m.C_DecryptX(hSession, mech, id2, data); // hKey: id2
         break;
-      case C_DigestKey:
-        m.C_DigestKey(hSession, id2); // hKey
-        break;
-      case C_DigestFinal:
-        payload = m.C_DigestFinal(hSession);
-        break;
-      // sign & verify
       case C_SignInit:
         m.C_SignInit(hSession, mech, id2); // hKey
-        break;
-      case C_Sign:
-        payload = m.C_Sign(hSession, data);
         break;
       case C_SignUpdate:
         m.C_SignUpdate(hSession, data);

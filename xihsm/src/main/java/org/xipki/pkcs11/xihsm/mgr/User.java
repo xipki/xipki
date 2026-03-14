@@ -2,30 +2,30 @@
 // License Apache License 2.0
 package org.xipki.pkcs11.xihsm.mgr;
 
+import org.xipki.pkcs11.wrapper.Category;
 import org.xipki.pkcs11.wrapper.PKCS11T;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.util.codec.json.JsonMap;
 
 import java.util.Arrays;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
-public class User {
+public class User implements JsonEncodable {
 
   private final long userType;
 
-  private final byte[] salt;
+  private final byte[] pin;
 
-  private final byte[] sha256;
-
-  public User(long userType, byte[] salt, byte[] sha256) {
+  public User(long userType, byte[] pin) {
     this.userType = userType;
-    this.salt = salt;
-    this.sha256 = sha256;
+    this.pin = pin;
   }
 
   public long getUserType() {
@@ -33,31 +33,24 @@ public class User {
   }
 
   public void verify(byte[] pin) throws HsmException {
-    byte[] hashValue = HashAlgo.SHA256.hash(salt, pin);
-    if (!Arrays.equals(sha256, hashValue)) {
-      throw new HsmException(PKCS11T.CKR_PIN_INCORRECT,
-          "PIN incorrect");
+    if (!Arrays.equals(this.pin, pin)) {
+      throw new HsmException(PKCS11T.CKR_PIN_INCORRECT, "PIN incorrect");
     }
   }
 
-  public void encodeTo(CborEncoder encoder) throws HsmException {
-    try {
-      encoder.writeArrayStart(3);
-      encoder.writeLong(userType);
-      encoder.writeByteString(salt);
-      encoder.writeByteString(sha256);
-    } catch (CodecException e) {
-      throw HsmException.newGeneralError("error encoding User", e);
-    }
+  @Override
+  public JsonMap toCodec() {
+    JsonMap map = new JsonMap();
+    map.put("userType", PKCS11T.ckuCodeToName(userType));
+    map.put("pin", Hex.encode(pin));
+    return map;
   }
 
-  public static User decode(CborDecoder decoder) throws HsmException {
+  public static User decode(JsonMap jMap) throws HsmException {
     try {
-      decoder.readArrayLength(3);
-      long userType = decoder.readLong();
-      byte[] salt = decoder.readByteString();
-      byte[] sha256 = decoder.readByteString();
-      return new User(userType, salt, sha256);
+      long userType = PKCS11T.nonnullNameToCode(Category.CKU, jMap.getNnString("userType"));
+      byte[] pin = Hex.decode(jMap.getNnString("pin"));
+      return new User(userType, pin);
     } catch (CodecException e) {
       throw HsmException.newGeneralError("error encoding User", e);
     }

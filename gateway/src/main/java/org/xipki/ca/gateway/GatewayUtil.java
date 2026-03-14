@@ -5,8 +5,6 @@ package org.xipki.ca.gateway;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1UTF8String;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
@@ -17,10 +15,13 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.pkix.DHSigStaticKeyCertPair;
+import org.xipki.security.sign.KemHmacSignature;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.SecretKeyWithAlias;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
 import org.xipki.util.extra.audit.AuditEvent;
 import org.xipki.util.extra.audit.AuditLevel;
 import org.xipki.util.extra.audit.AuditStatus;
@@ -66,22 +67,19 @@ public class GatewayUtil {
     }
   }
 
-  public static boolean verifyCsr(
-      CertificationRequest csr, SecurityFactory securityFactory,
-      PopControl popControl) {
+  public static boolean verifyCsr(CertificationRequest csr, SecurityFactory securityFactory,
+                                  PopControl popControl) {
     Args.notNull(popControl, "popControl");
 
     DHSigStaticKeyCertPair kaKeyAndCert = null;
     SecretKeyWithAlias kemMasterKey = null;
 
-    AlgorithmIdentifier algId =
-        Args.notNull(csr, "csr").getSignatureAlgorithm();
+    AlgorithmIdentifier algId = Args.notNull(csr, "csr").getSignatureAlgorithm();
     ASN1ObjectIdentifier algOid = algId.getAlgorithm();
 
     if (OIDs.Xipki.id_alg_dhPop_x25519.equals(algOid)
         || OIDs.Xipki.id_alg_dhPop_x448.equals(algOid)) {
-      DhSigStatic dhSigStatic = DhSigStatic.getInstance(
-          csr.getSignature().getBytes());
+      DhSigStatic dhSigStatic = DhSigStatic.getInstance(csr.getSignature().getBytes());
 
       IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
 
@@ -96,27 +94,28 @@ public class GatewayUtil {
         return false;
       }
     } else if (OIDs.Xipki.id_alg_KEM_HMAC_SHA256.equals(algOid)) {
-      ASN1Sequence seq = ASN1Sequence.getInstance(
-          csr.getSignature().getBytes());
+      KemHmacSignature sig;
+      try {
+        sig = KemHmacSignature.decode(Asn1Util.getBitStringOctets(csr.getSignature()));
+      } catch (CodecException e) {
+        return false;
+      }
 
-      String id = ((ASN1UTF8String) seq.getObjectAt(0)).getString();
-      kemMasterKey = popControl.kemMasterKey(id);
+      kemMasterKey = popControl.kemMasterKey(sig.id());
       if (kemMasterKey == null) {
         return false;
       }
     }
 
-    return securityFactory.verifyPop(csr,
-        popControl.popAlgoValidator(), kaKeyAndCert,
+    return securityFactory.verifyPop(csr, popControl.popAlgoValidator(), kaKeyAndCert,
         (kemMasterKey == null) ? null : kemMasterKey.secretKey());
   } // method verifyCsr
 
   public static void auditLogPciEvent(
       Logger log, String type, boolean successful, String eventType) {
-    PciAuditEvent event = PciAuditEvent.newPciAuditEvent("SYSTEM",
-        eventType, type,
+    PciAuditEvent event = PciAuditEvent.newPciAuditEvent("SYSTEM", eventType, type,
         successful ? AuditStatus.SUCCESSFUL : AuditStatus.FAILED,
-        successful ? AuditLevel.INFO : AuditLevel.ERROR);
+        successful ? AuditLevel.INFO        : AuditLevel.ERROR);
     Audits.getAuditService().logEvent(event);
     logAuditEvent(log, event);
   }
@@ -131,14 +130,12 @@ public class GatewayUtil {
     }
   }
 
-  public static CertificationRequest parseCsrInRequest(byte[] csrBytes)
-      throws OperationException {
+  public static CertificationRequest parseCsrInRequest(byte[] csrBytes) throws OperationException {
     try {
       return CertificationRequest.getInstance(X509Util.toDerEncoded(
           Args.notNull(csrBytes, "csrBytes")));
     } catch (Exception ex) {
-      throw new OperationException(ErrorCode.BAD_REQUEST,
-          "invalid CSR: " + ex.getMessage());
+      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
     }
   }
 
@@ -147,8 +144,7 @@ public class GatewayUtil {
     try {
       return CertificationRequest.getInstance(p10Asn1);
     } catch (Exception ex) {
-      throw new OperationException(ErrorCode.BAD_REQUEST,
-          "invalid CSR: " + ex.getMessage());
+      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
     }
   }
 

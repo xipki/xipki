@@ -7,6 +7,8 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class BufferCborEncoder extends CborEncoder {

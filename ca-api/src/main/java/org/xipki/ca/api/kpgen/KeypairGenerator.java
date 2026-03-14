@@ -26,8 +26,7 @@ import java.util.Set;
 
 public abstract class KeypairGenerator implements Closeable {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(KeypairGenerator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KeypairGenerator.class);
 
   protected String name;
 
@@ -57,8 +56,7 @@ public abstract class KeypairGenerator implements Closeable {
 
       if (StringUtil.isNotBlank(str)) {
         allowsAllKeySpecs = false;
-        Set<String> tokens = StringUtil.splitAsSet(
-            str.toUpperCase(Locale.ROOT), ": \t");
+        Set<String> tokens = StringUtil.splitAsSet(str.toUpperCase(Locale.ROOT), ": \t");
         assert tokens != null;
         for (String token : tokens) {
           try {
@@ -78,15 +76,13 @@ public abstract class KeypairGenerator implements Closeable {
     initialize0(pairs);
   }
 
-  protected abstract void initialize0(ConfPairs conf)
-      throws XiSecurityException;
+  protected abstract void initialize0(ConfPairs conf) throws XiSecurityException;
 
   public boolean supports(KeySpec keyspec) {
     return keyspec != null && keyspecs.contains(keyspec);
   }
 
-  public abstract KeyInfoPair generateKeypair(KeySpec keyspec)
-      throws XiSecurityException;
+  public abstract KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException;
 
   public abstract boolean isHealthy();
 

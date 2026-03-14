@@ -20,7 +20,7 @@ import java.io.IOException;
 /**
  * PKCS#11 {@link P11KeypairGenerator}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class P11KeypairGenerator extends KeypairGenerator {
 
@@ -29,8 +29,7 @@ public class P11KeypairGenerator extends KeypairGenerator {
   protected P11Slot slot;
 
   public P11KeypairGenerator(P11CryptServiceFactory cryptServiceFactory) {
-    this.cryptServiceFactory = Args.notNull(cryptServiceFactory,
-        "cryptService");
+    this.cryptServiceFactory = Args.notNull(cryptServiceFactory, "cryptService");
   }
 
   @Override
@@ -42,10 +41,8 @@ public class P11KeypairGenerator extends KeypairGenerator {
     str = conf.value("slot-id");
     Long slotId = (str == null) ? null : Long.parseLong(str);
 
-    if ((slotIndex == null && slotId == null)
-        || (slotIndex != null && slotId != null)) {
-      throw new XiSecurityException("exactly one of slot (index) and " +
-          "slot-id must be specified");
+    if ((slotIndex == null && slotId == null) || (slotIndex != null && slotId != null)) {
+      throw new XiSecurityException("exactly one of slot (index) and slot-id must be specified");
     }
 
     try {
@@ -59,11 +56,9 @@ public class P11KeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public KeyInfoPair generateKeypair(KeySpec keyspec)
-      throws XiSecurityException {
+  public KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException {
     if (!supports(keyspec)) {
-      throw new XiSecurityException(name +
-          " cannot generate keypair of keyspec " + keyspec);
+      throw new XiSecurityException(name + " cannot generate keypair of keyspec " + keyspec);
     }
 
     return slot.generateKeyPairOtf(keyspec);

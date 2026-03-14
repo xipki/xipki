@@ -13,6 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class AbstractID {
@@ -38,10 +40,8 @@ public class AbstractID {
   }
 
   protected static String canonicalizeAlias(String alias) {
-    return alias.toUpperCase(Locale.ROOT)
-        .replace("_", "")
-        .replace(" ", "")
-        .replace("-", "");
+    return alias.toUpperCase(Locale.ROOT).replace("_", "")
+        .replace(" ", "").replace("-", "");
   }
 
   public ASN1ObjectIdentifier oid() {
@@ -90,8 +90,7 @@ public class AbstractID {
     return ret;
   }
 
-  protected static <T extends AbstractID> T ofOidOrName(
-      Map<String, T> typeMap, String oidOrName) {
+  protected static <T extends AbstractID> T ofOidOrName(Map<String, T> typeMap, String oidOrName) {
     T attr = typeMap.get(oidOrName);
     if (attr != null) {
       return attr;

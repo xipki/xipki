@@ -22,8 +22,7 @@ class SqlErrorCodes {
       badSqlGrammarCodes = toSet(-7, -29, -97, -104, -109, -115,
           -128, -199, -204, -206, -301, -408, -441, -491);
       duplicateKeyCodes = toSet(-803);
-      dataIntegrityViolationCodes = toSet(-407, -530, -531, -532,
-          -543, -544, -545, -603, -667);
+      dataIntegrityViolationCodes = toSet(-407, -530, -531, -532, -543, -544, -545, -603, -667);
       dataAccessResourceFailureCodes = toSet(-904, -971);
       transientDataAccessResourceCodes = toSet(-1035, -1218, -30080, -30081);
       deadlockLoserCodes = toSet(-911, -913);
@@ -96,8 +95,7 @@ class SqlErrorCodes {
 
     PostgreSQL() {
       useSqlStateForTranslation = true;
-      badSqlGrammarCodes = toSet("03000", "42000", "42601",
-          "42602", "42622", "42804", "42P01");
+      badSqlGrammarCodes = toSet("03000", "42000", "42601", "42602", "42622", "42804", "42P01");
       duplicateKeyCodes = toSet(23505);
       dataIntegrityViolationCodes = toSet(23000, 23502, 23503, 23514);
       dataAccessResourceFailureCodes = toSet(53000, 53100, 53200, 53300);
@@ -163,8 +161,7 @@ class SqlErrorCodes {
       case UNKNOWN:
         return new SqlErrorCodes();
       default:
-        throw new IllegalStateException(
-            "should not reach here, unknown database type " + dbType);
+        throw new IllegalStateException("should not reach here, unknown database type " + dbType);
     }
   } // method newInstance
 

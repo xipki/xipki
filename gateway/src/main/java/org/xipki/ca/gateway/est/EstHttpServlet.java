@@ -30,8 +30,7 @@ import java.io.IOException;
 
 public class EstHttpServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(EstHttpServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EstHttpServlet.class);
 
   private final boolean logReqResp;
 
@@ -42,8 +41,7 @@ public class EstHttpServlet {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       service0(req, false).fillResponse(resp);
@@ -54,8 +52,7 @@ public class EstHttpServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean viaPost)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean viaPost) throws IOException {
     AuditService auditService = Audits.getAuditService();
     AuditEvent event = new AuditEvent("est-gw");
 
@@ -76,8 +73,7 @@ public class EstHttpServlet {
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       LogUtil.logReqResp("EST Gateway", LOG, logReqResp, viaPost,
-          req.getRequestURI(), requestBytes,
-          httpResp == null ? null : httpResp.body());
+          req.getRequestURI(), requestBytes, httpResp == null ? null : httpResp.body());
 
       event.finish();
       auditService.logEvent(event);

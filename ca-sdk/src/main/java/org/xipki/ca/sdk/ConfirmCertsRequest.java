@@ -36,19 +36,15 @@ public class ConfirmCertsRequest extends SdkRequest {
 
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(2)
-        .writeTextString(transactionId).writeObjects(entries);
+    encoder.writeArrayStart(2).writeTextString(transactionId).writeObjects(entries);
   }
 
-  public static ConfirmCertsRequest decode(byte[] encoded)
-      throws CodecException {
+  public static ConfirmCertsRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("ConfirmCertsRequest", decoder, 2);
-      return new ConfirmCertsRequest(
-          decoder.readTextString(), Entry.decodeArray(decoder));
+      return new ConfirmCertsRequest(decoder.readTextString(), Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, ConfirmCertsRequest.class), ex);
     }
   }
 
@@ -95,17 +91,13 @@ public class ConfirmCertsRequest extends SdkRequest {
           return null;
         }
 
-        return new Entry(
-            decoder.readBoolean(),
-            decoder.readBigInt(),
-            decoder.readByteString());
+        return new Entry(decoder.readBoolean(), decoder.readBigInt(), decoder.readByteString());
       } catch (RuntimeException ex) {
         throw new CodecException(buildDecodeErrMessage(ex, Entry.class), ex);
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder)
-        throws CodecException {
+    public static Entry[] decodeArray(CborDecoder decoder) throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

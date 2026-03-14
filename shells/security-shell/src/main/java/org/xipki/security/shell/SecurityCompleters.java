@@ -6,7 +6,6 @@ package org.xipki.security.shell;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.xipki.security.KeySpec;
-import org.xipki.security.SignAlgo;
 import org.xipki.security.pkcs11.P11CryptServiceFactory;
 import org.xipki.shell.DynamicEnumCompleter;
 import org.xipki.shell.EnumCompleter;
@@ -14,7 +13,6 @@ import org.xipki.util.extra.misc.CollectionUtil;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -60,15 +58,13 @@ public class SecurityCompleters {
 
     public P11KeyUsageCompleter() {
       Set<String> names = new HashSet<>();
-      for (NewKeyControl.P11KeyUsage usage
-          : NewKeyControl.P11KeyUsage.values()) {
+      for (NewKeyControl.P11KeyUsage usage : NewKeyControl.P11KeyUsage.values()) {
         names.add(usage.name());
       }
       setTokens(names);
     }
 
-    public static Set<NewKeyControl.P11KeyUsage> parseUsages(
-        List<String> usageTexts) {
+    public static Set<NewKeyControl.P11KeyUsage> parseUsages(List<String> usageTexts) {
       Set<NewKeyControl.P11KeyUsage> usages = new HashSet<>();
       for (String usageText : usageTexts) {
         NewKeyControl.P11KeyUsage usage =
@@ -105,43 +101,5 @@ public class SecurityCompleters {
     }
 
   } // class SecretKeyTypeCompleter
-
-  @Service
-  public static class SignAlgoCompleter extends EnumCompleter {
-
-    private static final Set<String> algos = new HashSet<>();
-
-    static {
-      for (SignAlgo m : SignAlgo.values()) {
-        algos.add(m.jceName());
-      }
-    }
-
-    public SignAlgoCompleter() {
-      setTokens(algos);
-    }
-  }
-
-  @Service
-  public static class AllSigAlgCompleter extends EnumCompleter {
-
-    public AllSigAlgCompleter() {
-      List<String> algos = new LinkedList<>();
-      for (SignAlgo a : SignAlgo.values()) {
-        algos.add(a.jceName());
-      }
-      setTokens(algos);
-    }
-
-  } // class SigAlgCompleter
-
-  @Service
-  public static class SignerTypeCompleter extends EnumCompleter {
-
-    public SignerTypeCompleter() {
-      setTokens("JCEKS", "PKCS11", "PKCS12");
-    }
-
-  } // class SignerTypeCompleter
 
 }

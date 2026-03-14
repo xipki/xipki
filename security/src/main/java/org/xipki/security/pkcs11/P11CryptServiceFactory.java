@@ -28,8 +28,7 @@ public interface P11CryptServiceFactory extends Closeable {
    * @throws XiSecurityException
    *         if security error occurs.
    */
-  P11Module getP11Module(String moduleName)
-      throws TokenException, XiSecurityException;
+  P11Module getP11Module(String moduleName) throws TokenException, XiSecurityException;
 
   Set<String> getModuleNames();
 

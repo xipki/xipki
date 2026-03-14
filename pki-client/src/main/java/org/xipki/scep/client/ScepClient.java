@@ -24,8 +24,7 @@ public class ScepClient extends Client {
     this(caId, caCertValidator, null);
   }
 
-  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator,
-                    Curl curl) {
+  public ScepClient(CaIdentifier caId, CaCertValidator caCertValidator, Curl curl) {
     super(caId, caCertValidator);
     this.curl = curl == null ? new DefaultCurl() : curl;
   }
@@ -42,8 +41,7 @@ public class ScepClient extends Client {
   }
 
   @Override
-  protected ScepHttpResponse httpPost(String url, String requestContentType,
-                                      byte[] request)
+  protected ScepHttpResponse httpPost(String url, String requestContentType, byte[] request)
       throws ScepClientException {
     Curl.CurlResult resp;
     try {
@@ -60,8 +58,7 @@ public class ScepClient extends Client {
     return parseResp(resp);
   }
 
-  private static ScepHttpResponse parseResp(Curl.CurlResult resp)
-      throws ScepClientException {
+  private static ScepHttpResponse parseResp(Curl.CurlResult resp) throws ScepClientException {
     int statusCode = resp.statusCode();
     if (statusCode != HttpStatusCode.SC_OK) {
       String msg = "server returned status code " + statusCode;

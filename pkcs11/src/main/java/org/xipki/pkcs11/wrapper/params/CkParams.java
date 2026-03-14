@@ -26,8 +26,7 @@ public abstract class CkParams extends CkType {
 
   public abstract ParamsType type();
 
-  protected abstract void addContent(
-      EncodeList contents);
+  protected abstract void addContent(EncodeList contents);
 
   private EncodeList getEncodeList() {
     EncodeList contents = new EncodeList().v(type().getCode());
@@ -56,9 +55,7 @@ public abstract class CkParams extends CkType {
       return false;
     }
 
-    EncodeList a = getEncodeList();
-    EncodeList b = ((CkParams) obj).getEncodeList();
-    return a.equals(b);
+    return getEncodeList().equals(((CkParams) obj).getEncodeList());
   }
 
   public int getEncodedLen(Arch arch) {
@@ -86,23 +83,19 @@ public abstract class CkParams extends CkType {
     return this;
   }
 
-  public String toString(
-      String indent, PKCS11Module module, Object... fieldNameValues) {
+  public String toString(String indent, PKCS11Module module, Object... fieldNameValues) {
     return toString(indent, getCkName(), module, fieldNameValues);
   }
 
-  protected static byte[] readByteArray(
-      Arch arch, byte[] src, AtomicInteger off) {
+  protected static byte[] readByteArray(Arch arch, byte[] src, AtomicInteger off) {
     return JniUtil.readByteArray(arch, src, off);
   }
 
-  protected static int readInt(
-      Arch arch, byte[] src, AtomicInteger off) {
+  protected static int readInt(Arch arch, byte[] src, AtomicInteger off) {
     return JniUtil.readInt(arch, src, off);
   }
 
-  protected static long readLong(
-      Arch arch, byte[] src, AtomicInteger off) {
+  protected static long readLong(Arch arch, byte[] src, AtomicInteger off) {
     return JniUtil.readLong(arch, src, off);
   }
 
@@ -114,8 +107,7 @@ public abstract class CkParams extends CkType {
     return src[off.getAndIncrement()];
   }
 
-  protected static void assertType(
-      byte[] encoded, AtomicInteger off, ParamsType type)
+  protected static void assertType(byte[] encoded, AtomicInteger off, ParamsType type)
       throws PKCS11Exception {
     byte byte0 = encoded[off.getAndIncrement()];
     if (byte0 != type.getCode()) {
@@ -126,13 +118,11 @@ public abstract class CkParams extends CkType {
     }
   }
 
-  public static CkParams decodeParams(Arch arch, byte[] encoded)
-      throws PKCS11Exception {
+  public static CkParams decodeParams(Arch arch, byte[] encoded) throws PKCS11Exception {
     return decodeParams(arch, encoded, new AtomicInteger());
   }
 
-  public static CkParams decodeParams(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static CkParams decodeParams(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     if (encoded == null || encoded.length < off.get() + 1) {
       throw new PKCS11Exception(JniResp.CKR_JNI_BAD_ARG);
@@ -156,6 +146,10 @@ public abstract class CkParams extends CkType {
         return HASH_SIGN_ADDITIONAL_CONTEXT.decode(arch, encoded, off);
       case LongParams:
         return LongParams.decode(arch, encoded, off);
+      case ECDH1_DERIVE_PARAMS:
+        return ECDH1_DERIVE_PARAMS.decode(arch, encoded, off);
+      case RSA_PKCS_OAEP_PARAMS:
+        return RSA_PKCS_OAEP_PARAMS.decode(arch, encoded, off);
       case RSA_PKCS_PSS_PARAMS:
         return RSA_PKCS_PSS_PARAMS.decode(arch, encoded, off);
       case SIGN_ADDITIONAL_CONTEXT:

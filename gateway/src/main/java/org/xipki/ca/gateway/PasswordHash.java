@@ -3,14 +3,17 @@
 
 package org.xipki.ca.gateway;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.RandomUtil;
 import org.xipki.util.misc.StringUtil;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 
 /**
  * PBKDF2 salted password hashing.
@@ -30,12 +33,6 @@ public class PasswordHash {
   public static final int SALT_INDEX = 1;
   public static final int PBKDF2_INDEX = 2;
 
-  private static final PKCS5S2ParametersGenerator GEN;
-
-  static {
-    GEN = new PKCS5S2ParametersGenerator(new SHA256Digest());
-  }
-
   private PasswordHash() {
   }
 
@@ -44,11 +41,9 @@ public class PasswordHash {
    *
    * @param password - the password to hash
    * @return a salted PBKDF2 hash of the password
-   *
    */
   public static String createHash(String password) {
-    Args.notBlank(password, "password");
-    return createHash(StringUtil.toUtf8Bytes(password));
+    return createHash(StringUtil.toUtf8Bytes(Args.notBlank(password, "password")));
   }
 
   /**
@@ -58,8 +53,7 @@ public class PasswordHash {
    * @return a salted PBKDF2 hash of the password
    */
   public static String createHash(byte[] password) {
-    return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS,
-        DERIVED_KEY_SIZE);
+    return createHash(password, SALT_BYTE_SIZE, PBKDF2_ITERATIONS, DERIVED_KEY_SIZE);
   }
 
   /**
@@ -71,8 +65,7 @@ public class PasswordHash {
    * @param dkSize - the length of the derived key
    * @return a salted PBKDF2 hash of the password
    */
-  public static String createHash(
-      byte[] password, int saltSize, int iterations, int dkSize) {
+  public static String createHash(byte[] password, int saltSize, int iterations, int dkSize) {
     Args.notNull(password, "password");
     // Generate a random salt
     byte[] salt = RandomUtil.nextBytes(saltSize);
@@ -143,12 +136,15 @@ public class PasswordHash {
    * @param bytes - the length of the hash to compute in bytes
    * @return the PBDKF2 hash of the password
    */
-  public static byte[] pbkdf2(byte[] password, byte[] salt,
-                              int iterations, int bytes) {
-    synchronized (GEN) {
-      GEN.init(password, salt, iterations);
-      return ((KeyParameter) GEN.generateDerivedParameters(bytes * 8)).getKey();
-    }
+  public static byte[] pbkdf2(byte[] password, byte[] salt, int iterations, int bytes) {
+      KeySpec spec = new PBEKeySpec(new String(password, StandardCharsets.UTF_8).toCharArray(),
+          salt, iterations, bytes * 8);
+      try {
+        SecretKeyFactory fact = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        return fact.generateSecret(spec).getEncoded();
+      } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+        throw new IllegalStateException(e);
+      }
   }
 
   /**
@@ -175,9 +171,7 @@ public class PasswordHash {
     BigInteger bi = new BigInteger(1, array);
     String hex = bi.toString(16);
     int paddingLength = (array.length * 2) - hex.length();
-    return (paddingLength > 0)
-        ? String.format("%0" + paddingLength + "d", 0) + hex
-        : hex;
+    return (paddingLength > 0) ? String.format("%0" + paddingLength + "d", 0) + hex : hex;
   }
 
 }

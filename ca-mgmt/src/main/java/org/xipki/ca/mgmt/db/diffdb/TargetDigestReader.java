@@ -118,13 +118,11 @@ class TargetDigestReader implements Closeable {
       datasource.returnConnection(conn);
     } // method run
 
-    private Map<BigInteger, DigestEntry> query(CertsBundle bundle)
-        throws DataAccessException {
+    private Map<BigInteger, DigestEntry> query(CertsBundle bundle) throws DataAccessException {
       List<BigInteger> serialNumbers = bundle.serialNumbers();
       int size = serialNumbers.size();
 
-      return (datasource.databaseType().supportsInArray()
-          && size == numPerSelect)
+      return (datasource.databaseType().supportsInArray() && size == numPerSelect)
         ? getCertsViaInArraySelect(inArraySelectStmt, serialNumbers)
         : getCertsViaSingleSelect(singleSelectStmt, serialNumbers);
     } // method query
@@ -157,9 +155,8 @@ class TargetDigestReader implements Closeable {
 
   public TargetDigestReader(
       boolean revokedOnly, ProcessLog processLog, RefDigestReader reader,
-      DigestDiffReporter reporter, DataSourceWrapper datasource,
-      DbType dbType, HashAlgo certHashAlgo, int caId, int numPerSelect,
-      int numThreads, AtomicBoolean stopMe)
+      DigestDiffReporter reporter, DataSourceWrapper datasource, DbType dbType,
+      HashAlgo certHashAlgo, int caId, int numPerSelect, int numThreads, AtomicBoolean stopMe)
       throws DataAccessException {
     this.processLog = Args.notNull(processLog, "processLog");
     this.numPerSelect = numPerSelect;
@@ -171,8 +168,7 @@ class TargetDigestReader implements Closeable {
     this.certhashAlgo = Args.notNull(certHashAlgo, "certhashAlgo");
 
     if (dbType == DbType.XIPKI_OCSP_v4) {
-      String certHashAlgoInDb =
-          datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
+      String certHashAlgoInDb = datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
       HashAlgo ha;
       try {
         ha = HashAlgo.getInstance(certHashAlgoInDb);
@@ -181,9 +177,8 @@ class TargetDigestReader implements Closeable {
       }
 
       if (certHashAlgo != ha) {
-        throw new IllegalArgumentException(
-            "certHashAlgo in parameter (" + certHashAlgo + ") != in DB (" +
-                certHashAlgoInDb + ")");
+        throw new IllegalArgumentException("certHashAlgo in parameter (" + certHashAlgo +
+            ") != in DB (" + certHashAlgoInDb + ")");
       }
     }
 
@@ -196,23 +191,19 @@ class TargetDigestReader implements Closeable {
       arrayBuffer.append("SN,REV,RR,RT,RIT,HASH FROM CERT WHERE IID=")
           .append(caId).append(" AND SN IN (?");
     } else {
-      String hashOrCertColumn = (certHashAlgo == HashAlgo.SHA1)
-          ? "SHA1" : "CERT";
+      String hashOrCertColumn = (certHashAlgo == HashAlgo.SHA1) ? "SHA1" : "CERT";
 
       singleSql = StringUtil.concat("REV,RR,RT,RIT,", hashOrCertColumn,
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND SN=?");
 
       arrayBuffer.append("SN,REV,RR,RT,RIT,").append(hashOrCertColumn)
-          .append(" FROM CERT WHERE CA_ID=").append(caId)
-          .append(" AND SN IN (?");
+          .append(" FROM CERT WHERE CA_ID=").append(caId).append(" AND SN IN (?");
     }
 
-    arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1)));
-    arrayBuffer.append(")");
+    arrayBuffer.append(",?".repeat(Math.max(0, numPerSelect - 1))).append(")");
 
     singleCertSql = datasource.buildSelectFirstSql(1, singleSql);
-    inArrayCertsSql = datasource.buildSelectFirstSql(
-        numPerSelect, arrayBuffer.toString());
+    inArrayCertsSql = datasource.buildSelectFirstSql(numPerSelect, arrayBuffer.toString());
 
     List<Retriever> retrievers = new ArrayList<>(numThreads);
 
@@ -280,8 +271,7 @@ class TargetDigestReader implements Closeable {
     }
   } // method getCertsViaInArraySelect
 
-  private Map<BigInteger, DigestEntry> buildResult(
-      ResultSet rs, List<BigInteger> serialNumbers)
+  private Map<BigInteger, DigestEntry> buildResult(ResultSet rs, List<BigInteger> serialNumbers)
       throws SQLException {
     Map<BigInteger, DigestEntry> ret = new HashMap<>(serialNumbers.size());
 
@@ -313,8 +303,7 @@ class TargetDigestReader implements Closeable {
     return ret;
   } // method buildResult
 
-  private DigestEntry getSingleCert(PreparedStatement singleSelectStmt,
-                                    BigInteger serialNumber)
+  private DigestEntry getSingleCert(PreparedStatement singleSelectStmt, BigInteger serialNumber)
       throws DataAccessException {
     ResultSet rs = null;
     try {
@@ -336,7 +325,7 @@ class TargetDigestReader implements Closeable {
         }
       }
       return new DigestEntry(serialNumber, revoked, revReason, revTime,
-          revInvTime, getBase64HashValue(rs));
+              revInvTime, getBase64HashValue(rs));
     } catch (SQLException ex) {
       throw datasource.translate(singleCertSql, ex);
     } finally {
@@ -360,7 +349,7 @@ class TargetDigestReader implements Closeable {
     if (exception != null) {
       throw exception;
     }
-  } // method awaitTerminiation
+  } // method awaitTermination
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
     if (dbType == DbType.XIPKI_OCSP_v4) {

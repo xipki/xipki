@@ -188,6 +188,7 @@ public class Template {
     List<Attribute> copy = new ArrayList<>(attributes);
     copy.sort(Comparator.comparingLong(Attribute::type));
 
+    Long keyType = keyType();
     int nameLen = 0;
     for (Attribute attribute : copy) {
       if (!attribute.isNullValue()) {
@@ -206,7 +207,7 @@ public class Template {
         sb.append("\n");
       }
 
-      sb.append(attribute.toString(true, nameLen, indent2));
+      sb.append(attribute.toString(true, nameLen, indent2, keyType));
     }
 
     return sb.toString();
@@ -901,24 +902,20 @@ public class Template {
         boolean v = bytes[off.getAndIncrement()] != 0;
         ((BooleanAttribute) attr).setValue(v);
       } else if (attr instanceof VersionAttribute) {
-        CkVersion v = new CkVersion(bytes[off.getAndIncrement()],
-            bytes[off.getAndIncrement()]);
+        CkVersion v = new CkVersion(bytes[off.getAndIncrement()], bytes[off.getAndIncrement()]);
         ((VersionAttribute) attr).setValue(v);
       } else if (attr instanceof DateAttribute) {
-        byte[] bytesV = Arrays.copyOfRange(bytes, off.get(),
-            off.addAndGet(parameterLen));
+        byte[] bytesV = Arrays.copyOfRange(bytes, off.get(), off.addAndGet(parameterLen));
         CkDate v = new CkDate(new String(bytesV, StandardCharsets.UTF_8));
         ((DateAttribute) attr).setValue(v);
       } else if (attr instanceof LongAttribute) {
         long v = JniUtil.readLong(arch, bytes, off);
         ((LongAttribute) attr).setValue(v);
       } else if (attr instanceof ByteArrayAttribute) {
-        byte[] v = Arrays.copyOfRange(bytes, off.get(),
-            off.addAndGet(parameterLen));
+        byte[] v = Arrays.copyOfRange(bytes, off.get(), off.addAndGet(parameterLen));
         ((ByteArrayAttribute) attr).setValue(v);
       } else if (attr instanceof StringAttribute) {
-        byte[] v = Arrays.copyOfRange(bytes, off.get(),
-            off.addAndGet(parameterLen));
+        byte[] v = Arrays.copyOfRange(bytes, off.get(), off.addAndGet(parameterLen));
         ((StringAttribute) attr).setValue(v);
       } else if (attr instanceof LongArrayAttribute) {
         int n = parameterLen / arch.longSize();

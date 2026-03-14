@@ -25,8 +25,7 @@ import org.xipki.util.password.Passwords;
 
 public class PasswordActions {
 
-  @Command(scope = "xi", name = "deobfuscate", description =
-      "deobfuscate password")
+  @Command(scope = "xi", name = "deobfuscate", description = "deobfuscate password")
   @Service
   public static class Deobfuscate extends SecurityAction {
 
@@ -35,8 +34,7 @@ public class PasswordActions {
         ":\n" + "exactly one of password and password-file must be specified")
     private String passwordHint;
 
-    @Option(name = "--password-file", description =
-        "file containing the obfuscated password")
+    @Option(name = "--password-file", description = "file containing the obfuscated password")
     @Completion(FileCompleter.class)
     private String passwordFile;
 
@@ -55,8 +53,7 @@ public class PasswordActions {
         passwordHint = StringUtil.toUtf8String(IoUtil.read(passwordFile));
       }
 
-      if (!StringUtil.startsWithIgnoreCase(passwordHint,
-          OBFPasswordService.PROTOCOL_OBF + ":")) {
+      if (!StringUtil.startsWithIgnoreCase(passwordHint, OBFPasswordService.PROTOCOL_OBF + ":")) {
         throw new IllegalCmdParamException("encrypted password '" +
             passwordHint + "' does not start with OBF:");
       }
@@ -77,8 +74,7 @@ public class PasswordActions {
   @Service
   public static class Obfuscate extends SecurityAction {
 
-    @Option(name = "--out", description =
-        "where to save the encrypted password")
+    @Option(name = "--out", description = "where to save the encrypted password")
     @Completion(FileCompleter.class)
     private String outFile;
 
@@ -112,8 +108,7 @@ public class PasswordActions {
 
   } // class Obfuscate
 
-  @Command(scope = "xi", name = "pbe-dec", description =
-      "decrypt password with master password")
+  @Command(scope = "xi", name = "pbe-dec", description = "decrypt password with master password")
   @Service
   public static class PbeDec extends SecurityAction {
 
@@ -122,8 +117,7 @@ public class PasswordActions {
             "exactly one of password and password-file must be specified")
     private String passwordHint;
 
-    @Option(name = "--password-file", description =
-        "file containing the encrypted password")
+    @Option(name = "--password-file", description = "file containing the encrypted password")
     @Completion(FileCompleter.class)
     private String passwordFile;
 
@@ -161,13 +155,11 @@ public class PasswordActions {
 
   } // class PbeDec
 
-  @Command(scope = "xi", name = "pbe-enc", description =
-      "encrypt password with master password")
+  @Command(scope = "xi", name = "pbe-enc", description = "encrypt password with master password")
   @Service
   public static class PbeEnc extends SecurityAction {
 
-    @Option(name = "--out", description =
-        "where to save the encrypted password")
+    @Option(name = "--out", description = "where to save the encrypted password")
     @Completion(FileCompleter.class)
     private String outFile;
 
@@ -184,14 +176,12 @@ public class PasswordActions {
       } else {
         char[][] parts = new char[quorum][];
         for (int i = 0; i < quorum; i++) {
-          parts[i] = readPassword(
-              "Password (part " + (i + 1) + "/" + quorum + ")");
+          parts[i] = readPassword("Password (part " + (i + 1) + "/" + quorum + ")");
         }
         password = StringUtil.merge(parts);
       }
 
-      String passwordHint = Passwords.protectPassword(
-          PBEPasswordService.PROTOCOL_PBE, password);
+      String passwordHint = Passwords.protectPassword(PBEPasswordService.PROTOCOL_PBE, password);
       if (outFile != null) {
         saveVerbose("saved the encrypted password to file",
             outFile, StringUtil.toUtf8Bytes(passwordHint));

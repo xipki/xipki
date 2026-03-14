@@ -30,14 +30,12 @@ public class TransactionIdRequest extends SdkRequest {
     encoder.writeArrayStart(1).writeTextString(tid);
   }
 
-  public static TransactionIdRequest decode(byte[] encoded)
-      throws CodecException {
+  public static TransactionIdRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("TransactionIdRequest", decoder, 1);
       return new TransactionIdRequest(decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, TransactionIdRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, TransactionIdRequest.class), ex);
     }
   }
 

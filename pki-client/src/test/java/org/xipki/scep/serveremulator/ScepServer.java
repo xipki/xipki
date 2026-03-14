@@ -6,6 +6,7 @@ package org.xipki.scep.serveremulator;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.scep.client.test.MyUtil;
+import org.xipki.security.KeySpec;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.scep.message.CaCaps;
 import org.xipki.security.util.KeyUtil;
@@ -13,9 +14,8 @@ import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
-import java.security.Security;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -52,8 +52,7 @@ public class ScepServer {
   private X509Cert nextRaCert;
 
   public ScepServer(String name, CaCaps caCaps, boolean withRa,
-                    boolean withNextCa, boolean generateCrl,
-                    ScepControl control) {
+                    boolean withNextCa, boolean generateCrl, ScepControl control) {
     this.name = Args.notBlank(name, "name");
     this.caCaps = Args.notNull(caCaps, "caCaps");
     this.control = Args.notNull(control, "control");
@@ -75,34 +74,25 @@ public class ScepServer {
       return servlet;
     }
 
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
 
-    KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA");
+    SecureRandom rnd = KeyUtil.random();
     X500Name rcaSubject;
-    kpGen.initialize(2048);
-    KeyPair keypair = kpGen.generateKeyPair();
+    KeyPair keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
     PrivateKey rcaKey = keypair.getPrivate();
     rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=myorg.org, C=DE");
 
-    kpGen.initialize(2048);
-    keypair = kpGen.generateKeyPair();
+    keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
 
-    SubjectPublicKeyInfo pkInfo =
-        MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
-    X500Name subject = new X500Name(
-        "CN=CA1, OU=emulator, O=myorg.org, C=DE");
+    SubjectPublicKeyInfo pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
+    X500Name subject = new X500Name("CN=CA1, OU=emulator, O=myorg.org, C=DE");
     this.caCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo,
-        subject, BigInteger.valueOf(2),
-        Instant.now().minus(10, ChronoUnit.MINUTES));
-    CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert,
-        generateCrl);
+        subject, BigInteger.valueOf(2), Instant.now().minus(10, ChronoUnit.MINUTES));
+    CaEmulator ca = new CaEmulator(keypair.getPrivate(), this.caCert, generateCrl);
 
     RaEmulator ra = null;
     if (withRa) {
-      kpGen.initialize(2048);
-      keypair = kpGen.generateKeyPair();
+      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
       subject = new X500Name("CN=RA1, OU=emulator, O=myorg.org, C=DE");
@@ -112,8 +102,7 @@ public class ScepServer {
 
     NextCaAndRa nextCaAndRa = null;
     if (withNextCa) {
-      kpGen.initialize(2048);
-      keypair = kpGen.generateKeyPair();
+      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
 
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       subject = new X500Name("CN=CA2, OU=emulator, O=myorg.org, C=DE");
@@ -121,12 +110,10 @@ public class ScepServer {
       Instant startTime = Instant.now().plus(365, ChronoUnit.DAYS);
       this.nextCaCert = MyUtil.issueSubCaCert(rcaKey, rcaSubject, pkInfo,
           subject, BigInteger.valueOf(2), startTime);
-      CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert,
-          generateCrl);
+      CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
       if (withRa) {
-        kpGen.initialize(2048);
-        keypair = kpGen.generateKeyPair();
+        keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
         pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
         subject = new X500Name("CN=RA2, OU=emulator, O=myorg.org, C=DE");

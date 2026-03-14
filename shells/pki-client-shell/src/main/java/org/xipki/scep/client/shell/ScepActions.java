@@ -17,6 +17,7 @@ import org.xipki.scep.client.CaCertValidator;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -32,10 +33,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -47,8 +46,7 @@ import java.util.List;
 
 public class ScepActions {
 
-  @Command(scope = "xi", name = "scep-certpoll", description =
-      "poll certificate")
+  @Command(scope = "xi", name = "scep-certpoll", description = "poll certificate")
   @Service
   public static class ScepCertpoll extends ClientAction {
 
@@ -56,8 +54,7 @@ public class ScepActions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -96,8 +93,7 @@ public class ScepActions {
 
   public abstract static class ClientAction extends XiAction {
 
-    @Option(name = "--url", required = true, description =
-        "URL of the SCEP server")
+    @Option(name = "--url", required = true, description = "URL of the SCEP server")
     protected String url;
 
     @Option(name = "--ca-id", description = "CA identifier")
@@ -107,8 +103,7 @@ public class ScepActions {
     @Completion(FileCompleter.class)
     private String caCertFile;
 
-    @Option(name = "--p12", required = true, description =
-        "PKCS#12 keystore file")
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FileCompleter.class)
     private String p12File;
 
@@ -123,14 +118,11 @@ public class ScepActions {
     private PrivateKey identityKey;
     private X509Cert identityCert;
 
-    protected ScepClient getScepClient()
-        throws CertificateException, IOException {
+    protected ScepClient getScepClient() throws CertificateException, IOException {
       if (scepClient == null) {
         X509Cert caCert = X509Util.parseCert(new File(caCertFile));
-        CaCertValidator caCertValidator =
-            new CaCertValidator.PreprovisionedCaCertValidator(caCert);
-        scepClient = new ScepClient(
-            new CaIdentifier(url, caId), caCertValidator, curl);
+        CaCertValidator caCertValidator = new CaCertValidator.PreprovisionedCaCertValidator(caCert);
+        scepClient = new ScepClient(new CaIdentifier(url, caId), caCertValidator, curl);
       }
       return scepClient;
     }
@@ -151,12 +143,11 @@ public class ScepActions {
     }
 
     private void readIdentity() throws Exception {
-      char[] pwd = readPasswordIfNotSet("Enter the keystore password",
-          passwordHint);
+      char[] pwd = readPasswordIfNotSet("Enter the keystore password", passwordHint);
 
-      KeyStore ks = KeyUtil.getInKeyStore("PKCS12");
+      PKCS12KeyStore ks;
       try (InputStream is = Files.newInputStream(Paths.get(p12File))) {
-        ks.load(is, pwd);
+        ks = KeyUtil.loadPKCS12KeyStore(is, pwd);
       }
 
       String keyname = null;
@@ -173,15 +164,13 @@ public class ScepActions {
         throw new Exception("no key entry is contained in the keystore");
       }
 
-      this.identityKey = (PrivateKey) ks.getKey(keyname, pwd);
-      this.identityCert = new X509Cert((X509Certificate)
-          ks.getCertificate(keyname));
+      this.identityKey = KeyUtil.getPrivateKey(ks.getKey(keyname));
+      this.identityCert = new X509Cert(ks.getCertificate(keyname));
     }
 
   } // class ClientAction
 
-  @Command(scope = "xi", name = "scep-enroll", description =
-      "enroll certificate")
+  @Command(scope = "xi", name = "scep-enroll", description = "enroll certificate")
   @Service
   public static class ScepEnroll extends ClientAction {
 
@@ -189,8 +178,7 @@ public class ScepActions {
     @Completion(FileCompleter.class)
     private String csrFile;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -199,8 +187,7 @@ public class ScepActions {
     @Completion(FileCompleter.class)
     private String outputFile;
 
-    @Option(name = "--method", description =
-        "method to enroll the certificate.")
+    @Option(name = "--method", description = "method to enroll the certificate.")
     @Completion(value = StringsCompleter.class, values = {"pkcs", "renewal"})
     private String method;
 
@@ -239,20 +226,17 @@ public class ScepActions {
 
   } // class ScepEnroll
 
-  @Command(scope = "xi", name = "scep-cacert", description =
-      "get CA certificate")
+  @Command(scope = "xi", name = "scep-cacert", description = "get CA certificate")
   @Service
   public static class ScepCacert extends XiAction {
 
-    @Option(name = "--url", required = true, description =
-        "URL of the SCEP server")
+    @Option(name = "--url", required = true, description = "URL of the SCEP server")
     private String url;
 
     @Option(name = "--ca-id", description = "CA identifier")
     private String caId;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -283,17 +267,14 @@ public class ScepActions {
 
   } // class ScepCacert
 
-  @Command(scope = "xi", name = "scep-get-cert", description =
-      "download certificate")
+  @Command(scope = "xi", name = "scep-get-cert", description = "download certificate")
   @Service
   public static class ScepGetCert extends ClientAction {
 
-    @Option(name = "--serial", aliases = "-s", required = true, description =
-        "serial number")
+    @Option(name = "--serial", aliases = "-s", required = true, description = "serial number")
     private String serialNumber;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -325,8 +306,7 @@ public class ScepActions {
   @Service
   public static class ScepGetCrl extends ClientAction {
 
-    @Option(name = "--cert", aliases = "-c", required = true, description =
-        "certificate file")
+    @Option(name = "--cert", aliases = "-c", required = true, description = "certificate file")
     @Completion(FileCompleter.class)
     private String certFile;
 
@@ -348,8 +328,7 @@ public class ScepActions {
         throw new CmdFailure("received no CRL from server");
       }
 
-      saveVerbose("saved CRL to file", outputFile,
-          encodeCrl(crl.getEncoded(), outform));
+      saveVerbose("saved CRL to file", outputFile, encodeCrl(crl.getEncoded(), outform));
       return null;
     }
 

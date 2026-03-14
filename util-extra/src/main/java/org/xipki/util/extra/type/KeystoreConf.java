@@ -40,8 +40,7 @@ public class KeystoreConf {
 
   public static KeystoreConf parse(JsonMap json) throws CodecException {
     return new KeystoreConf(json.getString("type"),
-        json.getString("password"),
-        FileOrBinary.parse(json.getMap("keystore")));
+        json.getString("password"), FileOrBinary.parse(json.getMap("keystore")));
   }
 
 }

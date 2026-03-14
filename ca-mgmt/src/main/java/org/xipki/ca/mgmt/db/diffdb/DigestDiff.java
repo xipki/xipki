@@ -63,9 +63,8 @@ class DigestDiff {
   private final int numTargetThreads;
 
   public DigestDiff(
-      DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource,
-      String reportDirName, boolean revokedOnly, AtomicBoolean stopMe,
-      int numPerSelect, int numThreads)
+      DataSourceWrapper refDatasource, DataSourceWrapper targetDatasource, String reportDirName,
+      boolean revokedOnly, AtomicBoolean stopMe, int numPerSelect, int numThreads)
       throws DataAccessException {
     this.refDatasource = Args.notNull(refDatasource, "refDatasource");
     this.revokedOnly = revokedOnly;
@@ -82,9 +81,8 @@ class DigestDiff {
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
         throw new IllegalArgumentException(StringUtil.concatObjects(
-            "Could not compare OCSP datasources with different " +
-                "CERTHASH_ALGO: refDataSource (",
-            refAlgo, ") and targetDataSource (", targetAlgo, ")"));
+            "Could not compare OCSP datasources with different CERTHASH_ALGO: " +
+            "refDataSource (",refAlgo, ") and targetDataSource (", targetAlgo, ")"));
       }
       this.certhashAlgo = refAlgo;
     } else {
@@ -92,8 +90,7 @@ class DigestDiff {
     }
 
     // number of threads
-    this.numTargetThreads = Math.min(numThreads,
-        targetDatasource.maximumPoolSize() - 1);
+    this.numTargetThreads = Math.min(numThreads, targetDatasource.maximumPoolSize() - 1);
 
     if (this.numTargetThreads != numThreads) {
       LOG.info("reduce the numTargetThreads from {} to {}",
@@ -111,12 +108,9 @@ class DigestDiff {
 
   public void diff() throws Exception {
     Map<Integer, byte[]> caIdCertMap = getCas(targetDatasource, targetDbType);
-
     List<Integer> refCaIds = new LinkedList<>();
-
     String refSql = (refDbType == DbType.XIPKI_OCSP_v4)
-        ? "SELECT ID FROM ISSUER"
-        : "SELECT ID FROM CA";
+        ? "SELECT ID FROM ISSUER" : "SELECT ID FROM CA";
 
     PreparedStatement refStmt = null;
     try {
@@ -125,8 +119,7 @@ class DigestDiff {
       try {
         refRs = refStmt.executeQuery();
         while (refRs.next()) {
-          int id = refRs.getInt(1);
-          refCaIds.add(id);
+          refCaIds.add(refRs.getInt(1));
         }
       } catch (SQLException ex) {
         throw refDatasource.translate(refSql, ex);
@@ -139,15 +132,13 @@ class DigestDiff {
 
     final int numBlocksToRead = numTargetThreads * 3 / 2;
     for (Integer refCaId : refCaIds) {
-      RefDigestReader refReader = RefDigestReader.getInstance(
-          refDatasource, refDbType, certhashAlgo, refCaId,
-          numBlocksToRead, numPerSelect, stopMe);
+      RefDigestReader refReader = RefDigestReader.getInstance(refDatasource, refDbType,
+          certhashAlgo, refCaId, numBlocksToRead, numPerSelect, stopMe);
       diffSingleCa(refReader, caIdCertMap);
     }
   } // method diff
 
-  private void diffSingleCa(RefDigestReader refReader,
-                            Map<Integer, byte[]> caIdCertBytesMap)
+  private void diffSingleCa(RefDigestReader refReader, Map<Integer, byte[]> caIdCertBytesMap)
       throws IOException, InterruptedException {
     X509Cert caCert = refReader.caCert();
     byte[] caCertBytes = caCert.getEncoded();
@@ -170,12 +161,10 @@ class DigestDiff {
 
     int idx = 2;
     while (caReportDir.exists()) {
-      caReportDir = new File(reportDirName,
-          "ca-" + commonName + "-" + (idx++));
+      caReportDir = new File(reportDirName, "ca-" + commonName + "-" + (idx++));
     }
 
-    DigestDiffReporter reporter =
-        new DigestDiffReporter(caReportDir.getPath(), caCertBytes);
+    DigestDiffReporter reporter = new DigestDiffReporter(caReportDir.getPath(), caCertBytes);
 
     Integer caId = null;
     for (Entry<Integer, byte[]> entry : caIdCertBytesMap.entrySet()) {
@@ -196,8 +185,7 @@ class DigestDiff {
     try {
       reporter.start();
       ProcessLog processLog = new ProcessLog(refReader.totalAccount());
-      System.out.println("Processing certificates of CA \n\t'"
-          + refReader.caSubjectName() + "'");
+      System.out.println("Processing certificates of CA \n\t'" + refReader.caSubjectName() + "'");
       processLog.printHeader();
 
       target = new TargetDigestReader(revokedOnly, processLog, refReader,
@@ -221,12 +209,10 @@ class DigestDiff {
     }
   } // method diffSingleCa
 
-  private static Map<Integer, byte[]> getCas(
-      DataSourceWrapper datasource, DbType dbType)
+  private static Map<Integer, byte[]> getCas(DataSourceWrapper datasource, DbType dbType)
       throws DataAccessException {
     // get a list of available CAs in the target database
-    String sql = "SELECT ID,CERT FROM " +
-        (dbType == DbType.XIPKI_OCSP_v4 ? "ISSUER" : "CA");
+    String sql = "SELECT ID,CERT FROM " + (dbType == DbType.XIPKI_OCSP_v4 ? "ISSUER" : "CA");
 
     PreparedStatement stmt = datasource.prepareStatement(sql);
     Map<Integer, byte[]> caIdCertMap = new HashMap<>(5);
@@ -234,8 +220,7 @@ class DigestDiff {
     try {
       rs = stmt.executeQuery();
       while (rs.next()) {
-        caIdCertMap.put(rs.getInt("ID"),
-            Base64.decodeFast(rs.getString("CERT")));
+        caIdCertMap.put(rs.getInt("ID"), Base64.decodeFast(rs.getString("CERT")));
       }
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);
@@ -246,8 +231,7 @@ class DigestDiff {
     return caIdCertMap;
   } // method getCas
 
-  public static DbType detectDbType(DataSourceWrapper datasource)
-      throws DataAccessException {
+  public static DbType detectDbType(DataSourceWrapper datasource) throws DataAccessException {
     Connection conn = datasource.getConnection();
     try {
       String dbSchemaVersion = datasource.getDbSchemaEntry(null, "VERSION");
@@ -263,15 +247,13 @@ class DigestDiff {
         } else if ("8".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v8;
         } else {
-          throw new IllegalArgumentException(
-              "unknown DBSCHEMA version " + dbSchemaVersion);
+          throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);
         }
       } else if (datasource.tableExists(conn, "ISSUER")) {
         if ("4".equals(dbSchemaVersion)) {
           return DbType.XIPKI_OCSP_v4;
         } else {
-          throw new IllegalArgumentException(
-              "unknown DBSCHEMA version " + dbSchemaVersion);
+          throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);
         }
       } else {
         throw new IllegalArgumentException("unknown database schema");

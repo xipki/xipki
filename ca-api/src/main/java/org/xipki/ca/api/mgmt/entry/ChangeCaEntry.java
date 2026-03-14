@@ -137,8 +137,7 @@ public class ChangeCaEntry extends MgmtEntry {
   }
 
   public void setCrlSignerName(String crlSignerName) {
-    this.crlSignerName = (crlSignerName == null) ? null
-        : crlSignerName.toLowerCase();
+    this.crlSignerName = (crlSignerName == null) ? null : crlSignerName.toLowerCase();
   }
 
   public List<String> keypairGenNames() {
@@ -282,8 +281,7 @@ public class ChangeCaEntry extends MgmtEntry {
   }
 
   public static ChangeCaEntry parse(JsonMap json) throws CodecException {
-    ChangeCaEntry ret = new ChangeCaEntry(
-        NameId.parse(json.getNnMap("ident")));
+    ChangeCaEntry ret = new ChangeCaEntry(NameId.parse(json.getNnMap("ident")));
 
     ret.setSignerType(json.getString("signerType"));
     ret.setSignerConf(json.getString("signerConf"));

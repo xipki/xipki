@@ -23,11 +23,9 @@ public abstract class AbstractBase64Test {
 
   protected abstract String jdkEncode(byte[] data);
 
-  protected abstract byte[] encodeToByte(
-      byte[] data, boolean wrapLongLine, boolean withPadding);
+  protected abstract byte[] encodeToByte(byte[] data, boolean wrapLongLine, boolean withPadding);
 
-  protected abstract String encodeToString(
-      byte[] data, boolean wrapLongLine, boolean withPadding);
+  protected abstract String encodeToString(byte[] data, boolean wrapLongLine, boolean withPadding);
 
   protected abstract byte[] decode(byte[] data);
 
@@ -73,8 +71,7 @@ public abstract class AbstractBase64Test {
     }
   }
 
-  private void check(String desc, byte[] data,
-                     boolean wrapLongLine, boolean withPadding) {
+  private void check(String desc, byte[] data, boolean wrapLongLine, boolean withPadding) {
     int len = data.length;
 
     System.out.println(desc + " len=" + len);
@@ -125,8 +122,7 @@ public abstract class AbstractBase64Test {
     // encodeToByte
     {
       byte[] encodedBytes = encodeToByte(data, wrapLongLine, withPadding);
-      Assert.assertEquals(expectedEncoded,
-          new String(encodedBytes, StandardCharsets.US_ASCII));
+      Assert.assertEquals(expectedEncoded, new String(encodedBytes, StandardCharsets.US_ASCII));
 
       byte[] decodedFast = decodeFast(encodedBytes);
       Assert.assertArrayEquals(data, decodedFast);

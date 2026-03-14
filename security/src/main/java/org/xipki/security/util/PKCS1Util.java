@@ -3,11 +3,11 @@
 
 package org.xipki.security.util;
 
-import org.bouncycastle.crypto.Xof;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
+import org.xipki.util.io.IoUtil;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -24,39 +24,29 @@ public class PKCS1Util {
   private static final Map<HashAlgo, byte[]> digestPkcsPrefix = new HashMap<>();
 
   static {
-    addDigestPkcsPrefix(HashAlgo.SHA1,
-        "3021300906052b0e03021a05000414");
-    addDigestPkcsPrefix(HashAlgo.SHA224,
-        "302d300d06096086480165030402040500041c");
-    addDigestPkcsPrefix(HashAlgo.SHA256,
-        "3031300d060960864801650304020105000420");
-    addDigestPkcsPrefix(HashAlgo.SHA384,
-        "3041300d060960864801650304020205000430");
-    addDigestPkcsPrefix(HashAlgo.SHA512,
-        "3051300d060960864801650304020305000440");
-    addDigestPkcsPrefix(HashAlgo.SHA3_224,
-        "302d300d06096086480165030402070500041c");
-    addDigestPkcsPrefix(HashAlgo.SHA3_256,
-        "3031300d060960864801650304020805000420");
-    addDigestPkcsPrefix(HashAlgo.SHA3_384,
-        "3041300d060960864801650304020905000430");
-    addDigestPkcsPrefix(HashAlgo.SHA3_512,
-        "3051300d060960864801650304020a05000440");
+    addDigestPkcsPrefix(HashAlgo.SHA1,     "3021300906052b0e03021a05000414");
+    addDigestPkcsPrefix(HashAlgo.SHA224,   "302d300d06096086480165030402040500041c");
+    addDigestPkcsPrefix(HashAlgo.SHA256,   "3031300d060960864801650304020105000420");
+    addDigestPkcsPrefix(HashAlgo.SHA384,   "3041300d060960864801650304020205000430");
+    addDigestPkcsPrefix(HashAlgo.SHA512,   "3051300d060960864801650304020305000440");
+    addDigestPkcsPrefix(HashAlgo.SHA3_224, "302d300d06096086480165030402070500041c");
+    addDigestPkcsPrefix(HashAlgo.SHA3_256, "3031300d060960864801650304020805000420");
+    addDigestPkcsPrefix(HashAlgo.SHA3_384, "3041300d060960864801650304020905000430");
+    addDigestPkcsPrefix(HashAlgo.SHA3_512, "3051300d060960864801650304020a05000440");
   } // method static
 
   private static void addDigestPkcsPrefix(HashAlgo algo, String prefix) {
     digestPkcsPrefix.put(algo, Hex.decode(prefix));
   }
 
-  public static byte[] EMSA_PKCS1_V1_5_ENCODE(
-      byte[] encodedDigestInfo, int modulusBitLength)
+  public static byte[] EMSA_PKCS1_V1_5_ENCODE(byte[] encodedDigestInfo, int modulusBitLength)
       throws XiSecurityException {
     int msgLen = Args.notNull(encodedDigestInfo, "encodedDigestInfo").length;
     int blockSize = (modulusBitLength + 7) / 8;
 
     if (msgLen + 3 > blockSize) {
       throw new XiSecurityException("data too long (maximal "
-        + (blockSize - 3) + " allowed): " + msgLen);
+          + (blockSize - 3) + " allowed): " + msgLen);
     }
 
     byte[] block = new byte[blockSize];
@@ -72,24 +62,21 @@ public class PKCS1Util {
     // mark the end of the padding
     block[offset++] = 0x00;
 
-    System.arraycopy(encodedDigestInfo, 0, block, offset,
-        encodedDigestInfo.length);
+    System.arraycopy(encodedDigestInfo, 0, block, offset, encodedDigestInfo.length);
     return block;
   }
   // method EMSA_PKCS1_V1_5_ENCODE
 
   public static byte[] EMSA_PSS_ENCODE(
-    HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest,
-    int saltLen, int modulusBitLength, SecureRandom random)
-    throws XiSecurityException {
+    HashAlgo contentDigest, byte[] hashValue, HashAlgo mgfDigest, int saltLen,
+    int modulusBitLength, SecureRandom random) throws XiSecurityException {
     if (contentDigest.isShake()) {
       if (mgfDigest != contentDigest) {
         throw new XiSecurityException("contentDigest != mgfDigest");
       }
 
       if (saltLen != contentDigest.length()) {
-        throw new XiSecurityException("saltLen != "
-          + contentDigest.length() + ": " + saltLen);
+        throw new XiSecurityException("saltLen != " + contentDigest.length() + ": " + saltLen);
       }
     }
 
@@ -100,27 +87,23 @@ public class PKCS1Util {
 
     if (hashValue.length != hLen) {
       throw new XiSecurityException("hashValue.length is incorrect: "
-        + hashValue.length + " != " + hLen);
+          + hashValue.length + " != " + hLen);
     }
 
     int emBits = modulusBitLength - 1;
     if (emBits < (8 * hLen + 8 * saltLen + 9)) {
-      throw new XiSecurityException(
-          "key too small for specified hash and salt lengths");
+      throw new XiSecurityException("key too small for specified hash and salt lengths");
     }
 
-    System.arraycopy(hashValue, 0, mDash,
-        mDash.length - hLen - saltLen, hLen);
+    System.arraycopy(hashValue, 0, mDash, mDash.length - hLen - saltLen, hLen);
 
     random.nextBytes(salt);
-    System.arraycopy(salt, 0, mDash,
-        mDash.length - saltLen, saltLen);
+    System.arraycopy(salt, 0, mDash, mDash.length - saltLen, saltLen);
 
     byte[] hv = contentDigest.hash(mDash);
     byte[] block = new byte[(emBits + 7) / 8];
     block[block.length - saltLen - 1 - hLen - 1] = 0x01;
-    System.arraycopy(salt, 0, block,
-        block.length - saltLen - hLen - 1, saltLen);
+    System.arraycopy(salt, 0, block, block.length - saltLen - hLen - 1, saltLen);
 
     int dbMaskLen = block.length - hLen - 1;
     byte[] dbMask = mgf(mgfDigest, hv, dbMaskLen);
@@ -155,8 +138,8 @@ public class PKCS1Util {
    * @exception IllegalArgumentException if an exception occurs.
    */
   public static boolean EMSA_PSS_DECODE(
-    HashAlgo mgfDigest, byte[] mHash, byte[] EM, int sLen,
-    int modulusBitLength) throws XiSecurityException {
+      HashAlgo mgfDigest, byte[] mHash, byte[] EM, int sLen, int modulusBitLength)
+      throws XiSecurityException {
     if (sLen < 0) {
       throw new XiSecurityException("invalid sLen");
     }
@@ -181,6 +164,7 @@ public class PKCS1Util {
     if ((EM[EM.length - 1] & 0xFF) != 0xBC) {
       return false;
     }
+
     // 5. Let maskedDB be the leftmost emLen - hLen - 1 octets of EM, and let
     //  H be the next hLen octets.
     // 6. If the leftmost 8 * emLen - emBits bits of the leftmost octet in
@@ -188,10 +172,12 @@ public class PKCS1Util {
     if ((EM[0] & (0xFF << (8 - (8 * emLen - emBits)))) != 0) {
       return false;
     }
+
     byte[] DB = new byte[emLen - hLen - 1];
     byte[] H = new byte[hLen];
     System.arraycopy(EM, 0, DB, 0, emLen - hLen - 1);
     System.arraycopy(EM, emLen - hLen - 1, H,  0, hLen);
+
     // 7. Let dbMask = MGF(H, emLen - hLen - 1).
     byte[] dbMask = mgf(mgfDigest, H, emLen - hLen - 1);
     // 8. Let DB = maskedDB XOR dbMask.
@@ -199,6 +185,7 @@ public class PKCS1Util {
     for (i = 0; i < DB.length; i++) {
       DB[i] = (byte)(DB[i] ^ dbMask[i]);
     }
+
     // 9. Set the leftmost 8 * emLen - emBits bits of DB to zero.
     DB[0] &= (byte) (0xFF >>> (8*emLen - emBits));
     // 10. If the emLen - hLen - sLen - 2 leftmost octets of DB are not zero or
@@ -233,8 +220,7 @@ public class PKCS1Util {
   }
 
   public static byte[] RSAES_OAEP_ENCODE(
-    byte[] M, int modulusBitLength, HashAlgo hashAlgo, SecureRandom random)
-      throws Exception {
+      byte[] M, int modulusBitLength, HashAlgo hashAlgo, SecureRandom random) throws Exception {
     int k = (modulusBitLength + 7) / 8;
     int mLen = M.length;
     int hLen = hashAlgo.length();
@@ -255,7 +241,7 @@ public class PKCS1Util {
     byte[] lHash = hashAlgo.hash(new byte[0]);
     byte[] PS = new byte[k - mLen - 2 * hLen - 2];
 
-    byte[] DB = concat(lHash, PS, new byte[]{1}, M);
+    byte[] DB = IoUtil.concatenate(lHash, PS, new byte[]{1}, M);
     byte[] seed = new byte[hLen];
     random.nextBytes(seed);
     byte[] dbMask = mgf1(hashAlgo, seed, k - hLen - 1);
@@ -268,7 +254,7 @@ public class PKCS1Util {
     byte[] maskedSeed = xor(seed, seedMask);
 
     // EM = 0x00 || maskedSeed || maskedDB
-    return concat(new byte[]{0}, maskedSeed, maskedDB);
+    return IoUtil.concatenate(new byte[]{0}, maskedSeed, maskedDB);
   }
 
   public static byte[] RSAES_OAEP_DECODE(
@@ -329,15 +315,8 @@ public class PKCS1Util {
    * mask generator function, as described in PKCS1v2.
    */
   private static byte[] mgf(HashAlgo mgfDigest, byte[] Z, int length) {
-    if (mgfDigest.isShake()) {
-      Xof xof = (Xof) mgfDigest.createDigest();
-      xof.update(Z, 0, Z.length);
-      byte[] res = new byte[length];
-      xof.doFinal(res, 0, length);
-      return res;
-    } else {
-      return mgf1(mgfDigest, Z, length);
-    }
+    return mgfDigest.isShake() ? KeyUtil.mgfShake(mgfDigest, Z, length)
+        : mgf1(mgfDigest, Z, length);
   }
 
   private static byte[] mgf1(HashAlgo mgfDigest, byte[] Z, int length) {
@@ -369,7 +348,7 @@ public class PKCS1Util {
    * int to octet string.
    */
   private static void ItoOSP(int i, byte[] sp, int spOffset) {
-    sp[spOffset  ] = (byte)(i >>> 24);
+    sp[spOffset]     = (byte)(i >>> 24);
     sp[spOffset + 1] = (byte)(i >>> 16);
     sp[spOffset + 2] = (byte)(i >>> 8);
     sp[spOffset + 3] = (byte)(i);
@@ -384,22 +363,6 @@ public class PKCS1Util {
     for (int i = 0; i < a.length; i++) {
       rv[i] = (byte) (a[i] ^ b[i]);
     }
-    return rv;
-  }
-
-  private static byte[] concat(byte[]... byteArrays) {
-    int len = 0;
-    for (byte[] ba : byteArrays) {
-      len += ba.length;
-    }
-
-    byte[] rv = new byte[len];
-    int offset = 0;
-    for (byte[] ba : byteArrays) {
-      System.arraycopy(ba, 0, rv, offset, ba.length);
-      offset += ba.length;
-    }
-
     return rv;
   }
 

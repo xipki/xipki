@@ -13,44 +13,44 @@ import org.xipki.util.misc.StringUtil;
  */
 public class HourMinute {
 
-    private final int hour;
+  private final int hour;
 
-    private final int minute;
+  private final int minute;
 
-    public HourMinute(int hour, int minute) {
-        this.hour = Args.range(hour, "hour", 0, 23);
-        this.minute = Args.range(minute, "minute", 0, 59);
+  public HourMinute(int hour, int minute) {
+    this.hour = Args.range(hour, "hour", 0, 23);
+    this.minute = Args.range(minute, "minute", 0, 59);
+  }
+
+  public int hour() {
+      return hour;
+  }
+
+  public int minute() {
+      return minute;
+  }
+
+  @Override
+  public String toString() {
+    return StringUtil.concatObjectsCap(100, (hour < 10 ? "0" : ""),
+        hour, ":", (minute < 10 ? "0" : ""), minute);
+  }
+
+  @Override
+  public int hashCode() {
+      return toString().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    } else if (!(obj instanceof HourMinute)) {
+      return false;
     }
 
-    public int hour() {
-        return hour;
-    }
-
-    public int minute() {
-        return minute;
-    }
-
-    @Override
-    public String toString() {
-        return StringUtil.concatObjectsCap(100, (hour < 10 ? "0" : ""),
-            hour, ":", (minute < 10 ? "0" : ""), minute);
-    }
-
-    @Override
-    public int hashCode() {
-        return toString().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        } else if (!(obj instanceof HourMinute)) {
-            return false;
-        }
-
-        HourMinute hm = (HourMinute) obj;
-        return hour == hm.hour && minute == hm.minute;
-    }
+    HourMinute hm = (HourMinute) obj;
+    return hour == hm.hour && minute == hm.minute;
+  }
 
 } // class HourMinute

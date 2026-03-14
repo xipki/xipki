@@ -12,16 +12,24 @@ import org.xipki.pkcs11.xihsm.crypt.MultiPartOperation;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.objects.XiKey;
 import org.xipki.pkcs11.xihsm.objects.XiPrivateKey;
+import org.xipki.pkcs11.xihsm.objects.XiPrivateOrSecretKey;
 import org.xipki.pkcs11.xihsm.objects.XiSecretKey;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.OperationType;
+import org.xipki.security.HashAlgo;
 import org.xipki.util.codec.Args;
 
 import java.util.Arrays;
 
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_TOKEN;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_VALUE;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_VALUE_LEN;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_SESSION_READ_ONLY;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_TEMPLATE_INCONSISTENT;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiSession {
@@ -72,8 +80,7 @@ public class XiSession {
     }
 
     long allOps = PKCS11T.CKF_SIGN | PKCS11T.CKF_VERIFY
-        | PKCS11T.CKF_DIGEST | PKCS11T.CKF_GENERATE
-        | PKCS11T.CKF_GENERATE_KEY_PAIR;
+        | PKCS11T.CKF_DIGEST | PKCS11T.CKF_GENERATE | PKCS11T.CKF_GENERATE_KEY_PAIR;
     // TODO: add CKF_DECRYPT and CKF_DERIVE if both operations are supported
     if ((flags & allOps) != flags) {
     }
@@ -136,18 +143,15 @@ public class XiSession {
     slot.C_DestroyObject(handle, rw, hObject);
   }
 
-  public Template C_GetAttributeValue(long hObject, long[] attrTypes)
-      throws HsmException {
+  public Template C_GetAttributeValue(long hObject, long[] attrTypes) throws HsmException {
     return slot.C_GetAttributeValue(handle, hObject, attrTypes);
   }
 
-  public void C_SetAttributeValue(long hObject, XiTemplate template)
-      throws HsmException {
+  public void C_SetAttributeValue(long hObject, XiTemplate template) throws HsmException {
     slot.C_SetAttributeValue(handle, rw, hObject, template);
   }
 
-  public void C_FindObjectsInit(XiTemplate template)
-      throws HsmException {
+  public void C_FindObjectsInit(XiTemplate template) throws HsmException {
     findObjectHandles = slot.findObjects(handle, template);
     if (findObjectHandles == null) {
       findObjectHandles = new long[0];
@@ -166,8 +170,7 @@ public class XiSession {
           "maxObjectCount is too big: " + maxObjectCount);
     }
 
-    int realSize = Math.min(findObjectHandles.length - findObjectIndex,
-        maxObjectCount);
+    int realSize = Math.min(findObjectHandles.length - findObjectIndex, maxObjectCount);
     long[] ret = Arrays.copyOfRange(findObjectHandles, findObjectIndex,
         findObjectIndex + realSize);
     findObjectIndex += realSize;
@@ -184,58 +187,61 @@ public class XiSession {
     findObjectHandles = null;
   }
 
-  public void C_DigestInit(XiMechanism mechanism) throws HsmException {
+  public byte[] C_DigestKeyX(XiMechanism mechanism, byte[] prefix, long hKey, byte[] suffix)
+      throws HsmException {
     assertLoggedInAndNoActiveOp();
-    enterMultiPartOp(new MultiPartOperation(OperationType.DIGEST, null,
-        mechanism, null));
-  }
 
-  public byte[] C_Digest(byte[] data) throws HsmException {
+    byte[] keyValue;
+    if (hKey == 0) {
+      keyValue = new byte[0];
+    } else {
+      XiKey obj = slot.getKey(handle, hKey);
+      if (!(obj instanceof XiSecretKey)) {
+        throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
+            "The key to be digested is not a SecretKey.");
+      }
+
+      keyValue = ((XiSecretKey) obj).getValue();
+    }
+
+    HashAlgo ha;
+    long ckm = mechanism.getCkm();
+    if (ckm == PKCS11T.CKM_SHA_1) {
+      ha = HashAlgo.SHA1;
+    } else if (ckm == PKCS11T.CKM_SHA224) {
+      ha = HashAlgo.SHA224;
+    } else if (ckm == PKCS11T.CKM_SHA256) {
+      ha = HashAlgo.SHA256;
+    } else if (ckm == PKCS11T.CKM_SHA384) {
+      ha = HashAlgo.SHA384;
+    } else if (ckm == PKCS11T.CKM_SHA512) {
+      ha = HashAlgo.SHA512;
+    } else if (ckm == PKCS11T.CKM_VENDOR_SM3) {
+      ha = HashAlgo.SM3;
+    } else {
+      throw new HsmException(PKCS11T.CKR_MECHANISM_INVALID,
+          "unsupported C_Digest algorithm " + PKCS11T.ckmCodeToName(ckm));
+    }
+
     try {
-      return activeOperation.assertMultiOpInitialized(OperationType.DIGEST)
-          .doFinal(data);
+      enterSimplePartOp();
+      return ha.hash(prefix, keyValue, suffix);
     } finally {
       leaveActiveOp();
     }
   }
 
-  public void C_DigestUpdate(byte[] part) throws HsmException {
-    boolean succ = false;
+  public byte[] C_SignX(XiMechanism mechanism, long hKey, byte[] data) throws HsmException {
+    assertLoggedInAndNoActiveOp();
     try {
-      activeOperation.assertMultiOpInitialized(OperationType.DIGEST)
-          .update(part);
-      succ = true;
-    } finally {
-      if (!succ) {
-        leaveActiveOp();
+      enterSimplePartOp();
+      XiKey key = slot.getKey(handle, hKey);
+      if (!(key instanceof XiPrivateKey || key instanceof XiSecretKey)) {
+        throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
+            "C_SignX is not supported for the given key type " + key.getClass().getName());
       }
-    }
-  }
 
-  public void C_DigestKey(long hKey) throws HsmException {
-    boolean succ = false;
-    try {
-      MultiPartOperation op =
-          activeOperation.assertMultiOpInitialized(OperationType.DIGEST);
-      XiKey obj = slot.getKey(handle, hKey);
-      if (!(obj instanceof XiSecretKey)) {
-        throw new HsmException(
-            PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-            "The key to be digested is not a SecretKey.");
-      }
-      op.update(((XiSecretKey) obj).getValue());
-      succ = true;
-    } finally {
-      if (!succ) {
-        leaveActiveOp();
-      }
-    }
-  }
-
-  public byte[] C_DigestFinal() throws HsmException {
-    try {
-      return activeOperation.assertMultiOpInitialized(OperationType.DIGEST)
-          .doFinal();
+      return ((XiPrivateOrSecretKey) key).sign(mechanism, data, slot.getRandom());
     } finally {
       leaveActiveOp();
     }
@@ -245,24 +251,13 @@ public class XiSession {
     assertLoggedInAndNoActiveOp();
 
     XiKey key = slot.getKey(handle, hKey);
-    enterMultiPartOp(new MultiPartOperation(OperationType.SIGN,
-        key, mechanism, slot.getRandom()));
- }
-
-  public byte[] C_Sign(byte[] data) throws HsmException {
-    try {
-      return activeOperation.assertMultiOpInitialized(OperationType.SIGN)
-          .signFinal(data);
-    } finally {
-      leaveActiveOp();
-    }
-  }
+    enterMultiPartOp(new MultiPartOperation(OperationType.SIGN, key, mechanism, slot.getRandom()));
+}
 
   public void C_SignUpdate(byte[] part) throws HsmException {
     boolean succ = false;
     try {
-      activeOperation.assertMultiOpInitialized(OperationType.SIGN)
-          .update(part);
+      activeOperation.assertMultiOpInitialized(OperationType.SIGN).update(part);
       succ = true;
     } finally {
       if (!succ) {
@@ -273,22 +268,72 @@ public class XiSession {
 
   public byte[] C_SignFinal() throws HsmException {
     try {
-      return activeOperation.assertMultiOpInitialized(OperationType.SIGN)
-          .signFinal();
+      return activeOperation.assertMultiOpInitialized(OperationType.SIGN).signFinal();
     } finally {
       leaveActiveOp();
     }
   }
 
-  public long C_DecapsulateKey(XiMechanism mechanism, long hPrivateKey,
-                              byte[] encapsulatedKey, XiTemplate template)
+  public byte[] C_DecryptX(XiMechanism mechanism, long hKey, byte[] cipherText)
       throws HsmException {
+    assertLoggedInAndNoActiveOp();
+    try {
+      enterSimplePartOp();
+      XiKey key = slot.getKey(handle, hKey);
+      if (!(key instanceof XiPrivateKey || key instanceof XiSecretKey)) {
+        throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
+            "C_DecryptX is not supported for the given key type " + key.getClass().getName());
+      }
+
+      return ((XiPrivateOrSecretKey) key).decrypt(mechanism, cipherText);
+    } finally {
+      leaveActiveOp();
+    }
+  }
+
+  public long C_DeriveKey(XiMechanism mechanism, long hBaseKey, XiTemplate template)
+      throws HsmException {
+    assertLoggedInAndNoActiveOp();
+    try {
+      enterSimplePartOp();
+      return doDeriveKey(mechanism, hBaseKey, template);
+    } finally {
+      leaveActiveOp();
+    }
+  }
+
+  private long doDeriveKey(XiMechanism mechanism, long hBaseKey, XiTemplate template)
+      throws HsmException {
+    XiKey key = slot.getKey(handle, hBaseKey);
+    if (!(key instanceof XiPrivateOrSecretKey)) {
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
+          "Key (handle=" + hBaseKey + ") is neither Private Key nor Secret Key");
+    }
+
+    XiPrivateOrSecretKey sKey = (XiPrivateOrSecretKey) key;
+    if (!rw) {
+      // check RW before processing operation.
+      Boolean b = template.removeBool(CKA_TOKEN);
+      boolean inToken = b != null && b;
+      if (inToken) {
+        throw new HsmException(CKR_SESSION_READ_ONLY, null);
+      }
+    }
+
+    applyAttributes(sKey.getDeriveTemplate(), template);
+    byte[] derivedKey = sKey.deriveKey(mechanism, template);
+    template.remove(CKA_VALUE_LEN);
+    template.add(XiAttribute.ofByteArray(CKA_VALUE, derivedKey));
+    return slot.C_CreateObject(handle, rw, template);
+  }
+
+  public long C_DecapsulateKey(XiMechanism mechanism, long hPrivateKey,
+                              byte[] encapsulatedKey, XiTemplate template) throws HsmException {
     assertLoggedInAndNoActiveOp();
 
     try {
       enterSimplePartOp();
-      return doDecapsulateKey(mechanism, hPrivateKey,
-          encapsulatedKey, template);
+      return doDecapsulateKey(mechanism, hPrivateKey, encapsulatedKey, template);
     } finally {
       leaveActiveOp();
     }
@@ -300,13 +345,11 @@ public class XiSession {
     XiPrivateKey privateKey = (XiPrivateKey) slot.getKey(handle, hPrivateKey);
 
     applyAttributes(privateKey.getUnwrapTemplate(), template);
-    long keyClass = template.getNonNullAttribute(PKCS11T.CKA_CLASS)
-        .getLongValue();
+    long keyClass = template.getNonNullAttribute(PKCS11T.CKA_CLASS).getLongValue();
 
     if (PKCS11T.CKO_SECRET_KEY != keyClass) {
       throw new HsmException(PKCS11T.CKR_TEMPLATE_INCONSISTENT,
-          "template.CKA_CLASS invalid: " +
-              PKCS11T.ckmCodeToName(keyClass));
+          "template.CKA_CLASS invalid: " + PKCS11T.ckmCodeToName(keyClass));
     }
 
     byte[] decapKey = privateKey.decapsulateKey(mechanism, encapsulatedKey);
@@ -316,10 +359,9 @@ public class XiSession {
   }
 
   public long[] C_GenerateKeyPair(
-      XiMechanism mechanism, XiTemplate pPublicKeyTemplate,
-      XiTemplate pPrivateKeyTemplate) throws HsmException {
-    return slot.C_GenerateKeyPair(handle, rw,
-        mechanism, pPublicKeyTemplate, pPrivateKeyTemplate);
+      XiMechanism mechanism, XiTemplate pPublicKeyTemplate, XiTemplate pPrivateKeyTemplate)
+      throws HsmException {
+    return slot.C_GenerateKeyPair(handle, rw, mechanism, pPublicKeyTemplate, pPrivateKeyTemplate);
   }
 
   public long C_GenerateKey(XiMechanism mechanism, XiTemplate template)
@@ -354,8 +396,7 @@ public class XiSession {
     activeOperation.clearActiveOp();
   }
 
-  private static void applyAttributes(XiTemplate source, XiTemplate target)
-      throws HsmException {
+  private static void applyAttributes(XiTemplate source, XiTemplate target) throws HsmException {
     if (source == null) {
       return;
     }
@@ -365,8 +406,7 @@ public class XiSession {
       if (tAttr == null) {
         target.add(sAttr);
       } else if (!tAttr.equals(sAttr)) {
-        throw new HsmException(CKR_TEMPLATE_INCONSISTENT,
-            "inconsistent attribute " + tAttr);
+        throw new HsmException(CKR_TEMPLATE_INCONSISTENT, "inconsistent attribute " + tAttr);
       }
     }
   }

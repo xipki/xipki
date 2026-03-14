@@ -1,0 +1,48 @@
+## Adapt me, HSM device capabilities
+HSM_KEYSPECs = [ MLDSA44 MLDSA65 MLDSA87 ED25519 ED448 \
+  RSA2048 RSA2048/PSS RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
+  P256 P384 P521 SM2 BRAINPOOLP256R1 BRAINPOOLP384R1 BRAINPOOLP512R1 ]
+
+echo "+----------------------------Group 1-----------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|     CA-key-spec x caconf-store-type x token-type                     |"
+echo "|  - CA-key-spec:       P256                                           |"
+echo "|  - caconf-store-type: FILE, DB (database)                            |"
+echo "|  - token-type:        PKCS11, PKCS12                                 |"
+echo "+----------------------------------------------------------------------+"
+ca_keyspecs = [ P256 ]
+storetypes  = [ FILE DB ]
+tokentypes  = [ PKCS11 PKCS12 ]
+source demo/doDemo-group.script
+
+echo "+----------------------------Group 2-----------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|          CA-key-spec x caconf-store-type x token-type                |"
+echo "|  - CA-key-spec:       MLDSA44, ED25519, RSA2048, RSA2048/PSS,        |"
+echo "|               :       SM2, BRAINPOOLP256R1, MLDSA44-P256             |"
+echo "|  - caconf-store-type: FILE                                           |"
+echo "|  - token-type:        PKCS11, PKCS12                                 |"
+echo "+----------------------------------------------------------------------+"
+
+ca_keyspecs = [ MLDSA44 ED25519 RSA2048 RSA2048/PSS SM2 BRAINPOOLP256R1 MLDSA44-P256 ]
+storetypes  = [ FILE ]
+tokentypes  = [ PKCS11 PKCS12 ]
+source demo/doDemo-group.script
+
+echo "+----------------------------Group 3-----------------------------------+"
+echo "| This script demonstrates the setup of CAs with all the combinations: |"
+echo "|          CA-key-spec x caconf-store-type x token-type                |"
+echo "|  - CA-key-spec:       MLDSA65, MLDSA87, ED448,                       |"
+echo "|               :       RSA3072, RSA3072/PSS, RSA4096, RSA4096/PSS,    |"
+echo "|               :       P384, P521,                                    |"
+echo "|               :       BRAINPOOLP384R1, BRAINPOOLP512R1               |"
+echo "|               :       MLDSA65-P256, MLDSA87-P521                     |"
+echo "|  - caconf-store-type: FILE                                           |"
+echo "|  - token-type:        PKCS11                                         |"
+echo "+----------------------------------------------------------------------+"
+
+ca_keyspecs = [ MLDSA65 MLDSA87 ED448 RSA3072 RSA3072/PSS RSA4096 RSA4096/PSS \
+                P384 P521 BRAINPOOLP384R1 BRAINPOOLP512R1 MLDSA65-P256 MLDSA87-P521 ]
+storetypes  = [ FILE ]
+tokentypes  = [ PKCS11 ]
+source demo/doDemo-group.script

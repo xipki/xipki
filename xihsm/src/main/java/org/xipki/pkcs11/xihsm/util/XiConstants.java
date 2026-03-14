@@ -11,20 +11,19 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiConstants {
 
   public enum P11MldsaVariant {
 
-    MLDSA44(PKCS11T.CKP_ML_DSA_44,
-        NISTObjectIdentifiers.id_ml_dsa_44),
+    MLDSA44(PKCS11T.CKP_ML_DSA_44, NISTObjectIdentifiers.id_ml_dsa_44),
 
-    MLDSA65(PKCS11T.CKP_ML_DSA_65,
-        NISTObjectIdentifiers.id_ml_dsa_65),
+    MLDSA65(PKCS11T.CKP_ML_DSA_65, NISTObjectIdentifiers.id_ml_dsa_65),
 
-    MLDSA87(PKCS11T.CKP_ML_DSA_87,
-        NISTObjectIdentifiers.id_ml_dsa_87);
+    MLDSA87(PKCS11T.CKP_ML_DSA_87, NISTObjectIdentifiers.id_ml_dsa_87);
 
     private final long code;
 
@@ -48,8 +47,7 @@ public class XiConstants {
         KeyPairGenerator gen = KeyPairGenerator.getInstance(oid.getId());
         return gen.generateKeyPair();
       } catch (Exception e) {
-        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-            "error generating keypair " + name(), e);
+        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error generating keypair " + name(), e);
       }
     }
 
@@ -60,20 +58,16 @@ public class XiConstants {
         }
       }
 
-      throw new HsmException(PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID,
-          "unknown MLDSA variant " + code);
+      throw new HsmException(PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID, "unknown MLDSA variant " + code);
     }
 
   }
 
   public enum P11MlkemVariant {
 
-    MLKEM512 (PKCS11T.CKP_ML_KEM_512, NISTObjectIdentifiers.id_alg_ml_kem_512),
-
-    MLKEM768 (PKCS11T.CKP_ML_KEM_768, NISTObjectIdentifiers.id_alg_ml_kem_768),
-
-    MLKEM1024(PKCS11T.CKP_ML_KEM_1024,
-        NISTObjectIdentifiers.id_alg_ml_kem_1024);
+    MLKEM512 (PKCS11T.CKP_ML_KEM_512,  NISTObjectIdentifiers.id_alg_ml_kem_512),
+    MLKEM768 (PKCS11T.CKP_ML_KEM_768,  NISTObjectIdentifiers.id_alg_ml_kem_768),
+    MLKEM1024(PKCS11T.CKP_ML_KEM_1024, NISTObjectIdentifiers.id_alg_ml_kem_1024);
 
     private final long code;
 
@@ -92,15 +86,6 @@ public class XiConstants {
       return oid;
     }
 
-    public static P11MlkemVariant ofOid(String oid) {
-      for (P11MlkemVariant v : P11MlkemVariant.values()) {
-        if (v.oid.getId().equals(oid)) {
-          return v;
-        }
-      }
-      return null;
-    }
-
     public static P11MlkemVariant ofCode(long code) throws HsmException {
       for (P11MlkemVariant variant : P11MlkemVariant.values()) {
         if (code == variant.code) {
@@ -108,8 +93,7 @@ public class XiConstants {
         }
       }
 
-      throw new HsmException(PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID,
-          "unknown MLKEM variant " + code);
+      throw new HsmException(PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID, "unknown MLKEM variant " + code);
     }
 
   }

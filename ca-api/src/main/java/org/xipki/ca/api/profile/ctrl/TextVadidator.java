@@ -60,8 +60,7 @@ public abstract class TextVadidator {
 
   public static final TextVadidator FQDN = new FQDNValidator();
 
-  private static final LruCache<String, TextVadidator> cache =
-      new LruCache<>(200);
+  private static final LruCache<String, TextVadidator> cache = new LruCache<>(200);
 
   private TextVadidator() {
   }
@@ -73,8 +72,7 @@ public abstract class TextVadidator {
   public static TextVadidator compile(String regex) {
     if (StringUtil.orEqualsIgnoreCase(regex, ":COUNTRY", "COUNTRY")) {
       return COUNTRY;
-    } else if (StringUtil.orEqualsIgnoreCase(regex,
-        ":DATE_OF_BIRTH", "DATE_OF_BIRTH")) {
+    } else if (StringUtil.orEqualsIgnoreCase(regex, ":DATE_OF_BIRTH", "DATE_OF_BIRTH")) {
       return DATE_OF_BIRTH;
     } else if (StringUtil.orEqualsIgnoreCase(regex, ":FQDN", "FQDN")) {
       return FQDN;

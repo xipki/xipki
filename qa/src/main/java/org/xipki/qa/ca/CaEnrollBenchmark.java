@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * CA enrollment benchmark.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaEnrollBenchmark extends BenchmarkExecutor {
@@ -54,8 +54,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     }
 
     private void testNext(EnrollCertsRequest request) throws Exception {
-      EnrollOrPollCertsResponse sdkResponse =
-          client.enrollCerts(caName, request);
+      EnrollOrPollCertsResponse sdkResponse = client.enrollCerts(caName, request);
       parseEnrollCertResult(sdkResponse, num);
     } // method testNext
 
@@ -63,8 +62,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private static final String CONF_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CaEnrollBenchmark.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaEnrollBenchmark.class);
 
   private final CaEnrollBenchEntry benchmarkEntry;
 
@@ -85,7 +83,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
   private final boolean caGenKeyPair;
 
   public CaEnrollBenchmark(String caName, CaEnrollBenchEntry benchmarkEntry,
-                           int maxRequests, int num, String description)
+                          int maxRequests, int num, String description)
       throws Exception {
     super(description);
     this.caName = caName;
@@ -120,11 +118,9 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
       EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
-      entry.setSubject(new X500NameType(
-          benchmarkEntry.getX500Name(thisIndex).getEncoded()));
+      entry.setSubject(new X500NameType(benchmarkEntry.getX500Name(thisIndex).getEncoded()));
       if (!caGenKeyPair) {
-        entry.setSubjectPublicKey(
-            benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
+        entry.setSubjectPublicKey(benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
       }
       entry.setCertprofile(benchmarkEntry.getCertprofile());
       entry.setCertReqId(BigInteger.valueOf(i + 1));
@@ -137,21 +133,19 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     return req;
   } // method nextCertRequest
 
-  private void parseEnrollCertResult(
-      EnrollOrPollCertsResponse response, int numCerts)
+  private void parseEnrollCertResult(EnrollOrPollCertsResponse response, int numCerts)
       throws Exception {
     EnrollOrPollCertsResponse.Entry[] entries = response.entries();
     int n = entries == null ? 0 : entries.length;
     if (n != numCerts) {
-      throw new Exception("expected " + numCerts +
-          " CertResponse, but returned " + n);
+      throw new Exception("expected " + numCerts + " CertResponse, but returned " + n);
     }
 
     for (int i = 0; i < numCerts; i++) {
       EnrollOrPollCertsResponse.Entry certResp = entries[i];
       if (certResp.error() != null) {
-        throw new Exception("CertReqId " + certResp.id()
-            + ": server returned PKIStatus: " + certResp.error());
+        throw new Exception("CertReqId " + certResp.id() +
+            ": server returned PKIStatus: " + certResp.error());
       }
     }
   } // method parseEnrollCertResult

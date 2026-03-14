@@ -23,11 +23,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class CertprofileFactoryRegister {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CertprofileFactoryRegister.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertprofileFactoryRegister.class);
 
-  private final ConcurrentLinkedDeque<CertprofileFactory> factories =
-      new ConcurrentLinkedDeque<>();
+  private final ConcurrentLinkedDeque<CertprofileFactory> factories = new ConcurrentLinkedDeque<>();
 
   /**
    * Retrieves the types of supported certificate profiles.
@@ -66,8 +64,7 @@ public class CertprofileFactoryRegister {
    * @throws ObjectCreationException
    *           If certificate profile could not be created.
    */
-  public Certprofile newCertprofile(String type)
-      throws ObjectCreationException {
+  public Certprofile newCertprofile(String type) throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (CertprofileFactory service : factories) {
@@ -104,8 +101,7 @@ public class CertprofileFactoryRegister {
     if (factories.remove(factory)) {
       LOG.info("removed CertprofileFactory binding for {}", factory);
     } else {
-      LOG.info("no CertprofileFactory binding found to remove for '{}'",
-          factory);
+      LOG.info("no CertprofileFactory binding found to remove for '{}'", factory);
     }
   } // method unregistFactory
 

@@ -29,8 +29,7 @@ import java.io.IOException;
 
 class HttpRaServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(HttpRaServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpRaServlet.class);
 
   private final boolean logReqResp;
 
@@ -41,8 +40,7 @@ class HttpRaServlet {
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       service0(req, false).fillResponse(resp);
@@ -53,14 +51,12 @@ class HttpRaServlet {
     }
   }
 
-  private HttpResponse service0(XiHttpRequest req, boolean post)
-      throws IOException {
+  private HttpResponse service0(XiHttpRequest req, boolean post) throws IOException {
     byte[] reqBody  = null;
     byte[] respBody = null;
     try {
       String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-      reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream())
-          : null;
+      reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
 
       SdkResponse response = responder.service(path, reqBody, req);
       respBody = response == null ? null : response.encode();
@@ -104,10 +100,8 @@ class HttpRaServlet {
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
       if (logReqResp && LOG.isDebugEnabled()) {
-        String reqBodyStr = reqBody == null ? null
-            : Base64.encodeToString( reqBody, true);
-        String respBodyStr = respBody == null ? null
-            : Base64.encodeToString(respBody, true);
+        String reqBodyStr = reqBody == null ? null : Base64.encodeToString( reqBody, true);
+        String respBodyStr = respBody == null ? null : Base64.encodeToString(respBody, true);
         LOG.debug("HTTP RA path: {}\nRequest:\n{}\nResponse:\n{}",
             req.getRequestURI(), reqBodyStr, respBodyStr);
       }

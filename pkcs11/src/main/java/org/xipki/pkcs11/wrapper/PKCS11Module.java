@@ -74,8 +74,7 @@ public class PKCS11Module {
    *
    * @param modulePath      The PKCS#11 module path.
    */
-  protected PKCS11Module(String modulePath)
-      throws IOException {
+  protected PKCS11Module(String modulePath) {
     Args.notNull(modulePath, "modulePath");
     this.pkcs11 = new LogPKCS11(modulePath, this);
     this.modulePath = Args.notNull(modulePath, "modulePath");
@@ -146,8 +145,7 @@ public class PKCS11Module {
 
     // Vendor code
     try {
-      this.hsmVendor = HsmVendor.getInstance(modulePath, moduleInfo,
-          tokenMechanisms);
+      this.hsmVendor = HsmVendor.getInstance(modulePath, moduleInfo, tokenMechanisms);
     } catch (Exception e) {
       LOG.error("error initializing HsmVendor", e);
       throw new PKCS11Exception(CKR_GENERAL_ERROR);
@@ -230,6 +228,10 @@ public class PKCS11Module {
     return hsmVendor == null ? Integer.MAX_VALUE : hsmVendor.getMaxFrameSize();
   }
 
+  public boolean supportsAttribute(long attrType) {
+    return hsmVendor == null || hsmVendor.supportsAttribute(attrType);
+  }
+
   public boolean supportsMultipart(long ckm, long flagBit) {
     return hsmVendor == null || hsmVendor.supportsMultipart(ckm, flagBit);
   }
@@ -243,14 +245,12 @@ public class PKCS11Module {
   }
 
   public byte[] prepareGcmIv(SecureRandom rnd) {
-    switch (getVendorEnum()) {
-      case CLOUDHSM:
-        return new byte[12];
-      default:
-        byte[] bytes = new byte[12];
-        rnd.nextBytes(bytes);
-        return bytes;
+    if (Objects.requireNonNull(getVendorEnum()) == VendorEnum.CLOUDHSM) {
+      return new byte[12];
     }
+    byte[] bytes = new byte[12];
+    rnd.nextBytes(bytes);
+    return bytes;
   }
 
   public boolean hasSpecialBehaviour(SpecialBehaviour vendorBehavior) {
@@ -258,13 +258,11 @@ public class PKCS11Module {
   }
 
   public boolean hasAnySpecialBehaviour(SpecialBehaviour... vendorBehaviors) {
-    return hsmVendor != null
-        && hsmVendor.hasAnySpecialBehaviour(vendorBehaviors);
+    return hsmVendor != null && hsmVendor.hasAnySpecialBehaviour(vendorBehaviors);
   }
 
   public boolean hasAllSpecialBehaviours(SpecialBehaviour... vendorBehaviors) {
-    return hsmVendor != null
-        && hsmVendor.hasAllSpecialBehaviours(vendorBehaviors);
+    return hsmVendor != null && hsmVendor.hasAllSpecialBehaviours(vendorBehaviors);
   }
 
   public long genericToVendorCode(Category category, long genericCode) {
@@ -278,19 +276,13 @@ public class PKCS11Module {
   }
 
   public String codeToName(Category category, long code) {
-    if (hsmVendor != null) {
-      return hsmVendor.codeToName(category, code);
-    } else {
-      return PKCS11T.codeToName(category, code);
-    }
+    return (hsmVendor != null)
+        ? hsmVendor.codeToName(category, code) : PKCS11T.codeToName(category, code);
   }
 
   public Long nameToCode(Category category, String name) {
-    if (hsmVendor != null) {
-      return hsmVendor.nameToCode(category, name);
-    } else {
-      return PKCS11T.nameToCode(category, name);
-    }
+    return (hsmVendor != null)
+        ? hsmVendor.nameToCode(category, name) : PKCS11T.nameToCode(category, name);
   }
 
   /**

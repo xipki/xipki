@@ -3,7 +3,11 @@
 
 package org.xipki.security.pkcs12.test;
 
+import org.junit.Assume;
 import org.xipki.security.SignAlgo;
+
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
 
 /**
  * JUnit tests to test the signature creation and verification of PKCS#12 token
@@ -25,7 +29,15 @@ public class Pkcs12SHAKE256withRSAPSSTest extends Pkcs12SignVerifyTest {
 
   @Override
   protected SignAlgo getSignatureAlgorithm() {
-    return SignAlgo.RSAPSS_SHAKE256;
+    SignAlgo signAlgo = SignAlgo.RSAPSS_SHAKE256;
+    boolean supported = true;
+    try {
+      Signature.getInstance(signAlgo.jceName());
+    } catch (NoSuchAlgorithmException e) {
+      supported = false;
+    }
+    Assume.assumeTrue(signAlgo.jceName() + " is not supported", supported);
+    return signAlgo;
   }
 
 }

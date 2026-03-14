@@ -61,12 +61,10 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(4).writeTextString(transactionId)
-        .writeLongObj(confirmWaitTime).writeObjects(entries)
-        .writeByteStrings(extraCerts);
+        .writeLongObj(confirmWaitTime).writeObjects(entries).writeByteStrings(extraCerts);
   }
 
-  public static EnrollOrPollCertsResponse decode(byte[] encoded)
-      throws CodecException {
+  public static EnrollOrPollCertsResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("EnrollOrPollCertsResponse", decoder, 4);
       EnrollOrPollCertsResponse ret = new EnrollOrPollCertsResponse();
@@ -76,8 +74,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       ret.setExtraCerts(decoder.readByteStrings());
       return ret;
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, EnrollOrPollCertsResponse.class), ex);
     }
   }
 
@@ -91,8 +88,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
     private final byte[] privateKey;
 
-    public Entry(BigInteger id, ErrorEntry error, byte[] cert,
-                 byte[] privateKey) {
+    public Entry(BigInteger id, ErrorEntry error, byte[] cert, byte[] privateKey) {
       this.id = id;
       this.error = error;
       this.cert = cert;
@@ -134,8 +130,7 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder)
-        throws CodecException {
+    public static Entry[] decodeArray(CborDecoder decoder) throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

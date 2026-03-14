@@ -28,21 +28,17 @@ import java.util.Map;
 
 class ResponseTemplate {
 
-  private static final Map<HashAlgo, byte[]> extnCerthashPrefixMap =
-      new HashMap<>();
+  private static final Map<HashAlgo, byte[]> extnCerthashPrefixMap = new HashMap<>();
 
   private static final byte[] extnInvalidityDate;
 
   private static final byte[] extnArchiveCutoff;
 
-  private static final byte[] revokedInfoNoReasonPrefix =
-      new byte[]{(byte) 0xA1, 0x11};
+  private static final byte[] revokedInfoNoReasonPrefix = new byte[]{(byte) 0xA1, 0x11};
 
-  private static final byte[] revokedInfoWithReasonPrefix =
-      new byte[]{(byte) 0xA1, 0x16};
+  private static final byte[] revokedInfoWithReasonPrefix = new byte[]{(byte) 0xA1, 0x16};
 
-  private static final byte[] reasonPrefix =
-      new byte[]{(byte) 0xa0, 0x03, 0x0a, 0x01};
+  private static final byte[] reasonPrefix = new byte[]{(byte) 0xa0, 0x03, 0x0a, 0x01};
 
   static {
     // CertHash
@@ -65,19 +61,16 @@ class ResponseTemplate {
       extnCerthashPrefixMap.put(h, prefix);
     }
 
-    Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE,
-        false, new byte[17]);
+    Extension extension = new ExtendedExtension(OID.ID_INVALIDITY_DATE, false, new byte[17]);
     extnInvalidityDate = new byte[extension.encodedLength()];
     extension.write(extnInvalidityDate, 0);
 
-    extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF,
-        false, new byte[17]);
+    extension = new ExtendedExtension(OID.ID_PKIX_OCSP_ARCHIVE_CUTOFF, false, new byte[17]);
     extnArchiveCutoff = new byte[extension.encodedLength()];
     extension.write(extnArchiveCutoff, 0);
   } // method static
 
-  public static WritableOnlyExtension getCertHashExtension(
-      HashAlgo hashAlgo, byte[] certHash) {
+  public static WritableOnlyExtension getCertHashExtension(HashAlgo hashAlgo, byte[] certHash) {
     if (hashAlgo.length() != certHash.length) {
       throw new IllegalArgumentException("hashAlgo and certHash do not match");
     }
@@ -90,8 +83,7 @@ class ResponseTemplate {
     return new WritableOnlyExtension(rv);
   } // method getCertHashExtension
 
-  public static WritableOnlyExtension getInvalidityDateExtension(
-      Instant invalidityDate) {
+  public static WritableOnlyExtension getInvalidityDateExtension(Instant invalidityDate) {
     int len = extnInvalidityDate.length;
     byte[] encoded = new byte[len];
     System.arraycopy(extnInvalidityDate, 0, encoded, 0, len - 17);
@@ -99,8 +91,7 @@ class ResponseTemplate {
     return new WritableOnlyExtension(encoded);
   } // method getInvalidityDateExtension
 
-  public static WritableOnlyExtension getArchiveOffExtension(
-      Instant archiveCutoff) {
+  public static WritableOnlyExtension getArchiveOffExtension(Instant archiveCutoff) {
     int len = extnArchiveCutoff.length;
     byte[] encoded = new byte[len];
     System.arraycopy(extnArchiveCutoff, 0, encoded, 0, len - 17);
@@ -108,8 +99,7 @@ class ResponseTemplate {
     return new WritableOnlyExtension(encoded);
   } // method getArchiveOffExtension
 
-  public static byte[] getEncodeRevokedInfo(
-      CrlReason reason, Instant revocationTime) {
+  public static byte[] getEncodeRevokedInfo(CrlReason reason, Instant revocationTime) {
     byte[] encoded;
     if (reason == null) {
       encoded = new byte[19];

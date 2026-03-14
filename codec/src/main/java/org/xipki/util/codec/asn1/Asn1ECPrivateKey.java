@@ -28,8 +28,7 @@ public class Asn1ECPrivateKey {
 
   private final byte[] publicKey;
 
-  public Asn1ECPrivateKey(byte[] privateKey, String namedCurve,
-                          byte[] publicKey) {
+  public Asn1ECPrivateKey(byte[] privateKey, String namedCurve, byte[] publicKey) {
     this.privateKey = Args.notNull(privateKey, "privateKey");
     this.namedCurve = namedCurve;
     this.publicKey = publicKey;
@@ -47,8 +46,7 @@ public class Asn1ECPrivateKey {
     return publicKey;
   }
 
-  public static Asn1ECPrivateKey getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1ECPrivateKey getInstance(byte[] encoded) throws InvalidKeySpecException {
     String errMsg = "invalid ECPrivateKey";
     AtomicInteger offset = new AtomicInteger();
 
@@ -62,16 +60,14 @@ public class Asn1ECPrivateKey {
       byte[] privateKey = Asn1Util.readOctetsFromASN1BitString(encoded, offset);
 
       // AlgorithmIdentifier
-      Asn1AlgorithmIdentifier algId = Asn1AlgorithmIdentifier.getInstance(
-          encoded, offset);
+      Asn1AlgorithmIdentifier algId = Asn1AlgorithmIdentifier.getInstance(encoded, offset);
       byte[] publicKey = null;
       String namedCurve = null;
 
       while (offset.get() < endIndex) {
         byte tag = encoded[offset.get()];
         if (tag == Asn1Const.TAG_EXPLICIT_ALT_0) {
-          namedCurve = Asn1Util.decodeOid(
-              Asn1Util.readValue(encoded, offset)); // explicit
+          namedCurve = Asn1Util.decodeOid(Asn1Util.readValue(encoded, offset)); // explicit
         } else if (tag == Asn1Const.TAG_EXPLICIT_ALT_1) {
           publicKey = Asn1Util.readValue(encoded, offset); // explicit
           break;

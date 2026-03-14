@@ -38,8 +38,7 @@ import java.util.Map;
 
 public class CmpHttpServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CmpHttpServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CmpHttpServlet.class);
 
   private static final String CT_REQUEST = "application/pkixcmp";
 
@@ -51,15 +50,13 @@ public class CmpHttpServlet {
 
   private final CmpResponder responder;
 
-  public CmpHttpServlet(boolean logReqResp, String reverseProxyMode,
-                        CmpResponder responder) {
+  public CmpHttpServlet(boolean logReqResp, String reverseProxyMode, CmpResponder responder) {
     this.logReqResp = logReqResp;
     this.reverseProxyMode = reverseProxyMode;
     this.responder = Args.notNull(responder, "responder");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if ("POST".equalsIgnoreCase(method)) {
       doPost(req).fillResponse(resp);
@@ -80,9 +77,8 @@ public class CmpHttpServlet {
       String reqContentType = req.getHeader("Content-Type");
       if (!CT_REQUEST.equalsIgnoreCase(reqContentType)) {
         String message = "unsupported media type " + reqContentType;
-        throw new HttpRespAuditException(
-            HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE, message,
-            AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE,
+            message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       String caName = null;
@@ -96,8 +92,8 @@ public class CmpHttpServlet {
       if (caName == null) {
         String message = "no CA is specified";
         LOG.warn(message);
-        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND, message,
-            AuditLevel.INFO, AuditStatus.FAILED);
+        throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND,
+            message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
       event.addEventData(CaAuditConstants.NAME_ca, caName);
@@ -112,10 +108,8 @@ public class CmpHttpServlet {
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      String certprofile = req.getHeader(
-          BaseCmpResponder.HTTP_HEADER_certprofile);
-      String groupEnroll = req.getHeader(
-          BaseCmpResponder.HTTP_HEADER_groupenroll);
+      String certprofile = req.getHeader(BaseCmpResponder.HTTP_HEADER_certprofile);
+      String groupEnroll = req.getHeader(BaseCmpResponder.HTTP_HEADER_groupenroll);
 
       Map<String, String> reqHeaders = null;
       if (certprofile != null || groupEnroll != null) {
@@ -133,8 +127,7 @@ public class CmpHttpServlet {
 
       encodedPkiResp = pkiResp.getEncoded();
 
-      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null,
-          encodedPkiResp);
+      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedPkiResp);
     } catch (Throwable th) {
       AuditLevel auditLevel;
       AuditStatus auditStatus;

@@ -70,8 +70,7 @@ public class CodecException extends Exception {
      * @param character unexpected character value (zero based).
      */
     public UnexpectedCharException(final int position, final char character) {
-      super("Unexpected character '" + character + "' at position " +
-          position + ".");
+      super("Unexpected character '" + character + "' at position " + position + ".");
     }
 
   }

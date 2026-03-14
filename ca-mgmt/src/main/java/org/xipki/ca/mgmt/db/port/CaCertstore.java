@@ -197,8 +197,7 @@ public class CaCertstore implements JsonEncodable {
       this.crlScope = crlScope;
     }
 
-    public void setRevocation(int revocationReason, long revocationTime,
-                              Long invalidityTime) {
+    public void setRevocation(int revocationReason, long revocationTime, Long invalidityTime) {
       this.rr = revocationReason;
       this.rt = revocationTime;
       this.rit = invalidityTime;
@@ -292,13 +291,13 @@ public class CaCertstore implements JsonEncodable {
 
       return ret.put("file", file).put("privateKeyFile", privateKeyFile)
           .put("caId", caId).put("sn", sn).put("pid", pid).put("rid", rid)
-          .put("ee",  ee).put("update", update).put("rev", rev).put("rr", rr)
+          .put("ee", ee).put("update", update).put("rev", rev).put("rr", rr)
           .put("rt", rt).put("rit", rit).put("tid", tid).put("fpRs", fpRs)
           .put("crlScope", crlScope).put("rs", rs);
     }
 
     public static Cert parse(JsonMap json) throws CodecException {
-      Cert ret = new Cert(json.getNnInt("id"),
+      Cert ret = new Cert(json.getNnLong("id"),
           json.getString("file"),   json.getNnInt("caId"),
           json.getString("sn"),     json.getNnInt("pid"),
           json.getNnInt("rid"),     json.getNnBool("ee"),
@@ -389,12 +388,11 @@ public class CaCertstore implements JsonEncodable {
     public JsonMap toCodec() {
       JsonMap ret = new JsonMap();
       super.toJson(ret);
-      return ret.put("caId", caId).put("file", file)
-          .put("crlNo", crlNo).put("crlScope", crlScope);
+      return ret.put("caId", caId).put("file", file).put("crlNo", crlNo).put("crlScope", crlScope);
     }
 
     public static Crl parse(JsonMap json) throws CodecException {
-      return new Crl(json.getNnInt("id"), json.getNnInt("caId"),
+      return new Crl(json.getNnLong("id"), json.getNnInt("caId"),
           json.getNnString("file"), json.getNnString("crlNo"),
           json.getNnInt("crlScope"));
     }
@@ -480,7 +478,6 @@ public class CaCertstore implements JsonEncodable {
   public static class Ca extends IdName {
 
     private final String revInfo;
-
     private final byte[] cert;
 
     public Ca(int id, String name, byte[] cert, String revInfo) {
@@ -506,7 +503,7 @@ public class CaCertstore implements JsonEncodable {
 
     public static Ca parse(JsonMap json) throws CodecException {
       return new Ca(json.getNnInt("id"), json.getNnString("name"),
-          json.getNnBytes("certs"), json.getString("revInfo"));
+          json.getNnBytes("cert"), json.getString("revInfo"));
     }
 
   }

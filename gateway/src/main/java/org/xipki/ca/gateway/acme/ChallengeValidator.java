@@ -3,8 +3,6 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.asn1.ASN1IA5String;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.slf4j.Logger;
@@ -16,6 +14,7 @@ import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.security.OIDs;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
 import org.xipki.util.extra.http.HttpRespContent;
@@ -42,6 +41,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -63,8 +63,7 @@ public class ChallengeValidator implements Runnable {
     }
   };
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(ChallengeValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ChallengeValidator.class);
 
   private final AcmeRepo repo;
 
@@ -134,8 +133,7 @@ public class ChallengeValidator implements Runnable {
           try {
             XiHttpClient client = new XiHttpClient();
             HttpRespContent authzResp = client.httpGet(url);
-            receivedAuthorization = new String(authzResp.content(),
-                StandardCharsets.UTF_8);
+            receivedAuthorization = new String(authzResp.content(), StandardCharsets.UTF_8);
           } catch (IOException ex) {
             String message =  "error while validating challenge " + challId +
                               " for identifier " + identifier;
@@ -149,8 +147,7 @@ public class ChallengeValidator implements Runnable {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
-            try (SSLSocket socket = (SSLSocket)
-                factory.createSocket(identifier.value(), 443)) {
+            try (SSLSocket socket = (SSLSocket) factory.createSocket(identifier.value(), 443)) {
               SSLParameters params = socket.getSSLParameters();
               params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
               params.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
@@ -159,29 +156,24 @@ public class ChallengeValidator implements Runnable {
               SSLSession session = socket.getSession();
               certs = session.getPeerCertificates();
             }
-          } catch (NoSuchAlgorithmException | IOException
-                   | KeyManagementException ex) {
+          } catch (NoSuchAlgorithmException | IOException | KeyManagementException ex) {
             String message =  "error while validating challenge " + challId +
                               " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
           }
 
-          boolean match = certs != null && certs.length > 0
-              && certs[0] instanceof X509Certificate;
+          boolean match = certs != null && certs.length > 0 && certs[0] instanceof X509Certificate;
           // check the SAN
           if (match) {
             X509Certificate cert = (X509Certificate) certs[0];
-            byte[] extnValue = cert.getExtensionValue(
-                OIDs.Extn.subjectAlternativeName.getId());
-            byte[] octets = ASN1OctetString.getInstance(extnValue).getOctets();
+            byte[] extnValue = cert.getExtensionValue(OIDs.Extn.subjectAlternativeName.getId());
+            byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
             GeneralNames generalNames = GeneralNames.getInstance(octets);
             GeneralName[] names = generalNames.getNames();
-            match = (names != null
-                    && names.length == 1
-                    && names[0].getTagNo() == GeneralName.dNSName);
+            match = (names != null && names.length == 1
+                      && names[0].getTagNo() == GeneralName.dNSName);
             if (match) {
-              String sanValue = ASN1IA5String.getInstance(
-                                  names[0].getName()).getString();
+              String sanValue = Asn1Util.getIA5String(names[0].getName());
               match = identifier.value().equals(sanValue);
             }
           }
@@ -192,73 +184,38 @@ public class ChallengeValidator implements Runnable {
             match = cert.getCriticalExtensionOIDs().contains(
                       OIDs.ACME.id_pe_acmeIdentifier.getId());
             if (match) {
-              byte[] extnValue = cert.getExtensionValue(
-                  OIDs.ACME.id_pe_acmeIdentifier.getId());
-              byte[] octets = ASN1OctetString.getInstance(extnValue)
-                              .getOctets();
-              byte[] value = ASN1OctetString.getInstance(octets).getOctets();
-              receivedAuthorization = Base64.getUrlNoPaddingEncoder()
-                  .encodeToString(value);
+              byte[] extnValue = cert.getExtensionValue(OIDs.ACME.id_pe_acmeIdentifier.getId());
+              byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
+              byte[] value  = Asn1Util.getOctetStringOctets(octets);
+              receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(value);
             }
           }
           break;
         }
         case AcmeConstants.DNS_01: {
-          String host = identifier.value();
-          if (host.startsWith("*.")) {
-            host = host.substring(2);
-          }
-
-          LOG.debug("dns-01: host='{}'", identifier.value());
-
-          String acmeDomain = "_acme-challenge." + host;
-          Record[] records = null;
-          try {
-            records = new Lookup(acmeDomain, Type.TXT).run();
-          } catch (TextParseException ex) {
-            String message =  "error while validating challenge " + challId +
-                              " for identifier " + identifier;
-            LogUtil.error(LOG, ex, message);
-          }
-
-          String expectedName = acmeDomain + ".";
-          if (records != null) {
-            for (Record record : records) {
-              TXTRecord txt = (TXTRecord) record;
-              String name = txt.getName().toString();
-              if (!expectedName.equals(name)) {
-                continue;
-              }
-
-              receivedAuthorization = txt.getStrings().get(0);
-            }
-          }
+          receivedAuthorization = validateDns(identifier, challId);
           break;
         }
         default: {
-          throw new RuntimeException("should not reach here, unknown " +
-              "challenge type '" + type + "'");
+          throw new RuntimeException("unknown challenge type '" + type + "'");
         }
       }
 
       boolean authorizationValid = false;
       if (receivedAuthorization != null) {
-        authorizationValid = chall.expectedAuthorization()
-            .equals(receivedAuthorization.trim());
+        authorizationValid = chall.expectedAuthorization().equals(receivedAuthorization.trim());
       }
 
       if (authorizationValid) {
         LOG.info("validated challenge {}/{} for identifier {}/{}",
-            chall.type(), challId, identifier.type(),
-            identifier.value());
+            chall.type(), challId, identifier.type(), identifier.value());
         chall.setValidated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
         chall.setStatus(ChallengeStatus.valid);
       } else {
-        LOG.warn("validation failed for challenge {}/{} for identifier " +
-                "{}/{}: received='{}', expected='{}'",
-            chall.type(), challId, identifier.type(),
-            identifier.value(), receivedAuthorization,
-            chall.expectedAuthorization());
+        LOG.warn("validation failed for challenge {}/{} for identifier {}/{} " +
+                "(receivedPresent={}, expectedPresent={})",
+            chall.type(), challId, identifier.type(), identifier.value(),
+            receivedAuthorization != null, chall.expectedAuthorization() != null);
         chall.setStatus(ChallengeStatus.invalid);
       }
 
@@ -267,6 +224,40 @@ public class ChallengeValidator implements Runnable {
       }
     }
 
+  }
+
+  private static String validateDns(AcmeIdentifier identifier, ChallId challId) {
+    String host = identifier.value();
+    if (host.startsWith("*.")) {
+      host = host.substring(2);
+    }
+
+    LOG.debug("dns-01: host='{}'", identifier.value());
+
+    String acmeDomain = "_acme-challenge." + host;
+    Record[] records = null;
+    try {
+      records = new Lookup(acmeDomain, Type.TXT).run();
+    } catch (TextParseException ex) {
+      String message =  "error while validating challenge " + challId +
+                        " for identifier " + identifier;
+      LogUtil.error(LOG, ex, message);
+    }
+
+    String expectedName = acmeDomain + ".";
+    if (records != null) {
+      for (Record record : records) {
+        TXTRecord txt = (TXTRecord) record;
+        String name = txt.getName().toString();
+        if (!expectedName.equals(name)) {
+          continue;
+        }
+
+        return txt.getStrings().get(0);
+      }
+    }
+
+    return null;
   }
 
   public void close() {

@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.xipki.ca.gateway.PasswordHash;
 import org.xipki.security.util.KeyUtil;
 
-import java.security.Security;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,9 +22,7 @@ public class PasswordHashTest {
 
   @Before
   public void addBouncyCastleProvider() {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
   }
 
   @Test

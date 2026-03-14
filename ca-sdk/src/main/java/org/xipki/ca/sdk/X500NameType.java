@@ -70,8 +70,7 @@ public class X500NameType extends SdkEncodable {
     }
 
     try {
-      name = (encoded != null) ? X500Name.getInstance(encoded)
-          : new X500Name(text);
+      name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
       return name;
     } catch (Exception e) {
       throw new IOException("error parsing X500Name " + (encoded == null
@@ -88,8 +87,7 @@ public class X500NameType extends SdkEncodable {
     }
   }
 
-  public static X500NameType decode(CborDecoder decoder)
-      throws CodecException {
+  public static X500NameType decode(CborDecoder decoder) throws CodecException {
     CborType type = decoder.peekType();
     if (CborDecoder.isNull(type)) {
       decoder.readNull();

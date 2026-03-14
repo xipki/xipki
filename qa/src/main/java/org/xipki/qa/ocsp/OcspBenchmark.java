@@ -55,8 +55,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(OcspBenchmark.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
 
   private final OcspRequestor client;
 
@@ -109,8 +108,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
   public boolean ask(BigInteger[] serialNumbers) {
     OCSPResp ocspResp;
     try {
-      ocspResp = client.ask(issuerCert, serialNumbers, responderUrl,
-          requestOptions, null);
+      ocspResp = client.ask(issuerCert, serialNumbers, responderUrl, requestOptions, null);
     } catch (Exception e) {
       LOG.warn("error client.ask", e);
       return false;
@@ -125,8 +123,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
     }
 
     if (ocspResp.getStatus() != 0) {
-      LOG.warn("bad response: response status is other than OK: {}",
-          ocspResp.getStatus());
+      LOG.warn("bad response: response status is other than OK: {}", ocspResp.getStatus());
       return false;
     }
 

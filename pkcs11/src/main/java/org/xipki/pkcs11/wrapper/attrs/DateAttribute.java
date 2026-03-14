@@ -41,11 +41,10 @@ public class DateAttribute extends Attribute {
     } else {
       //poor memory/performance behavior, consider alternatives
       ZonedDateTime utcTime = ZonedDateTime.ofInstant(value, ZoneOffset.UTC);
-      int year  = utcTime.getYear();
       int month = utcTime.getMonthValue();
       int day   = utcTime.getDayOfMonth();
 
-      String yearT  = Integer.toString(year);
+      String yearT  = Integer.toString(utcTime.getYear());
       String monthT = (month < 10 ? "0" + month : Integer.toString(month));
       String dayT   = (  day < 10 ? "0" +   day : Integer.toString(day));
       return new CkDate(yearT + monthT + dayT);
@@ -53,11 +52,7 @@ public class DateAttribute extends Attribute {
   }
 
   public CkDate getCkDateValue() {
-    if (isNullValue()) {
-      return null;
-    }
-
-    return (CkDate) value;
+    return isNullValue() ? null : (CkDate) value;
   }
 
   /**

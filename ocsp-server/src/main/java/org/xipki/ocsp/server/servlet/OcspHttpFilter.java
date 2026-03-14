@@ -26,8 +26,7 @@ import java.io.IOException;
 
 public class OcspHttpFilter implements XiHttpFilter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(OcspHttpFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspHttpFilter.class);
 
   private static final String DFLT_CFG = "etc/ocsp/ocsp.json";
 
@@ -45,12 +44,8 @@ public class OcspHttpFilter implements XiHttpFilter {
     OcspConf conf;
     try {
       conf = OcspConf.readConfFromFile(DFLT_CFG);
-    } catch (IOException ex) {
-      throw new IOException("could not parse configuration file "
-          + DFLT_CFG, ex);
     } catch (InvalidConfException ex) {
-      throw new InvalidConfException("could not parse configuration file "
-          + DFLT_CFG, ex);
+      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -86,8 +81,7 @@ public class OcspHttpFilter implements XiHttpFilter {
   }
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     // In Tomcat, req.getServletPath() will delete one %2F (/) if the URI
     // contains %2F%F (aka // after decoding). This may happen if the OCSP
     // request is sent via GET.

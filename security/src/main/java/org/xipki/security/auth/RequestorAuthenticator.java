@@ -3,29 +3,33 @@
 
 package org.xipki.security.auth;
 
+import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkix.X509Cert;
 
 /**
+ * Authenticates requestors and resolves protocol-specific requestor identities.
  *
  * @author Lijun Liao (xipki)
  */
 public interface RequestorAuthenticator {
 
+  void init(String conf) throws XiSecurityException;
+
   /**
-   * Return the password-based requestor for given keyID. Used for CMP gateway.
+   * Return the password-based requestor for given keyID. Used by CMP gateway.
    * @param keyId the key ID
    * @return the requestor.
    */
   Requestor.SimplePasswordRequestor getSimplePasswordRequestorByKeyId(
-      byte[] keyId);
+      Requestor.Protocol protocol, byte[] keyId);
 
   /**
-   * Return the password-based requestor for given user. Used for EST, REST
+   * Return the password-based requestor for given user. Used by EST, REST
    * and SCEP gateway.
    * @param user the user
    * @return the requestor.
    */
-  Requestor.PasswordRequestor getPasswordRequestorByUser(String user);
+  Requestor.PasswordRequestor getPasswordRequestorByUser(Requestor.Protocol protocol, String user);
 
   /**
    * Return the certificate-based requestor for given client certificate.
@@ -33,6 +37,6 @@ public interface RequestorAuthenticator {
    * @param cert the client certificate
    * @return the requestor.
    */
-  Requestor.CertRequestor getCertRequestor(X509Cert cert);
+  Requestor.CertRequestor getCertRequestor(Requestor.Protocol protocol, X509Cert cert);
 
 }

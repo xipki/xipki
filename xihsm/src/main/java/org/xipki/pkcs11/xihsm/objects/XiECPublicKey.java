@@ -17,6 +17,8 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_PARAMS;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_POINT;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 abstract class XiECPublicKey extends XiPublicKey {
@@ -49,21 +51,18 @@ abstract class XiECPublicKey extends XiPublicKey {
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, long keyType,
       Long keyGenMechanism, byte[] ecParams, byte[] ecPoint) {
-    super(vendor, cku, newObjectMethod, handle, inToken, keyType,
-        keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, keyType, keyGenMechanism);
     this.ecParams = Args.notNull(ecParams, "ecParams");
     this.ecPoint  = Args.notNull(ecPoint, "ecPoint");
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertEcPublicKeyAttributesSettable(attrs);
   }
 
   @Override
-  protected void doGetAttributes(
-      List<XiAttribute> res, long[] types, boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
 

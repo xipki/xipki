@@ -14,16 +14,14 @@ public enum SignAlgoMode {
   RSAPKCS1,
   RSAPSS;
 
-  public static SignAlgoMode getInstance(String str)
-      throws NoSuchAlgorithmException {
+  public static SignAlgoMode getInstance(String str) throws NoSuchAlgorithmException {
     for (SignAlgoMode v : SignAlgoMode.values()) {
       if (v.name().equalsIgnoreCase(str)) {
         return v;
       }
     }
 
-    throw new NoSuchAlgorithmException(
-        "Found no SignAlgoMode for '" + str + "'");
+    throw new NoSuchAlgorithmException("Found no SignAlgoMode for '" + str + "'");
   }
 
 }

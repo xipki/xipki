@@ -221,8 +221,7 @@ public class BaseCaInfo {
     return revokeSuspendedControl;
   }
 
-  public final void setRevokeSuspendedControl(
-      RevokeSuspendedControl revokeSuspendedControl) {
+  public final void setRevokeSuspendedControl(RevokeSuspendedControl revokeSuspendedControl) {
     this.revokeSuspendedControl = revokeSuspendedControl;
   }
 
@@ -259,8 +258,7 @@ public class BaseCaInfo {
         && CompareUtil.equals(crlControl,   obj.crlControl)
         && CompareUtil.equals(ctlogControl, obj.ctlogControl)
         && CompareUtil.equals(extraControl, obj.extraControl)
-        && CompareUtil.equals(revokeSuspendedControl,
-            obj.revokeSuspendedControl);
+        && CompareUtil.equals(revokeSuspendedControl, obj.revokeSuspendedControl);
   }
 
   protected String toString(boolean verbose) {
@@ -270,8 +268,7 @@ public class BaseCaInfo {
     } else {
       extraCtrlText = extraControl.getEncoded();
       if (!verbose && extraCtrlText.length() > 100) {
-        extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97),
-            "...");
+        extraCtrlText = StringUtil.concat(extraCtrlText.substring(0, 97), "...");
       }
     }
 
@@ -287,8 +284,7 @@ public class BaseCaInfo {
         "\nstatus:               ", (status == null ? "-" : status.status()),
         "\nmax. validity:        ", maxValidity,
         "\nexpiration period:    ", expirationPeriod, "d",
-        "\nCRL signer name:      ",
-            (crlSignerName == null ? "-" : crlSignerName),
+        "\nCRL signer name:      ", (crlSignerName == null ? "-" : crlSignerName),
         "\nsave certificate:     ", saveCert,
         "\nsave keypair:         ", saveKeypair,
         "\nvalidity mode:        ", validityMode,
@@ -297,19 +293,15 @@ public class BaseCaInfo {
                                     : keepExpiredCertDays + " days"),
         "\nextra control:        ", extraCtrlText,
         "\nserial number length: ", snSize, " bytes",
-        "\nrevocation:           ",
-            (revocationInfo == null ? "not revoked" : "revoked"), revInfoText,
+        "\nrevocation:           ", (revocationInfo == null ? "not revoked" : "revoked"),
+                                    revInfoText,
         "\nnext CRL number:      ", nextCrlNo,
-        "\nKeyPair generators:   ",
-            (keypairGenNames == null ? "-" : keypairGenNames),
+        "\nKeyPair generators:   ", (keypairGenNames == null ? "-" : keypairGenNames),
         "\n", caUris(),
-        "\nCRL control:\n", (crlControl == null ? "  -"
-            : crlControl.toString(verbose)),
-        "\nCTLog control:\n", (ctlogControl == null ? "  -"
-            : ctlogControl.toString(verbose)),
+        "\nCRL control:\n", (crlControl == null ? "  -" : crlControl.toString(verbose)),
+        "\nCTLog control:\n", (ctlogControl == null ? "  -" : ctlogControl.toString(verbose)),
         "\nrevoke suspended certificates control: \n",
-            (revokeSuspendedControl == null ? "  -"
-                : revokeSuspendedControl.toString(verbose)));
+            (revokeSuspendedControl == null ? "  -" : revokeSuspendedControl.toString(verbose)));
   }
 
   public void toJson(JsonMap map) {
@@ -326,7 +318,7 @@ public class BaseCaInfo {
         .put("signerType",     signerType)
         .put("snSize",         snSize)
         .putEnum("status",         status)
-        .put("extraControl",   extraControl)
+        .put("extraControl",       extraControl)
         .putEnum("validityMode",   validityMode)
         .putStrings("permissions", permissions.toPermissionTexts())
         .put("crlControl",     crlControl)
@@ -338,8 +330,7 @@ public class BaseCaInfo {
     }
   }
 
-  public static BaseCaInfo parse(JsonMap json)
-      throws CodecException {
+  public static BaseCaInfo parse(JsonMap json) throws CodecException {
     BaseCaInfo ret = new BaseCaInfo(json.getNnString("signerType"),
         Permissions.parseJson(json.getObject("permissions")));
 
@@ -362,8 +353,7 @@ public class BaseCaInfo {
 
     ret.setKeypairGenNames(json.getStringList("keypairGenNames"));
 
-    ret.setMaxValidity(
-        Validity.getInstance(json.getNnString("maxValidity")));
+    ret.setMaxValidity(Validity.getInstance(json.getNnString("maxValidity")));
 
     Long l = json.getLong("nextCrlNo");
     if (l != null) {

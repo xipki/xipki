@@ -13,6 +13,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.util.Pack;
 import org.xipki.security.OIDs;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
@@ -49,8 +50,7 @@ public class CtLog {
 
     private final byte[] signature;
 
-    public static DigitallySigned getInstance(
-        byte[] encoded, AtomicInteger offsetObj) {
+    public static DigitallySigned getInstance(byte[] encoded, AtomicInteger offsetObj) {
       int offset = offsetObj.get();
 
       SignatureAndHashAlgorithm algorithm =
@@ -67,8 +67,7 @@ public class CtLog {
       return new DigitallySigned(algorithm, signature);
     }
 
-    public DigitallySigned(SignatureAndHashAlgorithm algorithm,
-                           byte[] signature) {
+    public DigitallySigned(SignatureAndHashAlgorithm algorithm, byte[] signature) {
       this.algorithm = Args.notNull(algorithm, "algorithm");
       this.signature = Args.notNull(signature, "signature");
     }
@@ -82,8 +81,8 @@ public class CtLog {
     }
 
     public Object signatureObject() {
-      if (algorithm.signature == SignatureAlgorithm.ecdsa
-          || algorithm.signature == SignatureAlgorithm.dsa ) {
+      if (algorithm.signature == SignatureAlgorithm.ecdsa ||
+          algorithm.signature == SignatureAlgorithm.dsa ) {
         ASN1Sequence seq = ASN1Sequence.getInstance(signature);
         return new BigInteger[]{
             ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
@@ -171,8 +170,7 @@ public class CtLog {
         // the length.
         byte[] encodedSctWithLen = new byte[2 + encodedSct.length];
         writeInt(encodedSct.length, encodedSctWithLen, 0, 2);
-        System.arraycopy(encodedSct, 0, encodedSctWithLen, 2,
-            encodedSct.length);
+        System.arraycopy(encodedSct, 0, encodedSctWithLen, 2, encodedSct.length);
         totalLen += encodedSctWithLen.length;
         encodedScts.add(encodedSctWithLen);
       }
@@ -264,8 +262,7 @@ public class CtLog {
           SignatureAlgorithm.ofCode(encoded[1]));
     }
 
-    public SignatureAndHashAlgorithm(
-        HashAlgorithm hash, SignatureAlgorithm signature) {
+    public SignatureAndHashAlgorithm(HashAlgorithm hash, SignatureAlgorithm signature) {
       this.hash = Args.notNull(hash, "hash");
       this.signature = Args.notNull(signature, "signature");
     }
@@ -357,15 +354,13 @@ public class CtLog {
       offset += extensionsLen;
       offsetObj.set(offset);
 
-      DigitallySigned digitallySigned =
-          DigitallySigned.getInstance(encoded, offsetObj);
+      DigitallySigned digitallySigned = DigitallySigned.getInstance(encoded, offsetObj);
 
       if (offsetObj.get() != startOffset + len) {
         throw new IllegalArgumentException("length unmatch");
       }
 
-      return new SignedCertificateTimestamp(version, logID, timestamp,
-          extensions, digitallySigned);
+      return new SignedCertificateTimestamp(version, logID, timestamp, extensions, digitallySigned);
     } // constructor
 
     public SignedCertificateTimestamp(
@@ -392,8 +387,7 @@ public class CtLog {
     }
 
     public byte[] extensions() {
-      return extensions.length == 0 ? extensions
-          : Arrays.copyOf(extensions, extensions.length);
+      return extensions.length == 0 ? extensions : Arrays.copyOf(extensions, extensions.length);
     }
 
     public DigitallySigned digitallySigned() {
@@ -474,8 +468,7 @@ public class CtLog {
    *        number of bytes to represent the length, between 1 and 4.
    * @return bytesLenOfLength
    */
-  private static int writeInt(int value, byte[] buffer, int offset,
-                              int bytesLenOfValue) {
+  private static int writeInt(int value, byte[] buffer, int offset, int bytesLenOfValue) {
     if (bytesLenOfValue == 4) {
       buffer[offset++] = (byte) (value >>> 24);
     }
@@ -508,8 +501,7 @@ public class CtLog {
 
   public static void update(
       Signature sig, byte version, long timestamp, byte[] sctExtensions,
-      byte[] issuerKeyHash, byte[] preCertTbsCert)
-      throws SignatureException {
+      byte[] issuerKeyHash, byte[] preCertTbsCert) throws SignatureException {
     sig.update(version);
     sig.update((byte) 0); // signature_type = certificate_timestamp
     byte[] timestampBytes = Pack.longToBigEndian(timestamp);
@@ -528,29 +520,30 @@ public class CtLog {
     }
   }
 
-  public static byte[] getPreCertTbsCert(TBSCertificate tbsCert)
-      throws IOException {
+  public static byte[] getPreCertTbsCert(TBSCertificate tbsCert) throws IOException {
     ASN1EncodableVector vec = new ASN1EncodableVector();
     ASN1Sequence tbs = (ASN1Sequence) tbsCert.toASN1Primitive();
 
     // version, serialNumber, signature (algorithm), issuer, validity,
-    // subject, subjectpublickeyinfo
+    // subject, subjectPublicKeyInfo
     for (int i = 0; i < 7; i++) {
       vec.add(tbs.getObjectAt(i));
     }
 
     ASN1TaggedObject taggedExtns = (ASN1TaggedObject) tbs.getObjectAt(7);
     int tagNo = taggedExtns.getTagNo();
+    if (tagNo != 3) {
+      throw new IOException("TBSCertificate contains either issuerUniqueID or subjectUniqueID");
+    }
 
-    ASN1Sequence extns = (ASN1Sequence)
-        taggedExtns.getBaseObject().toASN1Primitive();
+    ASN1Sequence extns = (ASN1Sequence) Asn1Util.getBaseObject(taggedExtns).toASN1Primitive();
     ASN1EncodableVector extnsVec = new ASN1EncodableVector(extns.size() - 1);
     final int size = extns.size();
     for (int i = 0; i < size; i++) {
       ASN1Encodable extn = extns.getObjectAt(i).toASN1Primitive();
       ASN1Encodable type = ((ASN1Sequence) extn).getObjectAt(0);
-      if (OIDs.Extn.id_precertificate.equals(type)
-          || OIDs.Extn.id_SignedCertificateTimestampList.equals(type)) {
+      if (OIDs.Extn.id_precertificate.equals(type) ||
+          OIDs.Extn.id_SignedCertificateTimestampList.equals(type)) {
         continue;
       }
 
@@ -564,10 +557,8 @@ public class CtLog {
   public static Object getSignatureObject(DigitallySigned digitallySigned) {
     SignatureAndHashAlgorithm algorithm = digitallySigned.algorithm();
     SignatureAlgorithm signature = algorithm.signature();
-    if (signature == CtLog.SignatureAlgorithm.ecdsa ||
-        signature == CtLog.SignatureAlgorithm.dsa ) {
-      ASN1Sequence seq = ASN1Sequence.getInstance(
-          digitallySigned.signature());
+    if (signature == CtLog.SignatureAlgorithm.ecdsa || signature == CtLog.SignatureAlgorithm.dsa ) {
+      ASN1Sequence seq = ASN1Sequence.getInstance(digitallySigned.signature());
 
       return new BigInteger[]{
           ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue(),
@@ -599,8 +590,7 @@ public class CtLog {
       return new JsonMap().putBytesCol("chain", chain);
     }
 
-    public static AddPreChainRequest parse(JsonMap json)
-        throws CodecException {
+    public static AddPreChainRequest parse(JsonMap json) throws CodecException {
       return new AddPreChainRequest(json.getNnBytesList("chain"));
     }
 
@@ -620,7 +610,7 @@ public class CtLog {
     private final byte[] signature;
 
     public AddPreChainResponse(byte sct_version, byte[] id, long timestamp,
-                               byte[] extensions, byte[] signature) {
+                              byte[] extensions, byte[] signature) {
       this.sct_version = sct_version;
       this.id = Args.notNull(id, "id");
       this.timestamp = timestamp;
@@ -649,16 +639,11 @@ public class CtLog {
     }
 
     public JsonMap toJson() {
-      return new JsonMap()
-          .put("sct_version", (int) sct_version)
-          .put("id", id)
-          .put("timestamp",  timestamp)
-          .put("extensions", extensions)
-          .put("signature",  signature);
+      return new JsonMap().put("sct_version", (int) sct_version).put("id", id)
+          .put("timestamp",  timestamp).put("extensions", extensions).put("signature",  signature);
     }
 
-    public static AddPreChainResponse parse(JsonMap json)
-        throws CodecException {
+    public static AddPreChainResponse parse(JsonMap json) throws CodecException {
       int sct_version = json.getNnInt("sct_version");
       if (sct_version > 0xFF || sct_version < 0) {
         throw new CodecException("invalid sct_version " + sct_version);

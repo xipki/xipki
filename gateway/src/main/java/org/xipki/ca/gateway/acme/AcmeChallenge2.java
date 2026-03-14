@@ -9,6 +9,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -33,8 +34,7 @@ public class AcmeChallenge2 implements JsonEncodable {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().put("challenge", challenge)
-        .put("identifier", identifier);
+    return new JsonMap().put("challenge", challenge).put("identifier", identifier);
   }
 
   public static AcmeChallenge2 parse(JsonMap json) throws CodecException {
@@ -42,8 +42,7 @@ public class AcmeChallenge2 implements JsonEncodable {
     AcmeChallenge challenge = (map == null) ? null : AcmeChallenge.parse(map);
 
     map = json.getMap("identifier");
-    AcmeIdentifier identifier = (map == null) ? null
-        : AcmeIdentifier.parse(map);
+    AcmeIdentifier identifier = (map == null) ? null : AcmeIdentifier.parse(map);
     return new AcmeChallenge2(challenge, identifier);
   }
 

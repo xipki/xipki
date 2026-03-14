@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiHsmVendor extends HsmVendor {
-
-  public static final long CKM_CLOUDHSM_AES_KEY_WRAP_ZERO_PAD = 0x8000216FL;
 
   private final String manufactureID;
 
@@ -52,12 +52,11 @@ public class XiHsmVendor extends HsmVendor {
       String name, String manufactureID, String libraryDescription,
       CkVersion cryptokiVersion, CkVersion libraryVersion,
       String vendorEnum, int maxFrameSize, boolean privateObjectVisibleToOther,
-      JsonList jsonCkmMultipartExclude,
-      List<SpecialBehaviour> specialBehaviours,
+      JsonList jsonCkmMultipartExclude, List<SpecialBehaviour> specialBehaviours,
       JsonMap jsonNameToCodeMap, Map<String, String> mechanisms)
       throws Exception {
-    super(name, vendorEnum, maxFrameSize, null, jsonCkmMultipartExclude,
-        specialBehaviours, jsonNameToCodeMap);
+    super(name, vendorEnum, maxFrameSize, null, null,
+        jsonCkmMultipartExclude, specialBehaviours, jsonNameToCodeMap);
     this.manufactureID = Args.notBlank(manufactureID, "manufactureID");
     this.libraryDescription = Args.notBlank(libraryDescription,
         "libraryDescription");
@@ -74,16 +73,14 @@ public class XiHsmVendor extends HsmVendor {
       String[] flagTexts = tokens2[2].split(":");
       long flags = 0;
       for (String flagText : flagTexts) {
-        Long flag = PKCS11T.nameToCode(
-            Category.CKF_MECHANISM, "CKF_" + flagText);
+        Long flag = PKCS11T.nameToCode(Category.CKF_MECHANISM, "CKF_" + flagText);
         if (flag == null) {
           throw new Exception("unknown flag " + flagText);
         }
         flags |= flag;
       }
 
-      CkMechanismInfo mechInfo =
-          new CkMechanismInfo(minKeySize, maxKeySize, flags);
+      CkMechanismInfo mechInfo = new CkMechanismInfo(minKeySize, maxKeySize, flags);
       mechanismInfoMap.put(ckm, mechInfo);
     }
 
@@ -131,11 +128,9 @@ public class XiHsmVendor extends HsmVendor {
     return mechanisms;
   }
 
-  public void assertCryptokiVersionSupported(CkVersion version)
-      throws HsmException {
+  public void assertCryptokiVersionSupported(CkVersion version) throws HsmException {
     if (cryptokiVersion.version() < version.version()) {
-      throw new HsmException(PKCS11T.CKR_FUNCTION_NOT_SUPPORTED,
-          "unsupported version " + version);
+      throw new HsmException(PKCS11T.CKR_FUNCTION_NOT_SUPPORTED, "unsupported version " + version);
     }
   }
 
@@ -163,9 +158,8 @@ public class XiHsmVendor extends HsmVendor {
     }
 
     throw new HsmException(PKCS11T.CKR_MECHANISM_INVALID,
-        "mechanism " + PKCS11T.ckmCodeToName(ckm) +
-        " for " + codeToName(Category.CKF_MECHANISM, flagBit) +
-        " is not supported");
+        "mechanism " + PKCS11T.ckmCodeToName(ckm) + " for " +
+        codeToName(Category.CKF_MECHANISM, flagBit) + " is not supported");
   }
 
   public void assertFrameSize(int size) throws HsmException {
@@ -175,8 +169,7 @@ public class XiHsmVendor extends HsmVendor {
 
     long ckr = vendorEnum == VendorEnum.TASS
         ? PKCS11T.CKR_DEVICE_ERROR : PKCS11T.CKR_DATA_LEN_RANGE;
-    throw new HsmException(ckr,
-        "frame date too long (" + size + " > " + maxFrameSize + ")");
+    throw new HsmException(ckr, "frame date too long (" + size + " > " + maxFrameSize + ")");
   }
 
   private long nameToCode2(Category category, String ckmStr) {
@@ -192,8 +185,7 @@ public class XiHsmVendor extends HsmVendor {
     String basedir = "org/xipki/pkcs11/xihsm/vendor/";
     String confPath = basedir + "list.json";
     List<String> vendorFileNames;
-    try (InputStream in = XiHsmVendor.class.getClassLoader()
-        .getResourceAsStream(confPath)) {
+    try (InputStream in = XiHsmVendor.class.getClassLoader().getResourceAsStream(confPath)) {
       if (in == null) {
         throw new IOException("found no file " + confPath);
       }
@@ -204,7 +196,7 @@ public class XiHsmVendor extends HsmVendor {
     for (String vendorFileName : vendorFileNames) {
       String vendorFilePath = basedir + vendorFileName;
       try (InputStream in = XiHsmVendor.class.getClassLoader()
-          .getResourceAsStream(vendorFilePath)) {
+                              .getResourceAsStream(vendorFilePath)) {
         if (in == null) {
           throw new IOException("found no file " + vendorFilePath);
         }
@@ -221,10 +213,10 @@ public class XiHsmVendor extends HsmVendor {
       throw new IOException("found no block " + vendorName);
     }
 
-    String manufactureID = block.getNnString("manufacturerID");
-    String libDescription = block.getNnString("libDescription");
+    String manufactureID       = block.getNnString("manufacturerID");
+    String libDescription      = block.getNnString("libDescription");
     String cryptokiVersionText = block.getNnString("cryptokiVersion");
-    String libVersionText = block.getNnString("libVersion");
+    String libVersionText      = block.getNnString("libVersion");
 
     String[] versionTokens = cryptokiVersionText.split("\\.");
     CkVersion cryptokiVersion = new CkVersion(
@@ -234,8 +226,7 @@ public class XiHsmVendor extends HsmVendor {
     CkVersion libVersion = new CkVersion(
         Byte.parseByte(versionTokens[0]), Byte.parseByte(versionTokens[1]));
 
-    JsonList jsonCkmMultipartExclude =
-        block.getList("ckmMultipartExclude");
+    JsonList jsonCkmMultipartExclude = block.getList("ckmMultipartExclude");
 
     List<SpecialBehaviour> behaviours =
         block.getEnumList("specialBehaviours", SpecialBehaviour.class);

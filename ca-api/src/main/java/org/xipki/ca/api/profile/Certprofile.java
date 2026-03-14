@@ -13,12 +13,12 @@ import org.xipki.ca.api.profile.ctrl.*;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.BadCertTemplateException;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.CertprofileException;
 import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 import org.xipki.util.extra.type.Validity;
 
-import java.io.Closeable;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -31,13 +31,9 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 
-public abstract class Certprofile implements Closeable {
+public abstract class Certprofile {
 
   protected Certprofile() {
-  }
-
-  @Override
-  public void close() {
   }
 
   public ValidityMode notAfterMode() {
@@ -70,8 +66,7 @@ public abstract class Certprofile implements Closeable {
     return null;
   }
 
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>>
-      subjectInfoAccessModes() {
+  public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> subjectInfoAccessModes() {
     return null;
   }
 
@@ -154,8 +149,7 @@ public abstract class Certprofile implements Closeable {
     }
 
     if (!publicKeyControl().allowsPublicKey(keySpec)) {
-      throw new BadCertTemplateException("key type " + keySpec
-          + " is not permitted");
+      throw new BadCertTemplateException("key type " + keySpec + " is not permitted");
     }
 
     return publicKey;
@@ -173,8 +167,7 @@ public abstract class Certprofile implements Closeable {
    * @throws CertprofileException
    *         if error occurs.
    */
-  public SubjectInfo subject(X500Name requestedSubject)
-      throws CertprofileException, BadCertTemplateException {
+  public SubjectInfo subject(X500Name requestedSubject) throws BadCertTemplateException {
     Args.notNull(requestedSubject, "requestedSubject");
     verifySubjectDnOccurrence(requestedSubject);
 
@@ -213,7 +206,7 @@ public abstract class Certprofile implements Closeable {
       X500Name requestedSubject, X500Name grantedSubject,
       Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
-          throws CertprofileException, BadCertTemplateException;
+      throws CertprofileException, BadCertTemplateException;
 
   /**
    * Returns maximal size in bytes of the certificate.
@@ -225,15 +218,13 @@ public abstract class Certprofile implements Closeable {
     return 0;
   }
 
-  public byte[] subjectKeyIdentifier(
-      SubjectPublicKeyInfo subjectPublicKeyInfo)
-      throws CertprofileException {
+  public byte[] subjectKeyIdentifier(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     SubjectKeyIdentifierControl control = subjectKeyIdentifierControl();
     if (control == null) {
       control = new SubjectKeyIdentifierControl();
     }
 
-    byte[] keyData = subjectPublicKeyInfo.getPublicKeyData().getOctets();
+    byte[] keyData = Asn1Util.getPublicKeyData(subjectPublicKeyInfo);
     return control.computeKeyIdentifier(keyData);
   }
 

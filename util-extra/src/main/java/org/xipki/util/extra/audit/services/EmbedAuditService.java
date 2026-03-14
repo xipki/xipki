@@ -45,8 +45,7 @@ public class EmbedAuditService implements AuditService {
 
   private static final String DELIM = " | ";
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(EmbedAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmbedAuditService.class);
 
   private static final DateTimeFormatter DTF =
       DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS");
@@ -114,8 +113,7 @@ public class EmbedAuditService implements AuditService {
     try {
       IoUtil.mkdirs(this.logDir);
     } catch (IOException e) {
-      throw new InvalidConfException(
-          "error mkdirs for " + this.logDir.getPath());
+      throw new InvalidConfException("error mkdirs for " + this.logDir.getPath());
     }
 
     String fileName = logFile.getName();
@@ -136,12 +134,11 @@ public class EmbedAuditService implements AuditService {
   @Override
   public void logEvent(AuditEvent event) {
     storeLog(AuditService.AUDIT_EVENT, event.level(), event.toTextMessage());
-  } // method logEvent
+  }
 
   @Override
   public void logEvent(PciAuditEvent event) {
-    storeLog(AuditService.PCI_AUDIT_EVENT, event.level(),
-        event.toTextMessage());
+    storeLog(AuditService.PCI_AUDIT_EVENT, event.level(), event.toTextMessage());
   }
 
   protected void storeLog(int eventType, AuditLevel level, String message) {
@@ -155,8 +152,7 @@ public class EmbedAuditService implements AuditService {
       if (date.isAfter(lastMsOfToday) || size >= maxFileSize) {
         Instant oldLastOfToday = lastMsOfToday;
 
-        ZonedDateTime now = ZonedDateTime.ofInstant(date,
-                              ZoneId.systemDefault());
+        ZonedDateTime now = ZonedDateTime.ofInstant(date, ZoneId.systemDefault());
         int yyyyMMddNow = DateUtil.getYyyyMMdd(now);
         lastMsOfToday = DateUtil.getLastMsOfDay(now);
         writer.flush();
@@ -164,8 +160,7 @@ public class EmbedAuditService implements AuditService {
 
         if (oldLastOfToday == lastMsOfToday) {
           for (int i = 1; ;i++) {
-            File renameTo = new File(logDir,
-                writerFileCoreName + "-" + i + logFileNameSuffix);
+            File renameTo = new File(logDir, writerFileCoreName + "-" + i + logFileNameSuffix);
             if (!renameTo.exists()) {
               IoUtil.renameTo(writerPath.toFile(), renameTo);
               break;
@@ -191,14 +186,12 @@ public class EmbedAuditService implements AuditService {
 
   private OutputStreamWriter buildWriter(int yyyyMMdd) {
     this.writerFileCoreName = buildFileCoreName(yyyyMMdd);
-    File currentLogFile = new File(logDir,
-        writerFileCoreName + logFileNameSuffix);
+    File currentLogFile = new File(logDir, writerFileCoreName + logFileNameSuffix);
     OutputStream fw;
     try {
       fw = new FileOutputStream(currentLogFile, true);
     } catch (IOException ex) {
-      throw new IllegalStateException(
-          "error opening file " + currentLogFile.getPath());
+      throw new IllegalStateException("error opening file " + currentLogFile.getPath());
     }
 
     this.writerPath = currentLogFile.toPath();

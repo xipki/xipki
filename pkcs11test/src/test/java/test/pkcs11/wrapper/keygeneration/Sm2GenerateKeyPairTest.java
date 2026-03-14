@@ -129,8 +129,7 @@ public class Sm2GenerateKeyPairTest {
         LOG.info("Trying to search for the public key of the generated " +
             "key-pair by ID: {}", Functions.toHex(id));
         // set the search template for the public key
-        Template exportPublicKeyTemplate =
-            newPublicKey(CKK_VENDOR_SM2).attr(CKA_ID, id);
+        Template exportPublicKeyTemplate = newPublicKey(CKK_VENDOR_SM2).attr(CKA_ID, id);
 
         long[] foundPublicKeys = token.findObjects(exportPublicKeyTemplate, 1);
         if (foundPublicKeys.length != 1) {

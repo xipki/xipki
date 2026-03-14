@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <Karaf-Commands>*</Karaf-Commands>
+    <Import-Package>org.bouncycastle.*;version="${bc.versions}",*</Import-Package>
   </properties>
   <dependencies>
     <dependency>
@@ -22,7 +23,7 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>certprofile-xijson</artifactId>
+      <artifactId>certprofile</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

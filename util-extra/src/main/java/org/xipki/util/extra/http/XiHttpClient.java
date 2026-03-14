@@ -35,22 +35,19 @@ public class XiHttpClient {
     this.hostnameVerifier = null;
   }
 
-  public XiHttpClient(SslContextConf sslContextConf)
-      throws ObjectCreationException {
+  public XiHttpClient(SslContextConf sslContextConf) throws ObjectCreationException {
     this.sslSocketFactory = sslContextConf.getSslSocketFactory();
     this.hostnameVerifier = sslContextConf.getHostnameVerifier();
   }
 
-  public XiHttpClient(SSLSocketFactory sslSocketFactory,
-                      HostnameVerifier hostnameVerifier) {
+  public XiHttpClient(SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier) {
     this.sslSocketFactory = sslSocketFactory;
     this.hostnameVerifier = hostnameVerifier;
   }
 
   public HttpRespContent httpGet(String url) throws IOException {
     try {
-      HttpURLConnection httpConn = openHttpConn(
-          new URL(Args.notNull(url, "url")));
+      HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
       httpConn.setRequestMethod("GET");
       return parseResponse(httpConn);
     } catch (XiHttpClientException ex) {
@@ -59,8 +56,8 @@ public class XiHttpClient {
   } // method httpGet
 
   public HttpRespContent httpPost(
-      String url, String requestContentType, byte[] request,
-      String expectedRespContentType) throws IOException {
+      String url, String requestContentType, byte[] request, String expectedRespContentType)
+      throws IOException {
     HttpRespContent resp = httpPost(url, requestContentType, request);
     if (!resp.isOK()) {
       return resp;
@@ -75,19 +72,16 @@ public class XiHttpClient {
     }
 
     if (!isValidContentType) {
-      throw new IOException("bad response: mime type " + responseContentType
-          + " not supported!");
+      throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
     return resp;
   }
 
-  public HttpRespContent httpPost(
-      String url, String requestContentType, byte[] request)
+  public HttpRespContent httpPost(String url, String requestContentType, byte[] request)
       throws IOException {
     try {
-      HttpURLConnection httpConn = openHttpConn(
-          new URL(Args.notNull(url, "url")));
+      HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
       httpConn.setRequestMethod("POST");
       httpConn.setDoOutput(true);
       httpConn.setUseCaches(false);
@@ -97,8 +91,7 @@ public class XiHttpClient {
           httpConn.setRequestProperty("Content-Type", requestContentType);
         }
 
-        httpConn.setRequestProperty("Content-Length",
-            Integer.toString(request.length));
+        httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
         OutputStream outputstream = httpConn.getOutputStream();
         outputstream.write(request);
         outputstream.flush();
@@ -136,8 +129,7 @@ public class XiHttpClient {
   private HttpURLConnection openHttpConn(URL url) throws IOException {
     URLConnection conn = Args.notNull(url, "url").openConnection();
     if (!(conn instanceof HttpURLConnection)) {
-      throw new IOException(url + " is not of protocol HTTP: "
-          + url.getProtocol());
+      throw new IOException(url + " is not of protocol HTTP: " + url.getProtocol());
     }
 
     if (conn instanceof HttpsURLConnection) {

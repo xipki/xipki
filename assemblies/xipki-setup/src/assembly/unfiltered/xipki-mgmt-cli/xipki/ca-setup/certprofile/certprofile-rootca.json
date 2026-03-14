@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile rootca"
+  },
+  "certLevel": "RootCA",
+  "maxSize": 8400,
+  "validity": "10y",
+  "notBeforeTime": "current",
+  "keyAlgorithms": [
+    "BRAINPOOLP256R1",
+    "BRAINPOOLP384R1",
+    "BRAINPOOLP512R1",
+    "ED25519",
+    "ED448",
+    "FRP256V1",
+    "MLDSA44",
+    "MLDSA44-ED25519",
+    "MLDSA44-P256",
+    "MLDSA44-RSA2048",
+    "MLDSA65",
+    "MLDSA65-BP256",
+    "MLDSA65-ED25519",
+    "MLDSA65-P256",
+    "MLDSA65-P384",
+    "MLDSA65-RSA3072",
+    "MLDSA65-RSA4096",
+    "MLDSA87",
+    "MLDSA87-BP384",
+    "MLDSA87-ED448",
+    "MLDSA87-P384",
+    "MLDSA87-P521",
+    "MLDSA87-RSA3072",
+    "MLDSA87-RSA4096",
+    "P256",
+    "P384",
+    "P521",
+    "RSA2048",
+    "RSA3072",
+    "RSA4096",
+    "SM2"
+  ],
+  "subject": [
+    {
+      "type": "country",
+      "minOccurs": 0
+    },
+    {
+      "type": "organization"
+    },
+    {
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },
+    {
+      "type": "serialNumber",
+      "minOccurs": 0
+    },
+    {
+      "type": "commonName"
+    }
+  ],
+  "extensions": [
+    {
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },
+    {
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [
+          {
+            "required": [
+              "cRLSign",
+              "keyCertSign"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

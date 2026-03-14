@@ -100,12 +100,10 @@ public class EnrollCertsRequest extends SdkRequest {
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(6).writeTextString(transactionId)
         .writeBooleanObj(groupEnroll).writeBooleanObj(explicitConfirm)
-        .writeIntObj(confirmWaitTimeMs).writeEnumObj(caCertMode)
-        .writeObjects(entries);
+        .writeIntObj(confirmWaitTimeMs).writeEnumObj(caCertMode).writeObjects(entries);
   }
 
-  public static EnrollCertsRequest decode(byte[] encoded)
-      throws CodecException {
+  public static EnrollCertsRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("EnrollCertsRequest", decoder, 6);
       EnrollCertsRequest ret = new EnrollCertsRequest();
@@ -120,8 +118,7 @@ public class EnrollCertsRequest extends SdkRequest {
       ret.setEntries(Entry.decodeArray(decoder));
       return ret;
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, EnrollCertsRequest.class), ex);
     }
   }
 
@@ -197,10 +194,8 @@ public class EnrollCertsRequest extends SdkRequest {
       this.subjectPublicKey = subjectPublicKey;
     }
 
-    public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey)
-        throws IOException {
-      this.subjectPublicKey = subjectPublicKey == null ? null
-          : subjectPublicKey.getEncoded();
+    public void subjectPublicKey(SubjectPublicKeyInfo subjectPublicKey) throws IOException {
+      this.subjectPublicKey = subjectPublicKey == null ? null : subjectPublicKey.getEncoded();
     }
 
     public X500NameType subject() {
@@ -291,8 +286,7 @@ public class EnrollCertsRequest extends SdkRequest {
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder)
-        throws CodecException {
+    public static Entry[] decodeArray(CborDecoder decoder) throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

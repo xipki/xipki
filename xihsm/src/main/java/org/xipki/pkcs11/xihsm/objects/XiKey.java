@@ -24,6 +24,8 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_LOCAL;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_START_DATE;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiKey extends XiP11Storage {
@@ -143,8 +145,8 @@ public abstract class XiKey extends XiP11Storage {
   private long[] allowedMechanisms;
 
   public XiKey(XiHsmVendor vendor, long cku, Origin newObjectMethod,
-               long handle, boolean inToken, long objectClass, long keyType,
-               Long keyGenMechanism) {
+              long handle, boolean inToken, long objectClass, long keyType,
+              Long keyGenMechanism) {
     super(vendor, cku, newObjectMethod, handle, inToken, objectClass);
     this.keyType = keyType;
     this.keyGenMechanism = keyGenMechanism;
@@ -159,8 +161,7 @@ public abstract class XiKey extends XiP11Storage {
   }
 
   @Override
-  protected void doGetAttributes(
-      List<XiAttribute> res, long[] types, boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, CKA_KEY_TYPE,   keyType);
@@ -175,8 +176,7 @@ public abstract class XiKey extends XiP11Storage {
 
   @Override
   protected void doSetAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     super.doSetAttributes(loginState, initMethod, attrs);
 
     this.id        = attrs.removeByteArray(CKA_ID);

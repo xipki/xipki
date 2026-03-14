@@ -62,8 +62,7 @@ public abstract class MacAuditService implements AuditService {
 
   private static final String INNER_DELIM = ":";
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(MacAuditService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MacAuditService.class);
 
   private static final DateTimeFormatter DTF =
       DateTimeFormatter.ofPattern("yyyy.MM.dd-HH:mm:ss.SSS'Z'");
@@ -106,8 +105,8 @@ public abstract class MacAuditService implements AuditService {
   }
 
   protected abstract void storeLog(
-          Instant date, long thisId, int eventType, String levelText,
-          long previousId, String message, String thisTag);
+      Instant date, long thisId, int eventType, String levelText,
+      long previousId, String message, String thisTag);
 
   protected abstract void storeIntegrity(String integrityText);
 
@@ -116,8 +115,7 @@ public abstract class MacAuditService implements AuditService {
   protected void doExtraInit(ConfPairs confPairs) throws InvalidConfException {
   }
 
-  protected void verify(long id, String tag, String integrityText,
-                        ConfPairs confPairs) {
+  protected void verify(long id, String tag, String integrityText, ConfPairs confPairs) {
     if (id == 0) {
       // found no audit entry
       if (StringUtil.isBlank(integrityText)) {
@@ -145,17 +143,15 @@ public abstract class MacAuditService implements AuditService {
     } else {
       String oldKeyId = confPairs.value(KEY_OLD_KEYID);
       if (!thisKeyId.equals(oldKeyId)) {
-        throw new IllegalStateException(
-            "found no key to decrypt the integrityText");
+        throw new IllegalStateException("found no key to decrypt the integrityText");
       }
 
       String password = confPairs.value(KEY_OLD_PASSWORD);
       try {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance(
-            "PBKDF2WithHmacSHA256");
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         char[] passwordChars = password.toCharArray();
-        KeySpec spec = new PBEKeySpec(passwordChars,
-            "ENC".getBytes(StandardCharsets.UTF_8), 10000, 256);
+        KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8),
+                            10000, 256);
         decryptionKey = factory.generateSecret(spec);
       } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
         throw new IllegalStateException("error deriving key", ex);
@@ -168,8 +164,7 @@ public abstract class MacAuditService implements AuditService {
       cipher.init(Cipher.DECRYPT_MODE, decryptionKey, spec);
       plaintext = new String(cipher.doFinal(cipherText));
     } catch (Exception ex) {
-      throw new IllegalStateException(
-          "error while decrypting the integrityText");
+      throw new IllegalStateException("error while decrypting the integrityText");
     }
 
     tokenizer = new StringTokenizer(plaintext, DELIM);
@@ -189,16 +184,13 @@ public abstract class MacAuditService implements AuditService {
 
     if (integrityId == id) {
       if (!tag.equals(thisTag)) {
-        throw new IllegalStateException(
-            "tag in integrityText does not match the audit entry.");
+        throw new IllegalStateException("tag in integrityText does not match the audit entry.");
       }
     } else if (integrityId > id) {
       throw new IllegalStateException(String.format("audit entries deleted " +
-          "unexpectedly, id in the latest entry is %d, but expected %d",
-          id, integrityId));
+          "unexpectedly, id in the latest entry is %d, but expected %d", id, integrityId));
     } else {
-      LOG.warn("id in the last entry is{}, but in the integrityText is {}",
-          id, integrityId);
+      LOG.warn("id in the last entry is{}, but in the integrityText is {}", id, integrityId);
     }
   }
 
@@ -229,31 +221,25 @@ public abstract class MacAuditService implements AuditService {
 
     keyId = conf.value(KEY_KEYID);
     if (StringUtil.isBlank(keyId)) {
-      throw new IllegalArgumentException(
-          "property " + KEY_KEYID + " not defined");
+      throw new IllegalArgumentException("property " + KEY_KEYID + " not defined");
     }
 
-    this.tagPrefix = VERSION_V1 + INNER_DELIM + algoId + INNER_DELIM
-                      + keyId + INNER_DELIM;
+    this.tagPrefix = VERSION_V1 + INNER_DELIM + algoId + INNER_DELIM + keyId + INNER_DELIM;
     this.tagPrefixBytes = tagPrefix.getBytes(StandardCharsets.UTF_8);
     String password = conf.value(KEY_PASSWORD);
     if (StringUtil.isBlank(password)) {
-      throw new IllegalArgumentException(
-          "property " + KEY_PASSWORD + " not defined");
+      throw new IllegalArgumentException("property " + KEY_PASSWORD + " not defined");
     }
 
     try {
-      SecretKeyFactory factory = SecretKeyFactory.getInstance(
-          "PBKDF2WithHmacSHA256");
+      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
       KeySpec spec = new PBEKeySpec(passwordChars,
           "MAC".getBytes(StandardCharsets.UTF_8), 10000, 256);
       SecretKey macKey = factory.generateSecret(spec);
 
-      spec = new PBEKeySpec(passwordChars,
-          "ENC".getBytes(StandardCharsets.UTF_8), 10000, 256);
-      encKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(),
-                "AES");
+      spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8), 10000, 256);
+      encKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
       mac = Mac.getInstance(algo);
       mac.init(macKey);
@@ -277,8 +263,7 @@ public abstract class MacAuditService implements AuditService {
     log(AuditService.PCI_AUDIT_EVENT, event.level(), event.toTextMessage());
   }
 
-  private synchronized void log(
-      int eventType, AuditLevel level, String message) {
+  private synchronized void log(int eventType, AuditLevel level, String message) {
     Instant date = Instant.now();
     long previousId = id.get();
     long thisId = id.incrementAndGet();
@@ -294,8 +279,7 @@ public abstract class MacAuditService implements AuditService {
     String tagWithMeta = tagPrefix + Base64.getEncoder().encodeToString(tag);
     this.previousTag = tagWithMeta;
 
-    storeLog(date, thisId, eventType, levelText, previousId, message,
-        tagWithMeta);
+    storeLog(date, thisId, eventType, levelText, previousId, message, tagWithMeta);
     if (encInterval <= 1 || thisId % encInterval == 0) {
       String integrityText = buildIntegrityText();
       storeIntegrity(integrityText);

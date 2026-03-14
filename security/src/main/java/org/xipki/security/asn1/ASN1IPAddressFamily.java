@@ -21,7 +21,7 @@ import org.xipki.util.codec.ipadress.IPAddressFamily;
  *
  * A list of AFI is available under
  * https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml.
- *
+ * <p>
  * A list of SAFI is available under
  * https://www.iana.org/assignments/safi-namespace/safi-namespace.xhtml
  *
@@ -33,8 +33,7 @@ public class ASN1IPAddressFamily extends ASN1Object {
 
   private final IPAddressChoice ipAddressChoice;
 
-  public ASN1IPAddressFamily(ASN1OctetString addressFamily,
-                             IPAddressChoice ipAddressChoice) {
+  public ASN1IPAddressFamily(ASN1OctetString addressFamily, IPAddressChoice ipAddressChoice) {
     this.addressFamily = Args.notNull(addressFamily, "addressFamily");
     this.ipAddressChoice = Args.notNull(ipAddressChoice, "ipAddressChoice");
   }

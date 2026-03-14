@@ -25,6 +25,9 @@ import org.bouncycastle.util.io.pem.PemReader;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
+import org.xipki.security.pkix.JceX509Certificate;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
@@ -70,8 +73,7 @@ import java.util.Set;
 
 public class SecurityActions {
 
-  @Command(scope = "xi", name = "cert-info", description =
-      "print certificate information")
+  @Command(scope = "xi", name = "cert-info", description = "print certificate information")
   @Service
   public static class CertInfo extends SecurityAction {
 
@@ -79,12 +81,10 @@ public class SecurityActions {
     @Completion(FileCompleter.class)
     private String inFile;
 
-    @Option(name = "--hex", aliases = "-h", description =
-        "print (serial) number in hex format")
+    @Option(name = "--hex", aliases = "-h", description = "print (serial) number in hex format")
     private Boolean hex = Boolean.FALSE;
 
-    @Option(name = "--der", description =
-        "print DER-encoded issuer and subject in hex format")
+    @Option(name = "--der", description = "print DER-encoded issuer and subject in hex format")
     private Boolean der = Boolean.FALSE;
 
     @Option(name = "--serial", description = "print serial number")
@@ -122,12 +122,10 @@ public class SecurityActions {
         return getNumber(cert.serialNumber());
       } else if (subject != null && subject) {
         return (der != null && der)
-            ? Hex.encode(cert.subject().getEncoded())
-            : cert.subject().toString();
+            ? Hex.encode(cert.subject().getEncoded()) : cert.subject().toString();
       } else if (issuer != null && issuer) {
         return (der != null && der)
-            ? Hex.encode(cert.issuer().getEncoded())
-            : cert.issuer().toString();
+            ? Hex.encode(cert.issuer().getEncoded()) : cert.issuer().toString();
       } else if (notBefore != null && notBefore) {
         return toUtcTimeyyyyMMddhhmmssZ(cert.notBefore());
       } else if (notAfter != null && notAfter) {
@@ -162,18 +160,15 @@ public class SecurityActions {
 
   } // class CertInfo
 
-  @Command(scope = "xi", name = "convert-keystore", description =
-      "Convert keystore")
+  @Command(scope = "xi", name = "convert-keystore", description = "Convert keystore")
   @Service
   public static class ConvertKeystore extends SecurityAction {
 
-    @Option(name = "--in", required = true, description =
-        "source keystore file")
+    @Option(name = "--in", required = true, description = "source keystore file")
     @Completion(FileCompleter.class)
     private String inFile;
 
-    @Option(name = "--intype", required = true, description =
-        "type of the source keystore")
+    @Option(name = "--intype", required = true, description = "type of the source keystore")
     @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
     private String inType;
 
@@ -181,27 +176,22 @@ public class SecurityActions {
         "password of the source keystore, as plaintext or PBE-encrypted.")
     private String inPwdHint;
 
-    @Option(name = "--out", required = true, description =
-        "destination keystore file")
+    @Option(name = "--out", required = true, description = "destination keystore file")
     @Completion(FileCompleter.class)
     private String outFile;
 
-    @Option(name = "--outtype", required = true, description =
-        "type of the destination keystore")
+    @Option(name = "--outtype", required = true, description = "type of the destination keystore")
     @Completion(SecurityCompleters.KeystoreTypeWithPEMCompleter.class)
     private String outType;
 
     @Option(name = "--outpwd", description =
-        "password of the destination keystore, as plaintext or " +
-            "PBE-encrypted.\n" +
+        "password of the destination keystore, as plaintext or PBE-encrypted.\n" +
         "For PEM, you may use NONE to save the private key unprotected.")
     private String outPwdHint;
 
-    private static final byte[] CRLF = new byte[]{'\r', '\n'};
-
     @Override
     protected Object execute0() throws Exception {
-      File realInFile = new File(IoUtil.expandFilepath(inFile));
+      File realInFile  = new File(IoUtil.expandFilepath(inFile));
       File realOutFile = new File(IoUtil.expandFilepath(outFile));
 
       if (CompareUtil.equals(realInFile, realOutFile)) {
@@ -210,6 +200,7 @@ public class SecurityActions {
 
       KeyStore inKs = KeyStore.getInstance(inType);
       KeyStore outKs;
+
       ByteArrayOutputStream outPemKs;
 
       if ("PEM".equalsIgnoreCase(outType)) {
@@ -217,14 +208,13 @@ public class SecurityActions {
         outKs = null;
       } else {
         outPemKs = null;
-        outKs = KeyUtil.getOutKeyStore(outType);
+        outKs = KeyUtil.loadKeyStore(outType, null, null);
         outKs.load(null);
       }
 
       byte[] outBytes;
       try {
-        char[] inPassword = readPasswordIfNotSet(
-            "password of the source keystore", inPwdHint);
+        char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwdHint);
         try (InputStream inStream = Files.newInputStream(realInFile.toPath())) {
           inKs.load(inStream, inPassword);
         }
@@ -232,8 +222,7 @@ public class SecurityActions {
         boolean needsPassword = !("PEM".equalsIgnoreCase(outType)
             && "NONE".equalsIgnoreCase(outPwdHint));
         char[] outPassword = needsPassword
-             ? readPasswordIfNotSet(
-                "password of the destination keystore", outPwdHint)
+            ? readPasswordIfNotSet("password of the destination keystore", outPwdHint)
             : null;
 
         OutputEncryptor pemOe = null;
@@ -248,8 +237,7 @@ public class SecurityActions {
         while (aliases.hasMoreElements()) {
           String alias = aliases.nextElement();
           if (inKs.isKeyEntry(alias)) {
-            java.security.cert.Certificate[] certs =
-                inKs.getCertificateChain(alias);
+            java.security.cert.Certificate[] certs = inKs.getCertificateChain(alias);
             Key key = inKs.getKey(alias, inPassword);
             if (outKs != null) {
               outKs.setKeyEntry(alias, key, outPassword, certs);
@@ -258,8 +246,7 @@ public class SecurityActions {
                 outPemKs.write(PemEncoder.encode(key.getEncoded(),
                     PemEncoder.PemLabel.PRIVATE_KEY));
               } else {
-                JcaPKCS8Generator gen =
-                    new JcaPKCS8Generator((PrivateKey) key, pemOe);
+                JcaPKCS8Generator gen = new JcaPKCS8Generator((PrivateKey) key, pemOe);
                 PemObject po = gen.generate();
                 outPemKs.write(PemEncoder.encode(po.getContent(),
                     PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
@@ -293,22 +280,19 @@ public class SecurityActions {
         }
       }
 
-      saveVerbose("saved destination keystore to file",
-          realOutFile, outBytes);
+      saveVerbose("saved destination keystore to file", realOutFile, outBytes);
       return null;
     }
 
     private static void writePemCert(
         OutputStream out, java.security.cert.Certificate cert)
         throws CertificateEncodingException, IOException {
-      out.write(PemEncoder.encode(cert.getEncoded(),
-          PemEncoder.PemLabel.CERTIFICATE));
+      out.write(PemEncoder.encode(cert.getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
     }
 
   } // class ConvertKeystore
 
-  @Command(scope = "xi", name = "crl-info", description =
-      "print CRL information")
+  @Command(scope = "xi", name = "crl-info", description = "print CRL information")
   @Service
   public static class CrlInfo extends SecurityAction {
 
@@ -333,8 +317,7 @@ public class SecurityActions {
 
     @Override
     protected Object execute0() throws Exception {
-      CertificateList crl = CertificateList.getInstance(
-          X509Util.toDerEncoded(IoUtil.read(inFile)));
+      CertificateList crl = CertificateList.getInstance(X509Util.toDerEncoded(IoUtil.read(inFile)));
 
       if (crlNumber != null && crlNumber) {
         ASN1Encodable asn1 = crl.getTBSCertList().getExtensions()
@@ -346,8 +329,7 @@ public class SecurityActions {
       } else if (issuer != null && issuer) {
         return crl.getIssuer().toString();
       } else if (thisUpdate != null && thisUpdate) {
-        return toUtcTimeyyyyMMddhhmmssZ(
-            crl.getThisUpdate().getDate().toInstant());
+        return toUtcTimeyyyyMMddhhmmssZ(crl.getThisUpdate().getDate().toInstant());
       } else if (nextUpdate != null && nextUpdate) {
         return crl.getNextUpdate() == null ? "null" :
           toUtcTimeyyyyMMddhhmmssZ(crl.getNextUpdate().getDate().toInstant());
@@ -378,8 +360,7 @@ public class SecurityActions {
 
   } // class CrlInfo
 
-  @Command(scope = "xi", name = "import-cert", description =
-      "import certificates to a keystore")
+  @Command(scope = "xi", name = "import-cert", description = "import certificates to a keystore")
   @Service
   public static class ImportCert extends SecurityAction {
 
@@ -387,8 +368,7 @@ public class SecurityActions {
     @Completion(FileCompleter.class)
     private String ksFile;
 
-    @Option(name = "--type", required = true, description =
-        "type of the keystore")
+    @Option(name = "--type", required = true, description = "type of the keystore")
     @Completion(SecurityCompleters.KeystoreTypeCompleter.class)
     private String ksType;
 
@@ -404,22 +384,33 @@ public class SecurityActions {
     @Override
     protected Object execute0() throws Exception {
       File realKsFile = new File(IoUtil.expandFilepath(ksFile));
-      KeyStore ks = KeyUtil.getOutKeyStore(ksType);
-      char[] password = readPasswordIfNotSet(
-          "Enter the keystore password", ksPwdHint);
+      char[] password = readPasswordIfNotSet("Enter the keystore password", ksPwdHint);
 
       Set<String> aliases = new HashSet<>(10);
+
+      KeyStore ks = null;
+      PKCS12KeyStore pkcs12Ks = null;
+      boolean isPkcs12Ks = StringUtil.orEqualsIgnoreCase(ksType, "PKCS12", "PKCS#12");
+
       if (realKsFile.exists()) {
         try (InputStream inStream = Files.newInputStream(realKsFile.toPath())) {
-          ks.load(inStream, password);
+          if (isPkcs12Ks) {
+            pkcs12Ks = KeyUtil.loadPKCS12KeyStore(inStream, password);
+          } else {
+            ks = KeyUtil.loadKeyStore(ksType, inStream, password);
+          }
         }
 
-        Enumeration<String> strs = ks.aliases();
+        Enumeration<String> strs = isPkcs12Ks ? pkcs12Ks.aliases() : ks.aliases();
         while (strs.hasMoreElements()) {
           aliases.add(strs.nextElement());
         }
       } else {
-        ks.load(null);
+        if (isPkcs12Ks) {
+          pkcs12Ks = KeyUtil.loadPKCS12KeyStore(null, null);
+        } else {
+          ks = KeyUtil.loadKeyStore(ksType, null, null);
+        }
       }
 
       for (String certFile : certFiles) {
@@ -430,14 +421,23 @@ public class SecurityActions {
         while (aliases.contains(alias)) {
           alias = baseAlias + "-" + (idx++);
         }
-        ks.setCertificateEntry(alias, cert.toJceCert());
+
+        if (ks != null) {
+          ks.setCertificateEntry(alias, new JceX509Certificate(cert.getCert()));
+        } else {
+          pkcs12Ks.setCertificateEntry(alias, cert.getCert());
+        }
         aliases.add(alias);
       }
 
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream(4096)) {
-        ks.store(bout, password);
-        saveVerbose("saved keystore to file",
-            realKsFile, bout.toByteArray());
+        if (ks != null) {
+          ks.store(bout, password);
+        } else {
+          pkcs12Ks.store(bout, password);
+        }
+
+        saveVerbose("saved keystore to file", realKsFile, bout.toByteArray());
       }
       return null;
     }
@@ -449,8 +449,7 @@ public class SecurityActions {
   @Service
   public static class ExportCertP7m extends SecurityAction {
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -467,8 +466,7 @@ public class SecurityActions {
     @Override
     protected Object execute0() throws Exception {
       byte[] encodedCert = extractCertFromSignedData(IoUtil.read(p7mFile));
-      saveVerbose("saved certificate to file", certFile,
-          encodeCert(encodedCert, outform));
+      saveVerbose("saved certificate to file", certFile, encodeCert(encodedCert, outform));
       return null;
     }
 
@@ -479,8 +477,7 @@ public class SecurityActions {
   @Service
   public static class ExportKeyCertPem extends SecurityAction {
 
-    @Option(name = "--outform", description =
-        "output format of the key and certificate")
+    @Option(name = "--outform", description = "output format of the key and certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -504,8 +501,7 @@ public class SecurityActions {
       byte[] keyBytes = null;
       byte[] certBytes = null;
 
-      try (PemReader reader = new PemReader(new FileReader(
-          IoUtil.expandFilepath(pemFile)))) {
+      try (PemReader reader = new PemReader(new FileReader(IoUtil.expandFilepath(pemFile)))) {
         PemObject pemObject;
         while ((pemObject = reader.readPemObject()) != null) {
           String type = pemObject.getType();
@@ -535,8 +531,7 @@ public class SecurityActions {
         saveVerbose("private key saved to file", keyFile,
             derPemEncode(keyBytes, outform, PemEncoder.PemLabel.PRIVATE_KEY));
 
-        saveVerbose("certificate saved to file", certFile,
-            encodeCert(certBytes, outform));
+        saveVerbose("certificate saved to file", certFile, encodeCert(certBytes, outform));
       }
       return null;
     }
@@ -548,8 +543,7 @@ public class SecurityActions {
   @Service
   public static class ExportKeyCertEst extends SecurityAction {
 
-    @Option(name = "--outform", description =
-        "output format of the key and certificate")
+    @Option(name = "--outform", description = "output format of the key and certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -634,8 +628,7 @@ public class SecurityActions {
       return null;
     }
 
-    private static Object[] readBlock(BufferedReader reader, String boundary)
-        throws IOException {
+    private static Object[] readBlock(BufferedReader reader, String boundary) throws IOException {
       StringBuilder sb = new StringBuilder();
       String line;
 
@@ -673,8 +666,7 @@ public class SecurityActions {
             contentType = line.substring("content-type:".length()).trim();
           } else if (StringUtil.startsWithIgnoreCase(line,
               "content-transfer-encoding:")) {
-            encoding = line.substring("content-transfer-encoding:".length())
-                        .trim();
+            encoding = line.substring("content-transfer-encoding:".length()).trim();
           }
         }
       }
@@ -710,14 +702,14 @@ public class SecurityActions {
         String ksFile, String alias, String passwordHint)
         throws CmdFailure {
       try {
-        KeyStore ks = KeyUtil.getInKeyStore("JCEKS");
+        KeyStore ks;
         char[] password = readPasswordIfNotSet(
             "password of the keystore " + ksFile, passwordHint);
 
         SecretKey key = null;
         File file = IoUtil.expandFilepath(new File(ksFile));
         try (InputStream is = Files.newInputStream(file.toPath())) {
-          ks.load(is, password);
+          ks = KeyUtil.loadKeyStore("JCEKS", is, password);
           if (ks.isKeyEntry(alias)) {
             key = (SecretKey) ks.getKey(alias, password);
           }
@@ -727,7 +719,7 @@ public class SecurityActions {
           throw new CmdFailure(ksFile + " does not contain any secret key");
         }
         return key;
-      } catch (GeneralSecurityException | IOException | RuntimeException ex) {
+      } catch (GeneralSecurityException | IOException | XiSecurityException | RuntimeException ex) {
         throw new CmdFailure("error reading secret key from " + ksFile, ex);
       }
     }

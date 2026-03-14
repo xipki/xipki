@@ -23,8 +23,7 @@ public class Asn1SubjectPublicKey {
 
   private final byte[] publicKeyData;
 
-  public Asn1SubjectPublicKey(Asn1AlgorithmIdentifier algId,
-                              byte[] publicKeyData) {
+  public Asn1SubjectPublicKey(Asn1AlgorithmIdentifier algId, byte[] publicKeyData) {
     this.algId = Args.notNull(algId, "algId");
     this.publicKeyData = Args.notNull(publicKeyData, "publicKeyData");
   }
@@ -37,17 +36,13 @@ public class Asn1SubjectPublicKey {
     return publicKeyData;
   }
 
-  public static Asn1SubjectPublicKey getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1SubjectPublicKey getInstance(byte[] encoded) throws InvalidKeySpecException {
     String errMsg = "invalid SubjectPublicKey";
     AtomicInteger offset = new AtomicInteger();
     try {
       Asn1Util.readSeqPrefix(encoded, offset, errMsg);
-
-      Asn1AlgorithmIdentifier algId = Asn1AlgorithmIdentifier.getInstance(
-          encoded, offset);
-      byte[] publicKeyData = Asn1Util.readOctetsFromASN1BitString(
-          encoded, offset);
+      Asn1AlgorithmIdentifier algId = Asn1AlgorithmIdentifier.getInstance(encoded, offset);
+      byte[] publicKeyData = Asn1Util.readOctetsFromASN1BitString(encoded, offset);
       return new Asn1SubjectPublicKey(algId, publicKeyData);
     } catch (CodecException e) {
       throw new InvalidKeySpecException(errMsg + ": " + e.getMessage(), e);

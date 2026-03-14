@@ -60,8 +60,7 @@ public class SIGN_ADDITIONAL_CONTEXT extends CkParams {
         "pContext", context);
   }
 
-  public static SIGN_ADDITIONAL_CONTEXT decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static SIGN_ADDITIONAL_CONTEXT decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.SIGN_ADDITIONAL_CONTEXT);
     return new SIGN_ADDITIONAL_CONTEXT(

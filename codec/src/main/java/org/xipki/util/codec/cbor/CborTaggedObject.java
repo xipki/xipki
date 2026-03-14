@@ -9,6 +9,8 @@ import org.xipki.util.codec.Hex;
 import java.util.Arrays;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class CborTaggedObject implements CborEncodable {
@@ -43,14 +45,9 @@ public class CborTaggedObject implements CborEncodable {
 
   @Override
   public int hashCode() {
-    int hashCode;
-    if (value == null) {
-      hashCode = 0;
-    } else if (value instanceof byte[]) {
-      hashCode = Arrays.hashCode((byte[]) value);
-    } else {
-      hashCode = value.hashCode();
-    }
+    int hashCode = (value == null) ? 0
+        : (value instanceof byte[]) ? Arrays.hashCode((byte[]) value)
+        : value.hashCode();
 
     return hashCode * 31 + Long.hashCode(tag);
   }
@@ -58,13 +55,9 @@ public class CborTaggedObject implements CborEncodable {
   @Override
   public String toString() {
     String str = "tag " + tag + ": ";
-    if (value == null) {
-      return str + "<null>";
-    } else if (value instanceof byte[]) {
-      return str + "h'" + Hex.encode(((byte[]) value));
-    } else {
-      return str + value;
-    }
+    return (value == null) ? str + "<null>"
+        : (value instanceof byte[]) ? str + "h'" + Hex.encode(((byte[]) value))
+        : str + value;
   }
 
   @Override
@@ -74,13 +67,10 @@ public class CborTaggedObject implements CborEncodable {
     if (!(obj instanceof CborTaggedObject)) return false;
 
     CborTaggedObject b = (CborTaggedObject) obj;
-    if (value == null) {
-      return b.value == null;
-    } else if (value instanceof byte[]) {
-      return Arrays.equals((byte[]) value, (byte[]) b.value);
-    } else {
-      return value.equals(b.value);
-    }
+    return (value == null) ? b.value == null
+        : (value instanceof byte[] && b.value instanceof byte[])
+              ? Arrays.equals((byte[]) value, (byte[]) b.value)
+        : value.equals(b.value);
   }
 
 }

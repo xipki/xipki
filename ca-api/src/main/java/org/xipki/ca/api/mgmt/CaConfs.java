@@ -49,8 +49,7 @@ public class CaConfs {
    * @param out the output stream.
    * @throws IOException if IO error occurs while writing to the output stream.
    */
-  public static void marshal(CaConfType.CaSystem root, OutputStream out)
-      throws IOException {
+  public static void marshal(CaConfType.CaSystem root, OutputStream out) throws IOException {
     Args.notNull(root, "root");
     Args.notNull(out, "out");
 
@@ -62,8 +61,8 @@ public class CaConfs {
       throws IOException, InvalidConfException {
     Args.notNull(confFilename, "confFilename");
 
-    ByteArrayOutputStream bytesStream =
-        new ByteArrayOutputStream(1048576); // initial 1M
+    // initial 1M
+    ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576);
     String baseDir;
 
     try (ZipOutputStream zipStream = new ZipOutputStream(bytesStream)) {
@@ -108,8 +107,7 @@ public class CaConfs {
 
           if (m.cert() != null && m.cert().file() != null) {
             String zipEntryName = "files/signer-" + name + ".crt";
-            byte[] value = getBinary(m.conf().file(),
-                            properties, baseDir);
+            byte[] value = getBinary(m.conf().file(), properties, baseDir);
             createFileOrBinary(zipStream, value, zipEntryName);
             m.cert().setFile(zipEntryName);
           }
@@ -128,11 +126,9 @@ public class CaConfs {
             m.conf().setFile(zipEntryName);
           }
 
-          if (m.binaryConf() != null
-              && m.binaryConf().file() != null) {
+          if (m.binaryConf() != null && m.binaryConf().file() != null) {
             String zipEntryName = "files/requestor-" + name + ".bin";
-            byte[] value = getBinary(m.binaryConf().file(),
-                            properties, baseDir);
+            byte[] value = getBinary(m.binaryConf().file(), properties, baseDir);
             createFileOrBinary(zipStream, value, zipEntryName);
             m.binaryConf().setFile(zipEntryName);
           }
@@ -189,8 +185,7 @@ public class CaConfs {
             if (ci.genSelfIssued() == null) {
               if (ci.cert() != null && ci.cert().file() != null) {
                 String zipEntryName = "files/ca-" + name + ".crt";
-                byte[] value = getBinary(ci.cert().file(),
-                                properties, baseDir);
+                byte[] value = getBinary(ci.cert().file(), properties, baseDir);
                 createFileOrBinary(zipStream, value, zipEntryName);
                 ci.cert().setFile(zipEntryName);
               }
@@ -199,8 +194,7 @@ public class CaConfs {
                 for (int i = 0; i < ci.getCertchain().size(); i++) {
                   FileOrBinary fi = ci.getCertchain().get(i);
                   if (fi.file() != null) {
-                    String zipEntryName =
-                        "files/cacerts-" + name + "-" + i + ".crt";
+                    String zipEntryName = "files/cacerts-" + name + "-" + i + ".crt";
                     byte[] value = getBinary(fi.file(), properties, baseDir);
                     createFileOrBinary(zipStream, value, zipEntryName);
                     fi.setFile(zipEntryName);
@@ -209,8 +203,7 @@ public class CaConfs {
               }
             } else {
               if (ci.cert() != null) {
-                throw new InvalidConfException(
-                    "cert of CA " + name + " may not be set");
+                throw new InvalidConfException("cert of CA " + name + " may not be set");
               }
             }
           }
@@ -235,8 +228,7 @@ public class CaConfs {
     return new ByteArrayInputStream(bytesStream.toByteArray());
   } // method convertFileConfToZip
 
-  private static void createFileOrValue(
-      ZipOutputStream zipStream, String content, String fileName)
+  private static void createFileOrValue(ZipOutputStream zipStream, String content, String fileName)
       throws IOException {
     ZipEntry certZipEntry = new ZipEntry(fileName);
     zipStream.putNextEntry(certZipEntry);
@@ -247,8 +239,7 @@ public class CaConfs {
     }
   } // method createFileOrValue
 
-  private static void createFileOrBinary(
-      ZipOutputStream zipStream, byte[] content, String fileName)
+  private static void createFileOrBinary(ZipOutputStream zipStream, byte[] content, String fileName)
       throws IOException {
     ZipEntry certZipEntry = new ZipEntry(fileName);
     zipStream.putNextEntry(certZipEntry);
@@ -259,25 +250,20 @@ public class CaConfs {
     }
   } // method createFileOrBinary
 
-  public static String getValue(
-      String fileName, Map<String, String> properties, String baseDir)
+  public static String getValue(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     byte[] binary = getBinary(fileName, properties, baseDir);
     return StringUtil.toUtf8String(binary);
   } // method getValue
 
-  public static byte[] getBinary(
-      String fileName, Map<String, String> properties, String baseDir)
+  public static byte[] getBinary(String fileName, Map<String, String> properties, String baseDir)
       throws IOException {
     fileName = expandConf(fileName, properties);
-    return IoUtil.read(
-        Paths.get(resolveFilePath(fileName, baseDir)).toFile());
+    return IoUtil.read(Paths.get(resolveFilePath(fileName, baseDir)).toFile());
   } // method getBinary
 
-  private static String expandConf(
-      String confStr, Map<String, String> properties) {
-    if (confStr == null || !confStr.contains("${")
-        || confStr.indexOf('}') == -1) {
+  private static String expandConf(String confStr, Map<String, String> properties) {
+    if (confStr == null || !confStr.contains("${") || confStr.indexOf('}') == -1) {
       return confStr;
     }
 
@@ -330,8 +316,7 @@ public class CaConfs {
     return changed ? confPairs.getEncoded() : conf;
   } // method convertSignerConf
 
-  public static void checkName(String param, String paramName)
-      throws InvalidConfException {
+  public static void checkName(String param, String paramName) throws InvalidConfException {
     if (param == null || param.isEmpty()) {
       throw new InvalidConfException(paramName + " must not be blank");
     }
@@ -339,13 +324,11 @@ public class CaConfs {
     for (int i = 0; i < param.length(); i++) {
       char c = param.charAt(i);
       if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z')
-          || (c >= 'A' && c <= 'Z')
-          || (c == '-') || (c == '_') || (c == '.')) {
+          || (c >= 'A' && c <= 'Z') || (c == '-') || (c == '_') || (c == '.')) {
         continue;
       }
 
-      throw new InvalidConfException(
-          "invalid char '" + c + "' in " + paramName);
+      throw new InvalidConfException("invalid char '" + c + "' in " + paramName);
     }
   }
 

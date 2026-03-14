@@ -8,169 +8,96 @@
     <format>tar.gz</format>
   </formats>
   <fileSets>
+    <!-- target/classes: the filtered and unfiltered resources -->
     <fileSet>
-      <directory>${shared.dir}/license</directory>
-      <outputDirectory>license</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${shared.dir}/tomcat/xipki</directory>
-      <outputDirectory>xipki</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/jars</directory>
-      <outputDirectory>.</outputDirectory>
-      <excludes>
-        <exclude>system/org/apache/karaf/features/**</exclude>
-      </excludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- ${project.build.directory}/classes -->
-    <fileSet>
-      <directory>${project.build.directory}/classes</directory>
+      <directory>${project.build.outputDirectory}</directory>
       <includes>
-        <include>bin/**</include>
         <include>**/*.sh</include>
       </includes>
-      <excludes>
-        <exclude>bin/*.bat</exclude>
-      </excludes>
       <outputDirectory>.</outputDirectory>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/classes</directory>
-      <includes>
-        <include>bin/*.bat</include>
-      </includes>
-      <outputDirectory>.</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/classes</directory>
+      <directory>${project.build.outputDirectory}</directory>
       <excludes>
-        <exclude>bin/**</exclude>
         <exclude>**/*.sh</exclude>
       </excludes>
       <outputDirectory>.</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- QA -->
+
+    <!-- target/classes: the filtered and unfiltered resources -->
     <fileSet>
-      <directory>src/qa/unfiltered</directory>
-      <outputDirectory>.</outputDirectory>
+      <directory>${project.build.directory}/setup</directory>
+      <outputDirectory>setup</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy start scripts -->
+
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
+      <directory>${project.build.directory}/t2/xipki-qa</directory>
+      <outputDirectory>xipki-qa</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <!-- copy from xipki-setup -->
+    <fileSet>
+      <directory>${project.build.directory}/xipki-setup-${project.version}/xipki-mgmt-cli</directory>
+      <outputDirectory>xipki-qa</outputDirectory>
       <includes>
-        <include>inc</include>
-        <include>setenv</include>
-        <include>client</include>
-        <include>instance</include>
-        <include>karaf</include>
-        <include>shell</include>
-        <include>start</include>
-        <include>status</include>
-        <include>stop</include>
+        <include>bin/*</include>
       </includes>
-      <outputDirectory>bin/</outputDirectory>
-      <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}/bin</directory>
-      <includes>
-        <include>*.bat</include>
-      </includes>
-      <outputDirectory>bin/</outputDirectory>
-      <lineEnding>dos</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- Expanded Karaf -->
-    <fileSet>
-      <directory>${project.build.directory}/apache-karaf-minimal-${karaf.version}</directory>
-      <outputDirectory>.</outputDirectory>
+      <directory>${project.build.directory}/xipki-setup-${project.version}/xipki-mgmt-cli</directory>
+      <outputDirectory>xipki-qa</outputDirectory>
       <excludes>
-        <exclude>bin/**</exclude>
-        <exclude>deploy/README</exclude>
-        <exclude>README</exclude>
-        <exclude>LICENSE</exclude>
-        <exclude>NOTICE</exclude>
-        <exclude>RELEASE-NOTES</exclude>
-        <exclude>karaf-manual*</exclude>
-        <exclude>*.md</exclude>
-        <!-- We use only the OSGi core apache felix instead of eclipse.osgi. -->
-        <exclude>system/**/org.eclipse.osgi/**</exclude>
-        <exclude>system/org/apache/karaf/config/**</exclude>
-        <exclude>system/org/apache/karaf/jaas/blueprint/**</exclude>
-        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.config/**</exclude>
-        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.modules/**</exclude>
-        <exclude>system/org/apache/karaf/jaas/org.apache.karaf.jaas.command/**</exclude>
-        <exclude>system/org/apache/sshd/**</exclude>
-        <exclude>system/org/apache/servicemix/bundles/org.apache.servicemix.bundles.not-yet-commons-ssl/**</exclude>
-        <exclude>system/org/apache/karaf/shell/org.apache.karaf.shell.ssh/**</exclude>
-        <exclude>etc/equinox-debug.properties</exclude>
-        <exclude>etc/org.apache.karaf.features.repos.cfg</exclude>
-        <exclude>etc/org.apache.karaf.jaas.cfg</exclude>
-        <exclude>etc/org.apache.karaf.kar</exclude>
-        <!-- do not use the bc* from the apache karaf -->
-        <exclude>system/org/bouncycastle/bcutil-jdk15on/**</exclude>
-        <exclude>system/org/bouncycastle/bcprov-jdk15on/**</exclude>
-        <exclude>system/org/bouncycastle/bcpkix-jdk15on/**</exclude>
+        <exclude>bin/*</exclude>
+        <exclude>system/**</exclude>
+        <exclude>demo/**</exclude>
+        <exclude>xipki/ca-setup/**</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy xipki-ca -->
     <fileSet>
-      <directory>${project.build.directory}/xipki-ca-${project.version}/</directory>
-      <outputDirectory>xipki-ca</outputDirectory>
+      <directory>${project.build.directory}/xipki-setup-${project.version}/xipki-mgmt-cli</directory>
+      <outputDirectory>xipki-qa</outputDirectory>
+      <includes>
+        <include>xipki/ca-setup/c14n-keyspec.script</include>
+        <include>xipki/ca-setup/print-keyspecs.script</include>
+      </includes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy xipki-ocsp -->
     <fileSet>
-      <directory>${project.build.directory}/xipki-ocsp-${project.version}/</directory>
-      <outputDirectory>xipki-ocsp</outputDirectory>
-    </fileSet>
-    <!-- Copy xipki-gateway -->
-    <fileSet>
-      <directory>${project.build.directory}/xipki-gateway-${project.version}/</directory>
-      <outputDirectory>xipki-gateway</outputDirectory>
+      <directory>${project.build.directory}/xipki-setup-${project.version}</directory>
+      <outputDirectory>.</outputDirectory>
+      <excludes>
+        <exclude>xipki-cli/**</exclude>
+        <exclude>xipki-mgmt-cli/**</exclude>
+        <exclude>*.sh</exclude>
+        <exclude>setup/**</exclude>
+        <exclude>CHANGELOG.md</exclude>
+        <exclude>INSTALL.md</exclude>
+        <exclude>README.md</exclude>
+        <exclude>license/**</exclude>
+      </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
+
   <files>
     <file>
-      <source>README.md</source>
-      <outputDirectory>.</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${shared.dir}/tomcat/xipki/security/pkcs11.json</source>
-      <outputDirectory>xipki/security</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/apache-karaf-minimal-${karaf.version}/LICENSE</source>
-      <outputDirectory>license</outputDirectory>
-      <destName>karaf-LICENSE.txt</destName>
-      <fileMode>0644</fileMode>
-    </file>
-    <file>
-      <source>${project.build.directory}/webapps/dummy-servlet.war</source>
-      <outputDirectory>xipki/tomcat-files/xipki-ca/tomcat/webapps</outputDirectory>
+      <source>${project.build.directory}/t2/xipki-dummy/tomcat/webapps/dummy-servlet.war</source>
+      <outputDirectory>xipki-dummy/tomcat/webapps</outputDirectory>
       <destName>dummy.war</destName>
       <fileMode>0644</fileMode>
     </file>

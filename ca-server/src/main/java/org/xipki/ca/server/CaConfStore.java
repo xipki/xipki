@@ -59,8 +59,7 @@ public interface CaConfStore {
 
   CaInfo createCaInfo(String name, CertStore certstore) throws CaMgmtException;
 
-  Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca)
-      throws CaMgmtException;
+  Set<CaHasRequestorEntry> createCaHasRequestors(NameId ca) throws CaMgmtException;
 
   Set<CaProfileIdAliases> createCaHasProfiles(NameId ca) throws CaMgmtException;
 
@@ -72,8 +71,7 @@ public interface CaConfStore {
 
   void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException;
 
-  void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases)
-      throws CaMgmtException;
+  void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases) throws CaMgmtException;
 
   void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException;
 
@@ -81,14 +79,12 @@ public interface CaConfStore {
 
   NameId addEmbeddedRequestor(String requestorName) throws CaMgmtException;
 
-  void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca)
-      throws CaMgmtException;
+  void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException;
 
   void addPublisher(PublisherEntry dbEntry) throws CaMgmtException;
 
   void changeCa(ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConfInfo,
-                SecurityFactory securityFactory)
-      throws CaMgmtException;
+                SecurityFactory securityFactory) throws CaMgmtException;
 
   void commitNextCrlNoIfLess(NameId ca, long nextCrlNo) throws CaMgmtException;
 
@@ -96,16 +92,15 @@ public interface CaConfStore {
       NameId nameId, String type, String conf, CaManagerImpl certprofileManager)
       throws CaMgmtException;
 
-  RequestorEntryWrapper changeRequestor(
-      NameId nameId, String type, String conf) throws CaMgmtException;
+  RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf)
+      throws CaMgmtException;
 
   SignerEntry changeSigner(
       String name, String type, String conf, String base64Cert,
       CaManagerImpl signerManager) throws CaMgmtException;
 
   KeypairGenEntryWrapper changeKeypairGen(
-      String name, String type, String conf, CaManagerImpl manager)
-      throws CaMgmtException;
+      String name, String type, String conf, CaManagerImpl manager) throws CaMgmtException;
 
   IdentifiedCertPublisher changePublisher(
       String name, String type, String conf, CaManagerImpl publisherManager)
@@ -113,19 +108,15 @@ public interface CaConfStore {
 
   void removeCaAlias(String aliasName) throws CaMgmtException;
 
-  void removeCertprofileFromCa(String profileName, String caName)
-      throws CaMgmtException;
+  void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException;
 
-  void removeRequestorFromCa(String requestorName, String caName)
-      throws CaMgmtException;
+  void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException;
 
-  void removePublisherFromCa(String publisherName, String caName)
-      throws CaMgmtException;
+  void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException;
 
   void removeDbSchema(String name) throws CaMgmtException;
 
-  void revokeCa(String caName, CertRevocationInfo revocationInfo)
-      throws CaMgmtException;
+  void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException;
 
   void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException;
 

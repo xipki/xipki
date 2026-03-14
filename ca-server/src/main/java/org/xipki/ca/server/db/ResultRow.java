@@ -58,8 +58,7 @@ class ResultRow {
         case Types.CLOB:
         case Types.NCLOB:
           Clob clob = rs.getClob(index);
-          value = (clob == null) ? null
-              : clob.getSubString(1, (int) clob.length());
+          value = (clob == null) ? null : clob.getSubString(1, (int) clob.length());
           break;
         case Types.TIMESTAMP:
         case Types.TIMESTAMP_WITH_TIMEZONE:
@@ -112,8 +111,7 @@ class ResultRow {
     } else if (obj instanceof Boolean) {
       return ((boolean) obj) ? 1 : 0;
     } else {
-      throw new IllegalArgumentException(
-          "cannot convert " + obj.getClass().getName() + " to int");
+      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to int");
     }
   }
 
@@ -148,8 +146,7 @@ class ResultRow {
     } else if (obj instanceof Boolean) {
       return ((boolean) obj) ? 1 : 0;
     } else {
-      throw new IllegalArgumentException(
-          "cannot convert " + obj.getClass().getName() + " to long");
+      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to long");
     }
   }
 
@@ -205,8 +202,7 @@ class ResultRow {
     if (obj instanceof Time) {
       return (Time) obj;
     } else {
-      throw new IllegalArgumentException(
-          "cannot convert " + obj.getClass().getName() + " to Time");
+      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to Time");
     }
   }
 
@@ -219,8 +215,7 @@ class ResultRow {
     if (obj instanceof Date) {
       return (Date) obj;
     } else {
-      throw new IllegalArgumentException(
-          "cannot convert " + obj.getClass().getName() + " to Date");
+      throw new IllegalArgumentException("cannot convert " + obj.getClass().getName() + " to Date");
     }
   }
 

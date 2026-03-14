@@ -27,8 +27,7 @@ public class EnrollCertResult {
 
     private final PkiStatusInfo error;
 
-    public CertifiedKeyPairOrError(X509Cert certificate,
-                                   PrivateKeyInfo privateKeyInfo) {
+    public CertifiedKeyPairOrError(X509Cert certificate, PrivateKeyInfo privateKeyInfo) {
       this.certificate = Args.notNull(certificate, "certificate");
       this.privateKeyInfo = privateKeyInfo;
       this.error = null;
@@ -58,8 +57,8 @@ public class EnrollCertResult {
 
   private final Map<String, CertifiedKeyPairOrError> certsOrErrors;
 
-  public EnrollCertResult(X509Cert[] caCertChain,
-                          Map<String, CertifiedKeyPairOrError> certsOrErrors) {
+  public EnrollCertResult(
+      X509Cert[] caCertChain, Map<String, CertifiedKeyPairOrError> certsOrErrors) {
     this.certsOrErrors = Args.notEmpty(certsOrErrors, "certsOrErrors");
     this.caCertChain = caCertChain;
   }

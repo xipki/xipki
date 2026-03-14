@@ -12,14 +12,14 @@ import org.xipki.pkcs11.xihsm.LoginState;
 import org.xipki.pkcs11.xihsm.XiHsmVendor;
 import org.xipki.pkcs11.xihsm.attr.XiAttribute;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
-import org.xipki.pkcs11.xihsm.crypt.GMUtil;
-import org.xipki.pkcs11.xihsm.crypt.HashAlgo;
-import org.xipki.pkcs11.xihsm.crypt.WeierstraussCurveEnum;
 import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.HashAlgo;
+import org.xipki.security.util.KeyUtil;
+import org.xipki.security.util.WeierstraussCurveEnum;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.asn1.Asn1Util;
 
@@ -28,6 +28,8 @@ import java.security.SecureRandom;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
@@ -37,23 +39,20 @@ public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
   private final byte[] za;
 
   public XiSm2ECPrivateKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, Long keyGenMechanism,
-      byte[] ecParams, byte[] value, byte[] ecPoint) throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle, boolean inToken,
+      Long keyGenMechanism, byte[] ecParams, byte[] value, byte[] ecPoint)
+      throws HsmException {
     this(vendor, cku, newObjectMethod, handle, inToken,
-        PKCS11T.CKK_VENDOR_SM2, keyGenMechanism, ecParams,
-        value, ecPoint);
+        PKCS11T.CKK_VENDOR_SM2, keyGenMechanism, ecParams, value, ecPoint);
   }
 
   public XiSm2ECPrivateKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, long keyType,
-      Long keyGenMechanism, byte[] ecParams, byte[] value, byte[] ecPoint)
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle, boolean inToken,
+      long keyType, Long keyGenMechanism, byte[] ecParams, byte[] value, byte[] ecPoint)
       throws HsmException {
-    super(vendor, cku, newObjectMethod, handle, inToken, keyType,
-        keyGenMechanism, ecParams, value);
+    super(vendor, cku, newObjectMethod, handle, inToken, keyType, keyGenMechanism, ecParams, value);
     this.ecPoint = Args.notNull(ecPoint, "ecPoint");
-    this.za = GMUtil.getSM2Z(ecPoint);
+    this.za = KeyUtil.getSM2Z(null, ecPoint);
   }
 
   @Override
@@ -64,21 +63,16 @@ public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
-
     addAttr(res, types, PKCS11T.CKA_EC_POINT, ecPoint);
   }
 
   @Override
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                            SecureRandom random)
-      throws HsmException {
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random) throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     long ckm = mechanism.getCkm();
@@ -95,8 +89,7 @@ public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
     }
   }
 
-  private byte[] signEhash(XiHsmVendor vendor, byte[] hash,
-                           SecureRandom random) {
+  private byte[] signEhash(XiHsmVendor vendor, byte[] hash, SecureRandom random) {
     WeierstraussCurveEnum SM2 = WeierstraussCurveEnum.SM2;
     BigInteger order = SM2.getOrder();
     BigInteger eh= new BigInteger(1, hash);
@@ -146,18 +139,15 @@ public class XiSm2ECPrivateKey extends XiWeierstrassECPrivateKey {
       LoginState loginState, ObjectInitMethod initMethod,
       long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
       throws HsmException {
-    byte[] ecParams = attrs.removeNonNullByteArray(
-        PKCS11T.CKA_EC_PARAMS);
+    byte[] ecParams = attrs.removeNonNullByteArray(PKCS11T.CKA_EC_PARAMS);
     byte[] value = attrs.removeNonNullByteArray(PKCS11T.CKA_VALUE);
-
     byte[] bytes = attrs.removeByteArray(PKCS11T.CKA_EC_POINT);
     byte[] ecPoint = null;
     if (bytes != null) {
       ecPoint = HsmUtil.getOctetStringValue("EC_Point", bytes);
     }
 
-    XiSm2ECPrivateKey ret = new XiSm2ECPrivateKey(
-        vendor, cku, newObjectMethod,
+    XiSm2ECPrivateKey ret = new XiSm2ECPrivateKey(vendor, cku, newObjectMethod,
         handle, inToken, keyGenMechanism, ecParams, value, ecPoint);
     ret.updateAttributes(loginState, initMethod, attrs);
     return ret;

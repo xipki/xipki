@@ -30,8 +30,7 @@ abstract class AbstractOcspCertstoreDbImporter extends DbPorter {
       "ID,IID,SN,LUPDATE,NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,SUBJECT,CRL_ID");
 
   AbstractOcspCertstoreDbImporter(DataSourceWrapper datasource, String srcDir,
-                                  AtomicBoolean stopMe)
-      throws Exception {
+                                  AtomicBoolean stopMe) throws Exception {
     super(datasource, srcDir, stopMe);
   }
 

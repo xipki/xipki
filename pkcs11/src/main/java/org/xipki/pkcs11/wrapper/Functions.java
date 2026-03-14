@@ -47,8 +47,7 @@ public class Functions {
     ecParamsInfoMap = new HashMap<>(120);
 
     String propFile = "org/xipki/pkcs11/wrapper/ec.json";
-    try (InputStream is = Functions.class.getClassLoader()
-                            .getResourceAsStream(propFile)) {
+    try (InputStream is = Functions.class.getClassLoader().getResourceAsStream(propFile)) {
       JsonList json = JsonParser.parseList(is, true);
       for (JsonMap v : json.toMapList()) {
         ECInfo ecInfo = new ECInfo();
@@ -117,12 +116,10 @@ public class Functions {
   }
 
   private static final char[] DIGITS = {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
   private static final char[] UPPER_DIGITS = {
-      '0', '1', '2', '3', '4', '5', '6', '7',
-      '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
   private static String toFullHex(long value, boolean upperCase) {
     long currentValue = value;
@@ -179,8 +176,8 @@ public class Functions {
     }
   }
 
-  public static String toStringFlags(Category category, String prefix,
-                                     long flags, long... flagMasks) {
+  public static String toStringFlags(
+      Category category, String prefix, long flags, long... flagMasks) {
     // initialize the indent for non-first lines.
     char[] indentChars = new char[prefix.length() + 1];
     Arrays.fill(indentChars, ' ');
@@ -236,8 +233,7 @@ public class Functions {
     byte[] baseXBytes = baseX.toByteArray();
     for (Map.Entry<String, ECInfo> m : ecParamsInfoMap.entrySet()) {
       ECInfo ei = m.getValue();
-      if (Arrays.equals(ei.order, orderBytes)
-          && Arrays.equals(ei.baseX, baseXBytes)) {
+      if (Arrays.equals(ei.order, orderBytes) && Arrays.equals(ei.baseX, baseXBytes)) {
         return Hex.decode(m.getKey());
       }
     }
@@ -245,8 +241,7 @@ public class Functions {
   }
 
   public static Integer getCurveOrderBitLength(byte[] ecParams) {
-    ECInfo ecInfo = ecParamsInfoMap.get(
-        Hex.encode(ecParams, 0, ecParams.length));
+    ECInfo ecInfo = ecParamsInfoMap.get(Hex.encode(ecParams, 0, ecParams.length));
     return (ecInfo == null) ? null : ecInfo.orderBitLength;
   }
 
@@ -267,8 +262,7 @@ public class Functions {
 
   private static ECInfo getECInfo(byte[] ecParams) {
     // by OID
-    ECInfo ecInfo = ecParamsInfoMap.get(
-        Hex.encode(ecParams, 0, ecParams.length));
+    ECInfo ecInfo = ecParamsInfoMap.get(Hex.encode(ecParams, 0, ecParams.length));
     if (ecInfo != null) {
       return ecInfo;
     }
@@ -292,8 +286,7 @@ public class Functions {
   }
 
   public static byte[] fixECDSASignature(byte[] sig, byte[] ecParams) {
-    ECInfo ecInfo = ecParamsInfoMap.get(
-        Hex.encode(ecParams, 0, ecParams.length));
+    ECInfo ecInfo = ecParamsInfoMap.get(Hex.encode(ecParams, 0, ecParams.length));
     if (ecInfo == null) {
       return sig;
     }

@@ -8,6 +8,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -28,8 +29,7 @@ public class FinalizeOrderPayload implements JsonEncodable {
     return new JsonMap().put("csr", csr);
   }
 
-  public static FinalizeOrderPayload parse(JsonMap json)
-      throws CodecException {
+  public static FinalizeOrderPayload parse(JsonMap json) throws CodecException {
     return new FinalizeOrderPayload(json.getString("csr"));
   }
 

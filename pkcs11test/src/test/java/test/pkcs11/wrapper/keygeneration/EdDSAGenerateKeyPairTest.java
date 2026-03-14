@@ -110,8 +110,7 @@ public class EdDSAGenerateKeyPairTest {
       generateEdwardsKeypair(PKCS11KeyPairType.ED448);
     }
 
-    private void generateEdwardsKeypair(PKCS11KeyPairType keyPairType)
-        throws TokenException {
+    private void generateEdwardsKeypair(PKCS11KeyPairType keyPairType) throws TokenException {
       PKCS11Token token = getToken();
       Assume.assumeTrue(token.supportsMechanism(CKM_EC_EDWARDS_KEY_PAIR_GEN,
           CKF_GENERATE_KEY_PAIR));
@@ -162,8 +161,7 @@ public class EdDSAGenerateKeyPairTest {
         LOG.info("Trying to search for the public key of the generated " +
             "key-pair by ID: {}", Functions.toHex(id));
         // set the search template for the public key
-        Template exportPublicKeyTemplate =
-            newPublicKey(CKK_EC_EDWARDS).attr(CKA_ID, id);
+        Template exportPublicKeyTemplate = newPublicKey(CKK_EC_EDWARDS).attr(CKA_ID, id);
 
         long[] foundPublicKeys = token.findObjects(exportPublicKeyTemplate, 1);
         if (foundPublicKeys.length != 1) {

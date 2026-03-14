@@ -36,8 +36,7 @@ public class DataSourceConf {
     return name;
   }
 
-  public static List<DataSourceConf> parseList(JsonList json)
-      throws CodecException {
+  public static List<DataSourceConf> parseList(JsonList json) throws CodecException {
     if (json == null) {
       return null;
     }
@@ -49,8 +48,7 @@ public class DataSourceConf {
     return ret;
   }
 
-  public static DataSourceConf[] parseArray(JsonList json)
-      throws CodecException {
+  public static DataSourceConf[] parseArray(JsonList json) throws CodecException {
     List<DataSourceConf> list = parseList(json);
     return list == null ? null : list.toArray(new DataSourceConf[0]);
   }

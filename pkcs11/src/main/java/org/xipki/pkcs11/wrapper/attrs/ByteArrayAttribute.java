@@ -23,8 +23,7 @@ public class ByteArrayAttribute extends Attribute {
   }
 
   public ByteArrayAttribute(long type, BigInteger value) {
-    super(type, value == null ? null
-        : Functions.asUnsignedByteArray(value));
+    super(type, value == null ? null : Functions.asUnsignedByteArray(value));
   }
 
   /**
@@ -41,8 +40,7 @@ public class ByteArrayAttribute extends Attribute {
   }
 
   public BigInteger getBigIntValue() {
-    return isNullValue() ? null
-        : new BigInteger(1, (byte[]) value);
+    return isNullValue() ? null : new BigInteger(1, (byte[]) value);
   }
 
   /**
@@ -57,8 +55,7 @@ public class ByteArrayAttribute extends Attribute {
     }
 
     byte[] bvalue = (byte[]) value;
-    String text = "byte[" + bvalue.length + "]\n"
-        + Functions.toString("    ", bvalue);
+    String text = "byte[" + bvalue.length + "]\n" + Functions.toString("    ", bvalue);
 
     long type = type();
     if (type == PKCS11T.CKA_EC_PARAMS) {

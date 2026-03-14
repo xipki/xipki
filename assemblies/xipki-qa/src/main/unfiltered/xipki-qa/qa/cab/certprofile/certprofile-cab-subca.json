@@ -1,0 +1,112 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile SubCA (CA/Browser Forum BR)"
+  },
+  "certLevel": "SubCA",
+  "certDomain": "CABForumBR",
+  "maxSize": 8400,
+  "validity": "8y",
+  "notBeforeTime": "current",
+  "signatureAlgorithms": [
+    "ECDSA-SHA256",
+    "ECDSA-SHA384",
+    "ECDSA-SHA512",
+    "RSA-SHA256",
+    "RSA-SHA384",
+    "RSA-SHA512",
+    "RSAPSS-SHA256",
+    "RSAPSS-SHA384",
+    "RSAPSS-SHA512"
+  ],
+  "keyAlgorithms": [
+    "P256",
+    "P384",
+    "P521",
+    "RSA2048",
+    "RSA3072",
+    "RSA4096"
+  ],
+  "subject": [
+    {
+      "type": "country"
+    },
+    {
+      "type": "organization"
+    },
+    {
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },
+    {
+      "type": "serialNumber",
+      "minOccurs": 0
+    },
+    {
+      "type": "commonName"
+    }
+  ],
+  "extensions": [
+    {
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "CRLDistributionPoints",
+      "required": true
+    },
+    {
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true,
+      "basicConstraints": {
+        "pathLen": 1
+      }
+    },
+    {
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },
+    {
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "KeyUsage",
+      "required": true,
+      "critical": true,
+      "inRequest": "optional",
+      "keyUsage": {
+        "usages": [
+          {
+            "required": [
+              "cRLSign",
+              "keyCertSign"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "CertificatePolicies",
+      "required": true,
+      "certificatePolicies": {
+        "certificatePolicyInformations": [
+          {
+            "policyIdentifier": "1.2.3.4",
+            "policyQualifiers": [
+              {
+                "type": "cpsUri",
+                "value": "http://abc.def.de/cfp"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

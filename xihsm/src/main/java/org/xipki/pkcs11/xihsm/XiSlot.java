@@ -31,6 +31,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiSlot {
@@ -45,8 +47,7 @@ public class XiSlot {
 
   private static final int maxSessionCount = 256;
 
-  private final ConcurrentHashMap<Long, XiSession> sessions =
-      new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<Long, XiSession> sessions = new ConcurrentHashMap<>();
 
   private final LoginState loginState;
 
@@ -56,9 +57,8 @@ public class XiSlot {
 
   private final XiHsmVendor vendor;
 
-  public XiSlot(XiHsmVendor vendor, Backend store, String manufacturerID,
-                int index, long slotId, AtomicLong nextSessionHandle,
-                UserVerifier userVerifier) {
+  public XiSlot(XiHsmVendor vendor, Backend store, String manufacturerID, int index,
+                long slotId, AtomicLong nextSessionHandle, UserVerifier userVerifier) {
     this.vendor = vendor;
     this.store = store;
     this.loginState = new LoginState(userVerifier);
@@ -66,8 +66,7 @@ public class XiSlot {
     this.slotId = slotId;
     this.slotInfo  = buildSlotInfo (manufacturerID, slotId);
     this.tokenInfo = buildTokenInfo(manufacturerID, slotId);
-    this.nextSessionHandle =
-        Args.notNull(nextSessionHandle, "nextSessionHandle");
+    this.nextSessionHandle = Args.notNull(nextSessionHandle, "nextSessionHandle");
   }
 
   XiHsmVendor getVendor() {
@@ -116,8 +115,7 @@ public class XiSlot {
    * } CK_TOKEN_INFO;
    * </pre>
    */
-  private static CkTokenInfo buildTokenInfo(
-      String manufacturerID, long slotId) {
+  private static CkTokenInfo buildTokenInfo(String manufacturerID, long slotId) {
     String label = "token " + slotId;
     String model = manufacturerID + " G1";
     String serialNumber = "G1-123456";
@@ -134,25 +132,20 @@ public class XiSlot {
     long freePrivateMemory  = CK_UNAVAILABLE_INFORMATION;
     CkVersion hardwareVersion = HsmUtil.buildVersion(1, 0);
     CkVersion firmwareVersion = HsmUtil.buildVersion(1, 0);
-    String utcTime          = buildTokenUtcTime();
+    String utcTime            = buildTokenUtcTime();
 
     return new CkTokenInfo(label, manufacturerID, model, serialNumber, flags,
         maxSessionCount, sessionCount, maxRwSessionCount, rwSessionCount,
         maxPinLen, minPinLen, totalPublicMemory, freePublicMemory,
-        totalPrivateMemory, freePrivateMemory,
-        hardwareVersion, firmwareVersion, utcTime);
+        totalPrivateMemory, freePrivateMemory, hardwareVersion, firmwareVersion, utcTime);
   }
 
   // YYYYMMDDhhmmss00
   private static String buildTokenUtcTime() {
     ZonedDateTime c = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("UTC"));
-    return prepend0(4, c.getYear())
-        + prepend0(2, c.getMonthValue())
-        + prepend0(2, c.getDayOfMonth())
-        + prepend0(2, c.getHour())
-        + prepend0(2, c.getMinute())
-        + prepend0(2, c.getSecond())
-        + "00";
+    return prepend0(4, c.getYear()) + prepend0(2, c.getMonthValue())
+        + prepend0(2, c.getDayOfMonth()) + prepend0(2, c.getHour())
+        + prepend0(2, c.getMinute()) + prepend0(2, c.getSecond()) + "00";
   }
 
   private static String prepend0(int size, int v) {
@@ -199,8 +192,7 @@ public class XiSlot {
 
     return new CkTokenInfo(tokenInfo.label(), tokenInfo.manufacturerID(),
         tokenInfo.model(), tokenInfo.serialNumber(), tokenInfo.getFlags(),
-        maxSessionCount, sessionCount,
-        tokenInfo.maxRwSessionCount(), rwSessionCount,
+        maxSessionCount, sessionCount, tokenInfo.maxRwSessionCount(), rwSessionCount,
         tokenInfo.maxPinLen(), tokenInfo.minPinLen(),
         tokenInfo.totalPublicMemory(), tokenInfo.freePublicMemory(),
         tokenInfo.totalPrivateMemory(), tokenInfo.freePrivateMemory(),
@@ -211,15 +203,13 @@ public class XiSlot {
     return getVendor().getCkms();
   }
 
-  public CkMechanismInfo C_GetMechanismInfo(long type)
-      throws HsmException {
+  public CkMechanismInfo C_GetMechanismInfo(long type) throws HsmException {
     CkMechanismInfo info = getVendor().getMechanismInfo(type);
     if (info != null) {
       return info;
     }
     throw new HsmException(CKR_MECHANISM_INVALID,
-        "Mechanism " + ckmCodeToName(type) +
-        " is not supported");
+        "Mechanism " + ckmCodeToName(type) + " is not supported");
   }
 
   public LoginState loginState() {
@@ -246,8 +236,7 @@ public class XiSlot {
   public XiSession getSession(long hSession) throws HsmException {
     XiSession session = sessions.get(hSession);
     if (session == null) {
-      throw new HsmException(CKR_SESSION_HANDLE_INVALID,
-          "invalid hSession " + hSession);
+      throw new HsmException(CKR_SESSION_HANDLE_INVALID, "invalid hSession " + hSession);
     }
     return session;
   }
@@ -275,52 +264,41 @@ public class XiSlot {
     }
   }
 
-  public void C_DestroyObject(long hSession, boolean sessionRw, long hObject)
-      throws HsmException {
+  public void C_DestroyObject(long hSession, boolean sessionRw, long hObject) throws HsmException {
     store.destroyObject(sessionRw, slotId, hObject, loginState(hSession));
   }
 
-  public long[] findObjects(long hSession, XiTemplate template)
-      throws HsmException {
+  public long[] findObjects(long hSession, XiTemplate template) throws HsmException {
     return store.findObjects(slotId, loginState(hSession), template);
   }
 
   public long[] C_GenerateKeyPair(
       long hSession, boolean sessionRw, XiMechanism mechanism,
-      XiTemplate publicKeyTemplate, XiTemplate privateKeyTemplate)
-      throws HsmException {
+      XiTemplate publicKeyTemplate, XiTemplate privateKeyTemplate) throws HsmException {
     return store.C_GenerateKeyPair(loginState(hSession), sessionRw, slotId,
         mechanism, publicKeyTemplate, privateKeyTemplate);
 
   }
 
   public long C_GenerateKey(
-      long hSession, boolean sessionRw, XiMechanism pMechanism,
-      XiTemplate template)
+      long hSession, boolean sessionRw, XiMechanism pMechanism, XiTemplate template)
       throws HsmException {
-    return store.C_GenerateKey(loginState(hSession), sessionRw, slotId,
-        pMechanism, template);
+    return store.C_GenerateKey(loginState(hSession), sessionRw, slotId, pMechanism, template);
   }
 
-  public long C_CreateObject(
-      long hSession, boolean sessionRw, XiTemplate attrs)
+  public long C_CreateObject(long hSession, boolean sessionRw, XiTemplate attrs)
       throws HsmException {
-    return store.C_CreateObject(vendor, loginState(hSession),
-        sessionRw, slotId, attrs);
+    return store.C_CreateObject(vendor, loginState(hSession), sessionRw, slotId, attrs);
   }
 
-  public Template C_GetAttributeValue(
-      long hSession, long hObject, long[] attrTypes)
+  public Template C_GetAttributeValue(long hSession, long hObject, long[] attrTypes)
       throws HsmException {
-    return store.C_GetAttributeValue(slotId, hObject,
-        loginState(hSession), attrTypes);
+    return store.C_GetAttributeValue(slotId, hObject, loginState(hSession), attrTypes);
   }
 
   public void C_SetAttributeValue(
-      long hSession, boolean sessionRw, long hObject, XiTemplate template)
-      throws HsmException {
-    store.C_SetAttributeValue(loginState(hSession), sessionRw, slotId,
-        hObject, template);
+      long hSession, boolean sessionRw, long hObject, XiTemplate template) throws HsmException {
+    store.C_SetAttributeValue(loginState(hSession), sessionRw, slotId, hObject, template);
   }
 
   public XiKey getKey(long hSession, long hKey) throws HsmException {

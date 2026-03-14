@@ -58,8 +58,7 @@ public class ByteArrayCborDecoder extends CborDecoder {
    * @param offset offset of bytes for the cbor message.
    * @param len length of the bytes for the cbor message.
    */
-  public ByteArrayCborDecoder(byte[] bytes, int offset, int len)
-      throws IOException {
+  public ByteArrayCborDecoder(byte[] bytes, int offset, int len) throws IOException {
     Args.notNull(bytes, "bytes");
     Args.min(offset, "offset", 0);
     if (offset + len > bytes.length) {
@@ -181,8 +180,7 @@ public class ByteArrayCborDecoder extends CborDecoder {
       throw new CodecException("bytes too short");
     }
 
-    return (m_is[position++] & 0xFF) << 8
-        | (m_is[position++] & 0xFF);
+    return (m_is[position++] & 0xFF) << 8 | (m_is[position++] & 0xFF);
   }
 
   /**

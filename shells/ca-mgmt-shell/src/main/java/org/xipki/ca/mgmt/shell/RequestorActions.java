@@ -34,8 +34,7 @@ import java.util.Set;
  */
 public class RequestorActions {
 
-  @Command(scope = "ca", name = "careq-add",
-      description = "add requestor to CA")
+  @Command(scope = "ca", name = "careq-add", description = "add requestor to CA")
   @Service
   public static class CareqAdd extends CaAction {
 
@@ -43,13 +42,11 @@ public class RequestorActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
-    @Option(name = "--requestor", required = true,
-        description = "requestor name")
+    @Option(name = "--requestor", required = true, description = "requestor name")
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String requestorName;
 
-    @Option(name = "--permission", required = true, multiValued = true,
-        description = "permission")
+    @Option(name = "--permission", required = true, multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
 
@@ -61,8 +58,7 @@ public class RequestorActions {
     @Override
     protected Object execute0() throws Exception {
       CaHasRequestorEntry entry = new CaHasRequestorEntry(
-          new NameId(null, requestorName), new Permissions(permissions),
-          profiles);
+          new NameId(null, requestorName), new Permissions(permissions), profiles);
 
       String msg = "requestor " + requestorName + " to CA " + caName;
       try {
@@ -70,15 +66,13 @@ public class RequestorActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class CareqAdd
 
-  @Command(scope = "ca", name = "careq-info", description =
-      "show information of requestor in CA")
+  @Command(scope = "ca", name = "careq-info", description = "show information of requestor in CA")
   @Service
   public static class CareqInfo extends CaAction {
 
@@ -101,8 +95,7 @@ public class RequestorActions {
           sb.append("----------\n").append(entry).append("\n");
         }
       } else {
-        sb.append("no requestor for CA ").append(caName)
-            .append(" is configured");
+        sb.append("no requestor for CA ").append(caName).append(" is configured");
       }
       println(sb.toString());
       return null;
@@ -110,8 +103,7 @@ public class RequestorActions {
 
   } // class CareqInfo
 
-  @Command(scope = "ca", name = "careq-rm", description =
-      "remove requestor from CA")
+  @Command(scope = "ca", name = "careq-rm", description = "remove requestor from CA")
   @Service
   public static class CareqRm extends CaAction {
 
@@ -136,8 +128,7 @@ public class RequestorActions {
             caManager.removeRequestorFromCa(requestorName, caName);
             println("removed " + msg);
           } catch (CaMgmtException ex) {
-            throw new CmdFailure("could not remove " + msg +
-                ", error: " + ex.getMessage(), ex);
+            throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
           }
         }
       }
@@ -151,13 +142,11 @@ public class RequestorActions {
   @Service
   public static class RequestorAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "requestor name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
     private String name;
 
     @Option(name = "--cert", required = true, description =
-        "requestor certificate file (exactly one of cert and password " +
-        "must be specified).")
+        "requestor certificate file (exactly one of cert and password must be specified).")
     @Completion(FileCompleter.class)
     private String certFile;
 
@@ -174,8 +163,7 @@ public class RequestorActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -203,8 +191,7 @@ public class RequestorActions {
         int size = names.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1")
-              .append(" requestor is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" requestor is configured\n");
         } else {
           sb.append(size).append(" requestors are configured:\n");
         }
@@ -218,8 +205,7 @@ public class RequestorActions {
       } else {
         RequestorEntry entry =
             Optional.ofNullable(caManager.getRequestor(name)).orElseThrow(
-                () -> new CmdFailure(
-                    "could not find requestor '" + name + "'"));
+                () -> new CmdFailure("could not find requestor '" + name + "'"));
         sb.append(entry.toString(verbose));
       }
 
@@ -229,13 +215,11 @@ public class RequestorActions {
 
   } // class RequestorInfo
 
-  @Command(scope = "ca", name = "requestor-rm", description =
-      "remove requestor")
+  @Command(scope = "ca", name = "requestor-rm", description = "remove requestor")
   @Service
   public static class RequestorRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-        description = "requestor name")
+    @Argument(index = 0, name = "name", required = true, description = "requestor name")
     @Completion(CaCompleters.RequestorNameCompleter.class)
     private String name;
 
@@ -250,8 +234,7 @@ public class RequestorActions {
           caManager.removeRequestor(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg +
-              ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -259,18 +242,15 @@ public class RequestorActions {
 
   } // class RequestorRm
 
-  @Command(scope = "ca", name = "requestor-up",
-      description = "update requestor")
+  @Command(scope = "ca", name = "requestor-up", description = "update requestor")
   @Service
   public static class RequestorUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "requestor name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "requestor name")
     @Completion(CaCompleters.RequestorNameCompleter.class)
     protected String name;
 
-    @Option(name = "--cert", required = true,
-        description = "requestor certificate file")
+    @Option(name = "--cert", required = true, description = "requestor certificate file")
     @Completion(FileCompleter.class)
     protected String certFile;
 
@@ -279,16 +259,14 @@ public class RequestorActions {
       // check if the certificate is valid
       String msg = "requestor " + name;
 
-      String conf = Base64.encodeToString(
-          X509Util.parseCert(IoUtil.read(certFile)).getEncoded());
+      String conf = Base64.encodeToString(X509Util.parseCert(IoUtil.read(certFile)).getEncoded());
 
       try {
         caManager.changeRequestor(name, RequestorEntry.TYPE_CERT, conf);
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 

@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 /**
  * SubjectPublicKeyInfo entry for benchmark enrollment test.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaEnrollBenchKeyEntry {
@@ -23,8 +23,7 @@ public class CaEnrollBenchKeyEntry {
 
   private final SecureRandom random;
 
-  public CaEnrollBenchKeyEntry(KeySpec keySpec, boolean reuse,
-                               SecureRandom random)
+  public CaEnrollBenchKeyEntry(KeySpec keySpec, boolean reuse, SecureRandom random)
       throws Exception {
     this.keySpec = keySpec;
     this.random = (random != null) ? random : new SecureRandom();
@@ -32,8 +31,7 @@ public class CaEnrollBenchKeyEntry {
       return;
     }
 
-    this.spki = KeyUtil.generateKeypair2(keySpec, this.random)
-                  .subjectPublicKeyInfo();
+    this.spki = KeyUtil.generateKeyPair2(keySpec, this.random).subjectPublicKeyInfo();
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
@@ -41,7 +39,7 @@ public class CaEnrollBenchKeyEntry {
       return spki;
     }
 
-    return KeyUtil.generateKeypair2(keySpec, random).subjectPublicKeyInfo();
+    return KeyUtil.generateKeyPair2(keySpec, random).subjectPublicKeyInfo();
   }
 
 }

@@ -1,0 +1,32 @@
+{
+  "cmp":{
+    "confirmCert":false,
+    "sendCaCert":false,
+    "sendCertChain":false,
+    "messageTimeRequired":true,
+    "sendResponderCert":true,
+    "messageTimeBias":300,
+    "confirmWaitTime":300,
+    "requestSigAlgos":[
+      "RSA-SHA256",
+      "ECDSA-SHA256"
+    ],
+    "requestPbmMacs":[
+      "HMAC-SHA256"
+    ],
+    "requestPbmOwfs":[
+      "SHA256"
+    ],
+    "responsePbmMac":"HMAC-SHA256",
+    "responsePbmOwf":"SHA256",
+    "responsePbmIterationCount":10240
+  },
+  // WARNING: Replace the simple authenticator with your own.
+  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "signers":{
+    "default":{
+      "type":"pkcs12",
+      "conf":"password=$[gateway.https.keyPassword],keystore=file:keycerts/gateway-server.p12"
+    }
+  }
+}

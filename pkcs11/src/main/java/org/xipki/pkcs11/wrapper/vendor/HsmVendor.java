@@ -34,6 +34,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKF_VERIFY;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKM_VENDOR_DEFINED;
 
 /**
+ * XiPKI component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -51,6 +52,8 @@ public class HsmVendor {
 
   private final Map<Long, Long> ckmExclude = new HashMap<>();
 
+  private final Set<Long> ckaExclude = new HashSet<>();
+
   private final Map<Long, Long> ckmMultipartExclude = new HashMap<>();
 
   protected final int maxFrameSize;
@@ -63,19 +66,14 @@ public class HsmVendor {
     this.maxFrameSize = Integer.MAX_VALUE;
   }
 
-  protected HsmVendor(String vendorName,
-                      String vendorEnum,
-                      int maxFrameSize,
-                      JsonList jsonCkmExclude,
-                      JsonList jsonCkmMultipartExclude,
-                      List<SpecialBehaviour> specialBehaviours,
-                      JsonMap jsonNameToCodeMap)
-      throws Exception {
+  protected HsmVendor(
+      String vendorName, String vendorEnum, int maxFrameSize,
+      JsonList jsonCkmExclude, JsonList jsonCkaExclude,
+      JsonList jsonCkmMultipartExclude, List<SpecialBehaviour> specialBehaviours,
+      JsonMap jsonNameToCodeMap) throws Exception {
     this.name = Args.notBlank(vendorName, "vendorName");
-    this.vendorEnum = (vendorEnum == null) ? VendorEnum.UNKNOWN
-        : VendorEnum.valueOf(vendorEnum);
-    this.maxFrameSize = Args.range(
-        maxFrameSize, "maxFrameSize", 1024, Integer.MAX_VALUE);
+    this.vendorEnum = (vendorEnum == null) ? VendorEnum.UNKNOWN : VendorEnum.valueOf(vendorEnum);
+    this.maxFrameSize = Args.range(maxFrameSize, "maxFrameSize", 1024, Integer.MAX_VALUE);
 
     // CKM exclude
     if (jsonCkmExclude != null) {
@@ -92,16 +90,21 @@ public class HsmVendor {
       this.specialBehaviours.addAll(specialBehaviours);
     }
 
-    Category[] categories = {Category.CKD, Category.CKG_MGF,
-        Category.CKK, Category.CKM, Category.CKP_PRF, Category.CKR,
-        Category.CKU, Category.CKA};
+    // CKA exclude
+    if (jsonCkaExclude != null) {
+      for (String token : jsonCkaExclude.toStringList()) {
+        this.ckaExclude.add(parseCode(Category.CKA, token));
+      }
+    }
+
+    Category[] categories = {Category.CKD, Category.CKG_MGF, Category.CKK,
+        Category.CKM, Category.CKP_PRF, Category.CKR, Category.CKU, Category.CKA};
     for (Category category : categories) {
       vendorMaps.put(category, new VendorMap(category));
     }
 
     if (jsonNameToCodeMap != null) {
-      for (Map.Entry<String, String> entry
-          : jsonNameToCodeMap.toStringMap().entrySet()) {
+      for (Map.Entry<String, String> entry : jsonNameToCodeMap.toStringMap().entrySet()) {
         String key = entry.getKey();
         Category category =
             key.startsWith("CKD_") ? Category.CKD
@@ -111,15 +114,13 @@ public class HsmVendor {
                 : key.startsWith("CKP_") ? Category.CKP_PRF
                 : key.startsWith("CKR_") ? Category.CKR
                 : key.startsWith("CKU_") ? Category.CKU
-                : key.startsWith("CKA_") ? Category.CKA
-                : null;
+                : key.startsWith("CKA_") ? Category.CKA : null;
 
         if (category == null) {
           throw new Exception("Unknown name in vendor block: " + key);
         }
 
-        vendorMaps.get(category).addNameCode(key,
-            entry.getValue().toUpperCase(Locale.ROOT));
+        vendorMaps.get(category).addNameCode(key, entry.getValue().toUpperCase(Locale.ROOT));
       }
     }
   }
@@ -130,8 +131,7 @@ public class HsmVendor {
     String basedir = "org/xipki/pkcs11/wrapper/vendor/";
     String confPath = basedir + "list.json";
     List<String> vendorFileNames;
-    try (InputStream in = HsmVendor.class.getClassLoader()
-        .getResourceAsStream(confPath)) {
+    try (InputStream in = HsmVendor.class.getClassLoader().getResourceAsStream(confPath)) {
       if (in == null) {
         throw new IOException("found no file " + confPath);
       }
@@ -143,8 +143,7 @@ public class HsmVendor {
 
     for (String vendorFileName : vendorFileNames) {
       String vendorFilePath = basedir + vendorFileName;
-      try (InputStream in = HsmVendor.class.getClassLoader()
-          .getResourceAsStream(vendorFilePath)) {
+      try (InputStream in = HsmVendor.class.getClassLoader().getResourceAsStream(vendorFilePath)) {
         JsonMap v = JsonParser.parseMap(in, true);
         JsonMap filter = v.getNnMap("filter");
         String baseFileName = v.getString("base");
@@ -156,14 +155,12 @@ public class HsmVendor {
             baseBlock = JsonParser.parseMap(baseIn, true);
             baseFilter = v.getNnMap("filter");
             if (baseFilter.getString("base") != null) {
-              throw new IOException(
-                  "base vendor block shall not have filter.base field");
+              throw new IOException("base vendor block shall not have filter.base field");
             }
           }
         }
 
-        if (matches(filter, baseFilter, modulePath, moduleInfo,
-            tokenMechanisms)) {
+        if (matches(filter, baseFilter, modulePath, moduleInfo, tokenMechanisms)) {
           block = v;
           break;
         }
@@ -183,6 +180,13 @@ public class HsmVendor {
       jsonCkmExclude = baseBlock.getList(fieldName);
     }
 
+    // CKA exclude
+    fieldName = "ckaExclude";
+    JsonList jsonCkaExclude = block.getList(fieldName);
+    if (baseBlock != null && jsonCkaExclude == null) {
+      jsonCkaExclude = baseBlock.getList(fieldName);
+    }
+
     // CKM multipart exclude
     fieldName = "ckmMultipartExclude";
     JsonList jsonCkmMultipartExclude = block.getList(fieldName);
@@ -199,11 +203,9 @@ public class HsmVendor {
 
     // special behaviours
     fieldName = "specialBehaviours";
-    List<SpecialBehaviour> behaviours = block.getEnumList(
-        fieldName, SpecialBehaviour.class);
+    List<SpecialBehaviour> behaviours = block.getEnumList(fieldName, SpecialBehaviour.class);
     if (baseBlock != null && behaviours == null) {
-      behaviours = baseBlock.getEnumList(
-          fieldName, SpecialBehaviour.class);
+      behaviours = baseBlock.getEnumList(fieldName, SpecialBehaviour.class);
     }
 
     fieldName = "nameToCodeMap";
@@ -223,9 +225,8 @@ public class HsmVendor {
       maxFrameSize = i;
     }
 
-    return new HsmVendor(block.getNnString("name"), vendorEnum,
-        maxFrameSize, jsonCkmExclude, jsonCkmMultipartExclude, behaviours,
-        jsonNameToCodeMap);
+    return new HsmVendor(block.getNnString("name"), vendorEnum, maxFrameSize,
+        jsonCkmExclude, jsonCkaExclude, jsonCkmMultipartExclude, behaviours, jsonNameToCodeMap);
   }
 
   public int getMaxFrameSize() {
@@ -264,6 +265,10 @@ public class HsmVendor {
     }
 
     return (mapFlag & flagBit) == 0;
+  }
+
+  public boolean supportsAttribute(long attributeType) {
+    return !ckaExclude.contains(attributeType);
   }
 
   public boolean hasSpecialBehaviour(SpecialBehaviour vendorBehavior) {
@@ -311,8 +316,7 @@ public class HsmVendor {
   public String codeToName(Category category, long code) {
     if ((code & CKM_VENDOR_DEFINED) != 0 && vendorMaps != null) {
       VendorMap map = vendorMaps.get(category);
-      return map != null ? map.codeToName(code)
-          : PKCS11T.codeToName(category, code);
+      return map != null ? map.codeToName(code) : PKCS11T.codeToName(category, code);
     } else {
       return PKCS11T.codeToName(category, code);
     }
@@ -320,8 +324,7 @@ public class HsmVendor {
 
   public Long nameToCode(Category category, String name) {
     VendorMap map = vendorMaps.get(category);
-    return map != null ? map.nameToCode(name)
-        : PKCS11T.nameToCode(category, name);
+    return map != null ? map.nameToCode(name) : PKCS11T.nameToCode(category, name);
   }
 
   protected static void interpretCkm(
@@ -337,8 +340,7 @@ public class HsmVendor {
       } else {
         for (String f : flagTexts) {
           String c14nFlag = f.toUpperCase(Locale.ROOT)
-              .replace("-", "")
-              .replace("_", "");
+              .replace("-", "").replace("_", "");
 
           switch (c14nFlag) {
             case "SIGN":
@@ -406,9 +408,8 @@ public class HsmVendor {
   }
 
   private static boolean matches(
-      JsonMap filter, JsonMap baseFilter,
-      String modulePath, CkInfo moduleInfo, Set<Long> tokenMechanisms)
-      throws CodecException {
+      JsonMap filter, JsonMap baseFilter, String modulePath,
+      CkInfo moduleInfo, Set<Long> tokenMechanisms) throws CodecException {
     String fieldName = "modulePaths";
     List<String> modulePaths = filter.getStringList(fieldName);
     if (baseFilter != null && modulePaths == null) {
@@ -450,13 +451,11 @@ public class HsmVendor {
 
     if (isNotEmpty(versions)) {
       CkVersion libVersion = moduleInfo.libraryVersion();
-      int iVersion = ((0xFF & libVersion.major()) << 8)
-                      + (0xFF & libVersion.minor());
+      int iVersion = ((0xFF & libVersion.major()) << 8) + (0xFF & libVersion.minor());
       boolean match = false;
       for (String t : versions) {
         int idx = t.indexOf("-");
-        int from = (idx == -1) ? toIntVersion(t)
-            : toIntVersion(t.substring(0, idx));
+        int from = (idx == -1) ? toIntVersion(t) : toIntVersion(t.substring(0, idx));
         int to = (idx == -1) ? from : toIntVersion(t.substring(idx + 1));
 
         if (iVersion >= from && iVersion <= to) {
@@ -502,8 +501,7 @@ public class HsmVendor {
 
   private static int toIntVersion(String version) {
     StringTokenizer st = new StringTokenizer(version, ".");
-    return (Integer.parseInt(st.nextToken()) << 8)
-        + Integer.parseInt(st.nextToken());
+    return (Integer.parseInt(st.nextToken()) << 8) + Integer.parseInt(st.nextToken());
   }
 
   private static boolean isNotEmpty(Collection<?> c) {
@@ -541,8 +539,7 @@ public class HsmVendor {
       Long genericCode = PKCS11T.nameToCode(category, name);
       if (genericCode != null) {
         // the given name is already defined in the generic constants.
-        if ((genericCode & PKCS11T.CKM_VENDOR_DEFINED) != 0
-            && genericCode != lCode) {
+        if ((genericCode & PKCS11T.CKM_VENDOR_DEFINED) != 0 && genericCode != lCode) {
           // only vendor code is allowed to be overwritten.
           genericToVendorMap.put(genericCode, lCode);
           vendorToGenericMap.put(lCode, genericCode);

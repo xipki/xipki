@@ -31,8 +31,7 @@ public class CertprofileEntry extends MgmtEntry {
     this.type = Args.toNonBlankLower(type, "type");
     this.conf = conf;
     if ("all".equals(ident.name()) || "null".equals(ident.name())) {
-      throw new IllegalArgumentException(
-          "certificate profile name may not be 'all' and 'null'");
+      throw new IllegalArgumentException("certificate profile name may not be 'all' and 'null'");
     }
   }
 
@@ -99,14 +98,12 @@ public class CertprofileEntry extends MgmtEntry {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().put("ident", ident.toCodec())
-        .put("type", type).put("conf", conf);
+    return new JsonMap().put("ident", ident.toCodec()).put("type", type).put("conf", conf);
   }
 
   public static CertprofileEntry parse(JsonMap json) throws CodecException {
     NameId ident = NameId.parse(json.getNnMap("ident"));
-    return new CertprofileEntry(ident,
-        json.getNnString("type"), json.getString("conf"));
+    return new CertprofileEntry(ident, json.getNnString("type"), json.getString("conf"));
   }
 
 }

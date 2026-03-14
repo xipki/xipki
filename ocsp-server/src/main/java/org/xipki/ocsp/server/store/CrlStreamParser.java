@@ -3,12 +3,9 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.ASN1BitString;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERUTCTime;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.CRLReason;
@@ -24,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.OIDs;
 import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.pkix.CrlReason;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
@@ -137,8 +135,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   } // class RevokedCert
 
-  public class RevokedCertsIterator
-      implements Iterator<RevokedCert>, Closeable {
+  public class RevokedCertsIterator implements Iterator<RevokedCert>, Closeable {
 
     private BufferedInputStream instream;
 
@@ -147,8 +144,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     private int offset;
 
     private RevokedCertsIterator() throws IOException {
-      this.instream = new BufferedInputStream(
-          Files.newInputStream(crlFile.toPath()));
+      this.instream = new BufferedInputStream(Files.newInputStream(crlFile.toPath()));
       skip(this.instream, firstRevokedCertificateOffset);
       this.offset = firstRevokedCertificateOffset;
       next0();
@@ -178,11 +174,9 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       byte[] bytes;
       try {
-        bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream,
-            "revokedCertificate");
+        bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "revokedCertificate");
       } catch (IOException ex) {
-        throw new IllegalStateException(
-            "error reading next revokedCertificate", ex);
+        throw new IllegalStateException("error reading next revokedCertificate", ex);
       }
       offset += bytes.length;
 
@@ -195,33 +189,28 @@ public class CrlStreamParser extends Asn1StreamParser {
        * }
        */
       ASN1Sequence revCert = ASN1Sequence.getInstance(bytes);
-      BigInteger serialNumber = ASN1Integer.getInstance(
-          revCert.getObjectAt(0)).getValue();
+      BigInteger serialNumber = ASN1Integer.getInstance(revCert.getObjectAt(0)).getValue();
       Instant revocationDate = readTime(revCert.getObjectAt(1));
       Instant invalidityDate = null;
       int reason = 0;
-      X500Name certificateIssuer = null;
+      X500Name certIssuer = null;
 
       if (revCert.size() > 2) {
         Extensions extns = Extensions.getInstance(revCert.getObjectAt(2));
-        byte[] coreExtValue = X509Util.getCoreExtValue(extns,
-            OIDs.Extn.certificateIssuer);
+        byte[] coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.certificateIssuer);
         if (coreExtValue != null) {
-          certificateIssuer = X500Name.getInstance(
+          certIssuer = X500Name.getInstance(
               GeneralNames.getInstance(coreExtValue).getNames()[0].getName());
         }
 
-        coreExtValue = X509Util.getCoreExtValue(extns,
-            OIDs.Extn.invalidityDate);
+        coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.invalidityDate);
         if (coreExtValue != null) {
           int tag = coreExtValue[0] & 0xFF;
           try {
             if (tag == BERTags.UTC_TIME) {
-              invalidityDate = DERUTCTime.getInstance(coreExtValue)
-                  .getDate().toInstant();
+              invalidityDate = Asn1Util.getUTCTime(coreExtValue);
             } else if (tag == BERTags.GENERALIZED_TIME) {
-              invalidityDate = DERGeneralizedTime.getInstance(coreExtValue)
-                  .getDate().toInstant();
+              invalidityDate = Asn1Util.getGeneralizedTime(coreExtValue);
             } else {
               throw new IllegalArgumentException("invalid tag " + tag);
             }
@@ -235,8 +224,7 @@ public class CrlStreamParser extends Asn1StreamParser {
             : CRLReason.getInstance(coreExtValue).getValue().intValue();
       }
 
-      next = new RevokedCert(serialNumber, revocationDate, reason,
-              invalidityDate, certificateIssuer);
+      next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate, certIssuer);
     } // method next0
 
     @Override
@@ -249,8 +237,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   } // class RevokedCertsIterator
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CrlStreamParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CrlStreamParser.class);
 
   private final File crlFile;
 
@@ -332,30 +319,26 @@ public class CrlStreamParser extends Asn1StreamParser {
       }
 
       //       signature               AlgorithmIdentifier,
-      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream,
-          "tbsCertList.signature");
+      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "tbsCertList.signature");
       offset += bytes.length;
 
       AlgorithmIdentifier tbsSignature = AlgorithmIdentifier.getInstance(bytes);
 
       //       issuer                  Name,
-      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream,
-          "tbsCertList.issuer");
+      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "tbsCertList.issuer");
       offset += bytes.length;
       this.issuer = X500Name.getInstance(bytes);
 
       //       thisUpdate              Time,
       MyInt bytesLen = new MyInt();
-      this.thisUpdate = readTime(bytesLen, instream,
-          "tbsCertList.thisUpdate");
+      this.thisUpdate = readTime(bytesLen, instream, "tbsCertList.thisUpdate");
       offset += bytesLen.get();
 
       //       nextUpdate              Time OPTIONAL,
       tag = peekTag(instream);
       if (tag != TAG_CONSTRUCTED_SEQUENCE) {
         instream.reset();
-        this.nextUpdate = readTime(bytesLen, instream,
-            "tbsCertList.thisUpdate");
+        this.nextUpdate = readTime(bytesLen, instream, "tbsCertList.thisUpdate");
         offset += bytesLen.get();
         tag = peekTag(instream);
       } else {
@@ -371,8 +354,7 @@ public class CrlStreamParser extends Asn1StreamParser {
         int revokedCertificatesLength = readLength(lenBytesSize, instream);
         offset += lenBytesSize.get();
 
-        this.revokedCertificatesEndIndex =
-            revokedCertificatesOffset + revokedCertificatesLength;
+        this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
         this.firstRevokedCertificateOffset = offset;
 
         // skip the revokedCertificates
@@ -402,8 +384,7 @@ public class CrlStreamParser extends Asn1StreamParser {
           } else {
             instream.mark(1);
             // crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
-            bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream,
-                "crlExtensions");
+            bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
             offset += bytes.length;
             extns = Extensions.getInstance(bytes);
           }
@@ -413,15 +394,12 @@ public class CrlStreamParser extends Asn1StreamParser {
       this.crlExtensions = extns;
 
       if (this.crlExtensions != null) {
-        bytes = X509Util.getCoreExtValue(this.crlExtensions,
-            OIDs.Extn.cRLNumber);
-        this.crlNumber = (bytes == null) ? null
-            : ASN1Integer.getInstance(bytes).getValue();
+        bytes = X509Util.getCoreExtValue(this.crlExtensions, OIDs.Extn.cRLNumber);
+        this.crlNumber = (bytes == null) ? null : ASN1Integer.getInstance(bytes).getValue();
 
-        bytes = X509Util.getCoreExtValue(this.crlExtensions,
-            OIDs.Extn.deltaCRLIndicator);
+        bytes = X509Util.getCoreExtValue(this.crlExtensions, OIDs.Extn.deltaCRLIndicator);
         this.baseCrlNumber = (bytes == null) ? null
-            : ASN1Integer.getInstance(bytes).getPositiveValue();
+                              : ASN1Integer.getInstance(bytes).getPositiveValue();
       } else {
         this.crlNumber = null;
         this.baseCrlNumber = null;
@@ -429,16 +407,14 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       // From now on, the offset will not be needed anymore, so do not update
       // it.
-      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream,
-          "signatureAlgorithm");
+      bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "signatureAlgorithm");
       this.algorithmIdentifier = AlgorithmIdentifier.getInstance(bytes);
       if (!tbsSignature.equals(this.algorithmIdentifier)) {
-        throw new IllegalArgumentException(
-            "algorithmIdentifier != tbsCertList.signature");
+        throw new IllegalArgumentException("algorithmIdentifier != tbsCertList.signature");
       }
 
       bytes = readBlock(BERTags.BIT_STRING, instream, "signature");
-      this.signature = ASN1BitString.getInstance(bytes).getBytes();
+      this.signature = Asn1Util.getBitStringOctets(bytes);
     }
   } // constructor
 
@@ -482,8 +458,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     return crlExtensions;
   }
 
-  public boolean verifySignature(SubjectPublicKeyInfo publicKeyInfo)
-      throws IOException {
+  public boolean verifySignature(SubjectPublicKeyInfo publicKeyInfo) throws IOException {
     PublicKey publicKey;
     try {
       publicKey = KeyUtil.getPublicKey(publicKeyInfo);
@@ -495,8 +470,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   public boolean verifySignature(PublicKey publicKey) throws IOException {
     try {
-      ContentVerifierProvider cvp =
-          KeyUtil.getContentVerifierProvider(publicKey);
+      ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(publicKey);
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
       OutputStream sigOut = verifier.getOutputStream();
       try (InputStream crlStream = Files.newInputStream(crlFile.toPath())) {

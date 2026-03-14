@@ -31,8 +31,7 @@ import java.security.cert.CertificateFactory;
 
 public class SslContextConf {
 
-  private static final byte[] PEM_PREFIX =
-      StringUtil.toUtf8Bytes("-----BEGIN");
+  private static final byte[] PEM_PREFIX = StringUtil.toUtf8Bytes("-----BEGIN");
 
   private final String sslStoreType;
 
@@ -54,10 +53,8 @@ public class SslContextConf {
 
   private boolean initFailed;
 
-  public SslContextConf(FileOrBinary[] sslTrustanchors,
-                        String sslHostnameVerifier) {
-    this(null, null, null,
-        sslTrustanchors, sslHostnameVerifier);
+  public SslContextConf(FileOrBinary[] sslTrustanchors, String sslHostnameVerifier) {
+    this(null, null, null, sslTrustanchors, sslHostnameVerifier);
   }
 
   public SslContextConf(
@@ -73,15 +70,13 @@ public class SslContextConf {
   public synchronized void init() throws ObjectCreationException {
     if (initialized) {
       if (initFailed) {
-        throw new ObjectCreationException(
-            "initialization executed before but failed");
+        throw new ObjectCreationException("initialization executed before but failed");
       }
       return;
     }
 
     try {
-      this.hostnameVerifier =
-          HostnameVerifiers.createHostnameVerifier(sslHostnameVerifier);
+      this.hostnameVerifier = HostnameVerifiers.createHostnameVerifier(sslHostnameVerifier);
 
       SslContextBuilder builder = new SslContextBuilder();
       if (sslStoreType != null) {
@@ -90,8 +85,7 @@ public class SslContextConf {
 
       if (sslKeystore != null) {
         char[] password = Passwords.resolvePassword(sslKeystorePassword);
-        try (InputStream is =
-                 new ByteArrayInputStream(sslKeystore.readContent())) {
+        try (InputStream is = new ByteArrayInputStream(sslKeystore.readContent())) {
           builder.loadKeyMaterial(is, password, password);
         }
       }
@@ -104,8 +98,7 @@ public class SslContextConf {
         int idx = 1;
         for (FileOrBinary fb : sslTrustanchors) {
           byte[] bytes = fb.readContent();
-          if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0,
-              PEM_PREFIX.length)) {
+          if (CompareUtil.areEqual(bytes, 0, PEM_PREFIX, 0, PEM_PREFIX.length)) {
             try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(bytes)))) {
               StringBuilder sb = null;
@@ -117,8 +110,7 @@ public class SslContextConf {
                   if (sb != null) {
                     byte[] certBytes = Base64.decode(sb.toString());
                     sb = null;
-                    ks.setCertificateEntry("cert-" + (idx++),
-                        parseCert(cf, certBytes));
+                    ks.setCertificateEntry("cert-" + (idx++), parseCert(cf, certBytes));
                   }
                 } else {
                   if (sb != null) {
@@ -138,15 +130,13 @@ public class SslContextConf {
       sslSocketFactory = sslContext.getSocketFactory();
     } catch (Throwable th) {
       initFailed = true;
-      throw new ObjectCreationException(
-          "could not build SSLContext: " + th.getMessage(), th);
+      throw new ObjectCreationException("could not build SSLContext: " + th.getMessage(), th);
     } finally {
       initialized = true;
     }
   }
 
-  private static Certificate parseCert(
-      CertificateFactory fact, byte[] certBytes)
+  private static Certificate parseCert(CertificateFactory fact, byte[] certBytes)
       throws CertificateException, IOException {
     try (InputStream certIs = new ByteArrayInputStream(certBytes)) {
       return fact.generateCertificate(certIs);
@@ -170,8 +160,7 @@ public class SslContextConf {
 
   public static SslContextConf ofSslConf(SslConf ssl) {
     return new SslContextConf(ssl.storeType(), ssl.keystore(),
-        ssl.keystorePassword(), ssl.trustanchors(),
-        ssl.hostnameVerifier());
+        ssl.keystorePassword(), ssl.trustanchors(), ssl.hostnameVerifier());
   }
 
 }

@@ -96,8 +96,7 @@ public class OcspCertstore implements JsonEncodable {
       return rev;
     }
 
-    public void setRevocation(
-        int reason, long revocationTime, Long revocationInvalidityTime) {
+    public void setRevocation(int reason, long revocationTime, Long revocationInvalidityTime) {
       this.rev = true;
       this.rr = reason;
       this.rt = revocationTime;
@@ -220,9 +219,8 @@ public class OcspCertstore implements JsonEncodable {
     }
 
     public static Issuer parse(JsonMap json) throws CodecException {
-      return new Issuer(json.getNnInt("id"),
-          json.getNnString("certFile"), json.getString("revInfo"),
-          json.getInt("crlId"));
+      return new Issuer(json.getNnInt("id"), json.getNnString("certFile"),
+          json.getString("revInfo"), json.getInt("crlId"));
     }
 
   } // class Issuer
@@ -276,7 +274,7 @@ public class OcspCertstore implements JsonEncodable {
   private final List<CrlInfo> crlInfos;
 
   public OcspCertstore(int version, int countCerts, String certhashAlgo,
-                       List<Issuer> issuers, List<CrlInfo> crlInfos) {
+                      List<Issuer> issuers, List<CrlInfo> crlInfos) {
     this.version = version;
     this.countCerts = countCerts;
     this.certhashAlgo = certhashAlgo;
@@ -349,8 +347,7 @@ public class OcspCertstore implements JsonEncodable {
     }
 
     return new OcspCertstore(json.getNnInt("version"),
-        json.getNnInt("countCerts"), json.getString("certhashAlgo"),
-        issuers, crlInfos);
+        json.getNnInt("countCerts"), json.getString("certhashAlgo"), issuers, crlInfos);
   }
 
 }

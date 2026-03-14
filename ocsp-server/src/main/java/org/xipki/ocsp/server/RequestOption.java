@@ -32,13 +32,9 @@ public class RequestOption {
 
   static {
     SUPPORTED_HASH_ALGORITHMS = CollectionUtil.asSet(
-        HashAlgo.SHA1,
-        HashAlgo.SHA224,   HashAlgo.SHA256,
-        HashAlgo.SHA384,   HashAlgo.SHA512,
-        HashAlgo.SHA3_224, HashAlgo.SHA3_256,
-        HashAlgo.SHA3_384, HashAlgo.SHA3_512,
-        HashAlgo.SHAKE128, HashAlgo.SHAKE256,
-        HashAlgo.SM3);
+        HashAlgo.SHA1,     HashAlgo.SHA224,   HashAlgo.SHA256,   HashAlgo.SHA384,
+        HashAlgo.SHA512,   HashAlgo.SHA3_224, HashAlgo.SHA3_256, HashAlgo.SHA3_384,
+        HashAlgo.SHA3_512, HashAlgo.SHAKE128, HashAlgo.SHAKE256, HashAlgo.SM3);
   }
 
   private final boolean supportsHttpGet;
@@ -81,8 +77,7 @@ public class RequestOption {
     nonceMaxLen = nonceConf.maxLen() != null ? nonceConf.maxLen() : 96;
 
     if (nonceMinLen < 0) {
-      throw new InvalidConfException(
-          "invalid nonceMinLen (<1): " + nonceMinLen);
+      throw new InvalidConfException("invalid nonceMinLen (<1): " + nonceMinLen);
     }
 
     if (nonceMinLen > nonceMaxLen) {
@@ -91,14 +86,12 @@ public class RequestOption {
 
     maxRequestListCount = conf.maxRequestListCount();
     if (maxRequestListCount < 1) {
-      throw new InvalidConfException(
-          "invalid maxRequestListCount " + maxRequestListCount);
+      throw new InvalidConfException("invalid maxRequestListCount " + maxRequestListCount);
     }
 
     maxRequestSize = conf.maxRequestSize();
     if (maxRequestSize < 100) {
-      throw new InvalidConfException(
-          "invalid maxRequestSize " + maxRequestSize);
+      throw new InvalidConfException("invalid maxRequestSize " + maxRequestSize);
     }
 
     // Request versions
@@ -108,8 +101,7 @@ public class RequestOption {
       if ("v1".equalsIgnoreCase(m)) {
         versions.add(0);
       } else {
-        throw new InvalidConfException(
-            "invalid OCSP request version '" + m + "'");
+        throw new InvalidConfException("invalid OCSP request version '" + m + "'");
       }
     }
 
@@ -129,15 +121,13 @@ public class RequestOption {
         if (SUPPORTED_HASH_ALGORITHMS.contains(algo)) {
           hashAlgos.add(algo);
         } else {
-          throw new InvalidConfException(
-              "hash algorithm " + token + " is unsupported");
+          throw new InvalidConfException("hash algorithm " + token + " is unsupported");
         }
       }
     }
 
     // certpath validation
-    OcspServerConf.CertpathValidation certpathConf =
-        conf.certpathValidation();
+    OcspServerConf.CertpathValidation certpathConf = conf.certpathValidation();
     if (certpathConf == null) {
       if (validateSignature) {
         throw new InvalidConfException("certpathValidation is not specified");
@@ -155,16 +145,15 @@ public class RequestOption {
       trustanchors = new HashSet<>(tmpCerts.size());
       trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
-      throw new InvalidConfException("could not initialize the trustanchors: "
-          + ex.getMessage(), ex);
+      throw new InvalidConfException("could not initialize the trustanchors: " + ex.getMessage(),
+          ex);
     }
 
     OcspServerConf.CertCollection certsType = certpathConf.certs();
     try {
       certs = (certsType == null) ? null : getCerts(certsType);
     } catch (Exception ex) {
-      throw new InvalidConfException(
-          "could not initialize the certs: " + ex.getMessage(), ex);
+      throw new InvalidConfException("could not initialize the certs: " + ex.getMessage(), ex);
     }
   } // constructor
 
@@ -244,8 +233,7 @@ public class RequestOption {
         }
       }
     } else {
-      throw new IllegalStateException(
-          "should not happen, neither keystore nor dir is defined");
+      throw new IllegalStateException("should not happen, neither keystore nor dir is defined");
     }
 
     return tmpCerts;

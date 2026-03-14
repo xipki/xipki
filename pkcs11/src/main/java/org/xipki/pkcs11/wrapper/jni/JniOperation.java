@@ -5,6 +5,7 @@ package org.xipki.pkcs11.wrapper.jni;
 
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.ATTRS2_R;
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.ATTRS_R;
+import static org.xipki.pkcs11.wrapper.jni.PKCS11.DATA2_O;
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.DATA2_R;
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.DATA_O;
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.DATA_R;
@@ -44,15 +45,13 @@ public enum JniOperation {
   C_FindObjectsInit   (21 | ATTRS_R),
   C_FindObjects       (22),
   C_FindObjectsFinal  (23),
-  C_DigestInit        (24 | METH_R),
-  C_Digest            (25 | DATA_R),
-  C_DigestUpdate      (26 | DATA_R),
-  C_DigestKey         (27),
-  C_DigestFinal       (28),
-  C_SignInit          (29 | METH_R),
-  C_Sign              (30 | METH_O | DATA_R),
-  C_SignUpdate        (31 | DATA_R),
-  C_SignFinal         (32 | METH_O),
+  C_DigestX           (24 | METH_R | DATA_O | DATA2_O),
+  C_SignX             (25 | METH_R | DATA_R),
+  C_DecryptX          (26 | METH_R | DATA_R),
+  C_DeriveKey         (27 | METH_R | ATTRS_R),
+  C_SignInit          (28 | METH_R),
+  C_SignUpdate        (29 | DATA_R),
+  C_SignFinal         (30 | METH_O),
   C_GenerateKey       (33 | METH_R | ATTRS_R),
   C_GenerateKeyPair   (34 | METH_R | ATTRS_R | ATTRS2_R),
 

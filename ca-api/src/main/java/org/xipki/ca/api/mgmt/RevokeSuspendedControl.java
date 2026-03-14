@@ -54,8 +54,7 @@ public class RevokeSuspendedControl implements JsonEncodable {
 
     str = conf.value(KEY_UNCHANGED_SINCE);
     this.unchangedSince = (str == null)
-        ? new Validity(15, Unit.DAY)
-        : Validity.getInstance(str);
+        ? new Validity(15, Unit.DAY) : Validity.getInstance(str);
   } // constructor
 
   public RevokeSuspendedControl(boolean enabled) {
@@ -65,12 +64,9 @@ public class RevokeSuspendedControl implements JsonEncodable {
   public RevokeSuspendedControl(boolean enabled, CrlReason targetReason,
                                 Validity unchangedSince) {
     this.enabled = enabled;
-    this.targetReason = targetReason == null
-        ? CrlReason.CESSATION_OF_OPERATION
-        : targetReason;
+    this.targetReason = targetReason == null ? CrlReason.CESSATION_OF_OPERATION : targetReason;
     this.unchangedSince = unchangedSince == null
-        ? new Validity(15, Unit.DAY)
-        : unchangedSince;
+        ? new Validity(15, Unit.DAY) : unchangedSince;
 
     switch (this.targetReason) {
       case AFFILIATION_CHANGED:
@@ -81,8 +77,7 @@ public class RevokeSuspendedControl implements JsonEncodable {
       case UNSPECIFIED:
         break;
       default:
-        throw new IllegalArgumentException(
-            "invalid targetReason " + targetReason);
+        throw new IllegalArgumentException("invalid targetReason " + targetReason);
     }
   } // constructor
 
@@ -149,11 +144,9 @@ public class RevokeSuspendedControl implements JsonEncodable {
     return new JsonMap(getConfPairs().asMap());
   }
 
-  private static boolean getBoolean(
-      ConfPairs pairs, String key, boolean defaultValue) {
+  private static boolean getBoolean(ConfPairs pairs, String key, boolean defaultValue) {
     String str = pairs.value(key);
-    boolean ret = StringUtil.isBlank(str) ? defaultValue
-        : Boolean.parseBoolean(str);
+    boolean ret = StringUtil.isBlank(str) ? defaultValue : Boolean.parseBoolean(str);
     pairs.putPair(key, Boolean.toString(ret));
     return ret;
   }

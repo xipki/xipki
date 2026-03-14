@@ -19,8 +19,7 @@ public class HttpRespContent {
 
   private final int statusCode;
 
-  private HttpRespContent(int statusCode, String contentType,
-                          boolean base64, byte[] content) {
+  private HttpRespContent(int statusCode, String contentType, boolean base64, byte[] content) {
     this.contentType = contentType;
     this.content = content;
     this.base64 = base64;
@@ -28,30 +27,14 @@ public class HttpRespContent {
   }
 
   public static HttpRespContent ofOk(String contentType, byte[] content) {
-    return new HttpRespContent(HttpStatusCode.SC_OK, contentType,
-        false, content);
+    return new HttpRespContent(HttpStatusCode.SC_OK, contentType, false, content);
   }
 
-  public static HttpRespContent ofOk(
-      String contentType, boolean base64, byte[] content) {
-    return new HttpRespContent(HttpStatusCode.SC_OK, contentType,
-        base64, content);
+  public static HttpRespContent ofOk(String contentType, boolean base64, byte[] content) {
+    return new HttpRespContent(HttpStatusCode.SC_OK, contentType, base64, content);
   }
 
-  @Deprecated
-  public static HttpRespContent ofError(
-      int statusCode, String contentType, byte[] content) {
-    return new HttpRespContent(statusCode, contentType, false, content);
-  }
-
-  @Deprecated
-  public static HttpRespContent ofError(
-      int statusCode, String contentType, boolean base64, byte[] content) {
-    return new HttpRespContent(statusCode, contentType, base64, content);
-  }
-
-  public static HttpRespContent of(
-      int statusCode, String contentType, byte[] content) {
+  public static HttpRespContent of(int statusCode, String contentType, byte[] content) {
     return new HttpRespContent(statusCode, contentType, false, content);
   }
 

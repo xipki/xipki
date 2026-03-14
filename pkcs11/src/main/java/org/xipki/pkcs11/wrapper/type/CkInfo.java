@@ -104,10 +104,8 @@ public class CkInfo extends AbstractInfo {
   public String toString(PKCS11Module module, String indent) {
     return toString(indent, "CK_INFO", null,
         "cryptokiVersion", cryptokiVersion,
-        "manufacturerID", manufacturerID,
-        "libraryDescription", libraryDescription,
-        "libraryVersion", libraryVersion,
-        "flags", "0x" + Functions.toFullHex(flags));
+        "manufacturerID", manufacturerID, "libraryDescription", libraryDescription,
+        "libraryVersion", libraryVersion, "flags", "0x" + Functions.toFullHex(flags));
   }
 
   @Override
@@ -124,8 +122,7 @@ public class CkInfo extends AbstractInfo {
     long flags = readLong(arch, encoded, off);
     String libraryDescription = readFixedLenString(32, encoded, off);
     CkVersion libraryVersion = readVersion(encoded, off);
-    return new CkInfo(cryptokiVersion, manufacturerID, flags,
-        libraryDescription, libraryVersion);
+    return new CkInfo(cryptokiVersion, manufacturerID, flags, libraryDescription, libraryVersion);
   }
 
 }

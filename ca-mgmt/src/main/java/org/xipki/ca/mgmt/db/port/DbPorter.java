@@ -93,11 +93,9 @@ public class DbPorter extends DbToolBase {
 
   } // class CaDbEntryType
 
-  public static class DbPortFileNameIterator
-      implements Iterator<String>, Closeable {
+  public static class DbPortFileNameIterator implements Iterator<String>, Closeable {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(DbPortFileNameIterator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);
 
     private final BufferedReader reader;
 
@@ -105,7 +103,6 @@ public class DbPorter extends DbToolBase {
 
     public DbPortFileNameIterator(String filename) throws IOException {
       Args.notNull(filename, "filename");
-
       this.reader = Files.newBufferedReader(Paths.get(filename));
       this.nextFilename = readNextFilenameLine();
     }
@@ -145,8 +142,7 @@ public class DbPorter extends DbToolBase {
       String line;
       while ((line = reader.readLine()) != null) {
         line = line.trim();
-        if (StringUtil.isBlank(line) || line.startsWith("#")
-            || !line.endsWith(".zip")) {
+        if (StringUtil.isBlank(line) || line.startsWith("#") || !line.endsWith(".zip")) {
           continue;
         }
         return line;
@@ -157,8 +153,7 @@ public class DbPorter extends DbToolBase {
 
   } // class DbPortFileNameIterator
 
-  public static final String FILENAME_CA_CONFIGURATION =
-      "ca-configuration.json";
+  public static final String FILENAME_CA_CONFIGURATION = "ca-configuration.json";
 
   public static final String FILENAME_CA_CERTSTORE = "ca-certstore.json";
 
@@ -168,8 +163,7 @@ public class DbPorter extends DbToolBase {
 
   public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
 
-  public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME =
-      "import-to-ocsp.process";
+  public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "import-to-ocsp.process";
 
   /**
    * For XiPKI Version 5.3.x
@@ -187,20 +181,16 @@ public class DbPorter extends DbToolBase {
 
   protected final Map<String, String> dbSchemaInfo;
 
-  public DbPorter(DataSourceWrapper datasource, String baseDir,
-                  AtomicBoolean stopMe)
+  public DbPorter(DataSourceWrapper datasource, String baseDir, AtomicBoolean stopMe)
       throws DataAccessException {
     super(datasource, baseDir, stopMe);
 
     this.dbSchemaInfo = datasource.getDbSchema(connection);
-    this.dbSchemaVersion = Integer.parseInt(
-        dbSchemaInfo.get("VERSION"));
-    this.maxX500nameLen  = Integer.parseInt(
-        dbSchemaInfo.get("X500NAME_MAXLEN"));
+    this.dbSchemaVersion = Integer.parseInt(dbSchemaInfo.get("VERSION"));
+    this.maxX500nameLen  = Integer.parseInt(dbSchemaInfo.get("X500NAME_MAXLEN"));
   }
 
-  protected FileOrValue buildFileOrValue(String content, String fileName)
-      throws IOException {
+  protected FileOrValue buildFileOrValue(String content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
@@ -218,15 +208,13 @@ public class DbPorter extends DbToolBase {
     return FileOrValue.ofFile(fileName);
   } // method buildFileOrValue
 
-  protected FileOrBinary buildFileOrBase64Binary(
-      String base64Content, String fileName)
+  protected FileOrBinary buildFileOrBase64Binary(String base64Content, String fileName)
       throws IOException {
     return (base64Content == null) ? null
         : buildFileOrBinary(Base64.decode(base64Content), fileName);
   } // method buildFileOrBase64Binary
 
-  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName)
-      throws IOException {
+  protected FileOrBinary buildFileOrBinary(byte[] content, String fileName) throws IOException {
     if (content == null) {
       return null;
     }
@@ -265,8 +253,7 @@ public class DbPorter extends DbToolBase {
       return fileOrValue.value();
     }
 
-    return StringUtil.toUtf8String(
-        IoUtil.read(new File(baseDir, fileOrValue.file())));
+    return StringUtil.toUtf8String(IoUtil.read(new File(baseDir, fileOrValue.file())));
   } // method readContent
 
   public static void echoToFile(String content, File file) throws IOException {

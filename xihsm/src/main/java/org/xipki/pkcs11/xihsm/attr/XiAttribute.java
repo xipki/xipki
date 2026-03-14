@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.xihsm.attr;
 
 import org.bouncycastle.util.BigIntegers;
-import org.bouncycastle.util.encoders.Hex;
+import org.xipki.pkcs11.wrapper.Category;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.attrs.Attribute;
 import org.xipki.pkcs11.wrapper.attrs.BooleanAttribute;
@@ -15,10 +15,10 @@ import org.xipki.pkcs11.wrapper.attrs.LongAttribute;
 import org.xipki.pkcs11.wrapper.attrs.StringAttribute;
 import org.xipki.pkcs11.wrapper.attrs.TemplateAttribute;
 import org.xipki.pkcs11.xihsm.util.HsmException;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
-import org.xipki.util.codec.cbor.CborType;
+import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.util.codec.Hex;
+import org.xipki.util.codec.json.JsonList;
+import org.xipki.util.codec.json.JsonMap;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -27,9 +27,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiAttribute {
+
+  public static final long CKA_XIHSM_CKU = 0x1_FFFF_FFFFL;
+
+  public static final long CKA_XIHSM_ORIGIN = 0x1_FFFF_FFFEL;
 
   private final long type;
 
@@ -49,6 +55,36 @@ public class XiAttribute {
 
   public XiAttribute(long type) {
     this.type = type;
+  }
+
+  public static Attribute.DataType getCkaDataType(long cka) {
+    if (cka == CKA_XIHSM_CKU) {
+      return Attribute.DataType.CkLong;
+    } else if (cka == CKA_XIHSM_ORIGIN) {
+      return Attribute.DataType.CkLong;
+    }
+
+    return Attribute.getDataType(cka);
+  }
+
+  public static String ckaCodeToName(long cka) {
+    if (cka == CKA_XIHSM_CKU) {
+      return "CKA_XIHSM_CKU";
+    } else if (cka == CKA_XIHSM_ORIGIN) {
+      return "CKA_XIHSM_ORIGIN";
+    } else {
+      return PKCS11T.ckaCodeToName(cka);
+    }
+  }
+
+  public static long ckaNameToCode(String ckaName) {
+    if (ckaName.equals("CKA_XIHSM_CKU")) {
+      return CKA_XIHSM_CKU;
+    } else if (ckaName.equals("CKA_XIHSM_ORIGIN")) {
+      return CKA_XIHSM_ORIGIN;
+    } else {
+      return PKCS11T.nonnullNameToCode(Category.CKA, ckaName);
+    }
   }
 
   public static XiAttribute ofObject(long type, Object value)
@@ -73,8 +109,7 @@ public class XiAttribute {
       return ofAttributes(type, (XiTemplate) value);
     } else {
       throw new HsmException(PKCS11T.CKR_ATTRIBUTE_VALUE_INVALID,
-          "unsupported value type " +
-          (value == null ? "NULL" : value.getClass().getName()));
+          "unsupported value type " + (value == null ? "NULL" : value.getClass().getName()));
     }
   }
 
@@ -150,11 +185,9 @@ public class XiAttribute {
     } else if (attr instanceof LongArrayAttribute) {
       return ofLongArray(type, ((LongArrayAttribute) attr).getValue());
     } else if (attr instanceof DateAttribute) {
-      return ofDate(type, XiDate.fromCkDate(
-                            ((DateAttribute) attr).getCkDateValue()));
+      return ofDate(type, XiDate.fromCkDate(((DateAttribute) attr).getCkDateValue()));
     } else if (attr instanceof TemplateAttribute) {
-      return ofAttributes(type,
-          XiTemplate.fromCkAttributes(((TemplateAttribute) attr).getValue()));
+      return ofAttributes(type, XiTemplate.fromCkAttributes(((TemplateAttribute) attr).getValue()));
     } else {
       throw new HsmException(PKCS11T.CKR_ATTRIBUTE_TYPE_INVALID,
           "unsupported attribute " + attr.getClass().getName());
@@ -165,12 +198,9 @@ public class XiAttribute {
     return (boolValue != null)     ? new BooleanAttribute(type, boolValue)
         : (longValue      != null) ? new LongAttribute(type, longValue)
         : (charsValue     != null) ? new StringAttribute(type, charsValue)
-        : (byteArrayValue != null)
-            ? new ByteArrayAttribute(type, byteArrayValue)
-        : (longArrayValue != null)
-            ? new LongArrayAttribute(type, longArrayValue)
-        : (templateValue != null)
-            ? new TemplateAttribute(type, templateValue.toCkAttributeArray())
+        : (byteArrayValue != null) ? new ByteArrayAttribute(type, byteArrayValue)
+        : (longArrayValue != null) ? new LongArrayAttribute(type, longArrayValue)
+        : (templateValue != null)  ? new TemplateAttribute(type, templateValue.toCkAttributeArray())
         : new DateAttribute(type, dateValue.toCkDate());
   }
 
@@ -211,8 +241,7 @@ public class XiAttribute {
   }
 
   public BigInteger getBigIntValue() {
-    return byteArrayValue == null ? null
-        : new BigInteger(1, byteArrayValue);
+    return byteArrayValue == null ? null : new BigInteger(1, byteArrayValue);
   }
 
   public XiDate getDateValue() {
@@ -258,8 +287,7 @@ public class XiAttribute {
         text = PKCS11T.ckoCodeToName(longValue);
       } else if (type == PKCS11T.CKA_KEY_TYPE) {
         text = PKCS11T.ckkCodeToName(longValue);
-      } else if (type == PKCS11T.CKA_KEY_GEN_MECHANISM
-          || type == PKCS11T.CKA_NAME_HASH_ALGORITHM) {
+      } else if (type == PKCS11T.CKA_KEY_GEN_MECHANISM || type == PKCS11T.CKA_NAME_HASH_ALGORITHM) {
         text = PKCS11T.ckmCodeToName(longValue);
       } else {
         text = null;
@@ -271,7 +299,7 @@ public class XiAttribute {
     } else if (charsValue != null) {
       sb.append(charsValue);
     } else if (byteArrayValue != null) {
-      sb.append(Hex.toHexString(byteArrayValue));
+      sb.append(Hex.encode(byteArrayValue));
     } else if (dateValue != null) {
       sb.append(dateValue.getDate());
     } else if (longArrayValue != null) {
@@ -284,64 +312,52 @@ public class XiAttribute {
       } else {
         sb.append(Arrays.toString(longArrayValue));
       }
+    } else if (templateValue != null) {
+      sb.append(templateValue);
     } else {
       sb.append("NULL");
     }
     return sb.toString();
   }
 
-  public void encode(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(2);
-    encoder.writeLong(type);
+  public void encode(JsonMap encoder) {
+    String name = ckaCodeToName(type);
+    Attribute.DataType dataType = getCkaDataType(type);
+
     if (boolValue != null) {
-      encoder.writeBoolean(boolValue);
+      encoder.put(name, boolValue);
     } else if (longValue != null) {
-      encoder.writeLong(longValue);
+      if (type == CKA_XIHSM_CKU) {
+        encoder.put(name, PKCS11T.ckuCodeToName(longValue));
+      } else if (type == CKA_XIHSM_ORIGIN) {
+        encoder.put(name, Origin.ofCode(longValue).name());
+      } else if (dataType == Attribute.DataType.CkMechanism) {
+        encoder.put(name, PKCS11T.ckmCodeToName(longValue));
+      } else {
+        encoder.put(name, longValue);
+      }
     } else if (charsValue != null) {
-      encoder.writeTextString(charsValue);
+      encoder.put(name, charsValue);
     } else if (dateValue != null) {
-      encoder.writeTag(1);
-      encoder.writeLong(dateValue.getDate());
-    } else if (longArrayValue != null) {
-      encoder.writeLongs(longArrayValue);
+      encoder.put(name, dateValue.getDate());
+    } else if (longArrayValue != null && longArrayValue.length > 0) {
+      JsonList list = new JsonList();
+      if (dataType == Attribute.DataType.CkMechanismArray) {
+        for (long v : longArrayValue) {
+          list.add(PKCS11T.ckmCodeToName(v));
+        }
+      } else {
+        for (long v : longArrayValue) {
+          list.add(v);
+        }
+      }
+
+      encoder.put(name, list);
+    } else if (templateValue != null) {
+      encoder.put(name, templateValue.toCodec());
     } else { // if (byteArrayValue != null)
-      encoder.writeByteString(byteArrayValue);
+      encoder.put(name, Hex.encode(byteArrayValue));
     }
-  }
-
-  public static XiAttribute decode(CborDecoder decoder) throws CodecException {
-    int arrayLen = decoder.readArrayLength();
-    if (arrayLen != 2) {
-      throw new CodecException("arrayLen != 2: " + arrayLen);
-    }
-
-    long type = decoder.readLong();
-    CborType cborType = decoder.peekType();
-
-    if (cborType.isBooleanType()) {
-      return XiAttribute.ofBool(type, decoder.readBoolean());
-    } else if (cborType.isInt()) {
-      return XiAttribute.ofLong(type, decoder.readLong());
-    } else if (cborType.isTextString()) {
-      return XiAttribute.ofChars(type, decoder.readTextString());
-    } else if (cborType.isByteString()) {
-      return XiAttribute.ofByteArray(type, decoder.readByteString());
-    } else if (cborType.isArray()) {
-      int size = decoder.readArrayLength();
-      long[] values = new long[size];
-      for (int i = 0; i < size; i++) {
-        values[i] = decoder.readLong();
-      }
-      return XiAttribute.ofLongArray(type, values);
-    } else if (cborType.isTag()) {
-      long tag = decoder.readTag();
-      if (tag == 1) {
-        return XiAttribute.ofDate(type, decoder.readLong());
-      }
-    }
-
-    throw new CodecException("unknown cbor type for the attribute value " +
-        cborType);
   }
 
 }

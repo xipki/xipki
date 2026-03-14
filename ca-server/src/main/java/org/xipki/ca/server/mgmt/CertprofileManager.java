@@ -35,13 +35,12 @@ import java.util.Set;
 /**
  * Manages the certificate profiles.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 class CertprofileManager {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CertprofileManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertprofileManager.class);
 
   private boolean certprofilesInitialized;
 
@@ -56,10 +55,9 @@ class CertprofileManager {
   }
 
   void close() {
-    for (String name : manager.certprofiles.keySet()) {
-      IdentifiedCertprofile certprofile = manager.certprofiles.get(name);
-      shutdownCertprofile(certprofile);
-    }
+    manager.certprofileDbEntries.clear();
+    manager.idNameMap.clearCertprofile();
+    manager.certprofiles.clear();
   }
 
   void initCertprofiles() throws CaMgmtException {
@@ -67,9 +65,6 @@ class CertprofileManager {
       return;
     }
 
-    for (String name : manager.certprofiles.keySet()) {
-      shutdownCertprofile(manager.certprofiles.get(name));
-    }
     manager.certprofileDbEntries.clear();
     manager.idNameMap.clearCertprofile();
     manager.certprofiles.clear();
@@ -94,8 +89,7 @@ class CertprofileManager {
     certprofilesInitialized = true;
   } // method initCertprofiles
 
-  void removeCertprofileFromCa(String profileName, String caName)
-      throws CaMgmtException {
+  void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
     profileName = Args.toNonBlankLower(profileName, "profileName");
@@ -120,8 +114,7 @@ class CertprofileManager {
     }
   } // method removeCertprofileFromCa
 
-  void addCertprofileToCa(String profileNameAndAlias, String caName)
-      throws CaMgmtException {
+  void addCertprofileToCa(String profileNameAndAlias, String caName) throws CaMgmtException {
     manager.assertMasterMode();
 
     CaProfileEntry caProfileEntry;
@@ -153,18 +146,15 @@ class CertprofileManager {
       manager.caHasProfiles.put(caName, set);
     } else {
       for (CaProfileEntry existingEntry : set) {
-        String containedNameOrAlias =
-            existingEntry.containedNameOrAlias(caProfileEntry);
+        String containedNameOrAlias = existingEntry.containedNameOrAlias(caProfileEntry);
         if (containedNameOrAlias != null) {
           throw manager.logAndCreateException("Certprofile (name or alias) '"
-              + containedNameOrAlias + "' already associated with CA "
-              + caName);
+              + containedNameOrAlias + "' already associated with CA " + caName);
         }
       }
     }
 
-    manager.caConfStore.addCertprofileToCa(ident, caIdent,
-        caProfileEntry.profileAliases());
+    manager.caConfStore.addCertprofileToCa(ident, caIdent, caProfileEntry.profileAliases());
     set.add(caProfileEntry);
   } // method addCertprofileToCa
 
@@ -189,15 +179,12 @@ class CertprofileManager {
     }
 
     LOG.info("removed profile '{}'", name);
-    manager.idNameMap.removeCertprofile(
-        manager.certprofileDbEntries.get(name).ident().id());
+    manager.idNameMap.removeCertprofile(manager.certprofileDbEntries.get(name).ident().id());
     manager.certprofileDbEntries.remove(name);
-    IdentifiedCertprofile profile = manager.certprofiles.remove(name);
-    shutdownCertprofile(profile);
+    manager.certprofiles.remove(name);
   } // method removeCertprofile
 
-  void changeCertprofile(String name, String type, String conf)
-      throws CaMgmtException {
+  void changeCertprofile(String name, String type, String conf) throws CaMgmtException {
     manager.assertMasterMode();
 
     name = Args.toNonBlankLower(name, "name");
@@ -220,17 +207,11 @@ class CertprofileManager {
     IdentifiedCertprofile oldProfile = manager.certprofiles.remove(name);
     manager.certprofileDbEntries.put(name, profile.dbEntry());
     manager.certprofiles.put(name, profile);
-
-    if (oldProfile != null) {
-      shutdownCertprofile(oldProfile);
-    }
   } // method changeCertprofile
 
-  void addCertprofile(CertprofileEntry certprofileEntry)
-      throws CaMgmtException {
+  void addCertprofile(CertprofileEntry certprofileEntry) throws CaMgmtException {
     manager.assertMasterMode();
-    String name = Args.notNull(certprofileEntry, "certprofileEntry")
-                  .ident().name();
+    String name = Args.notNull(certprofileEntry, "certprofileEntry").ident().name();
     CaManagerImpl.checkName(name, "certprofile name");
     if (manager.certprofileDbEntries.containsKey(name)) {
       throw new CaMgmtException("Certprofile '" + name + "' exists");
@@ -248,8 +229,7 @@ class CertprofileManager {
     manager.certprofileDbEntries.put(name, certprofileEntry);
   } // method addCertprofile
 
-  CertprofileInfoResponse getCertprofileInfo(String profileName)
-      throws OperationException {
+  CertprofileInfoResponse getCertprofileInfo(String profileName) throws OperationException {
     IdentifiedCertprofile profile0 = Optional.ofNullable(
         manager.getIdentifiedCertprofile(profileName)).orElseThrow(
             () -> new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE));
@@ -302,36 +282,19 @@ class CertprofileManager {
     return new CertprofileInfoResponse(requiredOids, optionalOids, keyTypes);
   }
 
-  void shutdownCertprofile(IdentifiedCertprofile profile) {
-    if (profile == null) {
-      return;
-    }
-
-    try {
-      profile.close();
-    } catch (Exception ex) {
-      LogUtil.warn(LOG, ex, "could not shutdown Certprofile "
-          + profile.ident());
-    }
-  } // method shutdownCertprofile
-
-  IdentifiedCertprofile createCertprofile(CertprofileEntry entry)
-      throws CaMgmtException {
+  IdentifiedCertprofile createCertprofile(CertprofileEntry entry) throws CaMgmtException {
     String type = Args.notNull(entry, "entry").type();
     if (!manager.certprofileFactoryRegister.canCreateProfile(type)) {
       throw new CaMgmtException("unsupported cert profile type " + type);
     }
 
     try {
-      Certprofile profile =
-          manager.certprofileFactoryRegister.newCertprofile(type);
-      IdentifiedCertprofile identifiedCertprofile =
-          new IdentifiedCertprofile(entry, profile);
+      Certprofile profile = manager.certprofileFactoryRegister.newCertprofile(type);
+      IdentifiedCertprofile identifiedCertprofile = new IdentifiedCertprofile(entry, profile);
       try {
         CertprofileValidator.validate(profile);
       } catch (CertprofileException ex) {
-        LogUtil.warn(LOG, ex, "validating certprofile "
-            + entry.ident().name() + " failed");
+        LogUtil.warn(LOG, ex, "validating certprofile " + entry.ident().name() + " failed");
       }
       return identifiedCertprofile;
     } catch (ObjectCreationException | CertprofileException ex) {

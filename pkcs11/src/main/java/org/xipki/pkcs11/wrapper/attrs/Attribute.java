@@ -3,6 +3,7 @@
 
 package org.xipki.pkcs11.wrapper.attrs;
 
+import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.type.CkDate;
 import org.xipki.pkcs11.wrapper.type.CkVersion;
 import org.xipki.util.codec.json.JsonMap;
@@ -16,6 +17,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_PARAMETER_SET;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKK_ML_DSA;
+import static org.xipki.pkcs11.wrapper.PKCS11T.CKK_ML_KEM;
 import static org.xipki.pkcs11.wrapper.PKCS11T.ckaCodeToName;
 import static org.xipki.pkcs11.wrapper.PKCS11T.ckaNameToCode;
 
@@ -59,8 +63,7 @@ public abstract class Attribute {
   static {
     dataTypes = new HashMap<>(130);
     String propFile = "org/xipki/pkcs11/wrapper/type-cka.json";
-    try (InputStream is = Attribute.class.getClassLoader()
-        .getResourceAsStream(propFile)) {
+    try (InputStream is = Attribute.class.getClassLoader().getResourceAsStream(propFile)) {
       JsonMap json = JsonParser.parseMap(is, true);
       Map<String, String> map = json.toStringMap();
       for (Map.Entry<String, String> v : map.entrySet()) {
@@ -71,8 +74,7 @@ public abstract class Attribute {
         }
 
         if (dataTypes.containsKey(code)) {
-          throw new IllegalStateException(
-              "duplicated definition of CKA: " + name);
+          throw new IllegalStateException("duplicated definition of CKA: " + name);
         }
 
         String type = v.getValue();
@@ -84,8 +86,7 @@ public abstract class Attribute {
     }
 
     if (dataTypes.isEmpty()) {
-      throw new IllegalStateException(
-          "no code to name map is defined properties file " + propFile);
+      throw new IllegalStateException("no code to name map is defined properties file " + propFile);
     }
   }
 
@@ -118,8 +119,7 @@ public abstract class Attribute {
       case "VERSION":
         return DataType.CkVersion;
       default:
-        throw new IllegalStateException(
-            "unknown attribute type '" + attrType + "'");
+        throw new IllegalStateException("unknown attribute type '" + attrType + "'");
     }
   }
 
@@ -146,18 +146,10 @@ public abstract class Attribute {
   }
 
   /**
-   * @param type
-   * @return
+   * @param type the attribute type
+   * @return an Attribute for give type
    */
   public static Attribute getInstance(long type) {
-    return getInstance0(type);
-  }
-
-  /**
-   * @param type
-   * @return
-   */
-  static Attribute getInstance0(long type) {
     DataType attrType = getDataType(type);
     switch (attrType) {
       case CkBool:
@@ -255,8 +247,11 @@ public abstract class Attribute {
    * @return A string representation of this attribute.
    */
   public String toString(boolean withName, int minNameLen, String indent) {
-    StringBuilder sb = new StringBuilder(Math.max(15, minNameLen) + 20)
-        .append(indent);
+    return toString(withName, minNameLen, indent, null);
+  }
+
+  String toString(boolean withName, int minNameLen, String indent, Long keyType) {
+    StringBuilder sb = new StringBuilder(Math.max(15, minNameLen) + 20).append(indent);
 
     if (withName) {
       String name = ckaCodeToName(type);
@@ -272,12 +267,18 @@ public abstract class Attribute {
     if (value != null) {
       try {
         valueString = getValueString();
+        if (keyType != null && type == CKA_PARAMETER_SET) {
+          if (keyType == CKK_ML_DSA) {
+            valueString += " (" + PKCS11T.getStdMldsaName((long) value) + ")";
+          } else if (keyType == CKK_ML_KEM) {
+            valueString += " (" + PKCS11T.getStdMlkemName((long) value) + ")";
+          }
+        }
       } catch (RuntimeException e) {
         valueString = "<ERROR toString()>";
       }
     } else {
-      valueString = sensitive ? "<Value is sensitive>"
-                              : "<Attribute not present>";
+      valueString = sensitive ? "<Value is sensitive>" : "<Attribute not present>";
     }
 
     return sb.append(valueString).toString();

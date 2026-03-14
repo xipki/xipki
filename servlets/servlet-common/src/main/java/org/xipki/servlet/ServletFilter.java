@@ -24,13 +24,11 @@ import java.io.IOException;
  */
 public abstract class ServletFilter implements Filter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(ServletFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ServletFilter.class);
 
   private XiHttpFilter filter0;
 
-  protected abstract XiHttpFilter initFilter(FilterConfig filterConfig)
-      throws Exception;
+  protected abstract XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception;
 
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
@@ -51,15 +49,13 @@ public abstract class ServletFilter implements Filter {
   }
 
   @Override
-  public final void doFilter(ServletRequest request,
-                             ServletResponse response, FilterChain chain)
+  public final void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     if (filter0 == null) {
       throw new ServletException("filter is not initialized");
     }
 
-    if (!(request instanceof HttpServletRequest
-          && response instanceof HttpServletResponse)) {
+    if (!(request instanceof HttpServletRequest && response instanceof HttpServletResponse)) {
       throw new ServletException("Only HTTP request is supported");
     }
 

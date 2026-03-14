@@ -42,8 +42,7 @@ public class KemEncapKey {
     byte alg = encoded[off.getAndIncrement()];
     byte[] encapKey = readBytes(encoded, off);
     byte[] encryptedSecret = readBytes(encoded, off);
-    return new KemEncapKey(id,
-        new KemEncapsulation(alg, encapKey, encryptedSecret));
+    return new KemEncapKey(id, new KemEncapsulation(alg, encapKey, encryptedSecret));
   }
 
   public String id() {
@@ -58,8 +57,7 @@ public class KemEncapKey {
     byte[] idBytes = id.getBytes(StandardCharsets.US_ASCII);
     byte[] encapKey= encapulation.encapKey();
     byte[] encryptedSecret = encapulation.encryptedSecret();
-    int len = 7 + idBytes.length + encapKey.length +
-              encryptedSecret.length;
+    int len = 7 + idBytes.length + encapKey.length + encryptedSecret.length;
     byte[] encoded = new byte[len];
     AtomicInteger off = new AtomicInteger(0);
     writeBytes(idBytes, encoded, off);
@@ -78,8 +76,7 @@ public class KemEncapKey {
   }
 
   private static byte[] readBytes(byte[] bytes, AtomicInteger off) {
-    int len = ((0xFF & bytes[off.getAndIncrement()]) << 8) +
-               (0xFF & bytes[off.getAndIncrement()]);
+    int len = ((0xFF & bytes[off.getAndIncrement()]) << 8) + (0xFF & bytes[off.getAndIncrement()]);
     return Arrays.copyOfRange(bytes, off.get(), off.addAndGet(len));
   }
 

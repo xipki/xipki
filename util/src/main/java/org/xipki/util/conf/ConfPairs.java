@@ -155,8 +155,7 @@ public class ConfPairs implements JsonEncodable {
 
       if (BACKSLASH == ch) {
         if (i == len - 1) {
-          throw new IllegalArgumentException(
-              "invalid ConfPairs '" + confPairs + "'");
+          throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
         }
 
         tokenBuilder.append(ch);
@@ -184,8 +183,7 @@ public class ConfPairs implements JsonEncodable {
 
         if (BACKSLASH == ch) {
           if (i == len - 1) {
-            throw new IllegalArgumentException(
-                "invalid ConfPairs '" + confPairs + "'");
+            throw new IllegalArgumentException("invalid ConfPairs '" + confPairs + "'");
           }
 
           i += 2;
@@ -203,8 +201,7 @@ public class ConfPairs implements JsonEncodable {
         char ch = token.charAt(i);
         if (BACKSLASH == ch) {
           if (i == termPosition - 1) {
-            throw new IllegalArgumentException(
-                "invalid ConfPair '" + confPairs + "'");
+            throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
           }
 
           i += 2;
@@ -221,8 +218,7 @@ public class ConfPairs implements JsonEncodable {
         char ch = token.charAt(i);
         if (BACKSLASH == ch) {
           if (i == len - 1) {
-            throw new IllegalArgumentException(
-                "invalid ConfPair '" + confPairs + "'");
+            throw new IllegalArgumentException("invalid ConfPair '" + confPairs + "'");
           }
 
           ch = token.charAt(i + 1);
@@ -328,17 +324,17 @@ public class ConfPairs implements JsonEncodable {
       String pairValue = v.getValue();
 
       if (pairValue.equalsIgnoreCase("true")) {
-         jMap.put(pairKey, true);
+        jMap.put(pairKey, true);
       } else if (pairValue.equalsIgnoreCase("false")) {
-         jMap.put(pairKey, false);
+        jMap.put(pairKey, false);
       } else if (Args.isNumber(pairValue)) {
-         try {
-            jMap.put(pairKey, Long.parseLong(pairValue));
-         } catch (Exception e) {
-            jMap.put(pairKey, pairValue);
-         }
+        try {
+          jMap.put(pairKey, Long.parseLong(pairValue));
+        } catch (Exception e) {
+          jMap.put(pairKey, pairValue);
+        }
       } else {
-         jMap.put(v.getKey(), pairValue);
+        jMap.put(v.getKey(), pairValue);
       }
     }
 

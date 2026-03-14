@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * CA information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaInfo {
@@ -77,8 +77,7 @@ public class CaInfo {
 
   private final ConfPairs extraControl;
 
-  public CaInfo(CaEntry caEntry, CertStore certStore)
-      throws OperationException {
+  public CaInfo(CaEntry caEntry, CertStore certStore) throws OperationException {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = certStore;
 
@@ -89,18 +88,15 @@ public class CaInfo {
     this.selfSigned = cert.isSelfSigned();
 
     BaseCaInfo base = caEntry.base();
-    this.publicCaInfo = new PublicCaInfo(cert, base.caUris(),
-        base.extraControl());
+    this.publicCaInfo = new PublicCaInfo(cert, base.caUris(), base.extraControl());
     List<X509Cert> certs = caEntry.certchain();
     this.certchain = certs == null ? Collections.emptyList() : certs;
-    this.noNewCertificateAfter = notAfter.minus(
-        base.expirationPeriod(), ChronoUnit.DAYS);
+    this.noNewCertificateAfter = notAfter.minus(base.expirationPeriod(), ChronoUnit.DAYS);
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = base.extraControl();
 
     // keyspec
-    caKeySpec = KeySpec.ofPublicKey(
-        caEntry.cert().subjectPublicKeyInfo());
+    caKeySpec = KeySpec.ofPublicKey(caEntry.cert().subjectPublicKeyInfo());
   } // constructor
 
   public KeySpec caKeySpec() {
@@ -274,15 +270,13 @@ public class CaInfo {
     return null;
   } // method getSigner
 
-  public boolean initSigner(SecurityFactory securityFactory)
-      throws XiSecurityException {
+  public boolean initSigner(SecurityFactory securityFactory) throws XiSecurityException {
     if (signers != null) {
       return true;
     }
     dfltSigner = null;
 
-    List<CaEntry.CaSignerConf> signerConfs =
-        CaEntry.splitCaSignerConfs(caEntry.signerConf());
+    List<CaEntry.CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(caEntry.signerConf());
 
     Map<SignAlgo, ConcurrentSigner> tmpSigners = new HashMap<>();
     for (CaEntry.CaSignerConf m : signerConfs) {
@@ -290,7 +284,7 @@ public class CaInfo {
       ConcurrentSigner signer;
       try {
         signer = securityFactory.createSigner(caEntry.base().signerType(),
-            signerConf, caEntry.cert());
+                  signerConf, caEntry.cert());
 
         if (dfltSigner == null) {
           dfltSigner = signer;

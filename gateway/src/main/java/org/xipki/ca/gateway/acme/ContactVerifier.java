@@ -6,6 +6,7 @@ package org.xipki.ca.gateway.acme;
 import java.util.regex.Pattern;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -21,7 +22,7 @@ public interface ContactVerifier {
 
     private final Pattern pattern = Pattern.compile(
         "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
-         "[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
+        "[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$");
 
     public DfltContactVerifier() {
     }
@@ -32,8 +33,7 @@ public interface ContactVerifier {
         return unsupportedContact;
       }
 
-      return pattern.matcher(contact.substring(7)).matches() ? 0
-          : invalidContact;
+      return pattern.matcher(contact.substring(7)).matches() ? 0 : invalidContact;
     }
   }
 

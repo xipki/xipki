@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * Certificate issuer information.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class IssuerInfo {
@@ -40,14 +40,10 @@ public class IssuerInfo {
     Args.notNull(certBytes, "certBytes");
 
     this.cutoffNotAfter = cutoffNotAfter;
-    this.caIssuerUrls = CollectionUtil.isEmpty(caIssuerUrls) ? null
-        : Set.copyOf(caIssuerUrls);
-    this.ocspUrls     = CollectionUtil.isEmpty(ocspUrls) ? null
-        : Set.copyOf(ocspUrls);
-    this.crlUrls      = CollectionUtil.isEmpty(crlUrls) ? null
-        : Set.copyOf(crlUrls);
-    this.deltaCrlUrls = CollectionUtil.isEmpty(deltaCrlUrls) ? null
-        : Set.copyOf(deltaCrlUrls);
+    this.caIssuerUrls = CollectionUtil.isEmpty(caIssuerUrls) ? null : Set.copyOf(caIssuerUrls);
+    this.ocspUrls     = CollectionUtil.isEmpty(ocspUrls) ? null : Set.copyOf(ocspUrls);
+    this.crlUrls      = CollectionUtil.isEmpty(crlUrls) ? null : Set.copyOf(crlUrls);
+    this.deltaCrlUrls = CollectionUtil.isEmpty(deltaCrlUrls) ? null : Set.copyOf(deltaCrlUrls);
     this.cert = X509Util.parseCert(certBytes);
   } // constructor
 

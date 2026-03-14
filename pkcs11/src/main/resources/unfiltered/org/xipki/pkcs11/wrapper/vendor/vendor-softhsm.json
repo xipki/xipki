@@ -13,5 +13,10 @@
       "flags": ["Sign"]
     }
   ],
-  "vendor": "SOFTHSM"
+  "vendor": "SOFTHSM",
+  "ckaExclude": [
+    "CKA_DERIVE_TEMPLATE",
+    "CKA_ENCAPSULATE_TEMPLATE",
+    "CKA_DECAPSULATE_TEMPLATE"
+  ]
 }

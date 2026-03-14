@@ -10,24 +10,24 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public interface Store {
 
   void addObject(long slotId, XiP11Storage object) throws HsmException;
 
-  void findObjects(List<Long> res, long slotId, LoginState loginState,
-                   XiTemplate criteria)
+  void findObjects(List<Long> res, long slotId, LoginState loginState, XiTemplate criteria)
       throws HsmException;
 
   XiP11Storage getObject(long slotId, long hObject, LoginState loginState)
       throws HsmException;
 
-  void updateObject(long slotId, long hObject, LoginState loginState,
-                    XiTemplate attrs) throws HsmException;
-
-  void destroyObject(long slotId, long hObject, LoginState loginState)
+  void updateObject(long slotId, long hObject, LoginState loginState, XiTemplate attrs)
       throws HsmException;
+
+  void destroyObject(long slotId, long hObject, LoginState loginState) throws HsmException;
 
   long nextObjectHandle(long slotId) throws HsmException;
 

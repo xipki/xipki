@@ -16,8 +16,7 @@ public class ProtectionVerificationResult {
 
   private final ProtectionResult protectionResult;
 
-  public ProtectionVerificationResult(
-      Object requestor, ProtectionResult protectionResult) {
+  public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
     this.requestor = requestor;
     this.protectionResult = Args.notNull(protectionResult, "protectionResult");
   }

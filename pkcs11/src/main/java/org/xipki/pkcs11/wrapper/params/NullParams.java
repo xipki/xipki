@@ -34,8 +34,7 @@ public class NullParams extends CkParams {
     return indent + "<NULL>";
   }
 
-  public static NullParams decode(byte[] encoded, AtomicInteger off)
-      throws PKCS11Exception {
+  public static NullParams decode(byte[] encoded, AtomicInteger off) throws PKCS11Exception {
     assertType(encoded, off, ParamsType.NullParams);
     return INSTANCE;
   }

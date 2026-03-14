@@ -1,0 +1,57 @@
+{
+  "passwords": [
+    {
+      "user": "$[gateway.requestor.user1]",
+      "password": "$[gateway.requestor.password1]",
+      "protocols":["ALL"],
+      "permissions":["ALL"],
+      "caProfiles": [
+        {
+          "ca":"ALL",
+          "profiles":["ALL"]
+        }
+      ]
+    }
+  ],
+  "certs": [
+    {
+      "cert": {
+        "file": "keycerts/est-client-cert.pem"
+      },
+      "protocols":["EST"],
+      "permissions":["ALL"],
+      "caProfiles": [
+        {
+          "ca":"ALL",
+          "profiles":["ALL"]
+        }
+      ]
+    },
+    {
+      "cert": {
+        "file": "keycerts/cmp-client-cert.pem"
+      },
+      "protocols":["CMP"],
+      "permissions":["ALL"],
+      "caProfiles": [
+        {
+          "ca":"ALL",
+          "profiles":["ALL"]
+        }
+      ]
+    },
+    {
+      "cert": {
+        "file": "keycerts/rest-client-cert.pem"
+      },
+      "protocols":["REST"],
+      "permissions":["ALL"],
+      "caProfiles": [
+        {
+          "ca":"ALL",
+          "profiles":["ALL"]
+        }
+      ]
+    }
+  ]
+}

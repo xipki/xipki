@@ -97,8 +97,7 @@ public class AESGmacContentSigner implements Signer {
 
     final GCMParameters params = new GCMParameters(nonce, tagByteLen);
     try {
-      this.x509SigAlgIdTemplate =
-          new AlgorithmIdentifier(signAlgo.oid(), params).getEncoded();
+      this.x509SigAlgIdTemplate = new AlgorithmIdentifier(signAlgo.oid(), params).getEncoded();
     } catch (IOException ex) {
       throw new XiSecurityException("could not encode AlgorithmIdentifier", ex);
     }
@@ -124,8 +123,7 @@ public class AESGmacContentSigner implements Signer {
 
     // check the key.
     try {
-      cipher0.init(Cipher.ENCRYPT_MODE, signingKey,
-          new GCMParameterSpec(tagByteLen << 3, nonce));
+      cipher0.init(Cipher.ENCRYPT_MODE, signingKey, new GCMParameterSpec(tagByteLen << 3, nonce));
     } catch (GeneralSecurityException ex) {
       throw new XiSecurityException(ex);
     }
@@ -136,8 +134,7 @@ public class AESGmacContentSigner implements Signer {
   private void initCipher() {
     random.nextBytes(nonce);
     try {
-      cipher.init(Cipher.ENCRYPT_MODE, signingKey,
-          new GCMParameterSpec(tagByteLen << 3, nonce));
+      cipher.init(Cipher.ENCRYPT_MODE, signingKey, new GCMParameterSpec(tagByteLen << 3, nonce));
     } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
       throw new IllegalStateException(ex);
     }
@@ -150,8 +147,7 @@ public class AESGmacContentSigner implements Signer {
 
   @Override
   public byte[] getEncodedX509AlgId() {
-    byte[] bytes = Arrays.copyOf(x509SigAlgIdTemplate,
-                      x509SigAlgIdTemplate.length);
+    byte[] bytes = Arrays.copyOf(x509SigAlgIdTemplate, x509SigAlgIdTemplate.length);
     System.arraycopy(nonce, 0, bytes, nonceOffset, nonceLen);
     return bytes;
   }
@@ -166,8 +162,7 @@ public class AESGmacContentSigner implements Signer {
 
     @Override
     public AlgorithmIdentifier getAlgorithmIdentifier() {
-      return new AlgorithmIdentifier(signAlgo.oid(),
-          new GCMParameters(nonce, tagByteLen));
+      return new AlgorithmIdentifier(signAlgo.oid(), new GCMParameters(nonce, tagByteLen));
     }
 
     @Override
@@ -181,11 +176,9 @@ public class AESGmacContentSigner implements Signer {
       try {
         return cipher.doFinal();
       } catch (IllegalBlockSizeException ex) {
-        throw new IllegalStateException(
-            "IllegalBlockSizeException: " + ex.getMessage());
+        throw new IllegalStateException("IllegalBlockSizeException: " + ex.getMessage());
       } catch (BadPaddingException ex) {
-        throw new IllegalStateException(
-            "BadPaddingException: " + ex.getMessage());
+        throw new IllegalStateException("BadPaddingException: " + ex.getMessage());
       }
     }
   }

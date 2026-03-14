@@ -11,6 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -26,9 +27,9 @@ public class AccountResponse implements JsonEncodable {
 
   private final String orders;
 
-  public AccountResponse(AccountStatus status, List<String> contact,
-                         JoseMessage externalAccountBinding,
-                         Boolean termsOfServiceAgreed, String orders) {
+  public AccountResponse(
+      AccountStatus status, List<String> contact, JoseMessage externalAccountBinding,
+      Boolean termsOfServiceAgreed, String orders) {
     this.status = status;
     this.contact = contact;
     this.externalAccountBinding = externalAccountBinding;
@@ -58,18 +59,15 @@ public class AccountResponse implements JsonEncodable {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().putEnum("status", status)
-        .putStrings("contact", contact)
+    return new JsonMap().putEnum("status", status).putStrings("contact", contact)
         .put("externalAccountBinding", externalAccountBinding)
-        .put("termsOfServiceAgreed", termsOfServiceAgreed)
-        .put("orders", orders);
+        .put("termsOfServiceAgreed", termsOfServiceAgreed).put("orders", orders);
   }
 
   public static AccountResponse parse(JsonMap json) throws CodecException {
     AccountStatus status = json.getEnum("status", AccountStatus.class);
     JsonMap map = json.getMap("externalAccountBinding");
-    JoseMessage externalAccountBinding = (map == null) ? null
-        : JoseMessage.parse(map);
+    JoseMessage externalAccountBinding = (map == null) ? null : JoseMessage.parse(map);
     return new AccountResponse(status, json.getStringList("contact"),
         externalAccountBinding, json.getBool("termsOfServiceAgreed"),
         json.getString("orders"));

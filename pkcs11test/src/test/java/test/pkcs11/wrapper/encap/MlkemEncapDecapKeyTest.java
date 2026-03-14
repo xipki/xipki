@@ -136,8 +136,7 @@ public class MlkemEncapDecapKeyTest {
       testMlkem(PKCS11KeyPairType.MLKEM1024);
     }
 
-    private void testMlkem(PKCS11KeyPairType keyPairType)
-        throws TokenException {
+    private void testMlkem(PKCS11KeyPairType keyPairType) throws TokenException {
       Assume.assumeTrue("ML-KEM unsupported",
           getToken().supportsMechanism(CKM_ML_KEM, CKF_ENCAPSULATE));
 
@@ -152,8 +151,7 @@ public class MlkemEncapDecapKeyTest {
       PKCS11KeyId keypairId = token.generateKeyPair(spec);
 
       // be sure that your token can process the specified mechanism
-      CkMechanism mech = getSupportedMechanism(
-          CKM_ML_KEM, CKF_ENCAPSULATE, null);
+      CkMechanism mech = getSupportedMechanism(CKM_ML_KEM, CKF_ENCAPSULATE, null);
 
       Template template = token.getAttrValues(keypairId.getPublicKeyHandle(),
           new AttributeTypes().parameterSet().value());
@@ -166,13 +164,11 @@ public class MlkemEncapDecapKeyTest {
       } else if (variant == PKCS11T.CKP_ML_KEM_1024) {
         mlkemParams = MLKEMParameters.ml_kem_1024;
       } else {
-        throw new TokenException(
-          "invalid variant 0x" + Functions.toFullHex(variant));
+        throw new TokenException("invalid variant 0x" + Functions.toFullHex(variant));
       }
 
       byte[] value = template.value();
-      MLKEMPublicKeyParameters pk = new MLKEMPublicKeyParameters(
-          mlkemParams, value);
+      MLKEMPublicKeyParameters pk = new MLKEMPublicKeyParameters(mlkemParams, value);
       MLKEMGenerator gen = new MLKEMGenerator(random);
       SecretWithEncapsulation encapKey = gen.generateEncapsulated(pk);
 

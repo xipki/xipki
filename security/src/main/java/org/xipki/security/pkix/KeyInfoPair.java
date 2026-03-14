@@ -10,6 +10,8 @@ import org.xipki.util.codec.Args;
 import java.security.KeyPair;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class KeyInfoPair {
@@ -20,14 +22,11 @@ public class KeyInfoPair {
 
   public KeyInfoPair(KeyPair keyPair) {
     Args.notNull(keyPair, "keyPair");
-    this._private = PrivateKeyInfo.getInstance(
-        keyPair.getPrivate().getEncoded());
-    this._public = SubjectPublicKeyInfo.getInstance(
-        keyPair.getPublic().getEncoded());
+    this._private = PrivateKeyInfo.getInstance(keyPair.getPrivate().getEncoded());
+    this._public = SubjectPublicKeyInfo.getInstance(keyPair.getPublic().getEncoded());
   }
 
-  public KeyInfoPair(
-      SubjectPublicKeyInfo _public, PrivateKeyInfo _private) {
+  public KeyInfoPair(SubjectPublicKeyInfo _public, PrivateKeyInfo _private) {
     this._private = Args.notNull(_private, "_private");
     this._public = Args.notNull(_public, "_public");
   }

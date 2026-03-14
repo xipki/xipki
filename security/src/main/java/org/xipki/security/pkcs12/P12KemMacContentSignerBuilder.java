@@ -3,29 +3,22 @@
 
 package org.xipki.security.pkcs12;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentSigner;
-import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
-import org.xipki.security.composite.kem.CompositeMLKEMPublicKey;
+import org.xipki.security.composite.CompositeMLKEMPublicKey;
 import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.encap.KemEncapsulation;
 import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.sign.DfltConcurrentSigner;
+import org.xipki.security.sign.KemHmacSigner;
 import org.xipki.security.sign.Signer;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -43,14 +36,9 @@ public class P12KemMacContentSignerBuilder {
 
   private final SecretKey macKey;
 
-  private final DERUTF8String utf8Id;
+  private final String id;
 
-  private final AlgorithmIdentifier sigAlgId;
-
-  private final byte[] encodedX509SigAlgId;
-
-  public P12KemMacContentSignerBuilder(
-      KeypairWithCert keypairWithCert, KemEncapKey encapKey)
+  public P12KemMacContentSignerBuilder(KeypairWithCert keypairWithCert, KemEncapKey encapKey)
       throws XiSecurityException {
     this.keypairWithCert = Args.notNull(keypairWithCert, "keypairWithCert");
     Args.notNull(encapKey, "encapKey");
@@ -67,30 +55,21 @@ public class P12KemMacContentSignerBuilder {
       if (publicKey instanceof CompositeMLKEMPublicKey) {
         publicKeyData = ((CompositeMLKEMPublicKey) publicKey).keyValue();
       } else if (publicKey != null) {
-        publicKeyData = SubjectPublicKeyInfo.getInstance(
-            publicKey.getEncoded()).getPublicKeyData().getOctets();
+        publicKeyData = Asn1Util.getPublicKeyData(
+            SubjectPublicKeyInfo.getInstance(publicKey.getEncoded()));
       } else {
-        publicKeyData = keypairWithCert.x509CertChain()[0]
-            .subjectPublicKeyInfo().getPublicKeyData().getOctets();
+        publicKeyData = Asn1Util.getPublicKeyData(
+                          keypairWithCert.x509CertChain()[0].subjectPublicKeyInfo());
       }
 
       macKeyValue = KEMUtil.compositeMlKemDecryptSecret(
-        keypairWithCert.getKey(), publicKeyData,
-        encapKey.encapulation());
+                      keypairWithCert.getKey(), publicKeyData, encapKey.encapulation());
     } else {
       throw new XiSecurityException("unknown wrap mechanism " + algCode);
     }
 
     this.macKey = new SecretKeySpec(macKeyValue, "HMAC-SHA256");
-    this.utf8Id = new DERUTF8String(encapKey.id());
-
-    try {
-      this.sigAlgId = new AlgorithmIdentifier(
-          OIDs.Xipki.id_alg_KEM_HMAC_SHA256);
-      this.encodedX509SigAlgId = sigAlgId.getEncoded();
-    } catch (IOException ex) {
-      throw new XiSecurityException("error encoding AlgorithmIdentifier", ex);
-    }
+    this.id = encapKey.id();
   }
 
   public ConcurrentSigner createSigner(SignAlgo signAlgo, int parallelism)
@@ -100,20 +79,15 @@ public class P12KemMacContentSignerBuilder {
       throw new XiSecurityException("unknown signAlgo " + signAlgo);
     }
 
-    List<Signer> signers = new ArrayList<>(
-        Args.positive(parallelism, "parallelism"));
-
+    List<Signer> signers = new ArrayList<>(Args.positive(parallelism, "parallelism"));
     for (int i = 0; i < parallelism; i++) {
-      HmacSigner macSigner = new HmacSigner(SignAlgo.HMAC_SHA256, macKey);
-      Signer signer = new MyX509Signer(macSigner);
-      signers.add(signer);
+      signers.add(new KemHmacSigner(this.id, macKey));
     }
 
     final boolean mac = true;
     DfltConcurrentSigner concurrentSigner;
     try {
-      concurrentSigner = new DfltConcurrentSigner(
-          mac, signers, keypairWithCert.getKey());
+      concurrentSigner = new DfltConcurrentSigner(mac, signers, keypairWithCert.getKey());
     } catch (NoSuchAlgorithmException ex) {
       throw new XiSecurityException(ex.getMessage(), ex);
     }
@@ -127,56 +101,6 @@ public class P12KemMacContentSignerBuilder {
 
   public PrivateKey getKey() {
     return keypairWithCert.getKey();
-  }
-
-  private class MyX509Signer implements Signer {
-
-    private final HmacSigner macSigner;
-
-    public MyX509Signer(HmacSigner macSigner) {
-      this.macSigner = macSigner;
-    }
-
-    @Override
-    public ContentSigner x509Signer() {
-      return new ContentSigner() {
-        @Override
-        public AlgorithmIdentifier getAlgorithmIdentifier() {
-          return sigAlgId;
-        }
-
-        @Override
-        public OutputStream getOutputStream() {
-          return macSigner.x509Signer().getOutputStream();
-        }
-
-        /**
-         * X509 Signature Value
-         * <pre>
-         * SEQUENCE ::= {
-         *   id         UTF8String,
-         *   signature  OCTET STRING
-         * }
-         * </pre>
-         * @return the encoded signature value.
-         */
-        @Override
-        public byte[] getSignature() {
-          byte[] rawSignature = macSigner.x509Signer().getSignature();
-          try {
-            return new DERSequence(new ASN1Encodable[]{utf8Id,
-                new DEROctetString(rawSignature)}).getEncoded();
-          } catch (IOException e) {
-            throw new IllegalStateException("error encoding the DER signature");
-          }
-        }
-      };
-    }
-
-    @Override
-    public byte[] getEncodedX509AlgId() {
-      return encodedX509SigAlgId.clone();
-    }
   }
 
 }

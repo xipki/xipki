@@ -41,14 +41,13 @@ import java.util.Set;
 /**
  * CertProfile with identifier.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CertprofileUtil {
 
-  public static SubjectInfo getSubject(
-      Certprofile certprofile, X500Name requestedSubject)
-      throws CertprofileException, BadCertTemplateException {
+  public static SubjectInfo getSubject(Certprofile certprofile, X500Name requestedSubject)
+      throws BadCertTemplateException {
     SubjectInfo subjectInfo = certprofile.subject(requestedSubject);
 
     if (certprofile.certDomain() == CertDomain.CABForumBR) {
@@ -57,10 +56,8 @@ public class CertprofileUtil {
 
     // check the country
     ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
-        OIDs.DN.country,
-        OIDs.DN.countryOfCitizenship,
-        OIDs.DN.countryOfResidence,
-        OIDs.DN.jurIncorporationCountry};
+        OIDs.DN.country, OIDs.DN.countryOfCitizenship,
+        OIDs.DN.countryOfResidence, OIDs.DN.jurIncorporationCountry};
 
     ASN1ObjectIdentifier errorOid = null;
     String errorCountry = null;
@@ -132,9 +129,8 @@ public class CertprofileUtil {
             && !containsRdn(subject, OIDs.DN.givenName)
             && !containsRdn(subject, OIDs.DN.surname)) {
           throw new BadCertTemplateException(
-              "subject:localityName is prohibited if " +
-              "the subject:organizationName field, subject:givenName, and " +
-              "subject:surname field are absent.");
+              "subject:localityName is prohibited if the subject:organizationName field, " +
+                  "subject:givenName, and subject:surname field are absent.");
         }
       } else {
         if (!containsRdn(subject, OIDs.DN.state) &&
@@ -142,10 +138,9 @@ public class CertprofileUtil {
                 || containsRdn(subject, OIDs.DN.givenName)
                 || containsRdn(subject, OIDs.DN.surname))) {
           throw new BadCertTemplateException(
-              "subject:localityName is required if the " +
-              "subject:organizationName field, subject:givenName field, " +
-              "or subject:surname field are present and the " +
-              "subject:stateOrProvinceName field is absent.");
+              "subject:localityName is required if the subject:organizationName field, " +
+                  "subject:givenName field, or subject:surname field are present and the " +
+                  "subject:stateOrProvinceName field is absent.");
         }
       }
 
@@ -155,9 +150,8 @@ public class CertprofileUtil {
             && !containsRdn(subject, OIDs.DN.givenName)
             && !containsRdn(subject, OIDs.DN.surname)) {
           throw new BadCertTemplateException(
-              "subject:stateOrProvinceName is prohibited if the " +
-              "subject:organizationName field, subject:givenName, and " +
-              "subject:surname field are absent.");
+              "subject:stateOrProvinceName is prohibited if the subject:organizationName field, " +
+                  "subject:givenName, and subject:surname field are absent.");
         }
       } else {
         if (!containsRdn(subject, OIDs.DN.locality) &&
@@ -165,10 +159,9 @@ public class CertprofileUtil {
                 || containsRdn(subject, OIDs.DN.givenName)
                 || containsRdn(subject, OIDs.DN.surname))) {
           throw new BadCertTemplateException(
-              "subject:stateOrProvinceName is required if the " +
-              "subject:organizationName field, subject:givenName field, " +
-              "or subject:surname field are present and the " +
-              "subject:localityName field is absent.");
+              "subject:stateOrProvinceName is required if the subject:organizationName field, " +
+                  "subject:givenName field, or subject:surname field are present and the " +
+                  "subject:localityName field is absent.");
         }
       }
 
@@ -178,9 +171,8 @@ public class CertprofileUtil {
             && !containsRdn(subject, OIDs.DN.givenName)
             && !containsRdn(subject, OIDs.DN.surname)) {
           throw new BadCertTemplateException(
-              "subject:postalCode is prohibited if the " +
-              "subject:organizationName field, subject:givenName, and " +
-              "subject:surname field are absent.");
+              "subject:postalCode is prohibited if the subject:organizationName field, " +
+                  "subject:givenName, and subject:surname field are absent.");
         }
       }
 
@@ -190,9 +182,8 @@ public class CertprofileUtil {
             || containsRdn(subject, OIDs.DN.givenName)
             || containsRdn(subject, OIDs.DN.surname)) {
           throw new BadCertTemplateException(
-              "subject:countryCode is required if the " +
-              "subject:organizationName field, subject:givenName, and " +
-              "subject:surname field are present");
+              "subject:countryCode is required if the subject:organizationName field, " +
+                  "subject:givenName, and subject:surname field are present");
         }
       }
 
@@ -200,16 +191,14 @@ public class CertprofileUtil {
         ASN1ObjectIdentifier[] excludeSubjectFields =
             new ASN1ObjectIdentifier[] {
                 OIDs.DN.organization, OIDs.DN.givenName, OIDs.DN.surname,
-                OIDs.DN.street,       OIDs.DN.locality,  OIDs.DN.state,
-                OIDs.DN.postalCode};
+                OIDs.DN.street,       OIDs.DN.locality,  OIDs.DN.state,   OIDs.DN.postalCode};
         for (ASN1ObjectIdentifier m : excludeSubjectFields) {
           if (containsRdn(subject, m)) {
             throw new BadCertTemplateException("subject " + OIDs.getName(m)
                 + " is prohibited in domain validated certificate");
           }
         }
-      } else if (OIDs.PolicyIdentifier.id_organization_validated
-          .equals(policyId)) {
+      } else if (OIDs.PolicyIdentifier.id_organization_validated.equals(policyId)) {
         ASN1ObjectIdentifier[] includeSubjectFields =
             new ASN1ObjectIdentifier[] {OIDs.DN.organization, OIDs.DN.country};
 
@@ -220,16 +209,12 @@ public class CertprofileUtil {
           }
         }
 
-        if (!(containsRdn(subject, OIDs.DN.locality)
-            || containsRdn(subject, OIDs.DN.state))) {
-          throw new BadCertTemplateException("at least one of " +
-              "subject:localityName and subject:stateOrProvinceName is " +
-              "required in organization validated certificate");
+        if (!(containsRdn(subject, OIDs.DN.locality) || containsRdn(subject, OIDs.DN.state))) {
+          throw new BadCertTemplateException("at least one of subject:localityName and " +
+              "subject:stateOrProvinceName is required in organization validated certificate");
         }
-      } else if (OIDs.PolicyIdentifier.id_individual_validated.equals(
-          policyId)) {
-        ASN1ObjectIdentifier[] includeSubjectFields =
-            new ASN1ObjectIdentifier[] {OIDs.DN.country};
+      } else if (OIDs.PolicyIdentifier.id_individual_validated.equals(policyId)) {
+        ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {OIDs.DN.country};
         for (ASN1ObjectIdentifier m : includeSubjectFields) {
           if (!containsRdn(subject, m)) {
             throw new BadCertTemplateException("subject " + OIDs.getName(m)
@@ -240,18 +225,13 @@ public class CertprofileUtil {
         if (!(containsRdn(subject, OIDs.DN.organization)
             || (containsRdn(subject, OIDs.DN.givenName)
                   && containsRdn(subject, OIDs.DN.surname)))) {
-          throw new BadCertTemplateException(
-              "at least one of subject:organizationName and " +
-              "(subject:givenName, subject:surName) is required in " +
-              "individual validated certificate");
+          throw new BadCertTemplateException("at least one of subject:organizationName and " +
+            "(subject:givenName, subject:surName) is required in individual validated certificate");
         }
 
-        if (!(containsRdn(subject, OIDs.DN.locality)
-            || containsRdn(subject, OIDs.DN.state))) {
-          throw new BadCertTemplateException(
-              "at least one of subject:localityName and " +
-              "subject:stateOrProvinceName is required in individual " +
-              "validated certificate");
+        if (!(containsRdn(subject, OIDs.DN.locality) || containsRdn(subject, OIDs.DN.state))) {
+          throw new BadCertTemplateException("at least one of subject:localityName and " +
+              "subject:stateOrProvinceName is required in individual validated certificate");
         }
       }
     } else {
@@ -259,8 +239,7 @@ public class CertprofileUtil {
           OIDs.DN.commonName, OIDs.DN.organization, OIDs.DN.country};
       for (ASN1ObjectIdentifier m : requiredTypes) {
         if (!containsRdn(subject, OIDs.DN.commonName)) {
-          throw new BadCertTemplateException(
-              "missing " + OIDs.getName(m) + " in subject");
+          throw new BadCertTemplateException("missing " + OIDs.getName(m) + " in subject");
         }
       }
     }
@@ -272,8 +251,7 @@ public class CertprofileUtil {
   }
 
   static void addRequestedKeyusage(
-      Set<KeyUsage> usages,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Set<KeyUsage> usages, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Set<KeySingleUsage> usageOccs) {
     Extension extension = requestedExtensions.get(OIDs.Extn.keyUsage);
     if (extension == null) {
@@ -281,8 +259,7 @@ public class CertprofileUtil {
     }
 
     org.bouncycastle.asn1.x509.KeyUsage reqX509 =
-        org.bouncycastle.asn1.x509.KeyUsage.getInstance(
-            extension.getParsedValue());
+        org.bouncycastle.asn1.x509.KeyUsage.getInstance(extension.getParsedValue());
 
     for (KeySingleUsage k : usageOccs) {
       if (k.isRequired()) {
@@ -296,24 +273,21 @@ public class CertprofileUtil {
   } // method addRequestedKeyusage
 
   static void addRequestedExtKeyusage(
-      List<ASN1ObjectIdentifier> usages,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      List<ASN1ObjectIdentifier> usages, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
       Set<ExtKeyUsageControl> usageOccs) {
     Extension extension = requestedExtensions.get(OIDs.Extn.extendedKeyUsage);
     if (extension == null) {
       return;
     }
 
-    ExtendedKeyUsage reqKeyUsage =
-        ExtendedKeyUsage.getInstance(extension.getParsedValue());
+    ExtendedKeyUsage reqKeyUsage = ExtendedKeyUsage.getInstance(extension.getParsedValue());
 
     for (ExtKeyUsageControl k : usageOccs) {
       if (k.isRequired()) {
         continue;
       }
 
-      if (reqKeyUsage.hasKeyPurposeId(
-          KeyPurposeId.getInstance(k.extKeyUsage()))) {
+      if (reqKeyUsage.hasKeyPurposeId(KeyPurposeId.getInstance(k.extKeyUsage()))) {
         usages.add(k.extKeyUsage());
       }
     }
@@ -336,8 +310,7 @@ public class CertprofileUtil {
     int size = reqSeq.size();
 
     for (int i = 0; i < size; i++) {
-      AccessDescription ad =
-          AccessDescription.getInstance(reqSeq.getObjectAt(i));
+      AccessDescription ad = AccessDescription.getInstance(reqSeq.getObjectAt(i));
 
       ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
       Optional.ofNullable(modes.get(accessMethod)).orElseThrow(() ->
@@ -350,18 +323,15 @@ public class CertprofileUtil {
 
   static void addExtension(
       ExtensionValues values, ASN1ObjectIdentifier extType,
-      ExtensionControl extControl, ASN1Encodable extValue)
-      throws CertprofileException {
+      ExtensionControl extControl, ASN1Encodable extValue) throws CertprofileException {
     if (extValue != null) {
-      values.addExtension(extType,
-          new ExtensionValue(extControl.isCritical(), extValue));
+      values.addExtension(extType, new ExtensionValue(extControl.isCritical(), extValue));
     } else if (extControl.isRequired()) {
       String description = getExtensionIDDesc(extType);
       if (description == null) {
         description = extType.getId();
       }
-      throw new CertprofileException(
-          "could not add required extension " + description);
+      throw new CertprofileException("could not add required extension " + description);
     }
   } // method addExtension
 

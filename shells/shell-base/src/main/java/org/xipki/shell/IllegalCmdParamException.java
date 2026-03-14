@@ -11,9 +11,6 @@ package org.xipki.shell;
 
 public class IllegalCmdParamException extends Exception {
 
-  public IllegalCmdParamException() {
-  }
-
   public IllegalCmdParamException(String message) {
     super(message);
   }

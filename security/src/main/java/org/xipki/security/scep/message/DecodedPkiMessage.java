@@ -6,8 +6,8 @@ package org.xipki.security.scep.message;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.ASN1PrintableString;
-import org.bouncycastle.asn1.ASN1UTF8String;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cms.Attribute;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.ContentInfo;
@@ -61,8 +61,7 @@ import java.util.Set;
 
 public class DecodedPkiMessage extends PkiMessage {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DecodedPkiMessage.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DecodedPkiMessage.class);
 
   private static final Set<ASN1ObjectIdentifier> SCEP_ATTR_TYPES;
 
@@ -87,8 +86,8 @@ public class DecodedPkiMessage extends PkiMessage {
         OIDs.Scep.transactionId,  OIDs.PKCS9.pkcs9_at_signingTime);
   }
 
-  public DecodedPkiMessage(TransactionId transactionId,
-                           MessageType messageType, Nonce senderNonce) {
+  public DecodedPkiMessage(
+      TransactionId transactionId, MessageType messageType, Nonce senderNonce) {
     super(transactionId, messageType, senderNonce);
   }
 
@@ -112,8 +111,7 @@ public class DecodedPkiMessage extends PkiMessage {
     this.signatureValid = signatureValid;
   }
 
-  public void setContentEncryptionAlgorithm(
-      ASN1ObjectIdentifier encryptionAlgorithm) {
+  public void setContentEncryptionAlgorithm(ASN1ObjectIdentifier encryptionAlgorithm) {
     this.contentEncryptionAlgorithm = encryptionAlgorithm;
   }
 
@@ -150,44 +148,36 @@ public class DecodedPkiMessage extends PkiMessage {
   }
 
   public static DecodedPkiMessage decode(
-      CMSSignedData pkiMessage, PrivateKey recipientKey,
-      X509Cert recipientCert, CollectionStore<X509CertificateHolder> certStore)
-      throws CodecException {
+      CMSSignedData pkiMessage, PrivateKey recipientKey, X509Cert recipientCert,
+      CollectionStore<X509CertificateHolder> certStore) throws CodecException {
     EnvelopedDataDecryptorInstance decInstance =
         new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
-    return decode(pkiMessage,
-        new EnvelopedDataDecryptor(decInstance), certStore);
+    return decode(pkiMessage, new EnvelopedDataDecryptor(decInstance), certStore);
   }
 
   @SuppressWarnings("unchecked")
   public static DecodedPkiMessage decode(
       CMSSignedData pkiMessage, EnvelopedDataDecryptor recipient,
-      CollectionStore<X509CertificateHolder> certStore)
-      throws CodecException {
+      CollectionStore<X509CertificateHolder> certStore) throws CodecException {
     Args.notNull(recipient, "recipient");
 
-    SignerInformationStore signerStore =
-        Args.notNull(pkiMessage, "pkiMessage").getSignerInfos();
+    SignerInformationStore signerStore = Args.notNull(pkiMessage, "pkiMessage").getSignerInfos();
 
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
-      throw new CodecException("number of signerInfos is not 1, but " +
-          signerInfos.size());
+      throw new CodecException("number of signerInfos is not 1, but " + signerInfos.size());
     }
 
     SignerInformation signerInfo = signerInfos.iterator().next();
     SignerId sid = signerInfo.getSID();
 
-    Collection<?> signedDataCerts = (certStore == null) ? null
-        : certStore.getMatches(sid);
+    Collection<?> signedDataCerts = (certStore == null) ? null : certStore.getMatches(sid);
     if (CollectionUtil.isEmpty(signedDataCerts)) {
-      signedDataCerts =
-          pkiMessage.getCertificates().getMatches(signerInfo.getSID());
+      signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
     }
 
     if (signedDataCerts == null || signedDataCerts.size() != 1) {
-      throw new CodecException(
-          "could not find embedded certificate to verify the signature");
+      throw new CodecException("could not find embedded certificate to verify the signature");
     }
 
     AttributeTable signedAttrs = Optional.ofNullable(
@@ -198,15 +188,12 @@ public class DecodedPkiMessage extends PkiMessage {
     ASN1Encodable attrValue = ScepUtil.getFirstAttrValue(signedAttrs,
         OIDs.PKCS9.pkcs9_at_signingTime);
 
-    Instant signingTime = (attrValue == null) ? null
-        : ScepUtil.getTime(attrValue);
+    Instant signingTime = (attrValue == null) ? null : ScepUtil.getTime(attrValue);
 
     // transactionId
-    String str = getPrintableStringAttrValue(signedAttrs,
-                  OIDs.Scep.transactionId);
+    String str = getPrintableStringAttrValue(signedAttrs, OIDs.Scep.transactionId);
     if (StringUtil.isBlank(str)) {
-      throw new CodecException(
-          "missing required SCEP attribute transactionId");
+      throw new CodecException("missing required SCEP attribute transactionId");
     }
     TransactionId tid = new TransactionId(str);
 
@@ -214,26 +201,22 @@ public class DecodedPkiMessage extends PkiMessage {
     int iValue = Optional.ofNullable(
         getIntegerPrintStringAttrValue(signedAttrs, OIDs.Scep.messageType))
         .orElseThrow(() -> new CodecException(
-            "tid " + tid.id() +
-            ": missing required SCEP attribute messageType"));
+            "tid " + tid.id() + ": missing required SCEP attribute messageType"));
 
     MessageType messageType;
     try {
       messageType = MessageType.forValue(iValue);
     } catch (IllegalArgumentException ex) {
-      throw new CodecException("tid " + tid.id() +
-          ": invalid messageType '" + iValue + "'");
+      throw new CodecException("tid " + tid.id() + ": invalid messageType '" + iValue + "'");
     }
 
     // senderNonce
     Nonce senderNonce = Optional.ofNullable(
         getNonceAttrValue(signedAttrs, OIDs.Scep.senderNonce)).orElseThrow(
             () -> new CodecException(
-                "tid " + tid.id() +
-                ": missing required SCEP attribute senderNonce"));
+                "tid " + tid.id() + ": missing required SCEP attribute senderNonce"));
 
-    DecodedPkiMessage ret =
-        new DecodedPkiMessage(tid, messageType, senderNonce);
+    DecodedPkiMessage ret = new DecodedPkiMessage(tid, messageType, senderNonce);
 
     if (signingTime != null) {
       ret.setSigningTime(signingTime);
@@ -243,8 +226,7 @@ public class DecodedPkiMessage extends PkiMessage {
     try {
       recipientNonce = getNonceAttrValue(signedAttrs, OIDs.Scep.recipientNonce);
     } catch (CodecException ex) {
-      ret.setFailureMessage(
-          "could not parse recipientNonce: " + ex.getMessage());
+      ret.setFailureMessage("could not parse recipientNonce: " + ex.getMessage());
     }
 
     if (recipientNonce != null) {
@@ -257,8 +239,7 @@ public class DecodedPkiMessage extends PkiMessage {
       Integer intValue;
       // pkiStatus
       try {
-        intValue = getIntegerPrintStringAttrValue(signedAttrs,
-                    OIDs.Scep.pkiStatus);
+        intValue = getIntegerPrintStringAttrValue(signedAttrs, OIDs.Scep.pkiStatus);
       } catch (CodecException ex) {
         ret.setFailureMessage("could not parse pkiStatus: " + ex.getMessage());
         return ret;
@@ -280,8 +261,7 @@ public class DecodedPkiMessage extends PkiMessage {
       // failureInfo
       if (pkiStatus == PkiStatus.FAILURE) {
         try {
-          intValue = getIntegerPrintStringAttrValue(
-                      signedAttrs, OIDs.Scep.failInfo);
+          intValue = getIntegerPrintStringAttrValue(signedAttrs, OIDs.Scep.failInfo);
         } catch (CodecException ex) {
           ret.setFailureMessage("could not parse failInfo: " + ex.getMessage());
           return ret;
@@ -302,14 +282,12 @@ public class DecodedPkiMessage extends PkiMessage {
         ret.setFailInfo(failInfo);
 
         // failInfoText
-        ASN1Encodable value = ScepUtil.getFirstAttrValue(signedAttrs,
-            OIDs.Scep.failInfoText);
+        ASN1Encodable value = ScepUtil.getFirstAttrValue(signedAttrs, OIDs.Scep.failInfoText);
         if (value != null) {
-          if (value instanceof ASN1UTF8String) {
-            ret.setFailInfoText(((ASN1UTF8String) value).getString());
+          if (value instanceof DERUTF8String) {
+            ret.setFailInfoText(((DERUTF8String) value).getString());
           } else {
-            throw new CodecException(
-                "the value of attribute failInfoText is not UTF8String");
+            throw new CodecException("the value of attribute failInfoText is not UTF8String");
           }
         }
       } // end if(pkiStatus == PkiStatus.FAILURE)
@@ -326,8 +304,7 @@ public class DecodedPkiMessage extends PkiMessage {
 
     // unsignedAttributes
     AttributeTable unsignedAttrs = signerInfo.getUnsignedAttributes();
-    attrs = (unsignedAttrs == null) ? null
-            : unsignedAttrs.toASN1Structure().getAttributes();
+    attrs = (unsignedAttrs == null) ? null : unsignedAttrs.toASN1Structure().getAttributes();
     if (attrs != null) {
       for (Attribute attr : attrs) {
         ASN1ObjectIdentifier type = attr.getAttrType();
@@ -336,8 +313,7 @@ public class DecodedPkiMessage extends PkiMessage {
     }
 
     try {
-      HashAlgo digestAlgo =
-          HashAlgo.getInstance(signerInfo.getDigestAlgorithmID());
+      HashAlgo digestAlgo = HashAlgo.getInstance(signerInfo.getDigestAlgorithmID());
       ret.setDigestAlgorithm(digestAlgo);
 
       String sigAlgOid = signerInfo.getEncryptionAlgOID();
@@ -357,8 +333,7 @@ public class DecodedPkiMessage extends PkiMessage {
       return ret;
     }
 
-    X509CertificateHolder signerCert =
-        (X509CertificateHolder) signedDataCerts.iterator().next();
+    X509CertificateHolder signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
     ret.setSignatureCert(new X509Cert(signerCert));
 
     // validate the signature
@@ -414,8 +389,7 @@ public class DecodedPkiMessage extends PkiMessage {
       return ret;
     }
 
-    ret.setContentEncryptionAlgorithm(
-        envData.getContentEncryptionAlgorithm().getAlgorithm());
+    ret.setContentEncryptionAlgorithm(envData.getContentEncryptionAlgorithm().getAlgorithm());
 
     byte[] encodedMessageData;
     try {
@@ -436,22 +410,20 @@ public class DecodedPkiMessage extends PkiMessage {
         case PKCSReq:
         case RenewalReq:
           ret.setMessageData(CertificationRequest.getInstance(
-              X509Util.toDerEncoded(encodedMessageData)));
+                X509Util.toDerEncoded(encodedMessageData)));
           break;
         case CertPoll:
           ret.setMessageData(IssuerAndSubject.getInstance(encodedMessageData));
           break;
         case GetCert:
         case GetCRL:
-          ret.setMessageData(
-              IssuerAndSerialNumber.getInstance(encodedMessageData));
+          ret.setMessageData(IssuerAndSerialNumber.getInstance(encodedMessageData));
           break;
         case CertRep:
           ret.setMessageData(ContentInfo.getInstance(encodedMessageData));
           break;
         default:
-          throw new RuntimeException(
-              "should not reach here, unknown messageType " + messageType);
+          throw new RuntimeException("should not reach here, unknown messageType " + messageType);
       }
     } catch (Exception ex) {
       final String msg = "could not parse the messageData";
@@ -464,11 +436,10 @@ public class DecodedPkiMessage extends PkiMessage {
   } // method decode
 
   private static String getPrintableStringAttrValue(
-      AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws CodecException {
+      AttributeTable attrs, ASN1ObjectIdentifier type) throws CodecException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
-    if (value instanceof ASN1PrintableString) {
-      return ((ASN1PrintableString) value).getString();
+    if (value instanceof DERPrintableString) {
+      return ((DERPrintableString) value).getString();
     } else if (value != null) {
       throw new CodecException("the value of attribute "
           + type.getId() + " is not PrintableString");
@@ -478,8 +449,7 @@ public class DecodedPkiMessage extends PkiMessage {
   }
 
   private static Integer getIntegerPrintStringAttrValue(
-      AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws CodecException {
+      AttributeTable attrs, ASN1ObjectIdentifier type) throws CodecException {
     String str = getPrintableStringAttrValue(attrs, type);
     try {
       return str == null ? null : Integer.parseInt(str);
@@ -489,15 +459,13 @@ public class DecodedPkiMessage extends PkiMessage {
   }
 
   private static Nonce getNonceAttrValue(
-      AttributeTable attrs, ASN1ObjectIdentifier type)
-      throws CodecException {
+      AttributeTable attrs, ASN1ObjectIdentifier type) throws CodecException {
     ASN1Encodable value = ScepUtil.getFirstAttrValue(attrs, type);
     if (value instanceof ASN1OctetString) {
       byte[] bytes = ((ASN1OctetString) value).getOctets();
       return new Nonce(bytes);
     } else if (value != null) {
-      throw new CodecException("the value of attribute " + type.getId() +
-          " is not OctetString");
+      throw new CodecException("the value of attribute " + type.getId() + " is not OctetString");
     } else {
       return null;
     }

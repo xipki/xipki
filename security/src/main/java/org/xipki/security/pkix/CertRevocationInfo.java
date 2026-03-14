@@ -34,8 +34,7 @@ public class CertRevocationInfo implements JsonEncodable {
     this(reason, revocationTime, null);
   }
 
-  public CertRevocationInfo(
-      CrlReason reason, Instant revocationTime, Instant invalidityTime) {
+  public CertRevocationInfo(CrlReason reason, Instant revocationTime, Instant invalidityTime) {
     this.reason = Args.notNull(reason, "reason");
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
@@ -49,8 +48,7 @@ public class CertRevocationInfo implements JsonEncodable {
     this(reasonCode, revocationTime, null);
   }
 
-  public CertRevocationInfo(int reasonCode, Instant revocationTime,
-                            Instant invalidityTime) {
+  public CertRevocationInfo(int reasonCode, Instant revocationTime, Instant invalidityTime) {
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.reason = CrlReason.forReasonCode(reasonCode);
     this.invalidityTime = invalidityTime;
@@ -91,15 +89,13 @@ public class CertRevocationInfo implements JsonEncodable {
   @Override
   public String toString() {
     return StringUtil.concatObjects("reason: ", reason,
-        "\nrevocationTime: ", revocationTime,
-        "\ninvalidityTime: ", invalidityTime);
+        "\nrevocationTime: ", revocationTime, "\ninvalidityTime: ", invalidityTime);
   }
 
   public static CertRevocationInfo fromEncoded(String encoded) {
     ConfPairs pairs = new ConfPairs(encoded);
     CrlReason reason = CrlReason.forNameOrText(pairs.value("reason"));
-    Instant revocationTime = Instant.ofEpochSecond(
-        Long.parseLong(pairs.value("revocationTime")));
+    Instant revocationTime = Instant.ofEpochSecond(Long.parseLong(pairs.value("revocationTime")));
     String str = pairs.value("invalidityTime");
     Instant invalidityTime = null;
     if (str != null) {
@@ -110,13 +106,10 @@ public class CertRevocationInfo implements JsonEncodable {
   }
 
   public String encode() {
-    ConfPairs pairs = new ConfPairs()
-        .putPair("reason", reason.description())
-        .putPair("revocationTime",
-            Long.toString(revocationTime.getEpochSecond()));
+    ConfPairs pairs = new ConfPairs().putPair("reason", reason.description())
+        .putPair("revocationTime", Long.toString(revocationTime.getEpochSecond()));
     if (invalidityTime != null) {
-      pairs.putPair("invalidityTime",
-          Long.toString(invalidityTime.getEpochSecond()));
+      pairs.putPair("invalidityTime", Long.toString(invalidityTime.getEpochSecond()));
     }
     return pairs.getEncoded();
   }
@@ -158,8 +151,7 @@ public class CertRevocationInfo implements JsonEncodable {
     String str = json.getString("reason");
     CrlReason reason = str == null ? null : CrlReason.forNameOrText(str);
     return new CertRevocationInfo(reason,
-        json.getInstant("revocationTime"),
-        json.getInstant("invalidityTime"));
+        json.getInstant("revocationTime"), json.getInstant("invalidityTime"));
   }
 
 }

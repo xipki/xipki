@@ -70,8 +70,7 @@ public class DbCertStatusStore extends OcspStore {
 
   protected DataSourceWrapper datasource;
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DbCertStatusStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
   private static final int SECONDS_PER_5MIN = 300;
 
@@ -79,8 +78,7 @@ public class DbCertStatusStore extends OcspStore {
 
   private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
 
-  private final StoreUpdateService storeUpdateService =
-      new StoreUpdateService();
+  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
 
   private String sqlCsNoRit;
 
@@ -189,8 +187,7 @@ public class DbCertStatusStore extends OcspStore {
         }
       } // end if(initialized)
 
-      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_ID " +
-          "FROM ISSUER";
+      final String sql = "SELECT ID,NBEFORE,REV_INFO,S1C,CERT,CRL_ID FROM ISSUER";
       PreparedStatement ps = preparedStatement(sql);
 
       ResultSet rs = null;
@@ -203,16 +200,14 @@ public class DbCertStatusStore extends OcspStore {
             continue;
           }
 
-          X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(
-              rs.getString("CERT")));
+          X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
           IssuerEntry caInfoEntry = new IssuerEntry(rs.getInt("ID"), cert);
           RequestIssuer reqIssuer = new RequestIssuer(HashAlgo.SHA1,
               caInfoEntry.getEncodedHash(HashAlgo.SHA1));
 
           for (IssuerEntry existingIssuer : caInfos) {
             if (existingIssuer.matchHash(reqIssuer)) {
-              throw new Exception("found at least two issuers with the " +
-                  "same subject and key");
+              throw new Exception("found at least two issuers with the same subject and key");
             }
           }
 
@@ -231,8 +226,7 @@ public class DbCertStatusStore extends OcspStore {
         if (LOG.isInfoEnabled()) {
           StringBuilder sb = new StringBuilder();
           for (IssuerEntry m : caInfos) {
-            sb.append(overviewString(m.cert()));
-            sb.append("\n");
+            sb.append(overviewString(m.cert())).append("\n");
           }
           if (sb.length() > 1) {
             sb.deleteCharAt(sb.length() - 1);
@@ -282,8 +276,7 @@ public class DbCertStatusStore extends OcspStore {
     }
 
     if (!initialized) {
-      throw new OcspStoreException(
-          "initialization of CertStore is still in process");
+      throw new OcspStoreException("initialization of CertStore is still in process");
     }
 
     String sql;
@@ -300,8 +293,7 @@ public class DbCertStatusStore extends OcspStore {
         // check whether CRL is expired
         if (isIgnoreExpiredCrls()) {
           // CRL will expire in 5 minutes
-          if (crlInfo.nextUpdate().getEpochSecond()
-              < time.getEpochSecond() + SECONDS_PER_5MIN) {
+          if (crlInfo.nextUpdate().getEpochSecond() < time.getEpochSecond() + SECONDS_PER_5MIN) {
             return CertStatusInfo.crlExpiredStatusInfo();
           }
         }
@@ -391,22 +383,18 @@ public class DbCertStatusStore extends OcspStore {
 
         if (isIgnoreExpiredCrls()) {
           // CRL will expire in 5 minutes
-          if (crlInfo.nextUpdate().getEpochSecond()
-              < time.getEpochSecond() + SECONDS_PER_5MIN) {
+          if (crlInfo.nextUpdate().getEpochSecond() < time.getEpochSecond() + SECONDS_PER_5MIN) {
             return CertStatusInfo.crlExpiredStatusInfo();
           }
         }
       }
 
       if (unknown) {
-        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(
-            thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
       } else if (ignore) {
-        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(
-            thisUpdate, nextUpdate);
+        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
       } else {
-        byte[] certHash = (b64CertHash == null) ? null
-            : Base64.decodeFast(b64CertHash);
+        byte[] certHash = (b64CertHash == null) ? null : Base64.decodeFast(b64CertHash);
         if (revoked) {
           Instant invTime = (invalTime == 0 || invalTime == revTime)
               ? null : Instant.ofEpochSecond(invalTime);
@@ -432,11 +420,8 @@ public class DbCertStatusStore extends OcspStore {
             // expired certificate remains in status store forever
             date = issuer.notBefore();
           } else {
-            Instant t1 = Instant.now().minus(
-                retentionInterval, ChronoUnit.DAYS);
-
-            date = issuer.notBefore().isBefore(t1)
-                ? issuer.notBefore() : t1;
+            Instant t1 = Instant.now().minus(retentionInterval, ChronoUnit.DAYS);
+            date = issuer.notBefore().isBefore(t1) ? issuer.notBefore() : t1;
           }
 
           certStatusInfo.setArchiveCutOff(date);
@@ -452,24 +437,21 @@ public class DbCertStatusStore extends OcspStore {
       boolean replaced = false;
       if (certStatus == CertStatus.GOOD) {
         replaced = true;
-      } else if (certStatus == CertStatus.UNKNOWN
-          || certStatus == CertStatus.IGNORE) {
+      } else if (certStatus == CertStatus.UNKNOWN || certStatus == CertStatus.IGNORE) {
         if (unknownCertBehaviour == UnknownCertBehaviour.good) {
           replaced = true;
         }
       } else if (certStatus == CertStatus.REVOKED) {
-        if (certStatusInfo.revocationInfo().revocationTime().isAfter(
-            caRevInfo.revocationTime())) {
+        if (certStatusInfo.revocationInfo().revocationTime().isAfter(caRevInfo.revocationTime())) {
           replaced = true;
         }
       }
 
       if (replaced) {
-        CertRevocationInfo newRevInfo =
-            (caRevInfo.reason() == CrlReason.CA_COMPROMISE) ? caRevInfo
-                : new CertRevocationInfo(CrlReason.CA_COMPROMISE,
-                      caRevInfo.revocationTime(),
-                      caRevInfo.invalidityTime());
+        CertRevocationInfo newRevInfo = (caRevInfo.reason() == CrlReason.CA_COMPROMISE)
+            ? caRevInfo
+            : new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+                caRevInfo.revocationTime(), caRevInfo.invalidityTime());
 
         certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
             certStatusInfo.certHashAlgo(), certStatusInfo.certHash(),
@@ -488,8 +470,7 @@ public class DbCertStatusStore extends OcspStore {
    * @return the next idle preparedStatement, {@code null} will be returned if
    *         no PreparedStatement can be created within 5 seconds.
    */
-  private PreparedStatement preparedStatement(String sqlQuery)
-      throws DataAccessException {
+  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
     return datasource.prepareStatement(sqlQuery);
   }
 
@@ -533,8 +514,7 @@ public class DbCertStatusStore extends OcspStore {
    * @param datasource DataSource.
    */
   @Override
-  public void init(JsonMap sourceConf, DataSourceWrapper datasource)
-      throws OcspStoreException {
+  public void init(JsonMap sourceConf, DataSourceWrapper datasource) throws OcspStoreException {
     OcspServerConf.CaCerts caCerts = null;
     if (sourceConf != null) {
       caCerts = OcspServerConf.CaCerts.parseSourceConf(sourceConf);
@@ -548,16 +528,15 @@ public class DbCertStatusStore extends OcspStore {
         "NBEFORE,NAFTER,REV,RR,RT,CRL_ID FROM CERT WHERE IID=? AND SN=?");
 
     sqlCsWithCertHash = datasource.buildSelectFirstSql(1,
-        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,CRL_ID FROM CERT " +
-        "WHERE IID=? AND SN=?");
+        "NBEFORE,NAFTER,REV,RR,RT,RIT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
     sqlCsNoRitWithCertHash = datasource.buildSelectFirstSql(1,
         "NBEFORE,NAFTER,REV,RR,RT,HASH,CRL_ID FROM CERT WHERE IID=? AND SN=?");
 
     try {
       this.certHashAlgo = getCertHashAlgo(datasource);
     } catch (NoSuchAlgorithmException | DataAccessException ex) {
-      throw new OcspStoreException(
-          "Could not retrieve the certhash's algorithm from the database", ex);
+      throw new OcspStoreException("Could not retrieve the certhash's algorithm from the database",
+          ex);
     }
 
     Set<X509Cert> includeIssuers = null;
@@ -585,13 +564,11 @@ public class DbCertStatusStore extends OcspStore {
       List<Runnable> scheduledServices = scheduledServices();
       int size = scheduledServices == null ? 0 : scheduledServices.size();
       if (size > 0) {
-        this.scheduledThreadPoolExecutor =
-            new ScheduledThreadPoolExecutor(size);
+        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
         long intervalSeconds = updateInterval.approxMinutes() * 60;
         for (Runnable service : scheduledServices) {
           this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60),
-              intervalSeconds, TimeUnit.SECONDS);
+              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
         }
       }
     }
@@ -624,15 +601,14 @@ public class DbCertStatusStore extends OcspStore {
     return initialized;
   }
 
-  static Set<X509Cert> parseCerts(Collection<String> certFiles)
-      throws OcspStoreException {
+  static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {
     Set<X509Cert> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {
         certs.add(X509Util.parseCert(new File(certFile)));
       } catch (CertificateException | IOException ex) {
-        throw new OcspStoreException("could not parse X.509 certificate " +
-            "from file " + certFile + ": " + ex.getMessage(), ex);
+        throw new OcspStoreException("could not parse X.509 certificate from file " +
+            certFile + ": " + ex.getMessage(), ex);
       }
     }
     return certs;

@@ -4,10 +4,11 @@
 package org.xipki.security.pkcs11;
 
 import org.xipki.pkcs11.wrapper.ExtraParams;
-import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.params.ByteArrayParams;
 import org.xipki.pkcs11.wrapper.params.CkParams;
+import org.xipki.pkcs11.wrapper.params.ECDH1_DERIVE_PARAMS;
 import org.xipki.pkcs11.wrapper.params.EDDSA_PARAMS;
+import org.xipki.pkcs11.wrapper.params.RSA_PKCS_OAEP_PARAMS;
 import org.xipki.pkcs11.wrapper.params.RSA_PKCS_PSS_PARAMS;
 import org.xipki.pkcs11.wrapper.params.SIGN_ADDITIONAL_CONTEXT;
 import org.xipki.pkcs11.wrapper.type.CkMechanism;
@@ -19,37 +20,18 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.*;
  *
  * @author Lijun Liao (xipki)
  */
-public interface P11Params {
+public abstract class  P11Params {
 
-  default CkMechanism toMechanism(long mechanism, ExtraParams extraParams)
-      throws TokenException {
-    CkParams paramObj;
-    if (this instanceof P11Params.P11RSAPkcsPssParams) {
-      P11Params.P11RSAPkcsPssParams param =
-          (P11Params.P11RSAPkcsPssParams) this;
-      paramObj = new RSA_PKCS_PSS_PARAMS(param.hashAlgorithm(),
-          param.maskGenerationFunction(), param.saltLength());
-    } else if (this instanceof P11Params.P11ByteArrayParams) {
-      paramObj = new ByteArrayParams(
-          ((P11Params.P11ByteArrayParams) this).bytes());
-    } else if (this instanceof P11Params.P11EddsaParams) {
-      P11Params.P11EddsaParams eddsaParams = (P11Params.P11EddsaParams) this;
-      paramObj = new EDDSA_PARAMS(eddsaParams.prehash, eddsaParams.context);
-    } else if (this instanceof P11Params.P11SignAdditionalContext) {
-      P11Params.P11SignAdditionalContext sad =
-          (P11Params.P11SignAdditionalContext) this;
-      paramObj = new SIGN_ADDITIONAL_CONTEXT(sad.hedgeVariant, sad.context);
-    } else {
-      throw new TokenException(
-          "unknown P11Parameters " + getClass().getName());
-    }
+  protected abstract CkParams toCkParams();
 
+  public CkMechanism toMechanism(long mechanism, ExtraParams extraParams) {
+    CkParams paramObj = toCkParams();
     CkMechanism mech = new CkMechanism(mechanism, paramObj);
     mech.setExtraParams(extraParams);
     return mech;
   }
 
-  class P11ByteArrayParams implements P11Params {
+  public static class P11ByteArrayParams extends P11Params {
 
     private final byte[] bytes;
 
@@ -57,23 +39,20 @@ public interface P11Params {
       this.bytes = bytes;
     }
 
-    public byte[] bytes() {
-      return bytes;
+    @Override
+    protected CkParams toCkParams() {
+      return new ByteArrayParams(bytes);
     }
 
   }
 
-  class P11RSAPkcsPssParams implements P11Params {
+  private abstract static class P11RSAPkcsPssOrOaepParams extends P11Params {
 
-    private final long hashAlgorithm;
+    protected final long hashAlgorithm;
 
-    private final long maskGenerationFunction;
+    protected final long maskGenerationFunction;
 
-    private final int saltLength;
-
-    public P11RSAPkcsPssParams(HashAlgo hashAlgo) {
-      this.saltLength = hashAlgo.length();
-
+    public P11RSAPkcsPssOrOaepParams(HashAlgo hashAlgo) {
       switch (hashAlgo) {
         case SHA1:
           this.hashAlgorithm = CKM_SHA_1;
@@ -112,26 +91,48 @@ public interface P11Params {
           this.maskGenerationFunction = CKG_MGF1_SHA3_512;
           break;
         default:
-          throw new IllegalStateException(
-              "unsupported hash algorithm " + hashAlgo);
+          throw new IllegalStateException("unsupported hash algorithm " + hashAlgo);
       }
-    }
-
-    public long hashAlgorithm() {
-      return hashAlgorithm;
-    }
-
-    public long maskGenerationFunction() {
-      return maskGenerationFunction;
-    }
-
-    public int saltLength() {
-      return saltLength;
     }
 
   }
 
-  class P11EddsaParams implements P11Params {
+  public static class P11RSAPkcsPssParams extends P11RSAPkcsPssOrOaepParams {
+
+    private final int saltLength;
+
+    public P11RSAPkcsPssParams(HashAlgo hashAlgo) {
+      super(hashAlgo);
+      this.saltLength = hashAlgo.length();
+    }
+
+    @Override
+    protected CkParams toCkParams() {
+      return new RSA_PKCS_PSS_PARAMS(hashAlgorithm, maskGenerationFunction, saltLength);
+    }
+
+  }
+
+  public static class P11RSAPkcsOaepParams extends P11RSAPkcsPssOrOaepParams {
+
+    private final long source;
+
+    private final byte[] sourceData;
+
+    public P11RSAPkcsOaepParams(HashAlgo hashAlgo, long source, byte[] sourceData) {
+      super(hashAlgo);
+      this.source = source;
+      this.sourceData = sourceData;
+    }
+
+    @Override
+    protected CkParams toCkParams() {
+      return new RSA_PKCS_OAEP_PARAMS(hashAlgorithm, maskGenerationFunction, source, sourceData);
+    }
+
+  }
+
+  public static class P11EddsaParams extends P11Params {
 
     private final boolean prehash;
 
@@ -142,16 +143,14 @@ public interface P11Params {
       this.context = context;
     }
 
-    public boolean prehash() {
-      return prehash;
+    @Override
+    protected CkParams toCkParams() {
+      return new EDDSA_PARAMS(prehash, context);
     }
 
-    public byte[] context() {
-      return context;
-    }
   }
 
-  class P11SignAdditionalContext implements P11Params {
+  public static class P11SignAdditionalContext extends P11Params {
 
     private final long hedgeVariant;
 
@@ -166,13 +165,32 @@ public interface P11Params {
       this.context = context;
     }
 
-    public long hedgeVariant() {
-      return hedgeVariant;
+    @Override
+    protected CkParams toCkParams() {
+      return new SIGN_ADDITIONAL_CONTEXT(hedgeVariant, context);
     }
 
-    public byte[] context() {
-      return context;
+  }
+
+  public static class P11Ecdh1DeriveParams extends P11Params {
+
+    private final long kdf;
+
+    private final byte[] sharedData;
+
+    private final byte[] publicData;
+
+    public P11Ecdh1DeriveParams(long kdf, byte[] sharedData, byte[] publicData) {
+      this.kdf = kdf;
+      this.sharedData = sharedData;
+      this.publicData = publicData;
     }
+
+    @Override
+    protected CkParams toCkParams() {
+      return new ECDH1_DERIVE_PARAMS(kdf, sharedData, publicData);
+    }
+
   }
 
 }

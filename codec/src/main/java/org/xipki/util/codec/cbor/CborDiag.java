@@ -171,7 +171,7 @@ public class CborDiag {
     }
   }
 
-  private static class MyInputStream {
+  public static class MyInputStream {
 
     private final PushbackInputStream is;
     private final MyBuffer buffer;
@@ -227,6 +227,18 @@ public class CborDiag {
       }
     }
 
+    private void unread(byte[] bytes) throws CodecException {
+      try {
+        is.unread(bytes);
+        for (int i = 0; i < bytes.length; i++) {
+          buffer.unread();
+          offset.getAndDecrement();
+        }
+      } catch (IOException e) {
+        throw new CodecException(e);
+      }
+    }
+
     private void resetBuffer() {
       buffer.reset();
     }
@@ -241,8 +253,7 @@ public class CborDiag {
 
   }
 
-  private static final BigInteger _2power64 =
-      new BigInteger("10000000000000000", 16);
+  private static final BigInteger _2power64 = new BigInteger("10000000000000000", 16);
 
   private int numBytesPerLine = 32;
 
@@ -253,6 +264,8 @@ public class CborDiag {
   private int maxCharsPerLine = 80;
 
   private final MyInputStream is;
+
+  private final boolean cborseq;
 
   private final boolean printEofOffset;
 
@@ -266,11 +279,15 @@ public class CborDiag {
    * @param encoded the CBOR-encoded data form.
    */
   public CborDiag(byte[] encoded) {
-    this(encoded, true);
+    this(encoded, true, false);
   }
 
   public CborDiag(byte[] encoded, boolean printEofOffset) {
-    this(new ByteArrayInputStream(encoded), printEofOffset);
+    this(new ByteArrayInputStream(encoded), printEofOffset, false);
+  }
+
+  public CborDiag(byte[] encoded, boolean printEofOffset, boolean cborseq) {
+    this(new ByteArrayInputStream(encoded), printEofOffset, cborseq);
   }
 
   /**
@@ -280,15 +297,20 @@ public class CborDiag {
    *          cannot be <code>null</code>.
    */
   public CborDiag(InputStream is) {
-    this(is, true);
+    this(is, true, false);
   }
 
   public CborDiag(InputStream is, boolean printEofOffset) {
+    this(is, printEofOffset, false);
+  }
+
+  public CborDiag(InputStream is, boolean printEofOffset, boolean cborseq) {
     Args.notNull(is, "is");
+    this.cborseq = cborseq;
     if (is instanceof PushbackInputStream) {
       this.is = new MyInputStream((PushbackInputStream) is);
     } else {
-      this.is = new MyInputStream(new PushbackInputStream(is));
+      this.is = new MyInputStream(new PushbackInputStream(is, 10));
     }
     this.printEofOffset = printEofOffset;
     int size = this.is.totalSize;
@@ -296,8 +318,15 @@ public class CborDiag {
         : size < 100 ? 2
         : size < 1000 ? 3
         : size < 10000 ? 4
-        : size < 100000 ? 5
-        : 6;
+        : size < 100000 ? 5 : 6;
+  }
+
+  public CborDiag(MyInputStream is, boolean cborseq, int offsetLen, boolean printEofOffset) {
+    Args.notNull(is, "is");
+    this.cborseq = cborseq;
+    this.is = is;
+    this.printEofOffset = printEofOffset;
+    this.offsetLen = offsetLen;
   }
 
   public int numSpacesBeforeComment() {
@@ -314,6 +343,14 @@ public class CborDiag {
 
   public void setNumTextBytesPerLine(int numTextBytesPerLine) {
     this.numTextBytesPerLine = numTextBytesPerLine;
+  }
+
+  protected MyInputStream inputStream() {
+    return is;
+  }
+
+  protected IndentOutStream outputStream() {
+    return out;
   }
 
   public void setNumBytesPerLine(int numBytesPerLine) {
@@ -336,16 +373,21 @@ public class CborDiag {
     print(out, null);
   }
 
-  public void print(OutputStream out, int indentLevel)
-      throws CodecException {
+  public void print(OutputStream out, int indentLevel) throws CodecException {
     print(out, "  ".repeat(indentLevel));
   }
 
-  public void print(OutputStream out, String indentPrefix)
-      throws CodecException {
-    this.out = new IndentOutStream(Args.notNull(out, "out"), indentPrefix);
+  public void print(OutputStream out, String indentPrefix) throws CodecException {
+    print(new IndentOutStream(Args.notNull(out, "out"), indentPrefix));
+  }
 
-    print0();
+  protected int print0(IndentOutStream out) throws CodecException {
+    this.out = Args.notNull(out, "out");
+    return print0();
+  }
+
+  protected void print(IndentOutStream out) throws CodecException {
+    int numElements = print0(out);
 
     ByteArrayOutputStream bout = new ByteArrayOutputStream(32);
     int read;
@@ -360,6 +402,10 @@ public class CborDiag {
       writeNewLine();
     }
 
+    if (cborseq) {
+      writeLine("# CBOR sequence with " + numElements + " elements");
+    }
+
     if (size > 0) {
       writeLine("## " + size + " unused bytes:");
       byte[] remainingBytes = bout.toByteArray();
@@ -367,12 +413,21 @@ public class CborDiag {
     }
   }
 
-  protected void print0() throws CodecException {
-    output(0, "");
+  protected int print0() throws CodecException {
+    if (cborseq) {
+      int n = 0;
+      while (getOffset() < this.is.totalSize) {
+        output(0, "");
+        n++;
+      }
+      return n;
+    } else {
+      output(0, "");
+      return 1;
+    }
   }
 
-  protected void output(int level, String prefix)
-      throws CodecException {
+  protected void output(int level, String prefix) throws CodecException {
     CborType ctype = peekType();
     int addInfo = ctype.additionalInfo();
 
@@ -385,20 +440,17 @@ public class CborDiag {
         switch (addInfo) {
           case ONE_BYTE: {
             int v = readInt8();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "nint8(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "nint8(" + v + ")"));
             break;
           }
           case TWO_BYTES: {
             int v = readInt16();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "nint16(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "nint16(" + v + ")"));
             break;
           }
           case FOUR_BYTES: {
             long v = readInt32();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "=nint32(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "=nint32(" + v + ")"));
             break;
           }
           case EIGHT_BYTES: {
@@ -410,15 +462,13 @@ public class CborDiag {
               vText = BigInteger.valueOf(v).subtract(_2power64).toString();
             }
 
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "nint64(" + vText + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "nint64(" + vText + ")"));
             break;
           }
           default: {
             read1Byte();
             int v = -1 * (addInfo + 1);
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "simple-nint(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "simple-nint(" + v + ")"));
           }
         }
         break;
@@ -428,22 +478,19 @@ public class CborDiag {
           case ONE_BYTE: {
             read1Byte();
             int v = readUInt8();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "uint8(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "uint8(" + v + ")"));
             break;
           }
           case TWO_BYTES: {
             read1Byte();
             int v = readUInt16();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "uint16(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "uint16(" + v + ")"));
             break;
           }
           case FOUR_BYTES: {
             read1Byte();
             long v = readUInt32();
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "uint32(" + v + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "uint32(" + v + ")"));
             break;
           }
           case EIGHT_BYTES: {
@@ -456,15 +503,13 @@ public class CborDiag {
               vText = _2power64.add(BigInteger.valueOf(v)).toString();
             }
 
-            writeLine(level, readResetBuffer(),
-                concat(prefix, "uint64(" + vText + ")"));
+            writeLine(level, readResetBuffer(), concat(prefix, "uint64(" + vText + ")"));
             break;
           }
           default: {
             if (addInfo >= 0 && addInfo <= 23) {
               read1Byte();
-              writeLine(level, readResetBuffer(),
-                  concat(prefix, "simple-uint(" + addInfo + ")"));
+              writeLine(level, readResetBuffer(), concat(prefix, "simple-uint(" + addInfo + ")"));
             }
           }
         }
@@ -526,31 +571,25 @@ public class CborDiag {
               writeLine(level, readResetBuffer(), concat(prefix, "true"));
               break;
             case UNDEFINED:
-              writeLine(level, readResetBuffer(),
-                  concat(prefix, "<undefined>"));
+              writeLine(level, readResetBuffer(), concat(prefix, "<undefined>"));
               break;
             default:
-              writeLine(level, readResetBuffer(),
-                  concat(prefix, "float/simple(" + addInfo + ")"));
+              writeLine(level, readResetBuffer(), concat(prefix, "float/simple(" + addInfo + ")"));
           }
         } else if (addInfo == HALF_PRECISION_FLOAT) {
           double d = readHalfPrecisionFloat();
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "half precision float(" + d + ")"));
+          writeLine(level, readResetBuffer(), concat(prefix, "half precision float(" + d + ")"));
         } else if (addInfo == SINGLE_PRECISION_FLOAT) {
           double d = readFloat();
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "float(" + d + ")"));
+          writeLine(level, readResetBuffer(), concat(prefix, "float(" + d + ")"));
         } else if (addInfo == DOUBLE_PRECISION_FLOAT) {
           double d = readDouble();
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "double(" + d + ")"));
+          writeLine(level, readResetBuffer(), concat(prefix, "double(" + d + ")"));
         } else if (addInfo == BREAK) {
           writeLine(level, readResetBuffer(), concat(prefix, "<break>"));
         } else {
           byte b = readSimpleValue();
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "float/simple(" + (b & 0xFF) + ")"));
+          writeLine(level, readResetBuffer(), concat(prefix, "float/simple(" + (b & 0xFF) + ")"));
         }
         break;
       }
@@ -568,8 +607,7 @@ public class CborDiag {
             output(level + 1, "[" + (idx++) + "]");
           }
         } else {
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "array[" + len + "]"));
+          writeLine(level, readResetBuffer(), concat(prefix, "array[" + len + "]"));
           for (int i = 0; i < len; i++) {
             output(level + 1, "[" + i + "]");
           }
@@ -592,8 +630,7 @@ public class CborDiag {
             idx++;
           }
         } else {
-          writeLine(level, readResetBuffer(),
-              concat(prefix, "map(" + len + ")"));
+          writeLine(level, readResetBuffer(), concat(prefix, "map(" + len + ")"));
           for (int i = 0; i < len; i++) {
             output(level + 1, "[" + i + "].key  ");
             output(level + 1, "[" + i + "].value");
@@ -663,8 +700,7 @@ public class CborDiag {
     writeNewLine();
   }
 
-  protected byte[] printByteString(int level, String prefix)
-      throws CodecException {
+  protected byte[] printByteString(int level, String prefix) throws CodecException {
     int len = readByteStringLength();
     writeLine(level, readResetBuffer(), concat(prefix, "byte[" + len + "]"));
     byte[] bytes = readExactBytes(len);
@@ -674,8 +710,7 @@ public class CborDiag {
     return bytes;
   }
 
-  protected void printTextString(int level, String prefix)
-      throws CodecException {
+  protected void printTextString(int level, String prefix) throws CodecException {
     int len = (int) readTextStringLength();
     writeLine(level, readResetBuffer(), concat(prefix, "char[" + len + "]"));
     if (len == 0) {
@@ -708,8 +743,7 @@ public class CborDiag {
 
       if (sameLen) {
         String textPart = text.substring(off, off + numBytesInLine);
-        int commentOff =
-            Math.max(numPerLine, 2 * Math.min(numPerLine, len) + 1);
+        int commentOff = Math.max(numPerLine, 2 * Math.min(numPerLine, len) + 1);
 
         int numSpaces = commentOff - 2 * numBytesInLine;
         writeText(" ".repeat(numSpaces) + "# \"" + textPart + "\"");
@@ -717,8 +751,7 @@ public class CborDiag {
         // it is difficult to split the bytes, so we print
         // all text at the first line
         if (i == 0) {
-          int numSpaces =
-              Math.max(1, numSpacesBeforeComment - numBytesInLine * 2);
+          int numSpaces = Math.max(1, numSpacesBeforeComment - numBytesInLine * 2);
           writeText(" ".repeat(numSpaces) + "# \"" + text + "\"");
         }
       }
@@ -737,22 +770,19 @@ public class CborDiag {
     }
 
     if (off < len) {
-      throw new CodecException(
-          "in reaches end, but still expected " + (len - off) + " bytes");
+      throw new CodecException("in reaches end, but still expected " + (len - off) + " bytes");
     }
     return out;
   }
 
-  protected void writeBytesBlock(int level, byte[] data)
-    throws CodecException {
+  protected void writeBytesBlock(int level, byte[] data) throws CodecException {
     int offBase = getOffset() - data.length;
     is.resetBuffer();
 
     int len = data.length;
     String ind = "  ".repeat(level);
 
-    int numPerLine = Math.min(numBytesPerLine,
-        (maxCharsPerLine - 6 - ind.length()) / 2);
+    int numPerLine = Math.min(numBytesPerLine, (maxCharsPerLine - 6 - ind.length()) / 2);
 
     int n = (len + numPerLine - 1) / numPerLine;
 
@@ -771,13 +801,11 @@ public class CborDiag {
     writeNewLine();
   }
 
-  protected void writeLine(int level, byte[] data, String text)
-    throws CodecException {
+  protected void writeLine(int level, byte[] data, String text) throws CodecException {
     writeLine(level, data, true, text);
   }
 
-  protected void writeLine(int level, byte[] data, boolean firstByteIsTag,
-                           String text)
+  protected void writeLine(int level, byte[] data, boolean firstByteIsTag, String text)
     throws CodecException {
     writeOffset(getOffset() - data.length);
     writeText("  ".repeat(level));
@@ -802,7 +830,7 @@ public class CborDiag {
 
     writeText(" ".repeat(numSpaces));
     int textLen = text.length();
-    int lineOffset = out.lineOffset;;
+    int lineOffset = out.lineOffset;
 
     if (lineOffset + 2 + textLen < maxCharsPerLine) {
       writeText("# " + text);
@@ -830,8 +858,7 @@ public class CborDiag {
           writeText("# " + leading + line0);
         } else {
           writeNewLine();
-          writeText(" ".repeat(lineOffset) + "# " +
-              " ".repeat(leading.length()) + line0);
+          writeText(" ".repeat(lineOffset) + "# " + " ".repeat(leading.length()) + line0);
         }
       }
     }
@@ -914,6 +941,16 @@ public class CborDiag {
     return CborType.valueOf(p);
   }
 
+  protected CborType[] peekTypes(int num) throws CodecException {
+    byte[] bytes = readExactBytes(num);
+    is.unread(bytes);
+    CborType[] ret = new CborType[num];
+    for (int i = 0; i < num; i++) {
+      ret[i] = CborType.valueOf(0xFF & bytes[i]);
+    }
+    return ret;
+  }
+
   /**
    * read one bye
    * @return the read byte.
@@ -937,8 +974,7 @@ public class CborDiag {
     long len = readMajorTypeWithSize(TYPE_ARRAY);
     if (len < -1 || len > Integer.MAX_VALUE) {
       // -1: break / infinite length
-      throw new CodecException(
-          "array length not in range [0, " + Integer.MAX_VALUE + "]");
+      throw new CodecException("array length not in range [0, " + Integer.MAX_VALUE + "]");
     }
     return (int) len;
   }
@@ -1039,8 +1075,7 @@ public class CborDiag {
     long len = readMajorTypeWithSize(TYPE_MAP);
     if (len < -1 || len > Integer.MAX_VALUE) {
       // -1: break / infinite length
-      throw new CodecException(
-          "map length not in range [0, " + Integer.MAX_VALUE + "]");
+      throw new CodecException("map length not in range [0, " + Integer.MAX_VALUE + "]");
     }
     return (int) len;
 
@@ -1105,8 +1140,7 @@ public class CborDiag {
    * @param subtype the expected subtype.
    * @throws CodecException in case of CBOR decoding problem.
    */
-  protected void readMajorTypeExact(int majorType, int subtype)
-      throws CodecException {
+  protected void readMajorTypeExact(int majorType, int subtype) throws CodecException {
     int st = readMajorType(majorType);
     if ((st ^ subtype) != 0) {
       fail("Unexpected subtype: %d, expected: %d!", st, subtype);
@@ -1124,8 +1158,7 @@ public class CborDiag {
    *         infinite-length type is read.
    * @throws CodecException in case of CBOR decoding problem.
    */
-  protected long readMajorTypeWithSize(int majorType)
-      throws CodecException {
+  protected long readMajorTypeWithSize(int majorType) throws CodecException {
     return readUInt(readMajorType(majorType), true /* breakAllowed */);
   }
 
@@ -1137,8 +1170,7 @@ public class CborDiag {
    * @return the read unsigned integer, as long value.
    * @throws CodecException in case of CBOR decoding problem.
    */
-  protected long readUInt(int length, boolean breakAllowed)
-      throws CodecException {
+  protected long readUInt(int length, boolean breakAllowed) throws CodecException {
     return readUInt(length, breakAllowed, false);
   }
 
@@ -1206,9 +1238,9 @@ public class CborDiag {
   protected long readUInt64() throws CodecException {
     byte[] buf = readFully(new byte[8]);
     return (buf[0] & 0xFFL) << 56 | (buf[1] & 0xFFL) << 48 |
-           (buf[2] & 0xFFL) << 40 | (buf[3] & 0xFFL) << 32 |
-           (buf[4] & 0xFFL) << 24 | (buf[5] & 0xFFL) << 16 |
-           (buf[6] & 0xFFL) << 8  | (buf[7] & 0xFFL);
+          (buf[2] & 0xFFL) << 40 | (buf[3] & 0xFFL) << 32 |
+          (buf[4] & 0xFFL) << 24 | (buf[5] & 0xFFL) << 16 |
+          (buf[6] & 0xFFL) << 8  | (buf[7] & 0xFFL);
   }
 
   /**
@@ -1322,8 +1354,7 @@ public class CborDiag {
 
   protected boolean skipBreak() throws CodecException {
     CborType type = peekType();
-    if (type.majorType() == TYPE_FLOAT_SIMPLE
-        && type.additionalInfo() == BREAK) {
+    if (type.majorType() == TYPE_FLOAT_SIMPLE && type.additionalInfo() == BREAK) {
       readBreak();
       return true;
     } else {
@@ -1333,11 +1364,9 @@ public class CborDiag {
 
   protected long expectIntegerType(int ib) throws CodecException {
     int majorType = ((ib & 0xFF) >>> 5);
-    if ((majorType != TYPE_UNSIGNED_INTEGER)
-        && (majorType != TYPE_NEGATIVE_INTEGER)) {
+    if ((majorType != TYPE_UNSIGNED_INTEGER) && (majorType != TYPE_NEGATIVE_INTEGER)) {
       fail("Unexpected type: %s, expected type %s or %s!",
-          CborType.getName(majorType),
-          CborType.getName(TYPE_UNSIGNED_INTEGER),
+          CborType.getName(majorType), CborType.getName(TYPE_UNSIGNED_INTEGER),
           CborType.getName(TYPE_NEGATIVE_INTEGER));
     }
 
@@ -1356,8 +1385,7 @@ public class CborDiag {
     if ((expectedLength == -1 && length >= ONE_BYTE)
         || (expectedLength >= 0 && length != expectedLength)) {
       fail("Unexpected payload/length! Expected %s, but got %s.",
-          CborDecoder.lengthToString(expectedLength),
-          CborDecoder.lengthToString(length));
+          CborDecoder.lengthToString(expectedLength), CborDecoder.lengthToString(length));
     }
     return readUInt(length, false /* breakAllowed */, true);
   }

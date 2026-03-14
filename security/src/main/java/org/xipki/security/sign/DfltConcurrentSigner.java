@@ -34,8 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DfltConcurrentSigner implements ConcurrentSigner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      DfltConcurrentSigner.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DfltConcurrentSigner.class);
 
   private static final AtomicInteger NAME_INDEX = new AtomicInteger(1);
 
@@ -73,20 +72,16 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
     }
   } // method static
 
-  public DfltConcurrentSigner(
-      boolean mac, List<Signer> signers)
-      throws NoSuchAlgorithmException {
+  public DfltConcurrentSigner(boolean mac, List<Signer> signers) throws NoSuchAlgorithmException {
     this(mac, signers, null);
   }
 
-  public DfltConcurrentSigner(
-      boolean mac, List<Signer> signers, Key signingKey)
+  public DfltConcurrentSigner(boolean mac, List<Signer> signers, Key signingKey)
       throws NoSuchAlgorithmException {
     Args.notEmpty(signers, "signers");
 
     this.mac = mac;
-    this.algorithm = SignAlgo.getInstance(
-        signers.get(0).x509Signer().getAlgorithmIdentifier());
+    this.algorithm = SignAlgo.getInstance(signers.get(0).x509Signer().getAlgorithmIdentifier());
     this.signers = new ArrayBlockingQueue<>(signers.size());
     this.signers.addAll(signers);
 
@@ -95,7 +90,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
@@ -110,18 +105,17 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
     } else if (digest.length == 20) {
       this.sha1OfMacKey = Arrays.copyOf(digest, 20);
     } else {
-      throw new IllegalArgumentException(
-          "invalid sha1Digest.length (" + digest.length + " != 20)");
+      throw new IllegalArgumentException("invalid sha1Digest.length (" + digest.length + " != 20)");
     }
   }
 
   @Override
-  public byte[] getSha1OfMacKey() {
+  public byte[] sha1OfMacKey() {
     return (sha1OfMacKey == null) ? null : Arrays.copyOf(sha1OfMacKey, 20);
   }
 
   @Override
-  public SignAlgo getAlgorithm() {
+  public SignAlgo algorithm() {
     return algorithm;
   }
 
@@ -136,8 +130,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
    * @param soTimeout timeout in milliseconds, 0 for infinitely.
    */
   @Override
-  public Signer borrowSigner(int soTimeout)
-      throws NoIdleSignerException {
+  public Signer borrowSigner(int soTimeout) throws NoIdleSignerException {
     Signer signer = null;
     try {
       signer = signers.poll(soTimeout, TimeUnit.MILLISECONDS);
@@ -158,7 +151,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   }
 
   @Override
-  public Key getSigningKey() {
+  public Key signingKey() {
     return signingKey;
   }
 
@@ -174,7 +167,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   }
 
   @Override
-  public PublicKey getPublicKey() {
+  public PublicKey publicKey() {
     return publicKey;
   }
 
@@ -184,13 +177,12 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   }
 
   @Override
-  public X509Cert getX509Cert() {
-    return CollectionUtil.isEmpty(certificateChain) ? null
-        : certificateChain[0];
+  public X509Cert x509Cert() {
+    return CollectionUtil.isEmpty(certificateChain) ? null : certificateChain[0];
   }
 
   @Override
-  public X509Cert[] getX509CertChain() {
+  public X509Cert[] x509CertChain() {
     return certificateChain;
   }
 
@@ -219,8 +211,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   }
 
   @Override
-  public byte[] x509sign(byte[] data)
-      throws NoIdleSignerException, SignatureException {
+  public byte[] x509Sign(byte[] data) throws NoIdleSignerException, SignatureException {
     Signer signer = borrowSigner();
     try {
       ContentSigner x509Signer = signer.x509Signer();
@@ -238,8 +229,7 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
   } // method sign
 
   @Override
-  public byte[][] x509sign(byte[][] data)
-      throws NoIdleSignerException, SignatureException {
+  public byte[][] x509Sign(byte[][] data) throws NoIdleSignerException, SignatureException {
     byte[][] signatures = new byte[data.length][];
     Signer signer = borrowSigner();
 
@@ -250,8 +240,8 @@ public class DfltConcurrentSigner implements ConcurrentSigner {
         try {
           signatureStream.write(data[i]);
         } catch (IOException ex) {
-          throw new SignatureException("could not write data to " +
-              "SignatureStream: " + ex.getMessage(), ex);
+          throw new SignatureException(
+              "could not write data to SignatureStream: " + ex.getMessage(), ex);
         }
         signatures[i] = x509Signer.getSignature();
       }

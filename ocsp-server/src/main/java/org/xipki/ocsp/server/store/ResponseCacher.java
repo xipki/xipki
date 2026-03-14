@@ -3,7 +3,6 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.crypto.Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.RequestIssuer;
@@ -25,6 +24,7 @@ import org.xipki.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -47,8 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ResponseCacher implements Closeable {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(ResponseCacher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
   private static final long SEC_DFLT_NEXT_UPDATE_DURATION = 7L * 24 * 60 * 60;
 
@@ -103,8 +102,7 @@ public class ResponseCacher implements Closeable {
           int num1 = removeExpiredResponses(maxGeneratedAt, minNextUpdate);
           if (num1 > 0 && LOG.isInfoEnabled()) {
             LOG.info("removed {} with thisUpdate < {} ({}) OR " +
-                "nextUpdate < {} ({})",
-                num1 == 1 ? "1 response" : num1 + " responses",
+                "nextUpdate < {} ({})", num1 == 1 ? "1 response" : num1 + " responses",
                 maxGeneratedAt, Instant.ofEpochSecond(maxGeneratedAt),
                 minNextUpdate, Instant.ofEpochSecond(minNextUpdate));
           }
@@ -141,12 +139,10 @@ public class ResponseCacher implements Closeable {
 
   private final AtomicInteger cachedIssuerId = new AtomicInteger(0);
 
-  public ResponseCacher(DataSourceWrapper datasource, boolean master,
-                        Validity validity) {
+  public ResponseCacher(DataSourceWrapper datasource, boolean master, Validity validity) {
     this.datasource = Args.notNull(datasource, "datasource");
     this.master = master;
-    this.validity = (int) (Args.notNull(validity, "validity")
-                            .approxMinutes() * 60);
+    this.validity = (int) (Args.notNull(validity, "validity").approxMinutes() * 60);
     this.sqlSelectIssuerCert = datasource.buildSelectFirstSql(1,
         "CERT FROM ISSUER WHERE ID=?");
     this.sqlSelectOcsp = datasource.buildSelectFirstSql(1,
@@ -210,8 +206,7 @@ public class ResponseCacher implements Closeable {
   public synchronized IssuerEntry storeIssuer(X509Cert issuerCert)
       throws CertificateException, DataAccessException {
     if (!master) {
-      throw new IllegalStateException(
-          "storeIssuer is not permitted in slave mode");
+      throw new IllegalStateException("storeIssuer is not permitted in slave mode");
     }
 
     for (Integer id : issuerStore.ids()) {
@@ -257,8 +252,7 @@ public class ResponseCacher implements Closeable {
   } // method storeIssuer
 
   public OcspRespWithCacheInfo getOcspResponse(
-      int issuerId, BigInteger serialNumber, SignAlgo sigAlgo)
-      throws DataAccessException {
+      int issuerId, BigInteger serialNumber, SignAlgo sigAlgo) throws DataAccessException {
     final String sql = sqlSelectOcsp;
     byte[] identBytes = buildIdent(serialNumber, sigAlgo);
     long id = deriveId(issuerId, identBytes);
@@ -343,8 +337,7 @@ public class ResponseCacher implements Closeable {
           ps.execute();
         } catch (SQLException ex) {
           DataAccessException dex = datasource.translate(sql, ex);
-          if (dex.reason().isDescendantOrSelfOf(
-                Reason.DataIntegrityViolation)) {
+          if (dex.reason().isDescendantOrSelfOf(Reason.DataIntegrityViolation)) {
             dataIntegrityViolationException = Boolean.TRUE;
           } else {
             throw dex;
@@ -354,8 +347,7 @@ public class ResponseCacher implements Closeable {
         }
 
         if (dataIntegrityViolationException == null) {
-          LOG.debug("added cached OCSP response iid={}, ident={}",
-              issuerId, ident);
+          LOG.debug("added cached OCSP response iid={}, ident={}", issuerId, ident);
           return;
         }
 
@@ -377,11 +369,9 @@ public class ResponseCacher implements Closeable {
         datasource.returnConnection(conn);
       }
     } catch (DataAccessException ex) {
-      LOG.info("could not cache OCSP response iid={}, ident={}",
-          issuerId, ident);
+      LOG.info("could not cache OCSP response iid={}, ident={}", issuerId, ident);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("could not cache OCSP response iid={}, ident={}",
-            issuerId, ident, ex);
+        LOG.debug("could not cache OCSP response iid={}, ident={}", issuerId, ident, ex);
       }
     }
   } // method storeOcspResponse
@@ -457,8 +447,7 @@ public class ResponseCacher implements Closeable {
             ps.setInt(1, id);
             rs = ps.executeQuery();
             rs.next();
-            X509Cert cert = X509Util.parseCert(
-                StringUtil.toUtf8Bytes(rs.getString("CERT")));
+            X509Cert cert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
             IssuerEntry caInfoEntry = new IssuerEntry(id, cert);
             issuerStore.addIssuer(caInfoEntry);
             LOG.info("added issuer {}", id);
@@ -494,12 +483,11 @@ public class ResponseCacher implements Closeable {
   }
 
   private long deriveId(int issuerId, byte[] identBytes) {
-    byte[] hash = new byte[20];
-    Digest digest = HashAlgo.SHA1.createDigest();
+    MessageDigest digest = HashAlgo.SHA1.createDigest();
     digest.reset();
     digest.update(int2Bytes(issuerId), 0, 2);
     digest.update(identBytes, 0, identBytes.length);
-    digest.doFinal(hash, 0);
+    byte[] hash = digest.digest();
 
     return (0x7FL & hash[0]) << 56 // ignore the first bit
         | (0xFFL & hash[1]) << 48 | (0xFFL & hash[2]) << 40
@@ -512,8 +500,7 @@ public class ResponseCacher implements Closeable {
     if (value > -1 && value < 65535) {
       return new byte[]{(byte) (value >> 8), (byte) value};
     } else {
-      throw new IllegalArgumentException(
-          "value is out of the range [0, 65535]: " + value);
+      throw new IllegalArgumentException("value is out of the range [0, 65535]: " + value);
     }
   }
 

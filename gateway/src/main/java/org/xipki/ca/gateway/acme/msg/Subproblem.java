@@ -9,6 +9,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -36,15 +37,13 @@ public class Subproblem implements JsonEncodable {
 
   @Override
   public JsonMap toCodec() {
-    return new JsonMap().put("type", type)
-        .put("detail", detail).put("identifier", identifier);
+    return new JsonMap().put("type", type).put("detail", detail).put("identifier", identifier);
   }
 
   public static Subproblem parse(JsonMap json) throws CodecException {
     JsonMap map = json.getMap("identifier");
     Identifier identifier = (map == null) ? null : Identifier.parse(map);
-    return new Subproblem(json.getString("type"),
-        json.getString("detail"), identifier);
+    return new Subproblem(json.getString("type"), json.getString("detail"), identifier);
   }
 
 }

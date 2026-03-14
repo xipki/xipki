@@ -8,6 +8,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -36,8 +37,7 @@ public class RevokeCertPayload implements JsonEncodable {
   }
 
   public static RevokeCertPayload parse(JsonMap json) throws CodecException {
-    return new RevokeCertPayload(json.getInt("reason"),
-        json.getString("certificate"));
+    return new RevokeCertPayload(json.getInt("reason"), json.getString("certificate"));
   }
 
 }

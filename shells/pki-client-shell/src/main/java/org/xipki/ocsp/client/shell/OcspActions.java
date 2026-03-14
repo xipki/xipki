@@ -43,6 +43,7 @@ import org.xipki.security.SignAlgo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.IssuerHash;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -82,8 +83,7 @@ import java.util.StringTokenizer;
  */
 public class OcspActions {
 
-  public abstract static class BaseOcspStatusAction
-      extends CommonOcspStatusAction {
+  public abstract static class BaseOcspStatusAction extends CommonOcspStatusAction {
 
     private static class BigIntegerRange {
       private final BigInteger from;
@@ -92,8 +92,8 @@ public class OcspActions {
 
       BigIntegerRange(BigInteger from, BigInteger to) {
         if (from.compareTo(to) > 0) {
-          throw new IllegalArgumentException("from (" + from
-              + ") may not be larger than to (" + to + ")");
+          throw new IllegalArgumentException("from (" + from +
+              ") may not be larger than to (" + to + ")");
         }
         this.from = from;
         this.to = to;
@@ -106,15 +106,13 @@ public class OcspActions {
 
     } // class BigIntegerRange
 
-    protected static final Map<ASN1ObjectIdentifier, String>
-        EXTENSION_OIDNAME_MAP = new HashMap<>();
+    protected static final Map<ASN1ObjectIdentifier, String> EXTENSION_OIDNAME_MAP =
+        new HashMap<>();
 
-    @Option(name = "--verbose", aliases = "-v", description =
-        "show status verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
-    @Option(name = "--resp-issuer", description =
-        "certificate file of the responder's issuer")
+    @Option(name = "--resp-issuer", description = "certificate file of the responder's issuer")
     @Completion(FileCompleter.class)
     private String respIssuerFile;
 
@@ -129,8 +127,7 @@ public class OcspActions {
     @Completion(FileCompleter.class)
     private String respout;
 
-    @Option(name = "--hex", description =
-        "serial number without prefix is hex number")
+    @Option(name = "--hex", description = "serial number without prefix is hex number")
     private Boolean hex = Boolean.FALSE;
 
     @Option(name = "--serial", aliases = "-s", description =
@@ -143,8 +140,7 @@ public class OcspActions {
     @Completion(FileCompleter.class)
     private List<String> certFiles;
 
-    @Option(name = "--ac", description =
-        "the certificates are attribute certificates")
+    @Option(name = "--ac", description = "the certificates are attribute certificates")
     @Completion(FileCompleter.class)
     private Boolean isAttrCert = Boolean.FALSE;
 
@@ -152,12 +148,10 @@ public class OcspActions {
     private OcspRequestor requestor;
 
     static {
-      EXTENSION_OIDNAME_MAP.put(OIDs.OCSP.id_pkix_ocsp_archive_cutoff,
-          "ArchiveCutoff");
+      EXTENSION_OIDNAME_MAP.put(OIDs.OCSP.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
       EXTENSION_OIDNAME_MAP.put(OIDs.OCSP.id_pkix_ocsp_crl, "CrlID");
       EXTENSION_OIDNAME_MAP.put(OIDs.OCSP.id_pkix_ocsp_nonce, "Nonce");
-      EXTENSION_OIDNAME_MAP.put(OIDs.Extn.id_pkix_ocsp_extendedRevoke,
-          "ExtendedRevoke");
+      EXTENSION_OIDNAME_MAP.put(OIDs.Extn.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
     }
 
     /**
@@ -174,8 +168,8 @@ public class OcspActions {
      *         if checking failed.
      */
     protected abstract void checkParameters(
-        X509Cert respIssuer, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts) throws Exception;
+        X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
+        throws Exception;
 
     /**
      * Check whether the response has the expected issuer, certificate serial
@@ -203,8 +197,7 @@ public class OcspActions {
     @Override
     protected final Object execute0() throws Exception {
       if (StringUtil.isBlank(serialNumberList) && isEmpty(certFiles)) {
-        throw new IllegalCmdParamException(
-            "Neither serialNumbers nor certFiles is set");
+        throw new IllegalCmdParamException("Neither serialNumbers nor certFiles is set");
       }
 
       X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
@@ -277,8 +270,7 @@ public class OcspActions {
           String token = st.nextToken();
           StringTokenizer st2 = new StringTokenizer(token, "-");
           BigInteger from = toBigInt(st2.nextToken(), hex);
-          BigInteger to = st2.hasMoreTokens()
-              ? toBigInt(st2.nextToken(), hex) : null;
+          BigInteger to = st2.hasMoreTokens() ? toBigInt(st2.nextToken(), hex) : null;
 
           if (to == null) {
             sns.add(from);
@@ -298,8 +290,7 @@ public class OcspActions {
       }
 
       if (isBlank(serverUrl)) {
-        throw new IllegalCmdParamException(
-            "could not get URL for the OCSP responder");
+        throw new IllegalCmdParamException("could not get URL for the OCSP responder");
       }
 
       X509Cert respIssuer = null;
@@ -317,13 +308,12 @@ public class OcspActions {
         debug = new ReqRespDebug(saveReq, saveResp);
       }
 
-      IssuerHash issuerHash =
-          new IssuerHash(options.hashAlgorithm(), issuerCert);
+      IssuerHash issuerHash = new IssuerHash(options.hashAlgorithm(), issuerCert);
 
       OCSPResp response;
       try {
         response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]),
-            serverUrlObj, options, debug);
+                      serverUrlObj, options, debug);
       } finally {
         if (debug != null && debug.size() > 0) {
           ReqRespPair reqResp = debug.get(0);
@@ -348,17 +338,15 @@ public class OcspActions {
     } // method execute0
 
     public static List<String> extractOcspUrls(X509Cert cert) {
-      byte[] extnValue = cert.getExtensionCoreValue(
-          OIDs.Extn.authorityInfoAccess);
+      byte[] extnValue = cert.getExtensionCoreValue(OIDs.Extn.authorityInfoAccess);
 
       return (extnValue == null) ? Collections.emptyList()
           : extractOcspUrls(AuthorityInformationAccess.getInstance(extnValue));
     } // method extractOcspUrls
 
-    public static List<String> extractOcspUrls(
-        X509AttributeCertificateHolder cert) {
+    public static List<String> extractOcspUrls(X509AttributeCertificateHolder cert) {
       byte[] extValue = X509Util.getCoreExtValue(cert.getExtensions(),
-          OIDs.Extn.authorityInfoAccess);
+                          OIDs.Extn.authorityInfoAccess);
       return (extValue == null) ? Collections.emptyList()
           : extractOcspUrls(AuthorityInformationAccess.getInstance(extValue));
     } // method extractOcspUrls
@@ -376,8 +364,7 @@ public class OcspActions {
       List<String> ocspUris = new ArrayList<>(n);
       for (AccessDescription ocspAccessDescription : ocspAccessDescriptions) {
         GeneralName accessLocation = ocspAccessDescription.getAccessLocation();
-        if (accessLocation.getTagNo() ==
-            GeneralName.uniformResourceIdentifier) {
+        if (accessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
           ocspUris.add(((ASN1String) accessLocation.getName()).getString());
         }
       }
@@ -443,22 +430,19 @@ public class OcspActions {
 
   } // class CommonOcspStatusAction
 
-  @Command(scope = "xi", name = "ocsp-status", description =
-      "request certificate status")
+  @Command(scope = "xi", name = "ocsp-status", description = "request certificate status")
   @Service
   public static class OcspStatus extends BaseOcspStatusAction {
 
     @Reference
     private SecurityFactory securityFactory;
 
-    @Option(name = "--quiet", description =
-        "Do not throw error if OCSP status is not 'OK'")
+    @Option(name = "--quiet", description = "Do not throw error if OCSP status is not 'OK'")
     protected Boolean quiet = Boolean.FALSE;
 
     @Override
     protected void checkParameters(
-        X509Cert respIssuer, List<BigInteger> serialNumbers,
-        Map<BigInteger, byte[]> encodedCerts)
+        X509Cert respIssuer, List<BigInteger> serialNumbers, Map<BigInteger, byte[]> encodedCerts)
         throws Exception {
       Args.notEmpty(serialNumbers, "serialNumbers");
     }
@@ -475,8 +459,7 @@ public class OcspActions {
       int statusCode = response.getStatus();
       if (statusCode != 0) {
         if (quiet) {
-          println(new OcspResponseException.Unsuccessful(statusCode)
-              .statusText());
+          println(new OcspResponseException.Unsuccessful(statusCode).statusText());
           return;
         } else {
           throw new OcspResponseException.Unsuccessful(statusCode);
@@ -517,8 +500,7 @@ public class OcspActions {
       } else {
         X509CertificateHolder[] responderCerts = basicResp.getCerts();
         if (responderCerts == null || responderCerts.length < 1) {
-          throw new CmdFailure(
-              "no responder certificate is contained in the response");
+          throw new CmdFailure("no responder certificate is contained in the response");
         }
 
         ResponderID respId = basicResp.getResponderId().toASN1Primitive();
@@ -533,7 +515,7 @@ public class OcspActions {
             }
           } else {
             byte[] spkiSha1 = HashAlgo.SHA1.hash(
-                cert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+                Asn1Util.getPublicKeyData(cert.getSubjectPublicKeyInfo()));
             if (Arrays.equals(respIdByKey, spkiSha1)) {
               respSigner = cert;
             }
@@ -545,21 +527,17 @@ public class OcspActions {
         }
 
         if (respSigner == null) {
-          throw new CmdFailure(
-              "no responder certificate match the ResponderId");
+          throw new CmdFailure("no responder certificate match the ResponderId");
         }
 
         for (Date thisUpdate : thisUpdates) {
           if (!respSigner.isValidOn(thisUpdate)) {
-            throw new CmdFailure("responder certificate is not valid on " +
-                thisUpdate);
+            throw new CmdFailure("responder certificate is not valid on " + thisUpdate);
           }
         }
 
-        PublicKey responderPubKey = KeyUtil.getPublicKey(
-            respSigner.getSubjectPublicKeyInfo());
-        ContentVerifierProvider cvp =
-            securityFactory.getContentVerifierProvider(responderPubKey);
+        PublicKey responderPubKey = KeyUtil.getPublicKey(respSigner.getSubjectPublicKeyInfo());
+        ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
         boolean sigValid = basicResp.isSignatureValid(cvp);
 
         if (!sigValid) {
@@ -587,8 +565,7 @@ public class OcspActions {
         } // end if(respIssuer)
 
         if (verbose) {
-          println("responder is " +
-              X509Util.x500NameText(responderCerts[0].getSubject()));
+          println("responder is " + X509Util.x500NameText(responderCerts[0].getSubject()));
         }
       } // end if
 
@@ -596,8 +573,7 @@ public class OcspActions {
 
       for (int i = 0; i < n; i++) {
         if (n > 1) {
-          println("---------------------------- " + i +
-              "----------------------------");
+          println("---------------------------- " + i + "----------------------------");
         }
         SingleResp singleResp = singleResponses[i];
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
@@ -648,21 +624,17 @@ public class OcspActions {
           msg.append("\nthisUpdate: ").append(singleResp.getThisUpdate());
           msg.append("\nnextUpdate: ").append(singleResp.getNextUpdate());
 
-          Extension extension = singleResp.getExtension(
-              OIDs.Misc.isismtt_at_certHash);
+          Extension extension = singleResp.getExtension(OIDs.Misc.isismtt_at_certHash);
 
           if (extension != null) {
             msg.append("\nCertHash is provided:\n");
             ASN1Encodable extensionValue = extension.getParsedValue();
             CertHash certHash = CertHash.getInstance(extensionValue);
-            ASN1ObjectIdentifier hashAlgOid =
-                certHash.getHashAlgorithm().getAlgorithm();
+            ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
             byte[] hashValue = certHash.getCertificateHash();
 
-            msg.append("\tHash algo : ").append(hashAlgOid.getId())
-                .append("\n");
-            msg.append("\tHash value: ").append(Hex.encode(hashValue))
-                .append("\n");
+            msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
+            msg.append("\tHash value: ").append(Hex.encode(hashValue)).append("\n");
 
             if (encodedCerts != null) {
               byte[] encodedCert = encodedCerts.get(serialNumber);
@@ -676,13 +648,11 @@ public class OcspActions {
             }
           } // end if (extension != null)
 
-          extension = singleResp.getExtension(
-              OIDs.OCSP.id_pkix_ocsp_archive_cutoff);
+          extension = singleResp.getExtension(OIDs.OCSP.id_pkix_ocsp_archive_cutoff);
           if (extension != null) {
             ASN1Encodable extensionValue = extension.getParsedValue();
             msg.append("\nArchive-CutOff: ");
-            msg.append(ASN1GeneralizedTime.getInstance(extensionValue)
-                .getTimeString());
+            msg.append(ASN1GeneralizedTime.getInstance(extensionValue).getTimeString());
           }
 
           AlgorithmIdentifier sigAlgo = basicResp.getSignatureAlgorithmID();
@@ -707,8 +677,7 @@ public class OcspActions {
           } else {
             int size = extensionOids.size();
             for (int j = 0; j < size; j++) {
-              ASN1ObjectIdentifier extensionOid =
-                  (ASN1ObjectIdentifier) extensionOids.get(j);
+              ASN1ObjectIdentifier extensionOid = (ASN1ObjectIdentifier) extensionOids.get(j);
               String name = EXTENSION_OIDNAME_MAP.get(extensionOid);
               if (name == null) {
                 msg.append(extensionOid.getId());

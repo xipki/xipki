@@ -8,6 +8,8 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.TripleState;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class ExtensionControl {
@@ -45,8 +47,7 @@ public class ExtensionControl {
   }
 
   public boolean isPermittedInRequest() {
-    return TripleState.required == inRequest
-        || TripleState.optional == inRequest;
+    return TripleState.required == inRequest || TripleState.optional == inRequest;
   }
 
 } // class CertLevel

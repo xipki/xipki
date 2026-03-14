@@ -32,15 +32,12 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
     encoder.writeArrayStart(1).writeObjects(entries);
   }
 
-  public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded)
-      throws CodecException {
+  public static UnSuspendOrRemoveCertsResponse decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("UnSuspendOrRemoveCertsResponse", decoder, 1);
-      return new UnSuspendOrRemoveCertsResponse(
-          SingleCertSerialEntry.decodeArray(decoder));
+      return new UnSuspendOrRemoveCertsResponse(SingleCertSerialEntry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, UnSuspendOrRemoveCertsResponse.class), ex);
     }
   }
 

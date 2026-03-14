@@ -54,8 +54,7 @@ public class CmpActions {
     @Completion(FileCompleter.class)
     private String signerP12File;
 
-    @Option(name = "--signer-p12-algo", description =
-        "Signature algorithm of the PKCS#12 signer")
+    @Option(name = "--signer-p12-algo", description = "Signature algorithm of the PKCS#12 signer")
     @Completion(Completers.SigAlgCompleter.class)
     private String signerP12SigAlgo;
 
@@ -82,8 +81,7 @@ public class CmpActions {
         }
 
         SignerConf sc = new SignerConf();
-        sc.setPassword(signerPasswordHint)
-            .setKeystore("file:" + signerP12File);
+        sc.setPassword(signerPasswordHint).setKeystore("file:" + signerP12File);
 
         if (signerP12SigAlgo != null) {
           try {
@@ -93,8 +91,7 @@ public class CmpActions {
           }
         }
 
-        ConcurrentSigner signer =
-            securityFactory.createSigner("PKCS12", sc, (X509Cert)  null);
+        ConcurrentSigner signer = securityFactory.createSigner("PKCS12", sc, (X509Cert)  null);
 
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
@@ -103,8 +100,7 @@ public class CmpActions {
               "Enter the password for the user/keyID " + signerKeyId));
         }
         byte[] senderKID = StringUtil.startsWithIgnoreCase(signerKeyId, "0x")
-            ? Hex.decode(signerKeyId)
-            : signerKeyId.getBytes(StandardCharsets.UTF_8);
+            ? Hex.decode(signerKeyId) : signerKeyId.getBytes(StandardCharsets.UTF_8);
         int iterationCount = 2048;
         return new Requestor.PbmMacCmpRequestor(
             resolvePassword(signerPasswordHint), senderKID, HashAlgo.SHA256,
@@ -133,8 +129,7 @@ public class CmpActions {
     @Completion(FileCompleter.class)
     private String respout;
 
-    protected static HashAlgo getHashAlgo(String algoStr)
-        throws ObjectCreationException {
+    protected static HashAlgo getHashAlgo(String algoStr) throws ObjectCreationException {
       Args.notBlank(algoStr, "algoStr");
 
       try {
@@ -199,19 +194,16 @@ public class CmpActions {
         return filename + "-" + index;
       }
 
-      return new StringBuilder(filename).insert(idx, index)
-          .insert(idx, '-').toString();
+      return new StringBuilder(filename).insert(idx, index).insert(idx, '-').toString();
     }
 
   } // class ClientAction
 
-  @Command(scope = "xi", name = "cmp-cacert", description =
-      "get CA certificate")
+  @Command(scope = "xi", name = "cmp-cacert", description = "get CA certificate")
   @Service
   public static class CmpCacert extends ClientAction {
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -226,8 +218,7 @@ public class CmpActions {
       try {
         caCert = client.caCert(caName, getReqRespDebug());
       } catch (Exception ex) {
-        throw new CmdFailure("Error while retrieving CA certificate: "
-            + ex.getMessage());
+        throw new CmdFailure("Error while retrieving CA certificate: " + ex.getMessage());
       }
 
       if (caCert == null) {
@@ -241,8 +232,7 @@ public class CmpActions {
 
   } // class CmpCacert
 
-  @Command(scope = "xi", name = "cmp-cacerts", description =
-      "get CA certificate chain")
+  @Command(scope = "xi", name = "cmp-cacerts", description = "get CA certificate chain")
   @Service
   public static class CmpCacertchain extends ClientAction {
 
@@ -265,10 +255,8 @@ public class CmpActions {
         throw new CmdFailure("received no CA certificate chain");
       }
 
-      String encoded = X509Util.encodeCertificates(
-          caCertChain.toArray(new X509Cert[0]));
-      saveVerbose("saved CA certificate to file", outFile,
-          StringUtil.toUtf8Bytes(encoded));
+      String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Cert[0]));
+      saveVerbose("saved CA certificate to file", outFile, StringUtil.toUtf8Bytes(encoded));
       return null;
     } // method execute0
 

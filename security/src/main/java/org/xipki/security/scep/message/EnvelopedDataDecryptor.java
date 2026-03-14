@@ -34,8 +34,7 @@ public final class EnvelopedDataDecryptor {
 
     private final Recipient recipient;
 
-    public EnvelopedDataDecryptorInstance(
-        X509Cert recipientCert, PrivateKey privKey) {
+    public EnvelopedDataDecryptorInstance(X509Cert recipientCert, PrivateKey privKey) {
       Args.notNull(recipientCert, "recipientCert");
       Args.notNull(privKey, "privKey");
 
@@ -56,20 +55,17 @@ public final class EnvelopedDataDecryptor {
 
   private final List<EnvelopedDataDecryptorInstance> decryptors;
 
-  public EnvelopedDataDecryptor(
-      List<EnvelopedDataDecryptorInstance> decryptors) {
+  public EnvelopedDataDecryptor(List<EnvelopedDataDecryptorInstance> decryptors) {
     this.decryptors = new ArrayList<>(Args.notEmpty(decryptors, "decryptors"));
   }
 
   public EnvelopedDataDecryptor(EnvelopedDataDecryptorInstance decryptor) {
-    this.decryptors = Collections.singletonList(Args.notNull(decryptor,
-        "decryptor"));
+    this.decryptors = Collections.singletonList(Args.notNull(decryptor, "decryptor"));
   }
 
   public byte[] decrypt(CMSEnvelopedData envData) throws CodecException {
     Args.notNull(envData, "envData");
-    final RecipientInformationStore recipientInfos =
-        envData.getRecipientInfos();
+    final RecipientInformationStore recipientInfos = envData.getRecipientInfos();
     RecipientInformation recipientInfo = null;
     EnvelopedDataDecryptorInstance decryptor = null;
     for (EnvelopedDataDecryptorInstance m : decryptors) {

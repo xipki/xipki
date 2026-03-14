@@ -19,6 +19,7 @@ import org.xipki.security.pkix.CtLog.SignatureAndHashAlgorithm;
 import org.xipki.security.pkix.CtLog.SignedCertificateTimestamp;
 import org.xipki.security.pkix.CtLog.SignedCertificateTimestampList;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.Hex;
@@ -74,9 +75,8 @@ public class CtLogClient {
   } // constructor
 
   public SignedCertificateTimestampList getCtLogScts(
-      X509CertificateHolder precert, X509Cert caCert,
-      List<X509Cert> certchain, CtLogPublicKeyFinder publicKeyFinder)
-      throws OperationException {
+      X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain,
+      CtLogPublicKeyFinder publicKeyFinder) throws OperationException {
     List<byte[]> chain = new LinkedList<>();
 
     byte[] encodedPreCert;
@@ -88,16 +88,14 @@ public class CtLogClient {
 
     byte[] issuerKeyHash;
     try {
-      issuerKeyHash = HashAlgo.SHA256.hash(
-          caCert.subjectPublicKeyInfo().getEncoded());
+      issuerKeyHash = HashAlgo.SHA256.hash(caCert.subjectPublicKeyInfo().getEncoded());
     } catch (IOException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
 
     byte[] preCertTbsCert;
     try {
-      preCertTbsCert = CtLog.getPreCertTbsCert(
-          precert.toASN1Structure().getTBSCertificate());
+      preCertTbsCert = CtLog.getPreCertTbsCert(precert.toASN1Structure().getTBSCertificate());
     } catch (IOException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
@@ -112,15 +110,13 @@ public class CtLogClient {
 
     AddPreChainRequest request = new AddPreChainRequest(chain);
 
-    byte[] content = StringUtil.toUtf8Bytes(
-        JsonBuilder.toJson(request.toJson()));
+    byte[] content = StringUtil.toUtf8Bytes(JsonBuilder.toJson(request.toJson()));
 
     if (LOG.isDebugEnabled()) {
       LOG.debug("CTLog Request: {}", StringUtil.toUtf8String(content));
     }
 
-    List<SignedCertificateTimestamp> scts =
-        new ArrayList<>(addPreChainUrls.size());
+    List<SignedCertificateTimestamp> scts = new ArrayList<>(addPreChainUrls.size());
     Map<String, String> headers = new HashMap<>();
     headers.put("content-type", "application/json");
     for (String url : addPreChainUrls) {
@@ -148,42 +144,35 @@ public class CtLogClient {
             "server does not return any well-formed response", e);
       }
 
-      DigitallySigned ds = DigitallySigned.getInstance(resp.signature(),
-          new AtomicInteger(0));
+      DigitallySigned ds = DigitallySigned.getInstance(resp.signature(), new AtomicInteger(0));
       byte sctVersion = resp.sct_version();
       byte[] logId = resp.id();
       String hexLogId = Hex.encodeUpper(logId);
       long timestamp = resp.timestamp();
       byte[] extensions = resp.extensions();
 
-      PublicKey verifyKey = publicKeyFinder == null ? null
-          : publicKeyFinder.getPublicKey(logId);
+      PublicKey verifyKey = publicKeyFinder == null ? null : publicKeyFinder.getPublicKey(logId);
       if (verifyKey == null) {
-        LOG.warn("could not find CtLog public key 0x{} to verify the SCT",
-            hexLogId);
+        LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
       } else {
         SignatureAndHashAlgorithm algorithm = ds.algorithm();
         String signAlgo = getSignatureAlgo(algorithm);
 
         boolean sigValid;
         try {
-          Signature sig = Signature.getInstance(signAlgo, "BC");
+          Signature sig = Signature.getInstance(signAlgo, KeyUtil.providerName(signAlgo));
           sig.initVerify(verifyKey);
-          CtLog.update(sig, sctVersion, timestamp, extensions,
-              issuerKeyHash, preCertTbsCert);
+          CtLog.update(sig, sctVersion, timestamp, extensions, issuerKeyHash, preCertTbsCert);
           sigValid = sig.verify(ds.signature());
-        } catch (NoSuchAlgorithmException | NoSuchProviderException
-                 | InvalidKeyException | SignatureException ex) {
-          throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-              "error verifying SCT signature");
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException
+                | SignatureException ex) {
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, "error verifying SCT signature");
         }
 
         if (sigValid) {
-          LOG.info("verified SCT signature with logId {} and timestamp {}",
-              hexLogId, timestamp);
+          LOG.info("verified SCT signature with logId {} and timestamp {}", hexLogId, timestamp);
         } else {
-          throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-              "SCT signature is invalid");
+          throw new OperationException(ErrorCode.SYSTEM_FAILURE, "SCT signature is invalid");
         }
       }
 

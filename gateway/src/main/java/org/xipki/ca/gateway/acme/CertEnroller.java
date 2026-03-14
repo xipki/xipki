@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -103,8 +104,7 @@ public class CertEnroller implements Runnable {
         CertificationRequest p10Req;
         try {
           p10Req = GatewayUtil.parseCsrInRequest(csr);
-          Extensions extensions = X509Util.getExtensions(
-              p10Req.getCertificationRequestInfo());
+          Extensions extensions = X509Util.getExtensions(p10Req.getCertificationRequestInfo());
           if (extensions != null) {
             entry.setExtensions(extensions.getEncoded());
           }
@@ -121,8 +121,7 @@ public class CertEnroller implements Runnable {
 
       LOG.info("start enrolling certificate for order {}", orderIdStr);
       try {
-        EnrollOrPollCertsResponse sdkResp =
-            sdk.enrollCerts(certReqMeta.ca(), sdkReq);
+        EnrollOrPollCertsResponse sdkResp = sdk.enrollCerts(certReqMeta.ca(), sdkReq);
         EnrollOrPollCertsResponse.Entry sdkRespEntry = sdkResp.entries()[0];
         byte[] certBytes = sdkRespEntry.cert();
         boolean valid = certBytes != null;
@@ -131,13 +130,11 @@ public class CertEnroller implements Runnable {
           try {
             Certificate.getInstance(certBytes);
           } catch (Exception ex) {
-            LogUtil.error(LOG, ex, "Error parsing enrolled " +
-                "certificate for order " + orderIdStr);
+            LogUtil.error(LOG, ex, "Error parsing enrolled certificate for order " + orderIdStr);
             valid = false;
           }
         } else {
-          LOG.error("CA returned error for the order {}: {}",
-              orderIdStr, sdkRespEntry.error());
+          LOG.error("CA returned error for the order {}: {}", orderIdStr, sdkRespEntry.error());
         }
 
         if (valid) {

@@ -53,8 +53,7 @@ import java.util.Set;
 
 public class P11Actions {
 
-  @Command(scope = "xi", name = "keypair-p11", description =
-      "generate keypair in PKCS#11 device")
+  @Command(scope = "xi", name = "keypair-p11", description = "generate keypair in PKCS#11 device")
   @Service
   public static class KeypairP11 extends P11KeyGenAction {
 
@@ -70,15 +69,12 @@ public class P11Actions {
       NewKeyControl control = getControl();
       if (keySpec.isComposite()) {
         if (control.id() != null) {
-          throw new IllegalCmdParamException(
-              "id is not allowed for composite keypair");
+          throw new IllegalCmdParamException("id is not allowed for composite keypair");
         }
       }
 
       PKCS11KeyPairSpec spec = new PKCS11KeyPairSpec()
-          .token(true)
-          .generateId(true)
-          .extractable(control.extractable())
+          .token(true).generateId(true).extractable(control.extractable())
           .sensitive(control.sensitive());
 
       Set<NewKeyControl.P11KeyUsage> usages = control.usages();
@@ -93,6 +89,15 @@ public class P11Actions {
           spec.signVerify(true);
         } else if (keySpec.isCompositeMLKEM()) {
           spec.deEncapsulate(true);
+          KeySpec tradKeySpec = keySpec.compositeTradVariant();
+          assert tradKeySpec != null;
+          if (tradKeySpec.isRSA()) {
+            spec.decrypt(true);
+          } else if (tradKeySpec.isMontgomeryEC() || tradKeySpec.isWeierstrassEC()) {
+            spec.derive(true);
+          } else {
+            throw new IllegalStateException("shall not reach here");
+          }
         } else {
           spec.signVerify(true);
         }
@@ -122,38 +127,45 @@ public class P11Actions {
               break;
             case WRAP:
               spec.wrap(true);
+              break;
             case UNWRAP:
               spec.unwrap(true);
+              break;
+            case ENCAPSULATE:
+              spec.encapsulate(true);
+              break;
+            case DECAPSULATE:
+              spec.decapsulate(true);
+              break;
           }
         }
       }
 
       if (keySpec.isComposite()) {
         String coreLabel;
-        if (StringUtil.startsWithIgnoreCase(label,
-              P11CompositeKey.COMPOSITE_LABEL_PREFIX)) {
-          coreLabel = label.substring(
-              P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
-        } else if (StringUtil.startsWithIgnoreCase(label,
-                P11CompositeKey.COMP_PQC_LABEL_PREFIX)) {
-            coreLabel = label.substring(
-                P11CompositeKey.COMP_PQC_LABEL_PREFIX.length());
-        } else if (StringUtil.startsWithIgnoreCase(label,
-                P11CompositeKey.COMP_TRAD_LABEL_PREFIX)) {
-            coreLabel = label.substring(
-                P11CompositeKey.COMP_TRAD_LABEL_PREFIX.length());
+        if (StringUtil.startsWithIgnoreCase(label, P11CompositeKey.COMPOSITE_LABEL_PREFIX)) {
+          coreLabel = label.substring(P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        } else if (StringUtil.startsWithIgnoreCase(label, P11CompositeKey.COMP_PQC_LABEL_PREFIX)) {
+          coreLabel = label.substring(P11CompositeKey.COMP_PQC_LABEL_PREFIX.length());
+        } else if (StringUtil.startsWithIgnoreCase(label, P11CompositeKey.COMP_TRAD_LABEL_PREFIX)) {
+          coreLabel = label.substring(P11CompositeKey.COMP_TRAD_LABEL_PREFIX.length());
         } else {
           coreLabel = label;
         }
 
         PKCS11KeyPairSpec pqcSpec = spec.copy().label(
             P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
+        pqcSpec.derive(null).encrypt(null).decrypt(null);
+
         finalize(" PQC key of " + keyspecStr,
             slot.generateKeyPair(keySpec.compositePqcVariant(), pqcSpec));
 
-        spec.label(P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
+        PKCS11KeyPairSpec tradSpec = spec.copy()
+            .label(P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
+        tradSpec.encapsulate(null).decapsulate(null);
+
         finalize("Trad key of " + keyspecStr,
-            slot.generateKeyPair(keySpec.compositeTradVariant(), spec));
+            slot.generateKeyPair(keySpec.compositeTradVariant(), tradSpec));
       } else {
         spec.id(control.id()).label(label);
         finalize(keyspecStr, slot.generateKeyPair(keySpec, spec));
@@ -163,8 +175,7 @@ public class P11Actions {
 
   } // class EcP11
 
-  @Command(scope = "xi", name = "delete-key-p11", description =
-      "delete key in PKCS#11 device")
+  @Command(scope = "xi", name = "delete-key-p11", description = "delete key in PKCS#11 device")
   @Service
   public static class DeleteKeyP11 extends P11SecurityAction {
 
@@ -179,25 +190,21 @@ public class P11Actions {
         "either keyId or keyLabel must be specified")
     protected String label;
 
-    @Option(name = "--force", aliases = "-f", description =
-        "remove identifies without prompt")
+    @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
       boolean composite = false;
       if (label != null) {
-        composite = StringUtil.startsWithIgnoreCase(label,
-                      P11CompositeKey.COMPOSITE_LABEL_PREFIX);
+        composite = StringUtil.startsWithIgnoreCase(label, P11CompositeKey.COMPOSITE_LABEL_PREFIX);
       }
 
       if (composite) {
         if (id != null) {
-          throw new IllegalCmdParamException(
-              "id shall not be specified for composite key");
+          throw new IllegalCmdParamException("id shall not be specified for composite key");
         }
-        String coreLabel = label.substring(
-                            P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
+        String coreLabel = label.substring(P11CompositeKey.COMPOSITE_LABEL_PREFIX.length());
         doDeleteKey(null, P11CompositeKey.COMP_PQC_LABEL_PREFIX + coreLabel);
         doDeleteKey(null, P11CompositeKey.COMP_TRAD_LABEL_PREFIX + coreLabel);
       } else {
@@ -207,16 +214,14 @@ public class P11Actions {
     }
 
     private void doDeleteKey(String id, String label)
-        throws XiSecurityException, TokenException,
-               IllegalCmdParamException, IOException {
+        throws XiSecurityException, TokenException, IllegalCmdParamException, IOException {
       PKCS11KeyId identity = getIdentity(id, label);
       if (identity == null) {
         println("unknown identity");
         return;
       }
 
-      if (force || confirm(
-          "Do you want to remove the identity " + identity, 3)) {
+      if (force || confirm("Do you want to remove the identity " + identity, 3)) {
         long[] failedHandles = getSlot()
             .destroyObjectsAndReturnFailedHandles(identity.getAllHandles());
 
@@ -257,8 +262,7 @@ public class P11Actions {
     @Option(name = "--id", description = "id (hex) of the PKCS#11 objects")
     private String id;
 
-    @Option(name = "--label", required = true, description =
-        "label of the PKCS#11 objects")
+    @Option(name = "--label", required = true, description = "label of the PKCS#11 objects")
     protected String label;
 
     @Option(name = "--extractable", aliases = {"-x"}, description =
@@ -269,26 +273,20 @@ public class P11Actions {
         "whether the key is sensitive, valid values are yes|no|true|false")
     private String sensitive;
 
-    @Option(name = "--key-usage", multiValued = true, description =
-        "key usage of the private key")
+    @Option(name = "--key-usage", multiValued = true, description = "key usage of the private key")
     @Completion(SecurityCompleters.P11KeyUsageCompleter.class)
     private List<String> keyusages;
 
     protected void finalize(String keySpec, PKCS11KeyId keyId) {
       Args.notNull(keyId, "keyId");
-      println("generated " + keySpec + " key " + keyId +
-          " on slot " + slotIndex);
+      println("generated " + keySpec + " key " + keyId + " on slot " + slotIndex);
     }
 
     protected PKCS11SecretKeySpec getSecretKeyControl(long keyType) {
       NewKeyControl control = getControl();
       PKCS11SecretKeySpec spec = new PKCS11SecretKeySpec()
-          .token(true)
-          .keyType(keyType)
-          .id(control.id())
-          .label(control.label())
-          .extractable(control.extractable())
-          .sensitive(control.sensitive());
+          .token(true).keyType(keyType).id(control.id()).label(control.label())
+          .extractable(control.extractable()).sensitive(control.sensitive());
 
       Set<NewKeyControl.P11KeyUsage> usages = control.usages();
 
@@ -349,8 +347,7 @@ public class P11Actions {
       }
 
       if (CollectionUtil.isNotEmpty(keyusages)) {
-        control.setUsages(
-            SecurityCompleters.P11KeyUsageCompleter.parseUsages(keyusages));
+        control.setUsages(SecurityCompleters.P11KeyUsageCompleter.parseUsages(keyusages));
       }
 
       return control;
@@ -379,23 +376,20 @@ public class P11Actions {
             "(if handle is not set).")
     private String label;
 
-    @Option(name = "--force", aliases = "-f", description =
-        "remove identifies without prompt")
+    @Option(name = "--force", aliases = "-f", description = "remove identifies without prompt")
     private Boolean force = Boolean.FALSE;
 
     @Override
     protected Object execute0() throws Exception {
       if (handles != null && handles.length > 0) {
         if (id != null || label != null) {
-          throw new IllegalCmdParamException(
-              "If handle is set, id an label must not be set.");
+          throw new IllegalCmdParamException("If handle is set, id an label must not be set.");
         }
 
         if (force || confirm("Do you want to remove the PKCS#11 objects "
             + Arrays.toString(handles), 3)) {
           P11Slot slot = getSlot();
-          long[] failedHandles =
-              slot.destroyObjectsAndReturnFailedHandles(handles);
+          long[] failedHandles = slot.destroyObjectsAndReturnFailedHandles(handles);
           if (failedHandles.length == 0) {
             println("deleted all " + handles.length + " objects");
           } else {
@@ -430,8 +424,7 @@ public class P11Actions {
 
     @Override
     protected Object execute0() throws Exception {
-      String prompt = "!!!DANGEROUS OPERATION!!!, " +
-          "do you want to remove ALL PKCS#11 objects";
+      String prompt = "!!!DANGEROUS OPERATION!!!, do you want to remove ALL PKCS#11 objects";
       // this is not a bug to require 3 confirmations.
       if (confirm(prompt, 1)) {
         if (confirm(prompt, 1)) {
@@ -452,8 +445,7 @@ public class P11Actions {
   @Service
   public static class SecretkeyP11 extends P11KeyGenAction {
 
-    private static final Logger LOG =
-        LoggerFactory.getLogger(SecretkeyP11.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecretkeyP11.class);
 
     @Option(name = "--key-type", required = true, description =
         "keytype, current only AES, DES3, SM4 and GENERIC are supported")
@@ -471,8 +463,7 @@ public class P11Actions {
     @Override
     protected Object execute0() throws Exception {
       if (keysize != null && keysize % 8 != 0) {
-        throw new IllegalCmdParamException(
-            "keysize is not multiple of 8: " + keysize);
+        throw new IllegalCmdParamException("keysize is not multiple of 8: " + keysize);
       }
 
       long p11KeyType;
@@ -487,8 +478,7 @@ public class P11Actions {
       } else if ("GENERIC".equalsIgnoreCase(keyType)) {
         p11KeyType = PKCS11T.CKK_GENERIC_SECRET;
       } else {
-        Long keyTypeL = PKCS11T.ckkNameToCode(
-            "CKK_" + keyType.replace('-', '_'));
+        Long keyTypeL = PKCS11T.ckkNameToCode("CKK_" + keyType.replace('-', '_'));
         if (keyTypeL == null) {
           throw new IllegalCmdParamException("invalid keyType " + keyType);
         } else {
@@ -535,8 +525,7 @@ public class P11Actions {
         spec.keyType(p11KeyType);
         PKCS11KeyId objId = slot.importSecretKey(keyValue, spec);
         Arrays.fill(keyValue, (byte) 0); // clear the memory
-        String msg = "generated in memory and imported " + keyType +
-            " key " + objId;
+        String msg = "generated in memory and imported " + keyType + " key " + objId;
         if (LOG.isInfoEnabled()) {
           LOG.info(msg);
         }
@@ -580,12 +569,11 @@ public class P11Actions {
         throw new IllegalCmdParamException("invalid keyType " + keyType);
       }
 
-      KeyStore ks = KeyUtil.getInKeyStore("JCEKS");
-      InputStream ksStream = Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(keyOutFile)));
+      InputStream ksStream = Files.newInputStream(Paths.get(IoUtil.expandFilepath(keyOutFile)));
       char[] pwd = getPassword();
+      KeyStore ks;
       try {
-        ks.load(ksStream, pwd);
+        ks= KeyUtil.loadKeyStore("JCEKS", ksStream, pwd);
       } finally {
         ksStream.close();
       }
@@ -606,8 +594,7 @@ public class P11Actions {
       }
 
       if (keyValue == null) {
-        throw new IllegalCmdParamException(
-            "keystore does not contain secret key");
+        throw new IllegalCmdParamException("keystore does not contain secret key");
       }
 
       P11Slot slot = getSlot();
@@ -617,10 +604,8 @@ public class P11Actions {
       return null;
     } // method execute0
 
-    protected char[] getPassword()
-        throws IOException, PasswordResolverException {
-      char[] pwdInChar = readPasswordIfNotSet(
-          "Enter the keystore password", passwordHint);
+    protected char[] getPassword() throws IOException, PasswordResolverException {
+      char[] pwdInChar = readPasswordIfNotSet("Enter the keystore password", passwordHint);
       if (pwdInChar != null) {
         passwordHint = new String(pwdInChar);
       }
@@ -671,13 +656,11 @@ public class P11Actions {
 
   } // class P11SecurityAction
 
-  @Command(scope = "xi", name = "token-info-p11", description =
-      "list objects in PKCS#11 device")
+  @Command(scope = "xi", name = "token-info-p11", description = "list objects in PKCS#11 device")
   @Service
   public static class TokenInfoP11 extends SecurityAction {
 
-    @Option(name = "--verbose", aliases = "-v", description =
-        "show object information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show object information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Option(name = "--module", description = "name of the PKCS#11 module.")

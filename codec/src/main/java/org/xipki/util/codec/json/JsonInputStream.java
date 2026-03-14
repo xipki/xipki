@@ -29,21 +29,18 @@ public class JsonInputStream {
   private JsonInputStream(String bytes, boolean allowComments) {
     this.bytes = bytes;
     this.allowComments = allowComments && hasMultipleLines(bytes);
-    this.maxPosition = Args.positive(this.bytes.length(),
-        "bytes.length") - 1;
+    this.maxPosition = Args.positive(this.bytes.length(), "bytes.length") - 1;
   }
 
   public static JsonInputStream newReader(byte[] bytes, boolean allowComments) {
-    return new JsonInputStream(
-        new String(bytes, StandardCharsets.UTF_8), allowComments);
+    return new JsonInputStream(new String(bytes, StandardCharsets.UTF_8), allowComments);
   }
 
   public static JsonInputStream newReader(String text, boolean allowComments) {
     return newReader(text.getBytes(StandardCharsets.UTF_8), allowComments);
   }
 
-  public static JsonInputStream newReader(Path path, boolean allowComments)
-      throws CodecException {
+  public static JsonInputStream newReader(Path path, boolean allowComments) throws CodecException {
     byte[] bytes;
     try {
       bytes = Files.readAllBytes(path);
@@ -146,7 +143,6 @@ public class JsonInputStream {
   }
 
   private static boolean isWhiteSpace(char chr) {
-    return chr == ' '  | chr == '\b' | chr == '\f' | chr == '\t'
-        | chr == '\r'  | chr == '\n';
+    return chr == ' '  | chr == '\b' | chr == '\f' | chr == '\t' | chr == '\r'  | chr == '\n';
   }
 }

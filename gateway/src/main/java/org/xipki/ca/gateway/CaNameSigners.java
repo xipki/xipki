@@ -24,12 +24,10 @@ public class CaNameSigners {
 
   private final Map<String, ConcurrentSigner> signers;
 
-  public CaNameSigners(ConcurrentSigner defaultSigner,
-                       Map<String, ConcurrentSigner> signers)
+  public CaNameSigners(ConcurrentSigner defaultSigner, Map<String, ConcurrentSigner> signers)
       throws InvalidConfException {
     if (defaultSigner == null && CollectionUtil.isEmpty(signers)) {
-      throw new InvalidConfException(
-          "At least one of defaultSigner and signers must be set");
+      throw new InvalidConfException("At least one of defaultSigner and signers must be set");
     }
 
     this.defaultSigner = defaultSigner;
@@ -40,8 +38,7 @@ public class CaNameSigners {
       for (Map.Entry<String, ConcurrentSigner> m : signers.entrySet()) {
         String name = m.getKey().toLowerCase(Locale.ROOT);
         if (this.signers.containsKey(name)) {
-          throw new InvalidConfException(
-              "at least two signers for the CA " + name + " are set");
+          throw new InvalidConfException("at least two signers for the CA " + name + " are set");
         }
         this.signers.put(m.getKey().toLowerCase(Locale.ROOT), m.getValue());
       }

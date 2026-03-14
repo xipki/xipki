@@ -30,8 +30,7 @@ import java.util.List;
 
 class SignerManager {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SignerManager.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SignerManager.class);
 
   private boolean signerInitialized;
 
@@ -73,8 +72,7 @@ class SignerManager {
     String name = Args.notNull(signerEntry, "signerEntry").name();
     CaManagerImpl.checkName(name, "signer name");
     if (manager.signerDbEntries.containsKey(name)) {
-      throw new CaMgmtException(
-          StringUtil.concat("Signer named ", name, " exists"));
+      throw new CaMgmtException(StringUtil.concat("Signer named ", name, " exists"));
     }
 
     String conf = signerEntry.conf();
@@ -105,7 +103,6 @@ class SignerManager {
       if (name.equals(caInfo.crlSignerName())) {
         caInfo.setCrlSignerName(null);
       }
-
     }
 
     manager.signerDbEntries.remove(name);
@@ -126,8 +123,7 @@ class SignerManager {
       type = type.toLowerCase();
     }
 
-    SignerEntry newSigner = manager.caConfStore.changeSigner(
-        name, type, conf, base64Cert, manager);
+    SignerEntry newSigner = manager.caConfStore.changeSigner(name, type, conf, base64Cert, manager);
 
     manager.signers.remove(name);
     manager.signerDbEntries.remove(name);
@@ -151,8 +147,7 @@ class SignerManager {
     StringBuilder sb = new StringBuilder();
     final String NL = "\n";
     try {
-      P11Module module =
-          manager.p11CryptServiceFactory.getP11Module(moduleName);
+      P11Module module = manager.p11CryptServiceFactory.getP11Module(moduleName);
       if (module == null) {
         throw new CaMgmtException("undefined module " + moduleName);
       }
@@ -193,8 +188,7 @@ class SignerManager {
     }
 
     for (P11SlotId slotId : slots) {
-      sb.append("\tslot[").append(slotId.index()).append("]: ")
-          .append(slotId.id()).append("\n");
+      sb.append("\tslot[").append(slotId.index()).append("]: ").append(slotId.id()).append("\n");
     }
   }
 

@@ -20,8 +20,7 @@ public class PassThroughSinglePasswordResolver implements PasswordResolver {
         "===========================================================";
     String msg = sepLine +
         "\n|| PassThroughSinglePasswordResolver IS ONLY FOR DEMO PURPOSE, ||" +
-        "\n|| DO NOT USE IT IN THE PRODUCTION ENVIRONMENT.          ||\n" +
-        sepLine;
+        "\n|| DO NOT USE IT IN THE PRODUCTION ENVIRONMENT.          ||\n" + sepLine;
     System.out.println(msg);
   }
 
@@ -31,13 +30,11 @@ public class PassThroughSinglePasswordResolver implements PasswordResolver {
 
   @Override
   public boolean canResolveProtocol(String protocol) {
-    return PassThroughSinglePasswordResolver.protocol
-        .equalsIgnoreCase(protocol);
+    return PassThroughSinglePasswordResolver.protocol.equalsIgnoreCase(protocol);
   }
 
   @Override
-  public char[] resolvePassword(String passwordHint)
-      throws PasswordResolverException {
+  public char[] resolvePassword(String passwordHint) throws PasswordResolverException {
     if (!passwordHint.startsWith(protocol + ":")) {
       throw new PasswordResolverException(
           "encrypted password does not start with '" + protocol + ":'");
@@ -46,8 +43,7 @@ public class PassThroughSinglePasswordResolver implements PasswordResolver {
   }
 
   @Override
-  public String protectPassword(char[] password)
-      throws PasswordResolverException {
+  public String protectPassword(char[] password) throws PasswordResolverException {
     return protocol + ":" + new String(password);
   }
 }

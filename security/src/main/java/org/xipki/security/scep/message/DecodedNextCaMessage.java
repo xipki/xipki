@@ -47,8 +47,7 @@ import java.util.Optional;
 
 public class DecodedNextCaMessage {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DecodedNextCaMessage.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DecodedNextCaMessage.class);
 
   private AuthorityCertStore authorityCertStore;
 
@@ -115,19 +114,17 @@ public class DecodedNextCaMessage {
 
   @SuppressWarnings("unchecked")
   public static DecodedNextCaMessage decode(
-      CMSSignedData pkiMessage,
-      CollectionStore<X509CertificateHolder> certStore) throws CodecException {
+      CMSSignedData pkiMessage, CollectionStore<X509CertificateHolder> certStore)
+      throws CodecException {
     Args.notNull(pkiMessage, "pkiMessage");
 
     SignerInformationStore signerStore = pkiMessage.getSignerInfos();
     Collection<SignerInformation> signerInfos = signerStore.getSigners();
     if (signerInfos.size() != 1) {
-      throw new CodecException("number of signerInfos is not 1, but "
-          + signerInfos.size());
+      throw new CodecException("number of signerInfos is not 1, but " + signerInfos.size());
     }
 
     SignerInformation signerInfo = signerInfos.iterator().next();
-
     SignerId sid = signerInfo.getSID();
 
     Collection<?> signedDataCerts = null;
@@ -136,13 +133,11 @@ public class DecodedNextCaMessage {
     }
 
     if (CollectionUtil.isEmpty(signedDataCerts)) {
-      signedDataCerts = pkiMessage.getCertificates()
-          .getMatches(signerInfo.getSID());
+      signedDataCerts = pkiMessage.getCertificates().getMatches(signerInfo.getSID());
     }
 
     if (signedDataCerts == null || signedDataCerts.size() != 1) {
-      throw new CodecException(
-          "could not find embedded certificate to verify the signature");
+      throw new CodecException("could not find embedded certificate to verify the signature");
     }
 
     AttributeTable signedAttrs = Optional.ofNullable(
@@ -163,8 +158,7 @@ public class DecodedNextCaMessage {
     }
 
     try {
-      HashAlgo digestAlgo = HashAlgo.getInstance(
-          signerInfo.getDigestAlgorithmID());
+      HashAlgo digestAlgo = HashAlgo.getInstance(signerInfo.getDigestAlgorithmID());
       ret.setDigestAlgorithm(digestAlgo);
 
       String sigAlgOid = signerInfo.getEncryptionAlgOID();
@@ -184,9 +178,8 @@ public class DecodedNextCaMessage {
       return ret;
     }
 
-    X509CertificateHolder signerCert =
-        (X509CertificateHolder) signedDataCerts.iterator().next();
-    ret.setSignatureCert(new X509Cert(signerCert));
+    X509CertificateHolder signerCert = (X509CertificateHolder) signedDataCerts.iterator().next();
+    ret.setSignatureCert(new X509Cert(signerCert.toASN1Structure()));
 
     // validate the signature
     SignerInformationVerifier verifier;
@@ -226,8 +219,7 @@ public class DecodedNextCaMessage {
       }
     }
 
-    ContentInfo contentInfo =
-        ContentInfo.getInstance(signedContent.getContent());
+    ContentInfo contentInfo = ContentInfo.getInstance(signedContent.getContent());
     SignedData signedData = SignedData.getInstance(contentInfo.getContent());
 
     List<X509Cert> certs;
@@ -245,8 +237,7 @@ public class DecodedNextCaMessage {
     for (X509Cert cert : certs) {
       if (cert.basicConstraints() > -1) {
         if (caCert != null) {
-          final String msg = "multiple CA certificates is returned, " +
-              "but exactly 1 is expected";
+          final String msg = "multiple CA certificates is returned, but exactly 1 is expected";
           LOG.error(msg);
           ret.setFailureMessage(msg);
           return ret;
@@ -265,11 +256,9 @@ public class DecodedNextCaMessage {
       return ret;
     }
 
-    X509Cert[] locaRaCerts = raCerts.isEmpty() ? null
-        : raCerts.toArray(new X509Cert[0]);
+    X509Cert[] localRaCerts = raCerts.isEmpty() ? null : raCerts.toArray(new X509Cert[0]);
 
-    AuthorityCertStore authorityCertStore =
-        AuthorityCertStore.getInstance(caCert, locaRaCerts);
+    AuthorityCertStore authorityCertStore = AuthorityCertStore.getInstance(caCert, localRaCerts);
     ret.setAuthorityCertStore(authorityCertStore);
 
     return ret;

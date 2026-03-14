@@ -19,8 +19,7 @@ public class SqlUtil {
     }
 
     StringBuilder sb = new StringBuilder(100);
-    sb.append("INSERT INTO ").append(table).append(" (")
-        .append(columns).append(") VALUES(");
+    sb.append("INSERT INTO ").append(table).append(" (").append(columns).append(") VALUES(");
     for (int i = 0; i < numTokens; i++) {
       sb.append('?');
       if (i != numTokens - 1) {

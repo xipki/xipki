@@ -32,7 +32,7 @@ public class StreamCborDecoder extends CborDecoder {
    * @param is the actual input stream to read the CBOR-encoded data from,
    *          cannot be <code>null</code>.
    */
-  public StreamCborDecoder(InputStream is) throws IOException {
+  public StreamCborDecoder(InputStream is) {
     Args.notNull(is, "is");
     if (is instanceof PushbackInputStream) {
       this.m_is = (PushbackInputStream) is;
@@ -163,10 +163,8 @@ public class StreamCborDecoder extends CborDecoder {
   @Override
   protected long readUInt32() throws CodecException {
     byte[] bytes = readExactly(4);
-    return ((bytes[0] & 0xFFL) << 24
-        | (bytes[1] & 0xFFL) << 16
-        | (bytes[2] & 0xFFL) << 8
-        | (bytes[3] & 0xFFL)) & 0xffffffffL;
+    return ((bytes[0] & 0xFFL) << 24 | (bytes[1] & 0xFFL) << 16
+          | (bytes[2] & 0xFFL)  << 8 | (bytes[3] & 0xFFL)) & 0xffffffffL;
   }
 
   /**
@@ -180,14 +178,10 @@ public class StreamCborDecoder extends CborDecoder {
   @Override
   protected long readUInt64() throws CodecException {
     byte[] bytes = readExactly(8);
-    return (bytes[0] & 0xFFL) << 56
-        | (bytes[1] & 0xFFL) << 48
-        | (bytes[2] & 0xFFL) << 40
-        | (bytes[3] & 0xFFL) << 32
-        | (bytes[4] & 0xFFL) << 24
-        | (bytes[5] & 0xFFL) << 16
-        | (bytes[6] & 0xFFL) << 8
-        | (bytes[7] & 0xFFL);
+    return (bytes[0] & 0xFFL) << 56 | (bytes[1] & 0xFFL) << 48
+        | (bytes[2] & 0xFFL) << 40 | (bytes[3] & 0xFFL) << 32
+        | (bytes[4] & 0xFFL) << 24 | (bytes[5] & 0xFFL) << 16
+        | (bytes[6] & 0xFFL) << 8  | (bytes[7] & 0xFFL);
   }
 
   /**

@@ -21,7 +21,8 @@ import java.util.Map;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Provides a decoder capable of handling CBOR encoded data from a {@link InputStream}.
+ * Provides a decoder capable of handling CBOR encoded data from a
+ * {@link InputStream}.
  */
 public abstract class CborDecoder implements AutoCloseable {
 
@@ -32,35 +33,41 @@ public abstract class CborDecoder implements AutoCloseable {
   }
 
   static String lengthToString(int len) {
-    return (len < 0) ? "no payload"
-      : (len == ONE_BYTE)  ? "one byte"
-      : (len == TWO_BYTES)   ? "two bytes"
-      : (len == FOUR_BYTES)  ? "four bytes"
-      : (len == EIGHT_BYTES) ? "eight bytes"
-      : "(unknown)";
+    return (len < 0)           ? "no payload"
+        : (len == ONE_BYTE)    ? "one byte"
+        : (len == TWO_BYTES)   ? "two bytes"
+        : (len == FOUR_BYTES)  ? "four bytes"
+        : (len == EIGHT_BYTES) ? "eight bytes"
+        : "(unknown)";
   }
 
   /**
    * Peeks in the input stream for the upcoming type.
    *
-   * @return the upcoming type in the stream, or <code>null</code> in case of an end-of-stream.
-   * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
+   * @return the upcoming type in the stream, or <code>null</code> in case of
+   *         an end-of-stream.
+   * @throws CodecException in case of I/O problems reading the CBOR-type from
+   *         the underlying input stream.
    */
   public abstract CborType peekType() throws CodecException;
 
   /**
    * Peeks in the input stream for the upcoming type.
    *
-   * @return the upcoming type in the stream, or <code>null</code> in case of an end-of-stream.
-   * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
+   * @return the upcoming type in the stream, or <code>null</code> in case of
+   *         an end-of-stream.
+   * @throws CodecException in case of I/O problems reading the CBOR-type from
+   *         the underlying input stream.
    */
   public abstract CborType[] peekTypes(int num) throws CodecException;
 
   /**
    * Peeks in the input stream for the upcoming types.
    *
-   * @return the upcoming types in the stream, or <code>null</code> in case of an end-of-stream.
-   * @throws CodecException in case of I/O problems reading the CBOR-type from the underlying input stream.
+   * @return the upcoming types in the stream, or <code>null</code> in case of
+   *         an end-of-stream.
+   * @throws CodecException in case of I/O problems reading the CBOR-type from
+   *         the underlying input stream.
    */
   public CborType[] peek2Types() throws CodecException {
     return peekTypes(2);
@@ -69,7 +76,8 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * read one bye
    * @return the read byte.
-   * @throws CodecException in case of I/O problems reading the CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of I/O problems reading the CBOR-encoded
+   *         value from the underlying input stream.
    */
   public abstract int read1Byte() throws CodecException;
 
@@ -78,8 +86,10 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Prolog to reading an array value in CBOR format.
    *
-   * @return the number of elements in the array to read, or -1 in case of infinite-length arrays.
-   * @throws CodecException in case of CBOR decoding error or I/O problems reading the CBOR-encoded value from the underlying input stream.
+   * @return the number of elements in the array to read, or -1 in case of
+   *         infinite-length arrays.
+   * @throws CodecException in case of CBOR decoding error or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public int readArrayLength() throws CodecException {
     long len = readMajorTypeWithSize(TYPE_ARRAY);
@@ -94,8 +104,8 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads a boolean value in CBOR format.
    *
    * @return the read boolean.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public boolean readBoolean() throws CodecException {
     int b = readMajorType(TYPE_FLOAT_SIMPLE);
@@ -108,8 +118,8 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a "break"/stop value in CBOR format.
    *
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public void readBreak() throws CodecException {
     readMajorTypeExact(TYPE_FLOAT_SIMPLE, BREAK);
@@ -119,8 +129,8 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads a byte string value in CBOR format.
    *
    * @return the read byte string, or <code>null</code>.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public byte[] readByteString() throws CodecException {
     if (skipNull()) {
@@ -140,9 +150,10 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Prolog to reading a byte string value in CBOR format.
    *
-   * @return the number of bytes in the string to read, or -1 in case of infinite-length strings.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @return the number of bytes in the string to read, or -1 in case of
+   *         infinite-length strings.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public long readByteStringLength() throws CodecException {
     return readMajorTypeWithSize(TYPE_BYTE_STRING);
@@ -151,8 +162,10 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a double-precision float value in CBOR format.
    *
-   * @return the read double value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
-   * @throws CodecException in case of CBOR decoding problem I/O problems reading the CBOR-encoded value from the underlying input stream.
+   * @return the read double value, values from {@link Float#MIN_VALUE} to
+   *         {@link Float#MAX_VALUE} are supported.
+   * @throws CodecException in case of CBOR decoding problem I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public double readDouble() throws CodecException {
     readMajorTypeExact(TYPE_FLOAT_SIMPLE, DOUBLE_PRECISION_FLOAT);
@@ -163,8 +176,10 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a single-precision float value in CBOR format.
    *
-   * @return the read float value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the CBOR-encoded value from the underlying input stream.
+   * @return the read float value, values from {@link Float#MIN_VALUE} to
+   *         {@link Float#MAX_VALUE} are supported.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public float readFloat() throws CodecException {
     readMajorTypeExact(TYPE_FLOAT_SIMPLE, SINGLE_PRECISION_FLOAT);
@@ -175,10 +190,10 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a half-precision float value in CBOR format.
    *
-   * @return the read half-precision float value, values from {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE}
-   *     are supported.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @return the read half-precision float value, values from
+   *         {@link Float#MIN_VALUE} to {@link Float#MAX_VALUE} are supported.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    * @throws CodecException in case of CBOR decoding problem.
    */
   public double readHalfPrecisionFloat() throws CodecException {
@@ -206,8 +221,8 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads an unsigned integer value in CBOR format in the range [0, 2^64 - 1].
    *
    * @return the read integer value.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public BigInteger readUint() throws CodecException {
     int ib = read1Byte();
@@ -225,13 +240,16 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a signed or unsigned integer value in CBOR format.
    *
-   * @return the read integer value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the CBOR-encoded value from the underlying input stream.
+   * @return the read integer value, values from {@link Long#MIN_VALUE} to
+   *         {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public long readLong() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return ui ^ readUInt(ib & 0x1f, false /* breakAllowed */);
@@ -270,13 +288,14 @@ public abstract class CborDecoder implements AutoCloseable {
    * <p>
    * read the small integer value, values from [-65536..65535] are supported.
    * @return the read 16-bit integer.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying output stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying output stream.
    */
   public int readInt16() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return (int) (ui ^ readUIntExact(TWO_BYTES, ib & 0x1f));
@@ -285,15 +304,17 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a signed or unsigned 32-bit integer value in CBOR format.
    * <p>
-   * read the small integer value, values in the range [-4294967296..4294967295] are supported.
+   * read the small integer value, values in the range
+   * [-4294967296..4294967295] are supported.
    * @return the read 32-bit integer.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying output stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying output stream.
    */
   public long readInt32() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return ui ^ readUIntExact(FOUR_BYTES, ib & 0x1f);
@@ -302,16 +323,17 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a signed or unsigned 64-bit integer value in CBOR format.
    * <p>
-   * read the small integer value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE}
-   * are supported.
+   * read the small integer value, values from {@link Long#MIN_VALUE} to
+   * {@link Long#MAX_VALUE} are supported.
    * @return the read 64-bit integer (long).
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying output stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying output stream.
    */
   public long readInt64() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return ui ^ readUIntExact(EIGHT_BYTES, ib & 0x1f);
@@ -320,15 +342,17 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads a signed or unsigned 8-bit integer value in CBOR format.
    * <p>
-   * read the small integer value, values in the range [-256..255] are supported.
+   * read the small integer value, values in the range [-256..255] are
+   * supported.
    * @return the read 8-bit integer.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying output stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying output stream.
    */
   public int readInt8() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return (int) (ui ^ readUIntExact(ONE_BYTE, ib & 0x1f));
@@ -345,7 +369,8 @@ public abstract class CborDecoder implements AutoCloseable {
     long len = readMajorTypeWithSize(TYPE_MAP);
     if (len < -1 || len > Integer.MAX_VALUE) {
       // -1: break / infinite length
-      throw new CodecException("map length not in range [0, " + Integer.MAX_VALUE + "]");
+      throw new CodecException("map length not in range [0, " +
+          Integer.MAX_VALUE + "]");
     }
     return (int) len;
 
@@ -353,8 +378,8 @@ public abstract class CborDecoder implements AutoCloseable {
 
   /**
    * Reads a <code>null</code>-value in CBOR format.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public void readNull() throws CodecException {
     readMajorTypeExact(TYPE_FLOAT_SIMPLE, NULL);
@@ -364,8 +389,8 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads a single byte value in CBOR format.
    *
    * @return the read byte value.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    * @throws CodecException in case of CBOR decoding problem.
    */
   public byte readSimpleValue() throws CodecException {
@@ -378,13 +403,14 @@ public abstract class CborDecoder implements AutoCloseable {
    * <p>
    * read the small integer value, values in the range [-24..23] are supported.
    * @return the read small int.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying output stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying output stream.
    */
   public int readSmallInt() throws CodecException {
     int ib = read1Byte();
 
-    // in case of negative integers, extends the sign to all bits; otherwise zero...
+    // in case of negative integers, extends the sign to all bits; otherwise
+    // zero...
     long ui = expectIntegerType(ib);
     // in case of negative integers does a ones complement
     return (int) (ui ^ readUIntExact(-1, ib & 0x1f));
@@ -394,18 +420,19 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads a semantic tag value in CBOR format.
    *
    * @return the read tag value.
-   * @throws CodecException in case CBOR decoding problem or of I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case CBOR decoding problem or of I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public long readTag() throws CodecException {
     return readUInt(readMajorType(TYPE_TAG), false /* breakAllowed */);
   }
 
   /**
-   * Reads a semantic tag value in CBOR format, and assert it has the expected value.
+   * Reads a semantic tag value in CBOR format, and assert it has the expected
+   * value.
    * @param expectedTag the expected tag.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public void readTag(long expectedTag) throws CodecException {
     long tag = readTag();
@@ -445,17 +472,18 @@ public abstract class CborDecoder implements AutoCloseable {
    * Reads a UTF-8 encoded string value in CBOR format.
    *
    * @return the read UTF-8 encoded string, or <code>null</code>.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading
-   *         the CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public abstract String readTextString() throws CodecException;
 
   /**
    * Prolog to reading a UTF-8 encoded string value in CBOR format.
    *
-   * @return the length of the string to read, or -1 in case of infinite-length strings.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @return the length of the string to read, or -1 in case of infinite-length
+   *         strings.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public long readTextStringLength() throws CodecException {
     return readMajorTypeWithSize(TYPE_TEXT_STRING);
@@ -464,16 +492,16 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads an undefined value in CBOR format.
    *
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   public void readUndefined() throws CodecException {
     readMajorTypeExact(TYPE_FLOAT_SIMPLE, UNDEFINED);
   }
 
   /**
-   * Reads the next major type from the underlying input stream, and verifies whether
-   * it matches the given expectation.
+   * Reads the next major type from the underlying input stream, and verifies
+   * whether it matches the given expectation.
    *
    * @param ib the expected major type, cannot be <code>null</code> (unchecked).
    * @return either -1 if the major type was a signed integer, or 0 otherwise.
@@ -492,29 +520,33 @@ public abstract class CborDecoder implements AutoCloseable {
   }
 
   /**
-   * Reads the next major type from the underlying input stream, and verifies whether it matches the given expectation.
+   * Reads the next major type from the underlying input stream, and verifies
+   * whether it matches the given expectation.
    *
-   * @param majorType the expected major type, cannot be <code>null</code> (unchecked).
+   * @param majorType the expected major type, cannot be <code>null</code>
+   *                  (unchecked).
    * @return the read subtype, or payload, of the read major type.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the CBOR-encoded
-   *         value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   protected int readMajorType(int majorType) throws CodecException {
     int ib = read1Byte();
     if (majorType != ((ib >>> 5) & 0x07)) {
-      fail("Unexpected type: %s, expected: %s!", CborType.getName(ib), CborType.getName(majorType));
+      fail("Unexpected type: %s, expected: %s!", CborType.getName(ib),
+          CborType.getName(majorType));
     }
     return ib & 0x1F;
   }
 
   /**
-   * Reads the next major type from the underlying input stream, and verifies whether it matches the given
-   * expectations.
+   * Reads the next major type from the underlying input stream, and verifies
+   * whether it matches the given expectations.
    *
-   * @param majorType the expected major type, cannot be <code>null</code> (unchecked);
+   * @param majorType the expected major type, cannot be <code>null</code>
+   *                  (unchecked);
    * @param subtype the expected subtype.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         CBOR-encoded value from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   protected void readMajorTypeExact(int majorType, int subtype)
       throws CodecException {
@@ -525,13 +557,16 @@ public abstract class CborDecoder implements AutoCloseable {
   }
 
   /**
-   * Reads the next major type from the underlying input stream, verifies whether it matches the given expectation,
-   * and decodes the payload into a size.
+   * Reads the next major type from the underlying input stream, verifies
+   * whether it matches the given expectation, and decodes the payload into a
+   * size.
    *
-   * @param majorType the expected major type, cannot be <code>null</code> (unchecked).
-   * @return the number of succeeding bytes, &gt;= 0, or -1 if an infinite-length type is read.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *  CBOR-encoded value from the underlying input stream.
+   * @param majorType the expected major type, cannot be <code>null</code>
+   *                  (unchecked).
+   * @return the number of succeeding bytes, &gt;= 0, or -1 if an
+   *         infinite-length type is read.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the CBOR-encoded value from the underlying input stream.
    */
   protected long readMajorTypeWithSize(int majorType) throws CodecException {
     return readUInt(readMajorType(majorType), true /* breakAllowed */);
@@ -543,11 +578,10 @@ public abstract class CborDecoder implements AutoCloseable {
    * @param length the length indicator to use;
    * @param breakAllowed whether break is allowed.
    * @return the read unsigned integer, as long value.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         unsigned integer from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the unsigned integer from the underlying input stream.
    */
-  protected long readUInt(int length, boolean breakAllowed)
-      throws CodecException {
+  protected long readUInt(int length, boolean breakAllowed) throws CodecException {
     return readUInt(length, breakAllowed, false);
   }
 
@@ -580,32 +614,40 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * Reads an unsigned 16-bit integer value
    *
-   * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @return value the read value, values from {@link Long#MIN_VALUE} to
+   *         {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected abstract int readUInt16() throws CodecException;
 
   /**
    * Reads an unsigned 32-bit integer value
    *
-   * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @return value the read value, values from {@link Long#MIN_VALUE} to
+   *         {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *          value to the underlying output stream.
    */
   protected abstract long readUInt32() throws CodecException;
 
   /**
    * Reads an unsigned 64-bit integer value
    *
-   * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @return value the read value, values from {@link Long#MIN_VALUE} to
+   *         {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected abstract long readUInt64() throws CodecException;
 
   /**
    * Reads an unsigned 8-bit integer value
    *
-   * @return value the read value, values from {@link Long#MIN_VALUE} to {@link Long#MAX_VALUE} are supported.
-   * @throws CodecException in case of I/O problems writing the CBOR-encoded value to the underlying output stream.
+   * @return value the read value, values from {@link Long#MIN_VALUE} to
+   *         {@link Long#MAX_VALUE} are supported.
+   * @throws CodecException in case of I/O problems writing the CBOR-encoded
+   *         value to the underlying output stream.
    */
   protected abstract int readUInt8() throws CodecException;
 
@@ -614,15 +656,14 @@ public abstract class CborDecoder implements AutoCloseable {
    * @param expectedLength the expected length.
    * @param length the length indicator to use;
    * @return the read unsigned integer, as long value.
-   * @throws CodecException in case of CBOR decoding problem or I/O problems reading the
-   *         unsigned integer from the underlying input stream.
+   * @throws CodecException in case of CBOR decoding problem or I/O problems
+   *         reading the unsigned integer from the underlying input stream.
    */
-  protected long readUIntExact(int expectedLength, int length)
-      throws CodecException {
+  protected long readUIntExact(int expectedLength, int length) throws CodecException {
     if ((expectedLength == -1 && length >= ONE_BYTE)
       || (expectedLength >= 0 && length != expectedLength)) {
-      fail("Unexpected payload/length! Expected %s, but got %s.", lengthToString(expectedLength),
-        lengthToString(length));
+      fail("Unexpected payload/length! Expected %s, but got %s.",
+          lengthToString(expectedLength), lengthToString(length));
     }
     return readUInt(length, false /* breakAllowed */);
   }
@@ -635,8 +676,8 @@ public abstract class CborDecoder implements AutoCloseable {
    * true if it is null, or false it is an array of the specified length.
    * @param expectedLen the expected length of an array.
    * @return whether it is null.
-   * @throws CodecException in case of CBOR decoding problem or if cannot decode the
-   *         stream or is not an array with given length.
+   * @throws CodecException in case of CBOR decoding problem or if cannot
+   *         decode the stream or is not an array with given length.
    * @throws CodecException in case of CBOR decoding problem.
    */
   public boolean readNullOrArrayLength(int expectedLen) throws CodecException {
@@ -652,8 +693,9 @@ public abstract class CborDecoder implements AutoCloseable {
   /**
    * read array length and assert the equality to expectedLen.
    * @param expectedLen the expected length of an array.
-   * @throws CodecException in case of CBOR decoding problem or the length is different as expected
-   *         or if cannot decode the stream or is not an array with given length.
+   * @throws CodecException in case of CBOR decoding problem or the length is
+   *         different as expected or if cannot decode the stream or is not an
+   *         array with given length.
    */
   public void readArrayLength(int expectedLen) throws CodecException {
     Integer len = readNullOrArrayLength();
@@ -701,14 +743,12 @@ public abstract class CborDecoder implements AutoCloseable {
   }
 
   public static boolean isNull(CborType type) {
-    return type.majorType() == TYPE_FLOAT_SIMPLE
-      && type.additionalInfo() == NULL;
+    return type.majorType() == TYPE_FLOAT_SIMPLE && type.additionalInfo() == NULL;
   }
 
   public boolean skipBreak() throws CodecException {
     CborType type = peekType();
-    if (type.majorType() == TYPE_FLOAT_SIMPLE
-        && type.additionalInfo() == BREAK) {
+    if (type.majorType() == TYPE_FLOAT_SIMPLE && type.additionalInfo() == BREAK) {
       readBreak();
       return true;
     } else {
@@ -815,8 +855,7 @@ public abstract class CborDecoder implements AutoCloseable {
     }
   }
 
-  public static Instant parseRFC3339Timestamp(String timestamp)
-      throws DateTimeParseException {
+  public static Instant parseRFC3339Timestamp(String timestamp) throws DateTimeParseException {
     if (timestamp.endsWith("Z")) {
       return Instant.parse(timestamp);
     } else {

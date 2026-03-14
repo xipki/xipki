@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * QA extension value.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class QaExtensionValue {

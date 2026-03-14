@@ -48,11 +48,7 @@ public class ASIdOrRange extends ASN1Object {
 
   @Override
   public String toString() {
-    if (id != null) {
-      return id.toString();
-    } else {
-      return range.toString();
-    }
+    return (id != null) ? id.toString() : range.toString();
   }
 
   public static ASIdOrRange getInstance(Object  obj) {

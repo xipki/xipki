@@ -18,19 +18,16 @@ public class Base64UrlTest extends AbstractBase64Test {
   }
 
   private static Base64.Encoder getEncoder(boolean withPadding) {
-    return withPadding ? Base64.getUrlEncoder()
-        : Base64.getUrlNoPaddingEncoder();
+    return withPadding ? Base64.getUrlEncoder() : Base64.getUrlNoPaddingEncoder();
   }
 
   @Override
-  protected byte[] encodeToByte(byte[] data, boolean wrapLongLine,
-                                boolean withPadding) {
+  protected byte[] encodeToByte(byte[] data, boolean wrapLongLine, boolean withPadding) {
     return getEncoder(withPadding).encodeToByte(data, wrapLongLine);
   }
 
   @Override
-  protected String encodeToString(byte[] data, boolean wrapLongLine,
-                                  boolean withPadding) {
+  protected String encodeToString(byte[] data, boolean wrapLongLine, boolean withPadding) {
     return getEncoder(withPadding).encodeToString(data, wrapLongLine);
   }
 

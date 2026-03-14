@@ -49,8 +49,7 @@ public class Asn1RSAPrivateKey {
 
   public Asn1RSAPrivateKey(
       byte[] modulus, byte[] publicExponent, byte[] privateExponent,
-      byte[] prime1, byte[] prime2, byte[] exponent1,
-      byte[] exponent2, byte[] coefficient) {
+      byte[] prime1, byte[] prime2, byte[] exponent1, byte[] exponent2, byte[] coefficient) {
     this.modulus = Args.notNull(modulus, "modulus");
     this.publicExponent = Args.notNull(publicExponent, "publicExponent");
     this.privateExponent = Args.notNull(privateExponent, "privateExponent");
@@ -93,14 +92,12 @@ public class Asn1RSAPrivateKey {
     return coefficient;
   }
 
-  public static Asn1RSAPrivateKey getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1RSAPrivateKey getInstance(byte[] encoded) throws InvalidKeySpecException {
     byte[][] bns;
     try {
       bns = Asn1Util.readBigInts(encoded, 9);
     } catch (CodecException e) {
-      throw new InvalidKeySpecException(
-          "invalid RSAPrivateKey: " + e.getMessage(), e);
+      throw new InvalidKeySpecException("invalid RSAPrivateKey: " + e.getMessage(), e);
     }
 
     int off = 1;

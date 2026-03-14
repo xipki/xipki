@@ -52,7 +52,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Util class of CA.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class CaUtil {
@@ -65,22 +65,14 @@ public class CaUtil {
 
   static {
     SORTED_EXTENSIONS = List.of(OIDs.Extn.subjectKeyIdentifier,
-        OIDs.Extn.authorityKeyIdentifier,
-        OIDs.Extn.basicConstraints,
-        OIDs.Extn.keyUsage,
-        OIDs.Extn.extendedKeyUsage,
-        OIDs.Extn.privateKeyUsagePeriod,
-        OIDs.Extn.subjectAlternativeName,
-        OIDs.Extn.issuerAlternativeName,
-        OIDs.Extn.authorityInfoAccess,
-        OIDs.Extn.cRLDistributionPoints,
-        OIDs.Extn.freshestCRL,
-        OIDs.Extn.certificatePolicies,
-        OIDs.Extn.qCStatements,
-        OIDs.Extn.nameConstraints,
-        OIDs.Extn.policyConstraints,
-        OIDs.Extn.policyMappings,
-        OIDs.Extn.subjectInfoAccess,
+        OIDs.Extn.authorityKeyIdentifier, OIDs.Extn.basicConstraints,
+        OIDs.Extn.keyUsage,               OIDs.Extn.extendedKeyUsage,
+        OIDs.Extn.privateKeyUsagePeriod,  OIDs.Extn.subjectAlternativeName,
+        OIDs.Extn.issuerAlternativeName,  OIDs.Extn.authorityInfoAccess,
+        OIDs.Extn.cRLDistributionPoints,  OIDs.Extn.freshestCRL,
+        OIDs.Extn.certificatePolicies,    OIDs.Extn.qCStatements,
+        OIDs.Extn.nameConstraints,        OIDs.Extn.policyConstraints,
+        OIDs.Extn.policyMappings,         OIDs.Extn.subjectInfoAccess,
         OIDs.Extn.subjectDirectoryAttributes);
   }
 
@@ -89,8 +81,7 @@ public class CaUtil {
 
   public static void addExtensions(
       ExtensionValues extensionValues, X509v3CertificateBuilder certBuilder,
-      ExtensionsControl control)
-      throws CertIOException {
+      ExtensionsControl control) throws CertIOException {
     if (extensionValues == null) {
       return;
     }
@@ -118,8 +109,7 @@ public class CaUtil {
     // 2. id-ce
     // Get a copy of the types, without copy concurrent access exception may
     // be thrown.
-    for (ASN1ObjectIdentifier type
-        : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (type.getId().startsWith(id_ce_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
         certBuilder.addExtension(type, value.isCritical(), value.value());
@@ -127,8 +117,7 @@ public class CaUtil {
     }
 
     // 3. non-PEN extensions
-    for (ASN1ObjectIdentifier type
-        : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (!type.getId().startsWith(id_pen_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
         certBuilder.addExtension(type, value.isCritical(), value.value());
@@ -136,8 +125,7 @@ public class CaUtil {
     }
 
     // 4. PEN extensions
-    for (ASN1ObjectIdentifier type
-        : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
       ExtensionValue value = extensionValues.removeExtensionValue(type);
       certBuilder.addExtension(type, value.isCritical(), value.value());
     }
@@ -150,43 +138,34 @@ public class CaUtil {
     return list;
   }
 
-  public static BasicConstraints createBasicConstraints(
-      CertLevel level, Integer pathLen) {
+  public static BasicConstraints createBasicConstraints(CertLevel level, Integer pathLen) {
     return (level == CertLevel.EndEntity) ? new BasicConstraints(false)
-        : (pathLen != null)
-            ? new BasicConstraints(pathLen)
-            : new BasicConstraints(true);
+        : (pathLen != null) ? new BasicConstraints(pathLen) : new BasicConstraints(true);
   } // method createBasicConstraints
 
   public static AuthorityInformationAccess createAuthorityInformationAccess(
       List<String> caIssuerUris, List<String> ocspUris) {
-    if (CollectionUtil.isEmpty(caIssuerUris)
-        && CollectionUtil.isEmpty(ocspUris)) {
-      throw new IllegalArgumentException(
-          "caIssuerUris and ospUris may not be both empty");
+    if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
+      throw new IllegalArgumentException("caIssuerUris and ospUris may not be both empty");
     }
 
     ASN1EncodableVector accessDescriptions = new ASN1EncodableVector();
 
     if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
-        GeneralName gn = new GeneralName(
-            GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(
-            new AccessDescription(OIDs.X509.id_ad_caIssuers, gn));
+        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+        accessDescriptions.add(new AccessDescription(OIDs.X509.id_ad_caIssuers, gn));
       }
     }
 
     if (CollectionUtil.isNotEmpty(ocspUris)) {
       for (String uri : ocspUris) {
-        GeneralName gn = new GeneralName(
-            GeneralName.uniformResourceIdentifier, uri);
+        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
         accessDescriptions.add(new AccessDescription(OIDs.X509.id_ad_ocsp, gn));
       }
     }
 
-    return AuthorityInformationAccess.getInstance(
-        new DERSequence(accessDescriptions));
+    return AuthorityInformationAccess.getInstance(new DERSequence(accessDescriptions));
   } // method createX509AuthorityInformationAccess
 
   public static CRLDistPoint createCrlDistributionPoints(
@@ -196,12 +175,10 @@ public class CaUtil {
 
     GeneralName[] names = new GeneralName[size];
     for (int i = 0; i < size; i++) {
-      names[i] = new GeneralName(GeneralName.uniformResourceIdentifier,
-                  crlUris.get(i));
+      names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
     }
     // Distribution Point
-    DistributionPointName pointName =
-        new DistributionPointName(new GeneralNames(names));
+    DistributionPointName pointName = new DistributionPointName(new GeneralNames(names));
 
     GeneralNames crlIssuer = null;
     if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
@@ -252,8 +229,7 @@ public class CaUtil {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  public static String canonicalizeSignerConf(String signerConf)
-      throws CaMgmtException {
+  public static String canonicalizeSignerConf(String signerConf) throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -286,8 +262,7 @@ public class CaUtil {
       return signerConf;
     }
 
-    pairs.putPair("keystore",
-        "base64:" + Base64.encodeToString(ksBytes));
+    pairs.putPair("keystore", "base64:" + Base64.encodeToString(ksBytes));
     return pairs.getEncoded();
   } // method canonicalizeSignerConf
 
@@ -309,8 +284,7 @@ public class CaUtil {
    *         if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrValue createFileOrValue(
-      ZipOutputStream zipStream, String content, String fileName)
-      throws IOException {
+      ZipOutputStream zipStream, String content, String fileName) throws IOException {
     if (StringUtil.isBlank(content)) {
       return null;
     }
@@ -350,8 +324,7 @@ public class CaUtil {
    *         if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrBinary createFileOrBase64Value(
-      ZipOutputStream zipStream, String b64Content, String fileName)
-      throws IOException {
+      ZipOutputStream zipStream, String b64Content, String fileName) throws IOException {
     if (StringUtil.isBlank(b64Content)) {
       return null;
     }
@@ -377,8 +350,7 @@ public class CaUtil {
    *         if IO error occurs when writing to the ZIP output stream.
    */
   public static FileOrBinary createFileOrBinary(
-      ZipOutputStream zipStream, byte[] content, String fileName)
-      throws IOException {
+      ZipOutputStream zipStream, byte[] content, String fileName) throws IOException {
     if (content == null || content.length == 0) {
       return null;
     }
@@ -418,13 +390,11 @@ public class CaUtil {
     return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
   }
 
-  public static List<X509Cert> buildCertChain(
-      X509Cert targetCert, List<X509Cert> certs)
+  public static List<X509Cert> buildCertChain(X509Cert targetCert, List<X509Cert> certs)
       throws CaMgmtException {
     X509Cert[] certchain = X509Util.buildCertPath(targetCert, certs, false);
     if (certchain == null || certs.size() != certchain.length) {
-      throw new CaMgmtException(
-          "could not build certchain containing all specified certs");
+      throw new CaMgmtException("could not build certchain containing all specified certs");
     }
     return Arrays.asList(certchain);
   } // method buildCertChain

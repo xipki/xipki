@@ -29,6 +29,7 @@ import java.io.LineNumberReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -48,16 +49,14 @@ import java.util.regex.Pattern;
 public class ScriptRunner {
   private static final String DEFAULT_DELIMITER = ";";
   private static final Pattern SOURCE_COMMAND =
-      Pattern.compile("^\\s*SOURCE\\s+(.*?)\\s*$",
-          Pattern.CASE_INSENSITIVE);
+      Pattern.compile("^\\s*SOURCE\\s+(.*?)\\s*$", Pattern.CASE_INSENSITIVE);
 
   /**
    * regex to detect delimiter.
    * ignores spaces, allows delimiter in comment, allows an equals-sign
    */
   public static final Pattern delimP = Pattern.compile(
-      "^\\s*(--)?\\s*delimiter\\s*=?\\s*([^\\s]+)+\\s*.*$",
-      Pattern.CASE_INSENSITIVE);
+      "^\\s*(--)?\\s*delimiter\\s*=?\\s*([^\\s]+)+\\s*.*$", Pattern.CASE_INSENSITIVE);
 
   private final Connection connection;
 
@@ -70,7 +69,8 @@ public class ScriptRunner {
   private String delimiter = DEFAULT_DELIMITER;
   private boolean fullLineDelimiter = false;
 
-  public static void runScript(String dbConfFile, String scriptFile)
+  public static void runScript(
+      String dbConfFile, String scriptFile, Path createDbLogPath, Path createDbErrorLogPath)
       throws Exception {
     ConfigurableProperties props = new ConfigurableProperties();
     try (InputStream inStream = Files.newInputStream(
@@ -81,23 +81,27 @@ public class ScriptRunner {
     props.setProperty("minimumIdle", "1");
     try (DataSourceWrapper dataSource = new DataSourceFactory()
         .createDataSource("default", props)) {
-      runScript(dataSource, scriptFile);
+      runScript(dataSource, scriptFile, createDbLogPath, createDbErrorLogPath);
     }
   }
 
-  public static void runScript(DataSourceWrapper dataSource, String scriptFile)
+  public static void runScript(DataSourceWrapper dataSource, String scriptFile,
+                              Path createDbLogPath, Path createDbErrorLogPath)
       throws Exception {
     Connection conn = dataSource.getConnection();
     try {
-      runScript(conn, scriptFile);
+      runScript(conn, scriptFile, createDbLogPath, createDbErrorLogPath);
     } finally {
       dataSource.returnConnection(conn);
     }
   }
 
-  public static void runScript(Connection conn, String scriptFile)
+  public static void runScript(
+      Connection conn, String scriptFile,
+      Path createDbLogPath, Path createDbErrorLogPath)
       throws Exception {
-    ScriptRunner runner = new ScriptRunner(conn, true, true);
+    ScriptRunner runner = new ScriptRunner(conn, true, true,
+                            createDbLogPath, createDbErrorLogPath);
     runner.runScript(IoUtil.expandFilepath(scriptFile));
   }
 
@@ -106,26 +110,36 @@ public class ScriptRunner {
    * @param connection the SQL connection
    * @param stopOnError whether the process stops when error occurs.
    * @param logSql whether to log the SQL scripts and error
+   * @param createDbLogPath Path of the log file
+   * @param createDbErrorLogPath Path of the log file which logs only errors.
    */
-  public ScriptRunner(Connection connection, boolean stopOnError,
-                      boolean logSql) {
+  public ScriptRunner(
+      Connection connection, boolean stopOnError, boolean logSql,
+      Path createDbLogPath, Path createDbErrorLogPath) {
+    if (createDbLogPath == null) {
+      createDbLogPath = Paths.get("create_db.log");
+    }
+
+    if (createDbErrorLogPath == null) {
+      createDbErrorLogPath = Paths.get("create_db_error.log");
+    }
+
     this.connection = connection;
     this.stopOnError = stopOnError;
     if (!logSql) {
       return;
     }
 
-    File logFile = new File("create_db.log");
+    File logFile = createDbLogPath.toFile();
     try {
       logWriter = new PrintWriter(new FileWriter(logFile, logFile.exists()));
     } catch(IOException e){
       System.err.println("Unable to access or create the db_create log");
     }
 
-    File errorLogFile = new File("create_db_error.log");
+    File errorLogFile = createDbErrorLogPath.toFile();
     try {
-      errorLogWriter = new PrintWriter(
-          new FileWriter(errorLogFile, errorLogFile.exists()));
+      errorLogWriter = new PrintWriter(new FileWriter(errorLogFile, errorLogFile.exists()));
     } catch(IOException e){
       System.err.println("Unable to access or create the db_create error log");
     }
@@ -205,8 +219,7 @@ public class ScriptRunner {
    * @throws SQLException if any SQL errors occur
    * @throws IOException if there is an error reading from the Reader
    */
-  public void runScript(Connection conn, Reader reader)
-      throws IOException, SQLException {
+  public void runScript(Connection conn, Reader reader) throws IOException, SQLException {
     StringBuilder command = null;
 
     try {
@@ -232,7 +245,7 @@ public class ScriptRunner {
           }
           println(trimmedLine);
         } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
-            ||  fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
+                ||  fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
           command.append(line, 0, line.lastIndexOf(getDelimiter())).append(" ");
           this.execCommand(conn, command, lineReader, ignoreSqlError);
           ignoreSqlError = false;
@@ -248,8 +261,7 @@ public class ScriptRunner {
       }
     }
     catch (IOException e) {
-      throw new IOException(String.format("Error executing '%s': %s",
-          command, e.getMessage()), e);
+      throw new IOException(String.format("Error executing '%s': %s", command, e.getMessage()), e);
     } finally {
       // conn.rollback();
       flush();
@@ -257,8 +269,8 @@ public class ScriptRunner {
   }
 
   private void execCommand(
-      Connection conn, StringBuilder command, LineNumberReader lineReader,
-      boolean ignoreSqlError) throws IOException, SQLException {
+      Connection conn, StringBuilder command, LineNumberReader lineReader, boolean ignoreSqlError)
+      throws IOException, SQLException {
     if (command.length() == 0) {
       return;
     }
@@ -280,15 +292,14 @@ public class ScriptRunner {
     }
   }
 
-  private void runScriptFile(Connection conn, String filepath)
-      throws IOException, SQLException {
+  private void runScriptFile(Connection conn, String filepath) throws IOException, SQLException {
     File file = new File(filepath);
     this.runScript(conn, new BufferedReader(new FileReader(file)));
   }
 
   private void execSqlCommand(
-      Connection conn, StringBuilder command, LineNumberReader lineReader,
-      boolean outputErr) throws SQLException {
+      Connection conn, StringBuilder command, LineNumberReader lineReader, boolean outputErr)
+      throws SQLException {
     Statement statement = conn.createStatement();
 
     println(command);
@@ -298,8 +309,7 @@ public class ScriptRunner {
       hasResults = statement.execute(command.toString());
     } catch (SQLException e) {
       if (outputErr) {
-        final String errText = String.format(
-            "Error executing '%s' (line %d): %s",
+        final String errText = String.format("Error executing '%s' (line %d): %s",
             command, lineReader.getLineNumber(), e.getMessage());
 
         printlnError(errText);

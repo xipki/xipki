@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 
 /**
@@ -31,14 +30,10 @@ public class CrlStreamParserTest {
 
   @BeforeClass
   public static void init() {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
-
+    KeyUtil.addProviders();
   }
 
-  private static Certificate getIssuerSigner()
-      throws CertificateEncodingException, IOException {
+  private static Certificate getIssuerSigner() throws CertificateEncodingException, IOException {
     return parseCert(baseDir + "ca.crt");
   }
 
@@ -52,8 +47,7 @@ public class CrlStreamParserTest {
     CrlStreamParser parser = getParser("revoked-certs.crl");
 
     Assert.assertEquals("version", 1, parser.version());
-    Assert.assertEquals("CRL number", BigInteger.valueOf(1),
-        parser.crlNumber());
+    Assert.assertEquals("CRL number", BigInteger.valueOf(1), parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -76,8 +70,7 @@ public class CrlStreamParserTest {
     CrlStreamParser parser = getParser("invaliditydate.crl");
 
     Assert.assertEquals("version", 1, parser.version());
-    Assert.assertEquals("CRL number", BigInteger.valueOf(1),
-        parser.crlNumber());
+    Assert.assertEquals("CRL number", BigInteger.valueOf(1), parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -100,8 +93,7 @@ public class CrlStreamParserTest {
     CrlStreamParser parser = getParser("no-revoked-certs.crl");
 
     Assert.assertEquals("version", 1, parser.version());
-    Assert.assertEquals("CRL number",
-        BigInteger.valueOf(1), parser.crlNumber());
+    Assert.assertEquals("CRL number", BigInteger.valueOf(1), parser.crlNumber());
 
     Assert.assertTrue("signature",
         parser.verifySignature(issuerSigner.getSubjectPublicKeyInfo()));
@@ -170,8 +162,7 @@ public class CrlStreamParserTest {
       return Certificate.getInstance(
           X509Util.toDerEncoded(Files.readAllBytes(Paths.get(fileName))));
     } catch (RuntimeException ex) {
-      throw new CertificateEncodingException(
-          "error decoding certificate: " + ex.getMessage());
+      throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage());
     }
   }
 }

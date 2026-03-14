@@ -27,10 +27,8 @@ public class Responder {
 
   private final List<OcspStore> stores;
 
-  Responder(
-      ResponderOption responderOption, RequestOption requestOption,
-      ResponseOption responseOption, ResponseSigner signer,
-      List<OcspStore> stores) {
+  Responder(ResponderOption responderOption, RequestOption requestOption,
+            ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
     this.responderOption = Args.notNull(responderOption, "responderOption");
     this.requestOption = Args.notNull(requestOption, "requestOption");
     this.responseOption = Args.notNull(responseOption, "responseOption");

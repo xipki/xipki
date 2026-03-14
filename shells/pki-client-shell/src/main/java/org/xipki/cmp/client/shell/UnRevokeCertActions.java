@@ -55,18 +55,15 @@ public class UnRevokeCertActions {
 
   }
 
-  @Command(scope = "xi", name = "cmp-revoke", description =
-      "revoke certificate")
+  @Command(scope = "xi", name = "cmp-revoke", description = "revoke certificate")
   @Service
   public static class CmpRevoke extends UnRevokeCertAction {
 
-    @Option(name = "--reason", aliases = "-r", required = true, description =
-        "CRL reason")
+    @Option(name = "--reason", aliases = "-r", required = true, description = "CRL reason")
     @Completion(Completers.ClientCrlReasonCompleter.class)
     private String reason;
 
-    @Option(name = "--inv-date", description =
-        "invalidity date, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--inv-date", description = "invalidity date, UTC time of format yyyyMMddHHmmss")
     private String invalidityDateS;
 
     @Override
@@ -74,8 +71,7 @@ public class UnRevokeCertActions {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!CrlReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason)) {
-        throw new IllegalCmdParamException(
-            "reason " + reason + " is not permitted");
+        throw new IllegalCmdParamException("reason " + reason + " is not permitted");
       }
 
       Instant invalidityDate = null;
@@ -97,8 +93,7 @@ public class UnRevokeCertActions {
         for (int i = 0; i < reqInfo.ids.size(); i++) {
           RevokeCertRequest.Entry entry = new RevokeCertRequest.Entry(
               reqInfo.ids.get(i), caCert.subject(),
-              reqInfo.serialNumbers.get(i), crlReason.code(),
-              invalidityDate);
+              reqInfo.serialNumbers.get(i), crlReason.code(), invalidityDate);
           req.addRequestEntry(entry);
         }
 
@@ -113,8 +108,7 @@ public class UnRevokeCertActions {
 
   } // class CmpRevoke
 
-  @Command(scope = "xi", name = "cmp-unsuspend", description =
-      "unsuspend certificate")
+  @Command(scope = "xi", name = "cmp-unsuspend", description = "unsuspend certificate")
   @Service
   public static class CmpUnsuspend extends UnRevokeCertAction {
 
@@ -133,8 +127,7 @@ public class UnRevokeCertActions {
 
         for (int i = 0; i < reqInfo.ids.size(); i++) {
           UnsuspendCertRequest.Entry entry = new UnsuspendCertRequest.Entry(
-              reqInfo.ids.get(i), caCert.subject(),
-              reqInfo.serialNumbers.get(i));
+              reqInfo.ids.get(i), caCert.subject(), reqInfo.serialNumbers.get(i));
           req.addRequestEntry(entry);
         }
 
@@ -149,11 +142,9 @@ public class UnRevokeCertActions {
 
   } // class CmpUnsuspend
 
-  public abstract static class UnRevokeCertAction
-      extends CmpActions.AuthClientAction {
+  public abstract static class UnRevokeCertAction extends CmpActions.AuthClientAction {
 
-    @Option(name = "--ca-cert", required = true, description =
-        "certificate file")
+    @Option(name = "--ca-cert", required = true, description = "certificate file")
     @Completion(FileCompleter.class)
     private String caCertFile;
 
@@ -175,10 +166,8 @@ public class UnRevokeCertActions {
     ReqInfo getReqInfo()
         throws IllegalCmdParamException, CertificateException, IOException,
         CmpClientException {
-      if (CollectionUtil.isEmpty(certFiles)
-          && CollectionUtil.isEmpty(serialNumbersS)) {
-        throw new IllegalCmdParamException(
-            "none of cert and serial is specified");
+      if (CollectionUtil.isEmpty(certFiles) && CollectionUtil.isEmpty(serialNumbersS)) {
+        throw new IllegalCmdParamException("none of cert and serial is specified");
       }
 
       List<String> ids = new LinkedList<>();
@@ -215,12 +204,11 @@ public class UnRevokeCertActions {
     }
 
     void analyseResult(
-        boolean revoke, Map<String, CertIdOrError> certIdOrErrors,
-        ReqInfo reqInfo) throws CmdFailure {
+        boolean revoke, Map<String, CertIdOrError> certIdOrErrors, ReqInfo reqInfo)
+        throws CmdFailure {
       boolean failed = false;
       List<Integer> processedIndex = new ArrayList<>(reqInfo.sources.size());
-      for (Map.Entry<String, CertIdOrError> certIdOrError
-          : certIdOrErrors.entrySet()) {
+      for (Map.Entry<String, CertIdOrError> certIdOrError : certIdOrErrors.entrySet()) {
         String id = certIdOrError.getKey();
         int index = reqInfo.ids.indexOf(id);
 
@@ -236,8 +224,7 @@ public class UnRevokeCertActions {
             println((revoke ? "revoking" : "unsuspending") + " certificate "
                 + source + " failed: " + error);
           } else {
-            println((revoke ? "revoked" : "suspended") +
-                " certificate " + source);
+            println((revoke ? "revoked" : "suspended") + " certificate " + source);
           }
         }
       }
@@ -258,13 +245,11 @@ public class UnRevokeCertActions {
 
   }
 
-  private static void assertIssuedByCa(
-      X509Cert cert, X509Cert ca, String certDesc)
+  private static void assertIssuedByCa(X509Cert cert, X509Cert ca, String certDesc)
       throws CmpClientException {
     boolean issued = X509Util.issues(ca, cert);
     if (!issued) {
-      throw new CmpClientException("certificate " + certDesc +
-          "is not issued by the CA");
+      throw new CmpClientException("certificate " + certDesc + "is not issued by the CA");
     }
   }
 

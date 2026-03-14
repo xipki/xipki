@@ -51,8 +51,7 @@ public class P11SystemConf {
       return slots;
     }
 
-    public static MechanismFilterConf parse(JsonMap json)
-        throws CodecException {
+    public static MechanismFilterConf parse(JsonMap json) throws CodecException {
       List<SlotConf> slots = null;
       JsonList list = json.getList("slots");
       if (list != null) {
@@ -62,8 +61,7 @@ public class P11SystemConf {
       return new MechanismFilterConf(json.getString("mechanismSet"), slots);
     }
 
-    public static List<MechanismFilterConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<MechanismFilterConf> parseList(JsonList json) throws CodecException {
       List<MechanismFilterConf> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -87,12 +85,10 @@ public class P11SystemConf {
      */
     private final List<String> excludeMechanisms;
 
-    public MechanismSetConf(String name, List<String> mechanisms,
-                            List<String> excludeMechanisms) {
+    public MechanismSetConf(String name, List<String> mechanisms, List<String> excludeMechanisms) {
       this.name = Args.notBlank(name, "name");
       this.mechanisms = Args.notEmpty(mechanisms, "mechanisms");
-      this.excludeMechanisms = (excludeMechanisms == null) ? new LinkedList<>()
-          : excludeMechanisms;
+      this.excludeMechanisms = (excludeMechanisms == null) ? new LinkedList<>() : excludeMechanisms;
     }
 
     public String name() {
@@ -109,8 +105,7 @@ public class P11SystemConf {
 
     public static MechanismSetConf parse(JsonMap json) throws CodecException {
       return new MechanismSetConf(json.getNnString("name"),
-          json.getNnStringList("mechanisms"),
-          json.getStringList("excludeMechanisms"));
+          json.getNnStringList("mechanisms"), json.getStringList("excludeMechanisms"));
     }
 
   } // class MechanismSet
@@ -211,8 +206,7 @@ public class P11SystemConf {
         return mechanismFilters;
     }
 
-    public void setMechanismFilters(
-        List<MechanismFilterConf> mechanismFilters) {
+    public void setMechanismFilters(List<MechanismFilterConf> mechanismFilters) {
       this.mechanismFilters = mechanismFilters;
     }
 
@@ -260,8 +254,7 @@ public class P11SystemConf {
       List<NativeLibraryConf> nativeLibraries = NativeLibraryConf.parseList(
           json.getNnList("nativeLibraries"));
 
-      ModuleConf module = new ModuleConf(json.getString("name"),
-          nativeLibraries);
+      ModuleConf module = new ModuleConf(json.getString("name"), nativeLibraries);
       module.setMaxMessageSize(json.getInt("maxMessageSize"));
       module.setNewSessionTimeout(json.getInt("newSessionTimeout"));
       module.setNumSessions(json.getInt("numSessions"));
@@ -333,8 +326,7 @@ public class P11SystemConf {
       return ret;
     }
 
-    public static List<NativeLibraryConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<NativeLibraryConf> parseList(JsonList json) throws CodecException {
       List<NativeLibraryConf> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -368,8 +360,7 @@ public class P11SystemConf {
       return new PasswordSetConf(slots, json.getNnStringList("passwords"));
     }
 
-    public static List<PasswordSetConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<PasswordSetConf> parseList(JsonList json) throws CodecException {
       List<PasswordSetConf> ret = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         ret.add(parse(m));
@@ -412,8 +403,7 @@ public class P11SystemConf {
       return (id != null) ? new SlotConf(id) : new SlotConf(index);
     }
 
-    public static List<SlotConf> parseList(JsonList json)
-        throws CodecException {
+    public static List<SlotConf> parseList(JsonList json) throws CodecException {
       List<SlotConf> slots = new ArrayList<>(json.size());
       for (JsonMap m : json.toMapList()) {
         slots.add(SlotConf.parse(m));
@@ -430,11 +420,9 @@ public class P11SystemConf {
 
   private final List<MechanismSetConf> mechanismSets;
 
-  public P11SystemConf(List<ModuleConf> modules,
-                       List<MechanismSetConf> mechanismSets) {
+  public P11SystemConf(List<ModuleConf> modules, List<MechanismSetConf> mechanismSets) {
     this.modules = Args.notEmpty(modules, "modules");
-    this.mechanismSets = (mechanismSets == null) ? new LinkedList<>()
-        : mechanismSets;
+    this.mechanismSets = (mechanismSets == null) ? new LinkedList<>() : mechanismSets;
   }
 
   public List<ModuleConf> modules() {
@@ -445,8 +433,7 @@ public class P11SystemConf {
     return mechanismSets;
   }
 
-  public static P11SystemConf parse(FileOrValue fileOrValue)
-      throws InvalidConfException {
+  public static P11SystemConf parse(FileOrValue fileOrValue) throws InvalidConfException {
     try {
       return parse(JsonParser.parseMap(fileOrValue.readContent(), true));
     } catch (CodecException | IOException e) {

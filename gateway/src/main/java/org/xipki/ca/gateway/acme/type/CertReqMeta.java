@@ -11,6 +11,7 @@ import org.xipki.util.extra.misc.CompareUtil;
 import java.time.Instant;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -30,7 +31,7 @@ public class CertReqMeta implements JsonEncodable {
   }
 
   public CertReqMeta(Instant notBefore, Instant notAfter, String ca,
-                     String certProfile, String subject) {
+                    String certProfile, String subject) {
     this.notBefore = notBefore;
     this.notAfter = notAfter;
     this.ca = ca;
@@ -81,11 +82,8 @@ public class CertReqMeta implements JsonEncodable {
   @Override
   public JsonMap toCodec() {
     return new JsonMap()
-        .put("notBefore", notBefore)
-        .put("notAfter", notAfter)
-        .put("ca", ca)
-        .put("certProfile", certProfile)
-        .put("subject", subject);
+        .put("notBefore", notBefore).put("notAfter", notAfter)
+        .put("ca", ca).put("certProfile", certProfile).put("subject", subject);
   }
 
   public static CertReqMeta parse(JsonMap json) throws CodecException {
@@ -101,10 +99,8 @@ public class CertReqMeta implements JsonEncodable {
     }
 
     CertReqMeta b = (CertReqMeta) other;
-    return CompareUtil.equals(ca, b.ca)
-        && CompareUtil.equals(certProfile, b.certProfile)
-        && CompareUtil.equals(subject, b.subject)
-        && CompareUtil.equals(notBefore, b.notBefore)
+    return CompareUtil.equals(ca, b.ca)           && CompareUtil.equals(certProfile, b.certProfile)
+        && CompareUtil.equals(subject, b.subject) && CompareUtil.equals(notBefore, b.notBefore)
         && CompareUtil.equals(notAfter, b.notAfter);
   }
 

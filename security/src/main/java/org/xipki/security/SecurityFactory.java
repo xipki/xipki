@@ -51,8 +51,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  default ConcurrentSigner createSigner(
-      String type, SignerConf conf, X509Cert cert)
+  default ConcurrentSigner createSigner(String type, SignerConf conf, X509Cert cert)
       throws ObjectCreationException {
     X509Cert[] certs = (cert == null) ? null : new X509Cert[]{cert};
     return createSigner(type, conf, certs);
@@ -72,8 +71,7 @@ public interface SecurityFactory {
    * @throws ObjectCreationException
    *         if could not create the signer
    */
-  ConcurrentSigner createSigner(
-      String type, SignerConf conf, X509Cert[] certs)
+  ConcurrentSigner createSigner(String type, SignerConf conf, X509Cert[] certs)
       throws ObjectCreationException;
 
   /**
@@ -85,8 +83,8 @@ public interface SecurityFactory {
    * @throws InvalidKeyException
    *         If the publicKey is invalid or unsupported.
    */
-  default ContentVerifierProvider getContentVerifierProvider(
-      PublicKey publicKey) throws InvalidKeyException {
+  default ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+      throws InvalidKeyException {
     return getContentVerifierProvider(publicKey, null, null);
   }
 
@@ -106,8 +104,8 @@ public interface SecurityFactory {
    *         If the publicKey is invalid or unsupported.
    */
   ContentVerifierProvider getContentVerifierProvider(
-      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert,
-      SecretKey ownerMasterKey) throws InvalidKeyException;
+      PublicKey publicKey, DHSigStaticKeyCertPair ownerKeyAndCert, SecretKey ownerMasterKey)
+      throws InvalidKeyException;
 
   /**
    * Gets the ContentVerifierProvider from the certificate.
@@ -122,8 +120,12 @@ public interface SecurityFactory {
    */
   default ContentVerifierProvider getContentVerifierProvider(X509Cert cert)
       throws InvalidKeyException {
-    return getContentVerifierProvider(
-        Args.notNull(cert, "cert").publicKey());
+    try {
+      return getContentVerifierProvider(
+          Args.notNull(cert, "cert").publicKey());
+    } catch (RuntimeException e) {
+      throw new InvalidKeyException(e);
+    }
   }
 
   /**
@@ -136,8 +138,7 @@ public interface SecurityFactory {
    * @return true if the signature is valid and the signature
    *         algorithm is accepted, false otherwise.
    */
-  default boolean verifyPop(PKCS10CertificationRequest csr,
-                            AlgorithmValidator algoValidator) {
+  default boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator) {
     return verifyPop(csr, algoValidator, null, null);
   }
 
@@ -158,10 +159,8 @@ public interface SecurityFactory {
    * @return true if the signature is valid and the signature
    *         algorithm is accepted, false otherwise.
    */
-  boolean verifyPop(PKCS10CertificationRequest csr,
-                    AlgorithmValidator algoValidator,
-                    DHSigStaticKeyCertPair ownerKeyAndCert,
-                    SecretKey ownerMasterKey);
+  boolean verifyPop(PKCS10CertificationRequest csr, AlgorithmValidator algoValidator,
+                    DHSigStaticKeyCertPair ownerKeyAndCert, SecretKey ownerMasterKey);
 
   /**
    * Verifies the signature of CSR.
@@ -173,8 +172,7 @@ public interface SecurityFactory {
    * @return true if the signature is valid and the signature algorithm is
    *         accepted, false otherwise.
    */
-  default boolean verifyPop(CertificationRequest csr,
-                            AlgorithmValidator algoValidator) {
+  default boolean verifyPop(CertificationRequest csr, AlgorithmValidator algoValidator) {
     return verifyPop(csr, algoValidator, null, null);
   }
 

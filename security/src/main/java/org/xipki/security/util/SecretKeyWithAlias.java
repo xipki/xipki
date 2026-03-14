@@ -8,6 +8,8 @@ import org.xipki.util.codec.Args;
 import javax.crypto.SecretKey;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class SecretKeyWithAlias {

@@ -1,0 +1,5 @@
+CA_XIPKI_DIR=$[test.basedir]/ca-tomcat/xipki
+OCSP_XIPKI_DIR=$[test.basedir]/ocsp-tomcat/xipki
+GATEWAY_TOMCAT_DIR=$[test.basedir]/gateway-tomcat
+GATEWAY_XIPKI_DIR=${GATEWAY_TOMCAT_DIR}/xipki
+

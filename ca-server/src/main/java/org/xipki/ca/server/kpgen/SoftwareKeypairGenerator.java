@@ -31,11 +31,9 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public KeyInfoPair generateKeypair(KeySpec keyspec)
-      throws XiSecurityException {
+  public KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException {
     if (!supports(keyspec)) {
-      throw new XiSecurityException(
-          name + " cannot generate keypair of keyspec " + keyspec);
+      throw new XiSecurityException(name + " cannot generate keypair of keyspec " + keyspec);
     }
 
     try {
@@ -48,7 +46,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   private KeyInfoPair generateKeypair0(KeySpec keyspec) throws Exception {
-    KeyPair kp = KeyUtil.generateKeypair(keyspec, random);
+    KeyPair kp = KeyUtil.generateKeyPair(keyspec, random);
     return new KeyInfoPair(kp);
   }
 

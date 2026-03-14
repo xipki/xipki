@@ -56,8 +56,7 @@ public class Token {
     try {
       nativeMechanisms = module.getPKCS11().C_GetMechanismList(slotID);
     } catch (PKCS11Exception ex) {
-      LOG.warn("error calling C_GetMechanismList: {}",
-          ex.getMessage());
+      LOG.warn("error calling C_GetMechanismList: {}", ex.getMessage());
       mechCodes = new long[0];
       return;
     }
@@ -68,8 +67,7 @@ public class Token {
       try {
         mechInfo = module.getPKCS11().C_GetMechanismInfo(slotID, ckm);
       } catch (PKCS11Exception ex) {
-        LOG.warn(
-            "error calling C_GetMechanismInfo for mechanism {}: {}",
+        LOG.warn("error calling C_GetMechanismInfo for mechanism {}: {}",
             PKCS11T.ckmCodeToName(ckm), ex.getMessage());
         continue;
       }
@@ -173,23 +171,18 @@ public class Token {
    * @exception PKCS11Exception
    *            If the session could not be opened.
    */
-  public Session openSession(boolean rwSession, SessionAuth auth)
-      throws PKCS11Exception {
-    long flags = rwSession
-        ? CKF_SERIAL_SESSION | CKF_RW_SESSION : CKF_SERIAL_SESSION;
+  public Session openSession(boolean rwSession, SessionAuth auth) throws PKCS11Exception {
+    long flags = rwSession ? CKF_SERIAL_SESSION | CKF_RW_SESSION : CKF_SERIAL_SESSION;
     long sessionHandle = rawOpenSession(flags, null);
     Session session = new Session(this, sessionHandle, flags);
     session.setAuth(auth);
     return session;
   }
 
-  synchronized long rawOpenSession(long flags, Long oldHandle)
-      throws PKCS11Exception {
-    long sessionHandle = slot.getModule().getPKCS11().C_OpenSession(
-        slotID, flags, oldHandle);
+  synchronized long rawOpenSession(long flags, Long oldHandle) throws PKCS11Exception {
+    long sessionHandle = slot.getModule().getPKCS11().C_OpenSession(slotID, flags, oldHandle);
 
-    LOG.info(
-        "C_OpenSession: slotID={}, flags=0x{}, sessionHandle={}",
+    LOG.info("C_OpenSession: slotID={}, flags=0x{}, sessionHandle={}",
         slotID, Functions.toFullHex(flags), sessionHandle);
     return sessionHandle;
   }

@@ -26,8 +26,7 @@ public class PkiErrorException extends Exception {
   }
 
   public PkiErrorException(PkiStatusInfo statusInfo) {
-    this(statusInfo.status(), statusInfo.pkiFailureInfo(),
-        statusInfo.statusMessage());
+    this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
   }
 
   public PkiErrorException(

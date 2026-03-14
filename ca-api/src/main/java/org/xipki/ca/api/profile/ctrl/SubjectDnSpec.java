@@ -36,8 +36,7 @@ import java.util.StringTokenizer;
  */
 public class SubjectDnSpec {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SubjectDnSpec.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SubjectDnSpec.class);
 
   private enum StringControl {
     IA5,
@@ -69,14 +68,11 @@ public class SubjectDnSpec {
   // Lijun Liao (xipki).
   private static final Range RANGE_NAME = new Range(1, 256);
 
-  private static final Map<ASN1ObjectIdentifier, Range> RANGES =
-      new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, Range> RANGES = new HashMap<>();
 
-  private static final Map<ASN1ObjectIdentifier, TextVadidator> PATTERNS =
-      new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, TextVadidator> PATTERNS = new HashMap<>();
 
-  private static final Map<ASN1ObjectIdentifier, StringControl>
-      STRING_CONTROLS = new HashMap<>();
+  private static final Map<ASN1ObjectIdentifier, StringControl> STRING_CONTROLS = new HashMap<>();
 
   private static final List<ASN1ObjectIdentifier> FORWARD_DNS;
 
@@ -84,8 +80,7 @@ public class SubjectDnSpec {
 
   static {
     // ----- RDN order -----
-    BufferedReader reader = getReader("org.xipki.ca.rdnorder.cfg",
-        "/conf/rdnorder.cfg");
+    BufferedReader reader = getReader("org.xipki.ca.rdnorder.cfg", "/conf/rdnorder.cfg");
     List<ASN1ObjectIdentifier> tmpForwardDNs = new ArrayList<>(25);
     String line;
     try {
@@ -95,8 +90,7 @@ public class SubjectDnSpec {
           continue;
         }
 
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(line);
-        tmpForwardDNs.add(oid);
+        tmpForwardDNs.add(new ASN1ObjectIdentifier(line));
       }
     } catch (Exception ex) {
       throw new ExceptionInInitializerError(new Exception(
@@ -171,8 +165,7 @@ public class SubjectDnSpec {
     Set<ASN1ObjectIdentifier> ids = new HashSet<>();
 
     // businessCategory
-    conf(ids, OIDs.DN.businessCategory, RANGE_128,
-        StringControl.PrintableOrUtf8);
+    conf(ids, OIDs.DN.businessCategory, RANGE_128, StringControl.PrintableOrUtf8);
 
     // countryName, countryOfCitizenship, countryOfResidence,
     // jurisdictionOfIncorporationCountryName
@@ -204,8 +197,7 @@ public class SubjectDnSpec {
     PATTERNS.put(OIDs.DN.gender, TextVadidator.GENDER);
 
     // generation qualifier
-    conf(ids, OIDs.DN.generationQualifier, RANGE_64,
-        StringControl.PrintableOrUtf8);
+    conf(ids, OIDs.DN.generationQualifier, RANGE_64, StringControl.PrintableOrUtf8);
 
     // givenName
     conf(ids, OIDs.DN.givenName, RANGE_64, StringControl.PrintableOrUtf8);
@@ -217,8 +209,7 @@ public class SubjectDnSpec {
     conf(ids, OIDs.DN.userid, null, StringControl.PrintableOrUtf8);
 
     // localityName, jurisdictionOfIncorporationLocalityName
-    idList = new ASN1ObjectIdentifier[] {OIDs.DN.locality,
-        OIDs.DN.jurIncorporationLocality};
+    idList = new ASN1ObjectIdentifier[] {OIDs.DN.locality, OIDs.DN.jurIncorporationLocality};
     for (ASN1ObjectIdentifier m : idList) {
       conf(ids, m, RANGE_128, StringControl.PrintableOrUtf8);
     }
@@ -233,12 +224,10 @@ public class SubjectDnSpec {
     conf(ids, OIDs.DN.organization, RANGE_64, StringControl.PrintableOrUtf8);
 
     // organizationIdentifier
-    conf(ids, OIDs.DN.organizationIdentifier, RANGE_64,
-        StringControl.PrintableOrUtf8);
+    conf(ids, OIDs.DN.organizationIdentifier, RANGE_64, StringControl.PrintableOrUtf8);
 
     // organizationalUnitName
-    conf(ids, OIDs.DN.organizationalUnit, RANGE_64,
-        StringControl.PrintableOrUtf8);
+    conf(ids, OIDs.DN.organizationalUnit, RANGE_64, StringControl.PrintableOrUtf8);
 
     // placeOfBirth
     conf(ids, OIDs.DN.placeOfBirth, RANGE_128, StringControl.PrintableOrUtf8);
@@ -247,8 +236,7 @@ public class SubjectDnSpec {
     conf(ids, OIDs.DN.postalAddress, RANGE_POSTAL_ADDRESS, null);
 
     // postalCode
-    conf(ids, OIDs.DN.postalCode, RANGE_POSTAL_CODE,
-        StringControl.PrintableOrUtf8);
+    conf(ids, OIDs.DN.postalCode, RANGE_POSTAL_CODE, StringControl.PrintableOrUtf8);
 
     // pseudonym
     conf(ids, OIDs.DN.pseudonym, RANGE_64, StringControl.PrintableOrUtf8);
@@ -260,8 +248,7 @@ public class SubjectDnSpec {
     conf(ids, OIDs.DN.serialNumber, RANGE_64, StringControl.Printable);
 
     // stateOrProvinceName, jurisdictionOfIncorporationStateOrProvinceName
-    idList = new ASN1ObjectIdentifier[] {OIDs.DN.state,
-        OIDs.DN.jurIncorporationState};
+    idList = new ASN1ObjectIdentifier[] {OIDs.DN.state, OIDs.DN.jurIncorporationState};
     for (ASN1ObjectIdentifier m : idList) {
       conf(ids, m, RANGE_128, StringControl.PrintableOrUtf8);
     }
@@ -292,8 +279,8 @@ public class SubjectDnSpec {
   }
 
   private static void conf(
-      Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type, Range range,
-      StringControl stringControl) {
+      Set<ASN1ObjectIdentifier> types, ASN1ObjectIdentifier type,
+      Range range, StringControl stringControl) {
     types.add(type);
     if (range != null) {
       RANGES.put(type, range);
@@ -341,7 +328,7 @@ public class SubjectDnSpec {
           if (stringType == null) {
             control.setStringType(StringType.utf8String);
           } else if (stringType != StringType.printableString
-                  && stringType != StringType.utf8String) {
+              && stringType != StringType.utf8String) {
             control.setStringType(StringType.utf8String);
           }
       }
@@ -354,20 +341,17 @@ public class SubjectDnSpec {
 
   public static boolean isValidCountryAreaCode(String code) {
     Args.notBlank(code, "code");
-    return COUNTRY_AREA_CODES.isEmpty()
-        || COUNTRY_AREA_CODES.contains(code.toUpperCase());
+    return COUNTRY_AREA_CODES.isEmpty() || COUNTRY_AREA_CODES.contains(code.toUpperCase());
   }
 
-  private static BufferedReader getReader(
-      String propKey, String fallbackResource) {
+  private static BufferedReader getReader(String propKey, String fallbackResource) {
     String confFile = System.getProperty(propKey);
     if (StringUtil.isNotBlank(confFile)) {
       LOG.info("read from file {}", confFile);
       try {
         return Files.newBufferedReader(Paths.get(confFile));
       } catch (IOException ex) {
-        throw new IllegalStateException(
-            "could not access non-existing file " + confFile);
+        throw new IllegalStateException("could not access non-existing file " + confFile);
       }
     } else {
       InputStream confStream = Optional.ofNullable(
@@ -375,8 +359,7 @@ public class SubjectDnSpec {
           .orElseThrow(() -> new IllegalStateException(
               "could not access non-existing resource " + fallbackResource));
       LOG.info("read from resource {}", fallbackResource);
-      return new BufferedReader(
-          new InputStreamReader(confStream, StandardCharsets.UTF_8));
+      return new BufferedReader(new InputStreamReader(confStream, StandardCharsets.UTF_8));
     }
   } // method getReader
 

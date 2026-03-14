@@ -1,0 +1,14 @@
+tokentypes = [PKCS11 PKCS12]; each ($tokentypes) {
+  tokentype = $it
+
+  keyspecs = [ RSA2048 RSA2048/PSS P256 SM2 ED25519 MLDSA44 ]; each ($keyspecs) {
+    keyspec = $it
+
+    echo "+++++source qa/camgmt.script    $tokentype $keyspec +++++"
+               source qa/camgmt.script    $tokentype $keyspec
+
+    echo "+++++source qa/camgmt.script -l $tokentype $keyspec +++++"
+               source qa/camgmt.script -l $tokentype $keyspec
+  }
+
+}

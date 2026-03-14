@@ -31,6 +31,13 @@ public class StringUtil {
   private StringUtil() {
   }
 
+  /**
+   * Resolve the placeholder ${env:ENVIROMENT-NAME} for the environment, and
+   * ${sys:JAVA-PROPERTY-NAME} for the Java system property.
+   *
+   * @param value the value
+   * @return resolved value.
+   */
   public static String resolveVariables(String value) {
     // resolve value
     List<String> varTypes = null;
@@ -50,8 +57,7 @@ public class StringUtil {
             positions = new LinkedList<>();
           }
 
-          varTypes.add(StringUtil.startsWithIgnoreCase(
-              value, "${env:", i) ? "env" : "sys");
+          varTypes.add(StringUtil.startsWithIgnoreCase(value, "${env:", i) ? "env" : "sys");
           varNames.add(value.substring(i + 6, closeIndex));
           positions.add(new int[]{i, closeIndex});
 
@@ -91,8 +97,7 @@ public class StringUtil {
       }
       valueBuilder.append(thisValue);
 
-      int nextVarStartIndex = (i == n - 1) ? value.length()
-          : positions.get(i + 1)[0];
+      int nextVarStartIndex = (i == n - 1) ? value.length() : positions.get(i + 1)[0];
 
       if (nextVarStartIndex > indexes[1] + 1) {
         valueBuilder.append(value, indexes[1] + 1, nextVarStartIndex);
@@ -139,8 +144,7 @@ public class StringUtil {
     return (tokens == null) ? null : tokens.toArray(new String[0]);
   }
 
-  public static String collectionAsString(
-      Collection<String> set, String delim) {
+  public static String collectionAsString(Collection<String> set, String delim) {
     if (set == null) {
       return null;
     }
@@ -160,8 +164,7 @@ public class StringUtil {
     return startsWithIgnoreCase(str, prefix, 0);
   }
 
-  public static boolean startsWithIgnoreCase(
-      String str, String prefix, int offset) {
+  public static boolean startsWithIgnoreCase(String str, String prefix, int offset) {
     if (str.length() < offset + prefix.length()) {
       return false;
     }
@@ -370,9 +373,8 @@ public class StringUtil {
 
       String classPath = resource.toString();
 
-      String manifestPath =
-          classPath.substring(0, classPath.length() - className.length()) +
-          "/META-INF/MANIFEST.MF";
+      String manifestPath = classPath.substring(0, classPath.length() - className.length()) +
+                            "/META-INF/MANIFEST.MF";
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       Attributes attrs = manifest.getMainAttributes();
       String version = attrs.getValue("Bundle-Version");
@@ -382,8 +384,7 @@ public class StringUtil {
 
       String buildNumber = attrs.getValue("Bundle-Build-Id");
       String timestamp = attrs.getValue("Bundle-Build-Timestamp");
-      String desc = version + " buildNumber " + buildNumber +
-                    " built at " + timestamp;
+      String desc = version + " buildNumber " + buildNumber + " built at " + timestamp;
       if (withName) {
         desc = attrs.getValue("Bundle-SymbolicName") + " " + desc;
       }

@@ -1,0 +1,14 @@
+BASE_URL = https://localhost:$[gateway.https.port]/gw/rest/subcawithcrl
+CERTPROFILE = "?profile=tls"
+OUT_DIR = output/rest-raw
+source file:./qa/rest0.script
+
+BASE_URL = https://localhost:$[gateway.https.port]/gw/rest/myalias
+CERTPROFILE = ""
+OUT_DIR = output/rest-alias
+source file:./qa/rest0.script
+
+BASE_URL = https://localhost:$[gateway.https.port]/gw/rest
+CERTPROFILE = ""
+OUT_DIR = output/rest-none
+source file:./qa/rest0.script

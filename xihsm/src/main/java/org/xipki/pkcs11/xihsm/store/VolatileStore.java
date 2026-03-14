@@ -20,12 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class VolatileStore implements Store {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(VolatileStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VolatileStore.class);
 
   private final HashMap<Long, Slot> slotsMap = new HashMap<>();
 
@@ -41,8 +42,7 @@ public class VolatileStore implements Store {
   }
 
   @Override
-  public void destroyObject(long slotId, long hObject, LoginState loginState)
-      throws HsmException {
+  public void destroyObject(long slotId, long hObject, LoginState loginState) throws HsmException {
     getSlot(slotId).destroyObject(hObject, loginState);
   }
 
@@ -52,11 +52,9 @@ public class VolatileStore implements Store {
   }
 
   @Override
-  public long[] nextKeyPairHandles(long slotId)
-      throws HsmException {
+  public long[] nextKeyPairHandles(long slotId) throws HsmException {
     Slot slot = getSlot(slotId);
-    return new long[] {
-        slot.nextObjectHandle(), slot.nextObjectHandle()};
+    return new long[] {slot.nextObjectHandle(), slot.nextObjectHandle()};
   }
 
   @Override
@@ -68,8 +66,7 @@ public class VolatileStore implements Store {
   }
 
   @Override
-  public void findObjects(List<Long> res, long slotId, LoginState loginState,
-                          XiTemplate criteria)
+  public void findObjects(List<Long> res, long slotId, LoginState loginState, XiTemplate criteria)
       throws HsmException {
     getSlot(slotId).findObjects(res, loginState, criteria);
   }
@@ -81,20 +78,18 @@ public class VolatileStore implements Store {
   }
 
   @Override
-  public XiP11Storage getObject(
-      long slotId, long hObject, LoginState loginState) throws HsmException {
+  public XiP11Storage getObject(long slotId, long hObject, LoginState loginState)
+      throws HsmException {
     return getSlot(slotId).getObject(hObject, loginState);
   }
 
   private Slot getSlot(long slotId) throws HsmException {
     return Optional.ofNullable(slotsMap.get(slotId)).orElseThrow(
-        () -> new HsmException(PKCS11T.CKR_SLOT_ID_INVALID,
-              "invalid slot id " + slotId));
+        () -> new HsmException(PKCS11T.CKR_SLOT_ID_INVALID, "invalid slot id " + slotId));
   }
 
   @Override
-  public void updateObject(
-      long slotId, long hObject, LoginState loginState, XiTemplate attrs)
+  public void updateObject(long slotId, long hObject, LoginState loginState, XiTemplate attrs)
       throws HsmException {
     getSlot(slotId).setAttributeValues(hObject, loginState, attrs);
   }
@@ -103,11 +98,9 @@ public class VolatileStore implements Store {
 
     private final long slotId;
 
-    private final Map<Long, XiP11Storage> handleObjectMap =
-        new ConcurrentHashMap<>();
+    private final Map<Long, XiP11Storage> handleObjectMap = new ConcurrentHashMap<>();
 
-    private final AtomicLong nextHandle =
-        new AtomicLong(Backend.MIN_VOLATILE_HANDLE);
+    private final AtomicLong nextHandle = new AtomicLong(Backend.MIN_VOLATILE_HANDLE);
 
     public Slot(long slotId) {
       this.slotId = slotId;
@@ -123,8 +116,7 @@ public class VolatileStore implements Store {
       handleObjectMap.put(handle, object);
     }
 
-    void findObjects(List<Long> res, LoginState loginState,
-                     XiTemplate criteria) {
+    void findObjects(List<Long> res, LoginState loginState, XiTemplate criteria) {
       for (Map.Entry<Long, XiP11Storage> kv : handleObjectMap.entrySet()) {
         if (kv.getValue().match(criteria)) {
           if (kv.getValue().isVisibleForCku(loginState)) {
@@ -134,8 +126,7 @@ public class VolatileStore implements Store {
       }
     }
 
-    XiP11Storage getObject(long hObject, LoginState loginState)
-        throws HsmException {
+    XiP11Storage getObject(long hObject, LoginState loginState) throws HsmException {
       XiP11Storage ret = handleObjectMap.get(hObject);
       if (ret == null) {
         throw new HsmException(PKCS11T.CKR_OBJECT_HANDLE_INVALID,
@@ -150,12 +141,10 @@ public class VolatileStore implements Store {
       return ret;
     }
 
-    void destroyObject(long hObject, LoginState loginState)
-        throws HsmException {
+    void destroyObject(long hObject, LoginState loginState) throws HsmException {
       XiP11Storage obj = getObject(hObject, loginState);
       if (!obj.isDestroyable()) {
-        throw new HsmException(PKCS11T.CKR_ACTION_PROHIBITED,
-            "object is not destroyable");
+        throw new HsmException(PKCS11T.CKR_ACTION_PROHIBITED, "object is not destroyable");
       }
 
       handleObjectMap.remove(obj.getHandle());
@@ -166,8 +155,8 @@ public class VolatileStore implements Store {
       handleObjectMap.clear();
     }
 
-    void setAttributeValues(long hObject, LoginState loginState,
-                            XiTemplate attributes) throws HsmException {
+    void setAttributeValues(long hObject, LoginState loginState, XiTemplate attributes)
+        throws HsmException {
       getObject(hObject, loginState).updateAttributes(loginState,
           ObjectInitMethod.UPDATE, attributes);
     }
@@ -178,8 +167,8 @@ public class VolatileStore implements Store {
           long handle = nextHandle.getAndIncrement();
           if (nextHandle.get() > Backend.MAX_VOLATILE_HANDLE) {
             nextHandle.set(Backend.MIN_VOLATILE_HANDLE);
-            LOG.warn("nextObjectHandle for volatile objects reached end," +
-                "reset it to {}", Backend.MIN_VOLATILE_HANDLE);
+            LOG.warn("nextObjectHandle for volatile objects reached end,reset it to {}",
+                Backend.MIN_VOLATILE_HANDLE);
           }
 
           if (!handleObjectMap.containsKey(handle)) {

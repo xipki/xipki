@@ -52,16 +52,14 @@ public class AuditEvent {
   }
 
   public AuditEvent(String applicationName, Instant timestamp) {
-    this.applicationName = applicationName == null ? "undefined"
-        : applicationName;
+    this.applicationName = applicationName == null ? "undefined" : applicationName;
     this.timestamp = (timestamp == null) ? Instant.now() : timestamp;
     this.level = AuditLevel.INFO;
     this.duration = null;
   }
 
   public AuditLevel level() {
-    return (status == AuditStatus.FAILED && AuditLevel.INFO == level)
-        ? AuditLevel.WARN : level;
+    return (status == AuditStatus.FAILED && AuditLevel.INFO == level) ? AuditLevel.WARN : level;
   }
 
   public void setLevel(AuditLevel level) {

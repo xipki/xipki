@@ -47,8 +47,7 @@ public class Audits {
     }
 
     public static AuditConf parse(JsonMap json) throws CodecException {
-      return new AuditConf(json.getString("type"),
-          ConfPairs.parse(json.getMap("conf")));
+      return new AuditConf(json.getString("type"), ConfPairs.parse(json.getMap("conf")));
     }
 
   }
@@ -81,7 +80,7 @@ public class Audits {
         service = new NoopAuditService();
       } else if ("file-mac".equalsIgnoreCase(auditType)) {
         service = new FileMacAuditService();
-      } else if ("db-mac".equalsIgnoreCase(auditType)
+      } else if (  "db-mac".equalsIgnoreCase(auditType)
           || "database-mac".equalsIgnoreCase(auditType)) {
         service = new DatabaseMacAuditService();
       } else {

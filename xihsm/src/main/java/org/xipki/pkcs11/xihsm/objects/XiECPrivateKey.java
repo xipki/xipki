@@ -15,6 +15,8 @@ import org.xipki.util.codec.Args;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 abstract class XiECPrivateKey extends XiPrivateKey {
@@ -92,30 +94,24 @@ abstract class XiECPrivateKey extends XiPrivateKey {
    */
   protected final byte[] value;
 
-  XiECPrivateKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, long keyType,
-      Long keyGenMechanism, byte[] ecParams, byte[] value) {
-    super(vendor, cku, newObjectMethod, handle, inToken, keyType,
-        keyGenMechanism);
+  XiECPrivateKey(XiHsmVendor vendor, long cku, Origin newObjectMethod,
+                long handle, boolean inToken, long keyType,
+                Long keyGenMechanism, byte[] ecParams, byte[] value) {
+    super(vendor, cku, newObjectMethod, handle, inToken, keyType, keyGenMechanism);
     this.ecParams = Args.notNull(ecParams, "ecParams");
     this.value    = Args.notNull(value, "value");
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertEcPrivateKeyAttributesSettable(attrs);
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
-
     addAttr(res, types, PKCS11T.CKA_EC_PARAMS, ecParams);
-
     if (withAll || !isSensitive()) {
       addAttr(res, types, PKCS11T.CKA_VALUE, value);
     }

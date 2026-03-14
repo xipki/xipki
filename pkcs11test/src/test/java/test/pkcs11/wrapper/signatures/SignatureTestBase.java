@@ -3,12 +3,11 @@
 
 package test.pkcs11.wrapper.signatures;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.BeforeClass;
+import org.xipki.security.util.KeyUtil;
 import test.pkcs11.wrapper.TestBase;
 
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 
@@ -21,9 +20,7 @@ public abstract class SignatureTestBase extends TestBase {
 
   @BeforeClass
   public static void addProvider() {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(new BouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
   }
 
   protected void jceVerifySignature(
@@ -31,7 +28,7 @@ public abstract class SignatureTestBase extends TestBase {
       byte[] data, byte[] signatureValue) throws Exception {
     // verify with JCE
     PublicKey jcePublicKey = generateJCEPublicKey(publicKeyHandle, keyType);
-    Signature signature = Signature.getInstance(algorithm, "BC");
+    Signature signature = Signature.getInstance(algorithm, KeyUtil.providerName(algorithm));
     signature.initVerify(jcePublicKey);
     signature.update(data);
     boolean valid = signature.verify(signatureValue);

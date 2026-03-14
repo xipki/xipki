@@ -11,7 +11,7 @@ import org.xipki.qa.ValidationResult;
 /**
  * QA for Certprofile.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public interface CertprofileQa {

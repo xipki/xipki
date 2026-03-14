@@ -23,12 +23,10 @@ public class SqlStateCodes {
       super();
       // 57: out-of-memory exception / database not started
       // 58: unexpected system error
-      dataAccessResourceFailureCodes = addToSet(
-          dataAccessResourceFailureCodes, "57", "58");
+      dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "57", "58");
 
       // 51: communication failure
-      transientDataAccessResourceCodes = addToSet(
-          transientDataAccessResourceCodes, "51");
+      transientDataAccessResourceCodes = addToSet(transientDataAccessResourceCodes, "51");
     }
 
   } // class DB2
@@ -73,8 +71,7 @@ public class SqlStateCodes {
     PostgreSQL() {
       // 53: insufficient resources (e.g. disk full)
       // 54: program limit exceeded (e.g. statement too complex)
-      dataAccessResourceFailureCodes = addToSet(
-          dataAccessResourceFailureCodes, "53", "54");
+      dataAccessResourceFailureCodes = addToSet(dataAccessResourceFailureCodes, "53", "54");
     }
 
   } // class PostgreSQL

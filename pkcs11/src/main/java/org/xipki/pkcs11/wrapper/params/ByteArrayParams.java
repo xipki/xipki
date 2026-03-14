@@ -41,12 +41,10 @@ public class ByteArrayParams extends CkParams {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    return  indent + "ByteArray Params:\n"
-        + Functions.toString(indent + "  ", bytes);
+    return  indent + "ByteArray Params:\n" + Functions.toString(indent + "  ", bytes);
   }
 
-  public static ByteArrayParams decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static ByteArrayParams decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.ByteArrayParams);
     return new ByteArrayParams(readByteArray(arch, encoded, off));

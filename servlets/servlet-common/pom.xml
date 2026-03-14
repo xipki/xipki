@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.servlet</groupId>
-    <artifactId>servlet-parent</artifactId>
+    <artifactId>servlets</artifactId>
     <version>6.6.0-SNAPSHOT</version>
   </parent>
   <artifactId>servlet-common</artifactId>
@@ -29,6 +29,12 @@
       <artifactId>jakarta.servlet-api</artifactId>
       <version>5.0.0</version>
       <scope>compile</scope>
+    </dependency>
+    <!-- OSGI -->
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>osgi-placeholder</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

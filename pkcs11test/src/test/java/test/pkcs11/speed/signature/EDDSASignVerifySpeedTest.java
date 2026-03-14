@@ -37,8 +37,7 @@ public class EDDSASignVerifySpeedTest extends TestBase {
 
     public MySignExecutor() throws TokenException {
       super(ckmCodeToName(signMechanism) + " (Ed25519) Sign Speed",
-          new CkMechanism(signMechanism),
-          107);
+          new CkMechanism(signMechanism), 107);
     }
 
     @Override
@@ -60,12 +59,10 @@ public class EDDSASignVerifySpeedTest extends TestBase {
   public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
-    Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) + " is not supported, skip test",
         token.supportsMechanism(keypairGenMechanism, CKF_GENERATE_KEY_PAIR));
 
-    Assume.assumeTrue(ckmCodeToName(signMechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(signMechanism) + " is not supported, skip test",
         token.supportsMechanism(signMechanism, CKF_SIGN));
 
     BenchmarkExecutor executor = new MySignExecutor();

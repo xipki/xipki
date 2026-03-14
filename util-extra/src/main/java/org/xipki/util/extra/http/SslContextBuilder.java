@@ -72,12 +72,10 @@ public class SslContextBuilder {
 
   private String protocol;
   private final Set<KeyManager> keyManagers;
-  private String keyManagerFactoryAlgorithm =
-      KeyManagerFactory.getDefaultAlgorithm();
+  private String keyManagerFactoryAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
   private String keyStoreType = KeyStore.getDefaultType();
   private final Set<TrustManager> trustManagers;
-  private String trustManagerFactoryAlgorithm =
-      TrustManagerFactory.getDefaultAlgorithm();
+  private String trustManagerFactoryAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
   private SecureRandom secureRandom;
   private Provider provider;
 
@@ -158,8 +156,7 @@ public class SslContextBuilder {
    *      "https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyManagerFactory">Java
    *      Cryptography Architecture Standard Algorithm Name Documentation</a>
    */
-  public SslContextBuilder setKeyManagerFactoryAlgorithm(
-      String keyManagerFactoryAlgorithm) {
+  public SslContextBuilder setKeyManagerFactoryAlgorithm(String keyManagerFactoryAlgorithm) {
     this.keyManagerFactoryAlgorithm = keyManagerFactoryAlgorithm;
     return this;
   }
@@ -198,14 +195,12 @@ public class SslContextBuilder {
     return this;
   }
 
-  public SslContextBuilder loadTrustMaterial()
-      throws NoSuchAlgorithmException, KeyStoreException {
+  public SslContextBuilder loadTrustMaterial() throws NoSuchAlgorithmException, KeyStoreException {
     return loadTrustMaterial(null);
   }
 
   public SslContextBuilder loadTrustMaterial(File file, char[] storePassword)
-      throws NoSuchAlgorithmException, KeyStoreException,
-      CertificateException, IOException {
+      throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(file, "Truststore file");
     try (InputStream is = Files.newInputStream(file.toPath())) {
       return loadTrustMaterial(is, storePassword);
@@ -227,8 +222,7 @@ public class SslContextBuilder {
    */
   public SslContextBuilder loadTrustMaterial(
       InputStream instream, char[] storePassword)
-      throws NoSuchAlgorithmException, KeyStoreException, CertificateException,
-      IOException {
+      throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
     Args.notNull(instream, "Truststore instream");
     final KeyStore trustStore = KeyStore.getInstance(keyStoreType);
     trustStore.load(instream, storePassword);
@@ -237,12 +231,10 @@ public class SslContextBuilder {
 
   public SslContextBuilder loadKeyMaterial(
       KeyStore keystore, char[] keyPassword)
-      throws NoSuchAlgorithmException, KeyStoreException,
-      UnrecoverableKeyException {
+      throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
     final KeyManagerFactory kmfactory = KeyManagerFactory.getInstance(
         keyManagerFactoryAlgorithm == null
-            ? KeyManagerFactory.getDefaultAlgorithm()
-            : keyManagerFactoryAlgorithm);
+            ? KeyManagerFactory.getDefaultAlgorithm() : keyManagerFactoryAlgorithm);
     kmfactory.init(keystore, keyPassword);
     final KeyManager[] kms = kmfactory.getKeyManagers();
     if (kms != null) {
@@ -276,15 +268,12 @@ public class SslContextBuilder {
       Collection<TrustManager> trustManagers, SecureRandom secureRandom)
       throws KeyManagementException {
     sslContext.init(
-        keyManagers.isEmpty() ? null
-            : keyManagers.toArray(new KeyManager[0]),
-        trustManagers.isEmpty() ? null
-            : trustManagers.toArray(new TrustManager[0]),
+        keyManagers.isEmpty()   ? null : keyManagers.toArray(new KeyManager[0]),
+        trustManagers.isEmpty() ? null : trustManagers.toArray(new TrustManager[0]),
         secureRandom);
   }
 
-  public SSLContext build()
-      throws NoSuchAlgorithmException, KeyManagementException {
+  public SSLContext build() throws NoSuchAlgorithmException, KeyManagementException {
     final String protocolStr = this.protocol != null ? this.protocol : TLS;
     final SSLContext sslContext = (this.provider == null)
         ? SSLContext.getInstance(protocolStr)

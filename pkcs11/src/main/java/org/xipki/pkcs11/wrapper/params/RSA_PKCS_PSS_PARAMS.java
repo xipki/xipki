@@ -87,11 +87,10 @@ public class RSA_PKCS_PSS_PARAMS extends CkParams {
   @Override
   public String toString(PKCS11Module module, String indent) {
     return toString(indent, module, "hashAlg", ckmName(hashAlg, module),
-       "mgf", mgfName(mgf, module), "sLen", sLen);
+      "mgf", mgfName(mgf, module), "sLen", sLen);
   }
 
-  public static RSA_PKCS_PSS_PARAMS decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static RSA_PKCS_PSS_PARAMS decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.RSA_PKCS_PSS_PARAMS);
     return new RSA_PKCS_PSS_PARAMS(readLong(arch, encoded, off),

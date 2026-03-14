@@ -6,7 +6,7 @@ package org.xipki.pkcs11.xihsm.util;
 /**
  * The method to create the P11 object.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public enum ObjectInitMethod {
 

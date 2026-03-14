@@ -22,8 +22,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.ckmCodeToName;
  */
 public abstract class KeyGenExecutor extends Pkcs11Executor {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(KeyGenExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(KeyGenExecutor.class);
 
   public class MyRunnable implements Runnable {
 
@@ -43,8 +42,7 @@ public abstract class KeyGenExecutor extends Pkcs11Executor {
             secretKeyTemplate.id(id);
           }
 
-          PKCS11KeyId key = TestHSMs.getHsmForSpeed().getToken()
-              .generateKey(secretKeyTemplate);
+          PKCS11KeyId key = TestHSMs.getHsmForSpeed().getToken().generateKey(secretKeyTemplate);
           destroyKey(LOG, key);
 
           account(1, 0);
@@ -76,8 +74,7 @@ public abstract class KeyGenExecutor extends Pkcs11Executor {
   }
 
   private static String describe(long mechanism, int keyLen, boolean inToken) {
-    StringBuilder sb = new StringBuilder(100)
-      .append(ckmCodeToName(mechanism)).append(" (");
+    StringBuilder sb = new StringBuilder(100).append(ckmCodeToName(mechanism)).append(" (");
     if (keyLen > 0) {
       sb.append(keyLen * 8).append(" bits, ");
     }

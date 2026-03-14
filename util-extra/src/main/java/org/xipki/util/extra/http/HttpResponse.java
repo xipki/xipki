@@ -39,9 +39,8 @@ public class HttpResponse {
     this(statusCode, contentType, headers, false, body);
   }
 
-  public HttpResponse(
-      int statusCode, String contentType, Map<String, String> headers,
-      boolean base64, byte[] body) {
+  public HttpResponse(int statusCode, String contentType, Map<String, String> headers,
+                      boolean base64, byte[] body) {
     this.statusCode = statusCode;
     this.base64 = base64;
     this.contentType = contentType;
@@ -74,8 +73,7 @@ public class HttpResponse {
     return body;
   }
   public HttpResponse putHeader(String name, String value) {
-    List<String> values = headers.computeIfAbsent(name,
-        k -> new ArrayList<>(1));
+    List<String> values = headers.computeIfAbsent(name, k -> new ArrayList<>(1));
     values.add(value);
     return this;
   }

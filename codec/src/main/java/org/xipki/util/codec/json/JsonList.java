@@ -138,16 +138,14 @@ public class JsonList {
     List<Integer> ret = new ArrayList<>(lret.size());
     for (long l : lret) {
       if (l  < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-        throw new CodecException(
-            "At least one value is out of range of int32");
+        throw new CodecException("At least one value is out of range of int32");
       }
       ret.add((int) l);
     }
     return ret;
   }
 
-  public <T extends Enum<T>> List<T> toEnumList(Class<T> clazz)
-      throws CodecException {
+  public <T extends Enum<T>> List<T> toEnumList(Class<T> clazz) throws CodecException {
     List<T> ret = new ArrayList<>(list.size());
     int index = 0;
     for (Object o : list) {

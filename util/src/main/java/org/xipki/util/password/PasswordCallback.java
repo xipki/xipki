@@ -32,7 +32,6 @@ public interface PasswordCallback {
    * @throws PasswordResolverException
    *         if error occurs
    */
-  char[] getPassword(String prompt, String testToken)
-      throws PasswordResolverException;
+  char[] getPassword(String prompt, String testToken) throws PasswordResolverException;
 
 }

@@ -17,17 +17,23 @@ See also <https://github.com/xipki/xipki/releases>
     certificate profiles (v1) can still be used.
   - Use own JSON and CBOR parser and writer
   - Use own PKCS#11 JNI library.
-  - Update servlet from 3.1.0 to 5.0
+  - Update servlet from 3.1.0 to 5.0:
+    - remove support of tomcat 8 and tomcat 9
   - Dependencies Update
+    - OSGi blueprint: removed
     - ipkcs11wrapper: removed
-    - jackson: removed
-    - karaf: 4.4.4 -> 4.4.8
-    - bouncycastle: 1.77 -> 1.83
-    - dnsjava: 3.5.3 -> 3.5.4
-    - log4j: 2.22.1 -> 2.25.3
-    - mariadb jdbc client: 3.3.0 -> 3.5.7
-    - postgresql jdbc client: 42.7.0 -> 42.7.9
-    - h2 jdbc client: 2.2.224 -> 2.4.240
+    - zip4j:          removed
+    - jackson:        removed
+    - log4j:          removed
+    - hikaricp:       4.0.3 -> 7.0.2
+    - karaf:          4.4.4 -> 4.4.8
+    - dnsjava:        3.5.3 -> 3.6.4
+    - slf4j:          1.7.3 -> 2.0.17
+    - jdbc drivers
+      - mariadb:      3.3.0   -> 3.5.7
+      - postgresql:   42.7.0  -> 42.7.9
+      - h2:           2.2.224 -> 2.4.240
+    - bouncycastle:  1.77 -> 2.73.10-lts and v2.0.x-fips
 
 ## 6.5.3
 - Release date: 2024/01/01
@@ -48,7 +54,7 @@ See also <https://github.com/xipki/xipki/releases>
   - Add demo scripts.
   - Command ca:ca-info: prints also the associated publishers, profiles and requestors.
 - Dependencies
-  - dnsjava:           3.5.2    -> 3.5.3
+  - dnsjava: 3.5.2 -> 3.5.3
 
 ## 6.5.1
 - Release date: 2023/12/02

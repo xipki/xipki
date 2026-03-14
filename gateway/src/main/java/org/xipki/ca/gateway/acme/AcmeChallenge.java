@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -35,10 +36,9 @@ public class AcmeChallenge implements JsonEncodable {
   private AcmeAuthz authz;
 
   public AcmeChallenge(String type, int subId, String token,
-                       String expectedAuthorization, ChallengeStatus status) {
+                      String expectedAuthorization, ChallengeStatus status) {
     this.subId = subId;
-    this.expectedAuthorization = Args.notBlank(expectedAuthorization,
-        "expectedAuthorization");
+    this.expectedAuthorization = Args.notBlank(expectedAuthorization, "expectedAuthorization");
     this.type = Args.notBlank(type, "type");
     this.token = Args.notBlank(token, "token");
     this.status = Args.notNull(status, "status");
@@ -47,13 +47,9 @@ public class AcmeChallenge implements JsonEncodable {
   @Override
   public JsonMap toCodec() {
     Long validatedSec = validated == null ? null : validated.getEpochSecond();
-    return new JsonMap()
-        .put("subId", subId)
-        .put("type", type)
-        .put("token", token)
+    return new JsonMap().put("subId", subId).put("type", type).put("token", token)
         .put("expectedAuthorization", expectedAuthorization)
-        .put("status", status.name())
-        .put("validated", validatedSec);
+        .put("status", status.name()).put("validated", validatedSec);
   }
 
   public static AcmeChallenge parse(JsonMap json) throws CodecException {
@@ -61,11 +57,9 @@ public class AcmeChallenge implements JsonEncodable {
     String type = json.getNnString("type");
     String token = json.getNnString("token");
     String expectedAuthorization = json.getNnString("expectedAuthorization");
-    ChallengeStatus status =
-        ChallengeStatus.valueOf(json.getNnString("status"));
+    ChallengeStatus status = ChallengeStatus.valueOf(json.getNnString("status"));
 
-    AcmeChallenge chall = new AcmeChallenge(type, subId, token,
-        expectedAuthorization, status);
+    AcmeChallenge chall = new AcmeChallenge(type, subId, token, expectedAuthorization, status);
     Long l = json.getLong("validated");
     if (l != null) {
       chall.validated = Instant.ofEpochSecond(l);
@@ -121,8 +115,7 @@ public class AcmeChallenge implements JsonEncodable {
     }
   }
 
-  public ChallengeResponse toChallengeResponse(
-      String baseUrl, long orderId, int authzId) {
+  public ChallengeResponse toChallengeResponse(String baseUrl, long orderId, int authzId) {
     ChallId challId = new ChallId(orderId, authzId, subId);
     String url = baseUrl + "chall/" + challId.toIdText();
 
@@ -135,8 +128,7 @@ public class AcmeChallenge implements JsonEncodable {
   }
 
   public AcmeChallenge copy() {
-    AcmeChallenge copy = new AcmeChallenge(type, subId, token,
-        expectedAuthorization, status);
+    AcmeChallenge copy = new AcmeChallenge(type, subId, token, expectedAuthorization, status);
     copy.validated = validated;
     return copy;
   }

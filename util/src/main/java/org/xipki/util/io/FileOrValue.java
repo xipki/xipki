@@ -76,8 +76,7 @@ public class FileOrValue implements JsonEncodable {
     }
   }
 
-  public static List<FileOrValue> parseList(JsonList json)
-      throws CodecException {
+  public static List<FileOrValue> parseList(JsonList json) throws CodecException {
     if (json == null) {
       return null;
     }
@@ -89,8 +88,7 @@ public class FileOrValue implements JsonEncodable {
     return ret;
   }
 
-  public static FileOrValue[] parseArray(JsonList json)
-      throws CodecException {
+  public static FileOrValue[] parseArray(JsonList json) throws CodecException {
     List<FileOrValue> list = parseList(json);
     return list == null ? null : list.toArray(new FileOrValue[0]);
   }

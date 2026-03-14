@@ -4,6 +4,8 @@
 package org.xipki.pkcs11.xihsm.objects;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiP11Object {

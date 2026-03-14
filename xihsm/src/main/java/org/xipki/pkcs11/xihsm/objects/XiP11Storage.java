@@ -23,13 +23,11 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiP11Storage extends XiP11Object {
-
-  public static final long CKA_XIHSM_CKU = 0x1_FFFF_FFFFL;
-
-  public static final long CKA_XIHSM_ORIGIN = 0x1_FFFF_FFFEL;
 
   /**
    * CK_TRUE if the object is a token object; CK_FALSE if the object is a#
@@ -109,8 +107,7 @@ public abstract class XiP11Storage extends XiP11Object {
     return vendor.isPrivateObjectVisibleToOther() || (cku == loginCku);
   }
 
-  protected static void addAttr(
-      List<XiAttribute> res, long[] types, long type, Object value)
+  protected static void addAttr(List<XiAttribute> res, long[] types, long type, Object value)
       throws HsmException {
     if (value == null) {
       return;
@@ -124,8 +121,7 @@ public abstract class XiP11Storage extends XiP11Object {
       for (XiAttribute attr : res) {
         if (attr.type() == type) {
           throw new HsmException(CKR_GENERAL_ERROR,
-              "duplicated attribute " + PKCS11T.ckaCodeToName(type)
-          );
+              "duplicated attribute " + PKCS11T.ckaCodeToName(type));
         }
       }
 
@@ -133,35 +129,30 @@ public abstract class XiP11Storage extends XiP11Object {
     }
   }
 
-  protected abstract void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException;
+  protected abstract void assertAttributesSettable(XiTemplate attrs) throws HsmException;
 
   protected abstract boolean isDefaultPrivate();
 
   protected void doSetAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     // CKA_PRIVATE
     Boolean b = attrs.removeBool(CKA_PRIVATE);
     if (b != null) {
-      assertNotTrueToFalse(initMethod, CKA_PRIVATE, b,
-          boolValue(private_, isDefaultPrivate()));
+      assertNotTrueToFalse(initMethod, CKA_PRIVATE, b, boolValue(private_, isDefaultPrivate()));
       this.private_ = b;
     }
 
     // CKA_COPYABLE
     b = attrs.removeBool(CKA_COPYABLE);
     if (b != null) {
-      assertNotFalseToTrue(initMethod, CKA_COPYABLE, b,
-          boolValue(this.copyable, true));
+      assertNotFalseToTrue(initMethod, CKA_COPYABLE, b, boolValue(this.copyable, true));
       this.copyable = b;
     }
 
     // CKA_DESTROYABLE
     b = attrs.removeBool(CKA_DESTROYABLE);
     if (b != null) {
-      assertNotFalseToTrue(initMethod, CKA_DESTROYABLE, b,
-          boolValue(this.destroyable, true));
+      assertNotFalseToTrue(initMethod, CKA_DESTROYABLE, b, boolValue(this.destroyable, true));
       this.destroyable = b;
     }
 
@@ -170,14 +161,12 @@ public abstract class XiP11Storage extends XiP11Object {
     // CKA_MODIFIABLE
     b = attrs.removeBool(CKA_MODIFIABLE);
     if (b != null) {
-      assertNotFalseToTrue(initMethod, CKA_MODIFIABLE, b,
-          boolValue(this.modifiable, true));
+      assertNotFalseToTrue(initMethod, CKA_MODIFIABLE, b, boolValue(this.modifiable, true));
       this.modifiable = b;
     }
   }
 
-  protected void doGetAttributes(
-      List<XiAttribute> res, long[] types, boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     addAttr(res, types, CKA_TOKEN,       inToken);
     addAttr(res, types, CKA_CLASS,       objectClass);
@@ -188,8 +177,8 @@ public abstract class XiP11Storage extends XiP11Object {
     addAttr(res, types, CKA_LABEL,       label);
 
     if (withAll) {
-      addAttr(res, types, CKA_XIHSM_CKU, cku);
-      addAttr(res, types, CKA_XIHSM_ORIGIN, newObjectMethod.getCode());
+      addAttr(res, types, XiAttribute.CKA_XIHSM_CKU, cku);
+      addAttr(res, types, XiAttribute.CKA_XIHSM_ORIGIN, newObjectMethod.getCode());
     }
   }
 
@@ -210,21 +199,18 @@ public abstract class XiP11Storage extends XiP11Object {
   }
 
   public final void updateAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     assertAttributesSettable(attrs);
 
     if (modifiable != null && !modifiable) {
-      throw new HsmException(CKR_ACTION_PROHIBITED,
-          "The object is not modifiable");
+      throw new HsmException(CKR_ACTION_PROHIBITED, "The object is not modifiable");
     }
 
     doSetAttributes(loginState, initMethod, attrs);
 
     if (attrs.getSize() > 0) {
       throw new HsmException(CKR_ATTRIBUTE_TYPE_INVALID,
-          "Attribute of types are not allowed: " +
-          Arrays.toString(attrs.getTextTypes()));
+          "Attribute of types are not allowed: " + Arrays.toString(attrs.getTextTypes()));
     }
   }
 
@@ -257,8 +243,7 @@ public abstract class XiP11Storage extends XiP11Object {
       throws HsmException {
     if (initMethod == ObjectInitMethod.UPDATE && oldValue && !newValue) {
       throw new HsmException(CKR_ATTRIBUTE_VALUE_INVALID,
-          "Cannot set " + PKCS11T.ckaCodeToName(cka) +
-              " to FALSE");
+          "Cannot set " + PKCS11T.ckaCodeToName(cka) + " to FALSE");
     }
   }
 
@@ -270,32 +255,29 @@ public abstract class XiP11Storage extends XiP11Object {
       throws HsmException {
     if (initMethod == ObjectInitMethod.UPDATE && !oldValue && newValue) {
       throw new HsmException(CKR_ATTRIBUTE_VALUE_INVALID,
-          "Cannot set " + PKCS11T.ckaCodeToName(cka) +
-              " to TRUE");
+          "Cannot set " + PKCS11T.ckaCodeToName(cka) + " to TRUE");
     }
   }
 
-  public static XiP11Storage decode(
-      XiHsmVendor vendor, long handle, byte[] encoded) throws HsmException {
+  public static XiP11Storage decode(XiHsmVendor vendor, long handle, byte[] encoded)
+      throws HsmException {
     return fromAttributes(vendor, null, ObjectInitMethod.RESTORE,
         handle, XiTemplate.decode(encoded));
   }
 
-  public static XiP11Storage fromAttributes(
-      XiHsmVendor vendor, long handle, XiTemplate attrs) throws HsmException {
-   return fromAttributes(vendor, null, ObjectInitMethod.RESTORE,
-       handle, attrs);
+  public static XiP11Storage fromAttributes(XiHsmVendor vendor, long handle, XiTemplate attrs)
+      throws HsmException {
+  return fromAttributes(vendor, null, ObjectInitMethod.RESTORE, handle, attrs);
   }
 
   public static XiP11Storage fromAttributes(
       XiHsmVendor vendor, LoginState loginState, ObjectInitMethod initMethod,
       long handle, XiTemplate attrs) throws HsmException {
     long objClass = attrs.removeNonNullLong(CKA_CLASS);
-    long cku = attrs.removeNonNullLong(CKA_XIHSM_CKU);
+    long cku = attrs.removeNonNullLong(XiAttribute.CKA_XIHSM_CKU);
 
-    long newObjectMethodCode = attrs.removeLong(CKA_XIHSM_ORIGIN);
-    Origin newObjectMethod =
-        Origin.ofCode(newObjectMethodCode);
+    long newObjectMethodCode = attrs.removeLong(XiAttribute.CKA_XIHSM_ORIGIN);
+    Origin newObjectMethod = Origin.ofCode(newObjectMethodCode);
 
     Boolean b = attrs.removeBool(CKA_TOKEN);
     boolean inToken = b != null && b;
@@ -303,8 +285,7 @@ public abstract class XiP11Storage extends XiP11Object {
     if (!(objClass == CKO_SECRET_KEY || objClass == CKO_PUBLIC_KEY
         || objClass == CKO_PRIVATE_KEY)) {
       throw new HsmException(CKR_GENERAL_ERROR,
-          "can not construct a PKCS#11 object of class " +
-              PKCS11T.ckoCodeToName(objClass));
+          "can not construct a PKCS#11 object of class " + PKCS11T.ckoCodeToName(objClass));
     }
 
     long keyType = attrs.removeNonNullLong(CKA_KEY_TYPE);
@@ -312,16 +293,13 @@ public abstract class XiP11Storage extends XiP11Object {
 
     if (objClass == CKO_SECRET_KEY) {
       return XiSecretKey.newInstance(vendor, cku, newObjectMethod,
-          loginState, initMethod, handle, inToken, attrs, keyType,
-          keyGenMechanism);
+          loginState, initMethod, handle, inToken, attrs, keyType, keyGenMechanism);
     } else if (objClass == CKO_PUBLIC_KEY) {
       return XiPublicKey.newInstance(vendor, cku, newObjectMethod,
-          loginState, initMethod, handle, inToken, attrs, keyType,
-          keyGenMechanism);
+          loginState, initMethod, handle, inToken, attrs, keyType, keyGenMechanism);
     } else { // if (objClass == CKO_PRIVATE_KEY) {
       return XiPrivateKey.newInstance(vendor, cku, newObjectMethod,
-          loginState, initMethod, handle, inToken, attrs, keyType,
-          keyGenMechanism);
+          loginState, initMethod, handle, inToken, attrs, keyType, keyGenMechanism);
     }
   }
 

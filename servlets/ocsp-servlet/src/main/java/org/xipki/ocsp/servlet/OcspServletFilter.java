@@ -17,8 +17,7 @@ import org.xipki.util.extra.http.XiHttpFilter;
 public class OcspServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig)
-      throws Exception {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
     return new OcspHttpFilter();
   }
 

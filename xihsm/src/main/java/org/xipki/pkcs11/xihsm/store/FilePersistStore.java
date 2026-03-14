@@ -19,7 +19,7 @@ import org.xipki.pkcs11.xihsm.objects.XiP11Storage;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
+import org.xipki.util.codec.json.JsonBuilder;
 import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.LruCache;
 import org.xipki.util.misc.StringUtil;
@@ -27,6 +27,7 @@ import org.xipki.util.misc.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,16 +39,16 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_GENERAL_ERROR;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_OBJECT_HANDLE_INVALID;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class FilePersistStore implements PersistStore {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(FilePersistStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FilePersistStore.class);
 
   private static final int MAX_NUM_CHARS_HANDLE =
-      2 * BigIntegers.asUnsignedByteArray(
-          (BigInteger.valueOf(Backend.MAX_TOKEN_HANDLE))).length;
+      2 * BigIntegers.asUnsignedByteArray((BigInteger.valueOf(Backend.MAX_TOKEN_HANDLE))).length;
 
   private final long[] slotIds;
 
@@ -57,8 +58,7 @@ public class FilePersistStore implements PersistStore {
 
   private final File basedir;
 
-  public FilePersistStore(
-      XiHsmVendor vendor, String tenant, String parentBasedir)
+  public FilePersistStore(XiHsmVendor vendor, String tenant, String parentBasedir)
       throws HsmException {
     Args.notNull(vendor, "vendor");
 
@@ -83,8 +83,7 @@ public class FilePersistStore implements PersistStore {
 
       // read configuration
       // read module conf
-      TenantInfo tenantInfo = TenantInfo.decode(
-          IoUtil.read(new File(basedir, "INFO")));
+      TenantInfo tenantInfo = TenantInfo.decode(IoUtil.read(new File(basedir, "INFO")));
 
       // read slot conf
       List<FileSlot> slots = new ArrayList<>(2);
@@ -108,12 +107,10 @@ public class FilePersistStore implements PersistStore {
 
           SlotUsers slotUsers = tenantInfo.getSlotUsers(slotId);
           if (slotUsers == null) {
-            throw HsmException.newGeneralError(
-                "no users are configured for slot id " + slotId);
+            throw HsmException.newGeneralError("no users are configured for slot id " + slotId);
           }
 
-          FileSlot slot = new FileSlot(vendor, subDir,
-              slotIndex, slotId, slotUsers);
+          FileSlot slot = new FileSlot(vendor, subDir, slotIndex, slotId, slotUsers);
           slots.add(slot);
 
           if (slotIndex > maxIndex) {
@@ -135,20 +132,17 @@ public class FilePersistStore implements PersistStore {
 
       for (int i = 0; i < numSlots; i++) {
         if (slotInfos[i] == null) {
-          throw HsmException.newGeneralError(
-              "no slot is configured for index " + i);
+          throw HsmException.newGeneralError("no slot is configured for index " + i);
         }
       }
     } catch (IOException ex) {
-      throw HsmException.newGeneralError(
-          "error initializing file-based store", ex);
+      throw HsmException.newGeneralError("error initializing file-based store", ex);
     }
   }
 
   private FileSlot slot(long slotId) throws HsmException {
     return Optional.ofNullable(idSlotMap.get(slotId)).orElseThrow(() ->
-        new HsmException(PKCS11T.CKR_SLOT_ID_INVALID,
-            "invalid slot id " + slotId));
+        new HsmException(PKCS11T.CKR_SLOT_ID_INVALID, "invalid slot id " + slotId));
   }
 
   public File getBasedir() {
@@ -161,21 +155,19 @@ public class FilePersistStore implements PersistStore {
   }
 
   @Override
-  public void findObjects(List<Long> res, long slotId,
-                          LoginState loginState, XiTemplate criteria)
+  public void findObjects(List<Long> res, long slotId, LoginState loginState, XiTemplate criteria)
       throws HsmException {
     slot(slotId).findObjects(res, loginState, criteria);
   }
 
   @Override
-  public XiP11Storage getObject(
-      long slotId, long hObject, LoginState loginState) throws HsmException {
+  public XiP11Storage getObject(long slotId, long hObject, LoginState loginState)
+      throws HsmException {
     return slot(slotId).getFileObject(hObject, loginState).obj;
   }
 
   @Override
-  public void updateObject(
-      long slotId, long hObject, LoginState loginState, XiTemplate attrs)
+  public void updateObject(long slotId, long hObject, LoginState loginState, XiTemplate attrs)
       throws HsmException {
     slot(slotId).updateObject(hObject, loginState, attrs);
   }
@@ -218,11 +210,10 @@ public class FilePersistStore implements PersistStore {
 
     private final File slotDir;
 
-    FileSlot(XiHsmVendor vendor, File slotDir,
-             int slotIndex, long slotId, SlotUsers users) {
+    FileSlot(XiHsmVendor vendor, File slotDir, int slotIndex, long slotId, SlotUsers users) {
       super(vendor,
           new StoreSlotInfo(vendor, slotIndex, slotId,
-                "sn-1234", "file-slot-" + slotId, users));
+              "sn-1234", "file-slot-" + slotId, users));
       this.slotDir = Args.notNull(slotDir, "slotDir");
 
       String[] fileNames = this.slotDir.list();
@@ -270,12 +261,10 @@ public class FilePersistStore implements PersistStore {
       LOG.info("added object {} to slot {}", handle, slotInfo.getSlotId());
     }
 
-    public void destroyObject(long hObject, LoginState loginState)
-        throws HsmException {
+    public void destroyObject(long hObject, LoginState loginState) throws HsmException {
       FileP11Storage obj = getFileObject(hObject, loginState);
       if (!obj.obj.isDestroyable()) {
-        throw new HsmException(CKR_ACTION_PROHIBITED,
-            "the object is not destroyable");
+        throw new HsmException(CKR_ACTION_PROHIBITED, "the object is not destroyable");
       }
 
       String fileName = toFileName(hObject);
@@ -294,17 +283,14 @@ public class FilePersistStore implements PersistStore {
         }
 
         if (!deleted) {
-          throw new HsmException(CKR_OBJECT_HANDLE_INVALID,
-              "handle does not exist: " + hObject);
+          throw new HsmException(CKR_OBJECT_HANDLE_INVALID, "handle does not exist: " + hObject);
         }
       } catch (RuntimeException e) {
-        throw HsmException.newGeneralError(
-            "error deleting files: " + e.getMessage(), e);
+        throw HsmException.newGeneralError("error deleting files: " + e.getMessage(), e);
       }
     }
 
-    private FileP11Storage getFileObject(long hObject, LoginState loginState)
-        throws HsmException {
+    private FileP11Storage getFileObject(long hObject, LoginState loginState) throws HsmException {
       String fileName = toFileName(hObject);
       File objFile = new File(slotDir, fileName);
 
@@ -326,28 +312,25 @@ public class FilePersistStore implements PersistStore {
 
         if (fileObj == null) {
           PersistObject po = PersistObject.decode(IoUtil.read(objFile));
-          XiP11Storage obj = XiP11Storage.fromAttributes(
-              vendor, hObject, po.toAttributes());
+          XiP11Storage obj = XiP11Storage.fromAttributes(vendor, hObject, po.toAttributes());
           fileObj = new FileP11Storage(obj, modifiedAt);
           cache.put(hObject, fileObj);
         }
 
         if (!fileObj.obj.isVisibleForCku(loginState)) {
-          throw new HsmException(CKR_OBJECT_HANDLE_INVALID,
-              "object is not visible");
+          throw new HsmException(CKR_OBJECT_HANDLE_INVALID, "object is not visible");
         }
 
         return fileObj;
-      } catch (IOException | RuntimeException | CodecException e) {
+      } catch (IOException | RuntimeException e) {
         throw HsmException.newGeneralError("error getting object", e);
       }
     }
 
-    public void updateObject(long hObject, LoginState loginState,
-                             XiTemplate newAttrs) throws HsmException {
+    public void updateObject(long hObject, LoginState loginState, XiTemplate newAttrs)
+        throws HsmException {
       FileP11Storage fileObj = getFileObject(hObject, loginState);
-      fileObj.obj.updateAttributes(loginState, ObjectInitMethod.UPDATE,
-          newAttrs);
+      fileObj.obj.updateAttributes(loginState, ObjectInitMethod.UPDATE, newAttrs);
 
       String fileName = toFileName(hObject);
       File objFile = new File(slotDir, fileName);
@@ -357,18 +340,17 @@ public class FilePersistStore implements PersistStore {
       LOG.info("updated object {} to slot {}", hObject, slotInfo.getSlotId());
     }
 
-    private void saveObject(File objFile, XiTemplate attrs)
-        throws HsmException {
+    private void saveObject(File objFile, XiTemplate attrs) throws HsmException {
       PersistObject po = from(attrs);
       try {
-        IoUtil.save(objFile, po.getEncoded());
-      } catch (CodecException | IOException e) {
+        IoUtil.save(objFile,
+            JsonBuilder.toPrettyJson(po.toCodec()).getBytes(StandardCharsets.UTF_8));
+      } catch (IOException e) {
         throw new HsmException(CKR_GENERAL_ERROR, e.getMessage(), e);
       }
     }
 
-    public void findObjects(List<Long> result, LoginState loginState,
-                            XiTemplate criteria)
+    public void findObjects(List<Long> result, LoginState loginState, XiTemplate criteria)
         throws HsmException {
       File[] files = slotDir.listFiles((dir, name) -> {
         if (name.length() != 6) {
@@ -403,7 +385,7 @@ public class FilePersistStore implements PersistStore {
             long handle = Long.parseLong(file.getName(), 16);
             result.add(handle);
           }
-        } catch (IOException | CodecException e) {
+        } catch (IOException | HsmException e) {
           throw HsmException.newGeneralError("error reading key " + file, e);
         }
       }
@@ -434,8 +416,7 @@ public class FilePersistStore implements PersistStore {
         }
 
         if (cHandle == -1) {
-          throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-              "no available handle");
+          throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "no available handle");
         }
 
         ret[i] = cHandle;

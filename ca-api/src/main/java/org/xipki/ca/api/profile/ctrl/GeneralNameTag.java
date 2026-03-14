@@ -8,6 +8,8 @@ import org.xipki.util.codec.Args;
 import java.util.Locale;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum GeneralNameTag {
@@ -54,7 +56,7 @@ public enum GeneralNameTag {
 
     for (GeneralNameTag m : GeneralNameTag.values()) {
       if (c14nName.equalsIgnoreCase(m.name())) {
-          return m;
+        return m;
       }
 
       if (Integer.toString(m.tag()).equals(name)) {
@@ -66,10 +68,8 @@ public enum GeneralNameTag {
   }
 
   private static String canonicalizeName(String name) {
-    return name.toUpperCase(Locale.ROOT)
-        .replace("_", "")
-        .replace(" ", "")
-        .replace("-", "");
+    return name.toUpperCase(Locale.ROOT).replace("_", "")
+        .replace(" ", "").replace("-", "");
   }
 
 } // class GeneralNameTag

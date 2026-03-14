@@ -58,16 +58,16 @@ public class ASRange extends ASN1Object {
   }
 
   @Override
-   public String toString() {
+  public String toString() {
     return min.getValue() + "-" + max.getValue();
-   }
+  }
 
   @Override
   public ASN1Primitive toASN1Primitive() {
     ASN1EncodableVector vec = new ASN1EncodableVector(2);
     vec.add(min);
     vec.add(max);
-    return new DERSequence(vec);
+    return new DERSequence(min, max);
   }
 
   public static ASRange getInstance(Object  obj) {

@@ -60,10 +60,9 @@ public class FillKeypool implements AutoCloseable {
 
   public FillKeypool(DataSourceFactory datasourceFactory, String dbConfFile)
       throws InvalidConfException, IOException {
-    try (InputStream dbConfStream = Files.newInputStream(
-        Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
-      this.datasource = datasourceFactory.createDataSource(
-          "ds-" + dbConfFile, dbConfStream);
+    try (InputStream dbConfStream =
+            Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+      this.datasource = datasourceFactory.createDataSource("ds-" + dbConfFile, dbConfStream);
     }
   }
 
@@ -74,8 +73,7 @@ public class FillKeypool implements AutoCloseable {
     }
   }
 
-  public void execute(int numKeypairs, String encAlg, char[] password)
-      throws Exception {
+  public void execute(int numKeypairs, String encAlg, char[] password) throws Exception {
     Args.notNull(password, "password");
 
     int encAlgCode;
@@ -135,10 +133,8 @@ public class FillKeypool implements AutoCloseable {
       stmt = conn.createStatement();
 
       PBEKeySpec spec = new PBEKeySpec(password, salt, iteration, keyLength);
-      SecretKeyFactory factory = SecretKeyFactory.getInstance(
-          "PBKDF2WithHmacSHA256");
-      SecretKey key = new SecretKeySpec(
-          factory.generateSecret(spec).getEncoded(), "AES");
+      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+      SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
       Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
 
       sql = "DELETE FROM KEYPOOL";
@@ -200,8 +196,7 @@ public class FillKeypool implements AutoCloseable {
             byte[] skBytes = Base64.decodeFast(b64Sk);
             byte[] pkBytes = Base64.decodeFast(b64Pk);
             PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(skBytes);
-            SubjectPublicKeyInfo pkInfo =
-                SubjectPublicKeyInfo.getInstance(pkBytes);
+            SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(pkBytes);
             keys.add(new KeyInfoPair(pkInfo, skInfo));
           }
         }
@@ -218,7 +213,7 @@ public class FillKeypool implements AutoCloseable {
           if (preKeys != null) {
             keyInfoPair = preKeys.get(i % preKeys.size());
           } else {
-            KeyPair kp = KeyUtil.generateKeypair(keyspec, rnd);
+            KeyPair kp = KeyUtil.generateKeyPair(keyspec, rnd);
             keyInfoPair = new KeyInfoPair(kp);
           }
 
@@ -227,8 +222,7 @@ public class FillKeypool implements AutoCloseable {
           GCMParameterSpec gcmSpec = new GCMParameterSpec(128, nonce);
 
           cipher.init(Cipher.ENCRYPT_MODE, key, gcmSpec);
-          byte[] encryptedData = cipher.doFinal(
-              keyInfoPair.getPrivate().getEncoded());
+          byte[] encryptedData = cipher.doFinal(keyInfoPair.getPrivate().getEncoded());
 
           int idx = 1;
           ps.setInt(idx++, id++);
@@ -237,8 +231,7 @@ public class FillKeypool implements AutoCloseable {
           ps.setInt(idx++, encAlgCode); // AES128/GCM
           ps.setString(idx++, Base64.encodeToString(nonce));
           ps.setString(idx++, Base64.encodeToString(encryptedData));
-          ps.setString(idx,   Base64.encodeToString(
-                                  keyInfoPair.getPrivate().getEncoded()));
+          ps.setString(idx,   Base64.encodeToString(keyInfoPair.getPrivate().getEncoded()));
           ps.addBatch();
 
           if ((i == numKeypairs - 1) || (i % 100 == 0)) {

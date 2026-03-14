@@ -39,18 +39,15 @@ public class GetCertRequest extends SdkRequest {
 
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(2).writeBigInt(serialNumber)
-        .writeObject(issuer);
+    encoder.writeArrayStart(2).writeBigInt(serialNumber).writeObject(issuer);
   }
 
   public static GetCertRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("GetCertRequest", decoder, 2);
-      return new GetCertRequest(decoder.readBigInt(),
-          X500NameType.decode(decoder));
+      return new GetCertRequest(decoder.readBigInt(), X500NameType.decode(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, GetCertRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, GetCertRequest.class), ex);
     }
   }
 

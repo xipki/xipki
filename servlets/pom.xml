@@ -9,7 +9,7 @@
     <version>6.6.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.servlet</groupId>
-  <artifactId>servlet-parent</artifactId>
+  <artifactId>servlets</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
@@ -33,7 +33,8 @@
         <directory>${log4j.dir}</directory>
         <filtering>true</filtering>
         <includes>
-          <include>log4j2.properties</include>
+          <!--include>log4j2.properties</include-->
+          <include>logging.properties</include>
         </includes>
       </resource>
     </resources>

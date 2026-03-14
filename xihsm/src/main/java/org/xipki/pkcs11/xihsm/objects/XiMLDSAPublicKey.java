@@ -18,6 +18,8 @@ import org.xipki.util.codec.Args;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiMLDSAPublicKey extends XiPublicKey {
@@ -30,22 +32,19 @@ public class XiMLDSAPublicKey extends XiPublicKey {
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, Long keyGenMechanism,
       XiConstants.P11MldsaVariant variant, byte[] value) {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        PKCS11T.CKK_ML_DSA, keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, PKCS11T.CKK_ML_DSA, keyGenMechanism);
 
     this.variant = Args.notNull(variant, "variant");
     this.value = Args.notNull(value, "value");
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertMldsaPublicKeyAttributesSettable(attrs);
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, PKCS11T.CKA_PARAMETER_SET, variant.getCode());
@@ -53,18 +52,15 @@ public class XiMLDSAPublicKey extends XiPublicKey {
   }
 
   public static XiMLDSAPublicKey newInstance(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
-      throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, LoginState loginState,
+      ObjectInitMethod initMethod, long handle, boolean inToken, XiTemplate attrs,
+      Long keyGenMechanism) throws HsmException {
     long variantCode = attrs.removeNonNullLong(PKCS11T.CKA_PARAMETER_SET);
-    XiConstants.P11MldsaVariant variant =
-        XiConstants.P11MldsaVariant.ofCode(variantCode);
+    XiConstants.P11MldsaVariant variant = XiConstants.P11MldsaVariant.ofCode(variantCode);
     byte[] value = attrs.removeNonNullByteArray(PKCS11T.CKA_VALUE);
 
-    XiMLDSAPublicKey ret = new XiMLDSAPublicKey(
-        vendor, cku, newObjectMethod,
-        handle, inToken, keyGenMechanism, variant, value);
+    XiMLDSAPublicKey ret = new XiMLDSAPublicKey(vendor, cku, newObjectMethod,
+                              handle, inToken, keyGenMechanism, variant, value);
     ret.updateAttributes(loginState, initMethod, attrs);
     return ret;
   }

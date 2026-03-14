@@ -11,7 +11,6 @@ import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.io.IoUtil;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -30,22 +29,19 @@ public class OcspConf {
 
   private final SecurityConf security;
 
-  public OcspConf(boolean logReqResp, String serverConf,
-                  SecurityConf security) {
+  public OcspConf(boolean logReqResp, String serverConf, SecurityConf security) {
     this.logReqResp = logReqResp;
     this.serverConf = serverConf;
     this.security = security;
   }
 
-  public static OcspConf readConfFromFile(String fileName)
-      throws IOException, InvalidConfException {
+  public static OcspConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
       Path path = Paths.get(IoUtil.expandFilepath(fileName, true));
       return parse(JsonParser.parseMap(path, true));
     } catch (RuntimeException | CodecException e) {
-      throw new InvalidConfException("error parsing " + fileName + ": " +
-          e.getMessage(), e);
+      throw new InvalidConfException("error parsing " + fileName + ": " + e.getMessage(), e);
     }
   }
 

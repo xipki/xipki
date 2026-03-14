@@ -13,6 +13,7 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
     <Karaf-Commands>*</Karaf-Commands>
+    <Import-Package>org.bouncycastle.*;version="${bc.versions}",*</Import-Package>
   </properties>
   <dependencies>
     <dependency>

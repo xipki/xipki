@@ -26,6 +26,10 @@ public class PKCS11Key {
 
   private final Boolean decrypt;
 
+  private final Boolean encapsulate;
+
+  private final Boolean decapsulate;
+
   private final Boolean derive;
 
   private final Boolean signRecover;
@@ -75,6 +79,8 @@ public class PKCS11Key {
     // purposes
     this.decrypt = attrs.decrypt();
     this.encrypt = attrs.encrypt();
+    this.decapsulate = attrs.decapsulate();
+    this.encapsulate = attrs.encapsulate();
     this.sign = attrs.sign();
     this.verify = attrs.verify();
     this.signRecover = attrs.signRecover();
@@ -147,6 +153,14 @@ public class PKCS11Key {
 
   public Boolean verifyRecover() {
     return verifyRecover;
+  }
+
+  public Boolean encapsulate() {
+    return encapsulate;
+  }
+
+  public Boolean decapsulate() {
+    return decapsulate;
   }
 
   public Boolean wrap() {

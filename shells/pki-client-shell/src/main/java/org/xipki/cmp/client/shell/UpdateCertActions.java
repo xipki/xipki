@@ -25,13 +25,13 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.EnrollCertResult.CertifiedKeyPairOrError;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SecurityFactory;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.sign.SignAlgoMode;
@@ -51,9 +51,6 @@ import org.xipki.util.password.PasswordResolverException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,18 +124,12 @@ public class UpdateCertActions {
             encodeCert(cert.getEncoded(), certOutform));
       }
 
-      PrivateKey privateKey =
-          BouncyCastleProvider.getPrivateKey(privateKeyInfo);
-
-      KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
       char[] pwd = getPassword();
-      ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd,
-          new Certificate[] {cert.toJceCert()});
+      PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, pwd);
+      ks.setKeyEntry("main", privateKeyInfo, cert.getCert());
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         ks.store(bout, pwd);
-        saveVerbose("saved key to file", p12OutputFile,
-            bout.toByteArray());
+        saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
       }
 
       return null;
@@ -177,8 +168,7 @@ public class UpdateCertActions {
     private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentSigner getSigner() throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -186,10 +176,8 @@ public class UpdateCertActions {
         }
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName,
-            Integer.parseInt(slotIndex), keyLabel, keyIdBytes, null,
-            getSignAlgoMode());
-        signer = securityFactory.createSigner("PKCS11", signerConf,
-                  (X509Cert[]) null);
+            Integer.parseInt(slotIndex), keyLabel, keyIdBytes, null, getSignAlgoMode());
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
@@ -198,8 +186,7 @@ public class UpdateCertActions {
         String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
         HashAlgo hashAlgo, SignAlgoMode mode) {
       if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException(
-            "at least one of keyId and keyLabel may not be null");
+        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
       }
 
       SignerConf conf = new SignerConf();
@@ -237,8 +224,7 @@ public class UpdateCertActions {
   @Service
   public static class CmpUpdateP12 extends UpdateCertAction {
 
-    @Option(name = "--p12", required = true, description =
-        "PKCS#12 keystore file")
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FileCompleter.class)
     private String p12File;
 
@@ -256,55 +242,45 @@ public class UpdateCertActions {
         try {
           password = readPasswordIfNotSet(passwordHint);
         } catch (IOException | PasswordResolverException ex) {
-          throw new ObjectCreationException(
-              "could not read password: " + ex.getMessage(), ex);
+          throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
         }
 
         SignerConf conf = new SignerConf();
-        conf.setPassword(new String(password))
-            .setParallelism(1)
-            .setKeystore("file:" + p12File);
+        conf.setPassword(new String(password)).setParallelism(1).setKeystore("file:" + p12File);
         SignAlgoMode mode = getSignAlgoMode();
         if (mode != null) {
           conf.setMode(mode);
         }
 
-        signer = securityFactory.createSigner("PKCS12", conf,
-            (X509Cert[]) null);
+        signer = securityFactory.createSigner("PKCS12", conf, (X509Cert[]) null);
       }
       return signer;
     }
 
   }
 
-  public abstract static class UpdateAction
-      extends CmpActions.AuthClientAction {
+  public abstract static class UpdateAction extends CmpActions.AuthClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;
 
-    @Option(name = "--subject", aliases = "-s", description =
-        "subject to be requested")
+    @Option(name = "--subject", aliases = "-s", description = "subject to be requested")
     private String subject;
 
-    @Option(name = "--not-before", description =
-        "notBefore, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name = "--not-after", description =
-        "notAfter, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
-    @Option(name = "--oldcert", required = true, description =
-        "certificate file")
+    @Option(name = "--oldcert", required = true, description = "certificate file")
     @Completion(FileCompleter.class)
     private String oldCertFile;
 
     protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
-        String id, String profile, CertRequest certRequest)
-        throws Exception;
+        String id, String profile, CertRequest certRequest) throws Exception;
 
     protected EnrollCertResult enroll() throws Exception {
       CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
@@ -321,12 +297,10 @@ public class UpdateCertActions {
       if (StringUtil.isNotBlank(notBeforeS)
           || StringUtil.isNotBlank(notAfterS)) {
         Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(Date.from(
-                DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)))
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)))
             : null;
         Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(Date.from(
-                DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)))
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)))
             : null;
         OptionalValidity validity = new OptionalValidity(notBefore, notAfter);
         certTemplateBuilder.setValidity(validity);
@@ -335,23 +309,18 @@ public class UpdateCertActions {
       List<Extension> extensions = new LinkedList<>();
 
       if (isNotEmpty(extensions)) {
-        Extensions asn1Extensions =
-            new Extensions(extensions.toArray(new Extension[0]));
+        Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
         certTemplateBuilder.setExtensions(asn1Extensions);
       }
 
       X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
-      CertId oldCertId = new CertId(new GeneralName(
-          oldCert.issuer()), oldCert.serialNumber());
-      Controls controls = new Controls(new AttributeTypeAndValue(
-          OIDs.CMP.regCtrl_oldCertID, oldCertId));
-      CertRequest certReq = new CertRequest(1,
-          certTemplateBuilder.build(), controls);
+      CertId oldCertId = new CertId(new GeneralName(oldCert.issuer()), oldCert.serialNumber());
+      Controls controls = new Controls(
+                            new AttributeTypeAndValue(OIDs.CMP.regCtrl_oldCertID, oldCertId));
+      CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), controls);
 
-      EnrollCertRequest.Entry reqEntry =
-          buildEnrollCertRequestEntry("id-1", null, certReq);
-      EnrollCertRequest request = new EnrollCertRequest(
-          EnrollCertRequest.EnrollType.KEY_UPDATE);
+      EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry("id-1", null, certReq);
+      EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.EnrollType.KEY_UPDATE);
       request.addRequestEntry(reqEntry);
 
       ReqRespDebug debug = getReqRespDebug();
@@ -369,8 +338,7 @@ public class UpdateCertActions {
 
   public abstract static class UpdateCertAction extends UpdateAction {
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -398,13 +366,11 @@ public class UpdateCertActions {
      * @throws ObjectCreationException
      *           if no signer can be built.
      */
-    protected abstract ConcurrentSigner getSigner()
-        throws ObjectCreationException;
+    protected abstract ConcurrentSigner getSigner() throws ObjectCreationException;
 
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
       return embedsPulibcKey
-          ? getSigner().getX509Cert().subjectPublicKeyInfo()
-          : null;
+          ? getSigner().x509Cert().subjectPublicKeyInfo() : null;
     } // method getPublicKey
 
     @Override
@@ -424,8 +390,7 @@ public class UpdateCertActions {
       }
 
       ProofOfPossession pop = new ProofOfPossession(popSk);
-      return new EnrollCertRequest.Entry(id, profile, certRequest, pop,
-          false, true);
+      return new EnrollCertRequest.Entry(id, profile, certRequest, pop, false, true);
     } // method buildEnrollCertRequestEntry
 
     @Override

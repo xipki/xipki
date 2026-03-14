@@ -28,8 +28,7 @@ public class KeypairGenControl {
 
   private final KeySpec keySpec;
 
-  private KeypairGenControl(boolean inheritCA, boolean forbidden,
-                            KeySpec keySpec) {
+  private KeypairGenControl(boolean inheritCA, boolean forbidden, KeySpec keySpec) {
     this.inheritCA = inheritCA;
     this.forbidden = forbidden;
     this.keySpec = keySpec;
@@ -53,12 +52,10 @@ public class KeypairGenControl {
 
   public String text() {
     return inheritCA ? "InheritCA"
-        : forbidden ? "Forbidden"
-        : keySpec.text();
+        : forbidden ? "Forbidden" : keySpec.text();
   }
 
-  public static KeypairGenControl valueOf(String name)
-      throws NoSuchAlgorithmException {
+  public static KeypairGenControl valueOf(String name) throws NoSuchAlgorithmException {
     return "InheritCA".equalsIgnoreCase(name) ? INHERIT_CA
         : "Forbidden".equalsIgnoreCase(name) ? FORBIDDEN
         : new KeypairGenControl(KeySpec.ofKeySpec(name));

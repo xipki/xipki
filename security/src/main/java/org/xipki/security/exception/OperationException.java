@@ -21,8 +21,7 @@ public class OperationException extends Exception {
   }
 
   public OperationException(ErrorCode errorCode, String errorMessage) {
-    super(String.format("error code: %s, error message: %s",
-        errorCode, errorMessage));
+    super(String.format("error code: %s, error message: %s", errorCode, errorMessage));
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
   }
@@ -31,10 +30,8 @@ public class OperationException extends Exception {
     this(errorCode, cause.getMessage(), cause);
   }
 
-  public OperationException(ErrorCode errorCode, String message,
-                            Throwable cause) {
-    super(String.format("error code: %s, error message: %s",
-        errorCode, message), cause);
+  public OperationException(ErrorCode errorCode, String message, Throwable cause) {
+    super(String.format("error code: %s, error message: %s", errorCode, message), cause);
     this.errorMessage = cause.getMessage();
     this.errorCode = errorCode;
   }

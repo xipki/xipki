@@ -15,8 +15,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.crmf.CertRequest;
@@ -28,6 +26,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -52,6 +51,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.KeyUsage;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
@@ -59,6 +59,7 @@ import org.xipki.security.sign.CreateSignerCallback;
 import org.xipki.security.sign.SignAlgoMode;
 import org.xipki.security.sign.Signer;
 import org.xipki.security.sign.SignerConf;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.CmdFailure;
@@ -77,9 +78,7 @@ import org.xipki.util.password.PasswordResolverException;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+import java.security.PublicKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -100,8 +99,7 @@ import java.util.StringTokenizer;
  */
 public class EnrollCertActions {
 
-  @Command(scope = "xi", name = "cmp-csr-enroll", description =
-      "enroll certificate via CSR")
+  @Command(scope = "xi", name = "cmp-csr-enroll", description = "enroll certificate via CSR")
   @Service
   public static class CmpCsrEnroll extends CmpActions.AuthClientAction {
 
@@ -113,16 +111,13 @@ public class EnrollCertActions {
         description = "certificate profile")
     private String profile;
 
-    @Option(name = "--not-before", description =
-        "notBefore, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name = "--not-after", description =
-        "notAfter, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -228,8 +223,7 @@ public class EnrollCertActions {
       }
 
       X509Cert cert = Optional.ofNullable(certOrError.certificate())
-          .orElseThrow(() -> new CmdFailure(
-              "no certificate received from the server"));
+          .orElseThrow(() -> new CmdFailure("no certificate received from the server"));
       PrivateKeyInfo privateKeyInfo = Optional.ofNullable(
           certOrError.privateKeyInfo()).orElseThrow(
               () -> new CmdFailure("no private key received from the server"));
@@ -241,24 +235,20 @@ public class EnrollCertActions {
 
       X509Cert[] caCertChain = result.caCertChain();
       int size = caCertChain == null ? 1 : 1 + caCertChain.length;
-      X509Certificate[] certchain = new X509Certificate[size];
-      certchain[0] = cert.toJceCert();
+      Certificate[] certchain = new Certificate[size];
+      certchain[0] = cert.getCert();
       if (size > 1) {
         for (int i = 0; i < caCertChain.length; i++) {
-          certchain[i + 1] = caCertChain[i].toJceCert();
+          certchain[i + 1] = caCertChain[i].getCert();
         }
       }
 
-      PrivateKey privateKey = KeyUtil.getPrivateKey(privateKeyInfo);
-
-      KeyStore ks = KeyUtil.getOutKeyStore("PKCS12");
       char[] pwd = getPassword();
-      ks.load(null, pwd);
-      ks.setKeyEntry("main", privateKey, pwd, certchain);
+      PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, pwd);
+      ks.setKeyEntry("main", privateKeyInfo, certchain);
       try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
         ks.store(bout, pwd);
-        saveVerbose("saved key to file", p12OutputFile,
-            bout.toByteArray());
+        saveVerbose("saved key to file", p12OutputFile, bout.toByteArray());
       }
 
       return null;
@@ -285,8 +275,8 @@ public class EnrollCertActions {
 
   } // class CmpEnrollCagenkey
 
-  @Command(scope = "xi", name = "cmp-enroll-p11", description =
-      "enroll certificate (PKCS#11 token)")
+  @Command(scope = "xi", name = "cmp-enroll-p11",
+      description = "enroll certificate (PKCS#11 token)")
   @Service
   public static class CmpEnrollP11 extends EnrollCertAction {
 
@@ -309,8 +299,7 @@ public class EnrollCertActions {
     private ConcurrentSigner signer;
 
     @Override
-    protected ConcurrentSigner getSigner()
-        throws ObjectCreationException {
+    protected ConcurrentSigner getSigner() throws ObjectCreationException {
       if (signer == null) {
         byte[] keyIdBytes = null;
         if (keyId != null) {
@@ -318,10 +307,8 @@ public class EnrollCertActions {
         }
 
         SignerConf signerConf = getPkcs11SignerConf(moduleName,
-            Integer.parseInt(slotIndex), keyLabel, keyIdBytes, null,
-            getSignAlgoMode());
-        signer = securityFactory.createSigner(
-                "PKCS11", signerConf, (X509Cert[]) null);
+            Integer.parseInt(slotIndex), keyLabel, keyIdBytes, null, getSignAlgoMode());
+        signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
@@ -330,8 +317,7 @@ public class EnrollCertActions {
         String pkcs11ModuleName, int slotIndex, String keyLabel, byte[] keyId,
         HashAlgo hashAlgo, SignAlgoMode mode) {
       if (keyId == null && keyLabel == null) {
-        throw new IllegalArgumentException(
-            "at least one of keyId and keyLabel may not be null");
+        throw new IllegalArgumentException("at least one of keyId and keyLabel may not be null");
       }
 
       ConfPairs conf = new ConfPairs();
@@ -369,14 +355,12 @@ public class EnrollCertActions {
   @Service
   public static class CmpEnrollP12 extends EnrollCertAction {
 
-    @Option(name = "--p12", required = true, description =
-        "PKCS#12 keystore file")
+    @Option(name = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FileCompleter.class)
     private String p12File;
 
     @Option(name = "--password", description =
-        "password of the PKCS#12 keystore file, as plaintext or " +
-        "PBE-encrypted.")
+        "password of the PKCS#12 keystore file, as plaintext or PBE-encrypted.")
     private String passwordHint;
 
     private ConcurrentSigner signer;
@@ -387,22 +371,17 @@ public class EnrollCertActions {
       if (signer == null) {
         char[] password;
         try {
-          password = readPasswordIfNotSet("Enter keystore password",
-              passwordHint);
+          password = readPasswordIfNotSet("Enter keystore password", passwordHint);
         } catch (IOException | PasswordResolverException ex) {
-          throw new ObjectCreationException(
-              "could not read password: " + ex.getMessage(), ex);
+          throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
         }
 
         SignerConf sc = new SignerConf();
-        sc.setPassword(new String(password))
-            .setParallelism(1)
-            .setKeystore("file:" + p12File);
+        sc.setPassword(new String(password)).setParallelism(1).setKeystore("file:" + p12File);
 
         SubjectPublicKeyInfo tmpPkInfo = null;
         try {
-          tmpPkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry(
-              "PKCS12", p12File, password);
+          tmpPkInfo = KeyUtil.getPublicKeyOfFirstKeyEntry("PKCS12", p12File, password);
         } catch (Exception e) {
         }
 
@@ -420,14 +399,12 @@ public class EnrollCertActions {
             CreateSignerCallback callback = new CreateSignerCallback() {
               @Override
               public KemEncapKey generateKemEncapKey(
-                  SecurityFactory securityFactory,
-                  SubjectPublicKeyInfo publicKeyInfo)
+                  SecurityFactory securityFactory, SubjectPublicKeyInfo publicKeyInfo)
                   throws XiSecurityException {
                 try {
                   return client.generateKemEncapKey(caName, pkInfo, null);
                 } catch (CmpClientException | PkiErrorException e) {
-                  throw new XiSecurityException(
-                      "error generating KemEncapKey: " + e.getMessage());
+                  throw new XiSecurityException("error generating KemEncapKey: " + e.getMessage());
                 }
               }
 
@@ -446,16 +423,14 @@ public class EnrollCertActions {
           }
         }
 
-        signer = securityFactory.createSigner("PKCS12", sc,
-            (X509Cert[]) null);
+        signer = securityFactory.createSigner("PKCS12", sc, (X509Cert[]) null);
       }
       return signer;
     } // method getSigner
 
   } // class CmpEnrollP12
 
-  public abstract static class EnrollAction
-      extends CmpActions.AuthClientAction {
+  public abstract static class EnrollAction extends CmpActions.AuthClientAction {
 
     @Reference
     protected SecurityFactory securityFactory;
@@ -468,12 +443,10 @@ public class EnrollCertActions {
         description = "certificate profile")
     private String profile;
 
-    @Option(name = "--not-before", description =
-        "notBefore, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name = "--not-after", description =
-        "notAfter, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
     @Option(name = "--keyusage", multiValued = true, description = "keyusage")
@@ -502,8 +475,7 @@ public class EnrollCertActions {
             + " '8'/'rid'/OID")
     private List<String> subjectAltNames;
 
-    @Option(name = "--subject-info-access", multiValued = true, description =
-        "subjectInfoAccess")
+    @Option(name = "--subject-info-access", multiValued = true, description = "subjectInfoAccess")
     private List<String> subjectInfoAccesses;
 
     @Option(name = "--qc-eu-limit", multiValued = true, description =
@@ -524,27 +496,22 @@ public class EnrollCertActions {
     @Option(name = "--biometric-uri", description = "Biometric source data URI")
     private String biometricUri;
 
-    @Option(name = "--dateOfBirth", description =
-        "Date of birth YYYYMMdd in subject")
+    @Option(name = "--dateOfBirth", description = "Date of birth YYYYMMdd in subject")
     private String dateOfBirth;
 
-    @Option(name = "--postalAddress", multiValued = true, description =
-        "postal address in subject")
+    @Option(name = "--postalAddress", multiValued = true, description = "postal address in subject")
     private List<String> postalAddress;
 
-    @Option(name = "--extensions-file", description =
-        "File containing the DER-encoded Extensions")
+    @Option(name = "--extensions-file", description = "File containing the DER-encoded Extensions")
     @Completion(FileCompleter.class)
     private String extensionsFile;
 
     protected abstract SubjectPublicKeyInfo getPublicKey() throws Exception;
 
     protected abstract EnrollCertRequest.Entry buildEnrollCertRequestEntry(
-        String id, String profile, CertRequest certRequest)
-        throws Exception;
+        String id, String profile, CertRequest certRequest) throws Exception;
 
-    protected abstract EnrollCertRequest.EnrollType getCmpReqType()
-        throws Exception;
+    protected abstract EnrollCertRequest.EnrollType getCmpReqType() throws Exception;
 
     protected EnrollCertResult enroll() throws Exception {
       EnrollCertRequest.EnrollType type = getCmpReqType();
@@ -557,8 +524,7 @@ public class EnrollCertActions {
             try {
               new ASN1ObjectIdentifier(m).getId();
             } catch (Exception ex) {
-              throw new IllegalCmdParamException(
-                  "invalid extended key usage " + m);
+              throw new IllegalCmdParamException("invalid extended key usage " + m);
             }
           }
         }
@@ -619,13 +585,11 @@ public class EnrollCertActions {
       if (StringUtil.isNotBlank(notBeforeS)
           || StringUtil.isNotBlank(notAfterS)) {
         Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(Date.from(
-                DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)))
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS)))
             : null;
 
         Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(Date.from(
-                DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)))
+            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS)))
             : null;
 
         OptionalValidity validity = new OptionalValidity(notBefore, notAfter);
@@ -635,14 +599,12 @@ public class EnrollCertActions {
       // SubjectAltNames
       List<Extension> extensions = new LinkedList<>();
       if (isNotEmpty(subjectAltNames)) {
-        extensions.add(X509Util.createExtnSubjectAltName(
-            subjectAltNames, false));
+        extensions.add(X509Util.createExtnSubjectAltName(subjectAltNames, false));
       }
 
       // SubjectInfoAccess
       if (isNotEmpty(subjectInfoAccesses)) {
-        extensions.add(X509Util.createExtnSubjectInfoAccess(
-            subjectInfoAccesses, false));
+        extensions.add(X509Util.createExtnSubjectInfoAccess(subjectInfoAccesses, false));
       }
 
       // Keyusage
@@ -651,8 +613,7 @@ public class EnrollCertActions {
         for (String usage : keyusages) {
           usages.add(KeyUsage.getKeyUsage(usage));
         }
-        org.bouncycastle.asn1.x509.KeyUsage extValue =
-            X509Util.createKeyUsage(usages);
+        org.bouncycastle.asn1.x509.KeyUsage extValue = X509Util.createKeyUsage(usages);
         ASN1ObjectIdentifier extType = OIDs.Extn.keyUsage;
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
       }
@@ -662,8 +623,7 @@ public class EnrollCertActions {
         ExtendedKeyUsage extValue = X509Util.createExtendedUsage(
             textToAsn1ObjectIdentifers(extkeyusages));
 
-        extensions.add(new Extension(OIDs.Extn.extendedKeyUsage,
-            false, extValue.getEncoded()));
+        extensions.add(new Extension(OIDs.Extn.extendedKeyUsage, false, extValue.getEncoded()));
       }
 
       // QcEuLimitValue
@@ -687,8 +647,7 @@ public class EnrollCertActions {
             int amount = Integer.parseInt(amountS);
             int exponent = Integer.parseInt(exponentS);
 
-            MonetaryValue monterayValue =
-                new MonetaryValue(currency, amount, exponent);
+            MonetaryValue monterayValue = new MonetaryValue(currency, amount, exponent);
             QCStatement statement = new QCStatement(
                 OIDs.QCS.id_etsi_qcs_QcLimitValue, monterayValue);
             vec.add(statement);
@@ -705,23 +664,17 @@ public class EnrollCertActions {
       // biometricInfo
       if (biometricType != null && biometricHashAlgo != null
           && biometricFile != null) {
-        TypeOfBiometricData objBiometricType =
-            StringUtil.isNumber(biometricType)
-                ? new TypeOfBiometricData(Integer.parseInt(biometricType))
-                : new TypeOfBiometricData(
-                    new ASN1ObjectIdentifier(biometricType));
+        TypeOfBiometricData objBiometricType = StringUtil.isNumber(biometricType)
+            ? new TypeOfBiometricData(Integer.parseInt(biometricType))
+            : new TypeOfBiometricData(new ASN1ObjectIdentifier(biometricType));
 
         HashAlgo objBiometricHashAlgo = getHashAlgo(biometricHashAlgo);
         byte[] biometricBytes = IoUtil.read(biometricFile);
         byte[] biometricDataHash = objBiometricHashAlgo.hash(biometricBytes);
 
-        DERIA5String sourceDataUri = null;
-        if (biometricUri != null) {
-          sourceDataUri = new DERIA5String(biometricUri);
-        }
-        BiometricData biometricData = new BiometricData(objBiometricType,
-            objBiometricHashAlgo.algorithmIdentifier(),
-            new DEROctetString(biometricDataHash), sourceDataUri);
+        BiometricData biometricData = Asn1Util.buildBiometricData(
+            objBiometricType, objBiometricHashAlgo.algorithmIdentifier(),
+            biometricDataHash, biometricUri);
 
         ASN1EncodableVector vec = new ASN1EncodableVector();
         vec.add(biometricData);
@@ -729,16 +682,14 @@ public class EnrollCertActions {
         ASN1ObjectIdentifier extType = OIDs.Extn.biometricInfo;
         ASN1Sequence extValue = new DERSequence(vec);
         extensions.add(new Extension(extType, false, extValue.getEncoded()));
-      } else if (biometricType == null && biometricHashAlgo == null
-          && biometricFile == null) {
+      } else if (biometricType == null && biometricHashAlgo == null && biometricFile == null) {
         // Do nothing
       } else {
         throw new Exception("either all of biometric triples (type, " +
             "hash algo, file) must be set or none of them should be set");
       }
 
-      List<ASN1ObjectIdentifier> addedExtnTypes =
-          new ArrayList<>(extensions.size());
+      List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());
       for (Extension extn : extensions) {
         addedExtnTypes.add(extn.getExtnId());
       }
@@ -758,16 +709,13 @@ public class EnrollCertActions {
       }
 
       if (isNotEmpty(extensions)) {
-        Extensions asn1Extensions =
-            new Extensions(extensions.toArray(new Extension[0]));
+        Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
         certTemplateBuilder.setExtensions(asn1Extensions);
       }
 
-      CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(),
-          null);
+      CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
-      EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry(
-          "id-1", profile, certReq);
+      EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry("id-1", profile, certReq);
       EnrollCertRequest request = new EnrollCertRequest(type);
       request.addRequestEntry(reqEntry);
 
@@ -782,8 +730,7 @@ public class EnrollCertActions {
       return result;
     } // method enroll
 
-    static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(
-        List<String> oidTexts) {
+    static List<ASN1ObjectIdentifier> textToAsn1ObjectIdentifers(List<String> oidTexts) {
       if (oidTexts == null) {
         return null;
       }
@@ -808,13 +755,11 @@ public class EnrollCertActions {
 
     @Option(name = "--cmpreq-type", description =
         "CMP request type (ir for Initialization Request,\n" +
-        "cr for Certification Request, and ccr for Cross-Certification " +
-            "Request)")
+        "cr for Certification Request, and ccr for Cross-Certification Request)")
     @Completion(value = StringsCompleter.class, values = {"ir", "cr", "ccr"})
     private String cmpreqType = "cr";
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     private String outform = "der";
 
@@ -837,13 +782,23 @@ public class EnrollCertActions {
 
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return getSigner().getX509Cert().subjectPublicKeyInfo();
+      ConcurrentSigner signer = getSigner();
+      X509Cert cert = signer.x509Cert();
+      if (cert != null) {
+        return cert.subjectPublicKeyInfo();
+      }
+
+      PublicKey publicKey = signer.publicKey();
+      if (publicKey != null) {
+        return SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+      }
+
+      throw new IllegalCmdParamException("could not extract public key");
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
-        String id, String profile, CertRequest certRequest)
-            throws Exception {
+        String id, String profile, CertRequest certRequest) throws Exception {
       ConcurrentSigner signer = getSigner();
 
       ProofOfPossessionSigningKeyBuilder popBuilder =

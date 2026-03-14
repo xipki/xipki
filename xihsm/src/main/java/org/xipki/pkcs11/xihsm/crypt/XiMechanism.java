@@ -11,6 +11,8 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.OperationType;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiMechanism {
@@ -45,10 +47,8 @@ public class XiMechanism {
 
   public void assertUpdateSupported(OperationType opType)
       throws HsmException {
-    long flagBit =
-          (opType == OperationType.DIGEST) ? PKCS11T.CKF_DIGEST
-        : (opType == OperationType.SIGN) ? PKCS11T.CKF_SIGN
-        : 0;
+    long flagBit = (opType == OperationType.DIGEST) ? PKCS11T.CKF_DIGEST
+                : (opType == OperationType.SIGN)   ? PKCS11T.CKF_SIGN : 0;
 
     if (flagBit == 0) {
       return;
@@ -56,9 +56,8 @@ public class XiMechanism {
 
     if (!vendor.supportsMultipart(origCkm, flagBit)) {
       throw new HsmException(PKCS11T.CKR_FUNCTION_NOT_SUPPORTED,
-          "C_*Update() for mechanism " +
-              vendor.codeToName(Category.CKM, origCkm) + " and purpose " +
-              opType + " is not supported");
+          "C_*Update() for mechanism " + vendor.codeToName(Category.CKM, origCkm) +
+          " and purpose " + opType + " is not supported");
     }
   }
 

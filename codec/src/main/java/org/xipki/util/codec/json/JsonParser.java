@@ -65,64 +65,51 @@ public class JsonParser {
     this.instream = Args.notNull(instream, "instream");
   }
 
-  public static JsonMap parseMap(byte[] bytes, boolean allowComments)
-      throws CodecException {
-    return parseMap(JsonInputStream.newReader(
-        Args.notNull(bytes, "bytes"), allowComments));
+  public static JsonMap parseMap(byte[] bytes, boolean allowComments) throws CodecException {
+    return parseMap(JsonInputStream.newReader(Args.notNull(bytes, "bytes"), allowComments));
   }
 
-  public static JsonMap parseMap(String str, boolean allowComments)
-      throws CodecException {
-    return parseMap(JsonInputStream.newReader(
-        Args.notNull(str, "str"), allowComments));
+  public static JsonMap parseMap(String str, boolean allowComments) throws CodecException {
+    return parseMap(JsonInputStream.newReader(Args.notNull(str, "str"), allowComments));
   }
 
-  public static JsonMap parseMap(Path path, boolean allowComments)
-      throws CodecException {
-    return parseMap(JsonInputStream.newReader(
-        Args.notNull(path, "path"), allowComments));
+  public static JsonMap parseMap(Path path, boolean allowComments) throws CodecException {
+    return parseMap(JsonInputStream.newReader(Args.notNull(path, "path"), allowComments));
   }
 
-  public static JsonMap parseMap(
-      InputStream inputStream, boolean allowComments) throws CodecException {
+  public static JsonMap parseMap(InputStream inputStream, boolean allowComments)
+      throws CodecException {
     return parseMap(JsonInputStream.newReader(
         Args.notNull(inputStream, "inputStream"), allowComments));
   }
 
-  public static JsonList parseList(byte[] bytes, boolean allowComments)
-      throws CodecException {
-    return parseList(JsonInputStream.newReader(
-        Args.notNull(bytes, "bytes"), allowComments));
+  public static JsonList parseList(byte[] bytes, boolean allowComments) throws CodecException {
+    return parseList(JsonInputStream.newReader(Args.notNull(bytes, "bytes"), allowComments));
   }
 
-  public static JsonList parseList(String str, boolean allowComments)
-      throws CodecException {
+  public static JsonList parseList(String str, boolean allowComments) throws CodecException {
     return parseList(JsonInputStream.newReader(
         Args.notNull(str, "str"), allowComments));
   }
 
-  public static JsonList parseList(Path path, boolean allowComments)
-      throws CodecException {
+  public static JsonList parseList(Path path, boolean allowComments) throws CodecException {
     return parseList(JsonInputStream.newReader(
         Args.notNull(path, "path"), allowComments));
   }
 
-  public static JsonList parseList(
-      InputStream inputStream, boolean allowComments) throws CodecException {
+  public static JsonList parseList(InputStream inputStream, boolean allowComments)
+      throws CodecException {
     return parseList(JsonInputStream.newReader(
         Args.notNull(inputStream, "inputStream"), allowComments));
   }
 
-  private static JsonMap parseMap(JsonInputStream reader)
-      throws CodecException {
-    JsonParser parser = new JsonParser(reader);
-    return parser.parseRootMap();
+  private static JsonMap parseMap(JsonInputStream reader) throws CodecException {
+    return new JsonParser(reader).parseRootMap();
   }
 
   private static JsonList parseList(JsonInputStream reader)
       throws CodecException {
-    JsonParser parser = new JsonParser(reader);
-    return parser.parseRootList();
+    return new JsonParser(reader).parseRootList();
   }
 
   public void close() {
@@ -132,8 +119,7 @@ public class JsonParser {
     }
   }
 
-  private JsonMap parseRootMap()
-      throws CodecException {
+  private JsonMap parseRootMap() throws CodecException {
     try {
       int currentChar = consumeWhitespace(read());
       if (currentChar == '{') {
@@ -364,11 +350,9 @@ public class JsonParser {
 
         if (isEndOfValue(currentChar)) {
           this.recentChar = currentChar;
-          if (expSignum > 0) {
-            return (integer + decimal) * signum * pow(exponent);
-          } else {
-            return (integer + decimal) * signum / pow(exponent);
-          }
+          return (expSignum > 0)
+              ? (integer + decimal) * signum * pow(exponent)
+              : (integer + decimal) * signum / pow(exponent);
         }
       } else {
         // floating point without exponent
@@ -508,8 +492,7 @@ public class JsonParser {
   }
 
   private CodecException.UnexpectedCharException buildUnexpected(int chr) {
-    return new CodecException.UnexpectedCharException(
-        this.instream.position(), (char) chr);
+    return new CodecException.UnexpectedCharException(this.instream.position(), (char) chr);
   }
 
   private static boolean isDigit(int chr) {
@@ -517,9 +500,8 @@ public class JsonParser {
   }
 
   private int consumeWhitespace(int chr) throws CodecException {
-    while (chr == ' ' | chr == '\b' | chr == '\f' | chr == '\n'
-        | chr == '\r' | chr == '\t') {
-     chr = read();
+    while (chr == ' ' | chr == '\b' | chr == '\f' | chr == '\n' | chr == '\r' | chr == '\t') {
+    chr = read();
     }
 
     if (chr == -1) {

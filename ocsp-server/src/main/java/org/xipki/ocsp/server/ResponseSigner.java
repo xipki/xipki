@@ -13,6 +13,7 @@ import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 
 import java.io.IOException;
@@ -49,8 +50,7 @@ class ResponseSigner {
 
   private final boolean macSigner;
 
-  ResponseSigner(List<ConcurrentSigner> signers)
-      throws CertificateException, IOException {
+  ResponseSigner(List<ConcurrentSigner> signers) throws CertificateException, IOException {
     this.signers = Args.notEmpty(signers, "signers");
     ConcurrentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
@@ -62,13 +62,12 @@ class ResponseSigner {
       this.sequenceOfCert = null;
       this.sequenceOfCertChain = null;
 
-      byte[] keySha1 = firstSigner.getSha1OfMacKey();
+      byte[] keySha1 = firstSigner.sha1OfMacKey();
       this.responderIdByKey = new ResponderID(keySha1);
     } else {
-      X509Cert[] tmpCertChain = firstSigner.getX509CertChain();
+      X509Cert[] tmpCertChain = firstSigner.x509CertChain();
       if (tmpCertChain == null || tmpCertChain.length == 0) {
-        throw new CertificateException(
-            "no certificate is bound with the signer");
+        throw new CertificateException("no certificate is bound with the signer");
       }
       int len = tmpCertChain.length;
       if (len > 1) {
@@ -94,14 +93,14 @@ class ResponseSigner {
 
       Certificate bcCertificate = Certificate.getInstance(encodedCert);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-      byte[] keySha1 = HashAlgo.SHA1.hash(bcCertificate
-          .getSubjectPublicKeyInfo().getPublicKeyData().getBytes());
+      byte[] keySha1 = HashAlgo.SHA1.hash(Asn1Util.getPublicKeyData(
+                          bcCertificate.getSubjectPublicKeyInfo()));
       this.responderIdByKey = new ResponderID(keySha1);
     }
 
     algoSignerMap = new HashMap<>();
     for (ConcurrentSigner signer : signers) {
-      SignAlgo algo = signer.getAlgorithm();
+      SignAlgo algo = signer.algorithm();
       algoSignerMap.put(algo, signer);
     }
   } // constructor
@@ -114,8 +113,7 @@ class ResponseSigner {
     return signers.get(0);
   }
 
-  public ConcurrentSigner getSignerForPreferredSigAlgs(
-      List<AlgorithmIdentifier> prefSigAlgs) {
+  public ConcurrentSigner getSignerForPreferredSigAlgs(List<AlgorithmIdentifier> prefSigAlgs) {
     if (prefSigAlgs == null) {
       return signers.get(0);
     }
@@ -125,8 +123,7 @@ class ResponseSigner {
         // return any RSAPSS with MGF1 algorithms
         ASN1Encodable params = sigAlgId.getParameters();
         if (params == null) {
-          for (Entry<SignAlgo, ConcurrentSigner> entry
-              : algoSignerMap.entrySet()) {
+          for (Entry<SignAlgo, ConcurrentSigner> entry : algoSignerMap.entrySet()) {
             SignAlgo m = entry.getKey();
             if (m.isRSAPSSMGF1SigAlgo()) {
               return entry.getValue();

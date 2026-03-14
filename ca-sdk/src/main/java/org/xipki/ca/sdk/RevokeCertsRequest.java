@@ -41,14 +41,10 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
       throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("RevokeCertsRequest", decoder, 4);
-      return new RevokeCertsRequest(
-          decoder.readByteString(),
-          X500NameType.decode(decoder),
-          decoder.readByteString(),
-          Entry.decodeArray(decoder));
+      return new RevokeCertsRequest(decoder.readByteString(), X500NameType.decode(decoder),
+          decoder.readByteString(), Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, RevokeCertsRequest.class), ex);
     }
   }
 
@@ -66,8 +62,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
      */
     private final Instant invalidityTime;
 
-    public Entry(BigInteger serialNumber, CrlReason reason,
-                 Instant invalidityTime) {
+    public Entry(BigInteger serialNumber, CrlReason reason, Instant invalidityTime) {
       this.serialNumber = serialNumber;
       this.reason = reason;
       this.invalidityTime = invalidityTime;
@@ -108,8 +103,7 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder)
-        throws CodecException {
+    public static Entry[] decodeArray(CborDecoder decoder) throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

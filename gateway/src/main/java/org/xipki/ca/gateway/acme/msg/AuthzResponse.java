@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -27,9 +28,8 @@ public class AuthzResponse implements JsonEncodable {
 
   private final List<ChallengeResponse> challenges;
 
-  public AuthzResponse(
-      AuthzStatus status, String expires, Identifier identifier,
-      List<ChallengeResponse> challenges) {
+  public AuthzResponse(AuthzStatus status, String expires, Identifier identifier,
+                      List<ChallengeResponse> challenges) {
     this.status = status;
     this.expires = expires;
     this.identifier = identifier;
@@ -69,8 +69,7 @@ public class AuthzResponse implements JsonEncodable {
       }
     }
 
-    return new AuthzResponse(status, json.getString("expires"),
-        identifier, challenges);
+    return new AuthzResponse(status, json.getString("expires"), identifier, challenges);
   }
 
 }

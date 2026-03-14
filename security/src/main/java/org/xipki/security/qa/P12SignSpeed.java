@@ -10,6 +10,7 @@ import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.pkcs12.KeyStoreWrapper;
 import org.xipki.security.pkcs12.KeystoreGenerationParameters;
+import org.xipki.security.pkcs12.PKCS12KeyStoreWrapper;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.sign.SignerConf;
@@ -44,7 +45,7 @@ public final class P12SignSpeed extends BenchmarkExecutor {
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.x509sign(data);
+          signer.x509Sign(data);
           account(batch, 0);
         } catch (Exception ex) {
           LOG.error("P12SignSpeed.Tester.run()", ex);
@@ -76,10 +77,8 @@ public final class P12SignSpeed extends BenchmarkExecutor {
     Args.notNull(securityFactory, "securityFactory");
     SignerConf signerConf = getKeystoreSignerConf(
         Args.notNull(keystore, "keystore"), PASSWORD,
-        Args.notNull(signAlgo, "signAlgo"),
-        threads + Math.max(2, threads * 5 / 4));
-    this.signer = securityFactory.createSigner(tokenType, signerConf,
-        (X509Cert) null);
+        Args.notNull(signAlgo, "signAlgo"), threads + Math.max(2, threads * 5 / 4));
+    this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Cert) null);
   }
 
   @Override
@@ -87,16 +86,13 @@ public final class P12SignSpeed extends BenchmarkExecutor {
     return new Tester();
   }
 
-  private static byte[] generateKeystore(SignAlgo signAlgo, KeySpec keySpec)
-      throws Exception {
-    KeystoreGenerationParameters params =
-        new KeystoreGenerationParameters(PASSWORD.toCharArray());
+  private static byte[] generateKeystore(SignAlgo signAlgo, KeySpec keySpec) throws Exception {
+    KeystoreGenerationParameters params = new KeystoreGenerationParameters(PASSWORD.toCharArray());
 
     Integer keysize = getSymmKeyBitSize(signAlgo);
     if (keysize != null) {
       if (keySpec != null) {
-        throw new IllegalArgumentException(
-            "keySpec shall not be non-null: " + keySpec);
+        throw new IllegalArgumentException("keySpec shall not be non-null: " + keySpec);
       }
 
       // symmetric key
@@ -111,33 +107,27 @@ public final class P12SignSpeed extends BenchmarkExecutor {
           keyType = "HMAC";
       }
 
-      KeyStoreWrapper identity =
-          KeyUtil.generateSecretKey(keyType, keysize, params);
+      KeyStoreWrapper identity = KeyUtil.generateSecretKey(keyType, keysize, params);
       return identity.keystore();
     }
 
     if (keySpec == null) {
       keySpec = getKeySpec(signAlgo);
       if (keySpec == null) {
-        throw new IllegalArgumentException(
-            "cannot determine keyspec from signAlgo " + signAlgo);
+        throw new IllegalArgumentException("cannot determine keyspec from signAlgo " + signAlgo);
       }
     }
 
     params.setRandom(new SecureRandom());
-    KeyStoreWrapper identity = KeyUtil.generateKeypair3(keySpec, params);
+    PKCS12KeyStoreWrapper identity = KeyUtil.generateKeyPair3(keySpec, params);
     return identity.keystore();
   }
 
   private static SignerConf getKeystoreSignerConf(
-      byte[] keystoreBytes, String password, SignAlgo signAlgo,
-      int parallelism) {
+      byte[] keystoreBytes, String password, SignAlgo signAlgo, int parallelism) {
     return new SignerConf()
-        .setPassword(password)
-        .setAlgo(signAlgo)
-        .setParallelism(parallelism)
-        .setKeystore("base64:" +
-            Base64.getNoPaddingEncoder().encodeToString(keystoreBytes));
+        .setPassword(password).setAlgo(signAlgo).setParallelism(parallelism)
+        .setKeystore("base64:" + Base64.getNoPaddingEncoder().encodeToString(keystoreBytes));
   }
 
   static Integer getSymmKeyBitSize(SignAlgo signAlgo) {
@@ -146,13 +136,12 @@ public final class P12SignSpeed extends BenchmarkExecutor {
         return 128;
       case GMAC_AES192:
         return 192;
-      case GMAC_AES256:
-        return 256;
       case HMAC_SHA1:
         return 160;
       case HMAC_SHA224:
       case HMAC_SHA3_224:
         return 224;
+      case GMAC_AES256:
       case HMAC_SHA256:
       case HMAC_SHA3_256:
         return 256;
@@ -171,9 +160,9 @@ public final class P12SignSpeed extends BenchmarkExecutor {
     if (signAlgo.isRSAPSSSigAlgo() || signAlgo.isRSAPkcs1SigAlgo()) {
       return KeySpec.RSA2048;
     } else if (signAlgo == SignAlgo.SM2_SM3) {
-      return KeySpec.SM2P256V1;
+      return KeySpec.SM2;
     } else if (signAlgo.isECDSASigAlgo()) {
-      return KeySpec.SECP256R1;
+      return KeySpec.P256;
     } else {
       switch (signAlgo) {
         case ED25519:

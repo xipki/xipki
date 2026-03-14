@@ -12,21 +12,19 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.SecretWithEncapsulation;
-import org.bouncycastle.crypto.ec.CustomNamedCurves;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.bouncycastle.math.ec.rfc7748.X448;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMExtractor;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMGenerator;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPrivateKeyParameters;
-import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
 import org.bouncycastle.util.BigIntegers;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
+import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.SecretWithEncap;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.Asn1Util;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.PKCS1Util;
 import org.xipki.util.io.IoUtil;
 
@@ -38,39 +36,37 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class CompositeKemUtil {
 
-  public static SecretWithEncap encap(CompositeKemSuite algoSuite,
-                                      byte[] pk, SecureRandom rnd)
+  public static SecretWithEncap encap(CompositeKemSuite algoSuite, byte[] pk, SecureRandom rnd)
       throws XiSecurityException {
-    MlkemVariant mlkemVariant = algoSuite.mlkemVariant();
-    KemTradVariant tradVariant = algoSuite.tradVariant();
+    CompKemMlkemVariant mlkemVariant = algoSuite.pqcVariant();
+    CompKemTradVariant tradVariant = algoSuite.tradVariant();
     byte[] mlkemPk = Arrays.copyOfRange(pk, 0, mlkemVariant.pkSize());
-    byte[] tradPk = Arrays.copyOfRange(pk, mlkemVariant.pkSize(),
-        pk.length);
+    byte[] tradPk = Arrays.copyOfRange(pk, mlkemVariant.pkSize(), pk.length);
 
-    SecretWithEncap mlkemRes = mlKemEcapsulate(mlkemVariant, mlkemPk, rnd);
+    SecretWithEncap mlkemRes = mlKemEncapsulate(mlkemVariant, mlkemPk, rnd);
     SecretWithEncap tradRes  = tradEcapsulate(tradVariant, tradPk, rnd);
     byte[] ct = IoUtil.concatenate(mlkemRes.encap(), tradRes.encap());
-    byte[] k = sha3256Kdf(mlkemRes.secret(),
-        tradRes.secret(), tradRes.encap(), tradPk,
-        algoSuite.label());
+    byte[] k = sha3256Kdf(mlkemRes.secret(), tradRes.secret(), tradRes.encap(),
+                tradPk, algoSuite.label());
     return new SecretWithEncap(k, ct);
   }
 
-  private static SecretWithEncap mlKemEcapsulate(
-      MlkemVariant variant, byte[] pk, SecureRandom rnd) {
-    MLKEMGenerator enc = new MLKEMGenerator(rnd);
-    SecretWithEncapsulation res = enc.generateEncapsulated(
-        new MLKEMPublicKeyParameters(variant.params(), pk));
+  private static SecretWithEncap mlKemEncapsulate(
+      CompKemMlkemVariant variant, byte[] pk, SecureRandom rnd) {
+    KeySpec keySpec = variant == CompKemMlkemVariant.mlkem768
+                      ? KeySpec.MLKEM768 : KeySpec.MLKEM1024;
+    SecretWithEncapsulation res = KEMUtil.encapsulateKey(keySpec, pk, rnd);
     return new SecretWithEncap(res.getSecret(), res.getEncapsulation());
   }
 
   private static SecretWithEncap tradEcapsulate(
-      KemTradVariant variant, byte[] pk, SecureRandom rnd)
-      throws XiSecurityException {
+      CompKemTradVariant variant, byte[] pk, SecureRandom rnd) throws XiSecurityException {
     switch (variant) {
       case X25519: {
         byte[] tmpSk = new byte[32];
@@ -78,8 +74,7 @@ public class CompositeKemUtil {
         byte[] tmpPk = new byte[32]; // ct
         X25519.generatePublicKey(tmpSk, 0, tmpPk, 0);
         byte[] k = new byte[32]; // k
-        X25519.calculateAgreement(tmpSk, 0, pk, 0,
-            k, 0);
+        X25519.calculateAgreement(tmpSk, 0, pk, 0, k, 0);
         return new SecretWithEncap(k, tmpPk);
       }
       case X448: {
@@ -88,8 +83,7 @@ public class CompositeKemUtil {
         byte[] tmpPk = new byte[56]; // ct
         X448.generatePublicKey(tmpSk, 0, tmpPk, 0);
         byte[] k = new byte[56]; // k
-        X448.calculateAgreement(tmpSk, 0, pk, 0,
-            k, 0);
+        X448.calculateAgreement(tmpSk, 0, pk, 0, k, 0);
         return new SecretWithEncap(k, tmpPk);
       }
       case ECDH_P256:
@@ -121,15 +115,12 @@ public class CompositeKemUtil {
         rnd.nextBytes(tmpSk);
         BigInteger tmpSkBn = new BigInteger(1, tmpSk).mod(order);
 
-        byte[] tmpPk = curveEnum.multiplyBase(tmpSkBn).normalize()
-                        .getEncoded(false);
+        byte[] tmpPk = curveEnum.multiplyBase(tmpSkBn).normalize().getEncoded(false);
 
         BigInteger agreedSs = curveEnum.decodePoint(pk)
             .multiply(tmpSkBn).normalize().getAffineXCoord().toBigInteger();
         return new SecretWithEncap(
-            BigIntegers.asUnsignedByteArray(
-                curveEnum.fieldByteSize(), agreedSs),
-            tmpPk);
+            BigIntegers.asUnsignedByteArray(curveEnum.fieldByteSize(), agreedSs), tmpPk);
       }
       case RSA2048_OAEP:
       case RSA3072_OAEP:
@@ -140,13 +131,11 @@ public class CompositeKemUtil {
             variant.keySpec().algorithmIdentifier(), pk);
 
         try {
-          RSAPublicKey jceSk = (RSAPublicKey)
-              BouncyCastleProvider.getPublicKey(spki);
+          RSAPublicKey jceSk = (RSAPublicKey) KeyUtil.getPublicKey(spki);
           BigInteger modulus = jceSk.getModulus();
           Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
           cipher.init(Cipher.ENCRYPT_MODE, jceSk);
-          byte[] em = PKCS1Util.RSAES_OAEP_ENCODE(k, modulus.bitLength(),
-                        HashAlgo.SHA256, rnd);
+          byte[] em = PKCS1Util.RSAES_OAEP_ENCODE(k, modulus.bitLength(), HashAlgo.SHA256, rnd);
           byte[] ct = cipher.doFinal(em);
           return new SecretWithEncap(k, ct);
         } catch (XiSecurityException e) {
@@ -160,43 +149,40 @@ public class CompositeKemUtil {
     }
   }
 
-  public static byte[] sha3256Kdf(byte[] mlkemSS, byte[] tradSS, byte[] tradCT,
-                         byte[] tradPK, byte[] label) {
+  public static byte[] sha3256Kdf(
+      byte[] mlkemSS, byte[] tradSS, byte[] tradCT, byte[] tradPK, byte[] label) {
     return HashAlgo.SHA3_256.hash(mlkemSS, tradSS, tradCT, tradPK, label);
   }
 
-  public static byte[] decap(CompositeKemSuite algoSuite,
-                             byte[] sk, byte[] pk, byte[] ct)
+  public static byte[] decap(CompositeKemSuite algoSuite, byte[] sk, byte[] pk, byte[] ct)
       throws XiSecurityException {
-    MlkemVariant mlkemVariant = algoSuite.mlkemVariant();
+    CompKemMlkemVariant mlkemVariant = algoSuite.pqcVariant();
 
     byte[] mlkemSk = Arrays.copyOfRange(sk, 0, mlkemVariant.skSize());
     int off = mlkemVariant.skSize();
     byte[] tradSk  = Arrays.copyOfRange(sk, off, sk.length);
 
     byte[] mlkemCT  = Arrays.copyOfRange(ct, 0, mlkemVariant.ctSize());
-    byte[] tradCT  = Arrays.copyOfRange(ct, mlkemVariant.ctSize(), ct.length);
-    byte[] tradPk = Arrays.copyOfRange(pk, mlkemVariant.pkSize(), pk.length);
+    byte[] tradCT   = Arrays.copyOfRange(ct, mlkemVariant.ctSize(), ct.length);
+    byte[] tradPk   = Arrays.copyOfRange(pk, mlkemVariant.pkSize(), pk.length);
 
     byte[] mlkemSS = decapMlkem(mlkemVariant, mlkemSk, mlkemCT);
-    byte[] tradSS = decapTrad(algoSuite.tradVariant(), tradSk, tradCT);
+    byte[] tradSS  = decapTrad(algoSuite.tradVariant(), tradSk, tradCT);
     return sha3256Kdf(mlkemSS, tradSS, tradCT, tradPk, algoSuite.label());
   }
 
-  private static byte[] decapMlkem(MlkemVariant variant, byte[] sk, byte[] ct) {
-    MLKEMPrivateKeyParameters dkObj = new MLKEMPrivateKeyParameters(
-        variant.params(), sk);
-    MLKEMExtractor extractor = new MLKEMExtractor(dkObj);
-    return extractor.extractSecret(ct);
+  private static byte[] decapMlkem(CompKemMlkemVariant variant, byte[] sk, byte[] ct) {
+    KeySpec keySpec = (variant == CompKemMlkemVariant.mlkem768)
+        ? KeySpec.MLKEM768 : KeySpec.MLKEM1024;
+    return KEMUtil.decapsulateKey(keySpec, sk, ct);
   }
 
-  private static byte[] decapTrad(
-      KemTradVariant variant, byte[] sk, byte[] ct)
+  private static byte[] decapTrad(CompKemTradVariant variant, byte[] sk, byte[] ct)
       throws XiSecurityException {
     switch (variant) {
       case X25519:
       case X448: {
-        boolean isX448 = variant == KemTradVariant.X448;
+        boolean isX448 = variant == CompKemTradVariant.X448;
         int size = isX448 ? 56 : 32;
         if (sk.length != size) {
           throw new XiSecurityException("invalid sk.length " + sk.length);
@@ -217,17 +203,14 @@ public class CompositeKemUtil {
       case RSA4096_OAEP: {
         try {
           PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo(
-              new AlgorithmIdentifier(OIDs.Algo.id_rsaEncryption,
-                  DERNull.INSTANCE),
-              sk);
-          RSAPrivateKey jceSk = (RSAPrivateKey)
-              BouncyCastleProvider.getPrivateKey(privateKeyInfo);
+              new AlgorithmIdentifier(OIDs.Algo.id_rsaEncryption, DERNull.INSTANCE),
+              Asn1Util.toASN1OctetString(sk));
+          RSAPrivateKey jceSk = (RSAPrivateKey) KeyUtil.getPrivateKey(privateKeyInfo);
           BigInteger modulus = jceSk.getModulus();
           Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
           cipher.init(Cipher.DECRYPT_MODE, jceSk);
           byte[] em = cipher.doFinal(ct);
-          return PKCS1Util.RSAES_OAEP_DECODE(em, modulus.bitLength(),
-                  HashAlgo.SHA256);
+          return PKCS1Util.RSAES_OAEP_DECODE(em, modulus.bitLength(), HashAlgo.SHA256);
         } catch (XiSecurityException e) {
           throw e;
         } catch (Exception e) {
@@ -284,11 +267,7 @@ public class CompositeKemUtil {
     private final ECPoint base;
 
     WeierstraussCurveEnum(ASN1ObjectIdentifier oid) {
-      X9ECParameters params = CustomNamedCurves.getByOID(oid);
-      if (params == null) {
-        params = ECNamedCurveTable.getByOID(oid);
-      }
-
+      X9ECParameters params = ECNamedCurveTable.getByOID(oid);
       this.curve = params.getCurve();
       this.base = params.getG();
     }

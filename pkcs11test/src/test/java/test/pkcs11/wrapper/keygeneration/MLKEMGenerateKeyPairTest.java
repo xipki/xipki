@@ -11,7 +11,6 @@ import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.PKCS11Token;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.pkcs11.wrapper.attrs.AttributeTypes;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairType;
@@ -116,7 +115,7 @@ public class MLKEMGenerateKeyPairTest {
 
       PKCS11KeyPairSpec template = new PKCS11KeyPairSpec()
           .token(true).id(id).sensitive(true).private_(true)
-          .decryptEncrypt(true)
+          .deEncapsulate(true)
           .keyPairType(keyPairType);
       assertCanGenerate(template);
 
@@ -131,22 +130,17 @@ public class MLKEMGenerateKeyPairTest {
         LOG.info("The private key is {}", generatedPrivateKey);
 
         LOG.info("##################################################");
-        Template attrs = token.getAttrValues(generatedPublicKey,
-            new AttributeTypes().parameterSet().value());
-        byte[] pkValue = attrs.value();
-        long mlkemVariant = attrs.parameterSet();
-
-        LOG.info("Public Key: {}", Functions.toHex(pkValue));
-        LOG.info("Public Key (MLKEM Variant): {}",
-            PKCS11T.getStdMlkemName(mlkemVariant));
+        Template attrs = token.getDefaultAttrValues(generatedPublicKey);
+        LOG.info("Public Key: {}", attrs);
+        attrs = token.getDefaultAttrValues(generatedPrivateKey);
+        LOG.info("Private Key: {}", attrs);
 
         // now we try to search for the generated keys
         LOG.info("##################################################");
         LOG.info("Trying to search for the public key of the generated " +
             "key-pair by ID: {}", Functions.toHex(id));
         // set the search template for the public key
-        Template exportPublicKeyTemplate =
-            newPublicKey(PKCS11T.CKK_ML_KEM).id(id);
+        Template exportPublicKeyTemplate = newPublicKey(PKCS11T.CKK_ML_KEM).id(id);
 
         long[] foundPublicKeys = token.findObjects(exportPublicKeyTemplate, 1);
         if (foundPublicKeys.length != 1) {

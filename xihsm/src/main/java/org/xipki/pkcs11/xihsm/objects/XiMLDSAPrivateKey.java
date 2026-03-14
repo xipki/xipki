@@ -3,10 +3,6 @@
 
 package org.xipki.pkcs11.xihsm.objects;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.jcajce.spec.ContextParameterSpec;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.params.CkParams;
 import org.xipki.pkcs11.wrapper.params.NullParams;
@@ -21,6 +17,7 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.pkcs11.xihsm.util.XiConstants;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
 import java.io.IOException;
@@ -29,6 +26,8 @@ import java.security.Signature;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiMLDSAPrivateKey extends XiPrivateKey {
@@ -43,25 +42,21 @@ public class XiMLDSAPrivateKey extends XiPrivateKey {
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
       long handle, boolean inToken, Long keyGenMechanism,
       XiConstants.P11MldsaVariant variant, byte[] sk) throws HsmException {
-    super(vendor, cku, newObjectMethod, handle, inToken,
-        PKCS11T.CKK_ML_DSA, keyGenMechanism);
+    super(vendor, cku, newObjectMethod, handle, inToken, PKCS11T.CKK_ML_DSA, keyGenMechanism);
     this.variant = Args.notNull(variant, "variant");
     this.sk = sk;
 
     try {
-      this.jceKey = BouncyCastleProvider.getPrivateKey(new PrivateKeyInfo(
-          new AlgorithmIdentifier(this.variant.getOid()), sk));
+      this.jceKey = KeyUtil.getPrivateKey(KeyUtil.buildPrivateKeyInfo(this.variant.getOid(), sk));
     } catch (Exception e) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "error constructing JCE ML-DSA private key");
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error building JCE ML-DSA private key");
     }
   }
 
   @Override
   public byte[] getEncoded() throws HsmException {
     try {
-      return new PrivateKeyInfo(
-          new AlgorithmIdentifier(this.variant.getOid()), sk).getEncoded();
+      return KeyUtil.buildPrivateKeyInfo(this.variant.getOid(), sk).getEncoded();
     } catch (IOException ex) {
       throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
           "error encoding " + getClass().getName(), ex);
@@ -69,18 +64,15 @@ public class XiMLDSAPrivateKey extends XiPrivateKey {
   }
 
   @Override
-  protected void assertAttributesSettable(XiTemplate attrs)
-      throws HsmException {
+  protected void assertAttributesSettable(XiTemplate attrs) throws HsmException {
     XiTemplateChecker.assertMldsaPrivateKeyAttributesSettable(attrs);
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
-    addAttr(res, types, PKCS11T.CKA_PARAMETER_SET,
-        variant.getCode());
+    addAttr(res, types, PKCS11T.CKA_PARAMETER_SET, variant.getCode());
 
     if (withAll || !isSensitive()) {
       addAttr(res, types, PKCS11T.CKA_VALUE, sk);
@@ -88,12 +80,10 @@ public class XiMLDSAPrivateKey extends XiPrivateKey {
   }
 
   @Override
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                            SecureRandom random)
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random)
       throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     long ckm = mechanism.getCkm();
@@ -115,37 +105,32 @@ public class XiMLDSAPrivateKey extends XiPrivateKey {
     }
 
     try {
-      Signature sig = Signature.getInstance("ML-DSA", "BC");
+      String algo = "ML-DSA";
+      Signature sig = Signature.getInstance(algo, KeyUtil.providerName(algo));
       sig.initSign(jceKey);
       if (context != null) {
-        sig.setParameter(new ContextParameterSpec(context));
+        KeyUtil.setContext(sig, context);
       }
       sig.update(data);
       try {
         return sig.sign();
       } catch (Exception e) {
-        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-            "error sign()", e);
+        throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error sign()", e);
       }
     } catch (Exception e) {
-      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          "error initializing Signature instance");
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "error initializing Signature instance");
     }
   }
 
   public static XiMLDSAPrivateKey newInstance(
       XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
-      throws HsmException {
-    long variantCode = attrs.removeNonNullLong(
-        PKCS11T.CKA_PARAMETER_SET);
-    XiConstants.P11MldsaVariant variant =
-        XiConstants.P11MldsaVariant.ofCode(variantCode);
+      LoginState loginState, ObjectInitMethod initMethod, long handle,
+      boolean inToken, XiTemplate attrs, Long keyGenMechanism) throws HsmException {
+    long variantCode = attrs.removeNonNullLong(PKCS11T.CKA_PARAMETER_SET);
+    XiConstants.P11MldsaVariant variant = XiConstants.P11MldsaVariant.ofCode(variantCode);
     byte[] value = attrs.removeNonNullByteArray(PKCS11T.CKA_VALUE);
-    XiMLDSAPrivateKey ret = new XiMLDSAPrivateKey(
-        vendor, cku, newObjectMethod,
-        handle, inToken, keyGenMechanism, variant, value);
+    XiMLDSAPrivateKey ret = new XiMLDSAPrivateKey(vendor, cku, newObjectMethod,
+                              handle, inToken, keyGenMechanism, variant, value);
     ret.updateAttributes(loginState, initMethod, attrs);
     return ret;
   }

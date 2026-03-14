@@ -148,8 +148,7 @@ public class ECGenerateKeyPairTest {
         LOG.info("Trying to search for the public key of the generated " +
             "key-pair by ID: {}", Functions.toHex(id));
         // set the search template for the public key
-        Template exportPublicKeyTemplate =
-            newPublicKey(CKK_EC).attr(CKA_ID, id);
+        Template exportPublicKeyTemplate = newPublicKey(CKK_EC).attr(CKA_ID, id);
 
         long[] foundPublicKeys = token.findObjects(exportPublicKeyTemplate, 1);
         if (foundPublicKeys.length != 1) {
@@ -167,8 +166,7 @@ public class ECGenerateKeyPairTest {
     }
   }
 
-  static void fillTemplate(PKCS11KeyPairSpec template,
-                           CkMechanismInfo signatureMechanismInfo) {
+  static void fillTemplate(PKCS11KeyPairSpec template, CkMechanismInfo signatureMechanismInfo) {
     template
         .signVerify(
             signatureMechanismInfo.hasFlagBit(CKF_SIGN),

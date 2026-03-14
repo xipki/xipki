@@ -118,8 +118,7 @@ public class CkSlotInfo extends AbstractInfo {
       "manufacturerID", manufacturerID, "hardwareVersion", hardwareVersion,
       "firmwareVersion", firmwareVersion) + "\n" +
       Functions.toStringFlags(Category.CKF_SLOT, indent + "Flags: ", flags,
-          PKCS11T.CKF_TOKEN_PRESENT, PKCS11T.CKF_REMOVABLE_DEVICE,
-          PKCS11T.CKF_HW_SLOT);
+          PKCS11T.CKF_TOKEN_PRESENT, PKCS11T.CKF_REMOVABLE_DEVICE, PKCS11T.CKF_HW_SLOT);
   }
 
   @Override

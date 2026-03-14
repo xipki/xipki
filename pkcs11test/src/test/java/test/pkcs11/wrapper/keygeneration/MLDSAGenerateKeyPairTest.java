@@ -11,7 +11,6 @@ import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.PKCS11Token;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.pkcs11.wrapper.attrs.AttributeTypes;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairType;
@@ -107,8 +106,7 @@ public class MLDSAGenerateKeyPairTest {
       generateMldsaKeypair(PKCS11KeyPairType.MLDSA87);
     }
 
-    private void generateMldsaKeypair(PKCS11KeyPairType keyPairType)
-        throws TokenException {
+    private void generateMldsaKeypair(PKCS11KeyPairType keyPairType) throws TokenException {
       PKCS11Token token = getToken();
 
       byte[] id = new byte[20];
@@ -130,14 +128,10 @@ public class MLDSAGenerateKeyPairTest {
         LOG.info("The private key is {}", generatedPrivateKey);
 
         LOG.info("##################################################");
-        Template attrs = token.getAttrValues(generatedPublicKey,
-            new AttributeTypes().parameterSet().value());
-        byte[] pkValue = attrs.value();
-        Long mldsaVariant = attrs.parameterSet();
-
-        LOG.info("Public Key: {}", Functions.toHex(pkValue));
-        LOG.info("Public Key (ML-DSA Variant): {}",
-            PKCS11T.getStdMldsaName(mldsaVariant));
+        Template attrs = token.getDefaultAttrValues(generatedPublicKey);
+        LOG.info("Public Key: {}", attrs);
+        attrs = token.getDefaultAttrValues(generatedPrivateKey);
+        LOG.info("Private Key: {}", attrs);
 
         // now we try to search for the generated keys
         LOG.info("##################################################");

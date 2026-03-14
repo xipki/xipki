@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class QCStatementID extends AbstractID {
@@ -28,12 +30,10 @@ public class QCStatementID extends AbstractID {
       OIDs.QCS.id_qcs_pkixQCSyntax_v2, "QCStatement2", "QCStatementV2");
 
   public static final QCStatementID etsi_qcs_QcCompliance = initOf(
-      OIDs.QCS.id_etsi_qcs_QcCompliance, "QcCompliance",
-      "etsi-qcs-QcCompliance");
+      OIDs.QCS.id_etsi_qcs_QcCompliance, "QcCompliance", "etsi-qcs-QcCompliance");
 
   public static final QCStatementID etsi_qcs_QcLimitValue = initOf(
-      OIDs.QCS.id_etsi_qcs_QcLimitValue, "QcLimitValue",
-      "etsi-qcs-QcLimitValue");
+      OIDs.QCS.id_etsi_qcs_QcLimitValue, "QcLimitValue", "etsi-qcs-QcLimitValue");
 
   public static final QCStatementID etsi_qcs_QcRetentionPeriod = initOf(
       OIDs.QCS.id_etsi_qcs_QcRetentionPeriod, "QcRetentionPeriod",
@@ -53,15 +53,13 @@ public class QCStatementID extends AbstractID {
       "etsi-qcs-QcCClegislation");
 
   public static final QCStatementID etsi_psd2_qcStatement = initOf(
-      OIDs.QCS.id_etsi_psd2_qcStatement, "psd2-qcStatement",
-      "etsi-psd2-qcStatement");
+      OIDs.QCS.id_etsi_psd2_qcStatement, "psd2-qcStatement", "etsi-psd2-qcStatement");
 
   private QCStatementID(ASN1ObjectIdentifier oid, List<String> aliases) {
     super(oid, aliases);
   }
 
-  private static QCStatementID initOf(
-      ASN1ObjectIdentifier oid, String... aliases) {
+  private static QCStatementID initOf(ASN1ObjectIdentifier oid, String... aliases) {
     Args.notNull(oid, "oid");
     List<String> l = new ArrayList<>();
     if (aliases != null) {

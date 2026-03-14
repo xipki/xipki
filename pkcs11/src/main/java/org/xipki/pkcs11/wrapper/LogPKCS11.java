@@ -139,28 +139,23 @@ public class LogPKCS11 {
     }
   }
 
-  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type)
-      throws PKCS11Exception {
+  public CkMechanismInfo C_GetMechanismInfo(long slotID, long type) throws PKCS11Exception {
     String method = "C_GetMechanismInfo";
     if (debugEnabled) {
-      debugIn(method, null, "slotID={}, type={}",
-          slotID, codeToText(Category.CKM, type));
+      debugIn(method, null, "slotID={}, type={}", slotID, codeToText(Category.CKM, type));
     }
 
     try {
-      return toNonNullT(method, null,
-          pkcs11().C_GetMechanismInfo(slotID, type));
+      return toNonNullT(method, null, pkcs11().C_GetMechanismInfo(slotID, type));
     } catch (PKCS11Exception e) {
       throw debugError(method, null, e);
     }
   }
 
-  public long C_OpenSession(long slotID, long flags, Long oldHandle)
-      throws PKCS11Exception {
+  public long C_OpenSession(long slotID, long flags, Long oldHandle) throws PKCS11Exception {
     final String method = "C_OpenSession";
     if (debugEnabled) {
-      debugIn(method, oldHandle, "slotID={}, flags=0x{}",
-          slotID, Functions.toFullHex(flags));
+      debugIn(method, oldHandle, "slotID={}, flags=0x{}", slotID, Functions.toFullHex(flags));
     }
     try {
       long ret = pkcs11().C_OpenSession(slotID, flags);
@@ -205,12 +200,10 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_Login(long hSession, long userType, byte[] pin)
-      throws PKCS11Exception {
+  public void C_Login(long hSession, long userType, byte[] pin) throws PKCS11Exception {
     final String method = "C_Login";
     if (debugEnabled) {
-      debugIn(method, hSession, "userType={}",
-          PKCS11T.codeToName(Category.CKU, userType));
+      debugIn(method, hSession, "userType={}", PKCS11T.codeToName(Category.CKU, userType));
     }
 
     try {
@@ -232,13 +225,11 @@ public class LogPKCS11 {
     }
   }
 
-  public long C_CreateObject(long hSession, Template template)
-      throws PKCS11Exception {
+  public long C_CreateObject(long hSession, Template template) throws PKCS11Exception {
     final String method = "C_CreateObject";
     if (debugEnabled) {
       long objClass = template.getLongAttrValue(PKCS11T.CKA_CLASS);
-      if (objClass == PKCS11T.CKO_PRIVATE_KEY
-          || objClass == PKCS11T.CKO_SECRET_KEY) {
+      if (objClass == PKCS11T.CKO_PRIVATE_KEY || objClass == PKCS11T.CKO_SECRET_KEY) {
         template.attributesAsSensitive(PKCS11T.CKA_VALUE, // secret key, DSA, EC
             PKCS11T.CKA_PRIVATE_EXPONENT, PKCS11T.CKA_PRIME_1,
             PKCS11T.CKA_PRIME_2, PKCS11T.CKA_EXPONENT_1,
@@ -256,8 +247,7 @@ public class LogPKCS11 {
     }
   }
 
-  public long C_CopyObject(long hSession, long hObject,
-                           Template template)
+  public long C_CopyObject(long hSession, long hObject, Template template)
       throws PKCS11Exception {
     final String method = "C_CopyObject";
     debugIn(method, hSession, "hObject={}, template={}", hObject, template);
@@ -270,8 +260,7 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_DestroyObject(long hSession, long hObject)
-      throws PKCS11Exception {
+  public void C_DestroyObject(long hSession, long hObject) throws PKCS11Exception {
     final String method = "C_DestroyObject";
     debugIn(method, hSession, "hSession={}", hSession);
     try {
@@ -282,8 +271,7 @@ public class LogPKCS11 {
     }
   }
 
-  public Template C_GetAttributeValue(
-      long hSession, long hObject, long[] attrTypes)
+  public Template C_GetAttributeValue(long hSession, long hObject, long[] attrTypes)
       throws PKCS11Exception {
     final String method = "C_GetAttributeValue";
 
@@ -318,8 +306,7 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_SetAttributeValue(
-      long hSession, long hObject, Template template)
+  public void C_SetAttributeValue(long hSession, long hObject, Template template)
       throws PKCS11Exception {
     final String method = "C_SetAttributeValue";
     debugIn(method, hSession, "hObject={}, template={}", hObject, template);
@@ -331,8 +318,7 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_FindObjectsInit(long hSession, Template template)
-      throws PKCS11Exception {
+  public void C_FindObjectsInit(long hSession, Template template) throws PKCS11Exception {
     final String method = "C_FindObjectsInit";
     debugIn(method, hSession, "template={}", template);
     try {
@@ -343,8 +329,7 @@ public class LogPKCS11 {
     }
   }
 
-  public long[] C_FindObjects(long hSession, int maxObjectCount)
-      throws PKCS11Exception {
+  public long[] C_FindObjects(long hSession, int maxObjectCount) throws PKCS11Exception {
     final String method = "C_FindObjects";
     debugIn(method, hSession, "maxObjectCount={}", maxObjectCount);
     try {
@@ -369,85 +354,54 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_DigestInit(long hSession, CkMechanism mechanism)
+  public byte[] C_DigestX(
+      long hSession, CkMechanism mechanism, byte[] prefix, long hKey, byte[] suffix, int maxSize)
       throws PKCS11Exception {
-    final String method = "C_DigestInit";
-    debugIn(method, hSession, "mechanism={}", mechanism);
-    try {
-      pkcs11().C_DigestInit(hSession, mechanism);
-      debugOut(method, hSession);
-    } catch (PKCS11Exception e) {
-      throw debugError(method, hSession, e);
-    }
-  }
-
-  public byte[] C_Digest(long hSession, byte[] data, int maxSize)
-      throws PKCS11Exception {
-    final String method = "C_Digest";
-    debugIn(method, hSession, "data.len={}, maxSize={}", len(data), maxSize);
+    final String method = "C_DigestX";
+    debugIn(method, hSession,
+        "mechanism={}, prefix.len={}, hKey={}, suffix.len={}, maxSize={}",
+        mechanism, len(prefix), hKey, len(suffix), maxSize);
     try {
       return toNonNull(method, hSession,
-          pkcs11().C_Digest(hSession, data, maxSize),
-          true);
+          pkcs11().C_DigestX(hSession, mechanism, prefix, hKey, suffix, maxSize));
     } catch (PKCS11Exception e) {
       throw debugError(method, hSession, e);
     }
   }
 
-  public void C_DigestUpdate(long hSession, byte[] part)
+  public byte[] C_SignX(long hSession, CkMechanism mechanism, long hKey, byte[] data, int maxSize)
       throws PKCS11Exception {
-    final String method = "C_DigestUpdate";
-    debugIn(method, hSession, "part.len={}", len(part));
-    try {
-      pkcs11().C_DigestUpdate(hSession, part);
-      debugOut(method, hSession);
-    } catch (PKCS11Exception e) {
-      throw debugError(method, hSession, e);
-    }
-  }
-
-  public void C_DigestKey(long hSession, long hKey) throws PKCS11Exception {
-    final String method = "C_DigestKey";
-    debugIn(method, hSession, "hKey={}", hKey);
-    try {
-      pkcs11().C_DigestKey(hSession, hKey);
-      debugOut(method, hKey);
-    } catch (PKCS11Exception e) {
-      throw debugError(method, hSession, e);
-    }
-  }
-
-  public byte[] C_DigestFinal(long hSession, int maxSize)
-      throws PKCS11Exception {
-    final String method = "C_DigestFinal";
-    debugIn(method, hSession, "maxSize={}", maxSize);
+    final String method = "C_SignX";
+    debugIn(method, hSession, "hKey={}, mechanism={}, data.len={}, maxSize={}",
+        hKey, mechanism, len(data), maxSize);
     try {
       return toNonNull(method, hSession,
-          pkcs11().C_DigestFinal(hSession, maxSize), true);
+          pkcs11().C_SignX(hSession, mechanism, hKey, data, maxSize));
     } catch (PKCS11Exception e) {
       throw debugError(method, hSession, e);
     }
   }
 
-  public void C_SignInit(long hSession, CkMechanism mechanism, long hKey)
+  public byte[] C_DecryptX(
+      long hSession, CkMechanism mechanism, long hKey, byte[] cipherText, int maxSize)
       throws PKCS11Exception {
+    final String method = "C_DecryptX";
+    debugIn(method, hSession, "hKey={}, mechanism={}, cipherText.len={}, maxSize={}",
+        hKey, mechanism, len(cipherText), maxSize);
+    try {
+      return toNonNull(method, hSession,
+          pkcs11().C_DecryptX(hSession, mechanism, hKey, cipherText, maxSize));
+    } catch (PKCS11Exception e) {
+      throw debugError(method, hSession, e);
+    }
+  }
+
+  public void C_SignInit(long hSession, CkMechanism mechanism, long hKey) throws PKCS11Exception {
     final String method = "C_SignInit";
     debugIn(method, hSession, "hKey={}, mechanism={}", hKey, mechanism);
     try {
       pkcs11().C_SignInit(hSession, mechanism, hKey);
       debugOut(method, hSession);
-    } catch (PKCS11Exception e) {
-      throw debugError(method, hSession, e);
-    }
-  }
-
-  public byte[] C_Sign(long hSession, byte[] data, int maxSize)
-      throws PKCS11Exception {
-    final String method = "C_Sign";
-    debugIn(method, hSession, "data.len={}, maxSize={}", len(data), maxSize);
-    try {
-      return toNonNull(method, hSession,
-          pkcs11().C_Sign(hSession, data, maxSize));
     } catch (PKCS11Exception e) {
       throw debugError(method, hSession, e);
     }
@@ -464,24 +418,20 @@ public class LogPKCS11 {
     }
   }
 
-  public byte[] C_SignFinal(long hSession, int maxSize)
-      throws PKCS11Exception {
+  public byte[] C_SignFinal(long hSession, int maxSize) throws PKCS11Exception {
     final String method = "C_SignFinal";
     debugIn(method, hSession, "maxSize={}", maxSize);
     try {
-      return toNonNull(method, hSession,
-          pkcs11().C_SignFinal(hSession, maxSize));
+      return toNonNull(method, hSession, pkcs11().C_SignFinal(hSession, maxSize));
     } catch (PKCS11Exception e) {
       throw debugError(method, hSession, e);
     }
   }
 
-  public long C_GenerateKey(long hSession, CkMechanism mechanism,
-                            Template template)
+  public long C_GenerateKey(long hSession, CkMechanism mechanism, Template template)
       throws PKCS11Exception {
     final String method = "C_GenerateKey";
-    debugIn(method, hSession, "mechanism={}, template={}",
-        mechanism, template);
+    debugIn(method, hSession, "mechanism={}, template={}", mechanism, template);
     try {
       long hKey = pkcs11().C_GenerateKey(hSession, mechanism, template);
       debugOut(method, hSession, hKey);
@@ -492,8 +442,8 @@ public class LogPKCS11 {
   }
 
   public PKCS11KeyPair C_GenerateKeyPair(
-      long hSession, CkMechanism mechanism, Template publicKeyTemplate,
-      Template privateKeyTemplate) throws PKCS11Exception {
+      long hSession, CkMechanism mechanism, Template publicKeyTemplate, Template privateKeyTemplate)
+      throws PKCS11Exception {
     final String method = "C_GenerateKeyPair";
     debugIn(method, hSession, "mechanism={}, publicKeyTemplate={}, " +
         "privateTemplate={}", mechanism, publicKeyTemplate, privateKeyTemplate);
@@ -510,11 +460,24 @@ public class LogPKCS11 {
     }
   }
 
+  public long C_DeriveKey(long hSession, CkMechanism mechanism, long hBaseKey, Template template)
+      throws PKCS11Exception {
+    final String method = "C_DeriveKey";
+    debugIn(method, hSession, "hBaseKey={}, mechanism={}, template={}",
+        hBaseKey, mechanism, mechanism);
+    try {
+      long hKey = pkcs11().C_DeriveKey(hSession, mechanism, hBaseKey, template);
+      debugOut(method, hSession, hKey);
+      return hKey;
+    } catch (PKCS11Exception e) {
+      throw debugError(method, hSession, e);
+    }
+  }
+
   /* ***************************************
    * PKCS#11 V3.0 Functions
    * ***************************************/
-  public void C_LoginUser(long hSession, long userType, byte[] pin,
-                          byte[] username)
+  public void C_LoginUser(long hSession, long userType, byte[] pin, byte[] username)
       throws PKCS11Exception {
     final String method = "C_LoginUser";
 
@@ -532,8 +495,7 @@ public class LogPKCS11 {
     }
   }
 
-  public void C_SessionCancel(long hSession, long flags)
-      throws PKCS11Exception {
+  public void C_SessionCancel(long hSession, long flags) throws PKCS11Exception {
     final String method = "C_SessionCancel";
     debugIn(method, hSession, "flags=0x{}", Functions.toFullHex(flags));
     try {
@@ -550,15 +512,13 @@ public class LogPKCS11 {
 
   public long C_DecapsulateKey(
       long hSession, CkMechanism mechanism, long hPrivateKey,
-      byte[] encapsulatedKey, Template template)
-      throws PKCS11Exception {
+      byte[] encapsulatedKey, Template template) throws PKCS11Exception {
     final String method = "C_DecapsulateKey";
     debugIn(method, hSession, "hPrivateKey={}, encapsulatedKey.len={}, " +
-        "mechanism={}, template={}", hPrivateKey, len(encapsulatedKey),
-        mechanism, template);
+        "mechanism={}, template={}", hPrivateKey, len(encapsulatedKey), mechanism, template);
     try {
       long hKey = pkcs11().C_DecapsulateKey(hSession, mechanism,
-          hPrivateKey, encapsulatedKey, template);
+                    hPrivateKey, encapsulatedKey, template);
       debugOut(method, hSession, hKey);
       return hKey;
     } catch (PKCS11Exception e) {
@@ -590,11 +550,9 @@ public class LogPKCS11 {
     }
   }
 
-  private void debugIn(String method, Long hSession, String format,
-                       Object... arguments) {
+  private void debugIn(String method, Long hSession, String format, Object... arguments) {
     if (debugEnabled) {
-      LOG.debug(buildText(" IN", method, hSession) + ": " + format,
-          arguments);
+      LOG.debug(buildText(" IN", method, hSession) + ": " + format, arguments);
     }
   }
 
@@ -610,8 +568,7 @@ public class LogPKCS11 {
     }
   }
 
-  private PKCS11Exception debugError(
-      String method, Long hSession, PKCS11Exception e) {
+  private PKCS11Exception debugError(String method, Long hSession, PKCS11Exception e) {
     if (debugEnabled) {
       LOG.debug("{}: {}", buildText("ERR", method, hSession),
           module.codeToName(Category.CKR, e.errorCode()));
@@ -628,8 +585,7 @@ public class LogPKCS11 {
     return toNonNull(method, hSession, bytes, false);
   }
 
-  private byte[] toNonNull(String method, Long hSession, byte[] bytes,
-                           boolean printHex) {
+  private byte[] toNonNull(String method, Long hSession, byte[] bytes, boolean printHex) {
     byte[] rv = (bytes == null) ? new byte[0] : bytes;
     debugOut(method, hSession, toText(rv, printHex));
     return rv;
@@ -640,8 +596,7 @@ public class LogPKCS11 {
   }
 
   private String codeToText(Category cat, long code) {
-    return module.codeToName(cat, code) + " (0x" +
-        Functions.toFullHex(code) + ")";
+    return module.codeToName(cat, code) + " (0x" + Functions.toFullHex(code) + ")";
   }
 
   private static String toText(byte[] bytes, boolean printHex) {

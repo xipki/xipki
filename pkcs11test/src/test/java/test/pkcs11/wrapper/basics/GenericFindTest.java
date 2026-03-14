@@ -85,8 +85,7 @@ public class GenericFindTest {
     public void execTest() throws TokenException {
       LOG.info("##################################################");
       LOG.info("Find all signature private keys.");
-      Template signatureKeyTemplate =
-          Template.newPrivateKey().attr(CKA_SIGN, true);
+      Template signatureKeyTemplate = Template.newPrivateKey().attr(CKA_SIGN, true);
 
       PKCS11Token token = getToken();
       // this find operation will find all objects that possess a CKA_SIGN
@@ -106,8 +105,7 @@ public class GenericFindTest {
     }
 
     private String getLabel(long hObject) throws TokenException {
-      return getToken().getAttrValues(hObject,
-          new AttributeTypes().label()).label();
+      return getToken().getAttrValues(hObject, new AttributeTypes().label()).label();
     }
   }
 

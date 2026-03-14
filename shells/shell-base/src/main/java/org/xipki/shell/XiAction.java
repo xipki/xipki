@@ -45,8 +45,7 @@ public abstract class XiAction implements Action {
   @Reference
   protected Session session;
 
-  protected char[] resolvePassword(String passwordHint)
-      throws PasswordResolverException {
+  protected char[] resolvePassword(String passwordHint) throws PasswordResolverException {
     return Passwords.resolvePassword(passwordHint);
   }
 
@@ -90,13 +89,11 @@ public abstract class XiAction implements Action {
     return newPairs;
   } // method embedFileContent
 
-  protected void saveVerbose(String promptPrefix, String file, byte[] encoded)
-      throws IOException {
+  protected void saveVerbose(String promptPrefix, String file, byte[] encoded) throws IOException {
     saveVerbose(promptPrefix, new File(file), encoded);
   }
 
-  protected void saveVerbose(String promptPrefix, File file, byte[] encoded)
-      throws IOException {
+  protected void saveVerbose(String promptPrefix, File file, byte[] encoded) throws IOException {
     File saveTo = expandFilepath(file);
 
     if (saveTo.exists()) {
@@ -193,21 +190,17 @@ public abstract class XiAction implements Action {
     return Hex.encode(RandomUtil.nextBytes(numOfBytes));
   }
 
-  protected static boolean isEnabled(
-      String enabledS, boolean defaultEnabled, String optionName) {
-    return (enabledS == null) ? defaultEnabled
-        : isEnabled(enabledS, optionName);
+  protected static boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName) {
+    return (enabledS == null) ? defaultEnabled : isEnabled(enabledS, optionName);
   }
 
   private static boolean isEnabled(String enabledS, String optionName) {
     if (StringUtil.orEqualsIgnoreCase(enabledS, "yes", "enabled", "true")) {
       return true;
-    } else if (StringUtil.orEqualsIgnoreCase(enabledS,
-        "no", "disabled", "false")) {
+    } else if (StringUtil.orEqualsIgnoreCase(enabledS, "no", "disabled", "false")) {
       return false;
     } else {
-      throw new IllegalArgumentException(
-          "invalid option " + optionName + ": " + enabledS);
+      throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
     }
   }
 
@@ -232,8 +225,7 @@ public abstract class XiAction implements Action {
         : readPassword(prompt);
   }
 
-  protected char[] readPassword()
-      throws IOException, PasswordResolverException {
+  protected char[] readPassword() throws IOException, PasswordResolverException {
     return readPassword(null);
   }
 
@@ -327,10 +319,8 @@ public abstract class XiAction implements Action {
     return derPemEncode(data, encodeForm, PemLabel.CERTIFICATE_REQUEST);
   }
 
-  protected static byte[] derPemEncode(
-      byte[] data, String encodeForm, PemLabel pemLabel) {
-    return "pem".equalsIgnoreCase(encodeForm)
-        ? PemEncoder.encode(data, pemLabel) : data;
+  protected static byte[] derPemEncode(byte[] data, String encodeForm, PemLabel pemLabel) {
+    return "pem".equalsIgnoreCase(encodeForm) ? PemEncoder.encode(data, pemLabel) : data;
   }
 
   protected boolean confirm(String prompt, int maxTries) throws IOException {
@@ -339,8 +329,7 @@ public abstract class XiAction implements Action {
       tmpPrompt = "(Yes/No)? ";
     } else {
       tmpPrompt = ('?' == prompt.charAt(prompt.length() - 1))
-          ? prompt.substring(0, prompt.length() - 1)
-          : prompt;
+          ? prompt.substring(0, prompt.length() - 1) : prompt;
 
       tmpPrompt += " (Yes/No)? ";
     }

@@ -34,8 +34,7 @@ class X509PublisherModule extends X509CaModule {
 
   private final CaManagerImpl caManager;
 
-  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo,
-                      CertStore certstore) {
+  X509PublisherModule(CaManagerImpl caManager, CaInfo caInfo, CertStore certstore) {
     super(caInfo);
 
     this.caManager = Args.notNull(caManager, "caManager");
@@ -88,8 +87,7 @@ class X509PublisherModule extends X509CaModule {
 
     if (LOG.isWarnEnabled()) {
       LOG.warn("could not publish to publishers {}: {}", failedPublishers,
-          Base64.encodeToString(certInfo.cert().cert().getEncoded(),
-              true));
+          Base64.encodeToString(certInfo.cert().cert().getEncoded(), true));
     }
     return 2;
   } // method publishCert0
@@ -128,7 +126,7 @@ class X509PublisherModule extends X509CaModule {
 
     boolean onlyRevokedCerts = true;
     for (IdentifiedCertPublisher publisher : publishers) {
-      if (publisher.publishsGoodCert()) {
+      if (publisher.publishesGoodCert()) {
         onlyRevokedCerts = false;
         break;
       }
@@ -146,8 +144,7 @@ class X509PublisherModule extends X509CaModule {
 
       if (caInfo.revocationInfo() != null) {
         for (IdentifiedCertPublisher publisher : publishers) {
-          boolean successful = publisher.caRevoked(caCert,
-              caInfo.revocationInfo());
+          boolean successful = publisher.caRevoked(caCert, caInfo.revocationInfo());
 
           if (!successful) {
             LOG.error("republishing CA revocation to publisher {} failed",
@@ -179,8 +176,7 @@ class X509PublisherModule extends X509CaModule {
       try {
         publisher.crlAdded(caCert, crl);
       } catch (RuntimeException ex) {
-        LogUtil.error(LOG, ex, "could not publish CRL to the publisher "
-            + publisher.ident());
+        LogUtil.error(LOG, ex, "could not publish CRL to the publisher " + publisher.ident());
       }
     } // end for
   } // method publishCrl
@@ -204,10 +200,9 @@ class X509PublisherModule extends X509CaModule {
       successful = false;
       X509Cert cert = certToRemove.cert();
       if (LOG.isErrorEnabled()) {
-        LOG.error("removing certificate issuer='{}', serial={}, subject='{}' " +
-                "from publisher {} failed.", cert.issuerText(),
-            cert.serialNumberHex(), cert.subjectText(),
-            publisher.ident());
+        LOG.error(
+            "removing certificate issuer='{}', serial={}, subject='{}' from publisher {} failed.",
+            cert.issuerText(), cert.serialNumberHex(), cert.subjectText(), publisher.ident());
       }
     } // end for
 
@@ -225,8 +220,8 @@ class X509PublisherModule extends X509CaModule {
       }
 
       if (!successful) {
-        LOG.error("could not publish revocation of certificate to the " +
-                "publisher {}", publisher.ident());
+        LOG.error("could not publish revocation of certificate to the publisher {}",
+            publisher.ident());
       }
     } // end for
   }
@@ -253,8 +248,8 @@ class X509PublisherModule extends X509CaModule {
       return;
     }
 
-    LOG.error("could not publishCertUnrevoked of certificate {} to " +
-            "publishers {}", unrevokedCert.certId(), failedPublishers);
+    LOG.error("could not publishCertUnrevoked of certificate {} to publishers {}",
+        unrevokedCert.certId(), failedPublishers);
   }
 
   boolean publishCaRevoked(CertRevocationInfo revocationInfo) {
@@ -285,8 +280,8 @@ class X509PublisherModule extends X509CaModule {
             caIdent.name(), ident.name());
       } else {
         succ = false;
-        LOG.error("could not publish event caUnrevoked of CA {} to " +
-                "publisher {}", caIdent.name(), ident.name());
+        LOG.error("could not publish event caUnrevoked of CA {} to publisher {}",
+            caIdent.name(), ident.name());
       }
     }
 

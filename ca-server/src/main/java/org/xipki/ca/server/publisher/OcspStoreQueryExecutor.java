@@ -100,16 +100,13 @@ class OcspStoreQueryExecutor {
 
   } // class IssuerStore
 
-  private static final String SQL_ADD_REVOKED_CERT =
-      SqlUtil.buildInsertSql("CERT",
-          "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR");
+  private static final String SQL_ADD_REVOKED_CERT = SqlUtil.buildInsertSql("CERT",
+      "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT,RT,RIT,RR");
 
-  private static final String SQL_ADD_CERT =
-      SqlUtil.buildInsertSql("CERT",
-          "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT");
+  private static final String SQL_ADD_CERT = SqlUtil.buildInsertSql("CERT",
+      "ID,LUPDATE,SN,NBEFORE,NAFTER,REV,IID,HASH,SUBJECT");
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspStoreQueryExecutor.class);
 
   private final DataSourceWrapper datasource;
 
@@ -167,8 +164,7 @@ class OcspStoreQueryExecutor {
     }
   } // method initIssuerStore
 
-  void addCert(X509Cert issuer, CertWithDbId certificate,
-               CertRevocationInfo revInfo)
+  void addCert(X509Cert issuer, CertWithDbId certificate, CertRevocationInfo revInfo)
       throws DataAccessException, OperationException {
     addOrUpdateCert(issuer, certificate, revInfo);
   }
@@ -200,8 +196,7 @@ class OcspStoreQueryExecutor {
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
     X509Cert cert = certificate.cert();
-    String cuttedSubject = X509Util.cutText(
-        certificate.cert().subjectText(), maxX500nameLen);
+    String cuttedSubject = X509Util.cutText(certificate.cert().subjectText(), maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -226,8 +221,7 @@ class OcspStoreQueryExecutor {
         } else {
           ps.setNull(idx++, Types.BIGINT);
         }
-        int reasonCode = (revInfo.reason() == null)
-            ? 0 : revInfo.reason().code();
+        int reasonCode = (revInfo.reason() == null) ? 0 : revInfo.reason().code();
         ps.setInt(idx, reasonCode);
       }
 
@@ -253,13 +247,11 @@ class OcspStoreQueryExecutor {
     }
   } // method addOrUpdateCert
 
-  private void updateRegisteredCert(
-      long registeredCertId, CertRevocationInfo revInfo)
+  private void updateRegisteredCert(long registeredCertId, CertRevocationInfo revInfo)
       throws DataAccessException {
     boolean revoked = (revInfo != null);
 
-    final String sql =
-        "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+    final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -290,14 +282,12 @@ class OcspStoreQueryExecutor {
     }
   } // method updateRegisteredCert
 
-  void revokeCert(X509Cert caCert, CertWithDbId cert,
-                  CertRevocationInfo revInfo)
+  void revokeCert(X509Cert caCert, CertWithDbId cert, CertRevocationInfo revInfo)
       throws DataAccessException, OperationException {
     addOrUpdateCert(caCert, cert, revInfo);
   }
 
-  void unrevokeCert(X509Cert issuer, CertWithDbId cert)
-      throws DataAccessException {
+  void unrevokeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
     Args.notNull(issuer, "issuer");
     Args.notNull(cert, "cert");
 
@@ -314,8 +304,7 @@ class OcspStoreQueryExecutor {
     }
 
     if (publishGoodCerts) {
-      final String sql =
-          "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
+      final String sql = "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
       PreparedStatement ps = datasource.prepareStatement(sql);
 
       try {
@@ -349,12 +338,10 @@ class OcspStoreQueryExecutor {
 
   } // method unrevokeCert
 
-  void removeCert(X509Cert issuer, CertWithDbId cert)
-      throws DataAccessException {
+  void removeCert(X509Cert issuer, CertWithDbId cert) throws DataAccessException {
     Args.notNull(cert, "cert");
 
-    Integer issuerId = issuerStore.getIdForCert(
-        Args.notNull(issuer, "issuer").getEncoded());
+    Integer issuerId = issuerStore.getIdForCert(Args.notNull(issuer, "issuer").getEncoded());
     if (issuerId == null) {
       return;
     }
@@ -373,8 +360,7 @@ class OcspStoreQueryExecutor {
     }
   } // method removeCert
 
-  void revokeCa(X509Cert caCert, CertRevocationInfo revInfo)
-      throws DataAccessException {
+  void revokeCa(X509Cert caCert, CertRevocationInfo revInfo) throws DataAccessException {
     Args.notNull(revInfo, "revInfo");
 
     int issuerId = getIssuerId(Args.notNull(caCert, "caCert"));
@@ -410,11 +396,9 @@ class OcspStoreQueryExecutor {
 
   private int getIssuerId(X509Cert issuerCert) {
     return Optional.ofNullable(
-        issuerStore.getIdForCert(
-            Args.notNull(issuerCert, "issuerCert").getEncoded()))
+        issuerStore.getIdForCert(Args.notNull(issuerCert, "issuerCert").getEncoded()))
         .orElseThrow(() -> new IllegalStateException("could not find issuer, "
-            + "please start XiPKI in master mode first the restart this " +
-            "XiPKI system"));
+            + "please start XiPKI in master mode first the restart this XiPKI system"));
   }
 
   void addIssuer(X509Cert issuerCert) throws DataAccessException {
@@ -430,8 +414,7 @@ class OcspStoreQueryExecutor {
     byte[] encodedCert = issuerCert.getEncoded();
 
     final String sql =
-        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) " +
-        "VALUES (?,?,?,?,?,?)";
+        "INSERT INTO ISSUER (ID,SUBJECT,NBEFORE,NAFTER,S1C,CERT) VALUES (?,?,?,?,?,?)";
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -459,8 +442,7 @@ class OcspStoreQueryExecutor {
    * Returns the database id for the given issuer and serialNumber.
    * @return the database table id if registered, <code>null</code> otherwise.
    */
-  private Long getCertId(int issuerId, BigInteger serialNumber)
-      throws DataAccessException {
+  private Long getCertId(int issuerId, BigInteger serialNumber) throws DataAccessException {
     final String sql = sqlCertRegistered;
     ResultSet rs = null;
     PreparedStatement ps = datasource.prepareStatement(sql);

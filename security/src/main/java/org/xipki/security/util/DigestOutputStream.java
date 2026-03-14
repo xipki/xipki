@@ -3,21 +3,20 @@
 
 package org.xipki.security.util;
 
-import org.bouncycastle.crypto.Digest;
-
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.MessageDigest;
 
 /**
- * {@link OutputStream} with a {@link Digest} as the backend.
+ * {@link OutputStream} with a MessageDigest as the backend.
  *
  * @author Lijun Liao (xipki)
  */
 public class DigestOutputStream extends OutputStream {
 
-  private final Digest digest;
+  private final MessageDigest digest;
 
-  public DigestOutputStream(Digest digest) {
+  public DigestOutputStream(MessageDigest digest) {
     this.digest = digest;
   }
 
@@ -41,8 +40,7 @@ public class DigestOutputStream extends OutputStream {
   }
 
   public byte[] digest() {
-    byte[] result = new byte[digest.getDigestSize()];
-    digest.doFinal(result, 0);
+    byte[] result = digest.digest();
     reset();
     return result;
   }

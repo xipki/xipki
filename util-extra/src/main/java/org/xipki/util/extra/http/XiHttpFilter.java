@@ -11,7 +11,6 @@ public interface XiHttpFilter {
 
   void destroy();
 
-  void doFilter(XiHttpRequest request, XiHttpResponse response)
-      throws Exception;
+  void doFilter(XiHttpRequest request, XiHttpResponse response) throws Exception;
 
 }

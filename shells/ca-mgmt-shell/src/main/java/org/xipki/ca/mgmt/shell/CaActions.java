@@ -68,12 +68,10 @@ public class CaActions {
     protected SecurityFactory securityFactory;
 
     protected static Instant parseDate(String dateStr) {
-      return StringUtil.isBlank(dateStr) ? null
-          : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
+      return StringUtil.isBlank(dateStr) ? null : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
     }
 
-    protected void printCaNames(StringBuilder sb, Set<String> caNames,
-                                String prefix)
+    protected void printCaNames(StringBuilder sb, Set<String> caNames, String prefix)
         throws CaMgmtException {
       if (caNames.isEmpty()) {
         sb.append(prefix).append("-\n");
@@ -90,8 +88,7 @@ public class CaActions {
       }
     } // method printCaNames
 
-    protected Set<String> getPublisherNamesForCa(String caName)
-        throws CaMgmtException {
+    protected Set<String> getPublisherNamesForCa(String caName) throws CaMgmtException {
       Set<String> publisherNames= caManager.getPublisherNamesForCa(caName);
       return publisherNames == null ? Collections.emptySet() : publisherNames;
     }
@@ -132,8 +129,7 @@ public class CaActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -141,50 +137,42 @@ public class CaActions {
 
   public abstract static class CaAddOrGenAction extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true, description =
-        "CA name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "CA name")
     private String caName;
 
     @Option(name = "--status", description = "CA status")
     @Completion(CaCompleters.CaStatusCompleter.class)
     private String caStatus = "active";
 
-    @Option(name = "--ca-cert-uri", multiValued = true, description =
-        "CA certificate URI")
+    @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
     private List<String> caCertUris;
 
     @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI")
     private List<String> ocspUris;
 
-    @Option(name = "--crl-uri", multiValued = true, description =
-        "CRL distribution point")
+    @Option(name = "--crl-uri", multiValued = true, description = "CRL distribution point")
     private List<String> crlUris;
 
-    @Option(name = "--deltacrl-uri", multiValued = true, description =
-        "Delta CRL distribution point")
+    @Option(name = "--deltacrl-uri", multiValued = true,
+        description = "Delta CRL distribution point")
     private List<String> deltaCrlUris;
 
-    @Option(name = "--permission", required = true, multiValued = true,
-        description = "permission")
+    @Option(name = "--permission", required = true, multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private Set<String> permissions;
 
     @Option(name = "--sn-len", description =
         "number of bytes of the serial number, between "
-            + CaManager.MIN_SERIALNUMBER_SIZE + " and "
-            + CaManager.MAX_SERIALNUMBER_SIZE)
+            + CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
     private int snLen = CaManager.MAX_SERIALNUMBER_SIZE;
 
-    @Option(name = "--next-crl-no", required = true, description =
-        "CRL number for the next CRL")
+    @Option(name = "--next-crl-no", required = true, description = "CRL number for the next CRL")
     private Long nextCrlNumber;
 
-    @Option(name = "--max-validity", required = true, description =
-        "maximal validity")
+    @Option(name = "--max-validity", required = true, description = "maximal validity")
     private String maxValidity;
 
-    @Option(name = "--keep-expired-certs", description =
-        "days to keep expired certificates")
+    @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
     private Integer keepExpiredCertDays = -1;
 
     @Option(name = "--crl-signer", description = "CRL signer name")
@@ -206,25 +194,21 @@ public class CaActions {
         description = "Revoke suspended certificates control")
     private String revokeSuspendedControl;
 
-    @Option(name = "--num-crls", description =
-        "number of CRLs to be kept in database")
+    @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls = 30;
 
     @Option(name = "--expiration-period", description =
         "days before expiration time of CA to issue certificates")
     private Integer expirationPeriod = 365;
 
-    @Option(name = "--signer-type", required = true, description =
-        "CA signer type")
+    @Option(name = "--signer-type", required = true, description = "CA signer type")
     @Completion(CaCompleters.SignerTypeCompleter.class)
     private String signerType;
 
-    @Option(name = "--signer-conf", required = true, description =
-        "CA signer configuration")
+    @Option(name = "--signer-conf", required = true, description = "CA signer configuration")
     private String signerConf;
 
-    @Option(name = "--save-cert", description =
-        "whether to save the certificate")
+    @Option(name = "--save-cert", description = "whether to save the certificate")
     @Completion(Completers.YesNoCompleter.class)
     private String saveCertS = "yes";
 
@@ -245,8 +229,7 @@ public class CaActions {
           CaManager.MAX_SERIALNUMBER_SIZE);
 
       if (nextCrlNumber < 1) {
-        throw new IllegalCmdParamException(
-            "invalid CRL number: " + nextCrlNumber);
+        throw new IllegalCmdParamException("invalid CRL number: " + nextCrlNumber);
       }
 
       if (numCrls < 0) {
@@ -254,21 +237,17 @@ public class CaActions {
       }
 
       if (expirationPeriod < 0) {
-        throw new IllegalCmdParamException(
-            "invalid expirationPeriod: " + expirationPeriod);
+        throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
       }
 
       if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
-        signerConf = ShellUtil.canonicalizeSignerConf(
-            signerType, signerConf, securityFactory);
+        signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory);
       }
 
       CaUris caUris = new CaUris(caCertUris, ocspUris, crlUris, deltaCrlUris);
 
-      BaseCaInfo base = new BaseCaInfo(signerType,
-          new Permissions(permissions));
-      CaEntry entry = new CaEntry(base, new NameId(null, caName),
-          signerConf);
+      BaseCaInfo base = new BaseCaInfo(signerType, new Permissions(permissions));
+      CaEntry entry = new CaEntry(base, new NameId(null, caName), signerConf);
 
       base.setSnSize(snLen);
       base.setNextCrlNo(nextCrlNumber);
@@ -336,15 +315,13 @@ public class CaActions {
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not add " + msg + ", error: " +
-            ex.getMessage(), ex);
+        throw new CmdFailure("could not add " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
   } // class CaaliasAdd
 
-  @Command(scope = "ca", name = "caalias-info", description =
-      "show information of CA alias")
+  @Command(scope = "ca", name = "caalias-info", description = "show information of CA alias")
   @Service
   public static class CaaliasInfo extends CaAction {
 
@@ -362,8 +339,7 @@ public class CaActions {
         int size = aliasNames.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1")
-              .append(" CA alias is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" CA alias is configured\n");
         } else {
           sb.append(size).append(" CA aliases are configured:\n");
         }
@@ -376,8 +352,7 @@ public class CaActions {
         }
       } else {
         if (aliasNames.contains(caAlias)) {
-          sb.append(caAlias).append("\n\t")
-              .append(caManager.getCaNameForAlias(caAlias));
+          sb.append(caAlias).append("\n\t").append(caManager.getCaNameForAlias(caAlias));
         } else {
           throw new CmdFailure("could not find CA alias '" + caAlias + "'");
         }
@@ -393,8 +368,7 @@ public class CaActions {
   @Service
   public static class CaaliasRm extends CaAction {
 
-    @Argument(index = 0, name = "alias", description = "CA alias",
-        required = true)
+    @Argument(index = 0, name = "alias", description = "CA alias", required = true)
     @Completion(CaCompleters.CaAliasCompleter.class)
     private String caAlias;
 
@@ -409,8 +383,8 @@ public class CaActions {
           caManager.removeCaAlias(caAlias);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg +
-              ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(),
+              ex);
         }
       }
       return null;
@@ -418,32 +392,26 @@ public class CaActions {
 
   } // class CaaliasRm
 
-  @Command(scope = "ca", name = "gen-rootca", description =
-      "generate selfsigned CA")
+  @Command(scope = "ca", name = "gen-rootca", description = "generate selfsigned CA")
   @Service
   public static class GenRootca extends CaAddOrGenAction {
 
-    @Option(name = "--subject", required = true, description =
-        "subject of the Root CA")
+    @Option(name = "--subject", required = true, description = "subject of the Root CA")
     private String subject;
 
-    @Option(name = "--profile", required = true, description =
-        "profile of the Root CA")
+    @Option(name = "--profile", required = true, description = "profile of the Root CA")
     private String rootcaProfile;
 
     @Option(name = "--serial", description = "serial number of the Root CA")
     private String serialS;
 
-    @Option(name = "--not-before", description =
-        "notBefore, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-before", description = "notBefore, UTC time of format yyyyMMddHHmmss")
     private String notBeforeS;
 
-    @Option(name = "--not-after", description =
-        "notAfter, UTC time of format yyyyMMddHHmmss")
+    @Option(name = "--not-after", description = "notAfter, UTC time of format yyyyMMddHHmmss")
     private String notAfterS;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -478,8 +446,7 @@ public class CaActions {
     @Completion(CaCompleters.CaNameCompleter.class)
     private String name;
 
-    @Option(name = "--outform", description =
-        "output format of the certificate")
+    @Option(name = "--outform", description = "output format of the certificate")
     @Completion(Completers.DerPemCompleter.class)
     protected String outform = "der";
 
@@ -494,8 +461,7 @@ public class CaActions {
       if ("der".equalsIgnoreCase(outform)) {
         IoUtil.save(outFile, certs.get(0).getEncoded());
       } else if ("pem".equalsIgnoreCase(outform)) {
-        IoUtil.save(outFile,
-            X509Util.toPemCert(certs.get(0)).getBytes(StandardCharsets.UTF_8));
+        IoUtil.save(outFile, X509Util.toPemCert(certs.get(0)).getBytes(StandardCharsets.UTF_8));
       } else {
         throw new IllegalCmdParamException("invalid outform " + outform);
       }
@@ -505,8 +471,7 @@ public class CaActions {
 
   }
 
-  @Command(scope = "ca", name = "cacerts", description =
-      "get CA's certificate chain")
+  @Command(scope = "ca", name = "cacerts", description = "get CA's certificate chain")
   @Service
   public static class CaCerts extends CaAction {
 
@@ -529,17 +494,15 @@ public class CaActions {
 
   }
 
-  @Command(scope = "ca", name = "ca-info", description =
-      "show information of CA")
+  @Command(scope = "ca", name = "ca-info", description = "show information of CA")
   @Service
   public static class CaInfo extends CaAction {
 
-    @Argument(index = 0, name = "name", description = "CA name")
+    @Argument(name = "name", description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String name;
 
-    @Option(name = "--verbose", aliases = "-v", description =
-        "show CA information verbosely")
+    @Option(name = "--verbose", aliases = "-v", description = "show CA information verbosely")
     private Boolean verbose = Boolean.FALSE;
 
     @Override
@@ -557,17 +520,14 @@ public class CaActions {
         printCaNames(sb, caManager.getInactiveCaNames(), prefix);
       } else {
         CaEntry caEntry = Optional.ofNullable(caManager.getCa(name))
-            .orElseThrow(() -> new CmdFailure(
-                "could not find CA '" + name + "'"));
+            .orElseThrow(() -> new CmdFailure("could not find CA '" + name + "'"));
         if (CaStatus.active == caEntry.base().status()) {
-          boolean started = caManager.getSuccessfulCaNames()
-              .contains(caEntry.ident().name());
+          boolean started = caManager.getSuccessfulCaNames().contains(caEntry.ident().name());
           sb.append("started:              ").append(started).append("\n");
         }
         Set<String> aliases = caManager.getAliasesForCa(name);
         sb.append("aliases:              ")
-            .append(aliases == null || aliases.isEmpty()
-                ? "-" : aliases.toString())
+            .append(aliases == null || aliases.isEmpty() ? "-" : aliases.toString())
             .append("\n");
         sb.append(caEntry.toString(verbose));
 
@@ -589,8 +549,7 @@ public class CaActions {
           sb.append(" ").append(profiles).append(" ");
         }
 
-        Set<CaHasRequestorEntry> requestors =
-            caManager.getRequestorsForCa(name);
+        Set<CaHasRequestorEntry> requestors = caManager.getRequestorsForCa(name);
 
         sb.append("\nAssociated requestors:");
         if (CollectionUtil.isEmpty(requestors)) {
@@ -614,8 +573,7 @@ public class CaActions {
   @Service
   public static class CaRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-        description = "CA name")
+    @Argument(index = 0, name = "name", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String name;
 
@@ -630,8 +588,8 @@ public class CaActions {
           caManager.removeCa(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg +
-              ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(),
+              ex);
         }
       }
       return null;
@@ -649,8 +607,7 @@ public class CaActions {
         CrlReason.SUPERSEDED,       CrlReason.CESSATION_OF_OPERATION,
         CrlReason.CERTIFICATE_HOLD, CrlReason.PRIVILEGE_WITHDRAWN);
 
-    @Argument(index = 0, name = "name", description = "CA name",
-        required = true)
+    @Argument(index = 0, name = "name", description = "CA name", required = true)
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
@@ -671,8 +628,7 @@ public class CaActions {
       CrlReason crlReason = CrlReason.forNameOrText(reason);
 
       if (!PERMITTED_REASONS.contains(crlReason)) {
-        throw new IllegalCmdParamException(
-            "reason " + reason + " is not permitted");
+        throw new IllegalCmdParamException("reason " + reason + " is not permitted");
       }
 
       if (!caManager.getCaNames().contains(caName)) {
@@ -680,8 +636,7 @@ public class CaActions {
       }
 
       Instant revocationDate = isNotBlank(revocationDateS)
-          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS)
-          : Instant.now();
+          ? DateUtil.parseUtcTimeyyyyMMddhhmmss(revocationDateS) : Instant.now();
 
       Instant invalidityDate = null;
       if (isNotBlank(invalidityDateS)) {
@@ -705,8 +660,7 @@ public class CaActions {
   @Service
   public static class CaUnrevoke extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-        description = "CA name")
+    @Argument(index = 0, name = "name", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
@@ -732,27 +686,23 @@ public class CaActions {
   @Service
   public static class CaUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "CA name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
     private String caName;
 
     @Option(name = "--sn-len", description =
         "number of octets of the serial number, between " +
-        CaManager.MIN_SERIALNUMBER_SIZE + " and " +
-        CaManager.MAX_SERIALNUMBER_SIZE)
+        CaManager.MIN_SERIALNUMBER_SIZE + " and " + CaManager.MAX_SERIALNUMBER_SIZE)
     private Integer snLen;
 
     @Option(name = "--status", description = "CA status")
     @Completion(CaCompleters.CaStatusCompleter.class)
     private String caStatus;
 
-    @Option(name = "--ca-cert-uri", multiValued = true,
-        description = "CA certificate URI")
+    @Option(name = "--ca-cert-uri", multiValued = true, description = "CA certificate URI")
     private List<String> caCertUris;
 
-    @Option(name = "--ocsp-uri", multiValued = true,
-        description = "OCSP URI or 'null'")
+    @Option(name = "--ocsp-uri", multiValued = true, description = "OCSP URI or 'null'")
     private List<String> ocspUris;
 
     @Option(name = "--crl-uri", multiValued = true, description =
@@ -763,8 +713,7 @@ public class CaActions {
         "delta CRL distribution point URI or 'null'")
     private List<String> deltaCrlUris;
 
-    @Option(name = "--permission", multiValued = true,
-        description = "permission")
+    @Option(name = "--permission", multiValued = true, description = "permission")
     @Completion(CaCompleters.PermissionCompleter.class)
     private List<String> permissions;
 
@@ -775,8 +724,7 @@ public class CaActions {
         "days before expiration time of CA to issue certificates")
     private Integer expirationPeriod;
 
-    @Option(name = "--keep-expired-certs", description =
-        "days to keep expired certificates")
+    @Option(name = "--keep-expired-certs", description = "days to keep expired certificates")
     private Integer keepExpiredCertDays;
 
     @Option(name = "--crl-signer", description = "CRL signer name or 'null'")
@@ -798,8 +746,7 @@ public class CaActions {
         "Revoke suspended certificates control")
     private String revokeSuspendedControl;
 
-    @Option(name = "--num-crls", description =
-        "number of CRLs to be kept in database")
+    @Option(name = "--num-crls", description = "number of CRLs to be kept in database")
     private Integer numCrls;
 
     @Option(name = "--cert", description = "CA certificate file")
@@ -815,12 +762,10 @@ public class CaActions {
     @Completion(CaCompleters.SignerTypeCompleter.class)
     private String signerType;
 
-    @Option(name = "--signer-conf", description =
-        "CA signer configuration or 'null'")
+    @Option(name = "--signer-conf", description = "CA signer configuration or 'null'")
     private String signerConf;
 
-    @Option(name = "--save-cert", description =
-        "whether to save the certificate")
+    @Option(name = "--save-cert", description = "whether to save the certificate")
     @Completion(Completers.YesNoCompleter.class)
     private String saveCertS;
 
@@ -850,8 +795,7 @@ public class CaActions {
       }
 
       if (expirationPeriod != null && expirationPeriod < 0) {
-        throw new IllegalCmdParamException(
-            "invalid expirationPeriod: " + expirationPeriod);
+        throw new IllegalCmdParamException("invalid expirationPeriod: " + expirationPeriod);
       } else {
         entry.setExpirationPeriod(expirationPeriod);
       }
@@ -881,13 +825,11 @@ public class CaActions {
         String tmpSignerType = signerType;
         if (tmpSignerType == null) {
           CaEntry caEntry = Optional.ofNullable(caManager.getCa(caName))
-              .orElseThrow(() -> new IllegalCmdParamException(
-                  "please specify the signerType"));
+              .orElseThrow(() -> new IllegalCmdParamException("please specify the signerType"));
           tmpSignerType = caEntry.base().signerType();
         }
 
-        signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType,
-            signerConf, securityFactory);
+        signerConf = ShellUtil.canonicalizeSignerConf(tmpSignerType, signerConf, securityFactory);
         entry.setSignerConf(signerConf);
       }
 

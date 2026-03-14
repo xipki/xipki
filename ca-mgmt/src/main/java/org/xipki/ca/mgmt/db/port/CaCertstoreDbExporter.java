@@ -52,8 +52,7 @@ import java.util.zip.ZipOutputStream;
 
 class CaCertstoreDbExporter extends DbPorter {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CaCertstoreDbExporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaCertstoreDbExporter.class);
 
   private final int numCertsInBundle;
 
@@ -62,15 +61,12 @@ class CaCertstoreDbExporter extends DbPorter {
   private final boolean resume;
 
   CaCertstoreDbExporter(
-      DataSourceWrapper datasource, String baseDir, int numCertsInBundle,
-      int numCertsPerSelect, boolean resume, AtomicBoolean stopMe)
-      throws DataAccessException {
+      DataSourceWrapper datasource, String baseDir, int numCertsInBundle, int numCertsPerSelect,
+      boolean resume, AtomicBoolean stopMe) throws DataAccessException {
     super(datasource, baseDir, stopMe);
 
-    this.numCertsInBundle = Args.positive(numCertsInBundle,
-        "numCertsInBundle");
-    this.numCertsPerSelect = Args.positive(numCertsPerSelect,
-        "numCertsPerSelect");
+    this.numCertsInBundle = Args.positive(numCertsInBundle, "numCertsInBundle");
+    this.numCertsPerSelect = Args.positive(numCertsPerSelect, "numCertsPerSelect");
     this.resume = resume;
   } // constructor
 
@@ -146,8 +142,7 @@ class CaCertstoreDbExporter extends DbPorter {
     }
 
     try {
-      File processLogFile = new File(baseDir,
-          DbPorter.EXPORT_PROCESS_LOG_FILENAME);
+      File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
 
       Long idProcessedInLastProcess = null;
       CaDbEntryType typeProcessedInLastProcess = null;
@@ -158,13 +153,11 @@ class CaCertstoreDbExporter extends DbPorter {
           int idx = str.indexOf(':');
           String typeName = str.substring(0, idx).trim();
           typeProcessedInLastProcess = CaDbEntryType.valueOf(typeName);
-          idProcessedInLastProcess =
-              Long.parseLong(str.substring(idx + 1).trim());
+          idProcessedInLastProcess = Long.parseLong(str.substring(idx + 1).trim());
         }
       }
 
-      if (CaDbEntryType.CRL == typeProcessedInLastProcess
-          || typeProcessedInLastProcess == null) {
+      if (CaDbEntryType.CRL == typeProcessedInLastProcess || typeProcessedInLastProcess == null) {
         exception = exportEntries(CaDbEntryType.CRL, certstore,
                       processLogFile, idProcessedInLastProcess);
         typeProcessedInLastProcess = null;
@@ -175,18 +168,15 @@ class CaCertstoreDbExporter extends DbPorter {
 
       for (CaDbEntryType type : types) {
         if (exception == null
-            && (type == typeProcessedInLastProcess
-            || typeProcessedInLastProcess == null)) {
-          exception = exportEntries(type, certstore, processLogFile,
-                        idProcessedInLastProcess);
+            && (type == typeProcessedInLastProcess || typeProcessedInLastProcess == null)) {
+          exception = exportEntries(type, certstore, processLogFile, idProcessedInLastProcess);
           typeProcessedInLastProcess = null;
           idProcessedInLastProcess = null;
         }
       }
 
       try (OutputStream os = Files.newOutputStream(path)) {
-        byte[] bytes = StringUtil.toUtf8Bytes(
-            JsonBuilder.toJson(certstore.toCodec()));
+        byte[] bytes = StringUtil.toUtf8Bytes(JsonBuilder.toJson(certstore.toCodec()));
         os.write(bytes);
       }
     } catch (Exception ex) {
@@ -201,9 +191,8 @@ class CaCertstoreDbExporter extends DbPorter {
     }
   } // method export
 
-  private Exception exportEntries(
-      CaDbEntryType type, CaCertstore certstore,
-      File processLogFile, Long idProcessedInLastProcess) {
+  private Exception exportEntries(CaDbEntryType type, CaCertstore certstore,
+                                  File processLogFile, Long idProcessedInLastProcess) {
     String tablesText = "table " + type.tableName();
 
     File dir = new File(baseDir, type.dirName());
@@ -219,15 +208,13 @@ class CaCertstoreDbExporter extends DbPorter {
       entriesFileOs = Files.newOutputStream(
           Paths.get(baseDir, type.dirName() + ".mf"),
           StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-      exportEntries(type, certstore, processLogFile, entriesFileOs,
-          idProcessedInLastProcess);
+      exportEntries(type, certstore, processLogFile, entriesFileOs, idProcessedInLastProcess);
       return null;
     } catch (Exception ex) {
       // delete the temporary files
       deleteTmpFiles(baseDir, "tmp-");
 
-      System.err.println("\nexporting " + tablesText +
-          " has been cancelled due to error,\n"
+      System.err.println("\nexporting " + tablesText + " has been cancelled due to error,\n"
           + "please continue with the option '--resume'");
       LOG.error("Exception", ex);
       return ex;
@@ -236,14 +223,11 @@ class CaCertstoreDbExporter extends DbPorter {
     }
   } // method exportEntries
 
-  private void exportEntries(
-      CaDbEntryType type, CaCertstore certstore, File processLogFile,
-      OutputStream filenameListOs, Long idProcessedInLastProcess)
+  private void exportEntries(CaDbEntryType type, CaCertstore certstore, File processLogFile,
+                            OutputStream filenameListOs, Long idProcessedInLastProcess)
       throws Exception {
-    int numEntriesPerSelect = Math.max(1,
-        Math.round(type.sqlBatchFactor() * numCertsPerSelect));
-    int numEntriesPerZip = Math.max(1,
-        Math.round(type.sqlBatchFactor() * numCertsInBundle));
+    int numEntriesPerSelect = Math.max(1, Math.round(type.sqlBatchFactor() * numCertsPerSelect));
+    int numEntriesPerZip = Math.max(1, Math.round(type.sqlBatchFactor() * numCertsInBundle));
     File entriesDir = new File(baseDir, type.dirName());
     String tableName = type.tableName();
 
@@ -266,8 +250,7 @@ class CaCertstoreDbExporter extends DbPorter {
     }
 
     long minId = (idProcessedInLastProcess != null)
-        ? idProcessedInLastProcess + 1
-        : min(tableName, "ID");
+        ? idProcessedInLastProcess + 1 : min(tableName, "ID");
 
     String tablesText = "table " + type.tableName();
     System.out.println("exporting " + tablesText + " from ID " + minId);
@@ -275,8 +258,7 @@ class CaCertstoreDbExporter extends DbPorter {
     final long maxId = max(tableName, "ID");
     // 1: to avoid exception
     long total = Math.max(1, count(tableName) - numProcessedBefore);
-    String sql = datasource.buildSelectFirstSql(
-        numEntriesPerSelect, "ID ASC", coreSql);
+    String sql = datasource.buildSelectFirstSql(numEntriesPerSelect, "ID ASC", coreSql);
 
     JsonEncodable entriesInCurrentFile = createContainer(type);
     PreparedStatement ps = prepareStatement(sql);
@@ -286,8 +268,7 @@ class CaCertstoreDbExporter extends DbPorter {
     int sum = 0;
     File currentEntriesZipFile = new File(baseDir, "tmp-" +
         type.dirName() + "-" + Clock.systemUTC().millis() + ".zip");
-    ZipOutputStream currentEntriesZip =
-        getZipOutputStream(currentEntriesZipFile);
+    ZipOutputStream currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
 
     long minIdOfCurrentFile = -1;
     long maxIdOfCurrentFile = -1;
@@ -351,11 +332,9 @@ class CaCertstoreDbExporter extends DbPorter {
 
             String privateKeyFileName = sha1 + "-key.bin";
             if (privateKey != null) {
-              currentEntriesZip.putNextEntry(
-                  new ZipEntry(privateKeyFileName));
+              currentEntriesZip.putNextEntry(new ZipEntry(privateKeyFileName));
               try {
-                currentEntriesZip.write(
-                    privateKey.getBytes(StandardCharsets.UTF_8));
+                currentEntriesZip.write(privateKey.getBytes(StandardCharsets.UTF_8));
               } finally {
                 currentEntriesZip.closeEntry();
               }
@@ -366,8 +345,8 @@ class CaCertstoreDbExporter extends DbPorter {
 
             CaCertstore.Cert cert = new CaCertstore.Cert(id, certFileName,
                 rs.getInt("CA_ID"),  rs.getString("SN"),
-                rs.getInt("PID"),    rs.getInt("RID"),
-                ee, rs.getLong("LUPDATE"), rs.getInt("CRL_SCOPE"));
+                rs.getInt("PID"),    rs.getInt("RID"), ee,
+                rs.getLong("LUPDATE"), rs.getInt("CRL_SCOPE"));
 
             if (privateKey != null) {
               cert.setPrivateKeyFile(privateKeyFileName);
@@ -389,8 +368,7 @@ class CaCertstoreDbExporter extends DbPorter {
               long l = rs.getLong("RIT");
               Long revInvTime = (l == 0) ? null : l;
 
-              cert.setRevocation(rs.getInt("RR"),
-                  rs.getLong("RT"), revInvTime);
+              cert.setRevocation(rs.getInt("RR"), rs.getLong("RT"), revInvTime);
             }
 
             ((CaCertstore.Certs) entriesInCurrentFile).add(cert);
@@ -406,8 +384,7 @@ class CaCertstoreDbExporter extends DbPorter {
                   : new CRLException(ex.getMessage(), ex);
             }
 
-            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.extensions(),
-                Extension.cRLNumber);
+            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.extensions(), Extension.cRLNumber);
             if (extnValue == null) {
               LOG.warn("CRL without CRL number, ignore it");
               continue;
@@ -423,8 +400,7 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
-            BigInteger crlNumber = ASN1Integer.getInstance(extnValue)
-                .getPositiveValue();
+            BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
             CaCertstore.Crl crl = new CaCertstore.Crl(id,
                 rs.getInt("CA_ID"), crlFilename,
@@ -439,13 +415,10 @@ class CaCertstoreDbExporter extends DbPorter {
           sum++;
 
           if (numEntriesInCurrentFile == numEntriesPerZip) {
-            String currentEntriesFilename =
-                buildFilename(type.dirName() + "_", ".zip",
-                    minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
-            finalizeZip(currentEntriesZip, "overview.json",
-                entriesInCurrentFile);
-            IoUtil.renameTo(currentEntriesZipFile,
-                new File(entriesDir, currentEntriesFilename));
+            String currentEntriesFilename = buildFilename(type.dirName() + "_", ".zip",
+                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+            finalizeZip(currentEntriesZip, "overview.json", entriesInCurrentFile);
+            IoUtil.renameTo(currentEntriesZipFile, new File(entriesDir, currentEntriesFilename));
 
             writeLine(filenameListOs, currentEntriesFilename);
             setCount(type, certstore, numProcessedBefore + sum);
@@ -460,8 +433,7 @@ class CaCertstoreDbExporter extends DbPorter {
             minIdOfCurrentFile = -1;
             maxIdOfCurrentFile = -1;
             currentEntriesZipFile = new File(baseDir,
-                "tmp-" + type.dirName() + "-" +
-                    Clock.systemUTC().millis() + ".zip");
+                "tmp-" + type.dirName() + "-" + Clock.systemUTC().millis() + ".zip");
             currentEntriesZip = getZipOutputStream(currentEntriesZipFile);
           }
         } while (rs.next());
@@ -475,14 +447,11 @@ class CaCertstoreDbExporter extends DbPorter {
       }
 
       if (numEntriesInCurrentFile > 0) {
-        finalizeZip(currentEntriesZip, "overview.json",
-            entriesInCurrentFile);
+        finalizeZip(currentEntriesZip, "overview.json", entriesInCurrentFile);
 
         String currentEntriesFilename = buildFilename(
-            type.dirName() + "_", ".zip", minIdOfCurrentFile,
-            maxIdOfCurrentFile, maxId);
-        IoUtil.renameTo(currentEntriesZipFile,
-            new File(entriesDir, currentEntriesFilename));
+            type.dirName() + "_", ".zip", minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+        IoUtil.renameTo(currentEntriesZipFile, new File(entriesDir, currentEntriesFilename));
 
         writeLine(filenameListOs, currentEntriesFilename);
         setCount(type, certstore, numProcessedBefore + sum);
@@ -505,8 +474,7 @@ class CaCertstoreDbExporter extends DbPorter {
     System.out.println(" exported " + sum + " entries from " + tablesText);
   } // method exportEntries
 
-  private void finalizeZip(ZipOutputStream zipOutStream, String filename,
-                           JsonEncodable container)
+  private void finalizeZip(ZipOutputStream zipOutStream, String filename, JsonEncodable container)
       throws IOException {
     ZipEntry certZipEntry = new ZipEntry(filename);
     zipOutStream.putNextEntry(certZipEntry);
@@ -530,8 +498,7 @@ class CaCertstoreDbExporter extends DbPorter {
     }
   } // method createContainer
 
-  private static void setCount(CaDbEntryType type, CaCertstore certstore,
-                               int num) {
+  private static void setCount(CaDbEntryType type, CaCertstore certstore, int num) {
     if (type == CaDbEntryType.CERT) {
       certstore.setCountCerts(num);
     } else if (type == CaDbEntryType.CRL) {

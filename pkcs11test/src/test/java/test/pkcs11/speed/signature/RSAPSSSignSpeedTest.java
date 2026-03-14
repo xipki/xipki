@@ -41,8 +41,7 @@ public class RSAPSSSignSpeedTest extends TestBase {
   private class MySignExecutor extends SignExecutor {
 
     public MySignExecutor() throws TokenException {
-      super(ckmCodeToName(signMechanism) + " (2048) Sign Speed",
-          signMechanism2, 32);
+      super(ckmCodeToName(signMechanism) + " (2048) Sign Speed", signMechanism2, 32);
     }
 
     @Override
@@ -71,20 +70,17 @@ public class RSAPSSSignSpeedTest extends TestBase {
   public void execTest() throws TokenException {
     PKCS11Token token = getToken();
 
-    Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(keypairGenMechanism) + " is not supported, skip test",
         token.supportsMechanism(keypairGenMechanism, CKF_GENERATE_KEY_PAIR));
 
-    Assume.assumeTrue(ckmCodeToName(signMechanism) +
-            " is not supported, skip test",
+    Assume.assumeTrue(ckmCodeToName(signMechanism) + " is not supported, skip test",
         token.supportsMechanism(signMechanism, CKF_SIGN));
 
     BenchmarkExecutor executor = new MySignExecutor();
     executor.setThreads(TestHSMs.getSpeedThreads());
     executor.setDuration(TestHSMs.getSpeedDuration());
     executor.execute();
-    Assert.assertEquals("Sign speed", 0,
-        executor.getErrorAccount());
+    Assert.assertEquals("Sign speed", 0, executor.getErrorAccount());
   }
 
 }

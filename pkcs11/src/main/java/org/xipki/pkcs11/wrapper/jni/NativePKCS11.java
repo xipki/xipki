@@ -20,8 +20,7 @@ import java.util.Arrays;
  */
 public class NativePKCS11 extends PKCS11 {
 
-  private static final Logger log =
-      LoggerFactory.getLogger(NativePKCS11.class);
+  private static final Logger log = LoggerFactory.getLogger(NativePKCS11.class);
 
   private static Arch arch;
 
@@ -56,8 +55,7 @@ public class NativePKCS11 extends PKCS11 {
   }
 
   @Override
-  protected void initModule(int moduleId, String modulePath)
-      throws PKCS11Exception {
+  protected void initModule(int moduleId, String modulePath) throws PKCS11Exception {
     byte[] pathBytes = modulePath.getBytes(StandardCharsets.UTF_8);
     // append \0 at the end
     pathBytes = Arrays.copyOf(pathBytes, pathBytes.length + 1);
@@ -68,8 +66,7 @@ public class NativePKCS11 extends PKCS11 {
   }
 
   @Override
-  protected void closeModule(int moduleId)
-      throws PKCS11Exception {
+  protected void closeModule(int moduleId) throws PKCS11Exception {
     long ckr = Libpkcs11.closeModule(moduleId);
     if (ckr != PKCS11T.CKR_OK) {
       throw new PKCS11Exception(ckr);
@@ -78,11 +75,9 @@ public class NativePKCS11 extends PKCS11 {
 
   @Override
   protected byte[] doQuery(
-      int moduleId, int op,   byte[] resp,
-      long id,      long id2, long id3, int size,
-      byte[] data,  byte[] data2,
-      long ckm,     byte[] mechParams,
-      byte[] template, byte[] template2) {
+      int moduleId, int op, byte[] resp, long id, long id2, long id3,
+      int size, byte[] data, byte[] data2,
+      long ckm, byte[] mechParams, byte[] template, byte[] template2) {
     return Libpkcs11.query(op, resp, moduleId, id, id2, id3, size,
         data, data2, ckm, mechParams, template, template2);
   }

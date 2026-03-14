@@ -56,8 +56,7 @@ public class EDDSA_PARAMS extends CkParams {
     return toString(indent, module, "phFlag", phFlag, "pContext", context);
   }
 
-  public static EDDSA_PARAMS decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static EDDSA_PARAMS decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.EDDSA_PARAMS);
     return new EDDSA_PARAMS(encoded[off.getAndIncrement()] != 0,

@@ -10,6 +10,8 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.Args;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class LoginState {
@@ -57,8 +59,7 @@ public class LoginState {
 
   public void logout() throws HsmException {
     if (!loggedIn) {
-      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN,
-          "The session has not been logged in");
+      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN, "The session has not been logged in");
     }
     this.loggedIn = false;
     this.userType = null;
@@ -66,15 +67,13 @@ public class LoginState {
 
   public void assertLoggedIn() throws HsmException {
     if ((!loggedIn)) {
-      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN,
-          "The session has not been logged in");
+      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN, "The session has not been logged in");
     }
   }
 
   public void assertLoggedIn(long userType) throws HsmException {
     if ((!loggedIn)) {
-      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN,
-          "The session has not been logged in");
+      throw new HsmException(PKCS11T.CKR_USER_NOT_LOGGED_IN, "The session has not been logged in");
     }
 
     if (this.userType != null && userType == this.userType) {
@@ -82,8 +81,7 @@ public class LoginState {
     }
 
     throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-        "The session is not logged in with user " +
-            PKCS11T.codeToName(Category.CKU, userType));
+        "The session is not logged in with user " + PKCS11T.codeToName(Category.CKU, userType));
   }
 
   public long getSessionState(boolean rw) {
@@ -91,12 +89,10 @@ public class LoginState {
       if (userType == PKCS11T.CKU_SO) {
         return PKCS11T.CKS_RW_SO_FUNCTIONS;
       } else {
-        return rw ? PKCS11T.CKS_RW_USER_FUNCTIONS
-                  : PKCS11T.CKS_RO_USER_FUNCTIONS;
+        return rw ? PKCS11T.CKS_RW_USER_FUNCTIONS : PKCS11T.CKS_RO_USER_FUNCTIONS;
       }
     } else {
-      return rw ? PKCS11T.CKS_RW_PUBLIC_SESSION
-                : PKCS11T.CKS_RO_PUBLIC_SESSION;
+      return rw ? PKCS11T.CKS_RW_PUBLIC_SESSION : PKCS11T.CKS_RO_PUBLIC_SESSION;
     }
   }
 

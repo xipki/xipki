@@ -16,6 +16,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.type.KeystoreConf;
 import org.xipki.util.io.FileOrValue;
+import org.xipki.util.misc.StringUtil;
 import org.xipki.util.password.PasswordResolverException;
 import org.xipki.util.password.Passwords;
 
@@ -35,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class CsrControl {
@@ -56,8 +59,7 @@ public class CsrControl {
       this.peerCerts = null;
     } else {
       try {
-        peerCerts = X509Util.parseCerts(
-            conf.peerCerts().readContent().getBytes(StandardCharsets.UTF_8));
+        peerCerts = X509Util.parseCerts(StringUtil.toUtf8Bytes(conf.peerCerts().readContent()));
       } catch (Exception e) {
         throw new InvalidConfException(e);
       }
@@ -75,11 +77,9 @@ public class CsrControl {
       throw new InvalidConfException("error resolving password");
     }
 
-    try (InputStream is = new ByteArrayInputStream(
-        kemConf.keystore().readContent())) {
-      ks = KeyUtil.getInKeyStore(kemConf.type());
-      ks.load(is, password);
-    } catch (GeneralSecurityException | IOException ex) {
+    try (InputStream is = new ByteArrayInputStream(kemConf.keystore().readContent())) {
+      ks = KeyUtil.loadKeyStore(kemConf.type(), is, password);
+    } catch (XiSecurityException | IOException ex) {
       throw new InvalidConfException("error loading keystore", ex);
     }
 
@@ -94,8 +94,7 @@ public class CsrControl {
         Key key = ks.getKey(alias, password);
         if (key instanceof SecretKey) {
           // we consider only Secret key
-          this.kemMasterKeys.put(alias,
-              new SecretKeyWithAlias(alias, (SecretKey) key));
+          this.kemMasterKeys.put(alias, new SecretKeyWithAlias(alias, (SecretKey) key));
         }
       }
     } catch (GeneralSecurityException ex) {
@@ -114,8 +113,12 @@ public class CsrControl {
     return peerCerts;
   }
 
-  public KemEncapKey generateKemEncapKey(
-      SubjectPublicKeyInfo publicKey, SecureRandom rnd)
+  public SecretKey getKeyMasterKey(String id) {
+    SecretKeyWithAlias k = kemMasterKeys.get(id);
+    return (k == null) ? null : k.secretKey();
+  }
+
+  public KemEncapKey generateKemEncapKey(SubjectPublicKeyInfo publicKey, SecureRandom rnd)
       throws XiSecurityException {
     if (defaultKemMasterKey == null) {
       return null;

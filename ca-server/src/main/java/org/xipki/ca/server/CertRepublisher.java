@@ -73,8 +73,7 @@ class CertRepublisher {
       try {
         List<SerialWithId> serials;
         do {
-          serials = certstore.getSerialNumbers(ca, startId, numEntries,
-                      onlyRevokedCerts);
+          serials = certstore.getSerialNumbers(ca, startId, numEntries, onlyRevokedCerts);
           long maxId = 1;
           for (SerialWithId sid : serials) {
             if (sid.id() > maxId) {
@@ -137,8 +136,7 @@ class CertRepublisher {
         CertificateInfo certInfo;
 
         try {
-          certInfo = certstore.getCertForId(ca, caCert, sid.id(),
-                      caIdNameMap);
+          certInfo = certstore.getCertForId(ca, caCert, sid.id(), caIdNameMap);
         } catch (OperationException ex) {
           LogUtil.error(LOG, ex);
           failed = true;
@@ -147,7 +145,7 @@ class CertRepublisher {
 
         boolean allSucc = true;
         for (IdentifiedCertPublisher publisher : publishers) {
-          if (!certInfo.isRevoked() && !publisher.publishsGoodCert()) {
+          if (!certInfo.isRevoked() && !publisher.publishesGoodCert()) {
             continue;
           }
 
@@ -168,8 +166,7 @@ class CertRepublisher {
 
   } // class CertRepublishConsumer
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CertRepublisher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CertRepublisher.class);
 
   private final NameId ca;
 
@@ -185,8 +182,7 @@ class CertRepublisher {
 
   private final int numThreads;
 
-  private final BlockingQueue<QueueEntry> queue =
-      new ArrayBlockingQueue<>(1000);
+  private final BlockingQueue<QueueEntry> queue = new ArrayBlockingQueue<>(1000);
 
   private final AtomicBoolean stopMe = new AtomicBoolean(false);
 

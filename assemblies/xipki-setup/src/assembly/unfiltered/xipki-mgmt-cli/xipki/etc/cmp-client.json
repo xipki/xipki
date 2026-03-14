@@ -1,0 +1,28 @@
+{
+  "sendRequestorCert":true,
+  "responder":{
+    "url":"http://$[gateway.host]:$[gateway.http.port]/gw/cmp/",
+    "pbmMac": {
+      "macAlgos":["HMAC-SHA256"],
+      "owfAlgos":["SHA256"]
+    },
+    "signature":{
+      "signatureAlgos":["ECDSA-SHA256"],
+      "cert":{
+        "file":"xipki/keycerts/gateway-server-cert.pem"
+      }
+    },
+    "dhPopCerts":{
+      "file":"xipki/keycerts/dh-pop-certs.pem"
+    }
+  },
+  "ssl":{
+    "name":"ssl1",
+    // valid values: 'default' for standard verification, 'no_op' for no-operation, or
+    // 'java:'<class implements javax.net.ssl.HostnameVerifier>
+    "hostnameVerifier":"default",
+    "trustanchors":[{
+      "file":"xipki/keycerts/gateway-server-cert.pem"
+    }]
+  }
+}

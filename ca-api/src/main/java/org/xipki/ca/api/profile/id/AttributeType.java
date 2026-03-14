@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class AttributeType extends AbstractID {
@@ -62,8 +64,7 @@ public class AttributeType extends AbstractID {
   public static final AttributeType O = organization;
 
   public static final AttributeType organizationalUnit =
-      initOf(OIDs.DN.organizationalUnit,
-          "organizationalUnit", "organizationUnit", "OU");
+      initOf(OIDs.DN.organizationalUnit, "organizationalUnit", "organizationUnit", "OU");
 
   public static final AttributeType OU = organizationalUnit;
 
@@ -92,8 +93,7 @@ public class AttributeType extends AbstractID {
       initOf(OIDs.DN.organizationIdentifier, "organizationIdentifier", "OI");
 
   public static final AttributeType jurIncorporationLocality =
-      initOf(OIDs.DN.jurIncorporationLocality,
-          "jurIncorporationLocality", "JIL");
+      initOf(OIDs.DN.jurIncorporationLocality, "jurIncorporationLocality", "JIL");
 
   public static final AttributeType jurIncorporationState =
       initOf(OIDs.DN.jurIncorporationState, "jurIncorporationState", "JIS");
@@ -130,13 +130,11 @@ public class AttributeType extends AbstractID {
   public static final AttributeType unstructuredAddress =
       initOf(OIDs.DN.unstructuredAddress, "unstructuredAddress");
 
-  private AttributeType(
-      ASN1ObjectIdentifier x509, List<String> aliases) {
+  private AttributeType(ASN1ObjectIdentifier x509, List<String> aliases) {
     super(x509, aliases);
   }
 
-  private static AttributeType initOf(
-      ASN1ObjectIdentifier oid, String... aliases) {
+  private static AttributeType initOf(ASN1ObjectIdentifier oid, String... aliases) {
     Args.notNull(oid, "oid");
     List<String> l = new ArrayList<>();
     if (aliases != null) {

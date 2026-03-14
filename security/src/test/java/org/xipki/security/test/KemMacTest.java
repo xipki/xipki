@@ -17,7 +17,8 @@ import org.xipki.security.encap.KEMUtil;
 import org.xipki.security.encap.KemEncapKey;
 import org.xipki.security.encap.KemEncapsulation;
 import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.HmacSigner;
+import org.xipki.security.sign.HmacSigner;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.SecretKeyWithAlias;
 
@@ -29,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.util.Arrays;
 
 /**
@@ -39,9 +39,7 @@ public class KemMacTest {
 
   @Test
   public void signVerify() throws Exception {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
 
     // only the verifier has the master key
     String alias = "alias";
@@ -100,8 +98,8 @@ public class KemMacTest {
       // ASN1UTF8String id = (ASN1UTF8String) seq.getObjectAt(0);
       byte[] rawSignature = ((ASN1OctetString) seq.getObjectAt(1)).getOctets();
 
-      byte[] rawPkData = myPkInfo.getPublicKeyData().getOctets();
-      byte[] secret = KEMUtil.kmacDerive(masterKey.secretKey(), 32,
+      byte[] rawPkData = Asn1Util.getPublicKeyData(myPkInfo);
+      byte[] secret = KEMUtil.hmacDerive(masterKey.secretKey(), 32,
           "XIPKI-KEM".getBytes(StandardCharsets.US_ASCII), rawPkData);
 
       SecretKey macKey = new SecretKeySpec(secret, "AES");

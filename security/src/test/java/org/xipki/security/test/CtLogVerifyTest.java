@@ -22,7 +22,6 @@ import org.xipki.util.io.IoUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.Signature;
 
 /**
@@ -42,7 +41,7 @@ public class CtLogVerifyTest {
 
   @Test
   public void testVerify() throws Exception {
-    Security.addProvider(KeyUtil.newBouncyCastleProvider());
+    KeyUtil.addProviders();
     byte[] keyBytes = read(pubkeyFile);
 
     SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(
@@ -57,7 +56,7 @@ public class CtLogVerifyTest {
     byte[] issuerKeyHash = HashAlgo.SHA256.hash(
         caCert.subjectPublicKeyInfo().getEncoded());
     byte[] preCertTbsCert = CtLog.getPreCertTbsCert(
-        cert.toBcCert().toASN1Structure().getTBSCertificate());
+        cert.getCertHolder().toASN1Structure().getTBSCertificate());
 
     byte[] extnValue = cert.getExtensionCoreValue(
         OIDs.Extn.id_SignedCertificateTimestampList);

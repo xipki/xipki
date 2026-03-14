@@ -53,8 +53,7 @@ public class JniResult {
     int len = payload.length;
     int n = len / arch.longSize();
     if (n * arch.longSize() != len) {
-      throw new IllegalArgumentException(
-          len + " is not multiple of " + arch.longSize());
+      throw new IllegalArgumentException(len + " is not multiple of " + arch.longSize());
     }
 
     AtomicInteger off = new AtomicInteger(0);

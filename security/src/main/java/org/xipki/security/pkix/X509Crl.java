@@ -11,13 +11,12 @@ import org.xipki.security.OIDs;
 import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
-import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 
 /**
- * Wrapper to an {@link X509Certificate}.
+ * Wrapper to an X.509 Crl.
  *
  * @author Lijun Liao (xipki)
  */
@@ -56,14 +55,12 @@ public class X509Crl {
 
   public BigInteger crlNumber() {
     Extension extn = x509.getExtension(OIDs.Extn.cRLNumber);
-    return extn == null ? null
-        : ((ASN1Integer) extn.getParsedValue()).getValue();
+    return extn == null ? null : ((ASN1Integer) extn.getParsedValue()).getValue();
   }
 
   public BigInteger baseCrlNumber() {
     Extension extn = x509.getExtension(OIDs.Extn.deltaCRLIndicator);
-    return extn == null ? null
-        : ((ASN1Integer) extn.getParsedValue()).getValue();
+    return extn == null ? null : ((ASN1Integer) extn.getParsedValue()).getValue();
   }
 
   public Instant thisUpdate() {

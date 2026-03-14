@@ -47,8 +47,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DbActions {
 
-  private static String printDbInfo(
-      ConfigurableProperties dbProps, int scriptFilePathLen) {
+  private static String printDbInfo(ConfigurableProperties dbProps, int scriptFilePathLen) {
     Args.notNull(dbProps, "dbProps");
 
     String schema = dbProps.getProperty("liquibase.schema");
@@ -196,42 +195,35 @@ public class DbActions {
 
   } // class DbAction
 
-  @Command(scope = "ca", name = "export-ca", description =
-      "export CA database")
+  @Command(scope = "ca", name = "export-ca", description = "export CA database")
   @Service
   public static class ExportCa extends DbPortAction {
 
-    @Option(name = "--caconf-db-conf", description =
-        "CA configuration database file")
+    @Option(name = "--caconf-db-conf", description = "CA configuration database file")
     @Completion(FileCompleter.class)
     private String caConfDbConfFile;
 
-    @Option(name = "--db-conf", required = true, description =
-        "CA database file")
+    @Option(name = "--db-conf", required = true, description = "CA database file")
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    @Option(name = "--out-dir", required = true, description =
-        "output directory")
+    @Option(name = "--out-dir", required = true, description = "output directory")
     @Completion(Completers.DirCompleter.class)
     private String outdir;
 
-    @Option(name = "-n", description =
-        "number of certificates in one zip file")
+    @Option(name = "-n", description = "number of certificates in one zip file")
     private Integer numCertsInBundle = 10000;
 
     @Option(name = "-k", description = "number of certificates per SELECT")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
     protected DbPortWorker getDbWorker() throws Exception {
       return new DbPortWorker.ExportCaDb(datasourceFactory, caConfDbConfFile,
-          dbConfFile, outdir, resume, numCertsInBundle, numCertsPerCommit,
-          readPassword());
+          dbConfFile, outdir, resume, numCertsInBundle, numCertsPerCommit, readPassword());
     }
 
   } // class ExportCa
@@ -241,25 +233,21 @@ public class DbActions {
   @Service
   public static class ExportCaCertStore extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description =
-        "CA certstore database file")
+    @Option(name = "--db-conf", required = true, description = "CA certstore database file")
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    @Option(name = "--out-dir", required = true, description =
-        "output directory")
+    @Option(name = "--out-dir", required = true, description = "output directory")
     @Completion(Completers.DirCompleter.class)
     private String outdir;
 
-    @Option(name = "-n", description =
-        "number of certificates in one zip file")
+    @Option(name = "-n", description = "number of certificates in one zip file")
     private Integer numCertsInBundle = 10000;
 
     @Option(name = "-k", description = "number of certificates per SELECT")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
@@ -272,23 +260,17 @@ public class DbActions {
 
   public abstract static class DbPortAction extends DbAction {
 
-    @Option(name = "--password", description =
-        "password, as plaintext or PBE-encrypted, or 'NO' for no password")
+    @Option(name = "--password", description = "password, as plaintext or PBE-encrypted")
     private String passwordHint;
 
     @Override
-    protected char[] readPassword()
-        throws IOException, PasswordResolverException {
-      if ("NO".equalsIgnoreCase(passwordHint)) {
-        return null;
-      }
-      return readPasswordIfNotSet("Please enter password of the ZIP file",
-          passwordHint);
+    protected char[] readPassword() throws IOException, PasswordResolverException {
+      return readPasswordIfNotSet(
+          "Please enter password to decrypt / encrypt the ZIP file", passwordHint);
     }
   } // class DbAction
 
-  @Command(scope = "ca", name = "diff-digest", description =
-      "diff digest XiPKI database")
+  @Command(scope = "ca", name = "diff-digest", description = "diff digest XiPKI database")
   @Service
   public static class DiffDigest extends DbAction {
 
@@ -302,13 +284,11 @@ public class DbActions {
     @Completion(FileCompleter.class)
     private String dbconfFile;
 
-    @Option(name = "--report-dir", required = true, description =
-        "report directory")
+    @Option(name = "--report-dir", required = true, description = "report directory")
     @Completion(Completers.DirCompleter.class)
     private String reportDir;
 
-    @Option(name = "--revoked-only", description =
-        "considers only the revoked certificates")
+    @Option(name = "--revoked-only", description = "considers only the revoked certificates")
     private Boolean revokedOnly = Boolean.FALSE;
 
     @Option(name = "-k", description = "number of certificates per SELECT")
@@ -343,13 +323,11 @@ public class DbActions {
   @Service
   public static class Sql extends XiAction {
 
-    @Option(name = "--db-conf", required = true, description =
-        "database configuration file")
+    @Option(name = "--db-conf", required = true, description = "database configuration file")
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    @Argument(name = "script", required = true, description =
-        "SQL script file")
+    @Argument(name = "script", required = true, description = "SQL script file")
     @Completion(FileCompleter.class)
     private String scriptFile;
 
@@ -359,8 +337,7 @@ public class DbActions {
     @Override
     protected Object execute0() throws Exception {
       ConfigurableProperties props = new ConfigurableProperties();
-      try (InputStream is = Files.newInputStream(
-          Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
+      try (InputStream is = Files.newInputStream(Paths.get(IoUtil.expandFilepath(dbConfFile)))) {
         props.load(is);
       }
 
@@ -391,8 +368,7 @@ public class DbActions {
             type = "hsqldb";
             break;
           default:
-            throw new IllegalArgumentException(
-                "unknown database type " + dbType);
+            throw new IllegalArgumentException("unknown database type " + dbType);
         }
 
         scriptFile = expandFilepath(scriptFile);
@@ -401,20 +377,17 @@ public class DbActions {
         if (!Files.exists(p)) {
           String fileName = p.getFileName().toString();
           int idx = fileName.lastIndexOf('.');
-          fileName = fileName.substring(0, idx) + "." + type +
-                      fileName.substring(idx);
+          fileName = fileName.substring(0, idx) + "." + type + fileName.substring(idx);
 
           Path parentP = p.getParent();
-          p = parentP == null ? Paths.get(fileName)
-              : Paths.get(parentP.toString(), fileName);
+          p = parentP == null ? Paths.get(fileName) : Paths.get(parentP.toString(), fileName);
 
           if (!Files.exists(p)) {
             p = parentP == null ? Paths.get(type, fileName)
                 : Paths.get(parentP.toString(), type, fileName);
 
             if (!Files.exists(p)) {
-              throw new IllegalCmdParamException(
-                  "Could not find script file " + scriptFile);
+              throw new IllegalCmdParamException("Could not find script file " + scriptFile);
             }
           }
         }
@@ -428,7 +401,14 @@ public class DbActions {
         }
 
         println("Start executing script " + p);
-        ScriptRunner.runScript(dataSource, p.toString());
+
+        File logDir = new File("data/log");
+        logDir.mkdirs();
+
+        Path createDbLogPath = new File(logDir, "create_db.log").toPath();
+        Path createDbErrorLogPath = new File(logDir, "create_db_error.log").toPath();
+
+        ScriptRunner.runScript(dataSource, p.toString(), createDbLogPath, createDbErrorLogPath);
         println("  End executing script " + p);
         System.out.println(boundary);
         return null;
@@ -436,30 +416,25 @@ public class DbActions {
     }
   } // class Sql
 
-  @Command(scope = "ca", name = "export-ocsp", description =
-      "export OCSP database")
+  @Command(scope = "ca", name = "export-ocsp", description = "export OCSP database")
   @Service
   public static class ExportOcsp extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description =
-        "database configuration file.")
+    @Option(name = "--db-conf", required = true, description = "database configuration file.")
     @Completion(FileCompleter.class)
     private String dbconfFile;
 
-    @Option(name = "--out-dir", required = true, description =
-        "output directory")
+    @Option(name = "--out-dir", required = true, description = "output directory")
     @Completion(Completers.DirCompleter.class)
     private String outdir;
 
-    @Option(name = "-n", description =
-        "number of certificates in one zip file")
+    @Option(name = "-n", description = "number of certificates in one zip file")
     private Integer numCertsInBundle = 10000;
 
     @Option(name = "-k", description = "number of certificates per SELECT")
     private Integer numCertsPerSelect = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
@@ -470,8 +445,7 @@ public class DbActions {
 
   } // class ExportOcsp
 
-  @Command(scope = "ca", name = "import-ca", description =
-      "import CA database")
+  @Command(scope = "ca", name = "import-ca", description = "import CA database")
   @Service
   public static class ImportCa extends DbPortAction {
 
@@ -480,21 +454,18 @@ public class DbActions {
     @Completion(FileCompleter.class)
     private String caconfDbFile;
 
-    @Option(name = "--db-conf", required = true, description =
-        "CA database file")
+    @Option(name = "--db-conf", required = true, description = "CA database file")
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    @Option(name = "--in-dir", required = true, description =
-        "input directory")
+    @Option(name = "--in-dir", required = true, description = "input directory")
     @Completion(Completers.DirCompleter.class)
     private String indir;
 
     @Option(name = "-k", description = "number of certificates per commit")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
@@ -510,21 +481,18 @@ public class DbActions {
   @Service
   public static class ImportCaCertStore extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description =
-        "CA certstore database file")
+    @Option(name = "--db-conf", required = true, description = "CA certstore database file")
     @Completion(FileCompleter.class)
     private String dbConfFile;
 
-    @Option(name = "--in-dir", required = true, description =
-        "input directory")
+    @Option(name = "--in-dir", required = true, description = "input directory")
     @Completion(Completers.DirCompleter.class)
     private String indir;
 
     @Option(name = "-k", description = "number of certificates per commit")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
@@ -535,13 +503,11 @@ public class DbActions {
 
   } // class ImportCaCertStore
 
-  @Command(scope = "ca", name = "import-ocsp", description =
-      "import OCSP database")
+  @Command(scope = "ca", name = "import-ocsp", description = "import OCSP database")
   @Service
   public static class ImportOcsp extends DbPortAction {
 
-    @Option(name = "--db-conf", required = true, description =
-        "database configuration file")
+    @Option(name = "--db-conf", required = true, description = "database configuration file")
     @Completion(FileCompleter.class)
     private String dbconfFile;
 
@@ -552,8 +518,7 @@ public class DbActions {
     @Option(name = "-k", description = "number of certificates per commit")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override
@@ -571,8 +536,7 @@ public class DbActions {
 
     private static final String DFLT_PUBLISHER = "ocsp-publisher";
 
-    @Option(name = "--db-conf", required = true, description =
-        "database configuration file")
+    @Option(name = "--db-conf", required = true, description = "database configuration file")
     @Completion(FileCompleter.class)
     private String dbconfFile;
 
@@ -586,8 +550,7 @@ public class DbActions {
     @Option(name = "-k", description = "number of certificates per commit")
     private Integer numCertsPerCommit = 100;
 
-    @Option(name = "--resume", description =
-        "resume from the last successful point")
+    @Option(name = "--resume", description = "resume from the last successful point")
     private Boolean resume = Boolean.FALSE;
 
     @Override

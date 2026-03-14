@@ -48,21 +48,6 @@ public class CollectionUtil {
     return map != null && !map.isEmpty();
   }
 
-  @Deprecated
-  public static boolean isNonEmpty(Collection<?> col) {
-    return col != null && !col.isEmpty();
-  }
-
-  @Deprecated
-  public static boolean isNonEmpty(Object[] arrays) {
-    return arrays != null && arrays.length > 0;
-  }
-
-  @Deprecated
-  public static boolean isNonEmpty(Map<?, ?> map) {
-    return map != null && !map.isEmpty();
-  }
-
   public static List<String> toLowerCaseList(List<String> list) {
     if (list == null) {
       return null;
@@ -76,13 +61,11 @@ public class CollectionUtil {
   }
 
   public static <T> Set<T> unmodifiableSet(Set<? extends T> set) {
-    return (set == null) ? Collections.emptySet()
-        : Collections.unmodifiableSet(set);
+    return (set == null) ? Collections.emptySet() : Collections.unmodifiableSet(set);
   }
 
   public static <T> List<T> unmodifiableList(List<? extends T> list) {
-    return (list == null) ? Collections.emptyList()
-        : Collections.unmodifiableList(list);
+    return (list == null) ? Collections.emptyList() : Collections.unmodifiableList(list);
   }
 
   @SafeVarargs
@@ -98,8 +81,7 @@ public class CollectionUtil {
     return new HashSet<>(Arrays.asList(list));
   }
 
-  public static <T extends Comparable<? super T>> List<T> sort(
-      Collection<T> col) {
+  public static <T extends Comparable<? super T>> List<T> sort(Collection<T> col) {
     if (col == null) {
       return null;
     } else {

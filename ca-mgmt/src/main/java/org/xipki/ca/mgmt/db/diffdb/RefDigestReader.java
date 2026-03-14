@@ -41,8 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 class RefDigestReader implements Closeable {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(RefDigestReader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RefDigestReader.class);
 
   private final BlockingQueue<QueueEntry> outQueue;
 
@@ -77,8 +76,7 @@ class RefDigestReader implements Closeable {
     private PreparedStatement selectCertStmt;
     private boolean endReached;
 
-    Retriever()
-        throws DataAccessException {
+    Retriever() throws DataAccessException {
       try {
         selectCertStmt = datasource.prepareStatement(conn, selectCertSql);
       } catch (DataAccessException ex) {
@@ -110,7 +108,6 @@ class RefDigestReader implements Closeable {
       ResultSet rs = null;
       try {
         selectCertStmt.setLong(1, startId);
-
         rs = selectCertStmt.executeQuery();
 
         while (rs.next()) {
@@ -120,10 +117,9 @@ class RefDigestReader implements Closeable {
           }
 
           String hash =
-              (dbType == DbType.XIPKI_OCSP_v4) ? rs.getString("HASH")
+              (dbType == DbType.XIPKI_OCSP_v4)  ? rs.getString("HASH")
               : (certhashAlgo == HashAlgo.SHA1) ? rs.getString("SHA1")
-              : certhashAlgo.base64Hash(Base64.decodeFast(
-                  rs.getString("CERT")));
+              : certhashAlgo.base64Hash(Base64.decodeFast(rs.getString("CERT")));
 
           BigInteger serial = new BigInteger(rs.getString("SN"), 16);
           boolean revoked = rs.getBoolean("REV");
@@ -141,14 +137,12 @@ class RefDigestReader implements Closeable {
             }
           }
 
-          DigestEntry cert = new DigestEntry(serial, revoked, revReason,
-              revTime, revInvTime, hash);
+          DigestEntry cert = new DigestEntry(serial, revoked, revReason, revTime, revInvTime, hash);
           result.addEntry(new IdentifiedDigestEntry(cert, id));
         }
       } catch (Exception ex) {
         if (ex instanceof SQLException) {
-          result.setException(datasource.translate(
-              selectCertSql, (SQLException) ex));
+          result.setException(datasource.translate(selectCertSql, (SQLException) ex));
         } else {
           result.setException(ex);
         }
@@ -177,8 +171,7 @@ class RefDigestReader implements Closeable {
     this.outQueue = new ArrayBlockingQueue<>(numBlocksToRead);
   } // constructor
 
-  private void init(DbType dbType, HashAlgo certhashAlgo,
-                    int caId, int numPerSelect)
+  private void init(DbType dbType, HashAlgo certhashAlgo, int caId, int numPerSelect)
       throws Exception {
     this.caId = caId;
     this.conn = datasource.getConnection();
@@ -187,8 +180,7 @@ class RefDigestReader implements Closeable {
 
     String coreSql;
     if (dbType == DbType.XIPKI_OCSP_v4) {
-      String certHashAlgoInDb =
-          datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
+      String certHashAlgoInDb = datasource.getDbSchemaEntry(null, "CERTHASH_ALGO");
       if (certhashAlgo != HashAlgo.getInstance(certHashAlgoInDb)) {
         throw new IllegalArgumentException("certHashAlgo in parameter (" +
             certhashAlgo + ") != in DB (" + certHashAlgoInDb + ")");
@@ -202,8 +194,7 @@ class RefDigestReader implements Closeable {
           " FROM CERT WHERE CA_ID=", Integer.toString(caId), " AND ID>=?");
     }
 
-    this.selectCertSql = datasource.buildSelectFirstSql(
-        numPerSelect, "ID ASC", coreSql);
+    this.selectCertSql = datasource.buildSelectFirstSql(numPerSelect, "ID ASC", coreSql);
 
     try {
       executor = Executors.newFixedThreadPool(1);
@@ -222,9 +213,8 @@ class RefDigestReader implements Closeable {
   }
 
   public static RefDigestReader getInstance(
-      DataSourceWrapper datasource, DbType dbType, HashAlgo certhashAlgo,
-      int caId, int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe)
-      throws Exception {
+      DataSourceWrapper datasource, DbType dbType, HashAlgo certhashAlgo, int caId,
+      int numBlocksToRead, int numPerSelect, AtomicBoolean stopMe) throws Exception {
     Args.notNull(datasource, "datasource");
 
     PreparedStatement stmt = null;
@@ -244,12 +234,10 @@ class RefDigestReader implements Closeable {
 
       rs = stmt.executeQuery();
       if (!rs.next()) {
-        throw new IllegalArgumentException(
-            "no CA with id '" + caId + "' is available");
+        throw new IllegalArgumentException("no CA with id '" + caId + "' is available");
       }
 
-      caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(
-          rs.getString("CERT")));
+      caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
       rs.close();
 
       sql = "SELECT COUNT(*) FROM CERT WHERE " + colCaId + "=" + caId;
@@ -304,8 +292,7 @@ class RefDigestReader implements Closeable {
       endReached.set(true);
       return null;
     } else if (!(next instanceof DigestEntrySet)) {
-      throw new IllegalStateException("unknown QueueEntry type: "
-          + next.getClass().getName());
+      throw new IllegalStateException("unknown QueueEntry type: " + next.getClass().getName());
     }
 
     certSet = (DigestEntrySet) next;

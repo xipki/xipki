@@ -50,8 +50,7 @@ public class CertTemplateData {
       String certprofileName, BigInteger certReqId, boolean serverkeygen) {
     this.publicKeyInfo = publicKeyInfo;
     this.subject = Args.notNull(subject, "subject");
-    this.certprofileName = Args.toNonBlankLower(certprofileName,
-        "certprofileName");
+    this.certprofileName = Args.toNonBlankLower(certprofileName, "certprofileName");
     this.extensions = extensions;
     this.notBefore = notBefore;
     this.notAfter = notAfter;

@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -57,7 +58,7 @@ public class NonceManager {
 
     int sum = 0;
     try (BufferedReader reader =
-             new BufferedReader(new FileReader(nonceFile))) {
+            new BufferedReader(new FileReader(nonceFile))) {
       String line;
       while ((line = reader.readLine()) != null) {
         StringTokenizer tokenizer = new StringTokenizer(line, ":");
@@ -106,7 +107,12 @@ public class NonceManager {
   }
 
   public boolean removeNonce(String nonce) {
-    return null != noncePool.remove(nonce);
+    Long notAfter = noncePool.remove(nonce);
+    if (notAfter == null) {
+      return false;
+    }
+
+    return notAfter >= Clock.systemUTC().millis();
   }
 
   public void close() {

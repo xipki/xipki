@@ -22,8 +22,7 @@ public class PollCertRequest extends CaIdentifierRequest {
   private final Entry[] entries;
 
   public PollCertRequest(byte[] issuerCertSha1Fp, X500NameType issuer,
-                         byte[] authorityKeyIdentifier, String transactionId,
-                         Entry[] entries) {
+                        byte[] authorityKeyIdentifier, String transactionId, Entry[] entries) {
     super(issuerCertSha1Fp, issuer, authorityKeyIdentifier);
     this.transactionId = transactionId;
     this.entries = entries;
@@ -47,15 +46,10 @@ public class PollCertRequest extends CaIdentifierRequest {
   public static PollCertRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("PollCertRequest", decoder, 5);
-      return new PollCertRequest(
-          decoder.readByteString(),
-          X500NameType.decode(decoder),
-          decoder.readByteString(),
-          decoder.readTextString(),
-          Entry.decodeArray(decoder));
+      return new PollCertRequest(decoder.readByteString(), X500NameType.decode(decoder),
+          decoder.readByteString(), decoder.readTextString(), Entry.decodeArray(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, PollCertRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, PollCertRequest.class), ex);
     }
   }
 
@@ -98,8 +92,7 @@ public class PollCertRequest extends CaIdentifierRequest {
       }
     }
 
-    public static Entry[] decodeArray(CborDecoder decoder)
-        throws CodecException {
+    public static Entry[] decodeArray(CborDecoder decoder) throws CodecException {
       Integer arrayLen = decoder.readNullOrArrayLength();
       if (arrayLen == null) {
         return null;

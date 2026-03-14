@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class HsmUtil {
@@ -54,22 +56,19 @@ public class HsmUtil {
     return false;
   }
 
-  public static void assertNullParameter(XiMechanism mechanism)
-      throws HsmException {
+  public static void assertNullParameter(XiMechanism mechanism) throws HsmException {
     if (mechanism.getParameter() != null) {
       throw new HsmException(PKCS11T.CKR_MECHANISM_PARAM_INVALID,
           "Mechanism.parameters is not NULL");
     }
   }
 
-  public static byte[] getOctetStringValue(String name, byte[] derOctetString)
-      throws HsmException {
+  public static byte[] getOctetStringValue(String name, byte[] derOctetString) throws HsmException {
     try {
       return Asn1Util.readOctetsFromASN1OctetString(derOctetString);
     } catch (CodecException e) {
       throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-          name + " is not a DER-encoded OCTET STRING: "
-           + Hex.toHexString(derOctetString));
+          name + " is not a DER-encoded OCTET STRING: " + Hex.toHexString(derOctetString));
     }
   }
 

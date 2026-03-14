@@ -85,8 +85,7 @@ public interface CaCertValidator {
 
     @Override
     public boolean isTrusted(X509Cert cert) {
-      String hextFp = HashAlgo.SHA256.hexHash(
-          Args.notNull(cert, "cert").getEncoded());
+      String hextFp = HashAlgo.SHA256.hexHash(Args.notNull(cert, "cert").getEncoded());
       return fpOfCerts.contains(hextFp);
     }
 
@@ -98,8 +97,7 @@ public interface CaCertValidator {
 
     private final Set<byte[]> hashValues;
 
-    public PreprovisionedHashCaCertValidator(
-        HashAlgo hashAlgo, Set<byte[]> hashValues) {
+    public PreprovisionedHashCaCertValidator(HashAlgo hashAlgo, Set<byte[]> hashValues) {
       this.hashAlgo = Args.notNull(hashAlgo, "hashAlgo");
       Args.notEmpty(hashValues, "hashValues");
 

@@ -104,6 +104,10 @@ public class IPAddress {
             sb.append(0xFF & bytes[i]);
           }
 
+          if (bytes.length < 4) {
+            sb.append(".0".repeat(4 - bytes.length));
+          }
+
           int prefixLen = bytes.length * 8 - unusedBits;
           sb.append("/").append(prefixLen);
           break;
@@ -119,8 +123,7 @@ public class IPAddress {
     } else if (isIPv6) {
       switch (context) {
         case PREFIX:
-          sb.append(toStringIPv6Address(bytes))
-              .append("/").append(8 * bytes.length - unusedBits);
+          sb.append(toStringIPv6Address(bytes)).append("/").append(8 * bytes.length - unusedBits);
           break;
         case RANGE_MIN:
         case RANGE_MAX:
@@ -128,14 +131,29 @@ public class IPAddress {
           break;
       }
     } else {
-      sb.append(Hex.encode(value)).append(" (unused bits ")
-          .append(unusedBits).append(")");
+      sb.append(Hex.encode(value)).append(" (unused bits ").append(unusedBits).append(")");
     }
     return sb.toString();
   }
 
   private static String toStringIPv6Address(byte[] bytes) {
-    int numTokens = (bytes.length + 1) / 2;
+    // do not consider the ending zeros
+    int endIndexOfNonZeros = bytes.length; // exclusive
+    if (bytes[bytes.length - 1] == 0) {
+      if (bytes.length % 2 != 0) {
+        endIndexOfNonZeros--;
+      }
+
+      while (endIndexOfNonZeros > 2) {
+        if (bytes[endIndexOfNonZeros - 1] == 0 && bytes[endIndexOfNonZeros - 2] == 0) {
+          endIndexOfNonZeros -= 2;
+        } else {
+          break;
+        }
+      }
+    }
+
+    int numTokens = (endIndexOfNonZeros + 1) / 2;
     int[] tokens = new int[numTokens];
     for (int i = 0; i < numTokens; i++) {
       int off = i * 2;
@@ -145,8 +163,8 @@ public class IPAddress {
       }
     }
 
-    int zerosStartIndex = -1;
-    int zerosEndIndex = -1;
+    int zerosStartIndex = -1; // inclusive
+    int zerosEndIndex   = -1; // inclusive
 
     for (int i = 0; i < numTokens; i++) {
       int token = tokens[i];
@@ -191,6 +209,11 @@ public class IPAddress {
       }
     }
 
+    if (numTokens < 8 &&
+        !(sb.charAt(sb.length() - 1) == ':' && sb.charAt(sb.length() - 2) == ':')) {
+      sb.append("::");
+    }
+
     return sb.toString();
   }
 
@@ -202,8 +225,7 @@ public class IPAddress {
     return getInstance(false, str, context);
   }
 
-  public static IPAddress getInstance(
-      boolean ipv4, String str, Context context) {
+  public static IPAddress getInstance(boolean ipv4, String str, Context context) {
     int numFullBytes = ipv4 ? 4 : 16;
 
     int prefixLen = -1;
@@ -221,8 +243,7 @@ public class IPAddress {
     switch (context) {
       case PREFIX: {
         int numBytes = (prefixLen + 7) / 8;
-        bytes = (bytes.length == numBytes) ? bytes
-            : Arrays.copyOf(bytes, numBytes);
+        bytes = (bytes.length == numBytes) ? bytes : Arrays.copyOf(bytes, numBytes);
         int unusedBits = (8 - (prefixLen % 8)) % 8;
 
         if (unusedBits != 0) {
@@ -237,8 +258,7 @@ public class IPAddress {
       case C509_RANGE_MIN:
       case C509_RANGE_MAX: {
         BigInteger bn = new BigInteger(1, bytes);
-        boolean min = context == Context.RANGE_MIN
-            || context == Context.C509_RANGE_MIN;
+        boolean min = context == Context.RANGE_MIN || context == Context.C509_RANGE_MIN;
         int numDefaultBits = 0;
         boolean dfltBitSet = !min;
         for (int i = 0; i < bytes.length * 8; i++) {
@@ -248,8 +268,7 @@ public class IPAddress {
           numDefaultBits++;
         }
 
-        if (context == Context.C509_RANGE_MIN
-            || context == Context.C509_RANGE_MAX) {
+        if (context == Context.C509_RANGE_MIN || context == Context.C509_RANGE_MAX) {
           numDefaultBits = numDefaultBits / 8 * 8;
         }
 
@@ -264,8 +283,7 @@ public class IPAddress {
         if (bnBytes.length == numBytes) {
           bytes = bnBytes;
         } else if (bnBytes.length < numBytes) {
-          System.arraycopy(bnBytes, 0, bytes,
-              numBytes - bnBytes.length, bnBytes.length);
+          System.arraycopy(bnBytes, 0, bytes, numBytes - bnBytes.length, bnBytes.length);
         } else {
           System.arraycopy(bnBytes, 1, bytes, 0, numBytes);
         }

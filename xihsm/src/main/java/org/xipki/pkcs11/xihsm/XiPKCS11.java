@@ -22,8 +22,7 @@ public class XiPKCS11 extends PKCS11 {
   }
 
   @Override
-  protected void initModule(int moduleId, String modulePath)
-      throws PKCS11Exception {
+  protected void initModule(int moduleId, String modulePath) throws PKCS11Exception {
     XiLibpkcs11.initModule(moduleId, modulePath);
   }
 

@@ -26,11 +26,10 @@ import java.util.Set;
  */
 
 public class CanonicalizeCode {
-  private static final int MAX_COUNT_IN_LINE = 80;
+  private static final int MAX_COUNT_IN_LINE = 100;
 
   private static final Set<String> textFileExtensions = new HashSet<>(
-          Arrays.asList("txt", "xml", "xsd", "cfg", "properties",
-              "script", "jxb", "info", "json"));
+          Arrays.asList("txt", "xml", "xsd", "cfg", "properties", "script", "jxb", "info", "json"));
 
   private static final Set<String> excludeTextFiles = new HashSet<>();
 
@@ -40,8 +39,7 @@ public class CanonicalizeCode {
 
   private CanonicalizeCode(String baseDir) {
     baseDir = IoUtil.expandFilepath(baseDir);
-    this.baseDir = baseDir.endsWith(File.separator) ? baseDir
-        : baseDir + File.separator;
+    this.baseDir = baseDir.endsWith(File.separator) ? baseDir : baseDir + File.separator;
     this.baseDirLen = this.baseDir.length();
   }
 
@@ -92,8 +90,7 @@ public class CanonicalizeCode {
 
         if ("java".equals(extension) || "c".equalsIgnoreCase(extension)) {
           canonicalizeFile(file);
-        } else if (textFileExtensions.contains(extension)
-            && !excludeTextFiles.contains(filename)) {
+        } else if (textFileExtensions.contains(extension) && !excludeTextFiles.contains(filename)) {
           try {
             canonicalizeTextFile(file);
           } catch (Exception ex) {
@@ -110,7 +107,7 @@ public class CanonicalizeCode {
 
     byte[] newBytes;
     try (BufferedReader reader = Files.newBufferedReader(file.toPath());
-         ByteArrayOutputStream writer = new ByteArrayOutputStream()){
+        ByteArrayOutputStream writer = new ByteArrayOutputStream()){
       String line;
       boolean lastLineEmpty = false;
 
@@ -150,7 +147,7 @@ public class CanonicalizeCode {
 
     byte[] newBytes;
     try (BufferedReader reader = Files.newBufferedReader(file.toPath());
-         ByteArrayOutputStream writer = new ByteArrayOutputStream()) {
+        ByteArrayOutputStream writer = new ByteArrayOutputStream()) {
       String line;
       while ((line = reader.readLine()) != null) {
         String canonicalizedLine = canonicalizeTextLine(line);
@@ -190,8 +187,7 @@ public class CanonicalizeCode {
     int n = 0;
     for (File file : files) {
       if (file.isDirectory()) {
-        if (!file.getName().equals("target")
-            && !file.getName().equals("tbd")) {
+        if (!file.getName().equals("target") && !file.getName().equals("tbd")) {
           n += checkWarningsInDir(file, false);
         }
       } else {
@@ -253,8 +249,7 @@ public class CanonicalizeCode {
 
     boolean withWarnings = false;
     if (!lineNumbers.isEmpty()) {
-      System.out.println("Please check file " +
-          file.getPath().substring(baseDirLen) + ": lines " +
+      System.out.println("Please check file " + file.getPath().substring(baseDirLen) + ": lines " +
           Arrays.toString(lineNumbers.toArray(new Integer[0])));
       withWarnings = true;
     }

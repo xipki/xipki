@@ -41,8 +41,7 @@ public class KeyStoreWrapper {
     return subjectPublicKeyInfo;
   }
 
-  public void setSubjectPublicKeyInfo(
-      SubjectPublicKeyInfo subjectPublicKeyInfo) {
+  public void setSubjectPublicKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
     this.subjectPublicKeyInfo = subjectPublicKeyInfo;
   }
 

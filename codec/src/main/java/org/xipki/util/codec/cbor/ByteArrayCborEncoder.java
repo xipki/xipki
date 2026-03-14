@@ -14,13 +14,16 @@ import org.xipki.util.codec.CodecException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+/**
+ * CBOR encoder writing output to an in-memory byte array.
+ */
 public class ByteArrayCborEncoder extends CborEncoder implements AutoCloseable {
 
   private final ByteArrayOutputStream m_os;
 
   /**
-   * Creates a new {@link ByteArrayCborEncoder} instance with default initial size 32.
-   *
+   * Creates a new {@link ByteArrayCborEncoder} instance with default initial
+   * size 32.
    */
   public ByteArrayCborEncoder() {
     this(32);
@@ -29,7 +32,6 @@ public class ByteArrayCborEncoder extends CborEncoder implements AutoCloseable {
   /**
    * Creates a new {@link ByteArrayCborEncoder} instance.
    * @param size the initial size.
-   *
    */
   public ByteArrayCborEncoder(int size) {
     this.m_os = new ByteArrayOutputStream(Args.min(size, "size", 1));

@@ -84,8 +84,7 @@ public class DeleteObjectTest {
     @Test
     public void execTest() throws TokenException {
       // create a new object to be deleted later
-      PKCS11SecretKeySpec secKeyTemplate =
-          newSecretKey(CKK_AES).token(true).valueLen(16);
+      PKCS11SecretKeySpec secKeyTemplate = newSecretKey(CKK_AES).token(true).valueLen(16);
 
       PKCS11Token token = getToken();
       PKCS11KeyId secKeyId = token.generateKey(secKeyTemplate);

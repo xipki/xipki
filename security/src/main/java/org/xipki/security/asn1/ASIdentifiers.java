@@ -10,6 +10,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.xipki.security.util.Asn1Util;
 
 /**
  * RFC 3779, 8360
@@ -47,15 +48,14 @@ public class ASIdentifiers extends ASN1Object {
         ASN1TaggedObject to = (ASN1TaggedObject) obj;
         int tag = to.getTagNo();
         if (tag == 0) {
-          asnum = ASIdentifierChoice.getInstance(to.getBaseObject());
+          asnum = ASIdentifierChoice.getInstance(Asn1Util.getBaseObject(to));
         } else if (tag == 1) {
-          rdi = ASIdentifierChoice.getInstance(to.getBaseObject());
+          rdi = ASIdentifierChoice.getInstance(Asn1Util.getBaseObject(to));
         } else {
           throw new IllegalArgumentException("Bad tag: " + tag);
         }
       } else {
-        throw new IllegalArgumentException(
-            "Bad object at index " + i + ": " + obj);
+        throw new IllegalArgumentException("Bad object at index " + i + ": " + obj);
       }
     }
 

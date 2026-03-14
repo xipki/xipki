@@ -6,6 +6,14 @@
     ]
   },
   "vendor": "UTIMACO",
+  "ckaExclude": [
+    "CKA_ALLOWED_MECHANISMS",
+    "CKA_WRAP_TEMPLATE",
+    "CKA_UNWRAP_TEMPLATE",
+    "CKA_DERIVE_TEMPLATE",
+    "CKA_ENCAPSULATE_TEMPLATE",
+    "CKA_DECAPSULATE_TEMPLATE"
+  ],
   "nameToCodeMap": {
     "CKU_CS_GENERIC": "0x83"
   }

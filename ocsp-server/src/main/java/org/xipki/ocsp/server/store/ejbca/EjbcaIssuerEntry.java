@@ -9,6 +9,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.misc.CompareUtil;
 
@@ -52,8 +53,7 @@ class EjbcaIssuerEntry {
     try {
       Certificate bcCert = Certificate.getInstance(encodedCert);
       encodedName = bcCert.getSubject().getEncoded("DER");
-      encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData()
-                    .getBytes();
+      encodedKey  = Asn1Util.getPublicKeyData(bcCert.getSubjectPublicKeyInfo());
     } catch (IllegalArgumentException | IOException ex) {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }
@@ -126,10 +126,8 @@ class EjbcaIssuerEntry {
     }
 
     EjbcaIssuerEntry other = (EjbcaIssuerEntry) obj;
-    return id.equals(other.id)
-            && CompareUtil.equals(revocationInfo, other.revocationInfo);
-    // The comparison of id implies the comparison of issuerHashMap, notBefore
-    // and cert.
+    return id.equals(other.id) && CompareUtil.equals(revocationInfo, other.revocationInfo);
+    // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
   } // method equals
 
 }

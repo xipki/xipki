@@ -43,14 +43,12 @@ public class ScepServerContainer {
         "scepServer")));
   }
 
-  public ScepServerContainer(int port, List<ScepServer> scepServers)
-      throws Exception {
+  public ScepServerContainer(int port, List<ScepServer> scepServers) throws Exception {
     Args.notEmpty(scepServers, "scepServers");
     server = HttpServer.create(new InetSocketAddress(port), 0);
 
     for (ScepServer m : scepServers) {
-      server.createContext("/" + m.name() + "/pkiclient.exe",
-          new MyHandler(m.getServlet()));
+      server.createContext("/" + m.name() + "/pkiclient.exe", new MyHandler(m.getServlet()));
     }
 
     server.setExecutor(null); // creates a default executor

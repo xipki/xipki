@@ -60,7 +60,7 @@ class ConfLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfLoader.class);
 
- private final CaManagerImpl manager;
+  private final CaManagerImpl manager;
 
   ConfLoader(CaManagerImpl manager) {
     this.manager = Args.notNull(manager, "manager");
@@ -79,8 +79,7 @@ class ConfLoader {
     } catch (IOException | InvalidConfException ex) {
       throw new CaMgmtException("could not parse the CA configuration", ex);
     } catch (RuntimeException ex) {
-      throw new CaMgmtException("caught RuntimeException while parsing " +
-          "the CA configuration", ex);
+      throw new CaMgmtException("caught RuntimeException while parsing the CA configuration", ex);
     }
 
     // DBSCHEMA
@@ -104,8 +103,7 @@ class ConfLoader {
           LOG.info("ignore existed keypairGen {}", name);
           continue;
         } else {
-          throw logAndCreateException("keypairGen " + name +
-              " existed, could not re-added it");
+          throw logAndCreateException("keypairGen " + name + " existed, could not re-added it");
         }
       }
 
@@ -128,8 +126,7 @@ class ConfLoader {
           LOG.info("ignore existed signer {}", name);
           continue;
         } else {
-          throw logAndCreateException("signer " + name +
-              " existed, could not re-added it");
+          throw logAndCreateException("signer " + name + " existed, could not re-added it");
         }
       }
 
@@ -153,8 +150,8 @@ class ConfLoader {
           LOG.info("ignore existed cert-based requestor {}", name);
           continue;
         } else {
-          throw logAndCreateException("cert-based requestor " + name
-              + " existed, could not re-added it");
+          throw logAndCreateException("cert-based requestor " + name +
+              " existed, could not re-added it");
         }
       }
 
@@ -177,8 +174,7 @@ class ConfLoader {
           LOG.info("ignore existed publisher {}", name);
           continue;
         } else {
-          throw logAndCreateException("publisher " + name +
-              " existed, could not re-added it");
+          throw logAndCreateException("publisher " + name + " existed, could not re-added it");
         }
       }
 
@@ -201,8 +197,7 @@ class ConfLoader {
           LOG.info("ignore existed certprofile {}", name);
           continue;
         } else {
-          throw logAndCreateException("certprofile " + name +
-              " existed, could not re-added it");
+          throw logAndCreateException("certprofile " + name + " existed, could not re-added it");
         }
       }
 
@@ -230,12 +225,10 @@ class ConfLoader {
             ConcurrentSigner signer = null;
             try {
               signer = securityFactory.createSigner(
-                  caEntry.base().signerType(), signerConf,
-                  (X509Cert) null);
-              caEntry.setCert(signer.getX509Cert());
+                  caEntry.base().signerType(), signerConf, (X509Cert) null);
+              caEntry.setCert(signer.x509Cert());
             } catch (ObjectCreationException ex) {
-              throw new CaMgmtException(
-                  "could not create signer for CA " + caName, ex);
+              throw new CaMgmtException("could not create signer for CA " + caName, ex);
             } finally {
               if (signer != null) {
                 signer.close();
@@ -246,14 +239,12 @@ class ConfLoader {
           if (caEntry.equals(entryB, true, true)) {
             LOG.info("ignore existing CA {}", caName);
           } else {
-            throw logAndCreateException("CA " + caName +
-                " existed, could not re-added it");
+            throw logAndCreateException("CA " + caName + " existed, could not re-added it");
           }
         } else {
           if (genSelfIssued != null) {
-            manager.generateRootCa(caEntry, genSelfIssued.profile(),
-                genSelfIssued.subject(), genSelfIssued.serialNumber(),
-                genSelfIssued.notBefore(), genSelfIssued.notAfter());
+            manager.generateRootCa(caEntry, genSelfIssued.profile(), genSelfIssued.subject(),
+                genSelfIssued.serialNumber(), genSelfIssued.notBefore(), genSelfIssued.notAfter());
             LOG.info("generated root CA {}", caName);
           } else {
             try {
@@ -272,15 +263,13 @@ class ConfLoader {
         Set<String> aliasesB = manager.getAliasesForCa(caName);
         for (String aliasName : scc.aliases()) {
           if (aliasesB != null && aliasesB.contains(aliasName)) {
-            LOG.info("ignored adding existing CA alias {} to CA {}",
-                aliasName, caName);
+            LOG.info("ignored adding existing CA alias {} to CA {}", aliasName, caName);
           } else {
             try {
               manager.addCaAlias(aliasName, caName);
               LOG.info("associated alias {} to CA {}", aliasName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not associate alias " + aliasName +
-                  " to CA " + caName;
+              String msg = "could not associate alias " + aliasName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -294,8 +283,7 @@ class ConfLoader {
             manager.addCertprofileToCa(profileName, caName);
             LOG.info("added certprofile {} to CA {}", profileName, caName);
           } catch (CaMgmtException ex) {
-            String msg = "could not add certprofile " + profileName +
-                " to CA " + caName;
+            String msg = "could not add certprofile " + profileName + " to CA " + caName;
             LogUtil.error(LOG, ex, msg);
             throw new CaMgmtException(msg);
           }
@@ -306,16 +294,13 @@ class ConfLoader {
         Set<String> publishersB = manager.caHasPublishers.get(caName);
         for (String publisherName : scc.publisherNames()) {
           if (publishersB != null && publishersB.contains(publisherName)) {
-            LOG.info("ignored adding publisher {} to CA {}",
-                publisherName, caName);
+            LOG.info("ignored adding publisher {} to CA {}", publisherName, caName);
           } else {
             try {
               manager.addPublisherToCa(publisherName, caName);
-              LOG.info("added publisher {} to CA {}",
-                  publisherName, caName);
+              LOG.info("added publisher {} to CA {}", publisherName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not add publisher " + publisherName +
-                  " to CA " + caName;
+              String msg = "could not add publisher " + publisherName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -324,8 +309,7 @@ class ConfLoader {
       }
 
       if (scc.requestors() != null) {
-        Set<CaHasRequestorEntry> requestorsB =
-            manager.caHasRequestors.get(caName);
+        Set<CaHasRequestorEntry> requestorsB = manager.caHasRequestors.get(caName);
 
         for (CaHasRequestorEntry requestor : scc.requestors()) {
           String requestorName = requestor.requestorIdent().name();
@@ -341,19 +325,17 @@ class ConfLoader {
 
           if (requestorB != null) {
             if (requestor.equals(requestorB, ignoreId)) {
-              LOG.info("ignored adding requestor {} to CA {}",
-                  requestorName, caName);
+              LOG.info("ignored adding requestor {} to CA {}", requestorName, caName);
             } else {
-              throw logAndCreateException("could not add requestor "
-                  + requestorName + " to CA" + caName);
+              throw logAndCreateException("could not add requestor " + requestorName +
+                  " to CA" + caName);
             }
           } else {
             try {
               manager.addRequestorToCa(requestor, caName);
               LOG.info("added publisher {} to CA {}", requestorName, caName);
             } catch (CaMgmtException ex) {
-              String msg = "could not add requestor " + requestorName +
-                  " to CA " + caName;
+              String msg = "could not add requestor " + requestorName + " to CA " + caName;
               LogUtil.error(LOG, ex, msg);
               throw new CaMgmtException(msg);
             }
@@ -363,8 +345,7 @@ class ConfLoader {
     } // cas
   } // method loadConf
 
-  InputStream exportConf(List<String> caNames)
-      throws CaMgmtException, IOException {
+  InputStream exportConf(List<String> caNames) throws CaMgmtException, IOException {
     manager.assertMasterModeAndSetuped();
 
     if (caNames != null) {
@@ -382,7 +363,6 @@ class ConfLoader {
 
     // initial 1M
     ByteArrayOutputStream bytesStream = new ByteArrayOutputStream(1048576);
-
     CaConfType.CaSystem root = new CaConfType.CaSystem();
 
     try (ZipOutputStream zipStream = new ZipOutputStream(bytesStream)) {
@@ -407,16 +387,14 @@ class ConfLoader {
           }
 
           // CaHasRequestors
-          Set<CaHasRequestorEntry> requestors2 =
-              manager.caHasRequestors.get(name);
+          Set<CaHasRequestorEntry> requestors2 = manager.caHasRequestors.get(name);
           List<CaConfType.CaHasRequestor> requestors = null;
           if (CollectionUtil.isNotEmpty(requestors2)) {
             requestors = new ArrayList<>(requestors2.size());
 
             for (CaHasRequestorEntry m : requestors2) {
               CaConfType.CaHasRequestor chr = new CaConfType.CaHasRequestor(
-                  m.requestorIdent().name(), m.permissions(),
-                  new ArrayList<>(m.profiles()));
+                  m.requestorIdent().name(), m.permissions(), new ArrayList<>(m.profiles()));
 
               requestors.add(chr);
             }
@@ -462,8 +440,7 @@ class ConfLoader {
           FileOrValue signerConf = createFileOrValue(zipStream,
               entry.signerConf(), "files/ca-" + name + "-signerconf.conf");
 
-          CaConfType.CaInfo caInfo = new CaConfType.CaInfo(entry.base(),
-              signerConf, cert, ccList);
+          CaConfType.CaInfo caInfo = new CaConfType.CaInfo(entry.base(), signerConf, cert, ccList);
 
           CaConfType.Ca ca = new CaConfType.Ca(null, name, caInfo, aliases,
               profiles, requestors, publishers);
@@ -485,8 +462,7 @@ class ConfLoader {
           CaConfType.Requestor type;
 
           if (RequestorEntry.TYPE_CERT.equalsIgnoreCase(entry.type())) {
-            FileOrBinary fob = createFileOrBinary(zipStream,
-                Base64.decode(entry.conf()),
+            FileOrBinary fob = createFileOrBinary(zipStream, Base64.decode(entry.conf()),
                 "files/requestor-" + name + ".der");
             type = new CaConfType.Requestor(null, name, entry.type(), fob);
           } else {
@@ -542,10 +518,8 @@ class ConfLoader {
 
         for (String name : manager.signerDbEntries.keySet()) {
           SignerEntry entry = manager.signerDbEntries.get(name);
-          CaConfType.Signer conf = new CaConfType.Signer(
-              null, name, entry.type(),
-              createFileOrValue(zipStream, entry.conf(),
-                  "files/signer-" + name + ".conf"),
+          CaConfType.Signer conf = new CaConfType.Signer(null, name, entry.type(),
+              createFileOrValue(zipStream, entry.conf(), "files/signer-" + name + ".conf"),
               createFileOrBase64Value(zipStream, entry.base64Cert(),
                   "files/signer-" + name + ".der"));
 
@@ -563,11 +537,9 @@ class ConfLoader {
         for (String name : manager.keypairGenDbEntries.keySet()) {
           KeypairGenEntry entry = manager.keypairGenDbEntries.get(name);
 
-          FileOrValue fv = (entry.conf() == null) ? null
-              : FileOrValue.ofValue(entry.conf());
+          FileOrValue fv = (entry.conf() == null) ? null : FileOrValue.ofValue(entry.conf());
 
-          list.add(new CaConfType.NameTypeConf(
-              null, name, entry.type(), fv));
+          list.add(new CaConfType.NameTypeConf(null, name, entry.type(), fv));
         }
 
         if (!list.isEmpty()) {
@@ -588,8 +560,7 @@ class ConfLoader {
         }
       } catch (RuntimeException ex) {
         LogUtil.error(LOG, ex, "could not marshal CAConf");
-        throw new CaMgmtException(
-            "could not marshal CAConf: " + ex.getMessage(), ex);
+        throw new CaMgmtException("could not marshal CAConf: " + ex.getMessage(), ex);
       }
     }
 

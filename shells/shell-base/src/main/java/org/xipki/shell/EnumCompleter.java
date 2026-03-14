@@ -40,8 +40,7 @@ public abstract class EnumCompleter implements Completer {
   }
 
   @Override
-  public int complete(Session session, CommandLine commandLine,
-                      List<String> candidates) {
+  public int complete(Session session, CommandLine commandLine, List<String> candidates) {
     StringsCompleter delegate = new StringsCompleter();
     for (String entry : enums) {
       delegate.getStrings().add(entry);

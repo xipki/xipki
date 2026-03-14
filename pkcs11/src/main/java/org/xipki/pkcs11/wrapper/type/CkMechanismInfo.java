@@ -107,12 +107,10 @@ public class CkMechanismInfo extends AbstractInfo {
 
   @Override
   public String toString(PKCS11Module module, String indent) {
-    String text = indent + "  Key-Size: [" + minKeySize + ", " + maxKeySize
-        + "]\n";
+    String text = indent + "  Key-Size: [" + minKeySize + ", " + maxKeySize + "]\n";
 
     return text + Functions.toStringFlags(Category.CKF_MECHANISM,
-        indent + "  Flags: ", flags,
-        CKF_HW, CKF_FIND_OBJECTS,
+        indent + "  Flags: ", flags, CKF_HW, CKF_FIND_OBJECTS,
 
         CKF_ENCRYPT, CKF_DECRYPT, CKF_DIGEST, CKF_SIGN, CKF_SIGN_RECOVER,
         CKF_VERIFY,  CKF_VERIFY_RECOVER,  CKF_GENERATE, CKF_GENERATE_KEY_PAIR,

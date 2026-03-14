@@ -37,8 +37,7 @@ public class QaFillKeypoolAction extends XiAction {
   private String encAlg = "AES128/GCM";
 
   @Option(name = "--password", description =
-      "password to encrypt the generated keypair, as plaintext " +
-      "or PBE-encrypted.")
+      "password to encrypt the generated keypair, as plaintext or PBE-encrypted.")
   private String passwordHint;
 
   private final DataSourceFactory datasourceFactory;
@@ -54,8 +53,7 @@ public class QaFillKeypoolAction extends XiAction {
     }
 
     char[] passwordChars = readPasswordIfNotSet(passwordHint);
-    try (FillKeypool fillKeytool =
-             new FillKeypool(datasourceFactory, dbconfFile)) {
+    try (FillKeypool fillKeytool = new FillKeypool(datasourceFactory, dbconfFile)) {
       fillKeytool.execute(num, encAlg, passwordChars);
     }
     return null;

@@ -44,8 +44,7 @@ public class PKCS11KeyId {
    *        Label. Cannot be {@code null} and blank if id is null or
    *        zero-length.
    */
-  public PKCS11KeyId(KeyIdType type, long handle, long keyType,
-                     byte[] id, String label) {
+  public PKCS11KeyId(KeyIdType type, long handle, long keyType, byte[] id, String label) {
     this.type = type;
     this.handle = handle;
     this.keyType = keyType;
@@ -72,8 +71,7 @@ public class PKCS11KeyId {
   }
 
   public long[] getAllHandles() {
-    return publicKeyHandle == null ? new long[]{handle}
-        : new long[] {handle, publicKeyHandle};
+    return publicKeyHandle == null ? new long[]{handle} : new long[] {handle, publicKeyHandle};
   }
 
   public byte[] getId() {
@@ -112,8 +110,7 @@ public class PKCS11KeyId {
     else if (!(obj instanceof PKCS11KeyId)) return false;
 
     PKCS11KeyId other = (PKCS11KeyId) obj;
-    return handle == other.handle
-        && Arrays.equals(id, other.id)
+    return handle == other.handle && Arrays.equals(id, other.id)
         && Objects.equals(label, other.label);
   }
 

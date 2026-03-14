@@ -91,8 +91,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static KeyCertBytes parse(JsonMap json) throws CodecException {
-      return new KeyCertBytes(
-          json.getBytes("key"), json.getBytes("cert"));
+      return new KeyCertBytes(json.getBytes("key"), json.getBytes("cert"));
     }
 
   }
@@ -167,8 +166,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static GetCaSystemStatus parse(JsonMap json) throws CodecException {
-      return new GetCaSystemStatus(CaSystemStatus.valueOf(
-          json.getNnString("result")));
+      return new GetCaSystemStatus(CaSystemStatus.valueOf(json.getNnString("result")));
     }
 
   } // class GetCaSystemStatus
@@ -193,8 +191,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static GetCertprofile parse(JsonMap json) throws CodecException {
-      return new GetCertprofile(CertprofileEntry.parse(
-          json.getNnMap("result")));
+      return new GetCertprofile(CertprofileEntry.parse(json.getNnMap("result")));
     }
 
   } // class GetCertprofile
@@ -207,8 +204,7 @@ public abstract class MgmtResponse extends MgmtMessage {
 
     private final String certprofile;
 
-    public GetCert(X509Cert cert, CertRevocationInfo revInfo,
-                   String certprofile) {
+    public GetCert(X509Cert cert, CertRevocationInfo revInfo, String certprofile) {
       this.cert = cert;
       this.revInfo = revInfo;
       this.certprofile = certprofile;
@@ -292,8 +288,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static GetKeypairGen parse(JsonMap json) throws CodecException {
-      return new GetKeypairGen(KeypairGenEntry.parse(
-          json.getNnMap("result")));
+      return new GetKeypairGen(KeypairGenEntry.parse(json.getNnMap("result")));
     }
 
   } // class GetCertprofile
@@ -318,8 +313,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static GetPublisher parse(JsonMap json) throws CodecException {
-      return new GetPublisher(PublisherEntry.parse(
-          json.getNnMap("result")));
+      return new GetPublisher(PublisherEntry.parse(json.getNnMap("result")));
     }
 
   } // class GetPublisher
@@ -344,8 +338,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     }
 
     public static GetRequestor parse(JsonMap json) throws CodecException {
-      return new GetRequestor(RequestorEntry.parse(
-          json.getNnMap("result")));
+      return new GetRequestor(RequestorEntry.parse(json.getNnMap("result")));
     }
 
   } // class GetRequestor
@@ -373,8 +366,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       return ret;
     }
 
-    public static GetRequestorsForCa parse(JsonMap json)
-        throws CodecException {
+    public static GetRequestorsForCa parse(JsonMap json) throws CodecException {
       JsonList list = json.getNnList("result");
 
       Set<CaHasRequestorEntry> entries = new HashSet<>();

@@ -38,8 +38,7 @@ public final class P11KeypairGenSpeed extends BenchmarkExecutor {
 
   private final KeySpec keySpec;
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(P11KeypairGenSpeed.class);
+  private static final Logger LOG = LoggerFactory.getLogger(P11KeypairGenSpeed.class);
 
   public P11KeypairGenSpeed(P11Slot slot, KeySpec keySpec) {
     super("PKCS#11 key generation: " + keySpec.name());

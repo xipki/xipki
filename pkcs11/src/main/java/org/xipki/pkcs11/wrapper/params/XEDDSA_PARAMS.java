@@ -56,8 +56,7 @@ public class XEDDSA_PARAMS extends CkParams {
     return toString(indent, module, "hash", hash);
   }
 
-  public static XEDDSA_PARAMS decode(
-      Arch arch, byte[] encoded, AtomicInteger off)
+  public static XEDDSA_PARAMS decode(Arch arch, byte[] encoded, AtomicInteger off)
       throws PKCS11Exception {
     assertType(encoded, off, ParamsType.XEDDSA_PARAMS);
     long hash = readLong(arch, encoded, off);

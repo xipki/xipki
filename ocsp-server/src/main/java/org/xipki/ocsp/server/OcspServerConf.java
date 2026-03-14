@@ -65,8 +65,7 @@ public class OcspServerConf {
       String dir = json.getString("dir");
       FileOrBinary[] certs = FileOrBinary.parseArray(json.getList("certs"));
       Args.exactOne(dir, "dir", certs, "certs");
-      return (dir != null) ? new CertCollection(dir)
-          : new CertCollection(certs);
+      return (dir != null) ? new CertCollection(dir) : new CertCollection(certs);
     }
 
   } // class CertCollection
@@ -258,9 +257,8 @@ public class OcspServerConf {
 
     private final CertCollection certs;
 
-    public CertpathValidation(
-        CertPathValidationModel validationModel,
-        CertCollection trustanchors, CertCollection certs) {
+    public CertpathValidation(CertPathValidationModel validationModel,
+                              CertCollection trustanchors, CertCollection certs) {
       this.validationModel = Args.notNull(validationModel, "validationModel");
       this.trustanchors    = Args.notNull(trustanchors, "trustanchors");
       this.certs = certs;
@@ -278,8 +276,7 @@ public class OcspServerConf {
       return certs;
     }
 
-    public static CertpathValidation parse(JsonMap json)
-        throws CodecException {
+    public static CertpathValidation parse(JsonMap json) throws CodecException {
       JsonMap map = json.getMap("certs");
       CertCollection certs = null;
       if (map != null) {
@@ -325,8 +322,8 @@ public class OcspServerConf {
     private final String name;
 
     public Responder(String name, String mode, List<String> servletPaths,
-                     boolean inheritCaRevocation, String signer,
-                     String request, String response, List<String> stores) {
+                    boolean inheritCaRevocation, String signer,
+                    String request, String response, List<String> stores) {
       this.name     = Args.notBlank(name, "name");
       this.signer   = Args.notBlank(signer, "signer");
       this.request  = Args.notBlank(request, "request");
@@ -403,8 +400,7 @@ public class OcspServerConf {
       String str = json.getString("validity");
       Validity validity = str == null ? null : Validity.getInstance(str);
 
-      return new ResponseCache(
-          DataSourceConf.parse(json.getMap("datasource")), validity);
+      return new ResponseCache(DataSourceConf.parse(json.getMap("datasource")), validity);
     }
 
   } // class ResponseCache
@@ -506,8 +502,7 @@ public class OcspServerConf {
 
       ret.setCacheMaxAge(json.getLong("cacheMaxAge"));
 
-      EmbedCertsMode certsMode = json.getEnum("embedCertsMode",
-          EmbedCertsMode.class);
+      EmbedCertsMode certsMode = json.getEnum("embedCertsMode", EmbedCertsMode.class);
       if (certsMode != null) {
         ret.setEmbedCertsMode(certsMode);
       }
@@ -531,9 +526,8 @@ public class OcspServerConf {
 
     private final List<FileOrBinary> caCerts;
 
-    public Signer(String name, String type, String key,
-                  List<String> algorithms, FileOrBinary cert,
-                  List<FileOrBinary> caCerts) {
+    public Signer(String name, String type, String key, List<String> algorithms,
+                  FileOrBinary cert, List<FileOrBinary> caCerts) {
       this.name = Args.notBlank(name, "name");
       this.type = Args.notBlank(type, "type");
       this.key  = Args.notBlank(key, "key");
@@ -568,9 +562,8 @@ public class OcspServerConf {
 
     public static Signer parse(JsonMap json) throws CodecException {
       return new Signer(json.getNnString("name"),
-          json.getNnString("type"), json.getNnString("key"),
-          json.getStringList("algorithms"),
-          FileOrBinary.parse(json.getMap("cert")),
+          json.getNnString("type"),         json.getNnString("key"),
+          json.getStringList("algorithms"), FileOrBinary.parse(json.getMap("cert")),
           FileOrBinary.parseList(json.getList("caCerts")));
     }
 
@@ -604,7 +597,7 @@ public class OcspServerConf {
     private Boolean includeCrlId;
 
     public Store(String name, Source source, String minNextUpdatePeriod,
-                 String maxNextUpdatePeriod) {
+                String maxNextUpdatePeriod) {
       this.name = Args.notBlank(name, "name");
       this.source = Args.notNull(source, "source");
 
@@ -613,8 +606,8 @@ public class OcspServerConf {
         Validity max = Validity.getInstance(maxNextUpdatePeriod);
         if (min.compareTo(max) > 0) {
           throw new IllegalArgumentException(String.format(
-              "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not " +
-                  "allowed", minNextUpdatePeriod, maxNextUpdatePeriod));
+              "minNextUpdatePeriod (%s) > maxNextUpdatePeriod (%s) is not allowed",
+              minNextUpdatePeriod, maxNextUpdatePeriod));
         }
       }
 
@@ -654,8 +647,7 @@ public class OcspServerConf {
       return unknownCertBehaviour;
     }
 
-    public void setUnknownCertBehaviour(
-        UnknownCertBehaviour unknownCertBehaviour) {
+    public void setUnknownCertBehaviour(UnknownCertBehaviour unknownCertBehaviour) {
       this.unknownCertBehaviour = unknownCertBehaviour;
     }
 
@@ -699,8 +691,7 @@ public class OcspServerConf {
       JsonMap map = json.getMap("source");
       Source source = (map == null) ? null : Source.parse(map);
       Store ret = new Store(json.getString("name"), source,
-          json.getString("minNextUpdatePeriod"),
-          json.getString("maxNextUpdatePeriod"));
+          json.getString("minNextUpdatePeriod"), json.getString("maxNextUpdatePeriod"));
 
       ret.setUpdateInterval(json.getString("updateInterval"));
       ret.setIgnoreNotYetValidCert(json.getBool("ignoreNotYetValidCert"));
@@ -781,18 +772,15 @@ public class OcspServerConf {
     }
 
     public static CaCerts parse(JsonMap json) throws CodecException {
-      return new CaCerts(json.getStringList("includes"),
-          json.getStringList("excludes"));
+      return new CaCerts(json.getStringList("includes"), json.getStringList("excludes"));
     }
 
-    public static CaCerts parseSourceConf(JsonMap sourceConf)
-        throws OcspStoreException {
+    public static CaCerts parseSourceConf(JsonMap sourceConf) throws OcspStoreException {
       try {
         JsonMap map = sourceConf.getMap("caCerts");
         return map == null ? null : OcspServerConf.CaCerts.parse(map);
       } catch (CodecException e) {
-        throw new OcspStoreException(
-            "error parsing caCerts: " + e.getMessage(), e);
+        throw new OcspStoreException("error parsing caCerts: " + e.getMessage(), e);
       }
     }
 
@@ -814,15 +802,12 @@ public class OcspServerConf {
 
   private boolean master = true;
 
-  public OcspServerConf(ResponseCache responseCache,
-                        List<Responder> responders,
-                        List<Signer> signers, List<Store> stores,
-                        List<DataSourceConf> datasources,
-                        List<RequestOption> requestOptions,
-                        List<ResponseOption> responseOptions) {
+  public OcspServerConf(
+      ResponseCache responseCache, List<Responder> responders, List<Signer> signers,
+      List<Store> stores, List<DataSourceConf> datasources,
+      List<RequestOption> requestOptions, List<ResponseOption> responseOptions) {
     this.responseCache = responseCache;
-    this.datasources   = (datasources == null) ? Collections.emptyList()
-        : datasources;
+    this.datasources   = (datasources == null) ? Collections.emptyList() : datasources;
     this.responders    = Args.notEmpty(responders, "responders");
     this.signers       = Args.notEmpty(signers, "signers");
     this.stores        = Args.notEmpty(stores, "stores");
@@ -831,25 +816,21 @@ public class OcspServerConf {
 
   }
 
-  private UnknownIssuerBehaviour unknownIssuerBehaviour =
-      UnknownIssuerBehaviour.unknown;
+  private UnknownIssuerBehaviour unknownIssuerBehaviour = UnknownIssuerBehaviour.unknown;
 
-  public static OcspServerConf readConfFromFile(String fileName)
-      throws InvalidConfException {
+  public static OcspServerConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
       JsonMap root = JsonParser.parseMap(Paths.get(fileName), true);
       return parse(root);
     } catch (CodecException | RuntimeException e) {
-      throw new InvalidConfException("error parsing file " + fileName + ": " +
-          e.getMessage(), e);
+      throw new InvalidConfException("error parsing file " + fileName + ": " + e.getMessage(), e);
     }
   }
 
   public static OcspServerConf parse(JsonMap json) throws CodecException {
     JsonMap map = json.getMap("responseCache");
-    ResponseCache responseCache = (map == null) ? null
-        : ResponseCache.parse(map);
+    ResponseCache responseCache = (map == null) ? null : ResponseCache.parse(map);
 
     JsonList list = json.getList("responders");
     List<Responder> responders = null;
@@ -878,8 +859,7 @@ public class OcspServerConf {
       }
     }
 
-    List<DataSourceConf> datasources =
-        DataSourceConf.parseList(json.getList("datasources"));
+    List<DataSourceConf> datasources = DataSourceConf.parseList(json.getList("datasources"));
 
     list = json.getList("requestOptions");
     List<RequestOption> requestOptions = null;
@@ -956,8 +936,7 @@ public class OcspServerConf {
     return unknownIssuerBehaviour;
   }
 
-  public void setUnknownIssuerBehaviour(
-      UnknownIssuerBehaviour unknownIssuerBehaviour) {
+  public void setUnknownIssuerBehaviour(UnknownIssuerBehaviour unknownIssuerBehaviour) {
     this.unknownIssuerBehaviour = unknownIssuerBehaviour;
   }
 

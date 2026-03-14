@@ -4,6 +4,7 @@
 package org.xipki.ca.gateway.acme;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -59,8 +60,7 @@ public class AcmeConstants {
 
   public static final String CT_JSON = "application/json";
 
-  public static final String CT_PEM_CERTIFICATE_CHAIN =
-      "application/pem-certificate-chain";
+  public static final String CT_PEM_CERTIFICATE_CHAIN = "application/pem-certificate-chain";
 
   public static final String HDR_HOST = "host";
 

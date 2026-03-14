@@ -36,8 +36,7 @@ public class Asn1OneAsymmetricKey {
 
   public Asn1OneAsymmetricKey(Asn1AlgorithmIdentifier privateKeyAlgorithm,
                               byte[] privateKey, byte[] publicKey) {
-    this.privateKeyAlgorithm = Args.notNull(privateKeyAlgorithm,
-        "privateKeyAlgorithm");
+    this.privateKeyAlgorithm = Args.notNull(privateKeyAlgorithm, "privateKeyAlgorithm");
     this.privateKey = Args.notNull(privateKey, "privateKey");
     this.publicKey = publicKey;
   }
@@ -54,8 +53,7 @@ public class Asn1OneAsymmetricKey {
     return publicKey;
   }
 
-  public static Asn1OneAsymmetricKey getInstance(byte[] encoded)
-      throws InvalidKeySpecException {
+  public static Asn1OneAsymmetricKey getInstance(byte[] encoded) throws InvalidKeySpecException {
     String errMsg = "invalid OneAsymmetricKey";
     AtomicInteger offset = new AtomicInteger();
 
@@ -69,8 +67,7 @@ public class Asn1OneAsymmetricKey {
       Asn1AlgorithmIdentifier privateKeyAlgorithm =
           Asn1AlgorithmIdentifier.getInstance(encoded, offset);
 
-      byte[] privateKey =
-          Asn1Util.readOctetsFromASN1OctetString(encoded, offset);
+      byte[] privateKey = Asn1Util.readOctetsFromASN1OctetString(encoded, offset);
 
       byte[] publicKey = null;
 
@@ -86,8 +83,7 @@ public class Asn1OneAsymmetricKey {
 
       // ignore extra fields
       offset.set(endIndex);
-      return new Asn1OneAsymmetricKey(privateKeyAlgorithm,
-          privateKey, publicKey);
+      return new Asn1OneAsymmetricKey(privateKeyAlgorithm, privateKey, publicKey);
     } catch (CodecException e) {
       throw new InvalidKeySpecException(errMsg + ": " + e.getMessage(), e);
     }

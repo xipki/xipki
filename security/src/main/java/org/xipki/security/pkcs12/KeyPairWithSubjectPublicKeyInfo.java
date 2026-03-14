@@ -7,9 +7,10 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.util.X509Util;
 
 import java.security.KeyPair;
-import java.security.spec.InvalidKeySpecException;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class KeyPairWithSubjectPublicKeyInfo {
@@ -19,9 +20,7 @@ public class KeyPairWithSubjectPublicKeyInfo {
   private final SubjectPublicKeyInfo subjectPublicKeyInfo;
 
   public KeyPairWithSubjectPublicKeyInfo(
-      KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
-      throws InvalidKeySpecException {
-    super();
+      KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo) {
     this.keypair = keypair;
     this.subjectPublicKeyInfo = X509Util.toRfc3279Style(subjectPublicKeyInfo);
   }

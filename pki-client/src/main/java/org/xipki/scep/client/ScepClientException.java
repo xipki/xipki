@@ -23,8 +23,7 @@ public class ScepClientException extends Exception {
     super(cause.getMessage(), cause);
   }
 
-  public static class OperationNotSupportedException
-      extends ScepClientException {
+  public static class OperationNotSupportedException extends ScepClientException {
 
     public OperationNotSupportedException(String message) {
       super(message);

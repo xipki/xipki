@@ -3,6 +3,10 @@
 
 package org.xipki.qa.ca;
 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.codec.Args;
@@ -16,6 +20,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,15 +30,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * An implementation of {@link CaQaSystemManager}.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
-
+@Component(service = CaQaSystemManager.class, immediate = true,
+    configurationPid = "org.xipki.qa.ca")
 public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
 
-  private String confFile;
+  private String confFile = "xipki/ca-qa/qa-certcheck-conf.json";
 
   private final Map<String, CertprofileQa> profileMap = new HashMap<>();
 
@@ -41,6 +47,24 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   public CaQaSystemManagerImpl() {
+  }
+
+  @Activate
+  public void activate(ComponentContext context) {
+    Dictionary<String, Object> properties = context.getProperties();
+    Enumeration<String> keys = properties.keys();
+    while (keys.hasMoreElements()) {
+      String key = keys.nextElement();
+      Object value = properties.get(key);
+      if (!(value instanceof String)) {
+        continue;
+      }
+
+      String sValue = (String) value;
+      if (key.equals("confFile")) {
+        setConfFile(sValue);
+      }
+    }
   }
 
   public String getConfFile() {
@@ -98,8 +122,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
             issuer.getOcspUrls(), issuer.getCrlUrls(),
             issuer.getDeltaCrlUrls(), certBytes, cutoffNotAfter);
       } catch (CertificateException ex) {
-        LogUtil.error(LOG, ex,
-            "could not parse certificate of issuer " + issuer.getName());
+        LogUtil.error(LOG, ex, "could not parse certificate of issuer " + issuer.getName());
         continue;
       }
 
@@ -116,8 +139,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
         profileMap.put(name, certprofileQa);
         LOG.info("configured X509 certificate profile {}", name);
       } catch (IOException | CertprofileException ex) {
-        LogUtil.error(LOG, ex,
-            "could not parse QA certificate profile " + name);
+        LogUtil.error(LOG, ex, "could not parse QA certificate profile " + name);
       }
     }
 
@@ -127,6 +149,7 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
     return true;
   } // method init
 
+  @Deactivate
   @Override
   public void close() {
   }

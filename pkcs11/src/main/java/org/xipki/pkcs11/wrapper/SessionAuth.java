@@ -32,12 +32,10 @@ public class SessionAuth {
 
   private final AtomicLong incurableCkr = new AtomicLong(0);
 
-  private SessionAuth(boolean useLoginUser, long userType, String userName,
-                      List<String> pins) {
+  private SessionAuth(boolean useLoginUser, long userType, String userName, List<String> pins) {
     this.useLoginUser = useLoginUser;
     this.userType = userType;
-    this.userName = userName == null ? null
-        : userName.getBytes(StandardCharsets.UTF_8);
+    this.userName = userName == null ? null : userName.getBytes(StandardCharsets.UTF_8);
     if (pins == null || pins.isEmpty()) {
       this.pins = Collections.singletonList(new byte[0]);
     } else {
@@ -48,19 +46,16 @@ public class SessionAuth {
     }
   }
 
-  public static SessionAuth ofLoginUser(
-      long userType, String userName, List<String> pins) {
+  public static SessionAuth ofLoginUser(long userType, String userName, List<String> pins) {
     return new SessionAuth(true, userType,
         Args.notNull(userName, "userName"), pins);
   }
 
-  public static SessionAuth ofLogin(
-      long userType, List<String> pins) {
+  public static SessionAuth ofLogin(long userType, List<String> pins) {
     return new SessionAuth(false, userType, null, pins);
   }
 
-  public void authenticate(LogPKCS11 pkcs11, long hSession)
-      throws PKCS11Exception {
+  public void authenticate(LogPKCS11 pkcs11, long hSession) throws PKCS11Exception {
     long start = System.currentTimeMillis();
 
     String userText = "user ";
@@ -71,8 +66,7 @@ public class SessionAuth {
 
     long ckr = this.incurableCkr.get();
     if (ckr != 0) {
-      LOG.info("login session {}: duration {}ms", hSession,
-          System.currentTimeMillis() - start);
+      LOG.info("login session {}: duration {}ms", hSession, System.currentTimeMillis() - start);
       throw new PKCS11Exception(ckr);
     }
 
@@ -95,19 +89,15 @@ public class SessionAuth {
         return;
       } else if (err == PKCS11T.CKR_USER_ANOTHER_ALREADY_LOGGED_IN) {
         LOG.warn("another user already logged in");
-      } else if (err == PKCS11T.CKR_PIN_EXPIRED
-          || err == PKCS11T.CKR_PIN_INCORRECT
-          || err == PKCS11T.CKR_PIN_INVALID
-          || err == PKCS11T.CKR_PIN_LOCKED
-          || err == PKCS11T.CKR_PIN_TOO_WEAK
-          || err == PKCS11T.CKR_PIN_LEN_RANGE) {
+      } else if (err == PKCS11T.CKR_PIN_EXPIRED || err == PKCS11T.CKR_PIN_INCORRECT
+          || err == PKCS11T.CKR_PIN_INVALID  || err == PKCS11T.CKR_PIN_LOCKED
+          || err == PKCS11T.CKR_PIN_TOO_WEAK || err == PKCS11T.CKR_PIN_LEN_RANGE) {
         incurableCkr.set(err);
       }
 
       throw ex;
     } finally {
-      LOG.info("login session {} took {}ms", hSession,
-          System.currentTimeMillis() - start);
+      LOG.info("login session {} took {}ms", hSession, System.currentTimeMillis() - start);
     }
   }
 

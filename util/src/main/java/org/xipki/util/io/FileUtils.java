@@ -75,8 +75,7 @@ public class FileUtils {
     File fileInCanonicalDir = (file.getParent() == null) ? file
         : new File(file.getParentFile().getCanonicalFile(), file.getName());
 
-    return !fileInCanonicalDir.getCanonicalFile().equals(
-              fileInCanonicalDir.getAbsoluteFile());
+    return !fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
   }
 
   /**
@@ -172,23 +171,19 @@ public class FileUtils {
    *         "Negative size" if the file is truncated so that the size is less
    *         than the position
    */
-  public static void copyFile(File srcFile, File destFile,
-                              boolean preserveFileDate)
+  public static void copyFile(File srcFile, File destFile, boolean preserveFileDate)
       throws IOException {
     if (destFile.exists() && destFile.isDirectory()) {
-      throw new IOException("Destination '" + destFile +
-          "' exists but is a directory");
+      throw new IOException("Destination '" + destFile + "' exists but is a directory");
     }
 
-    Files.copy(srcFile.toPath(), destFile.toPath(),
-        StandardCopyOption.REPLACE_EXISTING);
+    Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
     if (preserveFileDate) {
       destFile.setLastModified(srcFile.lastModified());
     }
   }
 
-  public static void copyDirectory(File srcDir, File destDir)
-      throws IOException {
+  public static void copyDirectory(File srcDir, File destDir) throws IOException {
     copyDirectory(srcDir, destDir, null, true, null);
   }
 
@@ -212,8 +207,7 @@ public class FileUtils {
       List<String> exclusionList) throws IOException {
     // recurse
     final File[] srcFiles = (filter == null)
-        ? srcDir.listFiles()
-        : srcDir.listFiles(filter);
+        ? srcDir.listFiles() : srcDir.listFiles(filter);
     if (srcFiles == null) {
       // null if abstract pathname does not denote a directory, or if an I/O
       // error occurs
@@ -222,28 +216,23 @@ public class FileUtils {
 
     if (destDir.exists()) {
       if (!destDir.isDirectory()) {
-        throw new IOException("Destination '" + destDir +
-            "' exists but is not a directory");
+        throw new IOException("Destination '" + destDir + "' exists but is not a directory");
       }
     } else {
       if (!destDir.mkdirs() && !destDir.isDirectory()) {
-        throw new IOException("Destination '" + destDir +
-            "' directory cannot be created");
+        throw new IOException("Destination '" + destDir + "' directory cannot be created");
       }
     }
 
     if (!destDir.canWrite()) {
-      throw new IOException("Destination '" + destDir +
-          "' cannot be written to");
+      throw new IOException("Destination '" + destDir + "' cannot be written to");
     }
 
     for (final File srcFile : srcFiles) {
       final File dstFile = new File(destDir, srcFile.getName());
-      if (exclusionList == null
-          || !exclusionList.contains(srcFile.getCanonicalPath())) {
+      if (exclusionList == null || !exclusionList.contains(srcFile.getCanonicalPath())) {
         if (srcFile.isDirectory()) {
-          copyDirectory(srcFile, dstFile, filter, preserveFileDate,
-              exclusionList);
+          copyDirectory(srcFile, dstFile, filter, preserveFileDate, exclusionList);
         } else {
           copyFile(srcFile, dstFile, preserveFileDate);
         }

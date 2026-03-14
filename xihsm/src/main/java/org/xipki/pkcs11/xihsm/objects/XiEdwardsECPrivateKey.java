@@ -16,25 +16,43 @@ import org.xipki.pkcs11.xihsm.crypt.XiMechanism;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
+import org.xipki.security.util.KeyUtil;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.spec.InvalidKeySpecException;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiEdwardsECPrivateKey extends XiECPrivateKey {
 
   private final EdwardsCurveEnum curve;
 
+  private final PrivateKey jceSk;
+
   public XiEdwardsECPrivateKey(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      long handle, boolean inToken, Long keyGenMechanism,
-      byte[] ecParams, byte[] sk) throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, long handle,
+      boolean inToken, Long keyGenMechanism, byte[] ecParams, byte[] sk)
+      throws HsmException {
     super(vendor, cku, newObjectMethod, handle, inToken,
         PKCS11T.CKK_EC_EDWARDS, keyGenMechanism, ecParams, sk);
 
     this.curve = EdwardsCurveEnum.ofEcParamsNonNull(ecParams);
+    try {
+      PrivateKeyInfo skInfo = new PrivateKeyInfo(
+          new AlgorithmIdentifier(ASN1ObjectIdentifier.getInstance(curve.getEncodedOid())),
+          new DEROctetString(sk));
+      this.jceSk = KeyUtil.getPrivateKey(skInfo);
+    } catch (IOException | InvalidKeySpecException ex) {
+      throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
+          "could not build JCE " + curve + " key", ex);
+    }
   }
 
   public static XiEdwardsECPrivateKey newInstance(
@@ -42,13 +60,11 @@ public class XiEdwardsECPrivateKey extends XiECPrivateKey {
       LoginState loginState, ObjectInitMethod initMethod,
       long handle, boolean inToken, XiTemplate attrs, Long keyGenMechanism)
       throws HsmException {
-    byte[] ecParams = attrs.removeNonNullByteArray(
-        PKCS11T.CKA_EC_PARAMS);
+    byte[] ecParams = attrs.removeNonNullByteArray(PKCS11T.CKA_EC_PARAMS);
     byte[] value = attrs.removeNonNullByteArray(PKCS11T.CKA_VALUE);
 
-    XiEdwardsECPrivateKey ret = new XiEdwardsECPrivateKey(
-        vendor, cku, newObjectMethod,
-        handle, inToken, keyGenMechanism, ecParams, value);
+    XiEdwardsECPrivateKey ret = new XiEdwardsECPrivateKey(vendor, cku,
+        newObjectMethod, handle, inToken, keyGenMechanism, ecParams, value);
     ret.updateAttributes(loginState, initMethod, attrs);
     return ret;
   }
@@ -66,23 +82,27 @@ public class XiEdwardsECPrivateKey extends XiECPrivateKey {
   }
 
   @Override
-  public byte[] sign(XiMechanism mechanism, byte[] data,
-                            SecureRandom random)
+  public byte[] sign(XiMechanism mechanism, byte[] data, SecureRandom random)
       throws HsmException {
     if (!isSign()) {
-      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED,
-          "CKA_SIGN != TRUE");
+      throw new HsmException(PKCS11T.CKR_KEY_FUNCTION_NOT_PERMITTED, "CKA_SIGN != TRUE");
     }
 
     long ckm = mechanism.getCkm();
     if (ckm != PKCS11T.CKM_EDDSA) {
       throw new HsmException(PKCS11T.CKR_MECHANISM_INVALID,
-          "Invalid mechanism " +
-              PKCS11T.ckmCodeToName(ckm));
+          "Invalid mechanism " + PKCS11T.ckmCodeToName(ckm));
     }
 
     XiEdwardsECPublicKey.checkMechanismParameters(curve, mechanism);
-    return curve.sign(value, data);
+    try {
+      Signature sig = Signature.getInstance(curve.getOid(), KeyUtil.tradProviderName());
+      sig.initSign(jceSk);
+      sig.update(data);
+      return sig.sign();
+    } catch (GeneralSecurityException e) {
+      throw new HsmException(PKCS11T.CKR_SIGNATURE_INVALID, "could not sign", e);
+    }
   }
 
 }

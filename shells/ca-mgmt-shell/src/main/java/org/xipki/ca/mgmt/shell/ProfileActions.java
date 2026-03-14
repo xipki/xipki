@@ -42,8 +42,7 @@ import java.util.Set;
  */
 public class ProfileActions {
 
-  @Command(scope = "ca", name = "caprofile-add", description =
-      "add certificate profile to CA")
+  @Command(scope = "ca", name = "caprofile-add", description = "add certificate profile to CA")
   @Service
   public static class CaprofileAdd extends CaAction {
 
@@ -52,8 +51,7 @@ public class ProfileActions {
     private String caName;
 
     @Option(name = "--profile", required = true, multiValued = true,
-        description = "profile name and aliases," +
-            " <name>[:<\",\"-separated aliases>]")
+        description = "profile name and aliases," + " <name>[:<\",\"-separated aliases>]")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private List<String> profileNameAliasesList;
 
@@ -93,8 +91,7 @@ public class ProfileActions {
       StringBuilder sb = new StringBuilder();
       Set<CaProfileEntry> entries = caManager.getCertprofilesForCa(caName);
       if (CollectionUtil.isNotEmpty(entries)) {
-        sb.append("certificate profiles supported by CA ")
-            .append(caName).append("\n");
+        sb.append("certificate profiles supported by CA ").append(caName).append("\n");
 
         for (CaProfileEntry entry: entries) {
           String name = entry.profileName();
@@ -111,8 +108,7 @@ public class ProfileActions {
           sb.append("\n");
         }
       } else {
-        sb.append("\tno profile for CA ").append(caName)
-            .append(" is configured");
+        sb.append("\tno profile for CA ").append(caName).append(" is configured");
       }
 
       println(sb.toString());
@@ -121,8 +117,7 @@ public class ProfileActions {
 
   } // class CaprofileInfo
 
-  @Command(scope = "ca", name = "caprofile-rm", description =
-      "remove certificate profile from CA")
+  @Command(scope = "ca", name = "caprofile-rm", description = "remove certificate profile from CA")
   @Service
   public static class CaprofileRm extends CaAction {
 
@@ -148,8 +143,7 @@ public class ProfileActions {
             caManager.removeCertprofileFromCa(profileName, caName);
             println("removed " + msg);
           } catch (CaMgmtException ex) {
-            throw new CmdFailure("could not remove " + msg +
-                ", error: " + ex.getMessage(), ex);
+            throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
           }
         }
       }
@@ -159,13 +153,11 @@ public class ProfileActions {
 
   } // class CaprofileRm
 
-  @Command(scope = "ca", name = "profile-add", description =
-      "add certificate profile")
+  @Command(scope = "ca", name = "profile-add", description = "add certificate profile")
   @Service
   public static class ProfileAdd extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "profile name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
     private String name;
 
     @Option(name = "--type", description = "profile type")
@@ -175,8 +167,7 @@ public class ProfileActions {
     @Option(name = "--conf", description = "certificate profile configuration")
     private String conf;
 
-    @Option(name = "--conf-file", description =
-        "certificate profile configuration file")
+    @Option(name = "--conf-file", description = "certificate profile configuration file")
     @Completion(FileCompleter.class)
     private String confFile;
 
@@ -188,8 +179,7 @@ public class ProfileActions {
 
       String msg = "certificate profile " + name;
       try {
-        caManager.addCertprofile(new CertprofileEntry(
-            new NameId(null, name), type, conf));
+        caManager.addCertprofile(new CertprofileEntry(new NameId(null, name), type, conf));
         println("added " + msg);
         return null;
       } catch (CaMgmtException ex) {
@@ -205,8 +195,7 @@ public class ProfileActions {
   @Service
   public static class ProfileExport extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "profile name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String name;
 
@@ -238,8 +227,7 @@ public class ProfileActions {
   @Service
   public static class ProfileInfo extends CaAction {
 
-    @Argument(index = 0, name = "name", description =
-        "certificate profile name")
+    @Argument(index = 0, name = "name", description = "certificate profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String name;
 
@@ -256,8 +244,7 @@ public class ProfileActions {
         int size = names.size();
 
         if (size == 0 || size == 1) {
-          sb.append((size == 0) ? "no" : "1")
-              .append(" profile is configured\n");
+          sb.append((size == 0) ? "no" : "1").append(" profile is configured\n");
         } else {
           sb.append(size).append(" profiles are configured:\n");
         }
@@ -281,13 +268,11 @@ public class ProfileActions {
 
   } // class ProfileInfo
 
-  @Command(scope = "ca", name = "profile-rm", description =
-      "remove certificate profile")
+  @Command(scope = "ca", name = "profile-rm", description = "remove certificate profile")
   @Service
   public static class ProfileRm extends CaAction {
 
-    @Argument(index = 0, name = "name", required = true,
-        description = "certificate profile name")
+    @Argument(index = 0, name = "name", required = true, description = "certificate profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     private String name;
 
@@ -302,8 +287,7 @@ public class ProfileActions {
           caManager.removeCertprofile(name);
           println("removed " + msg);
         } catch (CaMgmtException ex) {
-          throw new CmdFailure("could not remove " + msg +
-              ", error: " + ex.getMessage(), ex);
+          throw new CmdFailure("could not remove " + msg + ", error: " + ex.getMessage(), ex);
         }
       }
       return null;
@@ -311,13 +295,11 @@ public class ProfileActions {
 
   } // class ProfileRm
 
-  @Command(scope = "ca", name = "profile-up", description =
-      "update certificate profile")
+  @Command(scope = "ca", name = "profile-up", description = "update certificate profile")
   @Service
   public static class ProfileUp extends CaAction {
 
-    @Option(name = "--name", aliases = "-n", required = true,
-        description = "profile name")
+    @Option(name = "--name", aliases = "-n", required = true, description = "profile name")
     @Completion(CaCompleters.ProfileNameCompleter.class)
     protected String name;
 
@@ -325,12 +307,10 @@ public class ProfileActions {
     @Completion(CaCompleters.ProfileTypeCompleter.class)
     protected String type;
 
-    @Option(name = "--conf", description =
-        "certificate profile configuration or 'null'")
+    @Option(name = "--conf", description = "certificate profile configuration or 'null'")
     protected String conf;
 
-    @Option(name = "--conf-file", description =
-        "certificate profile configuration file")
+    @Option(name = "--conf-file", description = "certificate profile configuration file")
     @Completion(FileCompleter.class)
     protected String confFile;
 
@@ -350,8 +330,7 @@ public class ProfileActions {
         println("updated " + msg);
         return null;
       } catch (CaMgmtException ex) {
-        throw new CmdFailure("could not update " + msg +
-            ", error: " + ex.getMessage(), ex);
+        throw new CmdFailure("could not update " + msg + ", error: " + ex.getMessage(), ex);
       }
     } // method execute0
 
@@ -367,8 +346,7 @@ public class ProfileActions {
     @Completion(FileCompleter.class)
     protected String inFile;
 
-    @Option(name = "--out", required = true, description =
-        "The output file")
+    @Option(name = "--out", required = true, description = "The output file")
     @Completion(FileCompleter.class)
     protected String outFile;
 
@@ -385,8 +363,7 @@ public class ProfileActions {
       } else {
         // V1, convert to V2
         XijsonCertprofileType conf = V1XijsonCertprofileType.parse(json).toV2();
-        outBytes = StringUtil.toUtf8Bytes(
-            JsonBuilder.toPrettyJson(conf.toCodec()));
+        outBytes = StringUtil.toUtf8Bytes(JsonBuilder.toPrettyJson(conf.toCodec()));
       }
 
       IoUtil.save(outFile, outBytes);

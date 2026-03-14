@@ -44,10 +44,9 @@ public class PasswordBasedEncryption {
    *         if error occurs.
    */
   public static PBECipherBlob encryptBlob(
-      PBEAlgo algo, byte[] plaintext, char[] password,
-      int iterationCount, byte[] salt) throws GeneralSecurityException {
-    byte[] encryptedBytes = encrypt(algo, plaintext, password,
-        iterationCount, salt);
+      PBEAlgo algo, byte[] plaintext, char[] password, int iterationCount, byte[] salt)
+      throws GeneralSecurityException {
+    byte[] encryptedBytes = encrypt(algo, plaintext, password, iterationCount, salt);
     return new PBECipherBlob(algo.code(), iterationCount, salt, encryptedBytes);
   }
 
@@ -69,22 +68,20 @@ public class PasswordBasedEncryption {
    *         if error occurs.
    */
   public static byte[] encrypt(
-      PBEAlgo algo, byte[] plaintext, char[] password,
-      int iterationCount, byte[] salt) throws GeneralSecurityException {
+      PBEAlgo algo, byte[] plaintext, char[] password, int iterationCount, byte[] salt)
+      throws GeneralSecurityException {
     Args.notNull(plaintext, "plaintext");
     Args.notNull(password, "password");
     Args.positive(iterationCount, "iterationCount");
     Args.notNull(salt, "salt");
 
-    SecretKeyFactory secretKeyFactory =
-        SecretKeyFactory.getInstance(algo.algoName());
+    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
 
     PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
     SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
     Cipher cipher = Cipher.getInstance(algo.algoName());
-    PBEParameterSpec pbeParameterSpec =
-        new PBEParameterSpec(salt, iterationCount);
+    PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
     cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
     pbeKeySpec.clearPassword();
 
@@ -121,24 +118,22 @@ public class PasswordBasedEncryption {
       throws GeneralSecurityException {
     int algoCode = blob.algo();
     PBEAlgo algo = Optional.ofNullable(PBEAlgo.forCode(algoCode))
-        .orElseThrow(() -> new GeneralSecurityException(
-            "unknown algorithm code " + algoCode));
+        .orElseThrow(() -> new GeneralSecurityException("unknown algorithm code " + algoCode));
     return decrypt(algo, blob.cipherText(),
         password, blob.iterations(), blob.salt());
   }
 
   public static byte[] decrypt(
-      PBEAlgo algo, byte[] cipherTextWithIv, char[] password,
-      int iterationCount, byte[] salt) throws GeneralSecurityException {
+      PBEAlgo algo, byte[] cipherTextWithIv, char[] password, int iterationCount, byte[] salt)
+      throws GeneralSecurityException {
     Args.notNull(cipherTextWithIv, "cipherTextWithIv");
     Args.notNull(password, "password");
-    Args. positive(iterationCount, "iterationCount");
-    Args. notNull(salt, "salt");
+    Args.positive(iterationCount, "iterationCount");
+    Args.notNull(salt, "salt");
 
     PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
 
-    SecretKeyFactory secretKeyFactory =
-        SecretKeyFactory.getInstance(algo.algoName());
+    SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algo.algoName());
     SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
     Cipher cipher = Cipher.getInstance(algo.algoName());
@@ -153,14 +148,12 @@ public class PasswordBasedEncryption {
     } else {
       byte[] iv = new byte[ivLen];
       System.arraycopy(cipherTextWithIv, 1, iv, 0, ivLen);
-      pbeParameterSpec = new PBEParameterSpec(salt, iterationCount,
-                          new IvParameterSpec(iv));
+      pbeParameterSpec = new PBEParameterSpec(salt, iterationCount, new IvParameterSpec(iv));
     }
 
     int cipherTextOffset = 1 + ivLen;
     byte[] cipherText = new byte[cipherTextWithIv.length - cipherTextOffset];
-    System.arraycopy(cipherTextWithIv, 1 + ivLen, cipherText, 0,
-        cipherText.length);
+    System.arraycopy(cipherTextWithIv, 1 + ivLen, cipherText, 0, cipherText.length);
 
     cipher.init(Cipher.DECRYPT_MODE, pbeKey, pbeParameterSpec);
     return cipher.doFinal(cipherText);

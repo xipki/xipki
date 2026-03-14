@@ -87,8 +87,7 @@ public class NameId implements JsonEncodable {
   }
 
   public static NameId parse(JsonMap json) throws CodecException {
-    return new NameId(json.getInt("id"),
-        json.getNnString("name"));
+    return new NameId(json.getInt("id"), json.getNnString("name"));
   }
 
 }

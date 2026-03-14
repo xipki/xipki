@@ -72,15 +72,13 @@ public class FileOrBinary implements JsonEncodable {
     if (file != null) {
       return "file:" + file;
     } else if (binary != null) {
-      return "binary:" + Hex.encode(
-          Arrays.copyOf(binary, Math.min(6, binary.length))) + "...";
+      return "binary:" + Hex.encode(Arrays.copyOf(binary, Math.min(6, binary.length))) + "...";
     } else {
       return "<NULL>";
     }
   }
 
-  public static List<FileOrBinary> parseList(JsonList json)
-      throws CodecException {
+  public static List<FileOrBinary> parseList(JsonList json) throws CodecException {
     if (json == null) {
       return null;
     }
@@ -92,8 +90,7 @@ public class FileOrBinary implements JsonEncodable {
     return ret;
   }
 
-  public static FileOrBinary[] parseArray(JsonList json)
-      throws CodecException {
+  public static FileOrBinary[] parseArray(JsonList json) throws CodecException {
     List<FileOrBinary> list = parseList(json);
     return list == null ? null : list.toArray(new FileOrBinary[0]);
   }

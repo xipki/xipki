@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.Signature;
 
 /**
@@ -32,9 +31,7 @@ public abstract class Pkcs12SignVerifyTest {
   private ConcurrentSigner signer;
 
   protected Pkcs12SignVerifyTest() {
-    if (Security.getProvider("BC") == null) {
-      Security.addProvider(KeyUtil.newBouncyCastleProvider());
-    }
+    KeyUtil.addProviders();
   }
 
   protected abstract SignAlgo getSignatureAlgorithm();
@@ -58,13 +55,10 @@ public abstract class Pkcs12SignVerifyTest {
     KeypairWithCert keypairWithCert;
     try (InputStream ks = Files.newInputStream(Paths.get(getPkcs12File()))) {
       char[] password = getPassword().toCharArray();
-      keypairWithCert = KeypairWithCert.fromKeystore("PKCS12", ks,
-          password, null, password, cert);
+      keypairWithCert = KeypairWithCert.fromPKCS12Keystore(ks, password, null, password, cert);
     }
-    P12ContentSignerBuilder builder =
-        new P12ContentSignerBuilder(keypairWithCert);
-    signer = builder.createSigner(getSignatureAlgorithm(), 1,
-        new SecureRandom());
+    P12ContentSignerBuilder builder = new P12ContentSignerBuilder(keypairWithCert);
+    signer = builder.createSigner(getSignatureAlgorithm(), 1, new SecureRandom());
     return signer;
   }
 
@@ -75,20 +69,18 @@ public abstract class Pkcs12SignVerifyTest {
       data[i] = (byte) (i & 0xFF);
     }
 
-    byte[] signatureValue = sign(data);
-    boolean signatureValid = verify(data, signatureValue,
-        getSigner().getX509Cert());
+    byte[] sigValue = sign(data);
+    boolean signatureValid = verify(data, sigValue, getSigner().x509Cert());
     Assert.assertTrue("Signature invalid", signatureValid);
   }
 
   protected byte[] sign(byte[] data) throws Exception {
-    return getSigner().x509sign(data);
+    return getSigner().x509Sign(data);
   }
 
   protected boolean verify(byte[] data, byte[] signatureValue, X509Cert cert)
       throws Exception {
-    Signature signature = Signature.getInstance(
-        getSignatureAlgorithm().jceName());
+    Signature signature = Signature.getInstance(getSignatureAlgorithm().jceName());
     signature.initVerify(cert.publicKey());
     signature.update(data);
     return signature.verify(signatureValue);

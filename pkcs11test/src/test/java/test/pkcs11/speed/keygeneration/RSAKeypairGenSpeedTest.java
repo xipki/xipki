@@ -27,8 +27,8 @@ public class RSAKeypairGenSpeedTest extends TestBase {
   private class MyExecutor extends KeypairGenExecutor {
 
     public MyExecutor(boolean inToken) throws PKCS11Exception {
-      super(ckmCodeToName(mechanism) + " (2048, inToken: " +
-              inToken + ") Speed", mechanism, inToken);
+      super(ckmCodeToName(mechanism) + " (2048, inToken: " + inToken + ") Speed",
+          mechanism, inToken);
     }
 
     @Override
@@ -59,8 +59,7 @@ public class RSAKeypairGenSpeedTest extends TestBase {
       executor.setThreads(TestHSMs.getSpeedThreads());
       executor.setDuration(TestHSMs.getSpeedDuration());
       executor.execute();
-      Assert.assertEquals("no error", 0,
-          executor.getErrorAccount());
+      Assert.assertEquals("no error", 0, executor.getErrorAccount());
     }
   }
 

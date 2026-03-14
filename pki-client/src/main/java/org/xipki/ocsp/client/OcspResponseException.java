@@ -37,10 +37,8 @@ public abstract class OcspResponseException extends Exception {
 
     private static String buildMessage(byte[] expected, byte[] is) {
       return StringUtil.concat("nonce unmatch (received ",
-          (is == null || is.length == 0 ? "none" : Hex.encode(is)),
-          ", but expected ",
-          (expected == null || expected.length == 0 ? "none"
-              : Hex.encode(expected)), ")");
+          (is == null || is.length == 0 ? "none" : Hex.encode(is)), ", but expected ",
+          (expected == null || expected.length == 0 ? "none" : Hex.encode(expected)), ")");
     }
 
   }

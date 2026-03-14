@@ -17,6 +17,8 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public abstract class XiPublicKey extends XiKey implements XiPublicOrSecretKey {
@@ -156,8 +158,7 @@ public abstract class XiPublicKey extends XiKey implements XiPublicOrSecretKey {
   }
 
   @Override
-  protected void doGetAttributes(List<XiAttribute> res, long[] types,
-                                 boolean withAll)
+  protected void doGetAttributes(List<XiAttribute> res, long[] types, boolean withAll)
       throws HsmException {
     super.doGetAttributes(res, types, withAll);
     addAttr(res, types, CKA_SUBJECT,         subject);
@@ -174,8 +175,7 @@ public abstract class XiPublicKey extends XiKey implements XiPublicOrSecretKey {
 
   @Override
   protected void doSetAttributes(
-      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs)
-      throws HsmException {
+      LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
     super.doSetAttributes(loginState, initMethod, attrs);
 
     subject       = attrs.removeByteArray(CKA_SUBJECT);
@@ -198,10 +198,9 @@ public abstract class XiPublicKey extends XiKey implements XiPublicOrSecretKey {
   }
 
   public static XiPublicKey newInstance(
-      XiHsmVendor vendor, long cku, Origin newObjectMethod,
-      LoginState loginState, ObjectInitMethod initMethod,
-      long handle, boolean inToken, XiTemplate attrs, long keyType,
-      Long keyGenMechanism) throws HsmException {
+      XiHsmVendor vendor, long cku, Origin newObjectMethod, LoginState loginState,
+      ObjectInitMethod initMethod, long handle, boolean inToken, XiTemplate attrs,
+      long keyType, Long keyGenMechanism) throws HsmException {
     if (keyType == CKK_RSA) {
       return XiRSAPublicKey.newInstance(vendor, cku, newObjectMethod,
           loginState, initMethod, handle, inToken, attrs, keyGenMechanism);
@@ -225,8 +224,7 @@ public abstract class XiPublicKey extends XiKey implements XiPublicOrSecretKey {
           loginState, initMethod, handle, inToken, attrs, keyGenMechanism);
     } else {
       throw new HsmException(CKR_GENERAL_ERROR,
-          "unsupported public key type " +
-              PKCS11T.ckkCodeToName(keyType));
+          "unsupported public key type " + PKCS11T.ckkCodeToName(keyType));
     }
   }
 

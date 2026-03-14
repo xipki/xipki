@@ -4,6 +4,7 @@
 package org.xipki.ca.gateway.acme.type;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */

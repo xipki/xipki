@@ -86,12 +86,10 @@ public class ScepServlet {
         int startIndex = 0;
         while (true) {
           int index = query.indexOf('&', startIndex);
-          String token = query.substring(
-              startIndex, index == -1 ? query.length() : index);
+          String token = query.substring(startIndex, index == -1 ? query.length() : index);
           int index2 = token.indexOf('=');
           if (index2 != -1) {
-            params.put(token.substring(0, index2),
-                token.substring(index2 + 1));
+            params.put(token.substring(0, index2), token.substring(index2 + 1));
           }
 
           if (index == -1) {
@@ -145,16 +143,12 @@ public class ScepServlet {
           ct = ScepConstants.CT_X509_CA_CERT;
           respBytes = responder.caEmulator().caCertBytes();
         } else {
-          CMSSignedDataGenerator cmsSignedDataGen =
-              new CMSSignedDataGenerator();
+          CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
           try {
-            cmsSignedDataGen.addCertificate(
-                responder.caEmulator().caCert().toBcCert());
+            cmsSignedDataGen.addCertificate(responder.caEmulator().caCert().getCertHolder());
             ct = ScepConstants.CT_X509_CA_RA_CERT;
-            cmsSignedDataGen.addCertificate(
-                responder.raEmulator().raCert().toBcCert());
-            CMSSignedData degenerateSignedData =
-                cmsSignedDataGen.generate(new CMSAbsentContent());
+            cmsSignedDataGen.addCertificate(responder.raEmulator().raCert().getCertHolder());
+            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
             respBytes = degenerateSignedData.getEncoded();
           } catch (CMSException ex) {
             auditMessage = "system internal error";
@@ -165,8 +159,7 @@ public class ScepServlet {
         }
 
         sendToResponse(exchange, ct, respBytes);
-      } else if (Operation.GetNextCACert.code()
-          .equalsIgnoreCase(operation)) {
+      } else if (Operation.GetNextCACert.code().equalsIgnoreCase(operation)) {
         if (responder.nextCaAndRa() == null) {
           auditMessage = "SCEP operation '" + operation + "' is not permitted";
           sendError(exchange, SC_FORBIDDEN);
@@ -183,8 +176,7 @@ public class ScepServlet {
 
           ContentInfo signedData = responder.encode(nextCaMsg);
           byte[] respBytes = signedData.getEncoded();
-          sendToResponse(exchange, ScepConstants.CT_X509_NEXT_CA_CERT,
-              respBytes);
+          sendToResponse(exchange, ScepConstants.CT_X509_NEXT_CA_CERT, respBytes);
         } catch (Exception ex) {
           auditMessage = "system internal error";
           LOG.error(auditMessage, ex);
@@ -208,8 +200,7 @@ public class ScepServlet {
     } // end try
   } // method service
 
-  private void sendToResponse(HttpExchange resp, String contentType,
-                              byte[] body)
+  private void sendToResponse(HttpExchange resp, String contentType, byte[] body)
       throws IOException {
     int rLen = body == null ? 0 : body.length;
     resp.getResponseHeaders().set("content-type", contentType);
@@ -219,8 +210,7 @@ public class ScepServlet {
     }
   }
 
-  private void sendError(HttpExchange exchange, int errorCode)
-      throws IOException {
+  private void sendError(HttpExchange exchange, int errorCode) throws IOException {
     exchange.sendResponseHeaders(errorCode, 0);
   }
 

@@ -54,15 +54,13 @@ public abstract class X509CaModule {
     return Audits.getAuditService();
   }
 
-  protected AuditEvent newAuditEvent(
-      String eventType, RequestorInfo requestor) {
+  protected AuditEvent newAuditEvent(String eventType, RequestorInfo requestor) {
     Args.notNull(eventType, "eventType");
     AuditEvent event = new AuditEvent(CaAuditConstants.APPNAME);
     event.setEventData(CaAuditConstants.NAME_ca, caIdent.name());
     event.setEventType(eventType);
     if (requestor != null) {
-      event.setEventData(CaAuditConstants.NAME_requestor,
-          requestor.ident().name());
+      event.setEventData(CaAuditConstants.NAME_requestor, requestor.ident().name());
     }
     return event;
   }
@@ -84,8 +82,7 @@ public abstract class X509CaModule {
       Args.notNull(cert, "cert").verify(caCert.publicKey());
       return true;
     } catch (Exception ex) {
-      LOG.debug("{} while verifying signature: {}",
-          ex.getClass().getName(), ex.getMessage());
+      LOG.debug("{} while verifying signature: {}", ex.getClass().getName(), ex.getMessage());
       return false;
     }
   } // method verifySignature

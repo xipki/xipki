@@ -61,20 +61,16 @@ public class IoUtil {
     return read(fileName, false);
   }
 
-  public static byte[] read(String fileName, boolean prependBaseDir)
-      throws IOException {
-    return Files.readAllBytes(Paths.get(
-        expandFilepath(fileName, prependBaseDir)));
+  public static byte[] read(String fileName, boolean prependBaseDir) throws IOException {
+    return Files.readAllBytes(Paths.get(expandFilepath(fileName, prependBaseDir)));
   }
 
   public static byte[] read(File file) throws IOException {
     return read(file, false);
   }
 
-  public static byte[] read(File file, boolean prependBaseDir)
-      throws IOException {
-    return Files.readAllBytes(Paths.get(
-        expandFilepath(file.getPath(), prependBaseDir)));
+  public static byte[] read(File file, boolean prependBaseDir) throws IOException {
+    return Files.readAllBytes(Paths.get(expandFilepath(file.getPath(), prependBaseDir)));
   }
 
   /**
@@ -86,8 +82,7 @@ public class IoUtil {
    * @throws IOException if error occurs while reading the bytes or
    *         not enough bytes are available.
    */
-  public static byte[] readExactBytes(InputStream in, int len)
-      throws IOException {
+  public static byte[] readExactBytes(InputStream in, int len) throws IOException {
     byte[] ret = new byte[len];
     readExactBytes(in, ret, 0, len);
     return ret;
@@ -103,8 +98,7 @@ public class IoUtil {
    * @throws IOException if error occurs while reading the bytes or
    *         not enough bytes are available..
    */
-  public static void readExactBytes(
-      InputStream in, byte[] out, int off, int len)
+  public static void readExactBytes(InputStream in, byte[] out, int off, int len)
       throws IOException {
     int offAfter = off + len;
     int read;
@@ -113,8 +107,7 @@ public class IoUtil {
     }
 
     if (off < offAfter) {
-      throw new IOException("in reaches end, but still expected " +
-          (offAfter - off) + " bytes");
+      throw new IOException("in reaches end, but still expected " + (offAfter - off) + " bytes");
     }
   }
 
@@ -126,14 +119,11 @@ public class IoUtil {
    * @throws IOException if error occurs while reading the bytes.
    */
   public static byte[] readAllBytesAndClose(InputStream in) throws IOException {
-    try {
+    try (in) {
       return readAllBytes(in);
-    } finally {
-      try {
-        in.close();
-      } catch (IOException ex) {
-        LOG.error("could not close stream: {}", ex.getMessage());
-      }
+    } catch (IOException ex) {
+      LOG.error("could not close stream: {}", ex.getMessage());
+      throw ex;
     }
   }
 
@@ -160,8 +150,7 @@ public class IoUtil {
     save(fileName, encoded, false);
   }
 
-  public static void save(String fileName, byte[] encoded,
-                          boolean prependBaseDir)
+  public static void save(String fileName, byte[] encoded, boolean prependBaseDir)
       throws IOException {
     save(new File(fileName), encoded, prependBaseDir);
   }
@@ -190,8 +179,7 @@ public class IoUtil {
   public static void mkdirs(File dir) throws IOException {
     if (dir.exists()) {
       if (!dir.isDirectory()) {
-        throw new IOException("Path " + dir.getPath() +
-            " exists but is not a directory");
+        throw new IOException("Path " + dir.getPath() + " exists but is not a directory");
       }
     } else {
       if (!dir.mkdirs()) {
@@ -202,16 +190,14 @@ public class IoUtil {
 
   public static void renameTo(File srcFile, File destFile) throws IOException {
     if (!srcFile.renameTo(destFile)) {
-      throw new IOException("Could not rename " + srcFile.getPath() + " to " +
-          destFile.getPath());
+      throw new IOException("Could not rename " + srcFile.getPath() + " to " + destFile.getPath());
     }
   }
 
   public static String getHostAddress() throws SocketException {
     List<String> addresses = new LinkedList<>();
 
-    Enumeration<NetworkInterface> interfaces =
-        NetworkInterface.getNetworkInterfaces();
+    Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
     while (interfaces.hasMoreElements()) {
       NetworkInterface ni = interfaces.nextElement();
@@ -330,8 +316,8 @@ public class IoUtil {
   }
 
   public static int parseInt(byte[] bytes, int offset) {
-    return (0xFF & bytes[offset++]) << 24 | (0xFF & bytes[offset++]) << 16
-          | (0xFF & bytes[offset++]) << 8 |  0xFF & bytes[offset];
+    return  (0xFF & bytes[offset++]) << 24 | (0xFF & bytes[offset++]) << 16
+          | (0xFF & bytes[offset++]) << 8  |  0xFF & bytes[offset];
   }
 
   public static int getIndex(byte[] arrayA, byte[] arrayB) {
@@ -360,8 +346,7 @@ public class IoUtil {
     if (conn instanceof HttpURLConnection) {
       return (HttpURLConnection) conn;
     }
-    throw new IOException(url + " is not of protocol HTTP: "
-        + url.getProtocol());
+    throw new IOException(url + " is not of protocol HTTP: " + url.getProtocol());
   }
 
   public static String detectPath(String path) {

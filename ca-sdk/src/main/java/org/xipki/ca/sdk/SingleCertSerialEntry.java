@@ -38,27 +38,22 @@ public class SingleCertSerialEntry extends SdkEncodable {
 
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(2).writeBigInt(serialNumber)
-        .writeObject(error);
+    encoder.writeArrayStart(2).writeBigInt(serialNumber).writeObject(error);
   }
 
-  public static SingleCertSerialEntry decode(CborDecoder decoder)
-      throws CodecException {
+  public static SingleCertSerialEntry decode(CborDecoder decoder) throws CodecException {
     try {
       if (decoder.readNullOrArrayLength(2)) {
         return null;
       }
 
-      return new SingleCertSerialEntry(
-          decoder.readBigInt(), ErrorEntry.decode(decoder));
+      return new SingleCertSerialEntry(decoder.readBigInt(), ErrorEntry.decode(decoder));
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, SingleCertSerialEntry.class), ex);
     }
   }
 
-  public static SingleCertSerialEntry[] decodeArray(CborDecoder decoder)
-      throws CodecException {
+  public static SingleCertSerialEntry[] decodeArray(CborDecoder decoder) throws CodecException {
     Integer arrayLen = decoder.readNullOrArrayLength();
     if (arrayLen == null) {
       return null;

@@ -20,6 +20,7 @@ import org.xipki.security.qa.P11KeypairGenSpeed;
 import org.xipki.security.qa.P11SignSpeed;
 import org.xipki.security.qa.P12KeypairGenSpeed;
 import org.xipki.security.qa.P12SignSpeed;
+import org.xipki.shell.Completers;
 import org.xipki.shell.IllegalCmdParamException;
 import org.xipki.shell.XiAction;
 import org.xipki.util.benchmark.BenchmarkExecutor;
@@ -35,6 +36,78 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class QaSecurityActions {
+
+  private static KeySpec getKeySpec(String keySpec, SignAlgo signAlgo)
+      throws NoSuchAlgorithmException {
+    if (keySpec != null) {
+      return KeySpec.ofKeySpec(keySpec);
+    }
+
+    if (signAlgo.isRSASigAlgo()) {
+      return KeySpec.RSA2048;
+    }
+
+    switch (signAlgo) {
+      case ECDSA_SHA1:
+      case ECDSA_SHA224:
+      case ECDSA_SHA3_224:
+      case ECDSA_SHA256:
+      case ECDSA_SHA3_256:
+      case ECDSA_SHAKE128:
+        return KeySpec.P256;
+      case ECDSA_SHA384:
+      case ECDSA_SHA3_384:
+        return KeySpec.P384;
+      case ECDSA_SHA512:
+      case ECDSA_SHA3_512:
+      case ECDSA_SHAKE256:
+        return KeySpec.P521;
+      case SM2_SM3:
+        return KeySpec.SM2;
+      case ED25519:
+        return KeySpec.ED25519;
+      case ED448:
+        return KeySpec.ED448;
+      case MLDSA44:
+        return KeySpec.MLDSA44;
+      case MLDSA65:
+        return KeySpec.MLDSA65;
+      case MLDSA87:
+        return KeySpec.MLDSA87;
+      case MLDSA44_ED25519:
+        return KeySpec.MLDSA44_ED25519;
+      case MLDSA44_P256:
+        return KeySpec.MLDSA44_P256;
+      case MLDSA44_RSA2048:
+        return KeySpec.MLDSA44_RSA2048;
+      case MLDSA65_P256:
+        return KeySpec.MLDSA65_P256;
+      case MLDSA65_ED25519:
+        return KeySpec.MLDSA65_ED25519;
+      case MLDSA65_BP256:
+        return KeySpec.MLDSA65_BP256;
+      case MLDSA65_P384:
+        return KeySpec.MLDSA65_P384;
+      case MLDSA65_RSA3072:
+        return KeySpec.MLDSA65_RSA3072;
+      case MLDSA65_RSA4096:
+        return KeySpec.MLDSA65_RSA4096;
+      case MLDSA87_ED448:
+        return KeySpec.MLDSA87_ED448;
+      case MLDSA87_P384:
+        return KeySpec.MLDSA87_P384;
+      case MLDSA87_P521:
+        return KeySpec.MLDSA87_P521;
+      case MLDSA87_BP384:
+        return KeySpec.MLDSA87_BP384;
+      case MLDSA87_RSA3072:
+        return KeySpec.MLDSA87_RSA3072;
+      case MLDSA87_RSA4096:
+        return KeySpec.MLDSA87_RSA4096;
+    }
+
+    throw new NoSuchAlgorithmException("could not detect KeySpec");
+  }
 
   public abstract static class QaSpeedAction extends XiAction {
 
@@ -114,21 +187,22 @@ public class QaSecurityActions {
 
   @Command(scope = "xi", name = "speed-sign-p11",
       description = "performance test of PKCS#11 signature creation")
+  @Service
   public static final class SpeedSignP11 extends QaSpeedP11Action {
 
     @Option(name = "--keyspec", description = "Key spec")
     @Completion(SecurityCompleters.KeySpecCompleter.class)
     private String keyspec;
 
-    @Option(name = "--sig-algo", required = true, description =
-        "signature algorithm")
-    @Completion(SecurityCompleters.AllSigAlgCompleter.class)
+    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Completion(Completers.SigAlgCompleter.class)
     private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P11SignSpeed(securityFactory, getSlot(), getSignAlgo(signAlgo),
-          getKeySpec(keyspec), getNumThreads());
+      SignAlgo jSignAlgo = getSignAlgo(signAlgo);
+      KeySpec jKeySpec = getKeySpec(keyspec, jSignAlgo);
+      return new P11SignSpeed(securityFactory, getSlot(), jSignAlgo, jKeySpec, getNumThreads());
     }
 
   } // class SpeedP11SignAction
@@ -158,21 +232,20 @@ public class QaSecurityActions {
     @Completion(SecurityCompleters.KeySpecCompleter.class)
     private String keyspec;
 
-    @Option(name = "--sig-algo", required = true, description =
-        "signature algorithm")
-    @Completion(SecurityCompleters.AllSigAlgCompleter.class)
+    @Option(name = "--sig-algo", required = true, description = "signature algorithm")
+    @Completion(Completers.SigAlgCompleter.class)
     private String signAlgo;
 
     @Override
     protected BenchmarkExecutor getTester() throws Exception {
-      return new P12SignSpeed(securityFactory, getSignAlgo(signAlgo),
-          getKeySpec(keyspec), getNumThreads());
+      SignAlgo jSignAlgo = getSignAlgo(signAlgo);
+      KeySpec jKeySpec = getKeySpec(keyspec, jSignAlgo);
+      return new P12SignSpeed(securityFactory, jSignAlgo, jKeySpec, getNumThreads());
     }
 
   }
 
-  private static SignAlgo getSignAlgo(String str)
-      throws IllegalCmdParamException {
+  private static SignAlgo getSignAlgo(String str) throws IllegalCmdParamException {
     try {
       return SignAlgo.getInstance(str);
     } catch (NoSuchAlgorithmException e) {
@@ -180,8 +253,7 @@ public class QaSecurityActions {
     }
   }
 
-  private static KeySpec getKeySpec(String str)
-      throws IllegalCmdParamException {
+  private static KeySpec getKeySpec(String str) throws IllegalCmdParamException {
     try {
       return KeySpec.ofKeySpec(str);
     } catch (NoSuchAlgorithmException e) {

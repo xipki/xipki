@@ -69,11 +69,9 @@ public class CaHttpFilter implements XiHttpFilter {
 
     CaServerConf conf;
     try {
-      conf = CaServerConf.readConfFromFile(
-          IoUtil.expandFilepath(DFLT_CFG, true));
+      conf = CaServerConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
     } catch (InvalidConfException ex) {
-      throw new InvalidConfException(
-          "could not parse configuration file " + DFLT_CFG, ex);
+      throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     boolean logReqResp = conf.isLogReqResp();
@@ -112,8 +110,7 @@ public class CaHttpFilter implements XiHttpFilter {
     if (conf.keypairGeneratorFactories() != null) {
       for (String className : conf.keypairGeneratorFactories()) {
         try {
-          KeypairGeneratorFactory factory =
-              ReflectiveUtil.newInstance(className);
+          KeypairGeneratorFactory factory = ReflectiveUtil.newInstance(className);
           keypairGeneratorFactories.add(factory);
         } catch (ObjectCreationException ex) {
           LOG.error("error creating KeypairGeneratorFactory {} : {}",
@@ -125,12 +122,10 @@ public class CaHttpFilter implements XiHttpFilter {
     caManager.setKeyPairGeneratorFactories(keypairGeneratorFactories);
 
     // Publisher
-    CertPublisherFactoryRegister publisherFactoryRegister =
-        new CertPublisherFactoryRegister();
+    CertPublisherFactoryRegister publisherFactoryRegister = new CertPublisherFactoryRegister();
     publisherFactoryRegister.registFactory(new OcspCertPublisherFactory());
     caManager.setCertPublisherFactoryRegister(publisherFactoryRegister);
     caManager.setCaServerConf(conf);
-
     caManager.startCaSystem();
 
     LOG.info("ca.noRA: {}", conf.isNoRA());
@@ -142,29 +137,25 @@ public class CaHttpFilter implements XiHttpFilter {
 
     RemoteMgmt remoteMgmt = conf.remoteMgmt();
     boolean remoteMgmtEnabled = remoteMgmt != null && remoteMgmt.isEnabled();
-    LOG.info("remote management is {}",
-        remoteMgmtEnabled ? "enabled" : "disabled");
+    LOG.info("remote management is {}", remoteMgmtEnabled ? "enabled" : "disabled");
 
     if (remoteMgmtEnabled) {
       List<FileOrBinary> certFiles = remoteMgmt.certs();
       if (CollectionUtil.isEmpty(certFiles)) {
-        LOG.error("no client certificate is configured, disable the " +
-            "remote management");
+        LOG.error("no client certificate is configured, disable the remote management");
       } else {
         List<X509Cert> certs = null;
         try {
           certs = X509Util.parseCerts(certFiles);
         } catch (InvalidConfException ex) {
-          LOG.error("error parsing remote management's client certificates",
-              ex);
+          LOG.error("error parsing remote management's client certificates", ex);
         }
 
         if (CollectionUtil.isEmpty(certs)) {
-          LOG.error("could not find any valid client certificates, " +
-              "disable the remote management");
+          LOG.error("could not find any valid client certificates, disable the remote management");
         } else {
-          mgmtServlet = new CaHttpMgmtServlet(caManager,
-              conf.reverseProxyMode(), certs, logReqResp);
+          mgmtServlet = new CaHttpMgmtServlet(caManager, conf.reverseProxyMode(),
+                          certs, logReqResp);
         }
       }
     }
@@ -193,13 +184,10 @@ public class CaHttpFilter implements XiHttpFilter {
     }
   } // method destroy
 
-  private CertprofileFactoryRegister initCertprofileFactoryRegister(
-      List<String> factories) {
-    CertprofileFactoryRegister certprofileFactoryRegister =
-        new CertprofileFactoryRegister();
+  private CertprofileFactoryRegister initCertprofileFactoryRegister(List<String> factories) {
+    CertprofileFactoryRegister certprofileFactoryRegister = new CertprofileFactoryRegister();
     try {
-      CertprofileFactory certprofileFactory =
-          ReflectiveUtil.newInstance(XIJSON_CERT_FACTORY);
+      CertprofileFactory certprofileFactory = ReflectiveUtil.newInstance(XIJSON_CERT_FACTORY);
       certprofileFactoryRegister.registFactory(certprofileFactory);
     } catch (ObjectCreationException ex) {
       LogUtil.warn(LOG, ex);
@@ -221,8 +209,7 @@ public class CaHttpFilter implements XiHttpFilter {
   } // method initCertprofileFactoryRegister
 
   @Override
-  public void doFilter(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String path = req.getServletPath();
     if (path.startsWith("/ra/")) {
       if (raServlet != null) {

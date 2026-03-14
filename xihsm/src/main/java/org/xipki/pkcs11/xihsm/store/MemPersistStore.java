@@ -24,12 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class MemPersistStore implements PersistStore {
 
-  private static final Logger LOG = LoggerFactory.getLogger(
-      MemPersistStore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(MemPersistStore.class);
 
   private final StoreSlotInfo[] slotInfos;
 
@@ -54,8 +55,7 @@ public class MemPersistStore implements PersistStore {
 
   private MemSlot getSlot(long slotId) throws HsmException {
     return Optional.ofNullable(slots.get(slotId)).orElseThrow(
-        () -> new HsmException(PKCS11T.CKR_SLOT_ID_INVALID,
-              "invalid slotId " + slotId));
+        () -> new HsmException(PKCS11T.CKR_SLOT_ID_INVALID, "invalid slotId " + slotId));
   }
 
   @Override
@@ -64,21 +64,20 @@ public class MemPersistStore implements PersistStore {
   }
 
   @Override
-  public void findObjects(List<Long> res, long slotId, LoginState loginState,
-                          XiTemplate criteria)
+  public void findObjects(List<Long> res, long slotId, LoginState loginState, XiTemplate criteria)
       throws HsmException {
     getSlot(slotId).findObjects(res, loginState, criteria);
   }
 
   @Override
-  public XiP11Storage getObject(
-      long slotId, long hObject, LoginState loginState) throws HsmException {
+  public XiP11Storage getObject(long slotId, long hObject, LoginState loginState)
+      throws HsmException {
     return getSlot(slotId).getObject(hObject, loginState);
   }
 
   @Override
-  public void updateObject(long slotId, long hObject, LoginState loginState,
-                           XiTemplate attrs) throws HsmException {
+  public void updateObject(long slotId, long hObject, LoginState loginState, XiTemplate attrs)
+      throws HsmException {
     getSlot(slotId).updateObject(hObject, loginState, attrs);
   }
 
@@ -114,8 +113,7 @@ public class MemPersistStore implements PersistStore {
 
   private static class MemSlot {
 
-    private final ConcurrentHashMap<Long, XiP11Storage> handleObjectMap
-        = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, XiP11Storage> handleObjectMap = new ConcurrentHashMap<>();
 
     private final XiHsmVendor vendor;
     private final StoreSlotInfo slotInfo;
@@ -125,8 +123,7 @@ public class MemPersistStore implements PersistStore {
     MemSlot(XiHsmVendor vendor, int slotIndex, long slotId) {
       this.vendor = vendor;
       this.slotInfo = new StoreSlotInfo(vendor, slotIndex, slotId,
-          "1234", "mem slot 1234",
-          NopUserVerifier.INSTANCE);
+          "1234", "mem slot 1234", NopUserVerifier.INSTANCE);
     }
 
     StoreSlotInfo getSlotInfo() {
@@ -137,18 +134,15 @@ public class MemPersistStore implements PersistStore {
       long hObject = object.getHandle();
       if (handleObjectMap.containsKey(hObject)) {
         throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-            "could not add object: hObject " + hObject +
-                " in slot " + slotInfo.getSlotId());
+            "could not add object: hObject " + hObject + " in slot " + slotInfo.getSlotId());
       }
-      XiP11Storage newObj = XiP11Storage.decode(
-          vendor, hObject, object.encode());
+      XiP11Storage newObj = XiP11Storage.decode(vendor, hObject, object.encode());
 
       handleObjectMap.put(hObject, newObj);
       LOG.debug("added object {} in slot {}", hObject, slotInfo.getSlotId());
     }
 
-    void findObjects(List<Long> res, LoginState loginState,
-                     XiTemplate criteria) {
+    void findObjects(List<Long> res, LoginState loginState, XiTemplate criteria) {
       for (Map.Entry<Long, XiP11Storage> kv : handleObjectMap.entrySet()) {
         XiP11Storage obj = kv.getValue();
         if (obj.isVisibleForCku(loginState) && obj.match(criteria)) {
@@ -157,8 +151,7 @@ public class MemPersistStore implements PersistStore {
       }
     }
 
-    XiP11Storage getObject(long hObject, LoginState loginState)
-        throws HsmException {
+    XiP11Storage getObject(long hObject, LoginState loginState) throws HsmException {
       XiP11Storage ret = handleObjectMap.get(hObject);
       if (ret == null) {
         throw new HsmException(PKCS11T.CKR_OBJECT_HANDLE_INVALID,
@@ -166,14 +159,12 @@ public class MemPersistStore implements PersistStore {
       }
 
       if (!ret.isVisibleForCku(loginState)) {
-        throw new HsmException(PKCS11T.CKR_OBJECT_HANDLE_INVALID,
-            "object is not visible");
+        throw new HsmException(PKCS11T.CKR_OBJECT_HANDLE_INVALID, "object is not visible");
       }
       return ret;
     }
 
-    void updateObject(long hObject, LoginState loginState, XiTemplate attrs)
-      throws HsmException {
+    void updateObject(long hObject, LoginState loginState, XiTemplate attrs) throws HsmException {
       XiP11Storage obj = getObject(hObject, loginState);
       obj.updateAttributes(loginState, ObjectInitMethod.UPDATE, attrs);
 
@@ -182,13 +173,11 @@ public class MemPersistStore implements PersistStore {
       LOG.debug("updated object {} in slot {}", hObject, slotInfo.getSlotId());
     }
 
-    void destroyObject(long hObject, LoginState loginState)
-        throws HsmException {
+    void destroyObject(long hObject, LoginState loginState) throws HsmException {
       XiP11Storage obj = getObject(hObject, loginState);
 
       if (!obj.isDestroyable()) {
-        throw new HsmException(PKCS11T.CKR_ACTION_PROHIBITED,
-            "object is not destroyable");
+        throw new HsmException(PKCS11T.CKR_ACTION_PROHIBITED, "object is not destroyable");
       }
 
       handleObjectMap.remove(obj.getHandle());
@@ -217,8 +206,7 @@ public class MemPersistStore implements PersistStore {
         }
 
         if (cHandle == -1) {
-          throw new HsmException(PKCS11T.CKR_GENERAL_ERROR,
-              "no available handle");
+          throw new HsmException(PKCS11T.CKR_GENERAL_ERROR, "no available handle");
         }
 
         ret[i] = cHandle;

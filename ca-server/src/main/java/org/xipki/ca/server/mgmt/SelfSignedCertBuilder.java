@@ -47,13 +47,12 @@ import java.util.Optional;
 /**
  * Self-signed certificate builder.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 
 public class SelfSignedCertBuilder {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SelfSignedCertBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SelfSignedCertBuilder.class);
 
   private SelfSignedCertBuilder() {
   }
@@ -61,8 +60,7 @@ public class SelfSignedCertBuilder {
   public static X509Cert generateSelfSigned(
       SecurityFactory securityFactory, String signerType, String signerConf,
       IdentifiedCertprofile certprofile, String subject, String serialNumber,
-      Instant notBefore, Instant notAfter)
-      throws OperationException, InvalidConfException {
+      Instant notBefore, Instant notAfter) throws OperationException, InvalidConfException {
     Args.notNull(securityFactory, "securityFactory");
     Args.notBlank(signerType, "signerType");
     Args.notBlank(subject, "subject");
@@ -70,14 +68,12 @@ public class SelfSignedCertBuilder {
     BigInteger serialOfThisCert = serialNumber == null || serialNumber.isEmpty()
         ? BigInteger.ONE : StringUtil.toBigInt(serialNumber);
     if (serialOfThisCert.signum() != 1) {
-      throw new IllegalArgumentException(
-          "serialNumber may not be non-positive: " + serialNumber);
+      throw new IllegalArgumentException("serialNumber may not be non-positive: " + serialNumber);
     }
 
     CertLevel level = Args.notNull(certprofile, "certprofile").certLevel();
     if (CertLevel.RootCA != level) {
-      throw new IllegalArgumentException("certprofile is not of level "
-          + CertLevel.RootCA);
+      throw new IllegalArgumentException("certprofile is not of level " + CertLevel.RootCA);
     }
 
     if (StringUtil.orEqualsIgnoreCase(signerType, "PKCS12", "JCEKS")) {
@@ -89,8 +85,7 @@ public class SelfSignedCertBuilder {
 
     ConcurrentSigner signer;
     try {
-      List<CaEntry.CaSignerConf> signerConfs =
-          CaEntry.splitCaSignerConfs(signerConf);
+      List<CaEntry.CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
       List<SignAlgo> restrictedSigAlgos = certprofile.signatureAlgorithms();
 
       String thisSignerConf = null;
@@ -112,8 +107,8 @@ public class SelfSignedCertBuilder {
       }
 
       if (thisSignerConf == null) {
-        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "CA does not " +
-            "support any signature algorithm restricted by the cert profile");
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE,
+            "CA does not support any signature algorithm restricted by the cert profile");
       }
 
       signer = securityFactory.createSigner(signerType,
@@ -127,15 +122,12 @@ public class SelfSignedCertBuilder {
   }
 
   private static X509Cert generateCertificate(
-      ConcurrentSigner signer, IdentifiedCertprofile certprofile,
-      String subject, BigInteger serialNumber, Instant notBefore,
-      Instant notAfter)
-      throws OperationException {
+      ConcurrentSigner signer, IdentifiedCertprofile certprofile, String subject,
+      BigInteger serialNumber, Instant notBefore, Instant notAfter) throws OperationException {
     SubjectPublicKeyInfo publicKeyInfo;
 
     try {
-      SubjectPublicKeyInfo x509PkInfo = KeyUtil.createSubjectPublicKeyInfo(
-          signer.getPublicKey());
+      SubjectPublicKeyInfo x509PkInfo = KeyUtil.createSubjectPublicKeyInfo(signer.publicKey());
       publicKeyInfo = X509Util.toRfc3279Style(x509PkInfo);
     } catch (InvalidKeyException ex) {
       LOG.warn("building SubjectPublicKeyInfo from JCE public key", ex);
@@ -144,9 +136,6 @@ public class SelfSignedCertBuilder {
 
     try {
       certprofile.checkPublicKey(publicKeyInfo);
-    } catch (CertprofileException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofile.ident());
     } catch (BadCertTemplateException ex) {
       LOG.warn("certprofile.checkPublicKey", ex);
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
@@ -196,12 +185,10 @@ public class SelfSignedCertBuilder {
           publicCaInfo, null, notBefore, notAfter);
 
         X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-            grantedSubject, serialNumber,
-            Date.from(notBefore), Date.from(notAfter), grantedSubject,
-            publicKeyInfo);
+            grantedSubject, serialNumber, Date.from(notBefore), Date.from(notAfter),
+            grantedSubject, publicKeyInfo);
 
-      CaUtil.addExtensions(extensionTuples, certBuilder,
-          certprofile.extensionControls());
+      CaUtil.addExtensions(extensionTuples, certBuilder, certprofile.extensionControls());
       X509CertificateHolder certHolder;
       try {
         certHolder = certBuilder.build(signer0.x509Signer());

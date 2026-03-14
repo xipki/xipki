@@ -117,6 +117,13 @@ CK_RV parseMechParams(CK_VOID_PTR* pParams, CK_ULONG* paramsLen,
       longField(p->ulTagBits);
       break;
     }
+    case MP_ECDH1_DERIVE_PARAMS: {
+      mallocParams(p, CK_ECDH1_DERIVE_PARAMS);
+      longField(p->kdf);
+      byteArrayField(p->pSharedData, p->ulSharedDataLen);
+      byteArrayField(p->pPublicData, p->ulPublicDataLen);
+      break;
+    }
     case MP_EDDSA_PARAMS: {
       mallocParams(p, CK_EDDSA_PARAMS);
       boolField(p->phFlag);
@@ -141,6 +148,14 @@ CK_RV parseMechParams(CK_VOID_PTR* pParams, CK_ULONG* paramsLen,
       longField(p->hashAlg);
       longField(p->mgf);
       longField(p->sLen);
+      break;
+    }
+    case MP_RSA_PKCS_OAEP_PARAMS: {
+      mallocParams(p, CK_RSA_PKCS_OAEP_PARAMS);
+      longField(p->hashAlg);
+      longField(p->mgf);
+      longField(p->source);
+      byteArrayField(p->pSourceData, p->ulSourceDataLen);
       break;
     }
     case MP_XEDDSA_PARAMS: {

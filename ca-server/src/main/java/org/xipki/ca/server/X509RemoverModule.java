@@ -49,18 +49,15 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       }
 
       inProcess = true;
-      final Instant expiredAt = Instant.now().minus(
-          keepDays + 1, ChronoUnit.DAYS);
+      final Instant expiredAt = Instant.now().minus(keepDays + 1, ChronoUnit.DAYS);
 
       try {
         LOG.debug("revoking expired certificates");
-        AuditEvent event = newAuditEvent(
-            CaAuditConstants.TYPE_remove_expired_certs, null);
+        AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_expired_certs, null);
         boolean successful = false;
         try {
           int num = removeExpiredCerts0(expiredAt, event);
-          LOG.info("removed {} certificates expired at {} of CA {}", num,
-              expiredAt, caIdent);
+          LOG.info("removed {} certificates expired at {} of CA {}", num, expiredAt, caIdent);
           successful = true;
         } finally {
           finish(event, successful);
@@ -97,15 +94,12 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
       return;
     }
 
-    ScheduledThreadPoolExecutor executor =
-        caManager.scheduledThreadPoolExecutor();
+    ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
 
     Random random = new Random();
     final int minutesOfDay = 24 * 60;
-    this.expiredCertsRemover = executor.scheduleAtFixedRate(
-        new ExpiredCertsRemover(),
-        minutesOfDay + random.nextInt(60), minutesOfDay,
-        TimeUnit.MINUTES);
+    this.expiredCertsRemover = executor.scheduleAtFixedRate(new ExpiredCertsRemover(),
+        minutesOfDay + random.nextInt(60), minutesOfDay, TimeUnit.MINUTES);
   } // constructor
 
   public CertWithDbId removeCert(SerialWithId serialNumber, AuditEvent event)
@@ -118,22 +112,17 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
     return removeCert0(0, serialNumber, event);
   }
 
-  private CertWithDbId removeCert0(
-      long certId, BigInteger serialNumber, AuditEvent event)
+  private CertWithDbId removeCert0(long certId, BigInteger serialNumber, AuditEvent event)
       throws OperationException {
-    if (caInfo.isSelfSigned()
-        && caInfo.serialNumber().equals(serialNumber)) {
-      throw new OperationException(ErrorCode.NOT_PERMITTED,
-          "could not remove CA certificate");
+    if (caInfo.isSelfSigned() && caInfo.serialNumber().equals(serialNumber)) {
+      throw new OperationException(ErrorCode.NOT_PERMITTED, "could not remove CA certificate");
     }
 
     boolean successful = true;
     try {
-      event.addEventData(CaAuditConstants.NAME_serial,
-          LogUtil.formatCsn(serialNumber));
+      event.addEventData(CaAuditConstants.NAME_serial, LogUtil.formatCsn(serialNumber));
       CertWithRevocationInfo certWithRevInfo = (certId == 0)
-          ? certstore.getCertWithRevocationInfo(caIdent.id(),
-              serialNumber, caIdNameMap)
+          ? certstore.getCertWithRevocationInfo(caIdent.id(), serialNumber, caIdNameMap)
           : certstore.getCertWithRevocationInfo(certId, caIdNameMap);
 
       if (certWithRevInfo == null) {
@@ -178,8 +167,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
       for (SerialWithId serial : serials) {
         // do not delete CA's own certificate
-        if ((caInfo.isSelfSigned()
-            && caInfo.serialNumber().equals(serial.serial()))) {
+        if ((caInfo.isSelfSigned() && caInfo.serialNumber().equals(serial.serial()))) {
           continue;
         }
 
@@ -188,10 +176,9 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
             sum++;
           }
         } catch (OperationException ex) {
-          LOG.info("removed {} expired certificates of CA {}",
-              sum, caIdent.name());
-          LogUtil.error(LOG, ex, "could not remove expired certificate " +
-              "with serial" + serial.serial());
+          LOG.info("removed {} expired certificates of CA {}", sum, caIdent.name());
+          LogUtil.error(LOG, ex, "could not remove expired certificate with serial" +
+              serial.serial());
           throw ex;
         }
       } // end for

@@ -61,11 +61,10 @@ public class GetCRLRequest extends SdkRequest {
   public static GetCRLRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("GetCRLRequest", decoder, 3);
-      return new GetCRLRequest(decoder.readBigInt(),
-          decoder.readInstant(), decoder.readTextString());
+      return new GetCRLRequest(decoder.readBigInt(), decoder.readInstant(),
+              decoder.readTextString());
     } catch (RuntimeException ex) {
-      throw new CodecException(
-          buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
+      throw new CodecException(buildDecodeErrMessage(ex, GetCRLRequest.class), ex);
     }
   }
 

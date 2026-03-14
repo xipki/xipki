@@ -21,8 +21,7 @@ public class AuthorityCertStore {
 
   private final X509Cert encryptionCert;
 
-  private AuthorityCertStore(X509Cert caCert, X509Cert signatureCert,
-                             X509Cert encryptionCert) {
+  private AuthorityCertStore(X509Cert caCert, X509Cert signatureCert, X509Cert encryptionCert) {
     this.caCert = caCert;
     this.signatureCert = signatureCert;
     this.encryptionCert = encryptionCert;
@@ -40,8 +39,7 @@ public class AuthorityCertStore {
     return caCert;
   }
 
-  public static AuthorityCertStore getInstance(
-      X509Cert caCert, X509Cert... raCerts) {
+  public static AuthorityCertStore getInstance(X509Cert caCert, X509Cert... raCerts) {
     Args.notNull(caCert, "caCert");
 
     X509Cert encryptionCert = null;
@@ -54,8 +52,7 @@ public class AuthorityCertStore {
       for (X509Cert cert : raCerts) {
         if (cert.hasKeyusage(KeyUsage.keyEncipherment)) {
           if (encryptionCert != null) {
-            throw new IllegalArgumentException(
-                "Could not determine RA certificate for encryption");
+            throw new IllegalArgumentException("Could not determine RA certificate for encryption");
           }
           encryptionCert = cert;
         }
@@ -63,21 +60,18 @@ public class AuthorityCertStore {
         if (cert.hasKeyusage(KeyUsage.digitalSignature)
             || cert.hasKeyusage(KeyUsage.contentCommitment)) {
           if (signatureCert != null) {
-            throw new IllegalArgumentException(
-                "Could not determine RA certificate for signature");
+            throw new IllegalArgumentException("Could not determine RA certificate for signature");
           }
           signatureCert = cert;
         }
       }
 
       if (encryptionCert == null) {
-        throw new IllegalArgumentException(
-            "Could not determine RA certificate for encryption");
+        throw new IllegalArgumentException("Could not determine RA certificate for encryption");
       }
 
       if (signatureCert == null) {
-        throw new IllegalArgumentException(
-            "Could not determine RA certificate for signature");
+        throw new IllegalArgumentException("Could not determine RA certificate for signature");
       }
     }
 

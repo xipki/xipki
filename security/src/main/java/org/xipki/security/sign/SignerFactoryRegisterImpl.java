@@ -3,6 +3,10 @@
 
 package org.xipki.security.sign;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SecurityFactory;
@@ -10,23 +14,30 @@ import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.ObjectCreationException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * An implementation of {@link SignerFactoryRegister}.
  *
  * @author Lijun Liao (xipki)
  */
+@Component(service = SignerFactoryRegister.class)
 public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  private final ConcurrentLinkedDeque<SignerFactory> factories =
-      new ConcurrentLinkedDeque<>();
+  // Cardinality.MULTIPLE means 0..n
+  // Policy.DYNAMIC allows the list to update as services come and go
+  @Reference(
+      service = SignerFactory.class,
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC
+  )
+  private volatile List<SignerFactory> factories = new ArrayList<>();
 
   public SignerFactoryRegisterImpl() {
   }
@@ -70,18 +81,17 @@ public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   @Override
   public ConcurrentSigner newSigner(
-      SecurityFactory securityFactory, String type, SignerConf conf,
-      X509Cert[] certificateChain) throws ObjectCreationException {
+      SecurityFactory securityFactory, String type, SignerConf conf, X509Cert[] certificateChain)
+      throws ObjectCreationException {
     Args.notBlank(type, "type");
 
     for (SignerFactory service : factories) {
       if (service.canCreateSigner(type)) {
-        return service.newSigner(type, conf, certificateChain);
+        return service.newSigner(securityFactory, type, conf, certificateChain);
       }
     }
 
-    throw new ObjectCreationException(
-        "could not find Factory to create Signer of type " + type);
+    throw new ObjectCreationException("could not find Factory to create Signer of type " + type);
   }
 
 }

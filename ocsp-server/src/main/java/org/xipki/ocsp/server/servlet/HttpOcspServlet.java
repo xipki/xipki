@@ -36,8 +36,7 @@ import java.util.Map;
 
 class HttpOcspServlet {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(HttpOcspServlet.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpOcspServlet.class);
 
   private static final long DFLT_CACHE_MAX_AGE = 60; // 1 minute
 
@@ -54,8 +53,7 @@ class HttpOcspServlet {
     this.server = Args.notNull(server, "server");
   }
 
-  public void service(XiHttpRequest req, XiHttpResponse resp)
-      throws IOException {
+  public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
     String method = req.getMethod();
     if ("GET".equalsIgnoreCase(method)) {
       doGet(req).fillResponse(resp);
@@ -92,23 +90,19 @@ class HttpOcspServlet {
         return new HttpResponse(HttpStatusCode.SC_REQUEST_ENTITY_TOO_LARGE);
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo =
-          server.answer(responder, reqContent, false);
-      if (ocspRespWithCacheInfo == null
-          || ocspRespWithCacheInfo.response() == null) {
+      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, reqContent, false);
+      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
         LOG.error("processRequest returned null, this should not happen");
         return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
 
       byte[] encodedOcspResp = ocspRespWithCacheInfo.response();
       if (logReqResp && LOG.isDebugEnabled()) {
-        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}",
-            req.getRequestURI(), LogUtil.base64Encode(reqContent),
-            LogUtil.base64Encode(encodedOcspResp));
+        LOG.debug("HTTP POST OCSP path: {}\nRequest:\n{}\nResponse:\n{}", req.getRequestURI(),
+            LogUtil.base64Encode(reqContent), LogUtil.base64Encode(encodedOcspResp));
       }
 
-      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null,
-          encodedOcspResp);
+      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, null, encodedOcspResp);
     } catch (Throwable th) {
       if (th instanceof EOFException) {
         LogUtil.warn(LOG, th, "Connection reset by peer");
@@ -163,10 +157,8 @@ class HttpOcspServlet {
         return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
 
-      OcspRespWithCacheInfo ocspRespWithCacheInfo =
-          server.answer(responder, ocsReqBytes, true);
-      if (ocspRespWithCacheInfo == null
-          || ocspRespWithCacheInfo.response() == null) {
+      OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocsReqBytes, true);
+      if (ocspRespWithCacheInfo == null || ocspRespWithCacheInfo.response() == null) {
         LOG.error("processRequest returned null, this should not happen");
         return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
       }
@@ -177,8 +169,7 @@ class HttpOcspServlet {
             LogUtil.base64Encode(encodedOcspResp));
       }
 
-      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo =
-          ocspRespWithCacheInfo.cacheInfo();
+      OcspRespWithCacheInfo.ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.cacheInfo();
       Map<String, String> headers = new HashMap<>();
       if (cacheInfo != null) {
         encodedOcspResp = ocspRespWithCacheInfo.response();
@@ -206,24 +197,18 @@ class HttpOcspServlet {
             HashAlgo.SHA1.hexHash(encodedOcspResp), "\""));
 
         // Max age must be in seconds in the cache-control header
-        long maxAge;
-        if (responder.cacheMaxAge() != null) {
-          maxAge = responder.cacheMaxAge();
-        } else {
-          maxAge = DFLT_CACHE_MAX_AGE;
-        }
+        long maxAge = (responder.cacheMaxAge() != null)
+            ? responder.cacheMaxAge() : DFLT_CACHE_MAX_AGE;
 
         if (nextUpdate != null) {
-          maxAge = Math.min(maxAge,
-              (nextUpdate - cacheInfo.generatedAt()) / 1000);
+          maxAge = Math.min(maxAge, (nextUpdate - cacheInfo.generatedAt()) / 1000);
         }
 
         headers.put("Cache-Control", StringUtil.concat("max-age=",
             Long.toString(maxAge), ",public,no-transform,must-revalidate"));
       } // end if (ocspRespWithCacheInfo)
 
-      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE,
-          headers, encodedOcspResp);
+      return new HttpResponse(HttpStatusCode.SC_OK, CT_RESPONSE, headers, encodedOcspResp);
     } catch (Throwable th) {
       LOG.error("Throwable thrown, this should not happen!", th);
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);

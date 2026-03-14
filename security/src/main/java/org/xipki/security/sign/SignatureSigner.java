@@ -8,12 +8,15 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.SignAlgo;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.util.KeyUtil;
 import org.xipki.util.codec.Args;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.PrivateKey;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
@@ -70,17 +73,19 @@ public class SignatureSigner implements Signer {
 
   private final ContentSigner x509Signer;
 
-  public SignatureSigner(SignAlgo sigAlgo, Signature signer, PrivateKey key)
-      throws XiSecurityException {
-    this(sigAlgo.algorithmIdentifier(), signer, key);
+  public SignatureSigner(
+      SignAlgo sigAlgo, Signature signer, SecureRandom random,
+      PrivateKey key, byte[] context) throws XiSecurityException {
+    this(sigAlgo.algorithmIdentifier(), signer, random, key, context);
   }
 
-  public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer,
-                         PrivateKey key)
-      throws XiSecurityException {
+  public SignatureSigner(
+      AlgorithmIdentifier sigAlgId, Signature signer, SecureRandom random,
+      PrivateKey key, byte[] context) throws XiSecurityException {
     Args.notNull(sigAlgId, "sigAlgId");
     Args.notNull(signer, "signer");
     Args.notNull(key, "key");
+
     try {
       this.encodedX509SigAlgId = sigAlgId.getEncoded();
     } catch (IOException ex) {
@@ -98,8 +103,11 @@ public class SignatureSigner implements Signer {
       @Override
       public OutputStream getOutputStream() {
         try {
-          signer.initSign(key);
-        } catch (InvalidKeyException ex) {
+          KeyUtil.initSign(signer, key, random);
+          if (context != null) {
+            KeyUtil.setContext(signer, context);
+          }
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException ex) {
           throw new RuntimeOperatorException("could not initSign", ex);
         }
         return stream;
@@ -110,8 +118,8 @@ public class SignatureSigner implements Signer {
         try {
           return stream.getSignature();
         } catch (SignatureException ex) {
-          throw new RuntimeOperatorException(
-              "exception obtaining signature: " + ex.getMessage(), ex);
+          throw new RuntimeOperatorException("exception obtaining signature: " + ex.getMessage(),
+              ex);
         }
       }
     };

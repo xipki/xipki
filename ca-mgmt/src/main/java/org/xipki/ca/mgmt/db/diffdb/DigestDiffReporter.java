@@ -28,8 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class DigestDiffReporter implements Closeable {
 
-  private static final Logger LOG =
-      LoggerFactory.getLogger(DigestDiffReporter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DigestDiffReporter.class);
 
   private final String reportDirname;
 
@@ -55,8 +54,7 @@ class DigestDiffReporter implements Closeable {
 
   private final AtomicInteger numError = new AtomicInteger(0);
 
-  public DigestDiffReporter(String reportDirname, byte[] caCertBytes)
-      throws IOException {
+  public DigestDiffReporter(String reportDirname, byte[] caCertBytes) throws IOException {
     this.reportDirname = Args.notBlank(reportDirname, "reportDirname");
     File dir = new File(reportDirname);
     IoUtil.mkdirs(dir);
@@ -99,12 +97,10 @@ class DigestDiffReporter implements Closeable {
     unexpectedWriter.writeSerialNumber(serialNumber);
   }
 
-  public void addDiff(DigestEntry refCert, DigestEntry targetCert)
-      throws IOException {
+  public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
     if (Args.notNull(refCert, "refCert").serialNumber().equals(
         Args.notNull(targetCert, "targetCert").serialNumber())) {
-      throw new IllegalArgumentException(
-          "refCert and targetCert are not of the same serialNumber");
+      throw new IllegalArgumentException("refCert and targetCert are not of the same serialNumber");
     }
 
     numDiff.incrementAndGet();
@@ -117,8 +113,7 @@ class DigestDiffReporter implements Closeable {
   } // method addDiff
 
   public void addError(String errorMessage) throws IOException {
-    String msg = StringUtil.concat(
-        Args.notNull(errorMessage, "errorMessage"), "\n");
+    String msg = StringUtil.concat(Args.notNull(errorMessage, "errorMessage"), "\n");
     numError.incrementAndGet();
     synchronized (errorWriter) {
       errorWriter.write(msg);
@@ -133,8 +128,7 @@ class DigestDiffReporter implements Closeable {
 
   @Override
   public void close() {
-    closeWriter(missingWriter, unexpectedWriter, diffWriter,
-        goodWriter, errorWriter);
+    closeWriter(missingWriter, unexpectedWriter, diffWriter, goodWriter, errorWriter);
 
     int sum = numGood.get() + numDiff.get() + numMissing.get()
               + numUnexpected.get() + numError.get();
@@ -160,8 +154,7 @@ class DigestDiffReporter implements Closeable {
       IoUtil.save(reportDirname + File.separator + "overview.txt",
           StringUtil.toUtf8Bytes(str));
     } catch (IOException ex) {
-      System.out.println("Could not write overview.txt with following " +
-          "content\n" + str);
+      System.out.println("Could not write overview.txt with following content\n" + str);
     }
   } // method close
 
@@ -182,8 +175,7 @@ class DigestDiffReporter implements Closeable {
       this.underlying = underlying;
     }
 
-    public synchronized void writeSerialNumber(BigInteger serialNumber)
-        throws IOException {
+    public synchronized void writeSerialNumber(BigInteger serialNumber) throws IOException {
       underlying.write(StringUtil.concat(serialNumber.toString(16), "\n"));
     }
 

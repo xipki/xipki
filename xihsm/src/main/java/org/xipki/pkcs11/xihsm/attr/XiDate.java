@@ -6,6 +6,8 @@ package org.xipki.pkcs11.xihsm.attr;
 import org.xipki.pkcs11.wrapper.type.CkDate;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public class XiDate {
@@ -20,9 +22,7 @@ public class XiDate {
     long m = date % 10000 / 100L;
     long d = date % 100L;
 
-    boolean valid = (y >= 1900 && y <= 9999)
-        && (m >= 1 && m <= 12)
-        && (d >= 1 && d <= 31);
+    boolean valid = (y >= 1900 && y <= 9999) && (m >= 1 && m <= 12) && (d >= 1 && d <= 31);
     if (!valid) {
       throw new IllegalArgumentException("invalid date: " + date);
     }
@@ -38,8 +38,7 @@ public class XiDate {
   }
 
   public static XiDate fromCkDate(CkDate value) {
-    return new XiDate(Long.parseLong(
-                value.year() + value.month() + value.day()));
+    return new XiDate(Long.parseLong(value.year() + value.month() + value.day()));
   }
 
 }

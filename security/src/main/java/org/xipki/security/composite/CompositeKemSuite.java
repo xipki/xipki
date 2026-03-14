@@ -13,102 +13,90 @@ import org.xipki.security.OIDs;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * XiPKI component.
+ *
  * @author Lijun Liao (xipki)
  */
 public enum CompositeKemSuite {
 
   MLKEM768_RSA2048_SHA3_256(
-      OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256,
-      "MLKEM768-RSAOAEP2048",
-      MlkemVariant.mlkem768, KemTradVariant.RSA2048_OAEP),
+      OIDs.Composite.id_MLKEM768_RSA2048_SHA3_256, "MLKEM768-RSAOAEP2048",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.RSA2048_OAEP),
 
   MLKEM768_RSA3072_SHA3_256(
-      OIDs.Composite.id_MLKEM768_RSA3072_SHA3_256,
-      "MLKEM768-RSAOAEP3072",
-      MlkemVariant.mlkem768, KemTradVariant.RSA3072_OAEP),
+      OIDs.Composite.id_MLKEM768_RSA3072_SHA3_256, "MLKEM768-RSAOAEP3072",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.RSA3072_OAEP),
 
   MLKEM768_RSA4096_SHA3_256(
-      OIDs.Composite.id_MLKEM768_RSA4096_SHA3_256,
-      "MLKEM768-RSAOAEP4096",
-      MlkemVariant.mlkem768, KemTradVariant.RSA4096_OAEP),
+      OIDs.Composite.id_MLKEM768_RSA4096_SHA3_256, "MLKEM768-RSAOAEP4096",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.RSA4096_OAEP),
 
   MLKEM768_X25519_SHA3_256(
-        OIDs.Composite.id_MLKEM768_X25519_SHA3_256,
-        "\\.//^\\", // "\.//^\"
-        MlkemVariant.mlkem768, KemTradVariant.X25519),
+        OIDs.Composite.id_MLKEM768_X25519_SHA3_256, "\\.//^\\", // "\.//^\"
+        CompKemMlkemVariant.mlkem768, CompKemTradVariant.X25519),
 
   MLKEM768_ECDH_P256_SHA3_256(
-      OIDs.Composite.id_MLKEM768_ECDH_P256_SHA3_256,
-      "MLKEM768-P256",
-      MlkemVariant.mlkem768, KemTradVariant.ECDH_P256),
+      OIDs.Composite.id_MLKEM768_ECDH_P256_SHA3_256, "MLKEM768-P256",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.ECDH_P256),
 
   MLKEM768_ECDH_P384_SHA3_256(
-      OIDs.Composite.id_MLKEM768_ECDH_P384_SHA3_256,
-      "MLKEM768-P384",
-      MlkemVariant.mlkem768, KemTradVariant.ECDH_P384),
+      OIDs.Composite.id_MLKEM768_ECDH_P384_SHA3_256, "MLKEM768-P384",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.ECDH_P384),
 
-  MLKEM768_ECDH_BRAINPOOLP256R1_SHA3_256(
-      OIDs.Composite.id_MLKEM768_ECDH_brainpoolP256r1_SHA3_256,
-      "MLKEM768-BP256",
-      MlkemVariant.mlkem768, KemTradVariant.ECDH_BP256),
+  MLKEM768_ECDH_BP256_SHA3_256(
+      OIDs.Composite.id_MLKEM768_ECDH_brainpoolP256r1_SHA3_256, "MLKEM768-BP256",
+      CompKemMlkemVariant.mlkem768, CompKemTradVariant.ECDH_BP256),
 
   MLKEM1024_RSA3072_SHA3_256(
-      OIDs.Composite.id_MLKEM1024_RSA3072_SHA3_256,
-      "MLKEM1024-RSAOAEP3072",
-      MlkemVariant.mlkem1024, KemTradVariant.RSA3072_OAEP),
+      OIDs.Composite.id_MLKEM1024_RSA3072_SHA3_256, "MLKEM1024-RSAOAEP3072",
+      CompKemMlkemVariant.mlkem1024, CompKemTradVariant.RSA3072_OAEP),
 
   MLKEM1024_ECDH_P384_SHA3_256(
-      OIDs.Composite.id_MLKEM1024_ECDH_P384_SHA3_256,
-      "MLKEM1024-P384",
-      MlkemVariant.mlkem1024, KemTradVariant.ECDH_P384),
+      OIDs.Composite.id_MLKEM1024_ECDH_P384_SHA3_256, "MLKEM1024-P384",
+      CompKemMlkemVariant.mlkem1024, CompKemTradVariant.ECDH_P384),
 
-  MLKEM1024_ECDH_BRAINPOOLP384R1_SHA3_256(
-      OIDs.Composite.id_MLKEM1024_ECDH_brainpoolP384r1_SHA3_256,
-      "MLKEM1024-BP384",
-      MlkemVariant.mlkem1024, KemTradVariant.ECDH_BP384),
+  MLKEM1024_ECDH_BP384_SHA3_256(
+      OIDs.Composite.id_MLKEM1024_ECDH_brainpoolP384r1_SHA3_256, "MLKEM1024-BP384",
+      CompKemMlkemVariant.mlkem1024, CompKemTradVariant.ECDH_BP384),
 
   MLKEM1024_X448_SHA3_256(
-      OIDs.Composite.id_MLKEM1024_X448_SHA3_256,
-      "MLKEM1024-X448",
-      MlkemVariant.mlkem1024, KemTradVariant.X448),
+      OIDs.Composite.id_MLKEM1024_X448_SHA3_256, "MLKEM1024-X448",
+      CompKemMlkemVariant.mlkem1024, CompKemTradVariant.X448),
 
   MLKEM1024_ECDH_P521_SHA3_256(
-      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256,
-      "MLKEM1024-P521",
-      MlkemVariant.mlkem1024, KemTradVariant.ECDH_P521);
+      OIDs.Composite.id_MLKEM1024_ECDH_P521_SHA3_256, "MLKEM1024-P521",
+      CompKemMlkemVariant.mlkem1024, CompKemTradVariant.ECDH_P521);
 
   private final AlgorithmIdentifier algId;
   private final ASN1ObjectIdentifier oid;
   private final byte[] label;
-  private final MlkemVariant mlkemVariant;
-  private final KemTradVariant tradVariant;
+  private final CompKemMlkemVariant pqcVariant;
+  private final CompKemTradVariant tradVariant;
   private final KeySpec keySpec;
 
   CompositeKemSuite(ASN1ObjectIdentifier oid, String label,
-                    MlkemVariant mlkemVariant, KemTradVariant tradVariant) {
+                    CompKemMlkemVariant pqcVariant, CompKemTradVariant tradVariant) {
     this.oid = oid;
     this.algId = new AlgorithmIdentifier(oid);
     this.label = label.getBytes(StandardCharsets.US_ASCII);
-    this.mlkemVariant = mlkemVariant;
+    this.pqcVariant = pqcVariant;
     this.tradVariant = tradVariant;
     this.keySpec = KeySpec.ofAlgorithmIdentifier(algId);
   }
 
   public static CompositeKemSuite ofVariants(
-      MlkemVariant mlkemVariant, KemTradVariant tradVariant) {
+      CompKemMlkemVariant pqcVariant, CompKemTradVariant tradVariant) {
     for (CompositeKemSuite as : CompositeKemSuite.values()) {
-      if (as.mlkemVariant == mlkemVariant && as.tradVariant == tradVariant) {
+      if (as.pqcVariant == pqcVariant && as.tradVariant == tradVariant) {
         return as;
       }
     }
     return null;
   }
 
-  public static CompositeKemSuite ofKeySpecs(
-      KeySpec mlkemKeySpec, KeySpec tradKeySpec) {
+  public static CompositeKemSuite ofKeySpecs(KeySpec pqcKeySpec, KeySpec tradKeySpec) {
     for (CompositeKemSuite as : CompositeKemSuite.values()) {
-      if (as.mlkemVariant.keySpec() == mlkemKeySpec
-          && as.tradVariant.keySpec() == tradKeySpec) {
+      if (as.pqcVariant.keySpec() == pqcKeySpec && as.tradVariant.keySpec() == tradKeySpec) {
         return as;
       }
     }
@@ -137,11 +125,11 @@ public enum CompositeKemSuite {
     return algId;
   }
 
-  public MlkemVariant mlkemVariant() {
-    return mlkemVariant;
+  public CompKemMlkemVariant pqcVariant() {
+    return pqcVariant;
   }
 
-  public KemTradVariant tradVariant() {
+  public CompKemTradVariant tradVariant() {
     return tradVariant;
   }
 

@@ -25,28 +25,20 @@ public class ScepSigner {
   private final EnvelopedDataDecryptor decryptor;
 
   public ScepSigner(ConcurrentSigner signer) {
-    Key signingKey = signer.getSigningKey();
+    Key signingKey = signer.signingKey();
     if (!(signingKey instanceof PrivateKey)) {
       throw new IllegalArgumentException(
           "Unsupported signer type: the signing key is not a PrivateKey");
     }
 
-    if (!(signer.getX509Cert().publicKey() instanceof RSAPublicKey)) {
-      throw new IllegalArgumentException(
-          "The SCEP responder key is not RSA key");
+    if (!(signer.x509Cert().publicKey() instanceof RSAPublicKey)) {
+      throw new IllegalArgumentException("The SCEP responder key is not RSA key");
     }
 
     this.key = (PrivateKey) signingKey;
-    this.cert = signer.getX509Cert();
+    this.cert = signer.x509Cert();
     this.decryptor = new EnvelopedDataDecryptor(
         new EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance(cert, key));
-  }
-
-  public ScepSigner(PrivateKey key, X509Cert cert,
-                    EnvelopedDataDecryptor decryptor) {
-    this.key = key;
-    this.cert = cert;
-    this.decryptor = decryptor;
   }
 
   public PrivateKey key() {

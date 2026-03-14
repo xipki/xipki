@@ -115,8 +115,7 @@ public class SignerConf {
   }
 
   public SignerConf setKeystore(String keystore) {
-    return putPair(name_keystore,
-        Args.notBlank(keystore, "keystore"));
+    return putPair(name_keystore, Args.notBlank(keystore, "keystore"));
   }
 
   public String keystore() {
@@ -124,8 +123,8 @@ public class SignerConf {
   }
 
   public SignerConf setParallelism(int parallelism) {
-    return putPair(name_parallelism, Integer.toString(
-        Args.positive(parallelism, "parallelism")));
+    return putPair(name_parallelism,
+        Integer.toString(Args.positive(parallelism, "parallelism")));
   }
 
   public Integer parallelism() throws InvalidConfException {
@@ -157,8 +156,7 @@ public class SignerConf {
   }
 
   public SignerConf setSlot(int slot) {
-    return putPair(name_slot, Integer.toString(
-        Args.notNegative(slot, "slot")));
+    return putPair(name_slot, Integer.toString(Args.notNegative(slot, "slot")));
   }
 
   public Integer slot() {

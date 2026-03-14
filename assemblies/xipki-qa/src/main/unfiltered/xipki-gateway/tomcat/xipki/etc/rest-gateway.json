@@ -1,0 +1,12 @@
+{
+  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "caProfiles": [{
+    "name": "default",
+    "ca": "subcawithcrl",
+    "certprofile": "tls"
+  },{
+    "name": "myalias",
+    "ca": "subcawithcrl",
+    "certprofile": "tls"
+  }]
+}

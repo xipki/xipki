@@ -15,8 +15,7 @@ import java.time.Instant;
  * @author Lijun Liao (xipki)
  */
 
-public class CertRevInfoWithSerial
-    implements Comparable<CertRevInfoWithSerial> {
+public class CertRevInfoWithSerial implements Comparable<CertRevInfoWithSerial> {
 
   private final long id;
 
@@ -29,7 +28,7 @@ public class CertRevInfoWithSerial
   private final Instant invalidityTime;
 
   public CertRevInfoWithSerial(long id, BigInteger serial, CrlReason reason,
-                               Instant revocationTime, Instant invalidityTime) {
+                              Instant revocationTime, Instant invalidityTime) {
     this.reason = Args.notNull(reason, "reason");
     this.revocationTime = Args.notNull(revocationTime, "revocationTime");
     this.invalidityTime = invalidityTime;
@@ -38,9 +37,8 @@ public class CertRevInfoWithSerial
   } // method constructor
 
   public CertRevInfoWithSerial(long id, BigInteger serial, int reasonCode,
-                               Instant revocationTime, Instant invalidityTime) {
-    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime,
-        invalidityTime);
+                              Instant revocationTime, Instant invalidityTime) {
+    this(id, serial, CrlReason.forReasonCode(reasonCode), revocationTime, invalidityTime);
   } // method constructor
 
   public BigInteger serial() {

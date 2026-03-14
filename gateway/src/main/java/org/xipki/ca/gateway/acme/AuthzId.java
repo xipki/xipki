@@ -8,6 +8,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */

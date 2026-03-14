@@ -44,17 +44,14 @@ public class TransactionId {
   public static TransactionId sha1TransactionId(SubjectPublicKeyInfo spki)
       throws InvalidKeySpecException {
     try {
-      return sha1TransactionId(
-              Args.notNull(spki, "spki").getEncoded());
+      return sha1TransactionId(Args.notNull(spki, "spki").getEncoded());
     } catch (IOException ex) {
       throw new InvalidKeySpecException("IOException while ");
     }
   }
 
   public static TransactionId sha1TransactionId(byte[] content) {
-    return new TransactionId(
-        HashAlgo.SHA1.hash(
-            Args.notNull(content, "content")));
+    return new TransactionId(HashAlgo.SHA1.hash(Args.notNull(content, "content")));
   }
 
 }

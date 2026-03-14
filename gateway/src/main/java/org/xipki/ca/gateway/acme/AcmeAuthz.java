@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * ACME component.
  *
  * @author Lijun Liao (xipki)
  */
@@ -61,8 +62,7 @@ public class AcmeAuthz implements JsonEncodable {
   public static AcmeAuthz parse(JsonMap json) throws CodecException {
     int subId = json.getNnInt("subId");
 
-    AcmeIdentifier identifier = AcmeIdentifier.parse(
-        json.getNnMap("identifier"));
+    AcmeIdentifier identifier = AcmeIdentifier.parse(json.getNnMap("identifier"));
     AuthzStatus status = json.getEnum("status", AuthzStatus.class);
 
     Long l = json.getLong("expires");
@@ -146,8 +146,7 @@ public class AcmeAuthz implements JsonEncodable {
     for (AcmeChallenge chall : challenges) {
       challResps.add(chall.toChallengeResponse(baseUrl, orderId, subId));
     }
-    return new AuthzResponse(status, expires.toString(),
-        identifier.toIdentifier(), challResps);
+    return new AuthzResponse(status, expires.toString(), identifier.toIdentifier(), challResps);
   }
 
   public String getUrl(String baseUrl) {
@@ -190,8 +189,7 @@ public class AcmeAuthz implements JsonEncodable {
     return JsonBuilder.toJson(maps);
   }
 
-  public static List<AcmeAuthz> decodeAuthzs(String encoded)
-      throws CodecException {
+  public static List<AcmeAuthz> decodeAuthzs(String encoded) throws CodecException {
     JsonList list = JsonParser.parseList(encoded, false);
     List<AcmeAuthz> ret = new ArrayList<>(list.size());
     for (JsonMap map : list.toMapList()) {

@@ -41,8 +41,7 @@ public class CertprofileValidator {
 
   private static final Validity maxCabEeValidity = new Validity(397, Unit.DAY);
 
-  public static void validate(Certprofile certprofile)
-      throws CertprofileException {
+  public static void validate(Certprofile certprofile) throws CertprofileException {
     StringBuilder msg = new StringBuilder();
 
     ExtensionsControl controls = certprofile.extensionsControl();
@@ -63,8 +62,7 @@ public class CertprofileValidator {
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("extensions ").append(toString(set))
-          .append(" must not be contained in request, ");
+      msg.append("extensions ").append(toString(set)).append(" must not be contained in request, ");
     }
 
     // make sure that non-permitted extensions are not configured
@@ -76,8 +74,7 @@ public class CertprofileValidator {
     }
 
     if (CollectionUtil.isNotEmpty(set)) {
-      msg.append("extensions ").append(toString(set))
-          .append(" must not be contained, ");
+      msg.append("extensions ").append(toString(set)).append(" must not be contained, ");
     }
 
     // make sure that critical only extensions are not marked as non-critical.
@@ -120,8 +117,7 @@ public class CertprofileValidator {
     }
 
     if (!set.isEmpty()) {
-      msg.append(
-          "required extensions are not configured or not marked as required ")
+      msg.append("required extensions are not configured or not marked as required ")
         .append(toString(set)).append(", ");
     }
 
@@ -136,8 +132,7 @@ public class CertprofileValidator {
               .append(getExtensionIDDesc(extnType)).append(" is not set, ");
         } else {
           TripleState inRequest = control.inRequest();
-          if (inRequest != TripleState.required
-              && inRequest != TripleState.optional) {
+          if (inRequest != TripleState.required && inRequest != TripleState.optional) {
             msg.append("Extension ").append(getExtensionIDDesc(extnType))
                 .append(" must be allowed in the request, ");
           }
@@ -165,8 +160,7 @@ public class CertprofileValidator {
 
   } // method validate
 
-  private static void validateCABForumBR(
-      Certprofile certprofile, StringBuilder msg) {
+  private static void validateCABForumBR(Certprofile certprofile, StringBuilder msg) {
     // Subject with only one entry in a RDN is allowed
     SubjectControl subjectCtl = certprofile.subjectControl();
 
@@ -183,8 +177,7 @@ public class CertprofileValidator {
     if (certLevel == CertLevel.EndEntity) {
       Validity validity = certprofile.validity();
       if (validity.compareTo(maxCabEeValidity) > 0) {
-        msg.append("validity exceeds the maximal validity of " +
-            "subscriber certificate, ");
+        msg.append("validity exceeds the maximal validity of subscriber certificate, ");
       }
     }
 
@@ -198,8 +191,7 @@ public class CertprofileValidator {
       for (SignAlgo signAlgo : sigAlgos) {
         HashAlgo hashAlgo = signAlgo.hashAlgo();
         if (!allowedHashAlgos.contains(hashAlgo)) {
-          msg.append("unpermitted hash algorithm ")
-              .append(hashAlgo).append(", ");
+          msg.append("unpermitted hash algorithm ").append(hashAlgo).append(", ");
         }
       }
     }
@@ -221,8 +213,7 @@ public class CertprofileValidator {
 
     // Certificate Policies
     if (certLevel == CertLevel.SubCA || certLevel == CertLevel.EndEntity) {
-      CertificatePolicies certPolicyValue =
-          certprofile.certificatePolicies();
+      CertificatePolicies certPolicyValue = certprofile.certificatePolicies();
       if (certPolicyValue == null) {
         msg.append("CertificatePolicies is not configured, ");
       }
@@ -247,8 +238,7 @@ public class CertprofileValidator {
         if (!(OIDs.XKU.id_kp_serverAuth.equals(oid)
             || OIDs.XKU.id_kp_clientAuth.equals(oid)
             || OIDs.XKU.id_kp_emailProtection.equals(oid))) {
-          msg.append("extendedKeyUsage ").append(oid.getId())
-              .append(" is not permitted, ");
+          msg.append("extendedKeyUsage ").append(oid.getId()).append(" is not permitted, ");
         }
       }
 

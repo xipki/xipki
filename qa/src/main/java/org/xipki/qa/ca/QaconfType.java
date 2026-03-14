@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Configuration the QA system.
  *
- * @author Lijun Liao
+ * @author Lijun Liao (xipki)
  */
 public class QaconfType {
 
@@ -151,8 +151,7 @@ public class QaconfType {
 
   public QaconfType(List<Issuer> issuers, List<Certprofile> certprofiles) {
     this.issuers = (issuers == null) ? Collections.emptyList() : issuers;
-    this.certprofiles = (certprofiles == null) ? Collections.emptyList()
-        : certprofiles;
+    this.certprofiles = (certprofiles == null) ? Collections.emptyList() : certprofiles;
   }
 
   public List<Issuer> getIssuers() {
