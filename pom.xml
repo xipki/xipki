@@ -32,7 +32,7 @@
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <!-- DO NOT UPGRADE TO karaf 4.4.9 and 4.4.10 -->
     <!-- Change assemblies/karaf-features/src/main/filtered/features.xml respectively -->
-    <karaf.version>4.4.8</karaf.version>
+    <karaf.version>4.4.10</karaf.version>
     <hikaricp.version>6.3.3</hikaricp.version>
     <dnsjava.version>3.6.4</dnsjava.version>
     <slf4j.version>2.0.17</slf4j.version>
