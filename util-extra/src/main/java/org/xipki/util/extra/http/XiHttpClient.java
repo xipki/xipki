@@ -132,6 +132,10 @@ public class XiHttpClient {
       throw new IOException(url + " is not of protocol HTTP: " + url.getProtocol());
     }
 
+    HttpURLConnection httpConn = (HttpURLConnection) conn;
+    httpConn.setConnectTimeout(Curl.DEFAULT_CONNECT_TIMEOUT_MS);
+    httpConn.setReadTimeout(Curl.DEFAULT_READ_TIMEOUT_MS);
+
     if (conn instanceof HttpsURLConnection) {
       if (sslSocketFactory != null) {
         ((HttpsURLConnection) conn).setSSLSocketFactory(sslSocketFactory);
@@ -141,7 +145,7 @@ public class XiHttpClient {
       }
     }
 
-    return (HttpURLConnection) conn;
+    return httpConn;
   }
 
 }

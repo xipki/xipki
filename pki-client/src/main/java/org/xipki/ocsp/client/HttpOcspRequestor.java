@@ -10,6 +10,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.xipki.security.SecurityFactory;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
+import org.xipki.util.extra.http.Curl;
 import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 
@@ -102,6 +103,9 @@ public class HttpOcspRequestor extends AbstractOcspRequestor {
       outputstream.write(request);
       outputstream.flush();
     }
+
+    httpUrlConnection.setConnectTimeout(Curl.DEFAULT_CONNECT_TIMEOUT_MS);
+    httpUrlConnection.setReadTimeout(Curl.DEFAULT_READ_TIMEOUT_MS);
 
     InputStream inputstream = httpUrlConnection.getInputStream();
     if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) {

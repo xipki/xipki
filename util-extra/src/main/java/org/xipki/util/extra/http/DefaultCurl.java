@@ -314,6 +314,8 @@ public class DefaultCurl implements Curl {
 
     URL newUrl = new URL(url);
     HttpURLConnection httpConn = IoUtil.openHttpConn(newUrl);
+    httpConn.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT_MS);
+    httpConn.setReadTimeout(DEFAULT_READ_TIMEOUT_MS);
     if (useSslConf && urlPatterns != null && urlPatterns.length > 0
         && httpConn instanceof HttpsURLConnection) {
       SslContextConf sslContextConf = null;
