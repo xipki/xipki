@@ -11,7 +11,7 @@
   <groupId>org.xipki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.6.0-SNAPSHOT</version>
+  <version>6.6.0</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <licenses>
@@ -45,7 +45,7 @@
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
     <jdbc.mariadb.version>3.5.7</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.7.9</jdbc.postgresql.version>
+    <jdbc.postgresql.version>42.7.10</jdbc.postgresql.version>
     <jdbc.h2.version>2.4.240</jdbc.h2.version>
     <!-- Only for test purpose -->
     <junit.version>4.13.1</junit.version>

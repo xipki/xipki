@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.6.1
+- Release date: 202x/xx/xx
+
 ## 6.6.0
-- Release date: 202y/mm/dd
+- Release date: 2026/03/15
 - All components:
   - Added support of issuing certificate with ML-DSA signature.
   - Added support of issuing certificate with composite ML-DSA signature 
