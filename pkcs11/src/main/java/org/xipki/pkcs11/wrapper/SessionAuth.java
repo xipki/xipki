@@ -32,7 +32,7 @@ public class SessionAuth {
 
   private final AtomicLong incurableCkr = new AtomicLong(0);
 
-  private SessionAuth(boolean useLoginUser, long userType, String userName, List<String> pins) {
+  private SessionAuth(boolean useLoginUser, long userType, String userName, List<byte[]> pins) {
     this.useLoginUser = useLoginUser;
     this.userType = userType;
     this.userName = userName == null ? null : userName.getBytes(StandardCharsets.UTF_8);
@@ -40,18 +40,35 @@ public class SessionAuth {
       this.pins = Collections.singletonList(new byte[0]);
     } else {
       this.pins = new ArrayList<>(pins.size());
-      for (String s : pins) {
-        this.pins.add(s.getBytes(StandardCharsets.UTF_8));
+      for (byte[] pin : pins) {
+        this.pins.add(pin == null ? new byte[0] : pin.clone());
       }
     }
   }
 
   public static SessionAuth ofLoginUser(long userType, String userName, List<String> pins) {
-    return new SessionAuth(true, userType, Args.notNull(userName, "userName"), pins);
+    return new SessionAuth(true, userType, Args.notNull(userName, "userName"), toUtf8Pins(pins));
   }
 
   public static SessionAuth ofLogin(long userType, List<String> pins) {
-    return new SessionAuth(false, userType, null, pins);
+    return new SessionAuth(false, userType, null, toUtf8Pins(pins));
+  }
+
+  public static SessionAuth ofLogin(long userType, byte[] pin) {
+    return new SessionAuth(false, userType, null,
+        pin == null ? null : Collections.singletonList(pin));
+  }
+
+  private static List<byte[]> toUtf8Pins(List<String> pins) {
+    if (pins == null || pins.isEmpty()) {
+      return null;
+    }
+
+    List<byte[]> ret = new ArrayList<>(pins.size());
+    for (String pin : pins) {
+      ret.add(pin == null ? new byte[0] : pin.getBytes(StandardCharsets.UTF_8));
+    }
+    return ret;
   }
 
   public void authenticate(LogPKCS11 pkcs11, long hSession) throws PKCS11Exception {
@@ -59,7 +76,7 @@ public class SessionAuth {
 
     String userText = "user ";
     if (userName != null) {
-      userText += new String(userName) + " ";
+      userText += new String(userName, StandardCharsets.UTF_8) + " ";
     }
     userText += "of type " + PKCS11T.codeToName(Category.CKU, userType);
 

@@ -29,12 +29,9 @@ class PKCS11Session {
 
   private final PKCS11Token slot;
 
-  private final int maxMessageSize;
-
-  PKCS11Session(Session session, PKCS11Token slot, int maxMessageSize) {
+  PKCS11Session(Session session, PKCS11Token slot) {
     this.session = session;
     this.slot = slot;
-    this.maxMessageSize = Math.min(maxMessageSize, slot.getMaxMessageSize());
   }
 
   long getSessionState() throws PKCS11Exception {
@@ -301,6 +298,7 @@ class PKCS11Session {
 
   byte[] sign(CkMechanism mechanism, long hKey, byte[] data, int maxSize) throws TokenException {
     int len = data.length;
+    int maxMessageSize = slot.getMaxMessageSize();
     boolean useMulti = len > maxMessageSize && slot.supportsMultipart(mechanism, CKF_SIGN);
 
     byte[] sig;

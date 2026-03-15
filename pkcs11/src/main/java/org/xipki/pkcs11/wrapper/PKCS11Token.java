@@ -61,6 +61,8 @@ public class PKCS11Token {
 
   private final boolean readOnly;
 
+  private volatile boolean closed;
+
   private long timeOutWaitNewSessionMs = 10000; // maximal wait for 10 second
 
   private final AtomicInteger countSessions = new AtomicInteger(0);
@@ -99,7 +101,7 @@ public class PKCS11Token {
 
   public PKCS11Token(Token token, boolean readOnly, byte[] pin, Integer numSessions)
       throws TokenException {
-    this(token, readOnly, pin == null ? null : new String(pin), numSessions);
+    this(token, readOnly, SessionAuth.ofLogin(CKU_USER, pin), numSessions);
   }
 
   /**
@@ -116,11 +118,17 @@ public class PKCS11Token {
   public PKCS11Token(Token token, boolean readOnly, long userType,
                     String userName, List<String> pins, Integer numSessions)
       throws TokenException {
+    this(token, readOnly,
+        userName == null ? SessionAuth.ofLogin(userType, pins)
+            : SessionAuth.ofLoginUser(userType, userName, pins),
+        numSessions);
+  }
+
+  private PKCS11Token(Token token, boolean readOnly, SessionAuth auth, Integer numSessions)
+      throws TokenException {
     this.token = Objects.requireNonNull(token, "token shall not be null");
     this.readOnly = readOnly;
-    this.auth = userName == null
-        ? SessionAuth.ofLogin(userType, pins)
-        : SessionAuth.ofLoginUser(userType, userName, pins);
+    this.auth = Args.notNull(auth, "auth");
 
     CkTokenInfo tokenInfo = token.getTokenInfo();
     long lc = tokenInfo.maxSessionCount();
@@ -130,8 +138,8 @@ public class PKCS11Token {
     //    tokenInfo.isProtectedAuthenticationPath();
 
     int maxNumSessions;
-    if (numSessions == null) {maxNumSessions = (tokenMaxSessionCount < 1)
-                              ? 32 : Math.min(32, tokenMaxSessionCount);
+    if (numSessions == null) {
+      maxNumSessions = (tokenMaxSessionCount < 1) ? 32 : Math.min(32, tokenMaxSessionCount);
     } else {
       if (tokenMaxSessionCount < 1) {
         maxNumSessions = numSessions;
@@ -161,11 +169,11 @@ public class PKCS11Token {
       }
     }
 
-    this.maxSessionCount = sessions.size();
-    LOG.info("tokenMaxSessionCount={}, maxSessionCount={}",
-        tokenMaxSessionCount, this.maxSessionCount);
-    if (this.maxSessionCount == 0) {
-      LOG.error("could not open any session");
+    this.maxSessionCount = maxNumSessions;
+    LOG.info("tokenMaxSessionCount={}, countSessions={}, maxSessionCount={}",
+        tokenMaxSessionCount, countSessions.get(), this.maxSessionCount);
+    if (countSessions.get() == 0) {
+      throw new TokenException("could not open any session");
     }
   }
 
@@ -233,7 +241,7 @@ public class PKCS11Token {
   }
 
   public int getMaxMessageSize() {
-    return getModule().getMaxFrameSize();
+    return Math.min(maxMessageSize, getModule().getMaxFrameSize());
   }
 
   public boolean supportsMultipart(long mechanism, long flagBit) {
@@ -253,13 +261,11 @@ public class PKCS11Token {
    * ***************************************/
 
   public void closeAllSessions() {
+    closed = true;
     if (token != null) {
       try {
         LOG.info("close all sessions on token: {}", token.getTokenInfo());
-
-        for (PKCS11Session session : sessions) {
-          session.close();
-        }
+        getModule().getPKCS11().C_CloseAllSessions(token.getTokenID());
       } catch (Throwable th) {
         LOG.error("error closing sessions, {}", th.getMessage());
       }
@@ -1073,14 +1079,35 @@ public class PKCS11Token {
   }
 
   void requiteSession(PKCS11Session session) {
+    if (closed) {
+      try {
+        session.close();
+      } catch (Exception ex) {
+        LOG.debug("error closing returned session after token shutdown: {}", ex.getMessage());
+      }
+      return;
+    }
+
     if (session.isRecoverable()) {
-      sessions.add(session);
+      if (!sessions.offer(session)) {
+        LOG.warn("session pool is full, closing returned session");
+        try {
+          session.close();
+        } catch (Exception ex) {
+          LOG.debug("error closing returned session: {}", ex.getMessage());
+        }
+        countSessions.decrementAndGet();
+      }
     } else {
       countSessions.decrementAndGet();
     }
   }
 
   PKCS11Session borrowSession() throws TokenException {
+    if (closed) {
+      throw new TokenException("token is already closed");
+    }
+
     if (maxSessionCount < 1) {
       throw new TokenException("could not open any session");
     }
@@ -1100,6 +1127,8 @@ public class PKCS11Token {
         try {
           session = sessions.poll(timeOutWaitNewSessionMs, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new TokenException("interrupted while waiting for idle session", e);
         }
       }
 
@@ -1135,7 +1164,7 @@ public class PKCS11Token {
           session == null ? "NULL" :  session.getSessionHandle(), clock.millis() - start);
     }
 
-    return new PKCS11Session(session, this, maxMessageSize);
+    return new PKCS11Session(session, this);
   }
 
   public void destroyKeyPairQuietly(PKCS11KeyPair keypair) {
