@@ -46,7 +46,7 @@ public class TransactionId {
     try {
       return sha1TransactionId(Args.notNull(spki, "spki").getEncoded());
     } catch (IOException ex) {
-      throw new InvalidKeySpecException("IOException while ");
+      throw new InvalidKeySpecException("IOException while encoding SubjectPublicKeyInfo", ex);
     }
   }
 

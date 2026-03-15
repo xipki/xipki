@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -44,7 +45,7 @@ class PendingCertificatePool {
 
     @Override
     public int hashCode() {
-      return certReqId.hashCode() + 961 * (int) waitForConfirmTill + 31 * certInfo.hashCode();
+      return 31 * certReqId.hashCode() + certInfo.hashCode();
     }
 
     @Override
@@ -144,12 +145,20 @@ class PendingCertificatePool {
 
       Set<CertificateInfo> ret = new HashSet<>();
 
-      for (Entry<String, Set<MyEntry>> entry0 : map.entrySet()) {
+      for (Iterator<Entry<String, Set<MyEntry>>> mapIt = map.entrySet().iterator();
+          mapIt.hasNext();) {
+        Entry<String, Set<MyEntry>> entry0 = mapIt.next();
         Set<PendingCertificatePool.MyEntry> entries = entry0.getValue();
-        for (PendingCertificatePool.MyEntry entry : entries) {
+        for (Iterator<MyEntry> entryIt = entries.iterator(); entryIt.hasNext();) {
+          PendingCertificatePool.MyEntry entry = entryIt.next();
           if (entry.waitForConfirmTill < now) {
             ret.add(entry.certInfo);
+            entryIt.remove();
           }
+        }
+
+        if (entries.isEmpty()) {
+          mapIt.remove();
         }
       }
       return ret;

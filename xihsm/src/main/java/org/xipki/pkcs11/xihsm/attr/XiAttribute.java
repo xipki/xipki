@@ -254,20 +254,30 @@ public class XiAttribute {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) return true;
+    if (this == obj) {
+      return true;
+    }
 
-    if (!(obj instanceof XiAttribute)) return false;
+    if (!(obj instanceof XiAttribute)) {
+      return false;
+    }
 
     XiAttribute b = (XiAttribute) obj;
     boolean bo = type == b.type
         && Objects.equals(boolValue,  b.boolValue)
         && Objects.equals(longValue,  b.longValue)
         && Objects.equals(charsValue, b.charsValue)
-        && Objects.equals(dateValue,  b.dateValue);
+        && Objects.equals(dateValue,  b.dateValue)
+        && Objects.equals(templateValue, b.templateValue);
 
     if (bo) {
       bo = (byteArrayValue == null) ? b.byteArrayValue == null
           : Arrays.equals(byteArrayValue, b.byteArrayValue);
+    }
+
+    if (bo) {
+      bo = (longArrayValue == null) ? b.longArrayValue == null
+          : Arrays.equals(longArrayValue, b.longArrayValue);
     }
 
     return bo;

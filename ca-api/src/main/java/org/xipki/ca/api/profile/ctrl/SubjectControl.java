@@ -58,6 +58,9 @@ public class SubjectControl {
 
     this.controls = new HashMap<>();
     for (RdnControl control : controls) {
+      if (this.controls.containsKey(control.type())) {
+        throw new IllegalArgumentException("duplicated subject type " + control.type().getId());
+      }
       this.controls.put(control.type(), control);
     }
   } // constructor

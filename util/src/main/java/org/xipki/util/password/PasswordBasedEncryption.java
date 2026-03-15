@@ -140,6 +140,9 @@ public class PasswordBasedEncryption {
     // extract the IV and cipherText
     byte bb = cipherTextWithIv[0];
     int ivLen = (bb < 0) ? 256 + bb : bb;
+    if (cipherTextWithIv.length < 1 + ivLen) {
+      throw new GeneralSecurityException("invalid ciphertext");
+    }
 
     PBEParameterSpec pbeParameterSpec;
     if (ivLen == 0) {

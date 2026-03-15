@@ -75,6 +75,11 @@ class IssuerStore {
   }
 
   public void addIssuer(IssuerEntry issuer) {
+    if (ids.contains(issuer.id())) {
+      throw new IllegalArgumentException(
+          "issuer with the same id " + issuer.id() + " duplicated");
+    }
+
     this.issuers.add(issuer);
 
     Set<Integer> newIds = new HashSet<>(this.ids);

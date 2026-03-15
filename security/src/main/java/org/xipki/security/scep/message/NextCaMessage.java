@@ -64,6 +64,7 @@ public class NextCaMessage {
       throws CodecException {
     Args.notNull(signingKey, "signingKey");
     Args.notNull(signerCert, "signerCert");
+    Args.notNull(caCert, "caCert");
 
     try {
       CMSSignedDataGenerator degenerateSignedData = new CMSSignedDataGenerator();

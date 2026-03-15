@@ -61,6 +61,9 @@ public class ExtensionsControl {
 
     this.controls = new HashMap<>();
     for (ExtensionControl control : controls) {
+      if (this.controls.containsKey(control.type())) {
+        throw new IllegalArgumentException("duplicated extension type " + control.type().getId());
+      }
       this.controls.put(control.type(), control);
     }
 

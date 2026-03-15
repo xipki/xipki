@@ -92,6 +92,9 @@ public class IssuerEntry {
 
   public byte[] getEncodedHash(HashAlgo hashAlgo) {
     byte[] data = issuerHashMap.get(hashAlgo);
+    if (data == null) {
+      return null;
+    }
     return Arrays.copyOf(data, data.length);
   }
 

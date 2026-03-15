@@ -184,6 +184,7 @@ class PublisherManager {
     }
 
     LOG.info("removed publisher '{}'", name);
+    manager.idNameMap.removePublisher(manager.publisherDbEntries.get(name).ident().id());
     manager.publisherDbEntries.remove(name);
     IdentifiedCertPublisher publisher = manager.publishers.remove(name);
     shutdownPublisher(publisher);

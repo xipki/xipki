@@ -23,10 +23,12 @@ public class IPAddressTest {
     Assert.assertEquals("12.34.56.78", "12.34.56.78/32", addr0.toString(afi, context));
 
     addr0 = IPAddress.getIPv4Instance("12.32.0.0/16", context);
-    System.out.println(addr0.toString(afi, context) + ":" + addr0.unusedBits() + ": " + Hex.encode(addr0.value()));
+    System.out.println(addr0.toString(afi, context) + ":" + addr0.unusedBits() +
+        ": " + Hex.encode(addr0.value()));
 
     addr0 = IPAddress.getIPv4Instance("12.32.0.0/12", context);
-    System.out.println(addr0.toString(afi, context) + ":" + addr0.unusedBits() + ": " + Hex.encode(addr0.value()));
+    System.out.println(addr0.toString(afi, context) + ":" + addr0.unusedBits() +
+        ": " + Hex.encode(addr0.value()));
 
     if (true) return;
 

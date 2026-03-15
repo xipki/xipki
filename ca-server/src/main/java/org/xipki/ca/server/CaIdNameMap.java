@@ -131,6 +131,14 @@ public class CaIdNameMap {
     return ident;
   } // method removeRequestor
 
+  public NameId removePublisher(int id) {
+    NameId ident = idPublisherMap.remove(id);
+    if (ident != null) {
+      namePublisherMap.remove(ident.name());
+    }
+    return ident;
+  } // method removePublisher
+
   public NameId removeCa(String name) {
     NameId ident = nameCaMap.remove(name.toLowerCase());
     if (ident != null) {

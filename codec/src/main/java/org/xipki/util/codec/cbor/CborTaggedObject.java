@@ -67,10 +67,10 @@ public class CborTaggedObject implements CborEncodable {
     if (!(obj instanceof CborTaggedObject)) return false;
 
     CborTaggedObject b = (CborTaggedObject) obj;
-    return (value == null) ? b.value == null
+    return tag == b.tag && ((value == null) ? b.value == null
         : (value instanceof byte[] && b.value instanceof byte[])
               ? Arrays.equals((byte[]) value, (byte[]) b.value)
-        : value.equals(b.value);
+        : value.equals(b.value));
   }
 
 }

@@ -446,6 +446,9 @@ public class OcspServer implements Closeable {
       ResponderOption option = entry.getValue();
       List<String> strs = option.servletPaths();
       for (String path : strs) {
+        if (path2responderMap.containsKey(path)) {
+          throw new InvalidConfException("duplicated servlet path '" + path + "'");
+        }
         tmpList.add(path);
         path2responderMap.put(path, responder);
       }

@@ -65,7 +65,7 @@ public class CaCaps {
 
   public void removeCapabilities(CaCaps caCaps) {
     Args.notNull(caCaps, "caCaps");
-    this.capabilities.retainAll(caCaps.capabilities);
+    this.capabilities.removeAll(caCaps.capabilities);
     refresh();
   }
 

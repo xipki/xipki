@@ -80,7 +80,7 @@ public abstract class XiAction implements Action {
       if (value.startsWith("file:")) {
         String fileName = value.substring("file:".length());
         byte[] binValue = IoUtil.read(fileName);
-        confPairs.putPair(name, "base64:" + Base64.encodeToString(binValue));
+        newPairs.putPair(name, "base64:" + Base64.encodeToString(binValue));
       } else {
         newPairs.putPair(name, value);
       }

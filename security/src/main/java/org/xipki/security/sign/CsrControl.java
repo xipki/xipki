@@ -24,7 +24,6 @@ import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -65,9 +64,14 @@ public class CsrControl {
       }
     }
 
-    this.kemMasterKeys = new HashMap<>();
-
     KeystoreConf kemConf = conf.kem();
+    if (kemConf == null) {
+      this.kemMasterKeys = Collections.emptyMap();
+      this.defaultKemMasterKey = null;
+      return;
+    }
+
+    Map<String, SecretKeyWithAlias> tmpKemMasterKeys = new HashMap<>();
     KeyStore ks;
     char[] password;
 
@@ -94,16 +98,18 @@ public class CsrControl {
         Key key = ks.getKey(alias, password);
         if (key instanceof SecretKey) {
           // we consider only Secret key
-          this.kemMasterKeys.put(alias, new SecretKeyWithAlias(alias, (SecretKey) key));
+          tmpKemMasterKeys.put(alias, new SecretKeyWithAlias(alias, (SecretKey) key));
         }
       }
     } catch (GeneralSecurityException ex) {
       throw new InvalidConfException("invalid KEM pop configuration", ex);
     }
 
-    if (this.kemMasterKeys.isEmpty()) {
+    if (tmpKemMasterKeys.isEmpty()) {
+      this.kemMasterKeys = Collections.emptyMap();
       this.defaultKemMasterKey = null;
     } else {
+      this.kemMasterKeys = Collections.unmodifiableMap(tmpKemMasterKeys);
       String alias = this.kemMasterKeys.keySet().iterator().next();
       this.defaultKemMasterKey = this.kemMasterKeys.get(alias);
     }

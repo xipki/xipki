@@ -172,7 +172,8 @@ public class Asn1Parser {
 
     if (firstLenByte == 0x80) {
       if (!constructed) {
-        throw new IllegalArgumentException("indefinite length used for primitive at offset " + offset);
+        throw new IllegalArgumentException(
+            "indefinite length used for primitive at offset " + offset);
       }
 
       ParseResult childResult = parseAll(encoded, valueStart, endExclusive, true);

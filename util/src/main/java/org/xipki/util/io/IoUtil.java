@@ -322,7 +322,7 @@ public class IoUtil {
 
   public static int getIndex(byte[] arrayA, byte[] arrayB) {
     int endIndex = arrayA.length - arrayB.length;
-    for (int i = 0; i < endIndex; i++) {
+    for (int i = 0; i <= endIndex; i++) {
       boolean found = true;
       for (int j = 0; j < arrayB.length; j++) {
         if (arrayA[i + j] != arrayB[j]) {
@@ -395,6 +395,10 @@ public class IoUtil {
 
         if (builder.length() > 0) {
           break;
+        }
+
+        if (pointer < 0) {
+          return "";
         }
       }
 
