@@ -1,0 +1,17 @@
+# DNS Root Trust Anchors
+# The Root Key Signing Key (KSK) acts as the trust anchor for DNSSEC for the
+# Domain Name System. This trust anchor is configured in DNSSEC-aware resolvers
+# to facilitate validation of DNS data.
+# This file contains root trust anchor data for DNSSEC-aware validation.
+#
+# Source:
+# https://www.iana.org/dnssec/files
+# IANA "Trust Anchors and Rollovers" page, root trust anchors section
+# Page updated: 2024-11-05
+#
+# Format:
+# zone-file DS or DNSKEY records accepted by dnsjava ValidatingResolver.
+# Keep this file current with the active DNS root trust anchors.
+
+. 172800 IN DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D
+. 172800 IN DS 38696 8 2 683D2D0ACB8C9B712A1948B27F741219298D0A450D612C483AF444A4C0FB2B16

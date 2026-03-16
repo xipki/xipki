@@ -7,19 +7,30 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xbill.DNS.Lookup;
+import org.xbill.DNS.CNAMERecord;
+import org.xbill.DNS.DClass;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Flags;
+import org.xbill.DNS.Message;
+import org.xbill.DNS.Name;
 import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.Rcode;
 import org.xbill.DNS.TXTRecord;
 import org.xbill.DNS.TextParseException;
 import org.xbill.DNS.Type;
+import org.xbill.DNS.dnssec.ValidatingResolver;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.security.OIDs;
 import org.xipki.security.util.Asn1Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
+import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.http.HttpRespContent;
 import org.xipki.util.extra.http.XiHttpClient;
 import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.util.io.IoUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -29,8 +40,13 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.Inet6Address;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -39,6 +55,8 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * ACME component.
@@ -65,10 +83,22 @@ public class ChallengeValidator implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(ChallengeValidator.class);
 
+  private static final int MAX_DNS_CNAME_DEPTH = 8;
+
   private final AcmeRepo repo;
 
-  public ChallengeValidator(AcmeRepo repo) {
+  private final Resolver dnsResolver;
+
+  private final boolean dnssecValidation;
+
+  private final boolean allowPrivateChallengeTargets;
+
+  public ChallengeValidator(AcmeRepo repo, AcmeProtocolConf.Acme conf) throws InvalidConfException {
     this.repo = Args.notNull(repo, "repo");
+    Args.notNull(conf, "conf");
+    this.dnsResolver = buildDnsResolver(conf);
+    this.dnssecValidation = conf.dnssecValidation();
+    this.allowPrivateChallengeTargets = conf.allowPrivateChallengeTargets();
   }
 
   private boolean stopMe;
@@ -131,6 +161,7 @@ public class ChallengeValidator implements Runnable {
           // host = "localhost:9081";
           String url = "http://" + host + "/.well-known/acme-challenge/" + chall.token();
           try {
+            ensureAllowedChallengeHost(host);
             XiHttpClient client = new XiHttpClient();
             HttpRespContent authzResp = client.httpGet(url);
             receivedAuthorization = new String(authzResp.content(), StandardCharsets.UTF_8);
@@ -144,6 +175,7 @@ public class ChallengeValidator implements Runnable {
         case AcmeConstants.TLS_ALPN_01: {
           Certificate[] certs = null;
           try {
+            ensureAllowedChallengeHost(identifier.value());
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustAll}, null);
             SSLSocketFactory factory = sslContext.getSocketFactory();
@@ -181,13 +213,20 @@ public class ChallengeValidator implements Runnable {
           if (match) {
             X509Certificate cert = (X509Certificate) certs[0];
             // check the critical extension id_pe_acmeIdentifier
-            match = cert.getCriticalExtensionOIDs().contains(
-                      OIDs.ACME.id_pe_acmeIdentifier.getId());
+            var criticalExtensionOids = cert.getCriticalExtensionOIDs();
+            match = criticalExtensionOids != null
+                && criticalExtensionOids.contains(OIDs.ACME.id_pe_acmeIdentifier.getId());
             if (match) {
               byte[] extnValue = cert.getExtensionValue(OIDs.ACME.id_pe_acmeIdentifier.getId());
-              byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
-              byte[] value  = Asn1Util.getOctetStringOctets(octets);
-              receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(value);
+              if (extnValue != null) {
+                byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
+                if (octets != null) {
+                  byte[] value  = Asn1Util.getOctetStringOctets(octets);
+                  if (value != null) {
+                    receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(value);
+                  }
+                }
+              }
             }
           }
           break;
@@ -226,7 +265,36 @@ public class ChallengeValidator implements Runnable {
 
   }
 
-  private static String validateDns(AcmeIdentifier identifier, ChallId challId) {
+  private static Resolver buildDnsResolver(AcmeProtocolConf.Acme conf) throws InvalidConfException {
+    ExtendedResolver resolver;
+    try {
+      List<String> resolverNames = conf.dnsResolvers();
+      if (resolverNames == null || resolverNames.isEmpty()) {
+        resolver = new ExtendedResolver();
+      } else {
+        resolver = new ExtendedResolver(resolverNames.toArray(new String[0]));
+      }
+    } catch (IOException ex) {
+      throw new InvalidConfException("could not initialize DNS resolver", ex);
+    }
+
+    if (!conf.dnssecValidation()) {
+      return resolver;
+    }
+
+    ValidatingResolver validatingResolver = new ValidatingResolver(resolver);
+    validatingResolver.setAddReasonToAdditional(true);
+    String anchorFile = IoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true);
+    try (InputStream in = Files.newInputStream(Path.of(anchorFile))) {
+      validatingResolver.loadTrustAnchors(in);
+    } catch (IOException ex) {
+      throw new InvalidConfException(
+          "could not load DNSSEC trust anchors from " + conf.dnssecTrustAnchorsFile(), ex);
+    }
+    return validatingResolver;
+  }
+
+  private String validateDns(AcmeIdentifier identifier, ChallId challId) {
     String host = identifier.value();
     if (host.startsWith("*.")) {
       host = host.substring(2);
@@ -235,29 +303,134 @@ public class ChallengeValidator implements Runnable {
     LOG.debug("dns-01: host='{}'", identifier.value());
 
     String acmeDomain = "_acme-challenge." + host;
-    Record[] records = null;
     try {
-      records = new Lookup(acmeDomain, Type.TXT).run();
-    } catch (TextParseException ex) {
+      return queryDnsTxt(acmeDomain, challId, identifier, 0);
+    } catch (IOException | ExecutionException ex) {
       String message =  "error while validating challenge " + challId +
+                        " for identifier " + identifier;
+      LogUtil.error(LOG, ex, message);
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      String message =  "interrupted while validating challenge " + challId +
                         " for identifier " + identifier;
       LogUtil.error(LOG, ex, message);
     }
 
-    String expectedName = acmeDomain + ".";
-    if (records != null) {
-      for (Record record : records) {
-        TXTRecord txt = (TXTRecord) record;
-        String name = txt.getName().toString();
-        if (!expectedName.equals(name)) {
-          continue;
-        }
+    return null;
+  }
 
-        return txt.getStrings().get(0);
+  private String queryDnsTxt(String acmeDomain, ChallId challId, AcmeIdentifier identifier, int depth)
+      throws IOException, ExecutionException, InterruptedException {
+    if (depth > MAX_DNS_CNAME_DEPTH) {
+      LOG.warn("dns-01: too many CNAME redirects for '{}'", acmeDomain);
+      return null;
+    }
+
+    Name queryName = Name.fromString(acmeDomain, Name.root);
+    Record question = Record.newRecord(queryName, Type.TXT, DClass.IN);
+    Message query = Message.newQuery(question);
+    Message response = dnsResolver.sendAsync(query).toCompletableFuture().get();
+
+    if (response.getRcode() != Rcode.NOERROR) {
+      LOG.debug("dns-01: query '{}' returned rcode {}", queryName, Rcode.string(response.getRcode()));
+      return null;
+    }
+
+    if (dnssecValidation && !response.getHeader().getFlag(Flags.AD)) {
+      LOG.warn("dns-01 DNSSEC validation failed for '{}' ({})",
+          queryName, getDnssecFailureReason(response));
+      return null;
+    }
+
+    Name cnameTarget = null;
+    for (Record record : response.getSection(Section.ANSWER)) {
+      if (record.getType() == Type.TXT && queryName.equals(record.getName())) {
+        TXTRecord txt = (TXTRecord) record;
+        List<String> strings = txt.getStrings();
+        if (strings != null && !strings.isEmpty()) {
+          return strings.get(0);
+        }
+      } else if (record.getType() == Type.CNAME && queryName.equals(record.getName())) {
+        cnameTarget = ((CNAMERecord) record).getTarget();
       }
     }
 
+    if (cnameTarget != null) {
+      LOG.debug("dns-01: following CNAME '{}' -> '{}'", queryName, cnameTarget);
+      return queryDnsTxt(cnameTarget.toString(), challId, identifier, depth + 1);
+    }
+
     return null;
+  }
+
+  private static String getDnssecFailureReason(Message response) {
+    for (Record record : response.getSection(Section.ADDITIONAL)) {
+      if (record.getType() == Type.TXT
+          && record.getDClass() == ValidatingResolver.VALIDATION_REASON_QCLASS
+          && Name.root.equals(record.getName())) {
+        List<String> strings = ((TXTRecord) record).getStrings();
+        return (strings == null || strings.isEmpty()) ? "missing validation reason"
+            : String.join("", strings);
+      }
+    }
+
+    return "response not DNSSEC-authenticated";
+  }
+
+  private void ensureAllowedChallengeHost(String host) throws UnknownHostException {
+    if (allowPrivateChallengeTargets) {
+      return;
+    }
+
+    ensurePublicAddressableHost(host);
+  }
+
+  private static void ensurePublicAddressableHost(String host) throws UnknownHostException {
+    InetAddress[] addresses = InetAddress.getAllByName(host);
+    for (InetAddress address : addresses) {
+      if (isForbiddenAddress(address)) {
+        throw new UnknownHostException("host resolves to forbidden address " + address.getHostAddress());
+      }
+    }
+  }
+
+  private static boolean isForbiddenAddress(InetAddress address) {
+    if (address.isAnyLocalAddress() || address.isLoopbackAddress()
+        || address.isLinkLocalAddress() || address.isSiteLocalAddress()
+        || address.isMulticastAddress()) {
+      return true;
+    }
+
+    byte[] bytes = address.getAddress();
+    if (address instanceof Inet4Address) {
+      int b0 = bytes[0] & 0xFF;
+      int b1 = bytes[1] & 0xFF;
+      if (b0 == 0 || b0 == 127) {
+        return true;
+      }
+
+      if (b0 == 169 && b1 == 254) {
+        return true;
+      }
+
+      if (b0 == 100 && b1 >= 64 && b1 <= 127) {
+        return true;
+      }
+
+      return b0 >= 224;
+    }
+
+    if (address instanceof Inet6Address) {
+      int b0 = bytes[0] & 0xFF;
+      int b1 = bytes[1] & 0xFF;
+      if ((b0 & 0xFE) == 0xFC) {
+        return true;
+      }
+
+      return b0 == 0xFE && (b1 & 0xC0) == 0x80;
+    }
+
+    return false;
   }
 
   public void close() {

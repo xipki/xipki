@@ -6,6 +6,20 @@
     "cacheSize": 1000,
     "syncDbSeconds": 60,
     "dbConf": "etc/acme/database/acme-db.properties",
+    // Explicit opt-in for validating http-01 / tls-alpn-01 against private or
+    // internal addresses. The secure default is false.
+    //"allowPrivateChallengeTargets": false,
+    // Enable DNSSEC verification for dns-01 challenge validation.
+    //"dnssecValidation": true,
+    // Optional explicit recursive resolvers. If unset, the host system DNS
+    // configuration is used.
+    //"dnsResolvers": [
+    //  "1.1.1.1",
+    //  "8.8.8.8"
+    //],
+    // Required if dnssecValidation is enabled. This file contains DNS root
+    // trust anchors in DS or DNSKEY zone-file format.
+    //"dnssecTrustAnchorsFile": "etc/acme/root-trust-anchors.zone",
     //"contactVerifier": "org.example.MyContactVerifier",
     //"termsOfService": "http://example.org/tos",
     "website": "http://example.org/doc/acme",

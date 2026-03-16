@@ -19,5 +19,18 @@ Deployment in Tomcat (10 and 11)
    1. Initialize the database configured in `acme-db.properties`:    
       In xipki-mgmt-cli, call `ca:sql --db-conf /path/to/acme-db.properties xipki/sql/acme-init.sql`
    2. Adapt the `acme`-block in the `tomcat/xipki/etc/acme-gateway.json`.
+      For compatibility, DNSSEC verification for ACME `dns-01` challenge validation is disabled
+      by default. It should be enabled in production if you use `dns-01`.
+      To enable it, set the following fields in `tomcat/xipki/etc/acme-gateway.json`:
+      - `allowPrivateChallengeTargets`: leave this as `false` unless you explicitly want
+        `http-01` or `tls-alpn-01` to reach private/internal addresses
+      - `dnssecValidation`: set to `true`
+      - `dnssecTrustAnchorsFile`: set to the trust-anchor file, for example
+        `etc/acme/root-trust-anchors.zone`
+      - `dnsResolvers`: optional explicit recursive resolvers such as your internal DNS servers
+      A sample trust-anchor file is provided in
+      `tomcat/xipki/etc/acme/root-trust-anchors.zone`. The example `.zone` file is derived from
+      the IANA "Trust Anchors and Rollovers" publication:
+      https://www.iana.org/dnssec/files
 4. Execute the command  
    `./install.sh -t <tomcat dir of proocol gaeway server>`.

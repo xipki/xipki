@@ -254,8 +254,14 @@ public class AcmeResponder {
     this.caProfiles = conf.caProfiles();
     if (conf.challengeTypes() != null) {
       List<String> types = conf.challengeTypes();
-      if (!(types.contains(DNS_01) || types.contains(HTTP_01) || types.contains(TLS_ALPN_01))) {
-        throw new InvalidConfException("invalid challengeTypes '" + types + "'");
+      if (types.isEmpty()) {
+        throw new InvalidConfException("challengeTypes must not be empty");
+      }
+
+      for (String type : types) {
+        if (!(DNS_01.equals(type) || HTTP_01.equals(type) || TLS_ALPN_01.equals(type))) {
+          throw new InvalidConfException("invalid challengeType '" + type + "'");
+        }
       }
       challengeTypes = new HashSet<>(types);
     } else {
@@ -325,7 +331,7 @@ public class AcmeResponder {
       throw new InvalidConfException("could not initialize database", ex);
     }
 
-    this.challengeValidator = new ChallengeValidator(repo);
+    this.challengeValidator = new ChallengeValidator(repo, conf);
     this.certEnroller = new CertEnroller(repo, sdk);
   }
 

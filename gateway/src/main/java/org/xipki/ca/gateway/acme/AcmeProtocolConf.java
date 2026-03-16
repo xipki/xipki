@@ -14,6 +14,7 @@ import org.xipki.util.conf.InvalidConfException;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,9 +37,14 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
   }
 
   public static AcmeProtocolConf parse(JsonMap json) throws CodecException, InvalidConfException {
-    GatewayConf.ProtocolConf pConf = GatewayConf.ProtocolConf.parse0(json);
+    JsonMap confJson = json.getMap("acme");
+    if (confJson == null) {
+      confJson = json;
+    }
 
-    Acme acme = Acme.parse(json);
+    GatewayConf.ProtocolConf pConf = GatewayConf.ProtocolConf.parse0(confJson);
+
+    Acme acme = Acme.parse(confJson);
     acme.validate();
 
     return new AcmeProtocolConf(pConf.logReqResp(), pConf.pop(), pConf.sdkClient(), acme);
@@ -111,6 +117,14 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
     private String website;
 
     private List<String> caaIdentities;
+
+    private boolean dnssecValidation;
+
+    private boolean allowPrivateChallengeTargets;
+
+    private List<String> dnsResolvers;
+
+    private String dnssecTrustAnchorsFile;
 
     private CleanupOrderConf cleanupOrder;
 
@@ -220,6 +234,38 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
       this.caaIdentities = caaIdentities;
     }
 
+    public boolean dnssecValidation() {
+      return dnssecValidation;
+    }
+
+    public void setDnssecValidation(boolean dnssecValidation) {
+      this.dnssecValidation = dnssecValidation;
+    }
+
+    public boolean allowPrivateChallengeTargets() {
+      return allowPrivateChallengeTargets;
+    }
+
+    public void setAllowPrivateChallengeTargets(boolean allowPrivateChallengeTargets) {
+      this.allowPrivateChallengeTargets = allowPrivateChallengeTargets;
+    }
+
+    public List<String> dnsResolvers() {
+      return dnsResolvers == null ? null : Collections.unmodifiableList(dnsResolvers);
+    }
+
+    public void setDnsResolvers(List<String> dnsResolvers) {
+      this.dnsResolvers = dnsResolvers == null ? null : new ArrayList<>(dnsResolvers);
+    }
+
+    public String dnssecTrustAnchorsFile() {
+      return dnssecTrustAnchorsFile;
+    }
+
+    public void setDnssecTrustAnchorsFile(String dnssecTrustAnchorsFile) {
+      this.dnssecTrustAnchorsFile = dnssecTrustAnchorsFile;
+    }
+
     public List<String> challengeTypes() {
       return challengeTypes;
     }
@@ -247,6 +293,12 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
 
       if (caProfiles == null || caProfiles.isEmpty()) {
         throw new InvalidConfException("profiles must be present and not empty.");
+      }
+
+      if (dnssecValidation
+          && (dnssecTrustAnchorsFile == null || dnssecTrustAnchorsFile.isBlank())) {
+        throw new InvalidConfException(
+            "dnssecTrustAnchorsFile must be specified if dnssecValidation is enabled");
       }
     }
 
@@ -278,6 +330,10 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
       ret.setContactVerifier(json.getString("contactVerifier"));
       ret.setTermsOfService(json.getString("termsOfService"));
       ret.setWebsite(json.getString("website"));
+      ret.setDnssecValidation(json.getBool("dnssecValidation", false));
+      ret.setAllowPrivateChallengeTargets(json.getBool("allowPrivateChallengeTargets", false));
+      ret.setDnsResolvers(json.getStringList("dnsResolvers"));
+      ret.setDnssecTrustAnchorsFile(json.getString("dnssecTrustAnchorsFile"));
 
       JsonMap map = json.getMap("cleanupOrder");
       if (map != null) {
