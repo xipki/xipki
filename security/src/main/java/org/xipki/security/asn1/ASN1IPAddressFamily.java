@@ -14,7 +14,7 @@ import org.xipki.util.codec.ipadress.IPAddressFamily;
 /**
  * ASN1 IPAddress Family.
  * <pre>
- *    IPAddressFamily     ::= SEQUENCE {    -- AFI & optional SAFI --
+ *    IPAddressFamily     ::= SEQUENCE {    -- AFI and optional SAFI --
  *       addressFamily        OCTET STRING (SIZE (2..3)),
  *       ipAddressChoice      IPAddressChoice }
  * </pre>
