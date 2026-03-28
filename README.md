@@ -42,7 +42,7 @@ can be obtained in one of the following ways:
     <dependency>
       <groupId>org.xipki.assembly</groupId>
       <artifactId>xipki-setup</artifactId>
-      <package>tar.gz</package>
+      <type>tar.gz</type>
       <version>placeholder-version</version>
       <classifier>placeholder-classifier</classifier>
     </dependency>

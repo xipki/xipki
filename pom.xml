@@ -98,20 +98,6 @@
     <developerConnection>scm:git:https://github.com/xipki/xipki.git</developerConnection>
     <url>https://github.com/xipki/xipki</url>
   </scm>
-  <repositories>
-    <!-- Apache snapshots -->
-    <repository>
-      <id>apache-snapshots</id>
-      <name>Apache Snapshots Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots-group</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
   <build>
     <plugins>
       <plugin>
