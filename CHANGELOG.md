@@ -2,8 +2,11 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.7.x
+- Release date: 202x/mm/dd
+
 ## 6.7.0
-- Release date: 202x/xx/xx
+- Release date: 2026/03/28
 - xipki-gateway
   - Harden ACME
 - xipki-cli and xipki-mgmt-cli

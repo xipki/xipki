@@ -6,7 +6,7 @@
   <groupId>org.xipki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.7.0-SNAPSHOT</version>
+  <version>6.7.0</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>https://github.com/xipki/xipki</url>
