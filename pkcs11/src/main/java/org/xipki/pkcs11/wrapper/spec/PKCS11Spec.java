@@ -6,7 +6,7 @@ import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 
 /**
- * XiPKI component.
+ * PKCS11 Spec.
  *
  * @author Lijun Liao (xipki)
  */

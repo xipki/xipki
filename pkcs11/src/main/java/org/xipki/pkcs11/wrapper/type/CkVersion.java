@@ -6,7 +6,7 @@ package org.xipki.pkcs11.wrapper.type;
 import org.xipki.pkcs11.wrapper.PKCS11Module;
 
 /**
- * Objects of this class represent a version. This consists of a major and a
+ * Ck Version.
  * minor version number.
  * <pre>
  * typedef struct CK_VERSION {

@@ -10,7 +10,7 @@ import org.xipki.security.util.KeyUtil;
 import java.security.SecureRandom;
 
 /**
- * SubjectPublicKeyInfo entry for benchmark enrollment test.
+ * CA Enroll Bench Key Entry entry.
  *
  * @author Lijun Liao (xipki)
  */

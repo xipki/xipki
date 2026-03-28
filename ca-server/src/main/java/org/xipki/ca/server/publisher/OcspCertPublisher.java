@@ -25,7 +25,7 @@ import org.xipki.util.extra.exception.CertPublisherException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Publish certificates to XiPKI OCSP database.
+ * OCSP Cert Publisher.
  *
  * @author Lijun Liao (xipki)
  */

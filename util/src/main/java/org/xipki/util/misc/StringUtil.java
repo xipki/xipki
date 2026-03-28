@@ -21,7 +21,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 /**
- * Utility class for String.
+ * String Util.
  *
  * @author Lijun Liao (xipki)
  */
@@ -371,21 +371,21 @@ public class StringUtil {
       }
 
       String classPath = resource.toString();
-
+// TODO
       String manifestPath = classPath.substring(0, classPath.length() - className.length()) +
                             "/META-INF/MANIFEST.MF";
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       Attributes attrs = manifest.getMainAttributes();
-      String version = attrs.getValue("Bundle-Version");
+      String version = attrs.getValue("Build-Version");
       if (version == null) {
         return "UNKNOWN";
       }
 
-      String buildNumber = attrs.getValue("Bundle-Build-Id");
-      String timestamp = attrs.getValue("Bundle-Build-Timestamp");
+      String buildNumber = attrs.getValue("Build-Id");
+      String timestamp = attrs.getValue("Build-Timestamp");
       String desc = version + " buildNumber " + buildNumber + " built at " + timestamp;
       if (withName) {
-        desc = attrs.getValue("Bundle-SymbolicName") + " " + desc;
+        desc = attrs.getValue("Build-SymbolicName") + " " + desc;
       }
       return desc;
     } catch (Exception ex) {

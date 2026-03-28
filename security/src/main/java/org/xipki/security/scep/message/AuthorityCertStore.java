@@ -8,7 +8,7 @@ import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.Args;
 
 /**
- * Contains the CA certificate and the corresponding RA certificates, if exists.
+ * Authority Cert Store store definition.
  *
  * @author Lijun Liao (xipki)
  */

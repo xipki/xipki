@@ -11,7 +11,7 @@ import org.xipki.util.extra.misc.CompareUtil;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Management Entry Publisher.
+ * Publisher Entry entry.
  * @author Lijun Liao (xipki)
  *
  */

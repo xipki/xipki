@@ -50,7 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * SCEP client.
+ * Client.
  *
  * @author Lijun Liao (xipki)
  */

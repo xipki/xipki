@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntBinaryOperator;
 
 /**
- * Unique Identifier Generator.
+ * Unique Id Generator.
  *
  * <p>An id consists of
  * <ol>

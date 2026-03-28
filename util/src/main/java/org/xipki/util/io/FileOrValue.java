@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration consisting either file path or the text content.
+ * File Or Value.
  *
  * @author Lijun Liao (xipki)
  */

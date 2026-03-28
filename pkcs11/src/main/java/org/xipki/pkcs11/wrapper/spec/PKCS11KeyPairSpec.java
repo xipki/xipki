@@ -10,7 +10,7 @@ import org.xipki.pkcs11.wrapper.attrs.Template;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * PKCS11 Key Pair Spec.
  *
  * @author Lijun Liao (xipki)
  */

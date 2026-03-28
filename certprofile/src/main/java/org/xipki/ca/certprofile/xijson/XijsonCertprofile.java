@@ -62,7 +62,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Certprofile configured in JSON.
+ * XiJSON certificate profile definition.
  *
  * @author Lijun Liao (xipki)
  */

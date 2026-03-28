@@ -8,7 +8,7 @@ import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
- * Binary with description.
+ * Describable Binary.
  *
  * @author Lijun Liao (xipki)
  */

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * RFC 6962 implementation of the required classes for the extension SCT in
+ * CT Log.
  * certificate.
  *
  * @author Lijun Liao (xipki)
@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CtLog {
 
   /**
-   * <pre>
+   * Digitally Signed.
    * struct {
    *     SignatureAndHashAlgorithm algorithm;
    *     opaque signature&lt;0..2^16-1&gt;;
@@ -109,7 +109,7 @@ public class CtLog {
   } // class DigitallySigned
 
   /**
-   * <pre>
+   * Serialized SCT.
    * opaque SerializedSCT&lt;1..2^16-1&gt;;
    * </pre>
    */
@@ -187,6 +187,11 @@ public class CtLog {
 
   } // class SerializedSCT
 
+  /**
+   * Hash Algorithm enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum HashAlgorithm {
     none((byte) 0),
     md5((byte) 1),
@@ -216,6 +221,11 @@ public class CtLog {
     }
   } // class HashAlgorithm
 
+  /**
+   * Signature Algorithm enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum SignatureAlgorithm {
     anonymous((byte) 0),
     rsa((byte) 1),
@@ -243,7 +253,7 @@ public class CtLog {
   } // class SignatureAlgorithm
 
   /**
-   * ASN.1 definition:
+   * Signature And Hash Algorithm.
    * <pre>
    * struct {
    *     HashAlgorithm hash;
@@ -282,7 +292,7 @@ public class CtLog {
   } // class SignatureAndHashAlgorithm
 
   /**
-   * ASN1. definition:
+   * Signed Certificate Timestamp.
    * <pre>
    * struct {
    *     Version sct_version;
@@ -427,7 +437,7 @@ public class CtLog {
   } // class SignedCertificateTimestamp
 
   /**
-   * <pre>
+   * Signed Certificate Timestamp List.
    * struct {
    *     SerializedSCT sct_list &lt;1..2^16-1&gt;;
    * } SignedCertificateTimestampList;
@@ -574,6 +584,11 @@ public class CtLog {
     return encoded;
   }
 
+  /**
+   * Add Pre Chain Request request payload.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddPreChainRequest {
 
     private final List<byte[]> chain;
@@ -597,6 +612,11 @@ public class CtLog {
   } // class AddPreChainRequest
 
   // Do not change the variable name, and the get- and set-methods.
+  /**
+   * Add Pre Chain Response response payload.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddPreChainResponse {
 
     private final byte sct_version;

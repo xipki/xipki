@@ -85,7 +85,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
- * Key utility class.
+ * Key Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -6,14 +6,7 @@ package org.xipki.ca.server.servlet;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.mgmt.CaManager;
-import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.ca.api.mgmt.CaProfileEntry;
-import org.xipki.ca.api.mgmt.CertListInfo;
-import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.ca.api.mgmt.MgmtAction;
-import org.xipki.ca.api.mgmt.MgmtRequest;
-import org.xipki.ca.api.mgmt.MgmtResponse;
+import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
@@ -304,6 +297,20 @@ class CaHttpMgmtServlet {
           } else {
             resp = new MgmtResponse.GetCert(null, null, null);
           }
+          break;
+        }
+        case getCertStatistics: {
+          MgmtRequest.GetCertStatistics req = MgmtRequest.GetCertStatistics.parse(json);
+          CertStatistics statistics = caManager.getCertStatistics(req.getFrom(), req.getTo(),
+              req.isRevokedOnly(), req.getCas(), req.getCertProfiles(), req.getRequestors());
+          resp = new MgmtResponse.GetCertStatistics(statistics);
+          break;
+        }
+        case getSimpleCertprofileInfo: {
+          String name = getNameFromRequest(nonNullReq(json));
+          SimpleProfileInfo result = Optional.ofNullable(caManager.getSimpleCertprofileInfo(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown Certprofile " + name));
+          resp = new MgmtResponse.GetSimpleCertprofileInfo(result);
           break;
         }
         case getCertprofile: {

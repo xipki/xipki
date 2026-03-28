@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * Container of name-value pairs.
+ * Conf Pairs.
  *
  * @author Lijun Liao (xipki)
  */

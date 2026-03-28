@@ -27,7 +27,7 @@ import java.util.Set;
 import static org.xipki.pkcs11.wrapper.jni.JniOperation.*;
 
 /**
- * This class provides the PKCS#11 v2.40 functions.
+ * PKCS11.
  *
  * @author Lijun Liao (xipki)
  */

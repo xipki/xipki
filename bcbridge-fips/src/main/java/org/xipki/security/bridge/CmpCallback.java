@@ -9,7 +9,7 @@ import org.bouncycastle.asn1.crmf.EncryptedValue;
 import java.security.GeneralSecurityException;
 
 /**
- * XiPKI component.
+ * CMP Callback interface.
  *
  * @author Lijun Liao (xipki)
  */

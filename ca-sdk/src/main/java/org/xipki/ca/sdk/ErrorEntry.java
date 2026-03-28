@@ -11,6 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Error Entry entry.
  */
 
 public class ErrorEntry extends SdkEncodable {

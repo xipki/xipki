@@ -60,7 +60,7 @@ import static org.xipki.pkcs11.xihsm.util.XiConstants.P11MldsaVariant;
 import static org.xipki.pkcs11.xihsm.util.XiConstants.P11MlkemVariant;
 
 /**
- * XiPKI component.
+ * Backend.
  *
  * @author Lijun Liao (xipki)
  */

@@ -21,7 +21,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_MODULUS;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_PUBLIC_EXPONENT;
 
 /**
- * XiPKI component.
+ * Xi RSAPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

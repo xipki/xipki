@@ -16,7 +16,7 @@ import org.xipki.pkcs11.wrapper.type.CkType;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Every Parameters-class implements this interface.
+ * Ck Params.
  *
  * @author Lijun Liao (xipki)
  */

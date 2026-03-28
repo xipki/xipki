@@ -10,7 +10,7 @@ import org.xipki.pkcs11.xihsm.util.HsmUtil;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi Template Checker.
  *
  * @author Lijun Liao (xipki)
  */

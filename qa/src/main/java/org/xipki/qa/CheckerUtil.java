@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Extensions checker.
+ * Checker Util.
  *
  * @author Lijun Liao (xipki)
  */

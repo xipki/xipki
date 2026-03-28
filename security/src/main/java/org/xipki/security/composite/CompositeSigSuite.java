@@ -14,7 +14,7 @@ import org.xipki.security.OIDs;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Enumeration of the composite signature algorithms
+ * Composite Sig Suite enumeration.
  * @author Lijun Liao (xipki)
  */
 public enum CompositeSigSuite {

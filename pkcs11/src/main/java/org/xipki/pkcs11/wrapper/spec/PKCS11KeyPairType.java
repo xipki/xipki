@@ -10,7 +10,7 @@ import org.xipki.util.codec.asn1.Asn1Util;
 import static org.xipki.pkcs11.wrapper.spec.PKCS11Spec.appendElement;
 
 /**
- * XiPKI component.
+ * PKCS11 Key Pair Type interface.
  *
  * @author Lijun Liao (xipki)
  */

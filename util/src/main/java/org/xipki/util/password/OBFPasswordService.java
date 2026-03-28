@@ -9,7 +9,7 @@ import org.xipki.util.misc.StringUtil;
 import java.nio.charset.StandardCharsets;
 
 /**
- * OBF (jetty's Obfuscate) password service.
+ * OBFPassword Service.
  *
  * @author Lijun Liao (xipki)
  */

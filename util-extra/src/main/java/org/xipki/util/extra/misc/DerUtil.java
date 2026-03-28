@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * DER encoding utility functions.
+ * Der Util.
  *
  * @author Lijun Liao (xipki)
  */

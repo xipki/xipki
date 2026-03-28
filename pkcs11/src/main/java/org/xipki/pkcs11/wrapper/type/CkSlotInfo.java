@@ -14,7 +14,7 @@ import org.xipki.pkcs11.wrapper.jni.JniUtil;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Objects of this call provide information about a slot.
+ * Ck Slot Info information.
  *
  * <pre>
  * typedef struct CK_SLOT_INFO {

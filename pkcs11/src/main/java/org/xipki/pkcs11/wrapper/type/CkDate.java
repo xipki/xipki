@@ -7,7 +7,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import org.xipki.util.codec.Args;
 
 /**
- * Objects of this class represent a CK_DATE.
+ * Ck Date.
  * <pre>
  * typedef struct CK_DATE{
  *   CK_CHAR       year[4];   // the year ("1900" - "9999")

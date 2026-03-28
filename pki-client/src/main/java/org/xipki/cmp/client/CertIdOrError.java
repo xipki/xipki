@@ -8,7 +8,7 @@ import org.xipki.security.cmp.PkiStatusInfo;
 import org.xipki.util.codec.Args;
 
 /**
- * CertId or PKI error.
+ * Cert Id Or Error.
  *
  * @author Lijun Liao (xipki)
  */

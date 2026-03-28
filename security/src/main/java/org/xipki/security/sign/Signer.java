@@ -9,7 +9,7 @@ import org.xipki.security.exception.XiSecurityException;
 import java.io.IOException;
 
 /**
- * Extends {@link ContentSigner} by a new method
+ * Signer interface.
  * {@link #getEncodedX509AlgId()}.
  *
  * @author Lijun Liao (xipki)

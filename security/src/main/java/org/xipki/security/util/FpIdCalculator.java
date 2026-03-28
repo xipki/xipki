@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * MD'5 Fingerprint calculator.
+ * Fp Id Calculator.
  *
  * @author Lijun Liao (xipki)
  */

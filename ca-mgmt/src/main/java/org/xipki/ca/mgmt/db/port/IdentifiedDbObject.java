@@ -7,7 +7,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
- * CA configuration entry with database table id.
+ * Identified DB Object.
  *
  * @author Lijun Liao (xipki)
  */

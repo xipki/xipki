@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * HTTP Response.
+ * SCEP Http Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

@@ -8,7 +8,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.io.FileOrBinary;
 
 /**
- * Configuration of CMP client.
+ * OCSP Requestor Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */

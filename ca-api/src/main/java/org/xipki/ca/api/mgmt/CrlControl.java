@@ -16,7 +16,7 @@ import org.xipki.util.misc.StringUtil;
 import java.util.List;
 
 /**
- * CRL control.
+ * Crl Control control settings.
  *<pre>
  * Example configuration
  *
@@ -95,12 +95,14 @@ public class CrlControl implements JsonEncodable {
    * Overlap in minutes.
    * @deprecated use {@link #KEY_OVERLAP} instead.
    */
+  @Deprecated
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
 
   /**
    * Overlap in days.
    * @deprecated use {@link #KEY_OVERLAP} instead.
    */
+  @Deprecated
   public static final String KEY_OVERLAP_DAYS = "overlap.days";
 
   /**

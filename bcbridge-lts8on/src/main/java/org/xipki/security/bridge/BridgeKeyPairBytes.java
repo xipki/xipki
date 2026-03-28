@@ -4,7 +4,11 @@
 package org.xipki.security.bridge;
 
 /**
+<<<<<<< ours
  * XiPKI component.
+=======
+ * Bridge Key Pair Bytes.
+>>>>>>> theirs
  *
  * @author Lijun Liao (xipki)
  */

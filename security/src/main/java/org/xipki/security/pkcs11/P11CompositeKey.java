@@ -21,7 +21,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * PKCS#11 composite key.
+ * P11 Composite Key.
  *
  * @author Lijun Liao (xipki)
  */

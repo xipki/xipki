@@ -9,7 +9,7 @@ import org.xipki.util.extra.type.Range;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * XiPKI component.
+ * Rdn Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

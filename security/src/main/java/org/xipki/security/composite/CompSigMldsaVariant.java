@@ -8,7 +8,7 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.SignAlgo;
 
 /**
- * Enumeration of MLDSA algorithms used in {@link CompositeSigSuite}.
+ * Comp Sig MLDSA Variant enumeration.
  * @author Lijun Liao (xipki)
  */
 public enum CompSigMldsaVariant {

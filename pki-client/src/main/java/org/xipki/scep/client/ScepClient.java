@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A concrete SCEP client.
+ * SCEP Client.
  *
  * @author Lijun Liao (xipki)
  */

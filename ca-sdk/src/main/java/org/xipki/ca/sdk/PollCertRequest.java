@@ -13,6 +13,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Poll Cert Request request payload.
  */
 
 public class PollCertRequest extends CaIdentifierRequest {
@@ -53,6 +54,11 @@ public class PollCertRequest extends CaIdentifierRequest {
     }
   }
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends SdkEncodable {
 
     /*

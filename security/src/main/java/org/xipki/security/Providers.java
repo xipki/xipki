@@ -3,27 +3,21 @@
 
 package org.xipki.security;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.xipki.security.util.KeyUtil;
 
 import java.io.Closeable;
 
 /**
- * Helper class to register providers.
+ * Providers.
  *
  * @author Lijun Liao (xipki)
  */
-@Component
 public class Providers implements Closeable {
 
-  @Activate
   public void init() {
     KeyUtil.addProviders();
   }
 
-  @Deactivate
   @Override
   public void close() {
   }

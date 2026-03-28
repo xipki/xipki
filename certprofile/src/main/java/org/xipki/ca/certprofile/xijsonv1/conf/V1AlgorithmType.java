@@ -11,7 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import java.util.List;
 
 /**
- * Configuration of the signature algorithm of certificate.
+ * V1 Algorithm Type type definition.
  *
  * @author Lijun Liao (xipki)
  */

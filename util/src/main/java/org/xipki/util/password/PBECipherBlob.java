@@ -11,7 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 import java.io.IOException;
 
 /**
- * PBE cipher blob containing algorithm parameters and encrypted data.
+ * PBECipher Blob.
  *
  * @author Lijun Liao (xipki)
  */

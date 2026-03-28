@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
 /**
- * Generate keys to be store in src/main/resources/keypool.
+ * Generate Key Pool Resources Main.
  *
  * @author Lijun Liao (xipki)
  */

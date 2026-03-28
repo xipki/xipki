@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Certificate issuer information.
+ * Issuer Info information.
  *
  * @author Lijun Liao (xipki)
  */

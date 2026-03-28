@@ -4,8 +4,6 @@
 package org.xipki.security.pkcs11;
 
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.security.SecurityFactory;
@@ -34,18 +32,16 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * {@link SignerFactory} for PKCS#11 token.
+ * P11 Signer Factory.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = SignerFactory.class)
 public class P11SignerFactory implements SignerFactory {
 
   private static final String TYPE = "pkcs11";
 
   private static final Set<String> types = Set.copyOf(Collections.singletonList(TYPE));
 
-  @Reference
   private P11CryptServiceFactory p11CryptServiceFactory;
 
   public void setP11CryptServiceFactory(P11CryptServiceFactory p11CryptServiceFactory) {

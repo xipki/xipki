@@ -19,7 +19,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Weierstrauss Curve Enum enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -10,7 +10,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Interface to register {@link SignerFactory} and to create new
+ * Signer Factory Register interface.
  * {@link ConcurrentSigner}.
  *
  * @author Lijun Liao (xipki)

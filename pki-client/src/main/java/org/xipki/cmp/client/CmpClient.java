@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CMP client interface.
+ * CMP Client interface.
  *
  * @author Lijun Liao (xipki)
  */

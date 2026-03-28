@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.xihsm.util;
 
 /**
- * XiPKI component.
+ * Operation Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

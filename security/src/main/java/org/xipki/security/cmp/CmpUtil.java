@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * CMP utility class.
+ * CMP Util.
  *
  * @author Lijun Liao (xipki)
  */

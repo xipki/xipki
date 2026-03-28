@@ -8,7 +8,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.xipki.util.codec.Args;
 
 /**
- * RFC 3779, 8360
+ * ASId Or Range.
  * <pre>
  *    ASIdOrRange         ::= CHOICE {
  *        id                  ASId,

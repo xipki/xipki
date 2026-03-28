@@ -18,7 +18,7 @@ import org.xipki.util.io.IoUtil;
 import java.io.IOException;
 
 /**
- * SCEP servlet.
+ * SCEP Http Servlet.
  *
  * <p>URL http://host:port/scep/&lt;name&gt;/&lt;profile-alias&gt;/pkiclient.exe
  *

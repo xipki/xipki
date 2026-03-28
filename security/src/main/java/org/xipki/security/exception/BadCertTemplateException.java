@@ -4,7 +4,7 @@
 package org.xipki.security.exception;
 
 /**
- * Exception indicates bad certificate template.
+ * Bad Cert Template Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

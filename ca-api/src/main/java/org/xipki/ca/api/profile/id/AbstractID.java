@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Abstract ID.
  *
  * @author Lijun Liao (xipki)
  */

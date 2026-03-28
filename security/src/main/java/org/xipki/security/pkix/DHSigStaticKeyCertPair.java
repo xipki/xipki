@@ -11,7 +11,7 @@ import java.security.PrivateKey;
 import java.util.Arrays;
 
 /**
- * Specifies private key and certificate pair for the DHSig-static defined in
+ * DHSig Static Key Cert Pair pair.
  * RFC 6955.
  *
  * @author Lijun Liao (xipki)

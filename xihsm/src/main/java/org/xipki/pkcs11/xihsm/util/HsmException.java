@@ -7,7 +7,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Exception;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 
 /**
- * XiPKI component.
+ * Hsm Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

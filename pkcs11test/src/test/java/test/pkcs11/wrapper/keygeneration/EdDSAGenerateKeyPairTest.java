@@ -36,6 +36,11 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKM_EDDSA;
 @RunWith(Enclosed.class)
 public class EdDSAGenerateKeyPairTest {
 
+  /**
+   * Nested class Cloudhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Cloudhsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -43,6 +48,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Luna.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Luna extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -50,6 +60,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Ncipher.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Ncipher extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -57,6 +72,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Sansec.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Sansec extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -64,6 +84,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Tass.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Tass extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -71,6 +96,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Softhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Softhsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -78,6 +108,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Utimaco.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Utimaco extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -85,6 +120,11 @@ public class EdDSAGenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Xihsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Xihsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {

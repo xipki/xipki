@@ -50,7 +50,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Util class of CA.
+ * CA Util.
  *
  * @author Lijun Liao (xipki)
  */

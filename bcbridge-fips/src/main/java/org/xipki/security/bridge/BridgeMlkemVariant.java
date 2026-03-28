@@ -4,7 +4,11 @@
 package org.xipki.security.bridge;
 
 /**
+<<<<<<< ours
  * XiPKI component.
+=======
+ * Bridge MLKEM Variant enumeration.
+>>>>>>> theirs
  *
  * @author Lijun Liao (xipki)
  */

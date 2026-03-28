@@ -14,6 +14,7 @@ import java.security.interfaces.RSAPublicKey;
 /**
  *
  * @author Lijun Liao (xipki)
+ * SCEP Signer signer definition.
  */
 
 public class ScepSigner {

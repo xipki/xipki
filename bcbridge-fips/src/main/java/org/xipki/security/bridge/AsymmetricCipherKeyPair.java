@@ -6,7 +6,7 @@ package org.xipki.security.bridge;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * Asymmetric Cipher Key Pair pair.
  *
  * @author Lijun Liao (xipki)
  */

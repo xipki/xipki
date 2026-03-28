@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Slot authentication.
+ * Session Auth.
  *
  * @author Lijun Liao (xipki)
  */

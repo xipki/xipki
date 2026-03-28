@@ -65,7 +65,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * This class represents the file-based CA configuration.
+ * File CA Conf Store store definition.
  * @author Lijun Liao (xipki)
  */
 public class FileCaConfStore implements CaConfStore {

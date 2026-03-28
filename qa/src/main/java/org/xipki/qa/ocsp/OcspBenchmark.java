@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * OCSP benchmark.
+ * OCSP Benchmark.
  *
  * @author Lijun Liao (xipki)
  */

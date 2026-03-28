@@ -14,13 +14,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * KeyParameters.
+ * V1 Key Parameters Type type definition.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class V1KeyParametersType {
 
+  /**
+   * EC Parameters Type type definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class EcParametersType {
 
     private final List<DescribableOid> curves;
@@ -41,6 +46,11 @@ public class V1KeyParametersType {
 
   } // class EcParametersType
 
+  /**
+   * RSA Parameters Type type definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RsaParametersType {
 
     private final List<Integer> modulus;

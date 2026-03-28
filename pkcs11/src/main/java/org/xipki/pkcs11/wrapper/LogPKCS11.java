@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A wrapper of {@link PKCS11} which logs the input, output and error of calling
+ * Log PKCS11.
  * PKCS#11 functions.
  *
  * @author Lijun Liao (xipki)

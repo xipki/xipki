@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * XiPKI component.
+ * Mem Persist Store store definition.
  *
  * @author Lijun Liao (xipki)
  */

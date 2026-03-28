@@ -10,7 +10,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 /**
- * Objects of this class represent a date attribute of a PKCS#11 object
+ * Date Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

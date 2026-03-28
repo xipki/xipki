@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An implementation of {@link AlgorithmValidator} where the permitted
+ * Collection Algorithm Validator.
  * algorithms are contained in a static collection.
  *
  * @author Lijun Liao (xipki)

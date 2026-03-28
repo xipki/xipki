@@ -24,12 +24,17 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A tool to replace text in files.
+ * Batch Replace.
  * @author Lijun Liao (xipki)
  */
 
 public class BatchReplace {
 
+  /**
+   * Includes.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Includes {
     private Set<String> suffixes;
     private Set<String> dirs;
@@ -51,6 +56,11 @@ public class BatchReplace {
     }
   }
 
+  /**
+   * Excludes.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Excludes {
     private Set<String> dirs;
     private Set<String> files;

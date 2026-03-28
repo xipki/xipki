@@ -7,7 +7,7 @@ import org.xipki.security.pkix.KeyUsage;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * Key Single Usage.
  *
  * @author Lijun Liao (xipki)
  */

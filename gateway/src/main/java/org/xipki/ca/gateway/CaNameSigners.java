@@ -17,6 +17,7 @@ import java.util.Set;
 /**
  *
  * @author Lijun Liao (xipki)
+ * CA Name Signers.
  */
 public class CaNameSigners {
 

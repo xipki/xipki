@@ -23,7 +23,7 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi P11 Storage.
  *
  * @author Lijun Liao (xipki)
  */

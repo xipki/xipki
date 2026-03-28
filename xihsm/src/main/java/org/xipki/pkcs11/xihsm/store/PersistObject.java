@@ -24,7 +24,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_LABEL;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_PRIVATE;
 
 /**
- * XiPKI component.
+ * Persist Object.
  *
  * @author Lijun Liao (xipki)
  */

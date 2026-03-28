@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Utility class providing util functions to encode and decode basic data types.
+ * Jni Util.
  *
  * @author Lijun Liao (xipki)
  */

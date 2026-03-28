@@ -7,6 +7,7 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
@@ -15,6 +16,10 @@ import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509CRLHolder;
+import org.bouncycastle.openssl.PKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
@@ -24,6 +29,8 @@ import org.xipki.security.OIDs;
 import org.xipki.security.asn1.Asn1StreamParser;
 import org.xipki.security.exception.BadInputException;
 import org.xipki.security.exception.XiSecurityException;
+import org.xipki.security.pkcs12.PKCS12KeyStore;
+import org.xipki.security.pkix.KeyCertBytesPair;
 import org.xipki.security.pkix.KeyUsage;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.pkix.X509Crl;
@@ -52,9 +59,12 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,7 +78,7 @@ import java.util.Set;
 import static org.xipki.util.codec.Args.notNull;
 
 /**
- * X.509 certificate utility class.
+ * X509 Util.
  *
  * @author Lijun Liao (xipki)
  */
@@ -955,6 +965,41 @@ public class X509Util {
       throw new IOException("could not read ASN.1 object");
     }
     return obj;
+  }
+
+  public static byte[] saveToKeyStore(
+      KeyCertBytesPair keyCertBytesPair, String keyOutform, char[] keyPassword)
+      throws XiSecurityException {
+    try {
+      PrivateKeyInfo privKey = PrivateKeyInfo.getInstance(keyCertBytesPair.key());
+
+      PKCS12KeyStore p12Ks = new PKCS12KeyStore();
+      if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
+        X509Cert cert = parseCert(keyCertBytesPair.cert());
+        p12Ks.setKeyEntry("main", privKey, cert.getCert());
+
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+          p12Ks.store(os, keyPassword);
+          return os.toByteArray();
+        }
+      } else {
+        if (keyPassword == null) {
+          return PemEncoder.encode(keyCertBytesPair.key(), PemEncoder.PemLabel.PRIVATE_KEY);
+        } else {
+          JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
+              new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
+          encryptorBuilder.setPassword(keyPassword);
+
+          PrivateKey privateKey = KeyUtil.getPrivateKey(privKey);
+          JcaPKCS8Generator gen = new JcaPKCS8Generator(privateKey, encryptorBuilder.build());
+          PemObject obj = gen.generate();
+          return PemEncoder.encode(obj.getContent(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY);
+        }
+      }
+    } catch (IOException | InvalidKeySpecException | KeyStoreException
+             | CertificateException | OperatorCreationException e) {
+      throw new XiSecurityException(e);
+    }
   }
 
 }

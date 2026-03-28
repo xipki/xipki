@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Extensions checker.
+ * X509 Extensions Checker.
  *
  * @author Lijun Liao (xipki)
  */

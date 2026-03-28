@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Root configuration of the json Certprofile.
+ * Xijson Certprofile Type type definition.
  *
  * @author Lijun Liao (xipki)
  *

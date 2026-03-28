@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Container of NameId of CA management entries.
+ * CA Id Name Map.
  *
  * @author Lijun Liao (xipki)
  */
@@ -50,6 +50,18 @@ public class CaIdNameMap {
   public void addCa(NameId nameId) {
     idCaMap.put(nameId.id(), nameId);
     nameCaMap.put(nameId.name(), nameId);
+  }
+
+  public NameId[] getAllCas() {
+    return nameCaMap.values().toArray(new NameId[0]);
+  }
+
+  public NameId[] getAllProfiles() {
+    return nameCertprofileMap.values().toArray(new NameId[0]);
+  }
+
+  public NameId[] getAllRequestors() {
+    return nameRequestorMap.values().toArray(new NameId[0]);
   }
 
   public NameId getCertprofile(int id) {

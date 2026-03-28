@@ -9,7 +9,7 @@ import org.xipki.util.codec.Hex;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Cbor Tagged Object.
  *
  * @author Lijun Liao (xipki)
  */

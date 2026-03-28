@@ -9,7 +9,7 @@ import org.xipki.servlet.ServletFilter;
 import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
- * CA ServletFilter.
+ * CA Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

@@ -4,7 +4,7 @@
 package org.xipki.security;
 
 /**
- * XiPKI component.
+ * Key Pair Bytes.
  *
  * @author Lijun Liao (xipki)
  */

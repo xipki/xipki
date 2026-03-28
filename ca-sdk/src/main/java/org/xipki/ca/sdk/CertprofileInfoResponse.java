@@ -17,6 +17,7 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Certprofile Info Response response payload.
  */
 
 public class CertprofileInfoResponse extends SdkResponse {

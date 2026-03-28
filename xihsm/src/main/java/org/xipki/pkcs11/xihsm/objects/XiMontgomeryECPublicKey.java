@@ -16,7 +16,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_PARAMS;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_POINT;
 
 /**
- * XiPKI component.
+ * Xi Montgomery ECPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

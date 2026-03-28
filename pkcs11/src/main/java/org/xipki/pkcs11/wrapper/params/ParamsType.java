@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper.params;
 
 /**
- * Types of CK_PARAMS.
+ * Params Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

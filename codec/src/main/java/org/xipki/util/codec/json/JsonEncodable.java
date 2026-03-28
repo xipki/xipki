@@ -4,7 +4,7 @@
 package org.xipki.util.codec.json;
 
 /**
- * Encodable object.
+ * Json Encodable interface.
  *
  * @author Lijun Liao (xipki)
  */

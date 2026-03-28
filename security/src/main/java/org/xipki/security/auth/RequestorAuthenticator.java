@@ -7,7 +7,7 @@ import org.xipki.security.exception.XiSecurityException;
 import org.xipki.security.pkix.X509Cert;
 
 /**
- * Authenticates requestors and resolves protocol-specific requestor identities.
+ * Requestor Authenticator interface.
  *
  * @author Lijun Liao (xipki)
  */

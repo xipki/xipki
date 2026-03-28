@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <pre>
+ * Kem Encap Key.
  * Encoding:
  *
  * alg:                  1 byte

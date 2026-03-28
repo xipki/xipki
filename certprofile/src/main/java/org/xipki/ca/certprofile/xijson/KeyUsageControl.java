@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * XiPKI component.
+ * Key Usage Control control settings.
  *
  * @author Lijun Liao (xipki)
  */
@@ -45,6 +45,11 @@ public class KeyUsageControl {
     return defaultUsages == null ? null : defaultUsages.singleUsages;
   }
 
+  /**
+   * Key Single Usages.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class KeySingleUsages {
 
     private final List<KeySpec> appliesTo;

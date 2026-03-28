@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * XiPKI component.
+ * Stream Cbor Encoder.
  *
  * @author Lijun Liao (xipki)
  */

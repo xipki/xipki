@@ -91,7 +91,7 @@ import static org.xipki.ca.gateway.acme.AcmeConstants.*;
 import static org.xipki.util.codec.Base64.decodeFast;
 
 /**
- * ACME responder.
+ * ACME Responder.
  *
  * @author Lijun Liao (xipki)
  */

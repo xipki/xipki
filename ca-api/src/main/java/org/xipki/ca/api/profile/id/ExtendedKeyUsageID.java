@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Extended Key Usage ID.
  *
  * @author Lijun Liao (xipki)
  */

@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Configuration of GeneralName.
+ * V1 General Name Type type definition.
  *
  * @author Lijun Liao (xipki)
  *

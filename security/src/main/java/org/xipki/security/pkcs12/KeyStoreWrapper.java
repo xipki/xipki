@@ -9,7 +9,7 @@ import org.xipki.util.codec.Args;
 import java.security.KeyStore;
 
 /**
- * Keystore wrapper (containing the keystore object and its encoded form).
+ * Key Store Wrapper.
  *
  * @author Lijun Liao (xipki)
  */

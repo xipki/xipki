@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Edwards Curve Enum enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * Transaction ID.
+ * Transaction Id.
  *
  * @author Lijun Liao (xipki)
  */

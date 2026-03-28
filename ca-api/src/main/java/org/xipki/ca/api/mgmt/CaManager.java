@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Interface to manage the CA system.
+ * CA Manager interface.
  *
  * @author Lijun Liao (xipki)
  */
@@ -326,6 +326,16 @@ public interface CaManager {
    *          if error occurs.
    */
   void addRequestorToCa(CaHasRequestorEntry requestor, String caName) throws CaMgmtException;
+
+  /**
+   * Returns the simple certificate profile named {@code profileName}.
+   * @param profileName
+   *          certificate profile name. Must not be {@code null}.
+   * @return the simple profile info
+   * @throws CaMgmtException
+   *          if error occurs.
+   */
+  SimpleProfileInfo getSimpleCertprofileInfo(String profileName) throws CaMgmtException;
 
   /**
    * Returns the certificate profile named {@code profileName}.
@@ -825,4 +835,7 @@ public interface CaManager {
   String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
       throws CaMgmtException;
 
+  CertStatistics getCertStatistics(
+      String from, String to, boolean revokedOnly, List<String> cas, List<String> certProfiles,
+      List<String> requestors) throws CaMgmtException;
 }

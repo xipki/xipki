@@ -65,7 +65,7 @@ import static org.xipki.ca.sdk.SdkConstants.*;
 import static org.xipki.security.exception.ErrorCode.*;
 
 /**
- * SDK responder.
+ * Sdk Responder.
  *
  * @author Lijun Liao (xipki)
  */

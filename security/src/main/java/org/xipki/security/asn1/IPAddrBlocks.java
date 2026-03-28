@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * RFC 3779, 8360
+ * IPAddr Blocks.
  * <pre>
  * IPAddrBlocks        ::= SEQUENCE OF IPAddressFamily
  * </pre>

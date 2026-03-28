@@ -242,6 +242,11 @@ public class TestHSMs {
     }
   }
 
+  /**
+   * Nested class TestHSM.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class TestHSM {
 
     private final PKCS11Token token;

@@ -29,7 +29,7 @@ import java.time.ZonedDateTime;
 import java.util.StringTokenizer;
 
 /**
- * File-based MAC protected audit service.
+ * File Mac Audit Service.
  *
  * @author Lijun Liao (xipki)
  */

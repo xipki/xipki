@@ -15,7 +15,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /**
- * Utility class for the date conversion.
+ * Date Util.
  *
  * @author Lijun Liao (xipki)
  */

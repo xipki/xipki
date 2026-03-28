@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Audit event.
+ * Audit Event.
  *
  * @author Lijun Liao (xipki)
  */

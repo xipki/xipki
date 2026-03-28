@@ -13,7 +13,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_RSA_PKCS_OAEP_PARAMS.
+ * RSA PKCS OAEP PARAMS.
  *
  * <pre>
  * typedef struct CK_RSA_PKCS_OAEP_PARAMS {

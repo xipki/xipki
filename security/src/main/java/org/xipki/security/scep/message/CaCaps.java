@@ -30,7 +30,7 @@ import static org.xipki.security.scep.transaction.CaCapability.SHA256;
 import static org.xipki.security.scep.transaction.CaCapability.SHA512;
 
 /**
- * CA caps.
+ * CA Caps.
  *
  * @author Lijun Liao (xipki)
  */

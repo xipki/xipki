@@ -10,7 +10,7 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Store interface.
  *
  * @author Lijun Liao (xipki)
  */

@@ -9,6 +9,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * Asn1 ECPrivate Key.
  * <pre>
  * ECPrivateKey ::= SEQUENCE {
  *   version        INTEGER { ecPrivkeyVer1(1) } (ecPrivkeyVer1),
@@ -16,9 +17,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   parameters EXPLICIT [0] ECParameters {{ NamedCurve }} OPTIONAL,
  *   publicKey  EXPLICIT [1] BIT STRING OPTIONAL
  * }
+ * </pre>
  *
  * @author Lijun Liao (xipki)
- * </pre>
  */
 public class Asn1ECPrivateKey {
 

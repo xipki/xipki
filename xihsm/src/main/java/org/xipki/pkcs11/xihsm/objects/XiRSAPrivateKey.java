@@ -34,7 +34,7 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi RSAPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

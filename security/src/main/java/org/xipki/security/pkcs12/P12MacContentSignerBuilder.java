@@ -23,7 +23,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * Builder of PKCS#12 MAC signers.
+ * P12 Mac Content Signer Builder.
  *
  * @author Lijun Liao (xipki)
  */

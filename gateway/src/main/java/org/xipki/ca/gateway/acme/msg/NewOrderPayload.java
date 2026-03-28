@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ACME component.
+ * New Order Payload.
  *
  * @author Lijun Liao (xipki)
  */

@@ -3,58 +3,56 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
   <groupId>org.xipki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.6.1-SNAPSHOT</version>
+  <version>6.7.0-SNAPSHOT</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
-  <developers>
-    <developer>
-      <id>project-owner</id>
-      <name>Lijun Liao (xipki)</name>
-    </developer>
-  </developers>
+  <url>https://github.com/xipki/xipki</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
-    <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <!-- DO NOT UPGRADE TO karaf 4.4.9 and 4.4.10 -->
-    <!-- Change assemblies/karaf-features/src/main/filtered/features.xml respectively -->
-    <karaf.version>4.4.8</karaf.version>
-    <hikaricp.version>6.3.3</hikaricp.version>
     <dnsjava.version>3.6.4</dnsjava.version>
+    <hikaricp.version>7.0.2</hikaricp.version>
+    <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
+    <jline.version>4.0.9</jline.version>
+    <picocli.version>4.7.7</picocli.version>
     <slf4j.version>2.0.17</slf4j.version>
     <!-- BouncyCastle -->
     <bc-lts.version>2.73.10</bc-lts.version>
+    <bc-fips.version>2.1.2</bc-fips.version>
+    <bcpkix-fips.version>2.1.10</bcpkix-fips.version>
     <bcpqc-fips.version>2.0.0</bcpqc-fips.version>
-    <bc-fips.version>2.0.1</bc-fips.version>
-    <bcutil-fips.version>2.0.5</bcutil-fips.version>
-    <bcpkix-fips.version>2.0.10</bcpkix-fips.version>
+    <bcutil-fips.version>2.1.5</bcutil-fips.version>
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
+    <jdbc.h2.version>2.4.240</jdbc.h2.version>
     <jdbc.mariadb.version>3.5.7</jdbc.mariadb.version>
     <jdbc.postgresql.version>42.7.10</jdbc.postgresql.version>
-    <jdbc.h2.version>2.4.240</jdbc.h2.version>
     <!-- Only for test purpose -->
-    <junit.version>4.13.1</junit.version>
-    <!-- for OSGi bundles -->
-    <hikaricp.versions>[2.7,10)</hikaricp.versions>
-    <bc.versions>[1.79,10)</bc.versions>
+    <junit.version>4.13.2</junit.version>
+    <!-- plugin versions -->
+    <maven.assembly-plugin.version>3.8.0</maven.assembly-plugin.version>
+    <maven.build-helper-plugin.version>3.6.0</maven.build-helper-plugin.version>
+    <maven.compiler-plugin.version>3.15.0</maven.compiler-plugin.version>
+    <maven.buildnumber-plugin.version>3.3.0</maven.buildnumber-plugin.version>
+    <maven.clean-plugin.version>3.5.0</maven.clean-plugin.version>
+    <maven.dependency-plugin.version>3.10.0</maven.dependency-plugin.version>
+    <maven.deploy-plugin.version>3.1.4</maven.deploy-plugin.version>
+    <maven.gpg-plugin.version>3.1.0</maven.gpg-plugin.version>
+    <maven.install-plugin.version>3.1.4</maven.install-plugin.version>
+    <maven.jar-plugin.version>3.5.0</maven.jar-plugin.version>
+    <maven.javadoc-plugin.version>3.6.2</maven.javadoc-plugin.version>
+    <maven.resources-plugin.version>3.5.0</maven.resources-plugin.version>
+    <maven.site-plugin.version>3.21.0</maven.site-plugin.version>
+    <maven.source-plugin.version>3.4.0</maven.source-plugin.version>
+    <maven.surefire-plugin.version>3.5.5</maven.surefire-plugin.version>
+    <maven.war-plugin.version>3.5.1</maven.war-plugin.version>
+    <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
+    <xipki.dependency-plugin.version>1.0.0-SNAPSHOT</xipki.dependency-plugin.version>
   </properties>
   <modules>
-    <module>patch-karaf</module>
     <!-- Base components -->
     <module>codec</module>
     <module>pkcs11</module>
@@ -65,7 +63,6 @@
     <module>bcbridge-lts8on</module>
     <module>bcbridge-fips</module>
 
-    <module>osgi-placeholder</module>
     <module>security</module>
     <!-- PKI SDK/Client -->
     <module>pki-client</module>
@@ -82,24 +79,13 @@
     <module>certprofile</module>
     <module>qa</module>
     <module>servlets</module>
-    <module>karaf-features</module>
     <module>assemblies</module>
   </modules>
   <scm>
-    <connection>scm:git:git@github.com:xipki/xipki.git</connection>
-    <developerConnection>scm:git:git@github.com:xipki/xipki.git</developerConnection>
-    <url>git@github.com:xipki/xipki.git</url>
+    <connection>scm:git:https://github.com/xipki/xipki.git</connection>
+    <developerConnection>scm:git:https://github.com/xipki/xipki.git</developerConnection>
+    <url>https://github.com/xipki/xipki</url>
   </scm>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <repositories>
     <!-- Apache snapshots -->
     <repository>
@@ -113,23 +99,37 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
- </repositories>
+  </repositories>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>${maven.compiler-plugin.version}</version>
         <configuration>
-          <optimize>true</optimize>
-          <source>11</source>
-          <target>11</target>
+          <release>11</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven.jar-plugin.version}</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Author>Lijun Liao (xipki)</Author>
+              <Build-Version>${project.version}</Build-Version>
+              <Build-Id>${buildNumber}</Build-Id>
+              <Build-Timestamp>${timestamp}</Build-Timestamp>
+              <Build-SymbolicName>${project.groupId}/${project.artifactId}</Build-SymbolicName>
+            </manifestEntries>
+          </archive>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>${maven.source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -140,24 +140,9 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>5.1.9</version>
-        <extensions>true</extensions>
-        <configuration>
-          <instructions>
-            <_dsannotations>*</_dsannotations>
-            <Bundle-Vendor>Lijun Liao (xipki)</Bundle-Vendor>
-            <Bundle-Build-Id>${buildNumber}</Bundle-Build-Id>
-            <Bundle-Description>${project.name}</Bundle-Description>
-            <Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
-          </instructions>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>${maven.buildnumber-plugin.version}</version>
         <executions>
           <execution>
             <phase>validate</phase>
@@ -179,54 +164,62 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>${maven.build-helper-plugin.version}</version>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>${central-publishing-maven-plugin.version}</version>
+        <extensions>true</extensions>
+        <configuration>
+          <publishingServerId>central</publishingServerId>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.apache.karaf.tooling</groupId>
-          <artifactId>karaf-maven-plugin</artifactId>
-          <version>${karaf.version}</version>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven.jar-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>${maven.assembly-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>${maven.clean-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>${maven.dependency-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
+          <version>${maven.deploy-plugin.version}</version>
           <configuration>
             <skip>${skipDeploy}</skip>
           </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>${maven.install-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>${maven.resources-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.21.0</version>
+          <version>${maven.site-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-war-plugin</artifactId>
-          <version>3.3.2</version>
+          <version>${maven.war-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>${maven.surefire-plugin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -285,21 +278,20 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-      <!--dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-slf4j2-impl</artifactId>
-        <version>${log4j.version}</version>
-        <scope>runtime</scope>
-      </dependency-->
+      <dependency>
+        <groupId>info.picocli</groupId>
+        <artifactId>picocli</artifactId>
+        <version>${picocli.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jline</groupId>
+        <artifactId>jline</artifactId>
+        <version>${jline.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>${hikaricp.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>javax.servlet-api</artifactId>
-        <version>${javax.servlet.version}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.servlet</groupId>
@@ -310,11 +302,6 @@
         <groupId>dnsjava</groupId>
         <artifactId>dnsjava</artifactId>
         <version>${dnsjava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.karaf.shell</groupId>
-        <artifactId>org.apache.karaf.shell.core</artifactId>
-        <version>${karaf.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mariadb.jdbc</groupId>
@@ -330,12 +317,6 @@
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
         <version>${jdbc.h2.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.karaf</groupId>
-        <artifactId>apache-karaf-minimal</artifactId>
-        <version>${karaf.version}</version>
-        <type>tar.gz</type>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -356,7 +337,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>${maven.gpg-plugin.version}</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -368,25 +349,17 @@
             </executions>
           </plugin>
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.7.0</version>
-            <extensions>true</extensions>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
             <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <!-- If autoReleaseAfterClose is set to false,
-                   call "mvn nexus-staging:release -Prelease" to trige a release of the staging
-                   repository, or nexus-staging:drop to drop the staging repositoy-->
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-              <!-- default to 5 minutes -->
-              <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
+              <autoPublish>true</autoPublish>
+              <waitUntil>published</waitUntil>
             </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.6.2</version>
+            <version>${maven.javadoc-plugin.version}</version>
             <configuration>
               <failOnError>true</failOnError>
             </configuration>

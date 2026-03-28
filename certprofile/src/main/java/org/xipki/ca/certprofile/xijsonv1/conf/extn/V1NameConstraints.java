@@ -3,8 +3,8 @@
 
 package org.xipki.ca.certprofile.xijsonv1.conf.extn;
 
-import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf.NameConstraints;
+import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
 import org.xipki.ca.certprofile.xijsonv1.conf.V1GeneralSubtreeType;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonList;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension NameConstraints.
+ * V1 Name Constraints.
  * Only for CA, at least one of permittedSubtrees and excludedSubtrees must
  * be present.
  * @author Lijun Liao (xipki)

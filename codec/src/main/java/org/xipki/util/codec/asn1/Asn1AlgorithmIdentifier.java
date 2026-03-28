@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * XiPKI component.
+ * Asn1 Algorithm Identifier.
  *
  * @author Lijun Liao (xipki)
  */

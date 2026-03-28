@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Subject checker.
+ * X509 Subject Checker.
  *
  * @author Lijun Liao (xipki)
  */

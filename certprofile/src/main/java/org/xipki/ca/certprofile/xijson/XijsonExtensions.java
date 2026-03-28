@@ -52,7 +52,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * Extensions configuration.
+ * Xijson Extensions.
  *
  * @author Lijun Liao (xipki)
  */

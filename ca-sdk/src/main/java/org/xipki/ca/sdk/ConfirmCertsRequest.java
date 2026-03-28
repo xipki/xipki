@@ -13,6 +13,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Confirm Certs Request request payload.
  */
 
 public class ConfirmCertsRequest extends SdkRequest {
@@ -48,6 +49,11 @@ public class ConfirmCertsRequest extends SdkRequest {
     }
   }
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends SdkEncodable {
 
     private final boolean accept;

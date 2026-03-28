@@ -4,7 +4,7 @@
 package org.xipki.util.extra.exception;
 
 /**
- * Exception related to Certprofile.
+ * Certprofile Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

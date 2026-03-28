@@ -15,6 +15,7 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Revoke Certs Request request payload.
  */
 
 public class RevokeCertsRequest extends CaIdentifierRequest {
@@ -48,6 +49,11 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
     }
   }
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends SdkEncodable {
 
     /*

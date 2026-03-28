@@ -19,6 +19,11 @@ import java.util.List;
 
 class ResponderOption {
 
+  /**
+   * OCSP Mode enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum OcspMode {
 
     RFC2560,

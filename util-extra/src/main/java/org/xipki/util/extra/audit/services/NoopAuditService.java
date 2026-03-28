@@ -9,7 +9,7 @@ import org.xipki.util.extra.audit.AuditService;
 import org.xipki.util.extra.audit.PciAuditEvent;
 
 /**
- * The No-Operation audit service. The events will be ignored.
+ * Noop Audit Service.
  *
  * @author Lijun Liao (xipki)
  */

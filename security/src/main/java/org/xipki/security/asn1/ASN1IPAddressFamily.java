@@ -12,7 +12,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.ipadress.IPAddressFamily;
 
 /**
- * RFC 3779, 8360
+ * ASN1 IPAddress Family.
  * <pre>
  *    IPAddressFamily     ::= SEQUENCE {    -- AFI & optional SAFI --
  *       addressFamily        OCTET STRING (SIZE (2..3)),

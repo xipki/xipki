@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration of the certificate's subject field.
+ * V1 Subject.
  *
  * @author Lijun Liao (xipki)
  */
@@ -54,6 +54,11 @@ public class V1Subject {
     return new V1Subject(json.getBool("keepRdnOrder"), rdns);
   }
 
+  /**
+   * Value Type type definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ValueType {
 
     private final String text;
@@ -82,6 +87,11 @@ public class V1Subject {
 
   }
 
+  /**
+   * V1 Rdn Type type definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class V1RdnType {
 
     private final DescribableOid type;

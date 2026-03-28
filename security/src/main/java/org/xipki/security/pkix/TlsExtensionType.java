@@ -4,7 +4,7 @@
 package org.xipki.security.pkix;
 
 /**
- * TLS feature extension type. See RFC 7633 for details.
+ * Tls Extension Type type definition.
  *
  * @author Lijun Liao (xipki)
  */

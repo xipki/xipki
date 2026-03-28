@@ -45,7 +45,7 @@ import java.util.Optional;
 import static org.xipki.security.HashAlgo.*;
 
 /**
- * Hash algorithm enum.
+ * Sign Algo enumeration.
  *
  * @author Lijun Liao (xipki)
  */

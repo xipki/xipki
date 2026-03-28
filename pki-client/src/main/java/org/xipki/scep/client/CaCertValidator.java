@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * CA Certificate validator.
+ * CA Cert Validator interface.
  *
  * @author Lijun Liao (xipki)
  */

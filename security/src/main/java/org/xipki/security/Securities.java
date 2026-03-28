@@ -26,13 +26,18 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Utility class to initialize {@link SecurityFactory} and
+ * Securities.
  * {@link P11CryptServiceFactory}.
  *
  * @author Lijun Liao (xipki)
  */
 public class Securities implements Closeable {
 
+  /**
+   * Security Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SecurityConf {
 
     private boolean keyStrongrandomEnabled;

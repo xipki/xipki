@@ -22,11 +22,11 @@ docker run -a stdin -a stdout \
 	make all
 
 #echo "build arm64"
-#docker run -a stdin -a stdout \
-#	-it \
-#	-v $DIR:/app \
-#	--name arm64builder \
-#	--rm --workdir /app/windows/win-arm64 \
-#	dockcross/windows-arm64 \
-#	make all
+docker run -a stdin -a stdout \
+	-it \
+	-v $DIR:/app \
+	--name arm64builder \
+	--rm --workdir /app/windows/win-arm64 \
+	dockcross/windows-arm64 \
+	make all
 

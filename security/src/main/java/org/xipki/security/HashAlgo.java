@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Hash algorithm enum.
+ * Hash Algo enumeration.
  *
  * @author Lijun Liao (xipki)
  */

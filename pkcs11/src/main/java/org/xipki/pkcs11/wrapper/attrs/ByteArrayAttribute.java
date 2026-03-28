@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Objects of this class represent a byte-array attribute of a PKCS#11 object
+ * Byte Array Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

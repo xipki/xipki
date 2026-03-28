@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi Slot slot definition.
  *
  * @author Lijun Liao (xipki)
  */

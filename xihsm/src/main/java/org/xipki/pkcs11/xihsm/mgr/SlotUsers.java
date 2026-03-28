@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Slot Users.
  *
  * @author Lijun Liao (xipki)
  */

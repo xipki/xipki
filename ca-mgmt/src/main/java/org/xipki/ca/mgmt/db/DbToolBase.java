@@ -31,7 +31,7 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Database tool base.
+ * DB Tool Base.
  *
  * @author Lijun Liao (xipki)
  */

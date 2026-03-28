@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Configuration of the OCSP server.
+ * OCSP Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */

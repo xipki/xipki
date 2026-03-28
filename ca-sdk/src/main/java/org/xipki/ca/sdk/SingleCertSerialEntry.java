@@ -12,6 +12,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Single Cert Serial Entry entry.
  */
 
 public class SingleCertSerialEntry extends SdkEncodable {

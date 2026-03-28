@@ -7,7 +7,7 @@ import org.xipki.pkcs11.wrapper.Category;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 
 /**
- * Objects of this class represent a long attribute of a PKCS#11 object
+ * Long Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

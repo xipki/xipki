@@ -4,7 +4,7 @@
 package org.xipki.security.scep.transaction;
 
 /**
- * Operation enum.
+ * Operation enumeration.
  *
  * @author Lijun Liao (xipki)
  */

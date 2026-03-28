@@ -11,13 +11,18 @@ import org.xipki.util.codec.Args;
 import java.time.Instant;
 
 /**
- * CertStatus information.
+ * Cert Status Info information.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class CertStatusInfo {
 
+  /**
+   * Cert Status enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum CertStatus {
     GOOD,
     REVOKED,
@@ -27,6 +32,11 @@ public class CertStatusInfo {
     CRL_EXPIRED
   } // class CertStatus
 
+  /**
+   * Unknown Cert Behaviour enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum UnknownCertBehaviour {
     unknown,
     good,
@@ -35,6 +45,11 @@ public class CertStatusInfo {
     tryLater
   } // class UnknownCertBehaviour
 
+  /**
+   * Unknown Issuer Behaviour enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum UnknownIssuerBehaviour {
     unknown,
     malformedRequest,

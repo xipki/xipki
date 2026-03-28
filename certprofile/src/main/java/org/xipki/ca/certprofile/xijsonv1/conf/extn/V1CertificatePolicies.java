@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension CertificatePolicies.
+ * V1 Certificate Policies.
  *
  * @author Lijun Liao (xipki)
  */

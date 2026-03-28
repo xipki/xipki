@@ -39,7 +39,7 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * Session objects are used to perform cryptographic operations on a token. The
+ * Session.
  * application gets a Session object by calling openSession on a certain Token
  * object. Having the session object, the application may login the user, if
  * required.

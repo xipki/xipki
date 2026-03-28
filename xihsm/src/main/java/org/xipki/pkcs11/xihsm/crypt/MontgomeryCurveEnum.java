@@ -15,7 +15,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Montgomery Curve Enum enumeration.
  *
  * @author Lijun Liao (xipki)
  */

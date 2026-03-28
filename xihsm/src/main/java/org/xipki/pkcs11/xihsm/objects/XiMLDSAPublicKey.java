@@ -18,7 +18,7 @@ import org.xipki.util.codec.Args;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Xi MLDSAPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

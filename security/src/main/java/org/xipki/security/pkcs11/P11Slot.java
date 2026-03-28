@@ -54,7 +54,7 @@ import java.util.Set;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * PKCS#11 slot.
+ * P11 Slot slot definition.
  *
  * @author Lijun Liao (xipki)
  */

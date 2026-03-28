@@ -15,7 +15,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 
 /**
- * Store of certificate status.
+ * OCSP Store store definition.
  *
  * @author Lijun Liao (xipki)
  */

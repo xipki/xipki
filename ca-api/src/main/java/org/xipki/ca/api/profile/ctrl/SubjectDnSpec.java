@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * Subject DN specification.
+ * Subject Dn Spec.
  *
  * @author Lijun Liao (xipki)
  *

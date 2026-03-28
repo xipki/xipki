@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.security.MessageDigest;
 
 /**
- * {@link OutputStream} with a MessageDigest as the backend.
+ * Digest Output Stream.
  *
  * @author Lijun Liao (xipki)
  */

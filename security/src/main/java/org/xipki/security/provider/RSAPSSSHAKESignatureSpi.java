@@ -25,7 +25,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * XiPKI component.
+ * RSAPSSSHAKESignature Spi.
  *
  * @author Lijun Liao (xipki)
  */
@@ -183,6 +183,11 @@ public class RSAPSSSHAKESignatureSpi extends SignatureSpi {
     return BigIntegers.asUnsignedByteArray(em.length, c);
   }
 
+  /**
+   * RSAPSSSHAKE128.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RSAPSSSHAKE128 extends RSAPSSSHAKESignatureSpi {
 
     public RSAPSSSHAKE128() {
@@ -191,6 +196,11 @@ public class RSAPSSSHAKESignatureSpi extends SignatureSpi {
 
   }
 
+  /**
+   * RSAPSSSHAKE256.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RSAPSSSHAKE256 extends RSAPSSSHAKESignatureSpi {
 
     public RSAPSSSHAKE256() {

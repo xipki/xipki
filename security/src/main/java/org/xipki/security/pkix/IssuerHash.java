@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * Contains issuerNameHash and issuerKeyHash as specified in the OCSP standard
+ * Issuer Hash.
  * RFC 6960.
  *
  * @author Lijun Liao (xipki)

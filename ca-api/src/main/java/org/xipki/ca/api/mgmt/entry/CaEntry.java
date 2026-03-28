@@ -26,13 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Management Entry CA.
+ * CA Entry entry.
  * @author Lijun Liao (xipki)
  *
  */
 
 public class CaEntry extends MgmtEntry {
 
+  /**
+   * CA Signer Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaSignerConf {
 
     private final SignAlgo algo;

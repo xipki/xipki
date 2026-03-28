@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension QCStatements.
+ * V1 QC Statements.
  *
  * @author Lijun Liao (xipki)
  */

@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Configuration:
+ * Simple Requestor Authenticator.
  * <pre>
  * {
  *   // optional

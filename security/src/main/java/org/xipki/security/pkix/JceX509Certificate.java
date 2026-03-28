@@ -39,7 +39,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Wrap a {@link Certificate} to an {@link X509Certificate}.
+ * JCE X509 Certificate.
  *
  * @author Lijun Liao (xipki)
  */

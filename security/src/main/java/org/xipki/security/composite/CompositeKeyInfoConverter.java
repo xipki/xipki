@@ -13,7 +13,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * XiPKI component.
+ * Composite Key Info Converter.
  *
  * @author Lijun Liao (xipki)
  */

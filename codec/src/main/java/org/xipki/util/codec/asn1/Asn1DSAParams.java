@@ -8,12 +8,13 @@ import org.xipki.util.codec.CodecException;
 import java.security.spec.InvalidKeySpecException;
 
 /**
+ * Asn1 DSAParams.
  * <pre>
  * DSA-Params ::= SEQUENCE {
  *   p  INTEGER,
  *   q  INTEGER,
  *   g  INTEGER
- *  }
+ * }
  * </pre>
  *
  * @author Lijun Liao (xipki)

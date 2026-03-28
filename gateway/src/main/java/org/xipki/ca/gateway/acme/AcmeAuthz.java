@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ACME component.
+ * ACME Authz.
  *
  * @author Lijun Liao (xipki)
  */

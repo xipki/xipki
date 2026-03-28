@@ -7,7 +7,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Identifier of a {@link P11Slot}.
+ * P11 Slot Id.
  * @author Lijun Liao (xipki)
  */
 public class P11SlotId {

@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * Ext Key Usage Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

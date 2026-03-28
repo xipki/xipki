@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Template pair for the private key and public key.
+ * Key Pair Template.
  * @author Lijun Liao (xipki)
  */
 public class KeyPairTemplate {

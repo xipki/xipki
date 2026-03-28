@@ -4,7 +4,7 @@
 package org.xipki.util.extra.http;
 
 /**
- * HTTP response.
+ * Http Resp Content.
  *
  * @author Lijun Liao (xipki)
  */

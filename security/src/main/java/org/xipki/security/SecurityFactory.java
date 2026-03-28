@@ -23,7 +23,7 @@ import java.security.SecureRandom;
 import java.util.Set;
 
 /**
- * This is the core interface. It specifies the method to create
+ * Security Factory interface.
  * {@link ConcurrentSigner}, {@link ContentVerifierProvider},
  * to verify POP, to the random, etc.
  *

@@ -14,7 +14,7 @@ import org.xipki.util.misc.StringUtil;
 import java.time.Instant;
 
 /**
- * Certificate revocation information.
+ * Cert Revocation Info information.
  *
  * @author Lijun Liao (xipki)
  */

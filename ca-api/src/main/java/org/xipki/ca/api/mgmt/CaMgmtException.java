@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 /**
- * Exception related to CA management.
+ * CA Mgmt Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

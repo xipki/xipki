@@ -11,7 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.misc.CompareUtil;
 
 /**
- * ACME component.
+ * ACME Identifier.
  *
  * @author Lijun Liao (xipki)
  */

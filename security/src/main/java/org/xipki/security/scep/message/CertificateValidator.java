@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * Certificate validator.
+ * Certificate Validator interface.
  *
  * @author Lijun Liao (xipki)
  */

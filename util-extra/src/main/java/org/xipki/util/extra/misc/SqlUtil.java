@@ -4,7 +4,7 @@
 package org.xipki.util.extra.misc;
 
 /**
- * SQL utilities.
+ * Sql Util.
  *
  * @author Lijun Liao (xipki)
  */

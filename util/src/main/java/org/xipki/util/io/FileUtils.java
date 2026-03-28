@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 /**
- * File utility class.
+ * File Utils.
  *
  * @author Lijun Liao (xipki)
  */

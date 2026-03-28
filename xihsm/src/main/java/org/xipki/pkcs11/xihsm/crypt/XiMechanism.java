@@ -11,7 +11,7 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.pkcs11.xihsm.util.OperationType;
 
 /**
- * XiPKI component.
+ * Xi Mechanism.
  *
  * @author Lijun Liao (xipki)
  */

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration of DataSource.
+ * Data Source Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */

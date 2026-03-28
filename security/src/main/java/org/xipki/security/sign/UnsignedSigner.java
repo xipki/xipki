@@ -12,7 +12,7 @@ import org.xipki.util.extra.misc.NopOutputStream;
 import java.io.OutputStream;
 
 /**
- * This signer implements the alg-unsigned algorithm, and returns new byte[0]
+ * Unsigned Signer signer definition.
  * as signature value.
  *
  * @author Lijun Liao (xipki)

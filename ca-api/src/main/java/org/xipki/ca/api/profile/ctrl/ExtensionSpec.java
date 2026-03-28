@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Extension specification.
+ * Extension Spec.
  *
  * @author Lijun Liao (xipki)
  */

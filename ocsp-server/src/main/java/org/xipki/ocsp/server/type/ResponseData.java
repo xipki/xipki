@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * ASN.1 ResponseData.
+ * Response Data.
  *
  * @author Lijun Liao (xipki)
  */

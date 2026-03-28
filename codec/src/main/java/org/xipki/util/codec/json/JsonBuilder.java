@@ -24,7 +24,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * JSON builder. This class is not thread safe but can be reused for parsing
+ * Json Builder.
  * consecutive JSON messages one by one.
  * @author lukasz.bownik@gmail.com
  * @author Lijun Liao (xipki)

@@ -9,7 +9,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import java.io.IOException;
 
 /**
- * ASN.1 ResponderID.
+ * Responder ID.
  *
  * @author Lijun Liao (xipki)
  */

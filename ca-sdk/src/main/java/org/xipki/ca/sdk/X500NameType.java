@@ -16,6 +16,7 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
+ * X500 Name Type type definition.
  */
 
 public class X500NameType extends SdkEncodable {

@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Identifier of a PKCS#11 key Object.
+ * PKCS11 Key Id.
  *
  * @author Lijun Liao (xipki)
  */
@@ -114,6 +114,11 @@ public class PKCS11KeyId {
         && Objects.equals(label, other.label);
   }
 
+  /**
+   * Key Id Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum KeyIdType {
     SECRET_KEY,
     PRIVATE_KEY,

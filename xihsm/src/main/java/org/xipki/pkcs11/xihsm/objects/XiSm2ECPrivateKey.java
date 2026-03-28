@@ -28,7 +28,7 @@ import java.security.SecureRandom;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Xi SM2 ECPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

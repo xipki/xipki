@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
- * Register of CertprofileFactories.
+ * Certprofile Factory Register.
  *
  * @author Lijun Liao (xipki)
  */

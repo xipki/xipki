@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 /**
- * CA identifier.
+ * CA Identifier.
  * @author Lijun Liao (xipki)
  */
 

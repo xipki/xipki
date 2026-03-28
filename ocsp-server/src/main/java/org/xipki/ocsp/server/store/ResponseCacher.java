@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Response cacher.
+ * Response Cacher.
  *
  * @author Lijun Liao (xipki)
  */

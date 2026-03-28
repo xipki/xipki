@@ -13,7 +13,7 @@ import org.xipki.util.codec.Args;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class encapsulates parameters byte arrays.
+ * Byte Array Params.
  *
  * @author Lijun Liao (xipki)
  */

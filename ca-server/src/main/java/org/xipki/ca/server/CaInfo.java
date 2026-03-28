@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CA information.
+ * CA Info information.
  *
  * @author Lijun Liao (xipki)
  */

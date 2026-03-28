@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * MLDSAParameter Spec.
  *
  * @author Lijun Liao (xipki)
  */

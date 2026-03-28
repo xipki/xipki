@@ -30,6 +30,11 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKK_VENDOR_SM2;
 @RunWith(Enclosed.class)
 public class Sm2GenerateKeyPairTest {
 
+  /**
+   * Nested class Cloudhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Cloudhsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -37,6 +42,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Luna.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Luna extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -44,6 +54,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Ncipher.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Ncipher extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -51,6 +66,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Sansec.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Sansec extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -58,6 +78,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Tass.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Tass extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -65,6 +90,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Softhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Softhsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -72,6 +102,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Utimaco.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Utimaco extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {
@@ -79,6 +114,11 @@ public class Sm2GenerateKeyPairTest {
     }
   }
 
+  /**
+   * Nested class Xihsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Xihsm extends Base {
     @Override
     protected TestHSMs.TestHSM getHSM() {

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Secure panel to enter password.
+ * Secure Password Input Panel.
  *
  * @author Lijun Liao (xipki)
  */

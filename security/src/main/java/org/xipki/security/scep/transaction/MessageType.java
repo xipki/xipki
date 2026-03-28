@@ -4,7 +4,7 @@
 package org.xipki.security.scep.transaction;
 
 /**
- * Message type enum.
+ * Message Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -17,7 +17,7 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * GMUtil.
  *
  * @author Lijun Liao (xipki)
  */

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Extension KeyUsage.
+ * V1 Key Usages.
  *
  * @author Lijun Liao (xipki)
  */
@@ -211,6 +211,11 @@ public class V1KeyUsages {
     return new V1KeyUsages(usages);
   }
 
+  /**
+   * Usage.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Usage {
 
     private final String value;

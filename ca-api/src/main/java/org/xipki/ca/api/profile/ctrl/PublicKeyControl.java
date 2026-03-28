@@ -8,7 +8,7 @@ import org.xipki.security.KeySpec;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Public Key Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

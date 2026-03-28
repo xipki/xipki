@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Container of extension value control.
+ * Extension Values.
  *
  * @author Lijun Liao (xipki)
  */

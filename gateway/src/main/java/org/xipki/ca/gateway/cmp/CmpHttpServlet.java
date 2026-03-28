@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * CMP servlet.
+ * CMP Http Servlet.
  *
  * @author Lijun Liao (xipki)
  */

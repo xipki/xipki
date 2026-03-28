@@ -12,7 +12,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.util.codec.Args;
 
 /**
- * ASN.1 IssuerAndSubject.
+ * Issuer And Subject.
  *
  * @author Lijun Liao (xipki)
  */

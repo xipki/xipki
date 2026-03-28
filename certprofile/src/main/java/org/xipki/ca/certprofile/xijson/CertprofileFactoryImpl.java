@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * CertprofileFactory for the Certprofile of type 'json'.
+ * Certprofile Factory Impl.
  *
  * @author Lijun Liao (xipki)
  */

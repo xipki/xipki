@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.util.codec.Args;
 
 /**
- * Keystore wrapper (containing the keystore object and its encoded form).
+ * PKCS12 Key Store Wrapper.
  *
  * @author Lijun Liao (xipki)
  */

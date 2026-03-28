@@ -6,7 +6,7 @@ package org.xipki.ca.certprofile.xijson;
 import org.xipki.util.codec.Args;
 
 /**
- * Control of the CertificatePolicyQualifier (in the extension
+ * Certificate Policy Qualifier.
  * CertificatePolicies).
  *
  * @author Lijun Liao (xipki)

@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * X509 Signature Value
+ * Kem Hmac Signature.
  * <pre>
  * len(id),  1 byte || id,  len(id) bytes ||
  * len(sig), 1 byte || sig, len(sig) bytes

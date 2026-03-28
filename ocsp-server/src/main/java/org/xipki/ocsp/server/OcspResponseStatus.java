@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server;
 
 /**
- * OCSP response status.
+ * OCSP Response Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

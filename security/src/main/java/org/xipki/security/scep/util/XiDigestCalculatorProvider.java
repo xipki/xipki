@@ -14,7 +14,7 @@ import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Digest Calculator Provider.
+ * Xi Digest Calculator Provider.
  *
  * @author Lijun Liao (xipki)
  */

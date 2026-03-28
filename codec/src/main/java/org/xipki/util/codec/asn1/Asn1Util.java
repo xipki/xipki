@@ -21,7 +21,7 @@ import static org.xipki.util.codec.asn1.Asn1Const.TAG_SEQUENCE;
 import static org.xipki.util.codec.asn1.Asn1Const.TAG_UTF8_STRING;
 
 /**
- * This class contains only static methods. It is the place for all functions
+ * Asn1 Util.
  * that are used by several classes in this package.
  *
  * @author Lijun Liao (xipki)

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Execute the database queries to manage CA system.
+ * CA Conf Store interface.
  *
  * @author Lijun Liao (xipki)
  */

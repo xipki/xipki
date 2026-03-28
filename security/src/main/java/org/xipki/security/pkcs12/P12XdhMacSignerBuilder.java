@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Builder of PKCS#12 XDH (e.g. X25519, X448) MAC signer.
+ * P12 Xdh Mac Signer Builder.
  *s
  * @author Lijun Liao (xipki)
  */

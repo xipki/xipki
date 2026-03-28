@@ -13,7 +13,7 @@ import org.xipki.security.OIDs;
 import java.nio.charset.StandardCharsets;
 
 /**
- * XiPKI component.
+ * Composite Kem Suite enumeration.
  *
  * @author Lijun Liao (xipki)
  */

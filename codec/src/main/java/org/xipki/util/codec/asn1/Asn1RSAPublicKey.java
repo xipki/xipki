@@ -8,11 +8,12 @@ import org.xipki.util.codec.CodecException;
 import java.security.spec.InvalidKeySpecException;
 
 /**
+ * Asn1 RSAPublic Key.
  * <pre>
  * RSAPublicKey ::= SEQUENCE {
  *   modulus         INTEGER, -- n
  *   publicExponent  INTEGER  -- e
- *  }
+ * }
  * </pre>
  *
  * @author Lijun Liao (xipki)

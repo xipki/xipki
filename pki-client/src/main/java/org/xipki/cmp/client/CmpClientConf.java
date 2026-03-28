@@ -12,13 +12,18 @@ import org.xipki.util.io.FileOrBinary;
 import java.util.List;
 
 /**
- * Configuration of CMP client.
+ * CMP Client Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class CmpClientConf {
 
+  /**
+   * Responder.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Responder {
 
     private final String url;
@@ -68,6 +73,11 @@ public class CmpClientConf {
           pbmMac, signature, FileOrBinary.parse(json.getMap("dhPopCerts")));
     }
 
+    /**
+     * Pbm Mac.
+     *
+     * @author Lijun Liao (xipki)
+     */
     public static class PbmMac {
 
       private final List<String> owfAlgos;
@@ -93,6 +103,11 @@ public class CmpClientConf {
 
     } // class PbmMac
 
+    /**
+     * Signature.
+     *
+     * @author Lijun Liao (xipki)
+     */
     public static class Signature {
 
       private final FileOrBinary cert;

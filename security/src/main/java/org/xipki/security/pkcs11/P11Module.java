@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * PKCS#11 module.
+ * P11 Module.
  *
  * @author Lijun Liao (xipki)
  */

@@ -5,7 +5,7 @@ package org.xipki.pkcs11.xihsm.mgr;
 import org.xipki.pkcs11.xihsm.util.HsmException;
 
 /**
- * XiPKI component.
+ * User Verifier interface.
  *
  * @author Lijun Liao (xipki)
  */

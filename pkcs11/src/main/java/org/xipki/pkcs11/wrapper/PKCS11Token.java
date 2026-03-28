@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * This is a PKCS#11 token with session management.
+ * PKCS11 Token.
  *
  * @author xipki
  */

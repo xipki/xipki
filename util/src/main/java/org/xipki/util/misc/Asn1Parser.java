@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Minimal ASN.1 TLV parser for DER/BER encoded data.
+ * Asn1 Parser.
  *
  * <p>The parser builds a tree of {@link Asn1Object}. It supports short and long-form tag numbers,
  * definite length, and BER indefinite length for constructed objects.</p>
@@ -20,10 +20,20 @@ public class Asn1Parser {
   private Asn1Parser() {
   }
 
+  /**
+   * Tag Class enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum TagClass {
     UNIVERSAL, APPLICATION, CONTEXT_SPECIFIC, PRIVATE
   }
 
+  /**
+   * Asn1 Object.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Asn1Object {
 
     private final TagClass tagClass;

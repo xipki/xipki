@@ -13,7 +13,7 @@ import org.xipki.util.codec.Args;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_ECDH1_DERIVE_PARAMS.
+ * ECDH1 DERIVE PARAMS.
  * <pre>
  * typedef struct CK_ECDH1_DERIVE_PARAMS {
  *    CK_EC_KDF_TYPE  kdf;

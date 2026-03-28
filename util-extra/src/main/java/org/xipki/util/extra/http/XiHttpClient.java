@@ -19,7 +19,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * The HTTP client.
+ * Xi Http Client.
  *
  * @author Lijun Liao (xipki)
  */

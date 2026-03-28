@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * ACME component.
+ * ACME Repo.
  *
  * @author Lijun Liao (xipki)
  */

@@ -4,7 +4,7 @@
 package org.xipki.util.password;
 
 /**
- * Callback to get password.
+ * Password Callback interface.
  *
  * @author Lijun Liao (xipki)
  */

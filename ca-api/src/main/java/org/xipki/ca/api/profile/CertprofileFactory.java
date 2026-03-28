@@ -8,7 +8,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Certprofile factory.
+ * Certprofile Factory interface.
  *
  * @author Lijun Liao (xipki)
  */

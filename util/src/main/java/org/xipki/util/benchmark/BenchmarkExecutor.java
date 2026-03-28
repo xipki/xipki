@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Benchmark executor.
+ * Benchmark Executor.
  *
  * @author Lijun Liao (xipki)
  */

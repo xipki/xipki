@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Provides a CBOR parser.
+ * Cbor Diag.
  * @author Lijun Liao (xipki)
  */
 public class CborDiag {
@@ -171,6 +171,11 @@ public class CborDiag {
     }
   }
 
+  /**
+   * My Input Stream.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class MyInputStream {
 
     private final PushbackInputStream is;

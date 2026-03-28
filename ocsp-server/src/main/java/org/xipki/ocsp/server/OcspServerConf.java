@@ -25,18 +25,28 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Configuration of OCSP server.
+ * OCSP Server Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
 public class OcspServerConf {
 
+  /**
+   * Embed Certs Mode enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum EmbedCertsMode {
     NONE,
     SIGNER,
     SIGNER_AND_CA
   } // class EmbedCertsMode
 
+  /**
+   * Cert Collection.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CertCollection {
 
     private final String dir;
@@ -70,6 +80,11 @@ public class OcspServerConf {
 
   } // class CertCollection
 
+  /**
+   * Nonce.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Nonce {
 
     /**
@@ -107,6 +122,11 @@ public class OcspServerConf {
 
   } // class Nonce
 
+  /**
+   * Request Option options.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RequestOption {
 
     /**
@@ -249,6 +269,11 @@ public class OcspServerConf {
 
   } // class RequestOption
 
+  /**
+   * Certpath Validation.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CertpathValidation {
 
     private final CertPathValidationModel validationModel;
@@ -290,6 +315,11 @@ public class OcspServerConf {
 
   } // class CertpathValidation
 
+  /**
+   * Responder.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Responder {
 
     /**
@@ -377,6 +407,11 @@ public class OcspServerConf {
 
   } // class Responder
 
+  /**
+   * Response Cache.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ResponseCache {
 
     private final DataSourceConf datasource;
@@ -405,6 +440,11 @@ public class OcspServerConf {
 
   } // class ResponseCache
 
+  /**
+   * Response Option options.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ResponseOption {
 
     private final String name;
@@ -512,6 +552,11 @@ public class OcspServerConf {
 
   } // class ResponseOption
 
+  /**
+   * Signer signer definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Signer {
 
     private final String name;
@@ -569,6 +614,11 @@ public class OcspServerConf {
 
   } // class Signer
 
+  /**
+   * Store store definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Store {
 
     private final String name;
@@ -711,6 +761,11 @@ public class OcspServerConf {
 
   } // class Store
 
+  /**
+   * Source.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Source {
 
     private final String type;
@@ -744,6 +799,11 @@ public class OcspServerConf {
 
   } // class Source
 
+  /**
+   * CA Certs.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaCerts {
 
     /**

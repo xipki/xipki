@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * LRU cache.
+ * Lru Cache.
  */
 public class LruCache<K, V> {
 

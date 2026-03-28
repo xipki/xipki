@@ -6,7 +6,7 @@ package org.xipki.util.extra.audit;
 import org.xipki.util.codec.Args;
 
 /**
- * Audit level.
+ * Audit Level enumeration.
  *
  * @author Lijun Liao (xipki)
  */

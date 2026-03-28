@@ -17,7 +17,7 @@ import org.xipki.util.misc.StringUtil;
 import java.util.List;
 
 /**
- * Management Entry Change CA.
+ * Change CA Entry entry.
  * @author Lijun Liao (xipki)
  *
  */

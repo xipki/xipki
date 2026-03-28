@@ -13,7 +13,7 @@ import org.xipki.util.codec.Args;
 import java.math.BigInteger;
 
 /**
- * RFC 3779, 8360
+ * ASRange.
  * <pre>
  *    ASRange             ::= SEQUENCE {
  *        min                 ASId,

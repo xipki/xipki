@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Management Entry CA-has-Requestor.
+ * CA Has Requestor Entry entry.
  * @author Lijun Liao (xipki)
  */
 

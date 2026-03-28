@@ -21,7 +21,7 @@ import org.xipki.util.extra.type.Validity;
 import java.util.List;
 
 /**
- * Represent the CONF column in the table CA.
+ * CA Conf Column.
  *
  * @author Lijun Liao (xipki)
  */

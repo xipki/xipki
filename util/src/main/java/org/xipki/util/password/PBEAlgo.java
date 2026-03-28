@@ -4,7 +4,7 @@
 package org.xipki.util.password;
 
 /**
- * Password based encryption algorithm enum.
+ * PBEAlgo enumeration.
  *
  * @author Lijun Liao (xipki)
  */

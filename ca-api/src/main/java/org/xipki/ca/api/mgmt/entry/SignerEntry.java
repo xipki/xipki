@@ -19,7 +19,7 @@ import org.xipki.util.misc.StringUtil;
 import java.security.cert.CertificateEncodingException;
 
 /**
- * Management Entry Signer.
+ * Signer Entry entry.
  * @author Lijun Liao (xipki)
  *
  */

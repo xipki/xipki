@@ -8,7 +8,7 @@ import org.xipki.servlet.ServletFilter;
 import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
- * HTTP servlet of CT Log server.
+ * CT Log Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

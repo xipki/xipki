@@ -20,7 +20,7 @@ import java.time.Clock;
 import java.util.Set;
 
 /**
- * Worker for DigestDiff.
+ * Digest Diff Worker.
  *
  * @author Lijun Liao (xipki)
  */

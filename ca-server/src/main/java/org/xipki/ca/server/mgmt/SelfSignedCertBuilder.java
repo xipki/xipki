@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Self-signed certificate builder.
+ * Self Signed Cert Builder.
  *
  * @author Lijun Liao (xipki)
  */

@@ -9,7 +9,7 @@ import org.xipki.security.util.X509Util;
 import java.security.KeyPair;
 
 /**
- * XiPKI component.
+ * Key Pair With Subject Public Key Info information.
  *
  * @author Lijun Liao (xipki)
  */

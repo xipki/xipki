@@ -4,7 +4,7 @@
 package org.xipki.ocsp.client;
 
 /**
- * Exception related to the OCSP requestor.
+ * OCSP Requestor Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

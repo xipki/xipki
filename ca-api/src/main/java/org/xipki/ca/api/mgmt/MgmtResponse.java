@@ -27,13 +27,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * CA Management response via the REST API.
+ * Response containing mgmt Response.
  *
  * @author Lijun Liao (xipki)
  */
 
 public abstract class MgmtResponse extends MgmtMessage {
 
+  /**
+   * Response containing get DB Schemas.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetDbSchemas extends MgmtResponse {
 
     private Map<String, String> result;
@@ -63,6 +68,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   }
 
+  /**
+   * Response containing key Cert Bytes.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class KeyCertBytes extends MgmtResponse {
 
     private final byte[] key;
@@ -96,6 +106,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   }
 
+  /**
+   * Response containing byte Array.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ByteArray extends MgmtResponse {
 
     private final byte[] result;
@@ -121,6 +136,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class ByteArray
 
+  /**
+   * Response containing get CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCa extends MgmtResponse {
 
     private final CaEntry result;
@@ -146,6 +166,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCa
 
+  /**
+   * Response containing get CA System Status.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCaSystemStatus extends MgmtResponse {
 
     private final CaSystemStatus result;
@@ -171,6 +196,42 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCaSystemStatus
 
+  /**
+   * Response containing get SimpleProfileInfo.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  public static class GetSimpleCertprofileInfo extends MgmtResponse {
+
+    private final SimpleProfileInfo result;
+
+    public GetSimpleCertprofileInfo(SimpleProfileInfo result) {
+      this.result = Args.notNull(result, "result");
+    }
+
+    public SimpleProfileInfo result() {
+      return result;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      ret.put("result", result);
+      return ret;
+    }
+
+    public static GetSimpleCertprofileInfo parse(JsonMap json) throws CodecException {
+      return new GetSimpleCertprofileInfo(
+          SimpleProfileInfo.parse(json.getNnMap("result")));
+    }
+
+  } // class GetSimpleCertprofileInfo
+
+  /**
+   * Response containing get Certprofile.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCertprofile extends MgmtResponse {
 
     private final CertprofileEntry result;
@@ -196,6 +257,40 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCertprofile
 
+  public static class GetCertStatistics extends MgmtResponse {
+
+    private CertStatistics result;
+
+    public GetCertStatistics(CertStatistics result) {
+      this.result = result;
+    }
+
+    public CertStatistics result() {
+      return result;
+    }
+
+    public void setResult(CertStatistics result) {
+      this.result = result;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      ret.put("result", result);
+      return ret;
+    }
+
+    public static GetCertStatistics parse(JsonMap json) throws CodecException {
+      return new GetCertStatistics(CertStatistics.parse(json.getNnMap("result")));
+    }
+
+  }
+
+  /**
+   * Response containing get Cert.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCert extends MgmtResponse {
 
     private final X509Cert cert;
@@ -268,6 +363,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCert
 
+  /**
+   * Response containing get Keypair Gen.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetKeypairGen extends MgmtResponse {
 
     private final KeypairGenEntry result;
@@ -293,6 +393,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetCertprofile
 
+  /**
+   * Response containing get Publisher.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetPublisher extends MgmtResponse {
 
     private final PublisherEntry result;
@@ -318,6 +423,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetPublisher
 
+  /**
+   * Response containing get Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetRequestor extends MgmtResponse {
 
     private final RequestorEntry result;
@@ -343,6 +453,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetRequestor
 
+  /**
+   * Response containing get Requestors For CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetRequestorsForCa extends MgmtResponse {
 
     private final Set<CaHasRequestorEntry> result;
@@ -378,6 +493,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetRequestorsForCa
 
+  /**
+   * Response containing get Signer.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetSigner extends MgmtResponse {
 
     private final SignerEntry result;
@@ -403,6 +523,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class GetSigner
 
+  /**
+   * Response containing list Certificates.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ListCertificates extends MgmtResponse {
 
     private final List<CertListInfo> result;
@@ -433,6 +558,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class ListCertificates
 
+  /**
+   * Response containing string Response.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class StringResponse extends MgmtResponse {
 
     private final String result;
@@ -458,6 +588,11 @@ public abstract class MgmtResponse extends MgmtMessage {
 
   } // class StringResponse
 
+  /**
+   * Response containing string Set.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class StringSet extends MgmtResponse {
 
     private final Set<String> result;

@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Base Certprofile.
+ * Profile Util.
  *
  * @author Lijun Liao (xipki)
  */

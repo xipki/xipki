@@ -3,6 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
+import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.json.JsonEncodable;
@@ -12,7 +13,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 
 /**
- * Certificate list container.
+ * Cert List Info information.
  *
  * @author Lijun Liao (xipki)
  */
@@ -27,12 +28,15 @@ public class CertListInfo implements JsonEncodable {
 
   private final String subject;
 
-  public CertListInfo(BigInteger serialNumber, String subject,
-                      Instant notBefore, Instant notAfter) {
+  private final CertRevocationInfo revocationInfo;
+
+  public CertListInfo(BigInteger serialNumber, String subject, Instant notBefore,
+                      Instant notAfter, CertRevocationInfo revocationInfo) {
     this.serialNumber = Args.notNull(serialNumber, "serialNumber");
     this.notBefore = Args.notNull(notBefore, "notBefore");
     this.notAfter  = Args.notNull(notAfter, "notAfter");
     this.subject   = Args.notNull(subject, "subject");
+    this.revocationInfo = revocationInfo;
   }
 
   public BigInteger serialNumber() {
@@ -51,6 +55,10 @@ public class CertListInfo implements JsonEncodable {
     return subject;
   }
 
+  public CertRevocationInfo getRevocationInfo() {
+    return revocationInfo;
+  }
+
   @Override
   public JsonMap toCodec() {
     JsonMap ret = new JsonMap();
@@ -58,11 +66,24 @@ public class CertListInfo implements JsonEncodable {
     ret.put("notBefore", notBefore);
     ret.put("notAfter", notAfter);
     ret.put("subject", subject);
+    if (revocationInfo != null) {
+      ret.put("revocationInfo", revocationInfo);
+    }
     return ret;
   }
 
   public static CertListInfo parse(JsonMap json) throws CodecException {
-    return new CertListInfo(json.getNnBigInteger("serialNumber"),
-        json.getNnString("subject"), json.getNnInstant("notBefore"), json.getNnInstant("notAfter"));
+    BigInteger sn = json.getNnBigInteger("serialNumber");
+    String subject = json.getNnString("subject");
+    Instant notBefore = json.getNnInstant("notBefore");
+    Instant notAfter = json.getNnInstant("notAfter");
+    JsonMap m = json.getMap("revocationInfo");
+    CertRevocationInfo revInfo = null;
+    if (m != null) {
+      revInfo = CertRevocationInfo.parse(m);
+    }
+
+    return new CertListInfo(sn, subject, notBefore, notAfter, revInfo);
   }
+
 }

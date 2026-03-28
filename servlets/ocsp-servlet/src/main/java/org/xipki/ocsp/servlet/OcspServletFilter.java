@@ -9,7 +9,7 @@ import org.xipki.servlet.ServletFilter;
 import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
- * The Servlet Filter of OCSP servlets.
+ * OCSP Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

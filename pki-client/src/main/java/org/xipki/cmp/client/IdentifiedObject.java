@@ -6,7 +6,7 @@ package org.xipki.cmp.client;
 import org.xipki.util.codec.Args;
 
 /**
- * Object with id.
+ * Identified Object.
  *
  * @author Lijun Liao (xipki)
  */

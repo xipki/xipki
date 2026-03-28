@@ -23,7 +23,7 @@ import java.text.ParseException;
 import java.time.Instant;
 
 /**
- * XiPKI component.
+ * Asn1 Util.
  *
  * @author Lijun Liao (xipki)
  */

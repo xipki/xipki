@@ -81,7 +81,7 @@ import static org.bouncycastle.asn1.cmp.PKIStatus.granted;
 import static org.bouncycastle.asn1.cmp.PKIStatus.rejection;
 
 /**
- * CMP responder.
+ * CMP Responder.
  *
  * @author Lijun Liao (xipki)
  */

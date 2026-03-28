@@ -33,7 +33,7 @@ import static org.xipki.util.misc.StringUtil.isBlank;
 import static org.xipki.util.misc.StringUtil.startsWithIgnoreCase;
 
 /**
- * A wrapper of {@link HikariDataSource}.
+ * Data Source Wrapper.
  *
  * @author Lijun Liao (xipki)
  */

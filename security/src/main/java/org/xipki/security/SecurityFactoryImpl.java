@@ -8,10 +8,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.composite.CompositeMLDSAPublicKey;
@@ -42,24 +38,19 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Set;
 
 /**
- * An implementation of {@link SecurityFactory}.
+ * Security Factory Impl.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = SecurityFactory.class, immediate = true,
-    configurationPid = "org.xipki.security")
 public class SecurityFactoryImpl implements SecurityFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
 
   private int defaultSignerParallelism = 32;
 
-  @Reference
   private SignerFactoryRegister signerFactoryRegister;
 
   private boolean strongRandom4KeyEnabled = false;
@@ -76,37 +67,6 @@ public class SecurityFactoryImpl implements SecurityFactory {
   }
 
   public SecurityFactoryImpl() {
-  }
-
-  @Activate
-  public void activate(ComponentContext context) {
-    KeyUtil.addProviders();
-
-    Dictionary<String, Object> properties = context.getProperties();
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      Object value = properties.get(key);
-      if (!(value instanceof String)) {
-        continue;
-      }
-
-      String sValue = (String) value;
-
-      switch (key) {
-        case "key.strongrandom.enabled":
-          setStrongRandom4KeyEnabled(Boolean.getBoolean(sValue));
-          break;
-        case "sign.strongrandom.enabled":
-          setStrongRandom4SignEnabled(Boolean.getBoolean(sValue));
-          break;
-        case "defaultSignerParallelism":
-          setDefaultSignerParallelism(Integer.parseInt(sValue));
-          break;
-        case "csr.confFile":
-          setCsrConfFile(sValue);
-      }
-    }
   }
 
   @Override

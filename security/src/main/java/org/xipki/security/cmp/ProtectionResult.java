@@ -4,7 +4,7 @@
 package org.xipki.security.cmp;
 
 /**
- * Protection verification result enum.
+ * Protection Result enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Configuration of GeneralSubtree.
+ * General Subtree Type type definition.
  *
  * @author Lijun Liao (xipki)
  *

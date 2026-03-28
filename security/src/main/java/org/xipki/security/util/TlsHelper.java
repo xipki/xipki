@@ -18,10 +18,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.Set;
 
 /**
- * TLS helper.
+ * Tls Helper.
  *
  * <p>For more details please refer to
  * http://httpd.apache.org/docs/2.2/mod/mod_ssl.html

@@ -6,7 +6,7 @@ package org.xipki.qa;
 import java.math.BigInteger;
 
 /**
- * Range with [from, to].
+ * Big Integer Range.
  *
  * @author Lijun Liao (xipki)
  */

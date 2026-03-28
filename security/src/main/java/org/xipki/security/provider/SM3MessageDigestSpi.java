@@ -6,7 +6,7 @@ package org.xipki.security.provider;
 import java.security.MessageDigestSpi;
 
 /**
- * XiPKI component.
+ * SM3 Message Digest Spi.
  *
  * @author Lijun Liao (xipki)
  */

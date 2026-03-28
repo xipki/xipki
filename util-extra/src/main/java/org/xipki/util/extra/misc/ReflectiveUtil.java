@@ -6,7 +6,7 @@ package org.xipki.util.extra.misc;
 import org.xipki.util.extra.exception.ObjectCreationException;
 
 /**
- * Utility class for the reflective operations.
+ * Reflective Util.
  *
  * @author Lijun Liao (xipki)
  */

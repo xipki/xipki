@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * ACME component.
+ * Cert Enroller.
  *
  * @author Lijun Liao (xipki)
  */

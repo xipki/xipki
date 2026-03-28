@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension SubjectInfoAccess.
+ * V1 Subject Info Access.
  *
  * @author Lijun Liao (xipki)
  */

@@ -9,7 +9,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Factory to create {@link KeypairGenerator}.
+ * Keypair Generator Factory interface.
  *
  * @author Lijun Liao (xipki)
  */

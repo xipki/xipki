@@ -10,7 +10,7 @@ import org.xipki.pkcs11.xihsm.util.HsmException;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * Login State.
  *
  * @author Lijun Liao (xipki)
  */

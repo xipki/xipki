@@ -4,7 +4,7 @@
 package org.xipki.ca.api.profile.ctrl;
 
 /**
- * XiPKI component.
+ * Cert Level enumeration.
  *
  * @author Lijun Liao (xipki)
  */

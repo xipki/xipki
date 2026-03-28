@@ -23,9 +23,9 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.EnrollCertsRequest;
@@ -73,7 +73,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * EST responder.
+ * Est Responder.
  *
  * @author Lijun Liao (xipki)
  */

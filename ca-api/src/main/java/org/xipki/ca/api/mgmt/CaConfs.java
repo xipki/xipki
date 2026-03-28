@@ -30,7 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Helper class to convert the CA configuration.
+ * CA Confs.
  *
  * @author Lijun Liao (xipki)
  */

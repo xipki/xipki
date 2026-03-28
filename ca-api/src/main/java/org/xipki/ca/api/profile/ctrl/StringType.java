@@ -10,7 +10,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * String Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

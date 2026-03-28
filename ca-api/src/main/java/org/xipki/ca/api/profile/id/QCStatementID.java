@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * QCStatement ID.
  *
  * @author Lijun Liao (xipki)
  */

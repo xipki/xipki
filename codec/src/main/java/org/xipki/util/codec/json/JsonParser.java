@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
- * JSON parser. This class is not thread safe but can be reused for parsing
+ * Json Parser.
  * consecutive JSON messages one by one.
  * @author lukasz.bownik@gmail.com
  * @author Lijun Liao (xipki)
@@ -57,7 +57,7 @@ public class JsonParser {
    *    purposes.
    *    This parameter exists only for performance optimization purposes.
    * @throws java.lang.IllegalArgumentException
-   *     if initialBufferSize <= 0.
+   *     if initialBufferSize &lt;= 0.
    */
   public JsonParser(JsonInputStream instream, int initialBufferSize) {
     this.bufferSize = Args.positive(initialBufferSize, "initialBufferSize");

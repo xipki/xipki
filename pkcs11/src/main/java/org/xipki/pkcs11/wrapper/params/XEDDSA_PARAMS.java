@@ -12,7 +12,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * <pre>
+ * XEDDSA PARAMS.
  * typedef struct CK_XEDDSA_PARAMS {
  *       CK_XEDDSA_HASH_TYPE  hash;
  * } CK_XEDDSA_PARAMS;

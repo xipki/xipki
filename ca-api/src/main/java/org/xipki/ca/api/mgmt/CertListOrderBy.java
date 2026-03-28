@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * The mode to sort the certificates.
+ * Cert List Order By enumeration.
  *
  * @author Lijun Liao (xipki)
  */

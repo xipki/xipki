@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Worker for database export / import.
+ * DB Worker.
  *
  * @author Lijun Liao (xipki)
  */

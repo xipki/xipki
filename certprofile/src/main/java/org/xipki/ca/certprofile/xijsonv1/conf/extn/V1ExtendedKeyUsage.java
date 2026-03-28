@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension ExtendedKeyUsage.
+ * V1 Extended Key Usage.
  *
  * @author Lijun Liao (xipki)
  */

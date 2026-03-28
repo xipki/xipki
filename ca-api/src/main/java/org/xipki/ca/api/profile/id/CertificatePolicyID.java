@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Certificate Policy ID.
  *
  * @author Lijun Liao (xipki)
  */

@@ -11,7 +11,7 @@ import org.xipki.util.extra.misc.CompareUtil;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Name and Identifier.
+ * Name Id.
  *
  * @author Lijun Liao (xipki)
  */

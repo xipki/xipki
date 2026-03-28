@@ -6,7 +6,7 @@ package org.xipki.security.pkix;
 import org.xipki.util.codec.Args;
 
 /**
- * Certificate key usage enum.
+ * Key Usage enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -8,7 +8,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import java.util.Arrays;
 
 /**
- * Objects of this class represent a mechanism array attribute of a PKCS#11
+ * Long Array Attribute.
  * object as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

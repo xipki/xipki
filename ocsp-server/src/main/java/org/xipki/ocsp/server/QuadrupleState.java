@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server;
 
 /**
- * Triple state enum.
+ * Quadruple State enumeration.
  *
  * @author Lijun Liao (xipki)
  */

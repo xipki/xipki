@@ -6,7 +6,7 @@ package org.xipki.util.extra.misc;
 import java.util.Arrays;
 
 /**
- * Utility class for the comparison.
+ * Compare Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -15,12 +15,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Configuration the QA system.
+ * Qaconf Type type definition.
  *
  * @author Lijun Liao (xipki)
  */
 public class QaconfType {
 
+  /**
+   * Certificate profile definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Certprofile extends FileOrValue {
 
     private final String name;
@@ -51,6 +56,11 @@ public class QaconfType {
 
   }
 
+  /**
+   * Issuer issuer definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Issuer {
 
     private final String name;

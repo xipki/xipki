@@ -15,7 +15,7 @@ import org.xipki.pkcs11.wrapper.type.CkTokenInfo;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class specifies the result returned by the JNI part.
+ * Jni Result result.
  *
  * @author Lijun Liao (xipki)
  */

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Access Method ID.
  *
  * @author Lijun Liao (xipki)
  */

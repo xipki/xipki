@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * ACME component.
+ * ACME Protocol Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
@@ -60,6 +60,11 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
     }
   }
 
+  /**
+   * CA profile definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaProfile {
 
     private final List<String> keyTypes;
@@ -93,6 +98,11 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
 
   }
 
+  /**
+   * ACME configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Acme {
 
     private int cacheSize = 1000;
@@ -354,6 +364,11 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
     }
   }
 
+  /**
+   * Cleanup Order Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CleanupOrderConf {
 
     private final int expiredCertDays;

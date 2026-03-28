@@ -34,12 +34,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ACME component.
+ * ACME Data Source.
  *
  * @author Lijun Liao (xipki)
  */
 public class AcmeDataSource {
 
+  /**
+   * Id Checker interface.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public interface IdChecker {
 
     boolean accountIdExists(long id);

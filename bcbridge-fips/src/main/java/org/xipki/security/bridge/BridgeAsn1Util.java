@@ -24,7 +24,7 @@ import java.text.ParseException;
 import java.time.Instant;
 
 /**
- * XiPKI component.
+ * Bridge Asn1 Util.
  *
  * @author Lijun Liao (xipki)
  */

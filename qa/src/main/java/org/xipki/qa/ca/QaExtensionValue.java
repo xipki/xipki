@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import java.util.Arrays;
 
 /**
- * QA extension value.
+ * Qa Extension Value.
  *
  * @author Lijun Liao (xipki)
  */

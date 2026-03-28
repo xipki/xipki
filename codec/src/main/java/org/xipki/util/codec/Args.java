@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Utility class to validate the parameters.
+ * Args.
  *
  * @author Lijun Liao (xipki)
  * @since 2.0.0

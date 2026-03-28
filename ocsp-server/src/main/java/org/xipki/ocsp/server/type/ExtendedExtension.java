@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 /**
- * ASN.1 extension that can be read and written.
+ * Extended Extension.
  *
  * @author Lijun Liao (xipki)
  */

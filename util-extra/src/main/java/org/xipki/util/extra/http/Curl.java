@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * This interface specifies similar operations like the Linux command curl.
+ * Curl interface.
  *
  * @author Lijun Liao (xipki)
  */

@@ -6,7 +6,7 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.SignAlgo;
 
 /**
- * Enumeration of Traditional algorithm variants used in
+ * Comp Sig Trad Variant enumeration.
  * {@link CompositeSigSuite}.
  * @author Lijun Liao (xipki)
  */

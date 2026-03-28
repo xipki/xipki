@@ -11,12 +11,17 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 
 /**
- * XiPKI component.
+ * Xi Constants.
  *
  * @author Lijun Liao (xipki)
  */
 public class XiConstants {
 
+  /**
+   * P11 MLDSA Variant enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum P11MldsaVariant {
 
     MLDSA44(PKCS11T.CKP_ML_DSA_44, NISTObjectIdentifiers.id_ml_dsa_44),
@@ -63,6 +68,11 @@ public class XiConstants {
 
   }
 
+  /**
+   * P11 MLKEM Variant enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum P11MlkemVariant {
 
     MLKEM512 (PKCS11T.CKP_ML_KEM_512,  NISTObjectIdentifiers.id_alg_ml_kem_512),

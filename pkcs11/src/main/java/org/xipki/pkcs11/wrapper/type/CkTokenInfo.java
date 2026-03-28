@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * TokenInfo.
+ * Ck Token Info information.
  * <pre>
  * typedef struct CK_TOKEN_INFO {
  *   CK_UTF8CHAR   label[32];           // blank padded

@@ -15,12 +15,17 @@ import java.text.ParseException;
 import java.time.Instant;
 
 /**
- * ASN.1 stream parser.
+ * Asn1 Stream Parser.
  *
  * @author Lijun Liao (xipki)
  */
 public class Asn1StreamParser {
 
+  /**
+   * My Int.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class MyInt {
 
     private int value;

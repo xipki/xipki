@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import java.security.SecureRandom;
 
 /**
- * Parameters for the keystore generation.
+ * Keystore Generation Parameters.
  *
  * @author Lijun Liao (xipki)
  */

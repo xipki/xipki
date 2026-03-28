@@ -27,13 +27,18 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Database porter.
+ * DB Porter.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class DbPorter extends DbToolBase {
 
+  /**
+   * OCSP DB Entry Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum OcspDbEntryType {
     CERT("certs", "CERT", 1);
 
@@ -63,6 +68,11 @@ public class DbPorter extends DbToolBase {
 
   } // class OcspDbEntryType
 
+  /**
+   * CA DB Entry Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum CaDbEntryType {
     CERT("certs", "CERT", 1),
     CRL("crls", "CRL", 0.1f);
@@ -93,6 +103,11 @@ public class DbPorter extends DbToolBase {
 
   } // class CaDbEntryType
 
+  /**
+   * DB Port File Name Iterator iterator.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class DbPortFileNameIterator implements Iterator<String>, Closeable {
 
     private static final Logger LOG = LoggerFactory.getLogger(DbPortFileNameIterator.class);

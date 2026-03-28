@@ -13,13 +13,18 @@ import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 
 /**
- * Entry for benchmark enrollment test.
+ * CA Enroll Bench Entry entry.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class CaEnrollBenchEntry {
 
+  /**
+   * Random Dn enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum RandomDn {
 
     GIVENNAME,

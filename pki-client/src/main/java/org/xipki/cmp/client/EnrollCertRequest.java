@@ -13,13 +13,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * CMP request to enroll certificates.
+ * Enroll Cert Request request payload.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class EnrollCertRequest {
 
+  /**
+   * Enroll Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum EnrollType {
 
     CERT_REQ,
@@ -29,6 +34,11 @@ public class EnrollCertRequest {
 
   } // class EnrollType
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends IdentifiedObject {
 
     private final String certprofile;

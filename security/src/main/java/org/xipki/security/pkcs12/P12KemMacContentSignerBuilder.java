@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder of PKCS#12 KEM MAC signers.
+ * P12 Kem Mac Content Signer Builder.
  *
  * @author Lijun Liao (xipki)
  */

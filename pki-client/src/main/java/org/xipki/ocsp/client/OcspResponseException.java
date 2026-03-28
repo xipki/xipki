@@ -10,13 +10,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Exception related to the OCSP response.
+ * OCSP Response Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */
 
 public abstract class OcspResponseException extends Exception {
 
+  /**
+   * Invalid Response response payload.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class InvalidResponse extends OcspResponseException {
 
     public InvalidResponse(String message, Throwable cause) {
@@ -29,6 +34,11 @@ public abstract class OcspResponseException extends Exception {
 
   }
 
+  /**
+   * OCSP Nonce Unmatched.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class OcspNonceUnmatched extends OcspResponseException {
 
     public OcspNonceUnmatched(byte[] expected, byte[] is) {
@@ -43,6 +53,11 @@ public abstract class OcspResponseException extends Exception {
 
   }
 
+  /**
+   * OCSP Target Unmatched.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class OcspTargetUnmatched extends OcspResponseException {
 
     public OcspTargetUnmatched(String message, Throwable cause) {
@@ -55,6 +70,11 @@ public abstract class OcspResponseException extends Exception {
 
   }
 
+  /**
+   * Responder Unreachable.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ResponderUnreachable extends OcspResponseException {
 
     public ResponderUnreachable(String message, Throwable cause) {
@@ -67,6 +87,11 @@ public abstract class OcspResponseException extends Exception {
 
   }
 
+  /**
+   * Unsuccessful.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Unsuccessful extends OcspResponseException {
 
     private static final Map<Integer, String> codeStatusMap = new HashMap<>();

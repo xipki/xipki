@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * POP (proof-of-possession) control.
+ * Pop Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

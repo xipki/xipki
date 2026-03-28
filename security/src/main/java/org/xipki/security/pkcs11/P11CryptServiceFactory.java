@@ -10,7 +10,7 @@ import java.io.Closeable;
 import java.util.Set;
 
 /**
- * Factory to create {@link P11Module}.
+ * P11 Crypt Service Factory interface.
  *
  * @author Lijun Liao (xipki)
  */

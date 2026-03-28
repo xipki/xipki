@@ -12,7 +12,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 
 /**
- * Certificate template data.
+ * Cert Template Data.
  *
  * @author Lijun Liao (xipki)
  */

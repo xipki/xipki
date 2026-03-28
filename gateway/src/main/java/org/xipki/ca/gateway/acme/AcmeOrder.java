@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ACME component.
+ * ACME Order.
  *
  * @author Lijun Liao (xipki)
  */

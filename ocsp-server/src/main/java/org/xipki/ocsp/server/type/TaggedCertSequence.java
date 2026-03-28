@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server.type;
 
 /**
- * ASN.1 tagged Sequence of certificates.
+ * Tagged Cert Sequence.
  *
  * @author Lijun Liao (xipki)
  */

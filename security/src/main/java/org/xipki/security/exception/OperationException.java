@@ -4,7 +4,7 @@
 package org.xipki.security.exception;
 
 /**
- * Operation exception.
+ * Operation Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

@@ -11,6 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
+ * CA Name Response response payload.
  */
 
 public class CaNameResponse extends SdkResponse {

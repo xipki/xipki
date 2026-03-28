@@ -3,10 +3,6 @@
 
 package org.xipki.qa.ca;
 
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.util.codec.Args;
@@ -20,20 +16,16 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * An implementation of {@link CaQaSystemManager}.
+ * CA Qa System Manager Impl.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = CaQaSystemManager.class, immediate = true,
-    configurationPid = "org.xipki.qa.ca")
 public class CaQaSystemManagerImpl implements CaQaSystemManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaQaSystemManagerImpl.class);
@@ -47,24 +39,6 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
   private final AtomicBoolean initialized = new AtomicBoolean(false);
 
   public CaQaSystemManagerImpl() {
-  }
-
-  @Activate
-  public void activate(ComponentContext context) {
-    Dictionary<String, Object> properties = context.getProperties();
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      Object value = properties.get(key);
-      if (!(value instanceof String)) {
-        continue;
-      }
-
-      String sValue = (String) value;
-      if (key.equals("confFile")) {
-        setConfFile(sValue);
-      }
-    }
   }
 
   public String getConfFile() {
@@ -149,7 +123,6 @@ public class CaQaSystemManagerImpl implements CaQaSystemManager {
     return true;
   } // method init
 
-  @Deactivate
   @Override
   public void close() {
   }

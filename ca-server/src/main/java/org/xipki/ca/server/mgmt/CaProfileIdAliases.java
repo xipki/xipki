@@ -4,7 +4,7 @@
 package org.xipki.ca.server.mgmt;
 
 /**
- * CA_HAS_PROFILE profile id and aliases.
+ * CA Profile Id Aliases.
  * @author Lijun Liao (xipki)
  */
 

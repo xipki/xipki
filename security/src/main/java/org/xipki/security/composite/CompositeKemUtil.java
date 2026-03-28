@@ -36,7 +36,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Composite Kem Util.
  *
  * @author Lijun Liao (xipki)
  */

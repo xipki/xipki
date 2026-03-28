@@ -9,7 +9,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
- * ACME component.
+ * Identifier.
  *
  * @author Lijun Liao (xipki)
  */

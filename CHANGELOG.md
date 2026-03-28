@@ -2,8 +2,19 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.6.1
+## 6.7.0
 - Release date: 202x/xx/xx
+- xipki-gateway
+  - Harden ACME
+- xipki-cli and xipki-mgmt-cli
+  - Replace karaf with picocli + jline
+- Dependencies
+  - bc-fips: 2.0.1 -> 2.1.2
+  - bcutil-fips: 2.0.5 -> 2.1.5
+  - bcpkix-fips: 2.0.10 -> 2.1.10
+  - karaf: removed
+  - jline: 4.0.9 (new)
+  - picocli: 4.7.7 (new)
 
 ## 6.6.0
 - Release date: 2026/03/15

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Attribute Type type definition.
  *
  * @author Lijun Liao (xipki)
  */

@@ -7,7 +7,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Token;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 
 /**
- * XiPKI component.
+ * PKCS11 Secret Key Spec.
  *
  * @author Lijun Liao (xipki)
  */

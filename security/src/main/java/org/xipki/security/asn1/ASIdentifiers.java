@@ -13,7 +13,7 @@ import org.bouncycastle.asn1.DERTaggedObject;
 import org.xipki.security.util.Asn1Util;
 
 /**
- * RFC 3779, 8360
+ * ASIdentifiers.
  * <pre>
  *    ASIdentifiers       ::= SEQUENCE {
  *        asnum               [0] EXPLICIT ASIdentifierChoice OPTIONAL,

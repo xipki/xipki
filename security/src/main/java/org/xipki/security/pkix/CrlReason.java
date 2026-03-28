@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The CRLReason enumeration specifies the reason that a certificate
+ * Crl Reason enumeration.
  * is revoked, as defined in <a href="http://www.ietf.org/rfc/rfc3280.txt">
  * RFC 3280: Internet X.509 Public Key Infrastructure Certificate and CRL
  * Profile</a>.

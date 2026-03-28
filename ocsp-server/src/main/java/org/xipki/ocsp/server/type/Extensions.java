@@ -6,7 +6,7 @@ package org.xipki.ocsp.server.type;
 import java.util.List;
 
 /**
- * ASN.1 Extensions.
+ * Extensions.
  *
  * @author Lijun Liao (xipki)
  */

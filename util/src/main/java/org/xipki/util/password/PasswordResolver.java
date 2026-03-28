@@ -4,7 +4,7 @@
 package org.xipki.util.password;
 
 /**
- * Password resolver interface.
+ * Password Resolver interface.
  *
  * @author Lijun Liao (xipki)
  */

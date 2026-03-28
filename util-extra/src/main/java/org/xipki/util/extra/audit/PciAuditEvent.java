@@ -20,7 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * PCI audit event.
+ * Pci Audit Event.
  *
  * @author Lijun Liao (xipki)
  */

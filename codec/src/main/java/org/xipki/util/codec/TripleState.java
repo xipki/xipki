@@ -4,7 +4,7 @@
 package org.xipki.util.codec;
 
 /**
- * Triple state enum.
+ * Triple State enumeration.
  *
  * @author Lijun Liao (xipki)
  */

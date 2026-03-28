@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * HTTP response interface.
+ * Xi Http Response interface.
  *
  * @author Lijun Liao (xipki)
  */

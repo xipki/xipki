@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper.attrs;
 
 /**
- * Objects of this class represent an attribute array of a PKCS#11 object
+ * Template Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

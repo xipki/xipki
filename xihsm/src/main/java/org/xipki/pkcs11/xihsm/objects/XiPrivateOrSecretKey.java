@@ -18,7 +18,7 @@ import java.util.List;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi Private Or Secret Key.
  *
  * @author Lijun Liao (xipki)
  */

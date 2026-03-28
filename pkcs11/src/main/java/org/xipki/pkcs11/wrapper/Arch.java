@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper;
 
 /**
- * Arch information of the underlying PKCS#11 library.
+ * Arch.
  * @author Lijun Liao (xipki)
  */
 public class Arch {

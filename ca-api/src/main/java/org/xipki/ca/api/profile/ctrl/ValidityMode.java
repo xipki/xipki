@@ -6,7 +6,7 @@ package org.xipki.ca.api.profile.ctrl;
 import org.xipki.util.codec.Args;
 
 /**
- * How CA assigns the notAfter field in the certificate if the requested
+ * Validity Mode enumeration.
  * notAfter is after CA's validity.
  * <ul>
  *  <li>STRICT: the enrollment request will be rejected.</li>

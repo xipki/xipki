@@ -11,7 +11,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_EDDSA_PARAMS.
+ * EDDSA PARAMS.
  * <pre>
  * typedef struct CK_EDDSA_PARAMS {
  *    CK_BBOOL     phFlag;

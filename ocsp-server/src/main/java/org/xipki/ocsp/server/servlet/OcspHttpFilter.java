@@ -19,7 +19,7 @@ import org.xipki.util.io.XipkiBaseDir;
 import java.io.IOException;
 
 /**
- * The Servlet Filter of OCSP servlets.
+ * OCSP Http Filter.
  *
  * @author Lijun Liao (xipki)
  */

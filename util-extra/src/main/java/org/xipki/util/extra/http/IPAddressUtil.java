@@ -4,7 +4,7 @@
 package org.xipki.util.extra.http;
 
 /**
- * Utility methods for processing String objects containing IP addresses.
+ * IPAddress Util.
  * @author Lijun Liao (xipki)
  */
 public class IPAddressUtil {

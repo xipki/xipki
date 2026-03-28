@@ -11,6 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Certprofile Info Request request payload.
  */
 
 public class CertprofileInfoRequest extends SdkRequest {

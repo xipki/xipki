@@ -18,7 +18,7 @@ import org.xipki.util.extra.exception.CertPublisherException;
 import java.io.Closeable;
 
 /**
- * CertPublisher with identifier.
+ * Identified Cert Publisher.
  *
  * @author Lijun Liao (xipki)
  */

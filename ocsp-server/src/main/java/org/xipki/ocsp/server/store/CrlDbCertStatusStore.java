@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OcspStore for CRLs. Note that the CRLs will be imported to XiPKI OCSP
+ * Crl DB Cert Status Store store definition.
  * database.
  *
  * @author Lijun Liao (xipki)

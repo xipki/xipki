@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * XiPKI component.
+ * Xi PKCS11 Module.
  *
  * @author Lijun Liao (xipki)
  */

@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * JSON text input stream.
+ * Json Input Stream.
  * @author Lijun Liao (xipki)
  */
 public class JsonInputStream {

@@ -6,7 +6,7 @@ package org.xipki.pkcs11.wrapper.attrs;
 import org.xipki.pkcs11.wrapper.type.CkVersion;
 
 /**
- * Objects of this class represent a date attribute of a PKCS#11 object
+ * Version Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

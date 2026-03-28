@@ -9,6 +9,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * Asn1 One Asymmetric Key.
  * <pre>
  * OneAsymmetricKey ::= SEQUENCE {
  *   version                   Version,

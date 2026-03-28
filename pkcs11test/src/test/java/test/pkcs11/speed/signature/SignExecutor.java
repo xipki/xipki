@@ -25,6 +25,11 @@ public abstract class SignExecutor extends Pkcs11Executor {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignExecutor.class);
 
+  /**
+   * Nested class MyRunnable.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public class MyRunnable implements Runnable {
 
     public MyRunnable() {

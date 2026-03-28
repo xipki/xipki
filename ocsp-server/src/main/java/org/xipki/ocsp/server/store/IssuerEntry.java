@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Issuer entry.
+ * Issuer Entry entry.
  *
  * @author Lijun Liao (xipki)
  */

@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Response of certificate enrolment.
+ * Enrolment Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

@@ -13,7 +13,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_SIGN_ADDITIONAL_CONTEXT.
+ * SIGN ADDITIONAL CONTEXT.
  * <pre>
  * typedef struct CK_SIGN_ADDITIONAL_CONTEXT {
  *    CK_HEDGE_TYPE  hedgeVariant;

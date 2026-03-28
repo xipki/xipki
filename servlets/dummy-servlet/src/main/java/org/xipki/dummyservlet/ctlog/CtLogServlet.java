@@ -39,12 +39,17 @@ import java.time.Clock;
 import java.util.List;
 
 /**
- * HTTP servlet of CT Log server.
+ * CT Log Servlet.
  *
  * @author Lijun Liao (xipki)
  */
 public class CtLogServlet {
 
+  /**
+   * ECCt Log Servlet.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ECCtLogServlet extends CtLogServlet {
     private static final String privateKey =
         "MEECAQAwEwYHKoZIzj0CAQYIKoZIzj0DAQcEJzAlAgEBBCA5yyZCYzCoBiIE" +
@@ -60,6 +65,11 @@ public class CtLogServlet {
 
   }
 
+  /**
+   * RSACt Log Servlet.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RSACtLogServlet extends CtLogServlet {
     private static final String privateKey =
         "MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCNHv1OLJCMm+N19hVH" +

@@ -18,6 +18,8 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
+import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.X500NameType;
@@ -68,7 +70,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Manages the CA system.
+ * CA Manager Impl.
  *
  * @author Lijun Liao (xipki)
  */
@@ -318,6 +320,54 @@ public class CaManagerImpl implements CaManager, Closeable {
   public String getTokenInfoP11(String moduleName, Integer slotIndex, boolean verbose)
       throws CaMgmtException {
     return signerManager.getTokenInfoP11(moduleName, slotIndex, verbose);
+  }
+
+  @Override
+  public CertStatistics getCertStatistics(
+      String from, String end, boolean revokedOnly, List<String> cas, List<String> certProfiles,
+      List<String> requestors) throws CaMgmtException {
+    try {
+      NameId[] caIds = null;
+      if (cas != null && !cas.isEmpty()) {
+        List<NameId> nids = new ArrayList<>(cas.size());
+        for (String m : cas) {
+          NameId nid = idNameMap.getCa(m);
+          if (nid != null) {
+            nids.add(nid);
+          }
+        }
+        caIds = nids.toArray(new NameId[0]);
+      }
+
+      NameId[] profileIds = null;
+      if (certProfiles != null && !certProfiles.isEmpty()) {
+        List<NameId> nids = new ArrayList<>(certProfiles.size());
+        for (String m : certProfiles) {
+          NameId nid = idNameMap.getCertprofile(m);
+          if (nid != null) {
+            nids.add(nid);
+          }
+        }
+        profileIds = nids.toArray(new NameId[0]);
+      }
+
+      NameId[] requestorIds = null;
+      if (requestors != null && !requestors.isEmpty()) {
+        List<NameId> nids = new ArrayList<>(requestors.size());
+        for (String m : requestors) {
+          NameId nid = idNameMap.getRequestor(m);
+          if (nid != null) {
+            nids.add(nid);
+          }
+        }
+        requestorIds = nids.toArray(new NameId[0]);
+      }
+
+      return certstore.getCertStatistics(
+          from, end, revokedOnly, idNameMap, caIds, profileIds, requestorIds);
+    } catch (DataAccessException ex) {
+      throw new CaMgmtException(ex);
+    }
   }
 
   private void init() throws CaMgmtException {
@@ -1006,6 +1056,24 @@ public class CaManagerImpl implements CaManager, Closeable {
   public void addRequestorToCa(CaHasRequestorEntry requestor, String caName)
       throws CaMgmtException {
     requestorManager.addRequestorToCa(requestor, caName);
+  }
+
+  @Override
+  public SimpleProfileInfo getSimpleCertprofileInfo(String name) {
+    IdentifiedCertprofile entry = certprofiles.get(name.toLowerCase());
+    if (entry == null) {
+      return null;
+    }
+
+    Certprofile p = entry.certprofile();
+    KeypairGenControl kpGenCtrl = p.keypairGenControl();
+
+    String kpGenText =
+        (kpGenCtrl == null || kpGenCtrl.isForbidden()) ? "Forbidden"
+        : kpGenCtrl.isInheritCA() ? "InheritCA"
+        : kpGenCtrl.keySpec().name();
+
+    return new SimpleProfileInfo(p.certDomain(), p.certLevel(), p.validity().toString(), kpGenText);
   }
 
   @Override

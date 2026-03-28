@@ -15,7 +15,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.codec.json.JsonMap;
 
 /**
- * XiPKI component.
+ * Rdn Type type definition.
  *
  * @author Lijun Liao (xipki)
  */

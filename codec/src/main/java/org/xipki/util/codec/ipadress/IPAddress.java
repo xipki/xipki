@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * RFC 3779, 8360
+ * IPAddress.
  * <pre>
  * IPAddress ::= BIT STRING
  * </pre>
@@ -22,6 +22,11 @@ import java.util.List;
  */
 public class IPAddress {
 
+  /**
+   * Context enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum Context {
     PREFIX,
     RANGE_MIN,

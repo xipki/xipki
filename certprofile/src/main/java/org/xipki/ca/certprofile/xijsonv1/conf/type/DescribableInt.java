@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Integer with description.
+ * Describable Int.
  *
  * @author Lijun Liao (xipki)
  */

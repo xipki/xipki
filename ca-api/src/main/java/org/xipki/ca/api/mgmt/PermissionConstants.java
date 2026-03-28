@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * CA permission constants.
+ * Permission Constants.
  *
  * @author Lijun Liao (xipki)
  */

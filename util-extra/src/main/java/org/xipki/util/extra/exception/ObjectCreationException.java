@@ -4,7 +4,7 @@
 package org.xipki.util.extra.exception;
 
 /**
- * Exception for object creation.
+ * Object Creation Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

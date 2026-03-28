@@ -11,7 +11,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 
 /**
- * Utility class to create {@link HostnameVerifier}.
+ * Hostname Verifiers.
  *
  * @author Lijun Liao (xipki)
  */

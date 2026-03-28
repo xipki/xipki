@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CA CertStore configuration.
+ * CA Certstore store definition.
  *
  * @author Lijun Liao (xipki)
  */
@@ -120,6 +120,11 @@ public class CaCertstore implements JsonEncodable {
     return ret;
   }
 
+  /**
+   * Cert certificate record.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Cert extends IdentifiedDbObject {
 
     private final String file;
@@ -315,6 +320,11 @@ public class CaCertstore implements JsonEncodable {
     }
   } // method Cert
 
+  /**
+   * Certs.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Certs implements JsonEncodable {
 
     private final List<Cert> certs;
@@ -349,6 +359,11 @@ public class CaCertstore implements JsonEncodable {
 
   } // class Certs
 
+  /**
+   * Crl CRL record.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Crl extends IdentifiedDbObject {
 
     private final int caId;
@@ -397,6 +412,11 @@ public class CaCertstore implements JsonEncodable {
 
   } // class CaHasEntry
 
+  /**
+   * Crls.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Crls implements JsonEncodable {
 
     private final List<Crl> crls;
@@ -429,6 +449,11 @@ public class CaCertstore implements JsonEncodable {
 
   } // class Crls
 
+  /**
+   * Id Name.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class IdName implements JsonEncodable {
 
     private final int id;
@@ -473,6 +498,11 @@ public class CaCertstore implements JsonEncodable {
 
   }
 
+  /**
+   * CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Ca extends IdName {
 
     private final String revInfo;

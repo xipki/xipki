@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server;
 
 /**
- * Responder and ServletPath.
+ * Responder And Path.
  *
  * @author Lijun Liao (xipki)
  */

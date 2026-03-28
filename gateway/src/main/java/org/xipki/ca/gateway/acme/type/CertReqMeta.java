@@ -11,7 +11,7 @@ import org.xipki.util.extra.misc.CompareUtil;
 import java.time.Instant;
 
 /**
- * ACME component.
+ * Cert Req Meta.
  *
  * @author Lijun Liao (xipki)
  */

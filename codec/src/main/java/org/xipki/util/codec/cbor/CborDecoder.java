@@ -21,7 +21,7 @@ import java.util.Map;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Provides a decoder capable of handling CBOR encoded data from a
+ * Cbor Decoder.
  * {@link InputStream}.
  */
 public abstract class CborDecoder implements AutoCloseable {

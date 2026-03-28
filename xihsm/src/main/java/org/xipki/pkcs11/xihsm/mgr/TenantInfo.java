@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Tenant Info information.
  *
  * @author Lijun Liao (xipki)
  */

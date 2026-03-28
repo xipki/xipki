@@ -31,7 +31,7 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 
 /**
- * XiPKI component.
+ * KEMUtil.
  *
  * @author Lijun Liao (xipki)
  */

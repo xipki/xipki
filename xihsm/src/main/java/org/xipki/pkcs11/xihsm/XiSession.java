@@ -28,7 +28,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_SESSION_READ_ONLY;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_TEMPLATE_INCONSISTENT;
 
 /**
- * XiPKI component.
+ * Xi Session.
  *
  * @author Lijun Liao (xipki)
  */

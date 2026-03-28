@@ -12,13 +12,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * CMP request to de-suspend certificates.
+ * Unsuspend Cert Request request payload.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class UnsuspendCertRequest {
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends IdentifiedObject {
 
     private final X500Name issuer;

@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server.type;
 
 /**
- * Abstract ASN.1 extension.
+ * Extension.
  *
  * @author Lijun Liao (xipki)
  */

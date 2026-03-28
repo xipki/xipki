@@ -15,7 +15,7 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 
 /**
- * Software-based keypair generator.
+ * Software Keypair Generator.
  * @author Lijun Liao (xipki)
  */
 public class SoftwareKeypairGenerator extends KeypairGenerator {

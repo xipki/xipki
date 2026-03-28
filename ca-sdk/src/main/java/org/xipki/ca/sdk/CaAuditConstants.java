@@ -4,7 +4,7 @@
 package org.xipki.ca.sdk;
 
 /**
- * Constants used to identify the audit event.
+ * CA Audit Constants.
  *
  * @author Lijun Liao (xipki)
  */

@@ -3,7 +3,7 @@
 package org.xipki.util.codec.asn1;
 
 /**
- * XiPKI component.
+ * Asn1 Const.
  *
  * @author Lijun Liao (xipki)
  */

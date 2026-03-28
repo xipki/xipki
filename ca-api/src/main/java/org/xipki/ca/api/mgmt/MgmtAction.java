@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 /**
- * CA Management action enums.
+ * Mgmt Action enumeration.
  *
  * @author Lijun Liao (xipki)
  */
@@ -46,6 +46,7 @@ public enum MgmtAction {
   getCertprofile,
   getCertprofileNames,
   getCertprofilesForCa,
+  getCertStatistics,
   getCrl,
   getCurrentCrl,
   getDbSchemas,
@@ -61,6 +62,7 @@ public enum MgmtAction {
   getRequestorsForCa,
   getSigner,
   getSignerNames,
+  getSimpleCertprofileInfo,
   getSuccessfulCaNames,
   getSupportedCertprofileTypes,
   getSupportedPublisherTypes,

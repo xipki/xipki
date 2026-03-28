@@ -21,7 +21,7 @@ package org.xipki.util.datasource;
 import org.xipki.util.codec.Args;
 
 /**
- * Root of the hierarchy of data access exceptions discussed in.
+ * Data Access Exception exception type.
  *
  * @author Rod Johnson
  */

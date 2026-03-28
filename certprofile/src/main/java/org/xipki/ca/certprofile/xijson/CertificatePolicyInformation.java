@@ -10,7 +10,7 @@ import org.xipki.util.extra.misc.CollectionUtil;
 import java.util.List;
 
 /**
- * Control of the CertificatePolicyInformation (in the extension
+ * Certificate Policy Information.
  * CertificatePolicies).
  *
  * @author Lijun Liao (xipki)

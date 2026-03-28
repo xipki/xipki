@@ -14,7 +14,7 @@ import org.xipki.util.codec.Args;
 import java.security.SecureRandom;
 
 /**
- * Speed test of PKCS#12 keypair generation.
+ * P12 Keypair Gen Speed.
  *
  * @author Lijun Liao (xipki)
  */

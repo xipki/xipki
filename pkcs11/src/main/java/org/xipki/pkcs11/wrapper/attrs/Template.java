@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * Object of this class represents the attribute vector.
+ * Template.
  *
  * @author Lijun Liao (xipki)
  */

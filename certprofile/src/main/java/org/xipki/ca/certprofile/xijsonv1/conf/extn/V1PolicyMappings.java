@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension PolicyMappings.
+ * V1 Policy Mappings.
  * Only for CA.
  *
  * @author Lijun Liao (xipki)

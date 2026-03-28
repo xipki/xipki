@@ -42,7 +42,7 @@ import static org.xipki.ca.sdk.CaAuditConstants.TYPE_suspend_ca;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_unsuspend_ca;
 
 /**
- * X509CA revoker module.
+ * X509 Revoker Module.
  *
  * @author Lijun Liao (xipki)
  */

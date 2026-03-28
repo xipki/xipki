@@ -39,7 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * CertProfile with identifier.
+ * Certprofile Util.
  *
  * @author Lijun Liao (xipki)
  */

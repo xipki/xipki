@@ -11,7 +11,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.ipadress.IPAddress;
 
 /**
- * RFC 3779, 8360
+ * IPAddress Range.
  * <pre>
  *    IPAddressRange      ::= SEQUENCE {
  *       min                  IPAddress,

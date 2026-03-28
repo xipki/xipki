@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Iterator which iterates the {@link BigInteger} as specified by a list of
+ * Range Big Integer Iterator iterator.
  * {@link BigIntegerRange}s.
  *
  * @author Lijun Liao (xipki)

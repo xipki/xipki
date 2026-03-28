@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Codec list.
+ * Json List.
  *
  * @author Lijun Liao (xipki)
  */

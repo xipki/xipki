@@ -10,7 +10,7 @@ import org.xipki.util.codec.json.JsonMap;
 import java.util.Locale;
 
 /**
- * Configure extension with given (constant) extension value.
+ * V1 Constant Extn Value.
  * @author Lijun Liao (xipki)
  */
 public class V1ConstantExtnValue {

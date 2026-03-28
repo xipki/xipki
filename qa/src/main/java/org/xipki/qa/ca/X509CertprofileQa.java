@@ -43,7 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * QA for Certprofile.
+ * X509 Certprofile Qa.
  *
  * @author Lijun Liao (xipki)
  */

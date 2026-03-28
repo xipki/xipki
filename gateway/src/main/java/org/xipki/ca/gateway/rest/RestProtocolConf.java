@@ -19,6 +19,7 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Rest Protocol Conf configuration.
  */
 
 public class RestProtocolConf extends GatewayConf.ProtocolConf {

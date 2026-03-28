@@ -19,12 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Configuration of PKCS#11.
+ * P11 System Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
 public class P11SystemConf {
 
+  /**
+   * Mechanism Filter Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class MechanismFilterConf {
 
     /**
@@ -71,6 +76,11 @@ public class P11SystemConf {
 
   } // class MechanismFilter
 
+  /**
+   * Mechanism Set Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class MechanismSetConf {
 
     private final String name;
@@ -110,6 +120,11 @@ public class P11SystemConf {
 
   } // class MechanismSet
 
+  /**
+   * Module Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ModuleConf {
 
     private final String name;
@@ -287,6 +302,11 @@ public class P11SystemConf {
 
   } // class Module
 
+  /**
+   * Native Library Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class NativeLibraryConf {
 
     private final String path;
@@ -335,6 +355,11 @@ public class P11SystemConf {
     }
   } // class NativeLibrary
 
+  /**
+   * Password Set Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class PasswordSetConf {
 
     private final List<SlotConf> slots;
@@ -370,6 +395,11 @@ public class P11SystemConf {
 
   } // class PasswordSet
 
+  /**
+   * Slot Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SlotConf {
 
     private final Integer index;

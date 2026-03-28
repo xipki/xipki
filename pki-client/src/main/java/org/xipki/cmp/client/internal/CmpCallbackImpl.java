@@ -49,7 +49,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.Iterator;
 
 /**
- * XiPKI component.
+ * CMP Callback Impl.
  *
  * @author Lijun Liao (xipki)
  */

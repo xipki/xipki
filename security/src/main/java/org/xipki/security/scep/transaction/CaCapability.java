@@ -6,7 +6,7 @@ package org.xipki.security.scep.transaction;
 import org.xipki.util.codec.Args;
 
 /**
- * CA capability enum.
+ * CA Capability enumeration.
  *
  * @author Lijun Liao (xipki)
  */

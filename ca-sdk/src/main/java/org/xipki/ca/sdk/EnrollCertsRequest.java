@@ -18,6 +18,7 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Enroll Certs Request request payload.
  */
 
 public class EnrollCertsRequest extends SdkRequest {
@@ -122,6 +123,11 @@ public class EnrollCertsRequest extends SdkRequest {
     }
   }
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends SdkEncodable {
 
     private BigInteger certReqId;

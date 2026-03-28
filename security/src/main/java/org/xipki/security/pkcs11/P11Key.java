@@ -29,7 +29,7 @@ import java.security.spec.RSAPublicKeySpec;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * PKCS#11 key.
+ * P11 Key.
  *
  * @author Lijun Liao (xipki)
  */

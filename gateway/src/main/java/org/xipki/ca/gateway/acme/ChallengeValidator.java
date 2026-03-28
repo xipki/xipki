@@ -7,19 +7,8 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xbill.DNS.CNAMERecord;
-import org.xbill.DNS.DClass;
-import org.xbill.DNS.ExtendedResolver;
-import org.xbill.DNS.Flags;
-import org.xbill.DNS.Message;
-import org.xbill.DNS.Name;
+import org.xbill.DNS.*;
 import org.xbill.DNS.Record;
-import org.xbill.DNS.Resolver;
-import org.xbill.DNS.Section;
-import org.xbill.DNS.Rcode;
-import org.xbill.DNS.TXTRecord;
-import org.xbill.DNS.TextParseException;
-import org.xbill.DNS.Type;
 import org.xbill.DNS.dnssec.ValidatingResolver;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.security.OIDs;
@@ -42,12 +31,12 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -59,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * ACME component.
+ * Challenge Validator.
  *
  * @author Lijun Liao (xipki)
  */
@@ -304,7 +293,7 @@ public class ChallengeValidator implements Runnable {
 
     String acmeDomain = "_acme-challenge." + host;
     try {
-      return queryDnsTxt(acmeDomain, challId, identifier, 0);
+      return queryDnsTxt(acmeDomain, 0);
     } catch (IOException | ExecutionException ex) {
       String message =  "error while validating challenge " + challId +
                         " for identifier " + identifier;
@@ -319,7 +308,7 @@ public class ChallengeValidator implements Runnable {
     return null;
   }
 
-  private String queryDnsTxt(String acmeDomain, ChallId challId, AcmeIdentifier identifier, int depth)
+  private String queryDnsTxt(String acmeDomain, int depth)
       throws IOException, ExecutionException, InterruptedException {
     if (depth > MAX_DNS_CNAME_DEPTH) {
       LOG.warn("dns-01: too many CNAME redirects for '{}'", acmeDomain);
@@ -332,7 +321,8 @@ public class ChallengeValidator implements Runnable {
     Message response = dnsResolver.sendAsync(query).toCompletableFuture().get();
 
     if (response.getRcode() != Rcode.NOERROR) {
-      LOG.debug("dns-01: query '{}' returned rcode {}", queryName, Rcode.string(response.getRcode()));
+      LOG.debug("dns-01: query '{}' returned rcode {}", queryName,
+          Rcode.string(response.getRcode()));
       return null;
     }
 
@@ -357,7 +347,7 @@ public class ChallengeValidator implements Runnable {
 
     if (cnameTarget != null) {
       LOG.debug("dns-01: following CNAME '{}' -> '{}'", queryName, cnameTarget);
-      return queryDnsTxt(cnameTarget.toString(), challId, identifier, depth + 1);
+      return queryDnsTxt(cnameTarget.toString(), depth + 1);
     }
 
     return null;
@@ -389,7 +379,8 @@ public class ChallengeValidator implements Runnable {
     InetAddress[] addresses = InetAddress.getAllByName(host);
     for (InetAddress address : addresses) {
       if (isForbiddenAddress(address)) {
-        throw new UnknownHostException("host resolves to forbidden address " + address.getHostAddress());
+        throw new UnknownHostException("host resolves to forbidden address " +
+            address.getHostAddress());
       }
     }
   }

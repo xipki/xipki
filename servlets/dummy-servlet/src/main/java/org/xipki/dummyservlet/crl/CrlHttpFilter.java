@@ -25,7 +25,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 
 /**
- * Dummy CRL ServletFilter.
+ * Crl Http Filter.
  *
  * @author Lijun Liao (xipki)
  */

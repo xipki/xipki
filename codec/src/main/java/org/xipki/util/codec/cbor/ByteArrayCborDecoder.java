@@ -18,7 +18,7 @@ import java.util.Arrays;
 import static org.xipki.util.codec.cbor.CborConstants.TYPE_TEXT_STRING;
 
 /**
- * Provides a decoder capable of handling CBOR encoded data from a
+ * Byte Array Cbor Decoder.
  * {@link InputStream}.
  */
 public class ByteArrayCborDecoder extends CborDecoder {

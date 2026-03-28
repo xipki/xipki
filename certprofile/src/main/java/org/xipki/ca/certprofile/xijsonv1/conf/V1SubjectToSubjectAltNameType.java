@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Control which RDNs and how they are converted to the SubjectAltNames
+ * V1 Subject To Subject Alt Name Type type definition.
  * extension.
  *
  * @author Lijun Liao (xipki)

@@ -9,7 +9,7 @@
 package org.xipki.util.codec.cbor;
 
 /**
- * Constant values used by the CBOR format.
+ * Cbor Constants interface.
  */
 public interface CborConstants {
 

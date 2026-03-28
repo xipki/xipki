@@ -11,7 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
 
 /**
- * Extension configuration.
+ * Extension Type type definition.
  *
  * @author Lijun Liao (xipki)
  *

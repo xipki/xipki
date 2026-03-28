@@ -30,7 +30,7 @@ import org.xipki.util.extra.audit.PciAuditEvent;
 import org.xipki.util.extra.misc.LogUtil;
 
 /**
- * Gateway Utilities.
+ * Gateway Util.
  * @author Lijun Liao (xipki)
  */
 public class GatewayUtil {

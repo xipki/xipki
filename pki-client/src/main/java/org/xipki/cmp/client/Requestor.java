@@ -15,7 +15,7 @@ import org.xipki.util.codec.Args;
 import java.security.SecureRandom;
 
 /**
- * CMP requestor.
+ * Requestor.
  *
  * @author Lijun Liao (xipki)
  */
@@ -34,6 +34,11 @@ public abstract class Requestor {
     return name;
   }
 
+  /**
+   * Pbm Mac CMP Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class PbmMacCmpRequestor extends Requestor {
 
     private final SecureRandom random = new SecureRandom();
@@ -78,6 +83,11 @@ public abstract class Requestor {
     }
   } // class PbmMacCmpRequestor
 
+  /**
+   * Signature CMP Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SignatureCmpRequestor extends Requestor {
 
     private final ConcurrentSigner signer;

@@ -14,7 +14,7 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 
 /**
- * Concurrent {@link ContentSigner}.
+ * Concurrent Signer interface.
  *
  * @author Lijun Liao (xipki)
  */

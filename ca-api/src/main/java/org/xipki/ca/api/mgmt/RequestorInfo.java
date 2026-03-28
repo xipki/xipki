@@ -10,7 +10,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.extra.exception.InsufficientPermissionException;
 
 /**
- * Requestor info interface.
+ * Requestor Info interface.
  *
  * @author Lijun Liao (xipki)
  */

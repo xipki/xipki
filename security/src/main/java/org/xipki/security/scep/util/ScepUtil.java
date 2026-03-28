@@ -33,7 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * SCEP utility class.
+ * SCEP Util.
  *
  * @author Lijun Liao (xipki)
  */

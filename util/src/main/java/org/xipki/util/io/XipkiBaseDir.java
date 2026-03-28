@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * XIPKI_BASE utility class.
+ * Xipki Base Dir.
  *
  * @author Lijun Liao (xipki)
  */

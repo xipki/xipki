@@ -10,7 +10,7 @@ import org.xipki.pkcs11.wrapper.jni.PKCS11;
 import org.xipki.pkcs11.wrapper.type.CkVersion;
 
 /**
- * PKCS#11 implementation which communicates with XiHSM.
+ * Xi PKCS11.
  *
  * @author Lijun Liao (xipki)
  */

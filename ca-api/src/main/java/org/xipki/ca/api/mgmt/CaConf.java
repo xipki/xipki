@@ -48,7 +48,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * CA configuration.
+ * CA Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
@@ -443,6 +443,11 @@ public class CaConf {
     return binary;
   } //method getBinary
 
+  /**
+   * Gen Self Issued.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenSelfIssued {
 
     private final String profile;
@@ -486,6 +491,11 @@ public class CaConf {
 
   } // class GenSelfIssued
 
+  /**
+   * Single CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SingleCa {
 
     private final String name;

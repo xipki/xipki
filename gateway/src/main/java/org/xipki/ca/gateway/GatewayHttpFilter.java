@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CMP Gateway ServletFilter.
+ * Gateway Http Filter.
  *
  * @author Lijun Liao (xipki)
  */

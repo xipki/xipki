@@ -39,7 +39,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_GENERAL_ERROR;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_OBJECT_HANDLE_INVALID;
 
 /**
- * XiPKI component.
+ * File Persist Store store definition.
  *
  * @author Lijun Liao (xipki)
  */
@@ -63,7 +63,7 @@ public class FilePersistStore implements PersistStore {
     Args.notNull(vendor, "vendor");
 
     if (StringUtil.isBlank(parentBasedir)) {
-      parentBasedir = "~/.xihsm/store";
+      parentBasedir = "~/.xihsm-plain/store";
     }
     parentBasedir = IoUtil.expandFilepath(parentBasedir);
 

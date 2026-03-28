@@ -10,6 +10,7 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Cbor Encodable interface.
  */
 public interface CborEncodable {
 

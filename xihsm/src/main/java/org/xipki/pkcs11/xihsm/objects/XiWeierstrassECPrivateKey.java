@@ -47,7 +47,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_MECHANISM_INVALID;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_MECHANISM_PARAM_INVALID;
 
 /**
- * XiPKI component.
+ * Xi Weierstrass ECPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

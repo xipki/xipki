@@ -4,7 +4,7 @@
 package org.xipki.security.scep.util;
 
 /**
- * SCEP constants.
+ * SCEP Constants.
  *
  * @author Lijun Liao (xipki)
  */

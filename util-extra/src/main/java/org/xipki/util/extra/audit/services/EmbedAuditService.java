@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * The embedded audit service.
+ * Embed Audit Service.
  *
  * @author Lijun Liao (xipki)
  */

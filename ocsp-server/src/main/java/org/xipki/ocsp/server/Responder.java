@@ -10,7 +10,7 @@ import org.xipki.util.codec.Args;
 import java.util.List;
 
 /**
- * Implementation of {@link Responder}.
+ * Responder.
  *
  * @author Lijun Liao (xipki)
  */

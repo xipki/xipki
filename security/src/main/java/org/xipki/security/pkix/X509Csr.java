@@ -16,7 +16,7 @@ import org.xipki.security.OIDs;
 import org.xipki.util.codec.Args;
 
 /**
- * Wrapper to an {@link CertificationRequest}.
+ * X509 CSR.
  *
  * @author Lijun Liao (xipki)
  */

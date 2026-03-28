@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 /**
- * The anchor class of ASN.1 types defined in this package.
+ * ASN1 Type type definition.
  *
  * @author Lijun Liao (xipki)
  */

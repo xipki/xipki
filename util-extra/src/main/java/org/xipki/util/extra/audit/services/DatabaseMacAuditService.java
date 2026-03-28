@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 
 /**
- * Database-based MAC protected audit service.
+ * Database Mac Audit Service.
  *
  * @author Lijun Liao (xipki)
  */

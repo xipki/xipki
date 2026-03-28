@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * CtLog public key finder.
+ * CT Log Public Key Finder.
  *
  * @author Lijun Liao (xipki)
  */

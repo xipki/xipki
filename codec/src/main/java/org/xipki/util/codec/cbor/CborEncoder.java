@@ -22,7 +22,7 @@ import java.util.Map;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Provides an encoder capable of encoding data into CBOR format to a given
+ * Cbor Encoder.
  * {@link OutputStream}.
  */
 public abstract class CborEncoder {

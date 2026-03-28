@@ -3,7 +3,7 @@
 package org.xipki.pkcs11.wrapper.spec;
 
 /**
- * XiPKI component.
+ * PKCS11 Key Spec.
  *
  * @author Lijun Liao (xipki)
  */

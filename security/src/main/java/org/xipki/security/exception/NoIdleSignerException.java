@@ -6,7 +6,7 @@ package org.xipki.security.exception;
 import java.security.GeneralSecurityException;
 
 /**
- * Exception that indicates no idle signer is available.
+ * No Idle Signer Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

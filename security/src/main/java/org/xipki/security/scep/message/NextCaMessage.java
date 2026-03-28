@@ -30,7 +30,7 @@ import java.security.cert.CertificateEncodingException;
 import java.util.List;
 
 /**
- * Get Next CA Response Message.
+ * Next CA Message.
  *
  * @author Lijun Liao (xipki)
  */

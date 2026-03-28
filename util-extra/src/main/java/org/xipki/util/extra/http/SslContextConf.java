@@ -24,7 +24,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
 /**
- * Configuration of SSL context.
+ * Ssl Context Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */

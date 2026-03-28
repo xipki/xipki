@@ -11,7 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 import java.math.BigInteger;
 
 /**
- * Response for the operations enrolling certificates and polling certificates.
+ * Enroll Or Poll Certs Response response payload.
  *
  * @author Lijun Liao (xipki)
  */
@@ -78,6 +78,11 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
     }
   }
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends SdkEncodable {
 
     private final BigInteger id;

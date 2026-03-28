@@ -12,7 +12,7 @@ import org.xipki.util.codec.Args;
 import java.io.IOException;
 
 /**
- * PKCS#11 module loader.
+ * PKCS11 Loader.
  *
  * @author Lijun Liao (xipki)
  */

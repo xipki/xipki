@@ -13,7 +13,7 @@ import java.util.Properties;
 import java.util.Set;
 
 /**
- * LOG utility class.
+ * Log Util.
  *
  * @author Lijun Liao (xipki)
  */

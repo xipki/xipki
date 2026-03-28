@@ -12,7 +12,7 @@ import org.xipki.pkcs11.xihsm.util.Origin;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * Persist Slot slot definition.
  *
  * @author Lijun Liao (xipki)
  */

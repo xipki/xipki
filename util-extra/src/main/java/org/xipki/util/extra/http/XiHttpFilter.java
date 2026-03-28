@@ -3,7 +3,7 @@
 package org.xipki.util.extra.http;
 
 /**
- * HTTP filter.
+ * Xi Http Filter interface.
  *
  * @author Lijun Liao (xipki)
  */

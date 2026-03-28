@@ -24,7 +24,7 @@ import org.xipki.util.misc.StringUtil;
 import java.util.List;
 
 /**
- * This class fields of a single CA, which are common of different real CA
+ * Base CA Info information.
  * classes.
  *
  * @author Lijun Liao (xipki)

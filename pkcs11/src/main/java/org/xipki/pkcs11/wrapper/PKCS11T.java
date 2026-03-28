@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * This interface holds constants of the constants defined in pkcs11t.h.
+ * PKCS11 T.
  *
  * @author Lijun Liao (xipki)
  */

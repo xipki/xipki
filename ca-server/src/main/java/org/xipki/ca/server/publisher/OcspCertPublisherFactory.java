@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- * Factory of {@link OcspCertPublisher}.
+ * OCSP Cert Publisher Factory.
  *
  * @author Lijun Liao (xipki)
  */

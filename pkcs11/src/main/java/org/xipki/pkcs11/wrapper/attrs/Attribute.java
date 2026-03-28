@@ -24,7 +24,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.ckaCodeToName;
 import static org.xipki.pkcs11.wrapper.PKCS11T.ckaNameToCode;
 
 /**
- * <pre>
+ * Attribute.
  * typedef struct CK_ATTRIBUTE {
  *   CK_ATTRIBUTE_TYPE type;
  *   CK_VOID_PTR       pValue;
@@ -36,6 +36,11 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.ckaNameToCode;
  */
 public abstract class Attribute {
 
+  /**
+   * Data Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum DataType {
     CkTemplate,
     CkBool,

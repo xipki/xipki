@@ -11,7 +11,7 @@ import java.math.BigInteger;
 import java.net.URL;
 
 /**
- * OCSP requestor interface.
+ * OCSP Requestor interface.
  *
  * @author Lijun Liao (xipki)
  */

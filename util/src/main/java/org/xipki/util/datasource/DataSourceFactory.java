@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
- * Factory to create {@link DataSourceWrapper}.
+ * Data Source Factory.
  *
  * @author Lijun Liao (xipki)
  */

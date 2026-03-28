@@ -24,12 +24,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CA server configuration.
+ * CA Server Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
 public class CaServerConf {
 
+  /**
+   * Ssl Context.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SslContext {
 
     private final String name;
@@ -53,6 +58,11 @@ public class CaServerConf {
 
   } // class SslContext
 
+  /**
+   * Remote Mgmt.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RemoteMgmt {
 
     private final boolean enabled;
@@ -80,6 +90,11 @@ public class CaServerConf {
 
   } // class RemoteMgmt
 
+  /**
+   * CT Log Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CtLogConf {
 
     private final String keydir;

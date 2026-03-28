@@ -33,7 +33,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * The Mac protected audit service.
+ * Mac Audit Service.
  *
  * @author Lijun Liao (xipki)
  */

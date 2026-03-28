@@ -10,7 +10,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Mechanism parameter of value NULL.
+ * Null Params.
  * @author Lijun Liao (xipki)
  */
 public class NullParams extends CkParams {

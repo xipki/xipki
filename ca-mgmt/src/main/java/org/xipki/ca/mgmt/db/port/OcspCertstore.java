@@ -14,13 +14,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * OCSP CertStore.
+ * OCSP Certstore store definition.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class OcspCertstore implements JsonEncodable {
 
+  /**
+   * Cert certificate record.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Cert extends IdentifiedDbObject {
 
     private final String hash;
@@ -142,6 +147,11 @@ public class OcspCertstore implements JsonEncodable {
     }
   }
 
+  /**
+   * Certs.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Certs implements JsonEncodable {
 
     private final List<Cert> certs;
@@ -178,6 +188,11 @@ public class OcspCertstore implements JsonEncodable {
 
   } // class Cert
 
+  /**
+   * Issuer issuer definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Issuer implements JsonEncodable {
 
     private final int id;
@@ -224,6 +239,11 @@ public class OcspCertstore implements JsonEncodable {
 
   } // class Issuer
 
+  /**
+   * Crl Info information.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CrlInfo implements JsonEncodable {
 
     private final int id;

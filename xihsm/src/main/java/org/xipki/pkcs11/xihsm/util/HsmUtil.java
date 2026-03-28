@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Hsm Util.
  *
  * @author Lijun Liao (xipki)
  */

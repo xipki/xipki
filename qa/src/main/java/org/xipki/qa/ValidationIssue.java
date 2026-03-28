@@ -6,7 +6,7 @@ package org.xipki.qa;
 import org.xipki.util.codec.Args;
 
 /**
- * Single validation issue.
+ * Validation Issue.
  *
  * @author Lijun Liao (xipki)
  */

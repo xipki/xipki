@@ -9,7 +9,7 @@ import org.xipki.servlet.ServletFilter;
 import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
- * ACME Gateway ServletFilter.
+ * Gateway Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

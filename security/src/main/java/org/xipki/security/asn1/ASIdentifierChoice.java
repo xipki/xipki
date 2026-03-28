@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * RFC 3779, 8360
+ * ASIdentifier Choice.
  *
  * <pre>
  *    ASIdentifierChoice  ::= CHOICE {

@@ -6,7 +6,7 @@ package org.xipki.ca.api;
 import org.xipki.security.pkix.X509Cert;
 
 /**
- * Certificate with id of this certificate in the database.
+ * Cert With DB Id.
  *
  * @author Lijun Liao (xipki)
  */

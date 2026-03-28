@@ -7,7 +7,7 @@ import java.security.PublicKey;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * MLKEMPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

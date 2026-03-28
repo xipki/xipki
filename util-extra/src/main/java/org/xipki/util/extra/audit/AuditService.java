@@ -7,7 +7,7 @@ import org.xipki.util.conf.ConfPairs;
 import org.xipki.util.conf.InvalidConfException;
 
 /**
- * Audit service interface.
+ * Audit Service interface.
  *
  * @author Lijun Liao (xipki)
  */

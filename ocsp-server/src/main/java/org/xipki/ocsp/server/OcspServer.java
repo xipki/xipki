@@ -78,7 +78,7 @@ import static org.xipki.ocsp.server.OcspServerUtil.parseConf;
 import static org.xipki.ocsp.server.OcspServerUtil.removeExtension;
 
 /**
- * Implementation of {@link OcspServer}.
+ * OCSP Server.
  *
  * @author Lijun Liao (xipki)
  */

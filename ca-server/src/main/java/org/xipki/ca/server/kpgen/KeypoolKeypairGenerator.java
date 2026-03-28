@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Keypool based keypair generator.
+ * Keypool Keypair Generator.
  *
  * @author Lijun Liao (xipki)
  */

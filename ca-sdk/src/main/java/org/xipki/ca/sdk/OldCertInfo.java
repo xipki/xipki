@@ -13,6 +13,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Old Cert Info information.
  */
 
 public class OldCertInfo extends SdkEncodable {
@@ -104,6 +105,11 @@ public class OldCertInfo extends SdkEncodable {
     }
   }
 
+  /**
+   * By Issuer And Serial.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ByIssuerAndSerial extends SdkEncodable {
 
     private final X500NameType issuer;
@@ -144,6 +150,11 @@ public class OldCertInfo extends SdkEncodable {
     }
   }
 
+  /**
+   * By Sha1 Fp And Serial.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class BySha1FpAndSerial extends SdkEncodable {
 
     private final byte[] caCertSha1;
@@ -184,6 +195,11 @@ public class OldCertInfo extends SdkEncodable {
     }
   }
 
+  /**
+   * By Subject.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class BySubject extends SdkEncodable {
 
     private final byte[] subject;

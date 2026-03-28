@@ -6,7 +6,7 @@ package org.xipki.ca.gateway.acme;
 import java.util.regex.Pattern;
 
 /**
- * ACME component.
+ * Contact Verifier interface.
  *
  * @author Lijun Liao (xipki)
  */

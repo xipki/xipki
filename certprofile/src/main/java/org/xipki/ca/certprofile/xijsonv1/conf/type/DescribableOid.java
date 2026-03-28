@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * OID with description.
+ * Describable OID.
  *
  * @author Lijun Liao (xipki)
  */

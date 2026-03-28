@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt.entry;
 import org.xipki.util.codec.json.JsonEncodable;
 
 /**
- * CA management entry.
+ * Mgmt Entry entry.
  *
  * @author Lijun Liao (xipki)
  *

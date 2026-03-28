@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Configuration consisting either the file path or the binary content.
+ * File Or Binary.
  *
  * @author Lijun Liao (xipki)
  */

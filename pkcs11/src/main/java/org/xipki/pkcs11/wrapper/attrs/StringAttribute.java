@@ -6,7 +6,7 @@ package org.xipki.pkcs11.wrapper.attrs;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Objects of this class represent a char-array attribute of a PKCS#11 object
+ * String Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

@@ -13,7 +13,7 @@ import org.xipki.util.extra.type.Validity.Unit;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Revoke suspended certificate control.
+ * Revoke Suspended Control control settings.
  *
  * <p>Example configuration
  *<pre>

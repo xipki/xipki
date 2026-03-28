@@ -11,7 +11,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class encapsulates parameters CK_LONG.
+ * Long Params.
  *
  * @author Lijun Liao (xipki)
  */

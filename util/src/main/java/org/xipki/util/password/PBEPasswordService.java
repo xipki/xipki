@@ -15,7 +15,7 @@ import java.util.Base64;
 import java.util.Optional;
 
 /**
- * PBE (Password Based Encryption) password service.
+ * PBEPassword Service.
  *
  * @author Lijun Liao (xipki)
  */

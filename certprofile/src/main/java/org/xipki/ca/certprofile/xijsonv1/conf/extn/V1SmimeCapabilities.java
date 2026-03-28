@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension S/MIME Capabilities.
+ * V1 Smime Capabilities.
  *
  * @author Lijun Liao (xipki)
  */

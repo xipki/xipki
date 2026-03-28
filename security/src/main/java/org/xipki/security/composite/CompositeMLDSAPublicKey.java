@@ -18,7 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 /**
- * Container of a composite MLDSA public key.
+ * Composite MLDSAPublic Key.
  * @author Lijun Liao (xipki)
  */
 public class CompositeMLDSAPublicKey implements PublicKey {

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CA configuration types.
+ * CA Conf Type type definition.
  *
  * @author Lijun Liao (xipki)
  */
@@ -41,6 +41,11 @@ public class CaConfType {
     }
   }
 
+  /**
+   * CA System.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaSystem implements JsonEncodable {
 
     /**
@@ -276,6 +281,11 @@ public class CaConfType {
 
   } // class CaSystem
 
+  /**
+   * CA Has Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaHasRequestor implements JsonEncodable {
 
     private final String requestorName;
@@ -318,6 +328,11 @@ public class CaConfType {
 
   } // class CaHasRequestor
 
+  /**
+   * CA Info information.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CaInfo implements JsonEncodable {
 
     private final BaseCaInfo base;
@@ -425,6 +440,11 @@ public class CaConfType {
 
   } // class CaInfo
 
+  /**
+   * Id Name Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class IdNameConf implements JsonEncodable {
 
     private Integer id;
@@ -471,6 +491,11 @@ public class CaConfType {
 
   }
 
+  /**
+   * CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Ca extends IdNameConf {
 
     private final CaInfo caInfo;
@@ -573,6 +598,11 @@ public class CaConfType {
 
   } // class Ca
 
+  /**
+   * Gen Self Issued.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenSelfIssued implements JsonEncodable {
 
     private final String subject;
@@ -647,6 +677,11 @@ public class CaConfType {
 
   } // class GenSelfIssued
 
+  /**
+   * Name Type Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class NameTypeConf extends IdNameConf {
 
     private final String type;
@@ -688,6 +723,11 @@ public class CaConfType {
 
   } // class NameTypeConf
 
+  /**
+   * Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Requestor extends IdNameConf {
 
     private final String type;
@@ -752,6 +792,11 @@ public class CaConfType {
 
   } // class Requestor
 
+  /**
+   * Signer signer definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Signer extends NameTypeConf {
 
     private final FileOrBinary cert;

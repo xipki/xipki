@@ -27,7 +27,7 @@ import java.util.Optional;
 import static org.xipki.ca.sdk.SdkConstants.*;
 
 /**
- * API client.
+ * Sdk Client.
  *
  * @author Lijun Liao (xipki)
  */

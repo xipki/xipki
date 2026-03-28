@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper.attrs;
 
 /**
- * Objects of this class represent a boolean attribute of a PKCS#11 object
+ * Boolean Attribute.
  * as specified by PKCS#11.
  *
  * @author Lijun Liao (xipki)

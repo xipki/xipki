@@ -4,7 +4,7 @@
 package org.xipki.security.verify;
 
 /**
- * Certpath validation model.
+ * Cert Path Validation Model enumeration.
  *
  * @author Lijun Liao (xipki)
  */

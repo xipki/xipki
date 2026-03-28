@@ -13,7 +13,7 @@ import static org.xipki.pkcs11.wrapper.jni.PKCS11.METH_O;
 import static org.xipki.pkcs11.wrapper.jni.PKCS11.METH_R;
 
 /**
- * Enumeration of JNI operations for the C_* PKCS#11 functions.
+ * Jni Operation enumeration.
  *
  * @author Lijun Liao (xipki)
  */

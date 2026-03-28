@@ -8,7 +8,7 @@ import org.xipki.ocsp.api.RequestIssuer;
 import java.math.BigInteger;
 
 /**
- * ASN.1 CertID.
+ * Cert ID.
  *
  * @author Lijun Liao (xipki)
  */

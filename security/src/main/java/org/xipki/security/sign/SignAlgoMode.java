@@ -5,7 +5,7 @@ package org.xipki.security.sign;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Sign Algorithm Mode.
+ * Sign Algo Mode enumeration.
  *
  * @author Lijun Liao (xipki)
  */

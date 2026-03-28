@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Collection of OBJECT IDENTIFIERS.
+ * OIDs.
  *
  * @author Lijun Liao (xipki)
  */
@@ -63,6 +63,11 @@ public class OIDs {
     return oid;
   }
 
+  /**
+   * CMP.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class CMP {
 
     public static final ASN1ObjectIdentifier id_it_certProfile = initOid(
@@ -88,12 +93,22 @@ public class OIDs {
 
   }
 
+  /**
+   * CMC.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class CMC {
 
     public static final ASN1ObjectIdentifier id_cmc_changeSubjectName = initOid(
         "1.3.6.1.5.5.7.7.36", "cmc_changeSubjectName");
   }
 
+  /**
+   * X509.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class X509 {
 
     public static final ASN1ObjectIdentifier id_ad_ocsp = initOid(
@@ -120,6 +135,11 @@ public class OIDs {
         "1.3.6.1.5.5.7.8.9", "SmtpUTF8Mailbox");
   }
 
+  /**
+   * ACME.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class ACME {
 
     public static final ASN1ObjectIdentifier id_pe_acmeIdentifier = initOid(
@@ -127,6 +147,11 @@ public class OIDs {
 
   }
 
+  /**
+   * Xipki.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Xipki {
 
     /**
@@ -166,6 +191,11 @@ public class OIDs {
 
   } // class Xipki
 
+  /**
+   * Policy Identifier.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class PolicyIdentifier {
 
     public static final ASN1ObjectIdentifier id_anyPolicy =
@@ -220,6 +250,11 @@ public class OIDs {
 
   }
 
+  /**
+   * Policy Qualifier Id.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class PolicyQualifierId {
 
     public static final ASN1ObjectIdentifier cps = initOid("1.3.6.1.5.5.7.2.1", "CPS");
@@ -227,6 +262,11 @@ public class OIDs {
         initOid("1.3.6.1.5.5.7.2.2", "User Notice");
   }
 
+  /**
+   * DN.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class DN {
 
     /**
@@ -429,6 +469,11 @@ public class OIDs {
   }
 
   // extended key usage
+  /**
+   * XKU.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class XKU {
 
     public static final ASN1ObjectIdentifier id_kp_anyExtendedKeyUsage =
@@ -649,6 +694,11 @@ public class OIDs {
         initOid( "1.3.6.1.4.1.11129.2.4.4", "kp-certificateTransparency");
   }
 
+  /**
+   * Extn.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Extn {
 
     /**
@@ -949,6 +999,11 @@ public class OIDs {
         initOid("1.3.6.1.4.1.41577.5.10", "CCC-M-VehicleOEM-CA-Cert");
   }
 
+  /**
+   * Secg.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Secg {
 
     public static final ASN1ObjectIdentifier id_aes128_cbc_in_ecies =
@@ -961,6 +1016,11 @@ public class OIDs {
         initOid("1.3.132.1.22", "hmac-full-ecies");
   }
 
+  /**
+   * Algo.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Algo {
 
     public static final ASN1ObjectIdentifier id_alg_unsigned = initOid(
@@ -1164,6 +1224,11 @@ public class OIDs {
 
   }
 
+  /**
+   * Curve.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Curve {
 
     public static final ASN1ObjectIdentifier id_X25519 = initOid("1.3.101.110", "X25519");
@@ -1209,6 +1274,11 @@ public class OIDs {
 
   }
 
+  /**
+   * Composite.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Composite {
     // composite_sigs
     public static final ASN1ObjectIdentifier id_MLDSA44_RSA2048_PSS_SHA256 =
@@ -1307,6 +1377,11 @@ public class OIDs {
         initOid("1.3.6.1.5.5.7.6.66", "id-MLKEM1024-ECDH-P521-SHA3-256");
   }
 
+  /**
+   * CMS.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CMS {
 
     public static final ASN1ObjectIdentifier signedData = initOid(
@@ -1318,6 +1393,11 @@ public class OIDs {
         "1.2.840.113549.1.7.3", "envelopedData");
   }
 
+  /**
+   * Misc.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Misc {
 
     public static final ASN1ObjectIdentifier iso18033_kdf2 = initOid(
@@ -1328,6 +1408,11 @@ public class OIDs {
 
   }
 
+  /**
+   * PKCS9.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class PKCS9 {
 
     public static final ASN1ObjectIdentifier pkcs9_at_challengePassword =
@@ -1341,6 +1426,11 @@ public class OIDs {
 
   }
 
+  /**
+   * OCSP.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class OCSP {
 
     public static final ASN1ObjectIdentifier id_pkix_ocsp_basic = initOid(
@@ -1360,6 +1450,11 @@ public class OIDs {
 
   }
 
+  /**
+   * QCS.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class QCS {
 
     public static final ASN1ObjectIdentifier id_qcs_pkixQCSyntax_v1 =
@@ -1394,6 +1489,11 @@ public class OIDs {
 
   }
 
+  /**
+   * SCEP.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Scep {
 
     public static final ASN1ObjectIdentifier transactionId = initOid(
@@ -1419,6 +1519,11 @@ public class OIDs {
 
   }
 
+  /**
+   * Spdm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Spdm {
 
     private static final ASN1ObjectIdentifier id_spdm =

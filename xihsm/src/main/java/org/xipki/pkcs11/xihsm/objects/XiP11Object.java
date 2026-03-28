@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.xihsm.objects;
 
 /**
- * XiPKI component.
+ * Xi P11 Object.
  *
  * @author Lijun Liao (xipki)
  */

@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
- * PKCS#11 implementation which communicates with real PKCS#11 device.
+ * Native PKCS11.
  *
  * @author Lijun Liao (xipki)
  */

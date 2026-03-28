@@ -7,7 +7,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.xipki.util.codec.Args;
 
 /**
- * PKI message with verification result.
+ * Verified Pki Message.
  *
  * @author Lijun Liao (xipki)
  */

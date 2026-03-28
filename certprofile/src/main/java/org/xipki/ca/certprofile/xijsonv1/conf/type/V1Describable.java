@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijsonv1.conf.type;
 
 /**
- * Configuration with description.
+ * V1 Describable.
  *
  * @author Lijun Liao (xipki)
  */

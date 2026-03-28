@@ -3,14 +3,17 @@
 
 package org.xipki.util.extra.http;
 
+import org.xipki.util.extra.misc.CollectionUtil;
 import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.misc.StringUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import java.util.StringTokenizer;
+import java.util.Arrays;
+import java.util.Set;
 
 /**
- * Configuration of SSL context.
+ * Ssl Context Conf Wrapper.
  *
  * @author Lijun Liao (xipki)
  */
@@ -70,19 +73,20 @@ public class SslContextConfWrapper {
     this.sslKeystorePassword = emptyAsNull(sslKeystorePassword);
   }
 
-  public void setSslTrustanchors(String sslTrustanchors) {
-    sslTrustanchors = emptyAsNull(sslTrustanchors);
-    if (sslTrustanchors == null) {
+  public void setSslTrustanchors(Set<String> sslTrustanchors) {
+    if (CollectionUtil.isEmpty(sslTrustanchors)) {
       this.sslTrustanchors = null;
       return;
     }
 
-    StringTokenizer tokens = new StringTokenizer(sslTrustanchors, ",;:");
-    FileOrBinary[] fbs = new FileOrBinary[tokens.countTokens()];
-    for (int i = 0; i < fbs.length; i++) {
-      fbs[i] = FileOrBinary.ofFile(tokens.nextToken());
+    FileOrBinary[] fbs = new FileOrBinary[sslTrustanchors.size()];
+    int index = 0;
+    for (String m : sslTrustanchors) {
+      if (StringUtil.isNotBlank(m)) {
+        fbs[index++] = FileOrBinary.ofFile(m);
+      }
     }
-    this.sslTrustanchors = fbs;
+    this.sslTrustanchors = index == fbs.length ? fbs : Arrays.copyOf(fbs, index);
   }
 
   public void setSslHostnameVerifier(String sslHostnameVerifier) {

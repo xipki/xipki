@@ -14,7 +14,7 @@ import java.util.Set;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * Objects of this class represent the attribute types.
+ * Attribute Types.
  *
  * @author Lijun Liao (xipki)
  */

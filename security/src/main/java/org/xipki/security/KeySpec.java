@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * XiPKI component.
+ * Key Spec enumeration.
  *
  * @author Lijun Liao (xipki)
  */

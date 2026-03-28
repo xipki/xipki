@@ -10,7 +10,7 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;
 import org.xipki.ocsp.server.store.CrlDbCertStatusStore;
 import org.xipki.ocsp.server.store.DbCertStatusStore;
-import org.xipki.ocsp.server.store.ejbca.EjbcaCertStatusStore;
+import org.xipki.ocsp.server.store.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.security.SecurityFactory;
@@ -44,7 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Utility functions for {@link OcspServer}.
+ * OCSP Server Util.
  *
  * @author Lijun Liao (xipki)
  */

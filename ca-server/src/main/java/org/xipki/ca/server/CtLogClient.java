@@ -48,7 +48,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Certificate transparency (CT) log client.
+ * CT Log Client.
  *
  * @author Lijun Liao (xipki)
  */

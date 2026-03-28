@@ -31,6 +31,8 @@ import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
+import org.xipki.util.extra.misc.PemEncoder;
+import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -51,7 +53,7 @@ import java.util.Optional;
 import java.util.Vector;
 
 /**
- * Wrapper to an {@link Certificate}.
+ * X509 Cert certificate record.
  *
  * @author Lijun Liao (xipki)
  */
@@ -385,6 +387,11 @@ public class X509Cert {
     }
     Extension extn = extns.getExtension(extnType);
     return extn == null ? null : Asn1Util.getOctetStringOctets(extn.getExtnValue());
+  }
+
+  public String toPemString() {
+    return StringUtil.toUtf8String(
+        PemEncoder.encode(getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
   }
 
   @Override

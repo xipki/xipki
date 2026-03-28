@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Keypair generator.
+ * Keypair Generator.
  *
  * @author Lijun Liao (xipki)
  */

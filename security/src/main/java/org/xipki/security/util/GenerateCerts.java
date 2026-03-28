@@ -58,7 +58,7 @@ import java.util.*;
 import static org.xipki.util.codec.Args.notEmpty;
 
 /**
- * Generate keypairs and certificates.
+ * Generate Certs.
  *
  * @author Lijun Liao (xipki)
  */

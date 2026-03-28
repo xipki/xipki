@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.security.cert.X509Certificate;
 
 /**
- * HTTP request.
+ * Xi Http Request interface.
  *
  * @author Lijun Liao (xipki)
  */

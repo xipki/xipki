@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Similar as {@link Properties}, with the extension to use the place-holder
+ * Configurable Properties.
  * ${env:ENVIROMENT-NAME} for the environment, and ${sys:JAVA-PROPERTY-NAME}
  * for the Java system property.
  *

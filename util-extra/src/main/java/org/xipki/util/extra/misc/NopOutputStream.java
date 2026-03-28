@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * XiPKI component.
+ * Nop Output Stream.
  *
  * @author Lijun Liao (xipki)
  */

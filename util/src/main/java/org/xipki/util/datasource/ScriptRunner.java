@@ -41,7 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Tool to run database scripts.
+ * Script Runner.
  * @author Apach project iBATIS
  * @author Benoit Duffez
  * @author Lijun Liao (xipki)

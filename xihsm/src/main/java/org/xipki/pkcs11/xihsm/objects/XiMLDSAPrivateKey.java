@@ -26,7 +26,7 @@ import java.security.Signature;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Xi MLDSAPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

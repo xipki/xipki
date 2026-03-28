@@ -4,7 +4,7 @@
 package org.xipki.util.extra.http;
 
 /**
- * XiPKI's HTTP constants.
+ * Http Constants.
  *
  * @author Lijun Liao (xipki)
  */

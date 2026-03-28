@@ -20,7 +20,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_EC_POINT;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKK_EC;
 
 /**
- * XiPKI component.
+ * Xi Weierstrass ECPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

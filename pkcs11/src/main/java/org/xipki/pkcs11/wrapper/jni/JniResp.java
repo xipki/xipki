@@ -9,7 +9,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Exception;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Every Parameters-class implements this interface.
+ * Jni Resp.
  *
  * @author Lijun Liao (xipki)
  */
@@ -67,7 +67,7 @@ public abstract class JniResp {
   }
 
   /**
-   * Error response returned by the JNI peer.
+   * Jni Err Resp.
    *
    * @author Lijun Liao (xipki)
    */
@@ -103,7 +103,7 @@ public abstract class JniResp {
   }
 
   /**
-   * Response returned by the JNI peer, it contains content of a long.
+   * Jni Long Resp.
    *
    * @author Lijun Liao (xipki)
    */
@@ -135,7 +135,7 @@ public abstract class JniResp {
   }
 
   /**
-   * Response returned by the JNI peer, it contains empty content.
+   * Jni Simple Resp.
    *
    * @author Lijun Liao (xipki)
    */

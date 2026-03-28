@@ -18,6 +18,7 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.CaConfStore;
 import org.xipki.ca.server.CaIdNameMap;
@@ -57,10 +58,13 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -73,7 +77,7 @@ import static org.xipki.security.exception.ErrorCode.NOT_PERMITTED;
 import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
- * CA cert store.
+ * DB Cert Store store definition.
  *
  * @author Lijun Liao (xipki)
  */
@@ -955,7 +959,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     Args.positive(numEntries, "numEntries");
 
     StringBuilder sb = new StringBuilder(200);
-    sb.append("SN,NBEFORE,NAFTER,SUBJECT FROM CERT WHERE CA_ID=?");
+    sb.append("SN,NBEFORE,NAFTER,SUBJECT,REV,RT,RIT,RR FROM CERT WHERE CA_ID=?");
 
     List<SqlColumn2> params = new ArrayList<>(4);
     params.add(col2Int(ca.id()));
@@ -1017,7 +1021,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     for (ResultRow rs : rows) {
       CertListInfo info = new CertListInfo(new BigInteger(rs.getString("SN"), 16),
           rs.getString("SUBJECT"), Instant.ofEpochSecond(rs.getLong("NBEFORE")),
-          Instant.ofEpochSecond(rs.getLong("NAFTER")));
+          Instant.ofEpochSecond(rs.getLong("NAFTER")), buildCertRevInfo(rs));
       ret.add(info);
     }
     return ret;
@@ -1269,6 +1273,267 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
         throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
       }
+    }
+  }
+
+  @Override
+  public CertStatistics getCertStatistics(
+      String from, String to, boolean revokedOnly, CaIdNameMap idNameMap,
+      NameId[] caIds, NameId[] profileIds, NameId[] requestorIds)
+      throws DataAccessException, CaMgmtException {
+    if (from == null ^ to == null) {
+      throw new CaMgmtException("from and to shall be both present or both absent");
+    }
+
+    int fromYear;
+    int fromMonth;
+    int toYear;
+    int toMonth;
+
+    OffsetDateTime now = OffsetDateTime.now();
+    ZoneOffset zoneOffset = now.getOffset();
+
+    if (from != null) {
+      fromYear  = Integer.parseInt(from.substring(0, 4));
+      fromMonth = Integer.parseInt(from.substring(4, 6));
+      toYear    = Integer.parseInt(to.substring(0, 4));
+      toMonth   = Integer.parseInt(to.substring(4, 6));
+      int numMonths = toYear * 12 + toMonth - fromYear * 12 - fromMonth;
+      if (numMonths < 0) {
+        throw new CaMgmtException("from (" + from +
+            ") shall not be after to (" + to + ").");
+      }
+    } else {
+      toYear = now.getYear();
+      toMonth = now.getMonthValue();
+
+      fromYear = now.getYear() - 1;
+      fromMonth = now.getMonthValue() + 1;
+      if (fromMonth > 12) {
+        fromMonth = 1;
+        fromYear += 1;
+      }
+    }
+
+    CertStatistics.YearMonth from1 = new CertStatistics.YearMonth(fromYear, fromMonth);
+    CertStatistics.YearMonth to1 = new CertStatistics.YearMonth(toYear, toMonth);
+
+    if ((caIds != null && caIds.length == 0)
+        || (profileIds != null && profileIds.length == 0)
+        || (requestorIds != null && requestorIds.length == 0)) {
+      return new CertStatistics(from1, to1, new CertStatistics.Summary(), new ArrayList<>());
+    }
+
+    Connection conn = datasource.getConnection();
+    try {
+      // Summary by CAs
+      CertStatistics.Summary summary = getSummary(conn, revokedOnly, zoneOffset,
+          fromYear, fromMonth, toYear, toMonth, idNameMap, caIds, profileIds, requestorIds);
+
+      // Details
+      String criteria = buildStaticsCriteria(
+          revokedOnly, caIds, profileIds, requestorIds);
+      List<CertStatistics.ByYear> certsData =
+          getCertsData(zoneOffset, fromYear, fromMonth, toYear, toMonth, criteria);
+      return new CertStatistics(from1, to1, summary, certsData);
+    } finally {
+      datasource.returnConnection(conn);
+    }
+  }
+
+  private static String buildStaticsCriteria(
+      boolean revokedOnly, NameId[] caIds, NameId[] profileIds, NameId[] requestorIds,
+      ZoneOffset offset, int fromYear, int fromMonth, int toYear, int toMonth) {
+    String criteria = buildStaticsCriteria0(revokedOnly, caIds, profileIds, requestorIds);
+    if (!criteria.isEmpty()) {
+      criteria += " AND ";
+    }
+
+    OffsetDateTime start = toOffsetDateTime(fromYear, fromMonth, offset);
+    OffsetDateTime end = (toMonth == 12)
+        ? toOffsetDateTime(toYear + 1, 1, offset)
+        : toOffsetDateTime(toYear, toMonth + 1, offset);
+
+    criteria += "NBEFORE>" + (start.toEpochSecond() - 1) +
+        " AND NBEFORE<" + (end.toEpochSecond() + 1);
+    return criteria;
+  }
+
+  private static String buildStaticsCriteria(
+      boolean revokedOnly, NameId[] caIds, NameId[] profileIds, NameId[] requestorIds) {
+    String criteria = buildStaticsCriteria0(revokedOnly, caIds, profileIds, requestorIds);
+    if (!criteria.isEmpty()) {
+      criteria += " AND ";
+    }
+
+    criteria += "NBEFORE>? AND NBEFORE<?";
+    return criteria;
+  }
+
+  private static String buildStaticsCriteria0(
+      boolean revokedOnly, NameId[] caIds, NameId[] profileIds, NameId[] requestorIds) {
+    List<String> singleCriterias = new ArrayList<>(4);
+    if (caIds != null) {
+      singleCriterias.add(buildStaticsCriteria("CA_ID", caIds));
+    }
+
+    if (profileIds != null) {
+      singleCriterias.add(buildStaticsCriteria("PID", profileIds));
+    }
+
+    if (requestorIds != null) {
+      singleCriterias.add(buildStaticsCriteria("RID", requestorIds));
+    }
+
+    if (revokedOnly) {
+      singleCriterias.add("REV=1");
+    }
+
+    String criteria = "";
+    if (!singleCriterias.isEmpty()) {
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < singleCriterias.size(); i++) {
+        if (i > 0) {
+          sb.append(" AND ");
+        }
+        sb.append(singleCriterias.get(i));
+      }
+      criteria = sb.toString();
+    }
+
+    return criteria;
+  }
+
+  private static String buildStaticsCriteria(String name, NameId[] nameIds) {
+    StringBuilder sb = new StringBuilder();
+    if (nameIds.length == 1) {
+      sb.append(name).append("=").append(nameIds[0].id());
+    } else {
+      sb.append(name).append(" IN (");
+      for (int i = 0; i < nameIds.length; i++) {
+        if (i != 0) {
+          sb.append(",");
+        }
+        sb.append(nameIds[i].id());
+      }
+      sb.append(")");
+    }
+    return sb.toString();
+  }
+
+  private List<CertStatistics.ByYear> getCertsData(
+      ZoneOffset zoneOffset, int fromYear, int fromMonth, int toYear, int toMonth, String criteria)
+      throws DataAccessException {
+    final String sql = "SELECT COUNT(*) FROM CERT WHERE " + criteria;
+
+    PreparedStatement ps = datasource.prepareStatement(sql);
+    try {
+      int numYears = toYear - fromYear + 1;
+      List<CertStatistics.ByYear> byYears = new ArrayList<>(numYears);
+
+      for (int year = fromYear; year <= toYear; year++) {
+        List<CertStatistics.ByMonth> months = new ArrayList<>(12);
+
+        int fMonth = (year == fromYear) ? fromMonth : 1;
+        int eMonth = (year < toYear)    ? 12 : toMonth;
+
+        for (int m = fMonth; m <= eMonth; m++) {
+          OffsetDateTime from = toOffsetDateTime(year, m, zoneOffset);
+          OffsetDateTime to = (m == 12)
+              ? toOffsetDateTime(year + 1, 1, zoneOffset)
+              : toOffsetDateTime(year, m + 1, zoneOffset);
+          int numCerts = getNumCerts(ps, from, to);
+          months.add(new CertStatistics.ByMonth(m, numCerts));
+        }
+
+        int totoal = 0;
+        for (CertStatistics.ByMonth month : months) {
+          totoal += month.getTotal();
+        }
+
+        byYears.add(new CertStatistics.ByYear(year, totoal, months));
+      }
+
+      return byYears;
+    } catch (SQLException ex) {
+      throw datasource.translate(sql, ex);
+    } finally {
+      datasource.releaseResources(ps, null, false);
+    }
+  }
+
+  private static OffsetDateTime toOffsetDateTime(
+      int year, int month, ZoneOffset zoneOffset) {
+    return OffsetDateTime.of(year, month, 1, 0, 0, 0, 0, zoneOffset);
+  }
+
+  private CertStatistics.Summary getSummary(
+      Connection conn, boolean revokedOnly, ZoneOffset zoneOffset,
+      int fromYear, int fromMonth, int toYear, int toMonth,
+      CaIdNameMap idNameMap, NameId[] caIds, NameId[] profileIds, NameId[] requestorIds)
+      throws DataAccessException {
+    CertStatistics.Summary summary = new CertStatistics.Summary();
+    NameId[] tCaIds = caIds;
+    if (caIds == null) {
+      tCaIds = idNameMap.getAllCas();
+    }
+
+    Map<String, Integer> summaryByCa = new HashMap<>();
+    for (NameId m : tCaIds) {
+      String criteria = buildStaticsCriteria(revokedOnly,
+          new NameId[] {m}, profileIds, requestorIds,
+          zoneOffset, fromYear, fromMonth, toYear, toMonth);
+      int count = datasource.getCount(conn, "CERT", criteria);
+      summaryByCa.put(m.name(), count);
+    }
+    summary.setByCa(summaryByCa);
+
+    // Summary by Profiles
+    NameId[] tProfileIds = profileIds;
+    if (profileIds == null) {
+      tProfileIds = idNameMap.getAllProfiles();
+    }
+
+    Map<String, Integer> summaryByProfile = new HashMap<>();
+    for (NameId m : tProfileIds) {
+      String criteria = buildStaticsCriteria(revokedOnly,
+          caIds, new NameId[]{m}, requestorIds,
+          zoneOffset, fromYear, fromMonth, toYear, toMonth);
+      int count = datasource.getCount(conn, "CERT", criteria);
+      summaryByProfile.put(m.name(), count);
+    }
+    summary.setByProfile(summaryByProfile);
+
+    // Summary by Profiles
+    NameId[] tRequestorIds = requestorIds;
+    if (requestorIds == null) {
+      tRequestorIds = idNameMap.getAllRequestors();
+    }
+
+    Map<String, Integer> summaryByRequestor = new HashMap<>();
+    for (NameId m : tRequestorIds) {
+      String criteria = buildStaticsCriteria(revokedOnly,
+          caIds, profileIds, new NameId[]{m},
+          zoneOffset, fromYear, fromMonth, toYear, toMonth);
+      int count = datasource.getCount(conn, "CERT", criteria);
+      summaryByRequestor.put(m.name(), count);
+    }
+    summary.setByRequestor(summaryByRequestor);
+
+    return summary;
+  }
+
+  private int getNumCerts(PreparedStatement ps, OffsetDateTime from, OffsetDateTime to)
+      throws SQLException {
+    ps.setLong(1, from.toEpochSecond() - 1);
+    ps.setLong(2, to.toEpochSecond() + 1);
+    ResultSet rs = null;
+    try {
+      rs = ps.executeQuery();
+      rs.next();
+      return rs.getInt(1);
+    } finally {
+      datasource.releaseResources(null, rs);
     }
   }
 

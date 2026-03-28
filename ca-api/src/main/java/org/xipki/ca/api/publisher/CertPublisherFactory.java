@@ -8,7 +8,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * CertPublisher factory interface.
+ * Cert Publisher Factory interface.
  *
  * @author Lijun Liao (xipki)
  */

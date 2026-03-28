@@ -8,7 +8,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.io.FileOrBinary;
 
 /**
- * Keystore configuration.
+ * Keystore Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Codec map.
+ * Json Map.
  *
  * @author Lijun Liao (xipki)
  */

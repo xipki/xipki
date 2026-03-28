@@ -13,6 +13,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Get Cert Request request payload.
  */
 
 public class GetCertRequest extends SdkRequest {

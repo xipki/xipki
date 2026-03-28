@@ -9,7 +9,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 /**
- * PKCS#11 key
+ * PKCS11 Key.
  *
  * @author Lijun Liao (xipki)
  */

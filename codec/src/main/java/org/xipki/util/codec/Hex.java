@@ -4,7 +4,7 @@
 package org.xipki.util.codec;
 
 /**
- * HEX encoder and decoder.
+ * Hex.
  *
  * @author Lijun Liao (xipki)
  *

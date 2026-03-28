@@ -43,7 +43,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * SCEP PKI-Message.
+ * Pki Message.
  *
  * @author Lijun Liao (xipki)
  */

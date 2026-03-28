@@ -21,7 +21,6 @@ import org.bouncycastle.cert.ocsp.CertificateID;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.SingleResp;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.HashAlgo;
@@ -60,7 +59,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Abstract class of OCSP requestor.
+ * Abstract OCSP Requestor.
  *
  * @author Lijun Liao (xipki)
  */
@@ -168,7 +167,6 @@ public abstract class AbstractOcspRequestor implements OcspRequestor {
     }
   }
 
-  @Deactivate
   public void close() {
   }
 

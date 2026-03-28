@@ -26,7 +26,7 @@ import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
 
 /**
- * XiPKI component.
+ * Xi Edwards ECPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

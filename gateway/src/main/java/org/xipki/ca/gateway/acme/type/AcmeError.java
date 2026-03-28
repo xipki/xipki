@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.acme.type;
 
 /**
- * ACME Error.
+ * ACME Error enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -6,7 +6,7 @@ package org.xipki.util.datasource;
 import org.xipki.util.codec.Args;
 
 /**
- * Database type.
+ * Database Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

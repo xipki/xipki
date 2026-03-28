@@ -5,7 +5,7 @@ package org.xipki.util.codec;
 import java.util.Arrays;
 
 /**
- * This class is based on the Base64 implemented by Mikael Grev, and licensed
+ * Base64.
  * under BSD.
  */
 
@@ -261,7 +261,7 @@ public abstract class Base64 {
   }
 
   /**
-   * Decodes a BASE64 / BASE&$-URL encoded <code>String</code>. All illegal characters will be
+   * Decodes a BASE64 / BASE64-URL encoded <code>String</code>. All illegal characters will be
    * ignored and can handle both strings with and without line separators.<br>
    * <b>Note!</b> It can be up to about 2x the speed to call
    * <code>decode(str.toCharArray())</code> instead. That will create a temporary array though.

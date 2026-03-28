@@ -43,7 +43,7 @@ import java.time.Instant;
 import java.util.Iterator;
 
 /**
- * Both BouncyCastle and JDK read the whole CRL during the initialization. The
+ * Crl Stream Parser.
  * size of the consumed memory is linear to the size of CRL. This may cause
  * that OutOfMemory error for large CRLs.
  *
@@ -80,6 +80,11 @@ import java.util.Iterator;
  */
 public class CrlStreamParser extends Asn1StreamParser {
 
+  /**
+   * Revoked Cert certificate record.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RevokedCert {
 
     private final BigInteger serialNumber;
@@ -135,6 +140,11 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   } // class RevokedCert
 
+  /**
+   * Revoked Certs Iterator iterator.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public class RevokedCertsIterator implements Iterator<RevokedCert>, Closeable {
 
     private BufferedInputStream instream;

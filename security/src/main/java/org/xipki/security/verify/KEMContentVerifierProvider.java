@@ -28,7 +28,7 @@ import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
- * {@link ContentVerifierProvider} for the signature algorithm ML-KEM-MAC.
+ * KEMContent Verifier Provider.
  *
  * @author Lijun Liao (xipki)
  */

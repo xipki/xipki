@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * CA_HASH_PROFILE profile name and aliases.
+ * CA Profile Entry entry.
  *
  * @author Lijun Liao (xipki)
  */

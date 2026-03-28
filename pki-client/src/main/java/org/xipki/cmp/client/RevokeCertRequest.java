@@ -13,13 +13,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * CMP request to revoke certificates.
+ * Revoke Cert Request request payload.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class RevokeCertRequest {
 
+  /**
+   * Entry entry.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Entry extends UnsuspendCertRequest.Entry {
 
     private final int reason;

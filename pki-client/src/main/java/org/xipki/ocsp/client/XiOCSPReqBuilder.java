@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * OCSP Request builder.
+ * Xi OCSPReq Builder.
  *
  * @author Lijun Liao (xipki)
  */

@@ -10,7 +10,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Factory to create {@link ConcurrentSigner}.
+ * Signer Factory interface.
  *
  * @author Lijun Liao (xipki)
  */

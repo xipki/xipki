@@ -6,7 +6,7 @@ package org.xipki.util.extra.type;
 import org.xipki.util.codec.Args;
 
 /**
- * Range with optional min and max values.
+ * Range.
  *
  * @author Lijun Liao (xipki)
  */

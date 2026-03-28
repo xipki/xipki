@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 
 /**
- * XiPKI component.
+ * Multi Part Operation.
  *
  * @author Lijun Liao (xipki)
  */

@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server.type;
 
 /**
- * Encoding exception.
+ * Encoding Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

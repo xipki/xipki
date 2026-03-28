@@ -6,7 +6,7 @@ package org.xipki.util.codec;
 import java.util.Map;
 
 /**
- * Variable resolver.
+ * Variable Resolver interface.
  *
  * @author Lijun Liao (xipki)
  */

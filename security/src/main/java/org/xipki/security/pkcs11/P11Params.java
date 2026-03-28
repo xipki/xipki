@@ -16,7 +16,7 @@ import org.xipki.security.HashAlgo;
 
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 /**
- * PKCS#11 params.
+ * P11 Params.
  *
  * @author Lijun Liao (xipki)
  */
@@ -31,6 +31,11 @@ public abstract class  P11Params {
     return mech;
   }
 
+  /**
+   * P11 Byte Array Params.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11ByteArrayParams extends P11Params {
 
     private final byte[] bytes;
@@ -97,6 +102,11 @@ public abstract class  P11Params {
 
   }
 
+  /**
+   * P11 RSAPkcs Pss Params.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11RSAPkcsPssParams extends P11RSAPkcsPssOrOaepParams {
 
     private final int saltLength;
@@ -113,6 +123,11 @@ public abstract class  P11Params {
 
   }
 
+  /**
+   * P11 RSAPkcs Oaep Params.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11RSAPkcsOaepParams extends P11RSAPkcsPssOrOaepParams {
 
     private final long source;
@@ -132,6 +147,11 @@ public abstract class  P11Params {
 
   }
 
+  /**
+   * P11 Eddsa Params.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11EddsaParams extends P11Params {
 
     private final boolean prehash;
@@ -150,6 +170,11 @@ public abstract class  P11Params {
 
   }
 
+  /**
+   * P11 Sign Additional Context.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11SignAdditionalContext extends P11Params {
 
     private final long hedgeVariant;
@@ -172,6 +197,11 @@ public abstract class  P11Params {
 
   }
 
+  /**
+   * P11 Ecdh1 Derive Params.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class P11Ecdh1DeriveParams extends P11Params {
 
     private final long kdf;

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * JDBC state codes for a particular database. It is the first two digits
+ * Sql State Codes.
  * (the SQL state "class").
  *
  * @author Lijun Liao (xipki)

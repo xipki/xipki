@@ -4,7 +4,7 @@
 package org.xipki.ca.sdk;
 
 /**
- * REST API constants.
+ * Sdk Constants.
  *
  * @author Lijun Liao (xipki)
  */

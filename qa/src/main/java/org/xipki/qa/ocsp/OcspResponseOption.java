@@ -9,7 +9,7 @@ import org.xipki.security.pkix.X509Cert;
 import org.xipki.util.codec.TripleState;
 
 /**
- * OCSP response option.
+ * OCSP Response Option options.
  *
  * @author Lijun Liao (xipki)
  */

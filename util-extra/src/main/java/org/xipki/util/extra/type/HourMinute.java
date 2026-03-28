@@ -7,7 +7,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Specifies hour:minute.
+ * Hour Minute.
  *
  * @author Lijun Liao (xipki)
  */

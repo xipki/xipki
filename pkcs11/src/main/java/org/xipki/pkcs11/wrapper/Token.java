@@ -19,7 +19,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKF_RW_SESSION;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKF_SERIAL_SESSION;
 
 /**
- * Objects of this class represent PKCS#11 tokens.
+ * Token.
  *
  * @author Lijun Liao (xipki)
  */

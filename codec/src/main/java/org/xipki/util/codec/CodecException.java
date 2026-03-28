@@ -7,6 +7,7 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Codec Exception exception type.
  */
 public class CodecException extends Exception {
 
@@ -22,6 +23,11 @@ public class CodecException extends Exception {
     super(message, cause);
   }
 
+  /**
+   * Codec IOException exception type.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class CodecIOException extends CodecException {
 
     public CodecIOException(String message) {
@@ -38,7 +44,7 @@ public class CodecException extends Exception {
   }
 
   /**
-   * An exception thrown when parser encounters duplicated JSON object keys.
+   * Duplicated Key Exception exception type.
    */
   public static final class DuplicatedKeyException extends CodecException {
 
@@ -61,7 +67,7 @@ public class CodecException extends Exception {
   }
 
   /**
-   * An exception thrown when parser encounters malformed JSON syntax.
+   * Unexpected Char Exception exception type.
    */
   public static final class UnexpectedCharException extends CodecException {
 

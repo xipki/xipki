@@ -20,7 +20,7 @@ import org.xipki.util.misc.StringUtil;
 import java.io.IOException;
 
 /**
- * Configure extension with given (constant) extension value.
+ * Constant Extn Value.
  * @author Lijun Liao (xipki)
  */
 public class ConstantExtnValue implements JsonEncodable {
@@ -80,6 +80,11 @@ public class ConstantExtnValue implements JsonEncodable {
         json.getNnString("value"));
   }
 
+  /**
+   * Type enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum Type {
     ASN1,
     OCTETSTRING,

@@ -27,7 +27,7 @@ import org.xipki.util.extra.misc.RandomUtil;
 import java.time.Clock;
 
 /**
- * Speed test of PKCS#11 signature creation.
+ * P11 Sign Speed.
  *
  * @author Lijun Liao (xipki)
  */

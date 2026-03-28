@@ -23,7 +23,7 @@ import org.xipki.util.io.IoUtil;
 import java.io.IOException;
 
 /**
- * REST servlet.
+ * Rest Http Servlet.
  *
  * @author Lijun Liao (xipki)
  */

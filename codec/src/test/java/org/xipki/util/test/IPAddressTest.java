@@ -8,8 +8,6 @@ import org.xipki.util.codec.Hex;
 import org.xipki.util.codec.ipadress.IPAddress;
 import org.xipki.util.codec.ipadress.IPAddressFamily;
 
-import static java.awt.SystemColor.text;
-
 /**
  * @author Lijun Liao (xipki)
  */

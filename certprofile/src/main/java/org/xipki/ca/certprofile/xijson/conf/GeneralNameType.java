@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Configuration of GeneralName.
+ * General Name Type type definition.
  *
  * @author Lijun Liao (xipki)
  *

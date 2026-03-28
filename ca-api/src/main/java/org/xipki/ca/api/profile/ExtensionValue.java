@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.xipki.util.codec.Args;
 
 /**
- * Extension value control.
+ * Extension Value.
  *
  * @author Lijun Liao (xipki)
  */

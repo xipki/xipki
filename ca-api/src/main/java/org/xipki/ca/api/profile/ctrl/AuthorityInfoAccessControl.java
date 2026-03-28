@@ -4,7 +4,7 @@
 package org.xipki.ca.api.profile.ctrl;
 
 /**
- * XiPKI component.
+ * Authority Info Access Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

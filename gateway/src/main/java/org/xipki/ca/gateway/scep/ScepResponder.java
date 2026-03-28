@@ -22,9 +22,9 @@ import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
@@ -81,7 +81,7 @@ import static org.xipki.security.exception.ErrorCode.PATH_NOT_FOUND;
 import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
- * SCEP responder.
+ * SCEP Responder.
  *
  * @author Lijun Liao (xipki)
  */

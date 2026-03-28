@@ -11,11 +11,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CRLHolder;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.cmp.client.*;
@@ -42,21 +37,25 @@ import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Implementation of the interface {@link CmpClient}.
+ * CMP Client Impl.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = CmpClient.class, immediate = true,
-    configurationPid = "org.xipki.pki.client")
 public final class CmpClientImpl implements CmpClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(CmpClientImpl.class);
 
-  @Reference
   private SecurityFactory securityFactory;
 
   private CmpAgent agent;
@@ -70,26 +69,6 @@ public final class CmpClientImpl implements CmpClient {
   private final AtomicBoolean initSucc = new AtomicBoolean(false);
 
   public CmpClientImpl() {
-  }
-
-  @Activate
-  public void activate(ComponentContext context) {
-    Dictionary<String, Object> properties = context.getProperties();
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      Object value = properties.get(key);
-      if (!(value instanceof String)) {
-        continue;
-      }
-
-      String sValue = (String) value;
-      if (key.equals("confFile")) {
-        setConfFile(sValue);
-      }
-    }
-
-    init();
   }
 
   public void setSecurityFactory(SecurityFactory securityFactory) {
@@ -205,7 +184,6 @@ public final class CmpClientImpl implements CmpClient {
     return conf;
   }
 
-  @Deactivate
   @Override
   public void close() {
   }

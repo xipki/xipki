@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.xijsonv1.conf.type;
 
 /**
- * XiPKI component.
+ * V1 String Type enumeration.
  *
  * @author Lijun Liao (xipki)
  */

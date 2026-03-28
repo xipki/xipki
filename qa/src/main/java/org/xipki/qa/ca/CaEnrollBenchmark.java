@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * CA enrollment benchmark.
+ * CA Enroll Benchmark.
  *
  * @author Lijun Liao (xipki)
  */

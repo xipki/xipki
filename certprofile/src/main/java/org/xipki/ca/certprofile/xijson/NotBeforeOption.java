@@ -11,7 +11,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Control of the certificate's NotBefore field.
+ * Not Before Option options.
  *
  * @author Lijun Liao (xipki)
  */

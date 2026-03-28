@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.acme;
 
 /**
- * ACME component.
+ * ACME Constants.
  *
  * @author Lijun Liao (xipki)
  */

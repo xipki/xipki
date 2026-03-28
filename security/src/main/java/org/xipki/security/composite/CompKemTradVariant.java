@@ -6,7 +6,7 @@ package org.xipki.security.composite;
 import org.xipki.security.KeySpec;
 
 /**
- * XiPKI component.
+ * Comp Kem Trad Variant enumeration.
  *
  * @author Lijun Liao (xipki)
  */

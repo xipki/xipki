@@ -11,7 +11,7 @@ import org.xipki.pkcs11.wrapper.PKCS11T;
 import java.util.Arrays;
 
 /**
- * Parent class of all CK objects needed to be encoded.
+ * Ck Type type definition.
  * @author Lijun Liao (xipki)
  */
 public abstract class CkType {

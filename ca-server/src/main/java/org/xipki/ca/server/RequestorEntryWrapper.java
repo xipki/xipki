@@ -15,7 +15,7 @@ import org.xipki.util.misc.StringUtil;
 import java.security.cert.CertificateException;
 
 /**
- * Wrapper of requestor database entry.
+ * Requestor Entry Wrapper.
  *
  * @author Lijun Liao (xipki)
  */

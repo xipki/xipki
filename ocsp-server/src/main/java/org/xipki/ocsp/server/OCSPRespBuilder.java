@@ -22,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Generator for OCSP response objects.
+ * OCSPResp Builder.
  *
  * @author Lijun Liao (xipki)
  */

@@ -23,7 +23,7 @@ import org.xipki.util.extra.misc.RandomUtil;
 import java.security.SecureRandom;
 
 /**
- * Speed test of PKCS#12 signature creation.
+ * P12 Sign Speed.
  *
  * @author Lijun Liao (xipki)
  */

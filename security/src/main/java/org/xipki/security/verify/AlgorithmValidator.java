@@ -7,7 +7,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.xipki.security.SignAlgo;
 
 /**
- * Interface to check whether given algorithm is permitted.
+ * Algorithm Validator interface.
  *
  * @author Lijun Liao (xipki)
  */

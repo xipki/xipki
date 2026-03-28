@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * An implementation of {@link Curl}.
+ * Default Curl.
  *
  * @author Lijun Liao (xipki)
  */

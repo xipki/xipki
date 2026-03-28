@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper;
 
 /**
- * PKCS#11 constants category enumerations.
+ * Category enumeration.
  *
  * @author Lijun Liao (xipki)
  */

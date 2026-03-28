@@ -12,7 +12,7 @@ import org.xipki.pkcs11.wrapper.PKCS11Module;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_RSA_PKCS_PSS_PARAMS.
+ * RSA PKCS PSS PARAMS.
  *
  * <pre>
  * typedef struct CK_RSA_PKCS_PSS_PARAMS {

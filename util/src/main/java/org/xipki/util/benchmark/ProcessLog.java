@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * Process Logger.
+ * Process Log.
  *
  * @author Lijun Liao (xipki)
  */

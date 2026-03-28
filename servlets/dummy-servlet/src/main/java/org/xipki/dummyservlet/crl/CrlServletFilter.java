@@ -8,7 +8,7 @@ import org.xipki.servlet.ServletFilter;
 import org.xipki.util.extra.http.XiHttpFilter;
 
 /**
- * Dummy CRL ServletFilter.
+ * Crl Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

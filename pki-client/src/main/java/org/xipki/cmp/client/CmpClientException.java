@@ -4,7 +4,7 @@
 package org.xipki.cmp.client;
 
 /**
- * CMP client exception.
+ * CMP Client Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

@@ -26,7 +26,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * X509CA revoker module.
+ * X509 Remover Module.
  *
  * @author Lijun Liao (xipki)
  */

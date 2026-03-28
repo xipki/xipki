@@ -12,7 +12,7 @@ import org.xipki.util.codec.Args;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Represents the CK_GCM_PARAMS.
+ * GCM PARAMS.
  * <pre>
  * typedef struct CK_GCM_PARAMS {
  *    CK_BYTE_PTR   pIv;

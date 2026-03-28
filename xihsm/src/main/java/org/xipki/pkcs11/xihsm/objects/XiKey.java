@@ -24,7 +24,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_LOCAL;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKA_START_DATE;
 
 /**
- * XiPKI component.
+ * Xi Key.
  *
  * @author Lijun Liao (xipki)
  */

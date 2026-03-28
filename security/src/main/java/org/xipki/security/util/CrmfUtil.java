@@ -30,7 +30,7 @@ import java.security.spec.ECParameterSpec;
 import java.util.Arrays;
 
 /**
- * Legacy CMP CRMF utility class.
+ * Crmf Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * CertProfile with identifier.
+ * Identified certificate profile definition.
  *
  * @author Lijun Liao (xipki)
  */

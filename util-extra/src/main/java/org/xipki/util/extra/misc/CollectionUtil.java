@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Utility class for operations on {@link Collection}, {@link Set},
+ * Collection Util.
  * {@link List}, {@link Map}, and arrays.
  *
  * @author Lijun Liao (xipki)

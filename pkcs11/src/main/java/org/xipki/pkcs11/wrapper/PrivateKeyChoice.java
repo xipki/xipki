@@ -7,7 +7,7 @@ import org.xipki.util.codec.Args;
 import java.security.PrivateKey;
 
 /**
- * XiPKI component.
+ * Private Key Choice.
  *
  * @author Lijun Liao (xipki)
  */

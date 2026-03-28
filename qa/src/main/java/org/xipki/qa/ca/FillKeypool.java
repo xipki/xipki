@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
- * Fill the keypool with keypairs.
+ * Fill Keypool.
  *
  * @author Lijun Liao (xipki)
  */

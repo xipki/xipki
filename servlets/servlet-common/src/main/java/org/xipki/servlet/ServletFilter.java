@@ -18,7 +18,7 @@ import org.xipki.util.extra.http.XiHttpFilter;
 import java.io.IOException;
 
 /**
- * Filter.
+ * Servlet Filter.
  *
  * @author Lijun Liao (xipki)
  */

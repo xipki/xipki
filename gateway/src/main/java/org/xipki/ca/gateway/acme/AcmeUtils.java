@@ -19,8 +19,8 @@ import org.xipki.util.codec.Base64;
 import org.xipki.util.extra.http.HttpStatusCode;
 import org.xipki.util.extra.misc.DateUtil;
 
-import java.net.IDN;
 import java.math.BigInteger;
+import java.net.IDN;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;

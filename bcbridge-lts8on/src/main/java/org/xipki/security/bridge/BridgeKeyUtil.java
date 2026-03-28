@@ -43,7 +43,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * Bridge Key Util.
  *
  * @author Lijun Liao (xipki)
  */

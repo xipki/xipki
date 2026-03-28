@@ -38,6 +38,11 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKM_ML_KEM;
 @RunWith(Enclosed.class)
 public class MlkemEncapDecapKeyTest {
 
+  /**
+   * Nested class Cloudhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Cloudhsm extends Base {
 
     @Override
@@ -47,6 +52,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class CloudhsmVendorGcm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CloudhsmVendorGcm extends Base {
 
     @Override
@@ -56,6 +66,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Luna.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Luna extends Base {
 
     @Override
@@ -65,6 +80,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Ncipher.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Ncipher extends Base {
 
     @Override
@@ -74,6 +94,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Sansec.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Sansec extends Base {
 
     @Override
@@ -83,6 +108,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Tass.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Tass extends Base {
 
     @Override
@@ -92,6 +122,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Softhsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Softhsm extends Base {
 
     @Override
@@ -101,6 +136,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Utimaco.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Utimaco extends Base {
 
     @Override
@@ -110,6 +150,11 @@ public class MlkemEncapDecapKeyTest {
 
   }
 
+  /**
+   * Nested class Xihsm.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Xihsm extends Base {
 
     @Override

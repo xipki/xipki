@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
- * Register of CertPublisherFacotries.
+ * Cert Publisher Factory Register.
  *
  * @author Lijun Liao (xipki)
  */

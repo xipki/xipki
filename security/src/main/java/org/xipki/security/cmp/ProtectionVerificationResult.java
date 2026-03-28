@@ -6,7 +6,7 @@ package org.xipki.security.cmp;
 import org.xipki.util.codec.Args;
 
 /**
- * Protection verification result with the requestor.
+ * Protection Verification Result result.
  *
  * @author Lijun Liao (xipki)
  */

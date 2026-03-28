@@ -112,7 +112,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Base CMP responder.
+ * Base CMP Responder.
  *
  * @author Lijun Liao (xipki)
  */

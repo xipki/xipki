@@ -8,13 +8,18 @@ import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * PEM encoder. For details please refer to RFC 7468.
+ * Pem Encoder.
  *
  * @author Lijun Liao (xipki)
  *
  */
 public class PemEncoder {
 
+  /**
+   * Pem Label enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum PemLabel {
     /**
      * RFC5280 Certificate.

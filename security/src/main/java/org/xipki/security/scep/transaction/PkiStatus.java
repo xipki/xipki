@@ -4,7 +4,7 @@
 package org.xipki.security.scep.transaction;
 
 /**
- * PKI status enum.
+ * Pki Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

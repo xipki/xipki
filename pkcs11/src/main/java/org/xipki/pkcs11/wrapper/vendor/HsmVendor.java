@@ -34,7 +34,7 @@ import static org.xipki.pkcs11.wrapper.PKCS11T.CKF_VERIFY;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKM_VENDOR_DEFINED;
 
 /**
- * XiPKI component.
+ * Hsm Vendor.
  *
  * @author Lijun Liao (xipki)
  */

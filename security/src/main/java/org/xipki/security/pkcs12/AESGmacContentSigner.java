@@ -26,7 +26,7 @@ import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 
 /**
- * AES GMAC signer.
+ * AESGmac Content Signer signer definition.
  * @author Lijun Liao (xipki)
  */
 public class AESGmacContentSigner implements Signer {

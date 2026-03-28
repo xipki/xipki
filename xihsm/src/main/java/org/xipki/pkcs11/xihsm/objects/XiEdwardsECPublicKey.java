@@ -17,7 +17,7 @@ import org.xipki.pkcs11.xihsm.util.ObjectInitMethod;
 import org.xipki.pkcs11.xihsm.util.Origin;
 
 /**
- * XiPKI component.
+ * Xi Edwards ECPublic Key.
  *
  * @author Lijun Liao (xipki)
  */

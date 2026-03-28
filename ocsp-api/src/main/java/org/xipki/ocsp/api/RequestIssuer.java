@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- * Issuer in the OCSP request.
+ * Request Issuer issuer definition.
  *
  * @author Lijun Liao (xipki)
  */

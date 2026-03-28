@@ -17,6 +17,7 @@ import java.util.List;
 /**
  *
  * @author Lijun Liao (xipki)
+ * CMP Protocol Conf configuration.
  */
 
 public class CmpProtocolConf extends GatewayConf.ProtocolConf {
@@ -76,7 +77,7 @@ public class CmpProtocolConf extends GatewayConf.ProtocolConf {
   }
 
   /**
-   * CMP control configuration.
+   * CMP Control Conf configuration.
    *
    * @author Lijun Liao (xipki)
    */

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension TlsFeature.
+ * V1 Tls Feature.
  *
  * @author Lijun Liao (xipki)
  */

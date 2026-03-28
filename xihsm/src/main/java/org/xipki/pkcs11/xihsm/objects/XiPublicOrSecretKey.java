@@ -5,7 +5,7 @@ package org.xipki.pkcs11.xihsm.objects;
 import org.xipki.pkcs11.xihsm.attr.XiTemplate;
 
 /**
- * XiPKI component.
+ * Xi Public Or Secret Key interface.
  *
  * @author Lijun Liao (xipki)
  */

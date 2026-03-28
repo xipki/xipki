@@ -68,7 +68,7 @@ import static org.xipki.ca.server.CaUtil.encodeCertchain;
 import static org.xipki.ca.server.CaUtil.parseCert;
 
 /**
- * Execute the database queries to manage CA system.
+ * DB CA Conf Store store definition.
  *
  * @author Lijun Liao (xipki)
  */

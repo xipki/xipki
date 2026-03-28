@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * Store Mgr Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -3,10 +3,6 @@
 
 package org.xipki.security.pkcs11;
 
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkcs11.wrapper.TokenException;
@@ -17,8 +13,6 @@ import org.xipki.util.misc.StringUtil;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +20,10 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * An implementation of {@link P11CryptServiceFactory}.
+ * P11 Crypt Service Factory Impl.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = P11CryptServiceFactory.class, immediate = true,
-    configurationPid = "org.xipki.security")
 public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
 
   private static final Logger LOG = LoggerFactory.getLogger(P11CryptServiceFactoryImpl.class);
@@ -47,24 +39,6 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
   private P11SystemConf pkcs11Conf;
 
   public P11CryptServiceFactoryImpl() {
-  }
-
-  @Activate
-  public void activate(ComponentContext context) {
-    Dictionary<String, Object> properties = context.getProperties();
-    Enumeration<String> keys = properties.keys();
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      Object value = properties.get(key);
-      if (!(value instanceof String)) {
-        continue;
-      }
-
-      String sValue = (String) value;
-      if (key.equals("pkcs11.confFile")) {
-        setPkcs11ConfFile(sValue);
-      }
-    }
   }
 
   public synchronized void init() throws InvalidConfException {
@@ -149,7 +123,6 @@ public class P11CryptServiceFactoryImpl implements P11CryptServiceFactory {
     this.pkcs11ConfFile = null;
   }
 
-  @Deactivate
   @Override
   public void close() {
     modules.clear();

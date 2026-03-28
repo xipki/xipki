@@ -23,7 +23,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 
 /**
- * {@link Signature}-based {@link ContentVerifierProvider}.
+ * Signature Content Verifier Provider.
  *
  * @author Lijun Liao (xipki)
  */

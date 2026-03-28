@@ -15,6 +15,7 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
+ * CA Identifier Request request payload.
  */
 public class CaIdentifierRequest extends SdkRequest{
 

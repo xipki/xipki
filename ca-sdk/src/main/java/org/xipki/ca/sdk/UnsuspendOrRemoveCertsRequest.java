@@ -13,6 +13,7 @@ import java.math.BigInteger;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Unsuspend Or Remove Certs Request request payload.
  */
 
 public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {

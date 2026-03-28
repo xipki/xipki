@@ -21,7 +21,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 
 /**
- * {@link Signature}-based {@link ContentVerifierProvider}.
+ * Composite MLDSAContent Verifier Provider.
  *
  * @author Lijun Liao (xipki)
  */

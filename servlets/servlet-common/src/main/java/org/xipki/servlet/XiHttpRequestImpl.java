@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.security.cert.X509Certificate;
 
 /**
- * HTTP request wrapper.
+ * Xi Http Request Impl.
  * @author Lijun Liao (xipki)
  */
 

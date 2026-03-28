@@ -24,10 +24,16 @@ import java.util.Set;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Gateway Conf configuration.
  */
 
 public class GatewayConf {
 
+  /**
+   * Supported Protocols.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class SupportedProtocols {
 
     private boolean acme;
@@ -195,6 +201,7 @@ public class GatewayConf {
   /**
    *
    * @author Lijun Liao (xipki)
+   * CA Name Signer Conf configuration.
    */
 
   public static class CaNameSignerConf {
@@ -227,6 +234,7 @@ public class GatewayConf {
   /**
    *
    * @author Lijun Liao (xipki)
+   * CA Name Signers Conf configuration.
    */
 
   public static class CaNameSignersConf {
@@ -266,7 +274,7 @@ public class GatewayConf {
   }
 
   /**
-   * Gateway's CA-Profile Map.
+   * CA Profile Conf configuration.
    *
    * @author Lijun Liao (xipki)
    */
@@ -304,7 +312,7 @@ public class GatewayConf {
   }
 
   /**
-   * Gateway's CA-Profiles.
+   * CA Profiles Control control settings.
    *
    * @author Lijun Liao (xipki)
    */
@@ -364,7 +372,7 @@ public class GatewayConf {
   }
 
   /**
-   * POP (proof-of-possession) control configuration.
+   * Pop Control Conf configuration.
    *
    * @author Lijun Liao (xipki)
    */
@@ -408,6 +416,7 @@ public class GatewayConf {
   /**
    *
    * @author Lijun Liao (xipki)
+   * Protocol Conf configuration.
    */
 
   public static class ProtocolConf {
@@ -450,6 +459,7 @@ public class GatewayConf {
   /**
    *
    * @author Lijun Liao (xipki)
+   * Signer Conf configuration.
    */
 
   public static class SignerConf {

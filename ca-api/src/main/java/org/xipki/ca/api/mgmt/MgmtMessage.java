@@ -8,7 +8,7 @@ import org.xipki.util.codec.json.JsonEncodable;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * CA Management message via the REST API.
+ * Mgmt Message.
  *
  * @author Lijun Liao (xipki)
  */

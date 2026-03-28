@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import java.time.Instant;
 
 /**
- * Certificate revocation information with serial number and database table id.
+ * Cert Rev Info With Serial.
  *
  * @author Lijun Liao (xipki)
  */

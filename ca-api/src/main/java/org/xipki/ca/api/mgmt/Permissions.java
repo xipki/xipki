@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Container of permissions.
+ * Permissions.
  *
  * @author Lijun Liao (xipki)
  */

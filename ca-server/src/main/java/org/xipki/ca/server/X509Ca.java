@@ -72,7 +72,7 @@ import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
 import static org.xipki.security.exception.ErrorCode.UNKNOWN_CERT_PROFILE;
 
 /**
- * X509CA.
+ * X509 CA.
  *
  * @author Lijun Liao (xipki)
  */

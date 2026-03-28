@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
 /**
- * Objects of this class provide information about a certain mechanism that a
+ * Ck Mechanism Info information.
  * token implements.
  * <pre>
  * typedef struct CK_MECHANISM_INFO {

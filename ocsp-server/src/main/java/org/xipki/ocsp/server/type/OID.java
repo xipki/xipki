@@ -10,7 +10,7 @@ import org.xipki.util.extra.misc.CompareUtil;
 import java.io.IOException;
 
 /**
- * OID enums.
+ * OID enumeration.
  *
  * @author Lijun Liao (xipki)
  */

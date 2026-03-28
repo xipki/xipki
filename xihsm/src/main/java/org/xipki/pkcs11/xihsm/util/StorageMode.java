@@ -3,7 +3,7 @@
 package org.xipki.pkcs11.xihsm.util;
 
 /**
- * XiPKI component.
+ * Storage Mode enumeration.
  *
  * @author Lijun Liao (xipki)
  */

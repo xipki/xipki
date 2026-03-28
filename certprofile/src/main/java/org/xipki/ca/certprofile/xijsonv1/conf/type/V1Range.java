@@ -8,7 +8,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.misc.StringUtil;
 
 /**
- * Range with optional min and max values.
+ * V1 Range.
  *
  * @author Lijun Liao (xipki)
  */

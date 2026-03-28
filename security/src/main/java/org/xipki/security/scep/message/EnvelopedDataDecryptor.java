@@ -21,13 +21,18 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * EnvelopedData decryptor.
+ * Enveloped Data Decryptor.
  *
  * @author Lijun Liao (xipki)
  */
 
 public final class EnvelopedDataDecryptor {
 
+  /**
+   * Enveloped Data Decryptor Instance.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class EnvelopedDataDecryptorInstance {
 
     private final RecipientId recipientId;

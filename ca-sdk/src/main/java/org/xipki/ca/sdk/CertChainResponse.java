@@ -9,7 +9,7 @@ import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
- * Response containing the certificate chain.
+ * Cert Chain Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

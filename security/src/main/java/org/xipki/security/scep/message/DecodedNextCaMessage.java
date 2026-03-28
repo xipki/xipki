@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Decoded {@link NextCaMessage}.
+ * Decoded Next CA Message.
  *
  * @author Lijun Liao (xipki)
  */

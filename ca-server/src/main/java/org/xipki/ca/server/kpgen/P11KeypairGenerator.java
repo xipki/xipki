@@ -18,7 +18,7 @@ import org.xipki.util.conf.ConfPairs;
 import java.io.IOException;
 
 /**
- * PKCS#11 {@link P11KeypairGenerator}.
+ * P11 Keypair Generator.
  *
  * @author Lijun Liao (xipki)
  */

@@ -77,7 +77,7 @@ import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
 import static org.xipki.security.exception.ErrorCode.SYSTEM_UNAVAILABLE;
 
 /**
- * X509CA CRL module.
+ * X509 Crl Module.
  *
  * @author Lijun Liao (xipki)
  */

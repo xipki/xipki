@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extension BiometricInfo.
+ * V1 Biometric Info information.
  *
  * @author Lijun Liao (xipki)
  */

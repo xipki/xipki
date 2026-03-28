@@ -22,7 +22,7 @@ import org.xipki.util.io.IoUtil;
 import java.io.IOException;
 
 /**
- * ACME servlet.
+ * ACME Http Servlet.
  *
  * @author Lijun Liao (xipki)
  */

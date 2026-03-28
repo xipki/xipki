@@ -7,13 +7,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Helper class for debug.
+ * Req Resp Debug.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class ReqRespDebug {
 
+  /**
+   * Req Resp Pair pair.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ReqRespPair {
 
     private byte[] request;

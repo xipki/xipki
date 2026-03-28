@@ -21,7 +21,7 @@ import org.bouncycastle.pqc.crypto.mlkem.MLKEMPublicKeyParameters;
 import java.security.SecureRandom;
 
 /**
- * XiPKI component.
+ * Bridge KEMUtil.
  *
  * @author Lijun Liao (xipki)
  */

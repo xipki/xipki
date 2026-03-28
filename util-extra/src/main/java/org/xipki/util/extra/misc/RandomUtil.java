@@ -6,7 +6,7 @@ package org.xipki.util.extra.misc;
 import java.security.SecureRandom;
 
 /**
- * Random utility class.
+ * Random Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -6,7 +6,7 @@ package org.xipki.ca.sdk;
 import org.xipki.security.exception.ErrorCode;
 
 /**
- * Exception wraps the error response.
+ * Sdk Error Response Exception exception type.
  * @author Lijun Liao (xipki)
  */
 public class SdkErrorResponseException extends Exception {

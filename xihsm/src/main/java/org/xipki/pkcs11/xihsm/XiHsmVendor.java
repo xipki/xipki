@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * XiPKI component.
+ * Xi Hsm Vendor.
  *
  * @author Lijun Liao (xipki)
  */

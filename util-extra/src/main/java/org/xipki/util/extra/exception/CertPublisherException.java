@@ -4,7 +4,7 @@
 package org.xipki.util.extra.exception;
 
 /**
- * Exception related to the publishing of certificates and CRLs.
+ * Cert Publisher Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

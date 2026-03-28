@@ -54,7 +54,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Decoded {@link PkiMessage}.
+ * Decoded Pki Message.
  *
  * @author Lijun Liao (xipki)
  */

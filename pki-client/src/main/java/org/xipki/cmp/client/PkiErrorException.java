@@ -8,7 +8,7 @@ import org.xipki.security.cmp.CmpUtil;
 import org.xipki.security.cmp.PkiStatusInfo;
 
 /**
- * Exception that wraps the PKIStatusInfo.
+ * Pki Error Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

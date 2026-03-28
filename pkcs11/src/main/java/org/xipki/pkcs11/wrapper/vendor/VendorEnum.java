@@ -3,7 +3,7 @@
 package org.xipki.pkcs11.wrapper.vendor;
 
 /**
- * XiPKI component.
+ * Vendor Enum enumeration.
  *
  * @author Lijun Liao (xipki)
  */

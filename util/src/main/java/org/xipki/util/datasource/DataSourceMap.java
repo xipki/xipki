@@ -4,7 +4,7 @@
 package org.xipki.util.datasource;
 
 /**
- * Interface to get data source by the name.
+ * Data Source Map interface.
  *
  * @author Lijun Liao (xipki)
  */

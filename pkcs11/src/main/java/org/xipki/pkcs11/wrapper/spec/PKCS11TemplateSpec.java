@@ -5,7 +5,7 @@ package org.xipki.pkcs11.wrapper.spec;
 import org.xipki.pkcs11.wrapper.attrs.Template;
 
 /**
- * XiPKI component.
+ * PKCS11 Template Spec.
  *
  * @author Lijun Liao (xipki)
  */

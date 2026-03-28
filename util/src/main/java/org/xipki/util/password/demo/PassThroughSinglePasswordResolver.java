@@ -7,7 +7,7 @@ import org.xipki.util.password.PasswordResolver;
 import org.xipki.util.password.PasswordResolverException;
 
 /**
- * A demo SinglePasswordResolver which just pass-through the password.
+ * Pass Through Single Password Resolver.
  *
  * @author Lijun Liao (xipki)
  */

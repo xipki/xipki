@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper;
 
 /**
- * The base class for all exceptions in this package. It is able to wrap another
+ * Token Exception exception type.
  * exception from a lower layer.
  *
  * @author Lijun Liao (xipki)

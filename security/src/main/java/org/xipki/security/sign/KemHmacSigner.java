@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * XiPKI component.
+ * Kem Hmac Signer signer definition.
  *
  * @author Lijun Liao (xipki)
  */

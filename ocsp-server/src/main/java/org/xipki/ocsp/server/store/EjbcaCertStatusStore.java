@@ -1,8 +1,9 @@
 // Copyright (c) 2013-2026 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ocsp.server.store.ejbca;
+package org.xipki.ocsp.server.store;
 
+import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -17,6 +18,7 @@ import org.xipki.security.HashAlgo;
 import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
+import org.xipki.security.util.Asn1Util;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Hex;
@@ -24,6 +26,7 @@ import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.util.extra.misc.CompareUtil;
 import org.xipki.util.extra.misc.LogUtil;
 import org.xipki.util.extra.misc.RandomUtil;
 import org.xipki.util.misc.StringUtil;
@@ -31,12 +34,15 @@ import org.xipki.util.misc.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,7 +55,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OcspStore for the EJBCA database.
+ * Ejbca Cert Status Store store definition.
  *
  * @author Lijun Liao (xipki)
  */
@@ -535,4 +541,175 @@ public class EjbcaCertStatusStore extends OcspStore {
     return (index == -1) ? null : caData.substring(startIndex, index);
   } // method extractTextFromCaData
 
+  /**
+   * IssuerEntry for the EJBCA database.
+   *
+   * @author Lijun Liao (xipki)
+   */
+
+  private static class EjbcaIssuerEntry {
+
+    private final String id;
+
+    private final Map<HashAlgo, byte[]> issuerHashMap;
+
+    private final Instant notBefore;
+
+    private final X509Cert cert;
+
+    private CertRevocationInfo revocationInfo;
+
+    public EjbcaIssuerEntry(X509Cert cert) throws CertificateEncodingException {
+      this.cert = Args.notNull(cert, "cert");
+      this.notBefore = cert.notBefore();
+      byte[] encodedCert = cert.getEncoded();
+      this.id = HashAlgo.SHA1.hexHash(encodedCert);
+      this.issuerHashMap = getIssuerHashAndKeys(encodedCert);
+    }
+
+    private static Map<HashAlgo, byte[]> getIssuerHashAndKeys(byte[] encodedCert)
+        throws CertificateEncodingException {
+      byte[] encodedName;
+      byte[] encodedKey;
+      try {
+        Certificate bcCert = Certificate.getInstance(encodedCert);
+        encodedName = bcCert.getSubject().getEncoded("DER");
+        encodedKey  = Asn1Util.getPublicKeyData(bcCert.getSubjectPublicKeyInfo());
+      } catch (IllegalArgumentException | IOException ex) {
+        throw new CertificateEncodingException(ex.getMessage(), ex);
+      }
+
+      Map<HashAlgo, byte[]> hashes = new HashMap<>();
+      for (HashAlgo ha : HashAlgo.values()) {
+        int hlen = ha.length();
+        byte[] nameAndKeyHash = new byte[(2 + hlen) << 1];
+        int offset = 0;
+        nameAndKeyHash[offset++] = 0x04;
+        nameAndKeyHash[offset++] = (byte) hlen;
+        System.arraycopy(ha.hash(encodedName), 0, nameAndKeyHash, offset, hlen);
+        offset += hlen;
+
+        nameAndKeyHash[offset++] = 0x04;
+        nameAndKeyHash[offset++] = (byte) hlen;
+        System.arraycopy(ha.hash(encodedKey), 0, nameAndKeyHash, offset, hlen);
+
+        hashes.put(ha, nameAndKeyHash);
+      }
+      return hashes;
+    } // method getIssuerHashAndKeys
+
+    public String id() {
+      return id;
+    }
+
+    public byte[] getEncodedHash(HashAlgo hashAlgo) {
+      byte[] data = issuerHashMap.get(hashAlgo);
+      return Arrays.copyOf(data, data.length);
+    }
+
+    public boolean matchHash(RequestIssuer reqIssuer) {
+      byte[] issuerHash = issuerHashMap.get(reqIssuer.hashAlgorithm());
+      return issuerHash != null &&
+          CompareUtil.areEqual(issuerHash, 0, reqIssuer.data(),
+              reqIssuer.nameHashFrom(), issuerHash.length);
+    }
+
+    public void setRevocationInfo(Instant revocationTime) {
+      this.revocationInfo = new CertRevocationInfo(CrlReason.CA_COMPROMISE,
+          Args.notNull(revocationTime, "revocationTime"), null);
+    }
+
+    public CertRevocationInfo revocationInfo() {
+      return revocationInfo;
+    }
+
+    public Instant notBefore() {
+      return notBefore;
+    }
+
+    public X509Cert cert() {
+      return cert;
+    }
+
+    @Override
+    public int hashCode() {
+      return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == this) {
+        return true;
+      }
+
+      if (!(obj instanceof EjbcaIssuerEntry)) {
+        return false;
+      }
+
+      EjbcaIssuerEntry other = (EjbcaIssuerEntry) obj;
+      return id.equals(other.id) && CompareUtil.equals(revocationInfo, other.revocationInfo);
+      // The comparison of id implies the comparison of issuerHashMap, notBefore and cert.
+    } // method equals
+
+  }
+
+  /**
+   * IssuerStore for the EJBCA database.
+   *
+   * @author Lijun Liao (xipki)
+   */
+
+  private static class EjbcaIssuerStore {
+
+    private final List<EjbcaIssuerEntry> entries;
+
+    private final Set<String> ids;
+
+    public EjbcaIssuerStore(Collection<EjbcaIssuerEntry> entries) {
+      this.entries = new ArrayList<>(entries.size());
+      Set<String> idSet = new HashSet<>(entries.size());
+
+      for (EjbcaIssuerEntry entry : entries) {
+        for (EjbcaIssuerEntry existingEntry : this.entries) {
+          if (existingEntry.id().contentEquals(entry.id())) {
+            throw new IllegalArgumentException(
+                "issuer with the same id (fingerprint) " + entry.id() + " already available");
+          }
+        }
+        this.entries.add(entry);
+        idSet.add(entry.id());
+      }
+
+      this.ids = Collections.unmodifiableSet(idSet);
+    }
+
+    public int size() {
+      return ids.size();
+    }
+
+    public Set<String> ids() {
+      return ids;
+    }
+
+    public EjbcaIssuerEntry getIssuerForId(String id) {
+      for (EjbcaIssuerEntry entry : entries) {
+        if (entry.id().contentEquals(id)) {
+          return entry;
+        }
+      }
+
+      return null;
+    }
+
+    public EjbcaIssuerEntry getIssuerForFp(RequestIssuer reqIssuer) {
+      for (EjbcaIssuerEntry entry : entries) {
+        if (entry.matchHash(reqIssuer)) {
+          return entry;
+        }
+      }
+
+      return null;
+    }
+
+  }
 }

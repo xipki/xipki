@@ -13,7 +13,7 @@ import org.xipki.security.exception.XiSecurityException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * XiPKI component.
+ * Create Signer Callback interface.
  *
  * @author Lijun Liao (xipki)
  */

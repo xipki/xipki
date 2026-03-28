@@ -7,7 +7,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 
 /**
- * XiPKI component.
+ * Buffer Cbor Encoder.
  *
  * @author Lijun Liao (xipki)
  */

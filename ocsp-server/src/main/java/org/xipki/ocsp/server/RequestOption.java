@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * OCSP request option.
+ * Request Option options.
  *
  * @author Lijun Liao (xipki)
  */

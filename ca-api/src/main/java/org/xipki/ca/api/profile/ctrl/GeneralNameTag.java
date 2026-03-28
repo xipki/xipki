@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import java.util.Locale;
 
 /**
- * XiPKI component.
+ * General Name Tag enumeration.
  *
  * @author Lijun Liao (xipki)
  */

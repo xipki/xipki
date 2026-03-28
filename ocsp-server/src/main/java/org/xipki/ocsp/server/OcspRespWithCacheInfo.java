@@ -4,13 +4,18 @@
 package org.xipki.ocsp.server;
 
 /**
- * OCSP response with {@link ResponseCacheInfo}.
+ * OCSP Resp With Cache Info information.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class OcspRespWithCacheInfo {
 
+  /**
+   * Response Cache Info information.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class ResponseCacheInfo {
 
     private final long generatedAt;

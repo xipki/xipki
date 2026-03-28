@@ -9,7 +9,7 @@ import org.xipki.security.KeySpec;
 import org.xipki.security.OIDs;
 
 /**
- * XiPKI component.
+ * Comp Kem MLKEM Variant enumeration.
  *
  * @author Lijun Liao (xipki)
  */

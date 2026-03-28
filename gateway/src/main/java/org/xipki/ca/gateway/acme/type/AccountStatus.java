@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.acme.type;
 
 /**
- * ACME component.
+ * Account Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

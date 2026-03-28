@@ -55,7 +55,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Builder for {@link javax.net.ssl.SSLContext} instances.
+ * Ssl Context Builder.
  * <p>
  * Please note: the default Oracle JSSE implementation of
  * {@link SSLContext#init(KeyManager[], TrustManager[], SecureRandom)}

@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper.vendor;
 
 /**
- * XiPKI component.
+ * Special Behaviour enumeration.
  *
  * @author Lijun Liao (xipki)
  */

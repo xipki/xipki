@@ -10,19 +10,21 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
+import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.security.exception.OperationException;
 import org.xipki.security.pkix.CertRevocationInfo;
 import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
 import org.xipki.security.pkix.X509Crl;
+import org.xipki.util.datasource.DataAccessException;
 
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.List;
 
 /**
- * CA cert store.
+ * Cert Store interface.
  *
  * @author Lijun Liao (xipki)
  */
@@ -157,5 +159,10 @@ public interface CertStore {
   boolean isHealthy();
 
   void updateDbInfo() throws CaMgmtException;
+
+  CertStatistics getCertStatistics(
+      String from, String to, boolean revokedOnly, CaIdNameMap idNameMap,
+      NameId[] caIds, NameId[] profileIds, NameId[] requestorIds)
+      throws DataAccessException, CaMgmtException;
 
 }

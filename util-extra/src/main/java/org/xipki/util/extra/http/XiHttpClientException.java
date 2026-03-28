@@ -4,7 +4,7 @@
 package org.xipki.util.extra.http;
 
 /**
- * HTTP client exception.
+ * Xi Http Client Exception exception type.
  *
  * @author Lijun Liao (xipki)
  */

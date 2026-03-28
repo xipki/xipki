@@ -11,6 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Gen CRLRequest request payload.
  */
 
 public class GenCRLRequest extends SdkRequest {

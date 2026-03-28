@@ -11,12 +11,17 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Validity like the certificate validity, e.g. 3 years.
+ * Validity.
  *
  * @author Lijun Liao (xipki)
  */
 public class Validity implements Comparable<Validity> {
 
+  /**
+   * Unit enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum Unit {
 
     YEAR("y", ChronoUnit.YEARS),

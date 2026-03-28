@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 /**
- * ACME component.
+ * ACME Challenge.
  *
  * @author Lijun Liao (xipki)
  */

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ACME component.
+ * Authz Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

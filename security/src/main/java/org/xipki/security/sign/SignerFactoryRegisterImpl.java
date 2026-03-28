@@ -3,10 +3,6 @@
 
 package org.xipki.security.sign;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SecurityFactory;
@@ -21,22 +17,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An implementation of {@link SignerFactoryRegister}.
+ * Signer Factory Register Impl.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = SignerFactoryRegister.class)
 public class SignerFactoryRegisterImpl implements SignerFactoryRegister {
 
   private static final Logger LOG = LoggerFactory.getLogger(SignerFactoryRegisterImpl.class);
 
-  // Cardinality.MULTIPLE means 0..n
-  // Policy.DYNAMIC allows the list to update as services come and go
-  @Reference(
-      service = SignerFactory.class,
-      cardinality = ReferenceCardinality.MULTIPLE,
-      policy = ReferencePolicy.DYNAMIC
-  )
   private volatile List<SignerFactory> factories = new ArrayList<>();
 
   public SignerFactoryRegisterImpl() {

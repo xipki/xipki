@@ -12,7 +12,7 @@ import org.xipki.pkcs11.wrapper.jni.JniUtil;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Objects of this class provide information about a PKCS#11 module; i.e. the
+ * Ck Info information.
  * driver for a specific token.
  *
  * <pre>

@@ -25,8 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Defines how the certificate looks like. All Certprofile classes must extend
- * this class.
+ * Certificate profile definition.
  *
  * @author Lijun Liao (xipki)
  */

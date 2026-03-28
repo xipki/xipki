@@ -18,7 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 /**
- * Container of a composite MLKEM public key.
+ * Composite MLKEMPublic Key.
  * @author Lijun Liao (xipki)
  */
 public class CompositeMLKEMPublicKey implements PublicKey {

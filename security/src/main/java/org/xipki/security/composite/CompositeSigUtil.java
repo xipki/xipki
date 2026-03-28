@@ -17,7 +17,7 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * Composite Sig Util.
  *
  * @author Lijun Liao (xipki)
  */

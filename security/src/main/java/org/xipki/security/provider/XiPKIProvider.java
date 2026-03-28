@@ -10,7 +10,7 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 
 /**
- * XiPKI component.
+ * Xi PKIProvider.
  *
  * @author Lijun Liao (xipki)
  */
@@ -36,6 +36,7 @@ public class XiPKIProvider extends Provider {
    */
   private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
 
+  @SuppressWarnings("removal")
   public XiPKIProvider(boolean withSM2, boolean withRsaPssShake) {
     super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
     AccessController.doPrivileged(new MyPrivilegedAction(this, withSM2, withRsaPssShake));

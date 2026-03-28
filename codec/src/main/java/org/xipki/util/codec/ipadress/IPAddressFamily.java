@@ -5,7 +5,7 @@ package org.xipki.util.codec.ipadress;
 import org.xipki.util.codec.Args;
 
 /**
- * A list of AFI is available under
+ * IPAddress Family.
  * https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml.
  * <p>
  * A list of SAFI is available under

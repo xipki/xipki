@@ -5,7 +5,7 @@ package org.xipki.pkcs11.xihsm.mgr;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Module Init Conf configuration.
  *
  * @author Lijun Liao (xipki)
  */
@@ -21,6 +21,11 @@ public class ModuleInitConf {
     return slots;
   }
 
+  /**
+   * Slot slot definition.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static final class Slot {
     private final long id;
     private final String soPin;

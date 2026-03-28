@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Builder of signer based PKCS#12 keystore.
+ * P12 Content Signer Builder.
  *
  * @author Lijun Liao (xipki)
  */

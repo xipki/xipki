@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * ACME component.
+ * Nonce Manager.
  *
  * @author Lijun Liao (xipki)
  */

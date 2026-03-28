@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Certificate issuer filter.
+ * Issuer Filter.
  *
  * @author Lijun Liao (xipki)
  */

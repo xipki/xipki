@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
 
 /**
- * ACME component.
+ * Authz Id.
  *
  * @author Lijun Liao (xipki)
  */

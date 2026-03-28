@@ -7,7 +7,7 @@ import java.io.Closeable;
 import java.util.Set;
 
 /**
- * QA system manager for CA.
+ * CA Qa System Manager interface.
  *
  * @author Lijun Liao (xipki)
  */

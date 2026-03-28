@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * XiPKI component.
+ * Extensions Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

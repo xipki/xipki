@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * X509CA module base class.
+ * X509 CA Module.
  *
  * @author Lijun Liao (xipki)
  */

@@ -22,7 +22,7 @@ import java.security.SignatureException;
 import java.util.Arrays;
 
 /**
- * {@link Signer} based on {@link Signature}.
+ * Signature Signer signer definition.
  *
  * @author Lijun Liao (xipki)
  */

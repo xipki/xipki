@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * OcspStore for XiPKI OCSP database.
+ * CA DB Cert Status Store store definition.
  *
  * @author Lijun Liao (xipki)
  */

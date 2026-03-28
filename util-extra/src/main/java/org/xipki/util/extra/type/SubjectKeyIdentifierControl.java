@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- * Extension SubjectKeyIdentifierControl.
+ * Subject Key Identifier Control control settings.
  *
  * @author Lijun Liao (xipki)
  */
@@ -116,11 +116,21 @@ public class SubjectKeyIdentifierControl implements JsonEncodable {
     }
   }
 
+  /**
+   * Subject Key Identifier Method enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum SubjectKeyIdentifierMethod {
     METHOD1,
     METHOD2
   }
 
+  /**
+   * Truncate Method enumeration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public enum TruncateMethod {
     LEFT,
     RIGHT

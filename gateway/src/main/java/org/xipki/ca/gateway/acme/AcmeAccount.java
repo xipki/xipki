@@ -19,12 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ACME component.
+ * ACME Account.
  *
  * @author Lijun Liao (xipki)
  */
 public class AcmeAccount {
 
+  /**
+   * Data.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Data implements JsonEncodable {
 
     private Map<String, String> jwk;

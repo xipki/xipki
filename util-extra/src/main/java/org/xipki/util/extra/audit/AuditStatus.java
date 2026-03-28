@@ -6,7 +6,7 @@ package org.xipki.util.extra.audit;
 import org.xipki.util.codec.Args;
 
 /**
- * Audit status.
+ * Audit Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

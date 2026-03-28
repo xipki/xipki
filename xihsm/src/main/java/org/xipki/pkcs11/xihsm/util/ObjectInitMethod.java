@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.xihsm.util;
 
 /**
- * The method to create the P11 object.
+ * Object Init Method enumeration.
  *
  * @author Lijun Liao (xipki)
  */

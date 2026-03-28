@@ -19,7 +19,7 @@ import org.xipki.util.extra.exception.ObjectCreationException;
 import java.util.Set;
 
 /**
- * Wrapper of keypair generation database entry.
+ * Keypair Gen Entry Wrapper.
  *
  * @author Lijun Liao (xipki)
  */

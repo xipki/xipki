@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * CBOR encoder writing output to an in-memory byte array.
+ * Byte Array Cbor Encoder.
  */
 public class ByteArrayCborEncoder extends CborEncoder implements AutoCloseable {
 

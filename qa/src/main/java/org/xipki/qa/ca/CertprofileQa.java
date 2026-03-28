@@ -9,7 +9,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.qa.ValidationResult;
 
 /**
- * QA for Certprofile.
+ * Certprofile Qa interface.
  *
  * @author Lijun Liao (xipki)
  */

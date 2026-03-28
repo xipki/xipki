@@ -14,7 +14,7 @@ import org.xipki.util.extra.exception.CertPublisherException;
 import java.io.Closeable;
 
 /**
- * Defines how to publish the certificates and CRLs. All CertPublisher classes
+ * Cert Publisher.
  * must extend this class.
  *
  * @author Lijun Liao (xipki)

@@ -4,7 +4,7 @@
 package org.xipki.qa.ocsp;
 
 /**
- * OCSP Certstatus enum.
+ * OCSP Cert Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

@@ -4,7 +4,7 @@
 package org.xipki.util.extra.type;
 
 /**
- * Mode to embed the certificates.
+ * Embed Certs Mode enumeration.
  *
  * @author Lijun Liao (xipki)
  */

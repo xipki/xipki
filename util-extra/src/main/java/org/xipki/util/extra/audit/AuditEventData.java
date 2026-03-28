@@ -6,7 +6,7 @@ package org.xipki.util.extra.audit;
 import org.xipki.util.codec.Args;
 
 /**
- * Audit event data.
+ * Audit Event Data.
  *
  * @author Lijun Liao (xipki)
  */

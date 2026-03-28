@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * CertProfile with identifier.
+ * Certprofile Validator.
  *
  * @author Lijun Liao (xipki)
  */

@@ -11,7 +11,7 @@ import org.xipki.pkcs11.xihsm.util.OperationType;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * XiPKI component.
+ * Active Operation.
  *
  * @author Lijun Liao (xipki)
  */

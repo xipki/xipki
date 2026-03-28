@@ -51,7 +51,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
- * Worker for database export / import.
+ * DB Port Worker.
  *
  * @author Lijun Liao (xipki)
  */
@@ -357,6 +357,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   }
 
+  /**
+   * Import CA DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ImportCaDb extends DbPortWorker {
 
     private final boolean resume;
@@ -436,6 +441,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ImportCaDb
 
+  /**
+   * Import CA Cert Store DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ImportCaCertStoreDb extends DbPortWorker {
 
     private final boolean resume;
@@ -498,6 +508,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ImportCaCertStoreDb
 
+  /**
+   * Export CA DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ExportCaDb extends ExportCaCertStoreDb {
 
     private final DataSourceWrapper caConfSource;
@@ -565,6 +580,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ExportCaDb
 
+  /**
+   * Export CA Cert Store DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ExportCaCertStoreDb extends DbPortWorker {
 
     protected final String destFolder;
@@ -643,6 +663,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ExportCaCertStoreDb
 
+  /**
+   * Export OCSP DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ExportOcspDb extends DbPortWorker {
 
     private final String destFolder;
@@ -714,6 +739,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ExportOcspDb
 
+  /**
+   * Import OCSP DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ImportOcspDb extends DbPortWorker {
 
     private final boolean resume;
@@ -762,6 +792,11 @@ public abstract class DbPortWorker extends DbWorker {
 
   } // class ImportOcspDb
 
+  /**
+   * Import OCSP From CA DB.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ImportOcspFromCaDb extends DbPortWorker {
 
     private final String publisherName;

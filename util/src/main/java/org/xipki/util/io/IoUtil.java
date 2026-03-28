@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * IO utility class.
+ * Io Util.
  *
  * @author Lijun Liao (xipki)
  */

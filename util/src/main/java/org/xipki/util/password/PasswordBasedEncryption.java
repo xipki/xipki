@@ -16,7 +16,7 @@ import java.security.GeneralSecurityException;
 import java.util.Optional;
 
 /**
- * Password based encryption utility class.
+ * Password Based Encryption.
  *
  * @author Lijun Liao (xipki)
  */

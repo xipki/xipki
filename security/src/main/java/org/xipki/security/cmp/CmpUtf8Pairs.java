@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * Specifies utf8Pairs defined in RFC4211.
+ * CMP Utf8 Pairs.
  *
  * @author Lijun Liao (xipki)
  */

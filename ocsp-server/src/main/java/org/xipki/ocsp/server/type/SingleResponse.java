@@ -6,7 +6,7 @@ package org.xipki.ocsp.server.type;
 import java.time.Instant;
 
 /**
- * ASN.1 SingleResponse.
+ * Single Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

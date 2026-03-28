@@ -16,6 +16,7 @@ import java.io.IOException;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Sdk Client Conf configuration.
  */
 
 public class SdkClientConf {

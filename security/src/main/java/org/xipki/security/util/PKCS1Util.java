@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * PKCS#1 utility class.
+ * PKCS1 Util.
  *
  * @author Lijun Liao (xipki)
  */

@@ -11,7 +11,7 @@ import org.xipki.util.codec.json.JsonMap;
 import java.util.List;
 
 /**
- * ACME component.
+ * Account Response response payload.
  *
  * @author Lijun Liao (xipki)
  */

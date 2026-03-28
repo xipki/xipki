@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Xi MLKEMPrivate Key.
  *
  * @author Lijun Liao (xipki)
  */

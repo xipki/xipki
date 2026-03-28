@@ -13,6 +13,7 @@ import java.util.Map;
 /**
  *
  * @author Lijun Liao (xipki)
+ * CA Name SCEP Signers.
  */
 public class CaNameScepSigners {
 

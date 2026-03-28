@@ -6,7 +6,7 @@ package org.xipki.pkcs11.xihsm.attr;
 import org.xipki.pkcs11.wrapper.type.CkDate;
 
 /**
- * XiPKI component.
+ * Xi Date.
  *
  * @author Lijun Liao (xipki)
  */

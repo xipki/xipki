@@ -14,7 +14,7 @@ import org.xipki.util.codec.CodecException;
 import static org.xipki.util.codec.cbor.CborConstants.*;
 
 /**
- * Represents the various major types in CBOR, along with their .
+ * Cbor Type type definition.
  * <p>
  * The major type is encoded in the upper three bits of each initial byte. The
  * lower 5 bytes represent any additional information.

@@ -4,7 +4,7 @@
 package org.xipki.pkcs11.wrapper;
 
 /**
- * This class specifies the result of the C_EncapsulateKey.
+ * Encap Key Result result.
  *
  * @author Lijun Liao (xipki)
  */

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class contains only static methods. It is the place for all functions
+ * Functions.
  * that are used by several classes in this package.
  *
  * @author Lijun Liao (xipki)

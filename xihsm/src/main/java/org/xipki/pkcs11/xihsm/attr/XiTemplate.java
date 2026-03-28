@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * XiPKI component.
+ * Xi Template.
  *
  * @author Lijun Liao (xipki)
  */

@@ -37,7 +37,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * XiPKI component.
+ * Bridge Key Util.
  *
  * @author Lijun Liao (xipki)
  */

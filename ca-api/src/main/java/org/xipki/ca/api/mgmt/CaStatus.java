@@ -6,7 +6,7 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.util.codec.Args;
 
 /**
- * CA status enum.
+ * CA Status enumeration.
  *
  * @author Lijun Liao (xipki)
  */

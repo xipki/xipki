@@ -7,7 +7,7 @@ import org.bouncycastle.crypto.SecretWithEncapsulation;
 import org.xipki.util.codec.Args;
 
 /**
- * XiPKI component.
+ * Secret With Encap.
  *
  * @author Lijun Liao (xipki)
  */

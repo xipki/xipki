@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * OCSP QA.
+ * OCSP Qa.
  *
  * @author Lijun Liao (xipki)
  */

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * XiPKI component.
+ * EC Curve Enum enumeration.
  *
  * @author Lijun Liao (xipki)
  */

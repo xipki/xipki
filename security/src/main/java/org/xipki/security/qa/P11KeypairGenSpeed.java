@@ -11,7 +11,7 @@ import org.xipki.util.benchmark.BenchmarkExecutor;
 import org.xipki.util.codec.Args;
 
 /**
- * Speed test of PKCS#11 keypair generation.
+ * P11 Keypair Gen Speed.
  *
  * @author Lijun Liao (xipki)
  */

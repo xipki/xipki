@@ -9,7 +9,7 @@ import org.xipki.util.misc.StringUtil;
 import java.util.regex.Pattern;
 
 /**
- * Text validator.
+ * Text Vadidator.
  *
  * @author Lijun Liao (xipki)
  */

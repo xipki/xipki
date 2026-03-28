@@ -8,7 +8,7 @@ import org.xipki.util.codec.Args;
 import org.xipki.util.codec.TripleState;
 
 /**
- * XiPKI component.
+ * Extension Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

@@ -7,7 +7,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
- * Utility methods for converting byte arrays into ints and longs, and back
+ * Pack Util.
  * again.
  *
  * @author bouncycastle

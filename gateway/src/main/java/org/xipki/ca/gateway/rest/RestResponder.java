@@ -14,9 +14,9 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
@@ -82,7 +82,7 @@ import static org.xipki.util.extra.audit.AuditLevel.INFO;
 import static org.xipki.util.extra.audit.AuditStatus.FAILED;
 
 /**
- * REST API responder.
+ * Rest Responder.
  *
  * @author Lijun Liao (xipki)
  */

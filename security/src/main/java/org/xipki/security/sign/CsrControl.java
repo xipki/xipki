@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * XiPKI component.
+ * CSR Control control settings.
  *
  * @author Lijun Liao (xipki)
  */
@@ -133,6 +133,11 @@ public class CsrControl {
     return KEMUtil.generateKemEncapKey(publicKey, defaultKemMasterKey, rnd);
   }
 
+  /**
+   * CSR Control Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class CsrControlConf {
 
     private FileOrValue peerCerts;

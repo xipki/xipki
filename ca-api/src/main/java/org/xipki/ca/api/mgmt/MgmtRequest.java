@@ -22,13 +22,18 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * CA Management request via the REST API.
+ * Request to mgmt Request.
  *
  * @author Lijun Liao (xipki)
  */
 
 public abstract class MgmtRequest extends MgmtMessage {
 
+  /**
+   * Request to add Or Change DB Schema.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddOrChangeDbSchema extends MgmtRequest {
 
     private final String name;
@@ -61,6 +66,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   }
 
+  /**
+   * Request to add CA Alias.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddCaAlias extends CaNameRequest {
 
     private final String aliasName;
@@ -88,6 +98,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddCaAlias
 
+  /**
+   * Request to add CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddCa extends MgmtRequest {
 
     private final CaEntry caEntry;
@@ -112,6 +127,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddCa
 
+  /**
+   * Request to add Certprofile.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddCertprofile extends MgmtRequest {
 
     private final CertprofileEntry certprofileEntry;
@@ -137,6 +157,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddCertprofile
 
+  /**
+   * Request to add Certprofile To CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddCertprofileToCa extends CaNameRequest {
 
     private final String profileName;
@@ -166,6 +191,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddCertprofileToCa
 
+  /**
+   * Request to add Keypair Gen.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddKeypairGen extends MgmtRequest {
 
     private final KeypairGenEntry entry;
@@ -191,6 +221,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddKeypairGen
 
+  /**
+   * Request to add Publisher.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddPublisher extends MgmtRequest {
 
     private final PublisherEntry publisherEntry;
@@ -216,6 +251,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddPublisher
 
+  /**
+   * Request to add Publisher To CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddPublisherToCa extends CaNameRequest {
 
     private final String publisherName;
@@ -243,6 +283,11 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
   } // class AddPublisherToCa
 
+  /**
+   * Request to add Requestor.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddRequestor extends MgmtRequest {
 
     private final RequestorEntry requestorEntry;
@@ -268,6 +313,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddRequestor
 
+  /**
+   * Request to add Requestor To CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddRequestorToCa extends CaNameRequest {
 
     private final CaHasRequestorEntry requestor;
@@ -296,6 +346,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class AddRequestorToCa
 
+  /**
+   * Request to add Signer.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AddSigner extends MgmtRequest {
 
     private final SignerEntry signerEntry;
@@ -339,6 +394,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class CaNameRequest
 
+  /**
+   * Request to change CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ChangeCa extends MgmtRequest {
 
     private final ChangeCaEntry changeCaEntry;
@@ -364,6 +424,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ChangeCa
 
+  /**
+   * Request to change Signer.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ChangeSigner extends MgmtRequest {
 
     private final String name;
@@ -426,6 +491,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ChangeSigner
 
+  /**
+   * Request to change Type Conf Entity.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ChangeTypeConfEntity extends MgmtRequest {
 
     private final String name;
@@ -468,6 +538,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ChangeTypeConfEntity
 
+  /**
+   * Request to export Conf.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ExportConf extends MgmtRequest {
 
     private final List<String> caNames;
@@ -530,6 +605,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GenerateCertificate
 
+  /**
+   * Request to generate Cert.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenerateCert extends AbstractGenerateCert {
 
     private final byte[] encodedCsr;
@@ -560,6 +640,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GenerateCertificate
 
+  /**
+   * Request to generate Key Cert.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenerateKeyCert extends AbstractGenerateCert {
 
     private final String subject;
@@ -589,6 +674,11 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
   } // class GenerateKeyCert
 
+  /**
+   * Request to generate Cross Certificate.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenerateCrossCertificate extends CaNameRequest {
 
     private final String profileName;
@@ -654,6 +744,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GenerateCrossCertificate
 
+  /**
+   * Request to generate Root CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GenerateRootCa extends MgmtRequest {
 
     private final CaEntry caEntry;
@@ -734,6 +829,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GenerateRootCa
 
+  /**
+   * Request to get Cert.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCert extends MgmtRequest {
 
     /**
@@ -794,6 +894,95 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GetCert
 
+  public static class GetCertStatistics extends MgmtRequest {
+
+    private final String from;
+
+    private final String to;
+
+    private final List<String> cas;
+
+    private final List<String> certProfiles;
+
+    private final List<String> requestors;
+
+    private final boolean revokedOnly;
+
+    public GetCertStatistics(
+        String from, String to, boolean revokedOnly,
+        List<String> cas, List<String> certProfiles, List<String> requestors) {
+      this.from = from;
+      this.to = to;
+      this.revokedOnly = revokedOnly;
+      this.cas = cas;
+      this.certProfiles = certProfiles;
+      this.requestors = requestors;
+    }
+
+    public String getFrom() {
+      return from;
+    }
+
+    public String getTo() {
+      return to;
+    }
+
+    public List<String> getCas() {
+      return cas;
+    }
+
+    public List<String> getCertProfiles() {
+      return certProfiles;
+    }
+
+    public List<String> getRequestors() {
+      return requestors;
+    }
+
+    public boolean isRevokedOnly() {
+      return revokedOnly;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      ret.put("revokedOnly", revokedOnly);
+      if (from != null) {
+        ret.put("from", from);
+      }
+
+      if (to != null) {
+        ret.put("to", to);
+      }
+
+      if (cas != null) {
+        ret.put("ca", cas.toArray(new String[0]));
+      }
+
+      if (certProfiles != null) {
+        ret.put("certProfiles", certProfiles.toArray(new String[0]));
+      }
+
+      if (requestors != null) {
+        ret.put("requestors", requestors.toArray(new String[0]));
+      }
+
+      return ret;
+    }
+
+    public static GetCertStatistics parse(JsonMap json) throws CodecException {
+      return new GetCertStatistics(json.getString("from"), json.getString("to"),
+          json.getBool("revokedOnly"), json.getStringList("ca"),
+          json.getStringList("certProfiles"), json.getStringList("requestors"));
+    }
+
+  }
+
+  /**
+   * Request to get Crl.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class GetCrl extends CaNameRequest {
 
     private final BigInteger crlNumber;
@@ -821,6 +1010,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class GetCrl
 
+  /**
+   * Request to list Certificates.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class ListCertificates extends CaNameRequest {
 
     private byte[] encodedSubjectDnPattern;
@@ -906,6 +1100,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class ListCertificates
 
+  /**
+   * Request to load Conf.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class LoadConf extends MgmtRequest {
 
     private final byte[] confBytes;
@@ -931,6 +1130,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class LoadConf
 
+  /**
+   * Request to name.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class Name extends MgmtRequest {
 
     private final String name;
@@ -956,6 +1160,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class Name
 
+  /**
+   * Request to remove Certificate.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RemoveCertificate extends CaNameRequest {
 
     private final BigInteger serialNumber;
@@ -983,6 +1192,11 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
   } // class RemoveCertificate
 
+  /**
+   * Request to remove Entity From CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RemoveEntityFromCa extends CaNameRequest {
 
     private final String entityName;
@@ -1010,6 +1224,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class RemoveEntityFromCa
 
+  /**
+   * Request to republish Certificates.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RepublishCertificates extends CaNameRequest {
 
     private final List<String> publisherNames;
@@ -1046,6 +1265,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class RepublishCertificates
 
+  /**
+   * Request to revoke CA.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RevokeCa extends CaNameRequest {
 
     private final CertRevocationInfo revocationInfo;
@@ -1078,6 +1302,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class RevokeCa
 
+  /**
+   * Request to revoke Certificate.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class RevokeCertificate extends CaNameRequest {
 
     private final BigInteger serialNumber;
@@ -1129,6 +1358,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class RevokeCertificate
 
+  /**
+   * Request to unsuspend Certificate.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class UnsuspendCertificate extends CaNameRequest {
 
     private final BigInteger serialNumber;
@@ -1157,6 +1391,11 @@ public abstract class MgmtRequest extends MgmtMessage {
 
   } // class UnrevokeCertificate
 
+  /**
+   * Request to token Info P11.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class TokenInfoP11 extends MgmtRequest {
 
     private final boolean verbose;

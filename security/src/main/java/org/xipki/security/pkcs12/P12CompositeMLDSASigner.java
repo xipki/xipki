@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * PKCS#12 Composite MLDSA signer.
+ * P12 Composite MLDSASigner signer definition.
  *
  * @author Lijun Liao (xipki)
  */

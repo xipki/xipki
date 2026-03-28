@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Native PKCS#11 module loader.
+ * Native PKCS11 Loader.
  *
  * @author Lijun Liao (xipki)
  */

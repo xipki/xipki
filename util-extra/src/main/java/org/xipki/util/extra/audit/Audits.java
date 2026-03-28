@@ -13,13 +13,18 @@ import org.xipki.util.extra.audit.services.NoopAuditService;
 import org.xipki.util.extra.misc.ReflectiveUtil;
 
 /**
- * Helper class to configure and initialize the Audit.
+ * Audits.
  *
  * @author Lijun Liao (xipki)
  */
 
 public class Audits {
 
+  /**
+   * Audit Conf configuration.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public static class AuditConf {
 
     /**

@@ -21,7 +21,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * Utility class to initialize {@link PasswordResolver}.
+ * Passwords.
  *
  * @author Lijun Liao (xipki)
  */

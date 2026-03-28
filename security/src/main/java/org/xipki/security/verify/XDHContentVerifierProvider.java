@@ -30,7 +30,7 @@ import java.security.PublicKey;
 import java.util.Arrays;
 
 /**
- * {@link ContentVerifierProvider} for the algorithm X25519 / X448 static HMAC
+ * XDHContent Verifier Provider.
  * (XiPKI own algorithm, based on RFC 6955).
  *
  * @author Lijun Liao (xipki)

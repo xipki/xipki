@@ -6,7 +6,7 @@ package org.xipki.ca.server;
 import org.xipki.util.codec.Args;
 
 /**
- * System event.
+ * System Event.
  * @author Lijun Liao (xipki)
  */
 public class SystemEvent {

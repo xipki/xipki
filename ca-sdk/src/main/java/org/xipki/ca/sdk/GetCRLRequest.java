@@ -14,6 +14,7 @@ import java.time.Instant;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Get CRLRequest request payload.
  */
 
 public class GetCRLRequest extends SdkRequest {

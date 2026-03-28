@@ -13,7 +13,7 @@ import org.xipki.util.codec.json.JsonMap;
 import java.util.Arrays;
 
 /**
- * XiPKI component.
+ * User.
  *
  * @author Lijun Liao (xipki)
  */

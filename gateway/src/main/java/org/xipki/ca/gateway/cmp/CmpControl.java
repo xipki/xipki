@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * CMP control.
+ * CMP Control control settings.
  *
  * @author Lijun Liao (xipki)
  */

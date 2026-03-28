@@ -22,6 +22,11 @@ public abstract class KeypairGenExecutor extends Pkcs11Executor {
 
   private static final Logger LOG = LoggerFactory.getLogger(KeypairGenExecutor.class);
 
+  /**
+   * Nested class MyRunnable.
+   *
+   * @author Lijun Liao (xipki)
+   */
   public class MyRunnable implements Runnable {
 
     public MyRunnable() {

@@ -6,7 +6,6 @@ package org.xipki.security.pkcs12;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jcajce.interfaces.XDHPublicKey;
-import org.osgi.service.component.annotations.Component;
 import org.xipki.security.KeySpec;
 import org.xipki.security.SecurityFactory;
 import org.xipki.security.SignAlgo;
@@ -34,11 +33,10 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * {@link SignerFactory} for the types pkcs12 and jceks.
+ * P12 Signer Factory.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = SignerFactory.class)
 public class P12SignerFactory implements SignerFactory {
 
   private static final String TYPE_PKCS12 = "pkcs12";

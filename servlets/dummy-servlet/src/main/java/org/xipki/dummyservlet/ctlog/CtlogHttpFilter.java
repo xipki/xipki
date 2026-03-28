@@ -13,7 +13,7 @@ import org.xipki.util.extra.http.XiHttpResponse;
 import java.io.IOException;
 
 /**
- * Dummy CRL ServletFilter.
+ * Ctlog Http Filter.
  *
  * @author Lijun Liao (xipki)
  */

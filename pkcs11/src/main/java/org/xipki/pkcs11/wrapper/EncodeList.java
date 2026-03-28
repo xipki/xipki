@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Internal class. Container of fields to be encoded.
+ * Encode List.
  * @author Lijun Liao (xipki)
  */
 public class EncodeList {

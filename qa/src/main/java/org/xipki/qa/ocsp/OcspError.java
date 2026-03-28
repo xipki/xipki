@@ -6,7 +6,7 @@ package org.xipki.qa.ocsp;
 import org.xipki.util.codec.Args;
 
 /**
- * OCSP error enum.
+ * OCSP Error enumeration.
  *
  * @author Lijun Liao (xipki)
  */

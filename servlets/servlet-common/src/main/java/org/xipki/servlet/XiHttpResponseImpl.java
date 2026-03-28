@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * HTTP response wrapper.
+ * Xi Http Response Impl.
  *
  * @author Lijun Liao (xipki)
  */

@@ -8,6 +8,7 @@ import org.xipki.util.codec.CodecException;
 import java.security.spec.InvalidKeySpecException;
 
 /**
+ * Asn1 RSAPrivate Key.
  * <pre>
  * RSAPrivateKey ::= SEQUENCE {
  *     version           Version,

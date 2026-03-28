@@ -11,6 +11,7 @@ import org.xipki.util.codec.cbor.CborEncoder;
 /**
  *
  * @author Lijun Liao (xipki)
+ * Payload Response response payload.
  */
 
 public class PayloadResponse extends SdkResponse {

@@ -4,9 +4,6 @@
 package org.xipki.ca.mgmt.client;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.mgmt.*;
@@ -51,8 +48,6 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -60,12 +55,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * CA management client via REST API.
+ * CA Mgmt Client.
  *
  * @author Lijun Liao (xipki)
  */
-@Component(service = CaManager.class, immediate = true,
-    configurationPid = "org.xipki.ca.mgmt.client")
 public class CaMgmtClient implements CaManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaMgmtClient.class);
@@ -89,63 +82,6 @@ public class CaMgmtClient implements CaManager {
   static {
     LOG.info("XiPKI CA Management Client version {}",
         StringUtil.getBundleVersion(CaMgmtClient.class));
-  }
-
-  @Activate
-  public void activate(ComponentContext context)
-      throws MalformedURLException, ObjectCreationException {
-    Dictionary<String, Object> properties = context.getProperties();
-    Enumeration<String> keys = properties.keys();
-
-    String serverUrl = "https://localhost:8444/ca/mgmt";
-    boolean useSslConf = false;
-    String storeType = "";
-    String keystore = "";
-    String keystorePassword = "";
-    String trustanchors = "";
-    String hostnameVerifier = "default";
-
-    while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
-      Object value = properties.get(key);
-      if (!(value instanceof String)) {
-        continue;
-      }
-
-      String sValue = (String) value;
-      switch (key) {
-        case "serverUrl":
-          serverUrl = sValue;
-          break;
-        case "useSslConf":
-          useSslConf = Boolean.parseBoolean(sValue);
-          break;
-        case "ssl.storeType":
-          storeType = sValue;
-          break;
-        case "ssl.keystore":
-          keystore = sValue;
-          break;
-        case "ssl.keystorePassword":
-          keystorePassword = sValue;
-          break;
-        case "ssl.trustanchors":
-          trustanchors = sValue;
-          break;
-        case "ssl.hostnameVerifier":
-          hostnameVerifier = sValue;
-      }
-    }
-
-    SslContextConfWrapper wrapper = new SslContextConfWrapper();
-    wrapper.setUseSslConf(useSslConf);
-    wrapper.setSslStoreType(storeType);
-    wrapper.setSslKeystore(keystore);
-    wrapper.setSslKeystorePassword(keystorePassword);
-    wrapper.setSslHostnameVerifier(hostnameVerifier);
-    wrapper.setSslTrustanchors(trustanchors);
-
-    init(wrapper, serverUrl);
   }
 
   public void init(SslContextConfWrapper sslConf, String serverUrl)
@@ -506,6 +442,17 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
+  public SimpleProfileInfo getSimpleCertprofileInfo(String profileName) throws CaMgmtException {
+    MgmtRequest.Name req = new MgmtRequest.Name(profileName);
+    JsonMap respJson = transmitJson(MgmtAction.getSimpleCertprofileInfo, req);
+    try {
+      return MgmtResponse.GetSimpleCertprofileInfo.parse(respJson).result();
+    } catch (CodecException e) {
+      throw new CaMgmtException(e);
+    }
+  }
+
+  @Override
   public CertprofileEntry getCertprofile(String profileName) throws CaMgmtException {
     JsonMap respJson = transmitJson(MgmtAction.getCertprofile, new MgmtRequest.Name(profileName));
     try {
@@ -829,6 +776,20 @@ public class CaMgmtClient implements CaManager {
     JsonMap respJson = transmitJson(MgmtAction.tokenInfoP11, req);
     try {
       return MgmtResponse.StringResponse.parse(respJson).result();
+    } catch (CodecException e) {
+      throw new CaMgmtException(e);
+    }
+  }
+
+  @Override
+  public CertStatistics getCertStatistics(
+      String from, String to, boolean revokedOnly, List<String> cas, List<String> certProfiles,
+      List<String> requestors) throws CaMgmtException {
+    MgmtRequest.GetCertStatistics req = new MgmtRequest.GetCertStatistics(
+        from, to, revokedOnly, cas, certProfiles, requestors);
+    JsonMap respJson = transmitJson(MgmtAction.getCertStatistics, req);
+    try {
+      return MgmtResponse.GetCertStatistics.parse(respJson).result();
     } catch (CodecException e) {
       throw new CaMgmtException(e);
     }

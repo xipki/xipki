@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * XiPKI component.
+ * Xi Attribute.
  *
  * @author Lijun Liao (xipki)
  */

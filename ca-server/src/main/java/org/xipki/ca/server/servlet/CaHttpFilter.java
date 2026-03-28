@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * CA ServletFilter.
+ * CA Http Filter.
  *
  * @author Lijun Liao (xipki)
  */

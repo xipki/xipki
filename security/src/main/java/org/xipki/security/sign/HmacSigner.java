@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
- * HMAC signer.
+ * Hmac Signer signer definition.
  *
  * @author Lijun Liao (xipki)
  */

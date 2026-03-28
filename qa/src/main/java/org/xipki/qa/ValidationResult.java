@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Validation result consisting of failed validation issues and successful
+ * Validation Result result.
  * issues.
  *
  * @author Lijun Liao (xipki)

@@ -27,7 +27,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 
 /**
- * XiPKI component.
+ * SM2 WITHSM3 Signature Spi.
  *
  * @author Lijun Liao (xipki)
  */

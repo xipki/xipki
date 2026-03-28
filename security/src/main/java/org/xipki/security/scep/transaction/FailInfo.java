@@ -4,7 +4,7 @@
 package org.xipki.security.scep.transaction;
 
 /**
- * FailInfo enum.
+ * Fail Info enumeration.
  *
  * @author Lijun Liao (xipki)
  */

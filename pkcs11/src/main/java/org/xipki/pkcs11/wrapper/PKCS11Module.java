@@ -23,7 +23,7 @@ import java.util.Set;
 import static org.xipki.pkcs11.wrapper.PKCS11T.CKR_GENERAL_ERROR;
 
 /**
- * <p>
+ * PKCS11 Module.
  * Objects of this class represent a PKCS#11 module.
  *
  * @author Lijun Liao (xipki)
