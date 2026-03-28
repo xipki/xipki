@@ -47,7 +47,7 @@ can be obtained in one of the following ways:
       <classifier>placeholder-classifier</classifier>
     </dependency>
     ```
-    Where `placeholder-version` is the version, e.g. 6.6.1; and 
+    Where `placeholder-version` is the version, e.g. 6.7.0; and 
     `placeholder-classifier`is either `thin`, `bclts` and `bcfips`.
   - Build it from source
     - Get a copy of the project code, for example:
