@@ -1,0 +1,45 @@
+rm -r -f output
+
+mkdir output
+
+rm -r -f error-output
+
+mkdir error-output
+
+copy-dir qa/p12/shared output
+copy-dir qa/p12/${KEYSPEC} output
+
+# OCSP uses the same key type as the CA
+set list [ rootca1 subca1 subcawithcrl1 ocsp99 ]
+
+set SLOT "0"
+
+if "$TOKEN_TYPE" eq "PKCS11"
+
+  set OCSP_KEYCONF "slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}ocsp99"
+
+  for it in $list
+    set label ${CA_P11_LABEL_PREFIX}${it}
+
+    delete-key-p11 --force --slot $SLOT --label ${label}
+    keypair-p11 --keyspec $CA_KEYSPEC --slot $SLOT --label ${label}
+  done
+
+elif "$TOKEN_TYPE" eq "PKCS12"
+
+  set OCSP_KEYCONF "password=CHANGEIT,keystore=file:keycerts/ocsp99.p12"
+
+  for it in $list
+    keypair-p12 --password CHANGEIT --keyspec $CA_KEYSPEC --out output/${it}.p12
+  done
+
+fi
+
+set list [ p11-tls-cmp p11-tls-rest ]
+for it in $list
+  set label ${EE_P11_LABEL_PREFIX}${it}
+
+  delete-key-p11 --force --slot $SLOT --label ${label}
+  keypair-p11 --keyspec $KEYSPEC --slot $SLOT --label ${label}
+done
+

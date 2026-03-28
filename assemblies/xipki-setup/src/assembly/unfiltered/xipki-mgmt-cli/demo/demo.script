@@ -1,46 +1,46 @@
-printUsage = "false"
-argsValid = "false"
-errMsg = ""
+set printUsage "false"
+set argsValid "false"
+set errMsg ""
 
-if { "$1" equals "" | "$1" equals "help" } then {
-  printUsage = "true"
-  argsValid = "true"
-} else {
-  storetype  = $1
-  tokentype  = $2
-  keyspec    = $3
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  set storetype $1
+  set tokentype $2
+  set keyspec $3
 
-  storetype = $(xi:lowercase "$storetype")
-  tokentype = $(xi:uppercase "$tokentype")
+  set storetype $(lowercase "$storetype")
+  set tokentype $(uppercase "$tokentype")
 
-  argsValid = $([db file] contains $storetype)
+  set argsValid $($storetype in db file)
 
-  if { "$argsValid" equals "false" } then {
-    errMsg = "invalid store type $storetype"
-  } else {
-    argsValid = $([PKCS11 PKCS12] contains $tokentype)
-  }
+  if "$argsValid" eq "false"
+    set errMsg "invalid store type $storetype"
+  else
+    set argsValid $($tokentype in PKCS11 PKCS12)
+  fi
 
-  if { "$argsValid" equals "false" } then {
-    errMsg = "invalid token type $tokentype"
-  } else {
+  if "$argsValid" eq "false"
+    set errMsg "invalid token type $tokentype"
+  else
     source xipki/ca-setup/c14n-keyspec.script
-    if { "$sigalg" equals "" } then {
-      argsValid = "false"
-    } else {
-      CA_KEYSPEC = $keyspec
-      CA_SIGALG = $sigalg
-    }
-  }
-}
+    if "$sigalg" eq ""
+      set argsValid "false"
+    else
+      set CA_KEYSPEC $keyspec
+      set CA_SIGALG $sigalg
+    fi
+  fi
+fi
 
-if { "$argsValid" equals "false" } then {
+if "$argsValid" eq "false"
   echo "$errMsg"
   echo ""
-  printUsage = "true"
-}
+  set printUsage "true"
+fi
 
-if { "$printUsage" equals "true" } then {
+if "$printUsage" eq "true"
   echo "Usage: "
   echo ""
   echo "source demo/demo.script <store type> <token type> <CA keyspec>"
@@ -56,6 +56,9 @@ if { "$printUsage" equals "true" } then {
   echo "                     MLDSA65-ED25519, MLDSA65-RSA3072, MLDSA65-RSA4096,"
   echo "                     MLDSA87-P384,    MLDSA87-P521,    MLDSA87-BP384,"
   echo "                     MLDSA87-ED448,   MLDSA87-RSA3072, MLDSA87-RSA4096"
-} else {
-  source demo/doDemo.script
-}
+
+  # exit current script file
+  return
+fi
+
+source demo/doDemo.script

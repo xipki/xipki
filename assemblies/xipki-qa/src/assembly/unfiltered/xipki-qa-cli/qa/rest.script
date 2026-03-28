@@ -1,0 +1,14 @@
+set BASE_URL https://localhost:$[gateway.https.port]/gw/rest/subcawithcrl
+set CERTPROFILE "?profile=tls"
+set OUT_DIR output/rest-raw
+source qa/rest0.script
+
+set BASE_URL https://localhost:$[gateway.https.port]/gw/rest/myalias
+set CERTPROFILE ""
+set OUT_DIR output/rest-alias
+source qa/rest0.script
+
+set BASE_URL https://localhost:$[gateway.https.port]/gw/rest
+set CERTPROFILE ""
+set OUT_DIR output/rest-none
+source qa/rest0.script

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://www.w3.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>6.6.1-SNAPSHOT</version>
+    <version>6.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>ca-mgmt-shell</artifactId>
-  <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <Karaf-Commands>*</Karaf-Commands>
-    <Import-Package>org.bouncycastle.*;version="${bc.versions}",*</Import-Package>
-  </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>xi-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>ca-mgmt</artifactId>
@@ -23,13 +23,50 @@
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>certprofile</artifactId>
+      <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>shell-base</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>util-extra</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>certprofile</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.xipki.shell.ca.mgmt.CaMgmtShellMain</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-runtime-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <includeScope>runtime</includeScope>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

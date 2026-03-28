@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>main</id>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+
+  <fileSets>
+    <!-- target/classes: the filtered and unfiltered resources -->
+    <fileSet>
+      <directory>${project.build.outputDirectory}</directory>
+      <includes>
+        <include>**/*.sh</include>
+        <include>**/bin/xipki</include>
+      </includes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+      <lineEnding>unix</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.outputDirectory}</directory>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+        <exclude>**/bin/xipki</exclude>
+      </excludes>
+      <outputDirectory>.</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>${project.build.directory}/setup</directory>
+      <outputDirectory>setup</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-qa-cli</directory>
+      <outputDirectory>xipki-qa-cli</outputDirectory>
+      <includes>
+        <include>bin/xipki</include>
+        <include>bin/xipki.bat</include>
+      </includes>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-qa-cli</directory>
+      <outputDirectory>xipki-qa-cli</outputDirectory>
+      <excludes>
+        <exclude>bin/xipki</exclude>
+        <exclude>bin/xipki.bat</exclude>
+        <exclude>lib/bc*-lts8on*</exclude>
+      </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <fileSet>
+      <directory>${project.build.directory}/t2/setup/</directory>
+      <outputDirectory>setup</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+
+    <!-- copy from xipki-setup -->
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-setup-${project.version}/xipki-mgmt-cli</directory>
+      <outputDirectory>xipki-qa-cli</outputDirectory>
+      <excludes>
+        <exclude>bin/*</exclude>
+        <exclude>lib/**</exclude>
+        <exclude>demo/**</exclude>
+        <exclude>xipki/ca-setup/**</exclude>
+      </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-setup-${project.version}/xipki-mgmt-cli</directory>
+      <outputDirectory>xipki-qa-cli</outputDirectory>
+      <includes>
+        <include>xipki/ca-setup/c14n-keyspec.script</include>
+        <include>xipki/ca-setup/print-keyspecs.script</include>
+      </includes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-setup-${project.version}</directory>
+      <outputDirectory>.</outputDirectory>
+      <excludes>
+        <exclude>xipki-cli/**</exclude>
+        <exclude>xipki-mgmt-cli/**</exclude>
+        <exclude>*.sh</exclude>
+        <exclude>bin/xipki</exclude>
+        <exclude>*.bat</exclude>
+        <exclude>setup/**</exclude>
+        <exclude>docs/**</exclude>
+        <exclude>INSTALL.md</exclude>
+      </excludes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
+
+  <files>
+    <file>
+      <source>${project.build.directory}/t2/xipki-dummy/tomcat/webapps/dummy-servlet.war</source>
+      <outputDirectory>xipki-dummy/tomcat/webapps</outputDirectory>
+      <destName>dummy.war</destName>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+
+</assembly>

@@ -1,0 +1,76 @@
+echo "#################################################################"
+echo "#                              QA                               #"
+echo "#################################################################"
+
+sleep 1
+
+echo "#################################################################"
+echo "#                       Check certificate                       #"
+echo "#################################################################"
+
+init-caqa
+
+## rootca
+
+check-cert --issuer rootca --profile cross --csr output/cross1.csr \
+  --cert output/cross1.crt
+
+check-cert --issuer rootca --profile subca --csr output/subca1.csr \
+  --cert output/subca1.crt
+
+check-cert --issuer rootca --profile subca-complex \
+  --csr output/subcawithcrl1.csr --cert output/subcawithcrl1.crt
+
+## subcawithcrl
+
+check-cert --issuer subcawithcrl --profile ocsp --csr output/ocsp1.csr \
+  --cert output/ocsp1.crt
+
+check-cert --issuer subcawithcrl --profile ocsp --csr output/ocsp2.csr \
+  --cert output/ocsp2.crt
+
+check-cert --issuer subcawithcrl --profile multiple-ous \
+  --csr output/multiple-ous1.csr --cert output/multiple-ous1.crt
+
+check-cert --issuer subcawithcrl --profile multiple-ous \
+  --csr output/multiple-ous2.csr --cert output/multiple-ous2.crt
+
+check-cert --issuer subcawithcrl --profile max-time \
+  --csr output/max-time1.csr --cert output/max-time1.crt
+
+## subca
+
+check-cert --issuer subca --profile smime --csr output/smime1.csr \
+  --cert output/smime1.crt
+
+check-cert --issuer subca --profile smime-legacy \
+  --csr output/smime-legacy1.csr --cert output/smime-legacy1.crt
+
+check-cert --issuer subca --profile tls --csr output/tls1.csr \
+  --cert output/tls1.crt
+
+check-cert --issuer subca --profile tls --csr output/tls2.csr \
+  --cert output/tls2.crt
+
+check-cert --issuer subca --profile tls-c --csr output/tls-c1.csr \
+  --cert output/tls-c1.crt
+
+check-cert --issuer subca --profile tls-c --csr output/tls-c2.csr \
+  --cert output/tls-c2.crt
+
+check-cert --issuer subca --profile qc --csr output/qc1.csr \
+  --cert output/qc1.crt
+
+check-cert --issuer subca --profile ee-complex \
+  --csr output/ee-complex1.csr --cert output/ee-complex1.crt
+
+check-cert --issuer subca --profile ee-complex \
+  --csr output/ee-complex2.csr --cert output/ee-complex2.crt
+
+check-cert --issuer subca --profile fixed-partial-subject \
+  --csr output/fixed-partial-subject1.csr \
+  --cert output/fixed-partial-subject1.crt
+
+check-cert --issuer subca --profile fixed-partial-subject \
+  --csr output/fixed-partial-subject2.csr \
+  --cert output/fixed-partial-subject2.crt

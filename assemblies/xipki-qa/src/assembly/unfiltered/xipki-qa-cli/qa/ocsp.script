@@ -1,0 +1,203 @@
+echo "#################################################################"
+echo "#                              OCSP                             #"
+echo "#################################################################"
+set URL_CRL http://localhost:$[ocsp.http.port]/ocsp/responder2
+
+set list [http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  http://localhost:$[ocsp.http.port]/ocsp/responder3]
+for it in $list
+
+  set URL $it
+
+  echo "URL: $URL"
+
+  ## POST
+  echo "QA: Good (POST, DB)"
+  qa-ocsp-status --issuer output/rootca1.crt --cert output/subca1.crt \
+    --exp-status good --exp-certhash required --exp-sig-alg $CA_SIGALG \
+    --url $URL --nonce --resp-issuer output/rootca1.crt
+
+  echo "QA: Good (POST, DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c1.crt \
+    --exp-status good --exp-certhash required --exp-sig-alg $CA_SIGALG \
+    --url $URL --nonce --resp-issuer output/rootca1.crt
+
+  echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c2.crt \
+    --exp-status affiliationChanged --exp-certhash required \
+    --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+    --resp-issuer output/rootca1.crt
+
+  echo "QA: Unknown (RFC2560) (POST, ISSUER UNKNOWN)"
+  qa-ocsp-status --issuer output/ocsp1.crt --serial 2 \
+    --exp-error malformedRequest --url $URL --nonce
+
+  ## GET
+  echo "QA: Good (GET, DB)"
+  qa-ocsp-status --issuer output/rootca1.crt --cert output/subca1.crt \
+    --http-get --exp-status good --exp-certhash required \
+    --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+    --resp-issuer output/rootca1.crt
+
+  echo "QA: Good (GET,DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c1.crt \
+    --http-get --exp-status good --exp-certhash required \
+    --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+    --resp-issuer output/rootca1.crt
+
+  echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c2.crt \
+    --http-get --exp-status affiliationChanged --exp-certhash required \
+    --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+    --resp-issuer output/rootca1.crt
+
+  echo "QA: Unknown (RFC2560) (GET, ISSUER UNKNOWN)"
+  qa-ocsp-status --issuer output/ocsp1.crt --serial 2 --http-get \
+    --exp-error malformedRequest --url $URL --nonce
+
+  ## POST, SIGNED
+  echo "QA: Good (POST, SIGNED, DB)"
+  qa-ocsp-status --issuer output/rootca1.crt --cert output/subca1.crt --sign \
+    --exp-status good --exp-certhash required --exp-sig-alg $CA_SIGALG \
+    --url $URL --nonce --resp-issuer output/rootca1.crt
+
+  echo "QA: Good (POST, SIGNED, DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c1.crt --sign \
+    --exp-status good --exp-certhash required --exp-sig-alg $CA_SIGALG \
+    --url $URL --nonce --resp-issuer output/rootca1.crt
+
+  echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
+  qa-ocsp-status --issuer output/subca1.crt --cert output/tls-c2.crt --sign \
+    --exp-status affiliationChanged --exp-certhash required \
+    --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+    --resp-issuer output/rootca1.crt
+
+  echo "QA: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN)"
+  qa-ocsp-status --issuer output/ocsp1.crt --serial 2 --sign \
+    --exp-error malformedRequest --url $URL --nonce
+
+done
+
+
+##### responder1 #####
+set URL http://localhost:$[ocsp.http.port]/ocsp/responder1
+
+echo "URL: $URL"
+
+echo "QA: Unknown (now is before notBefore) (POST, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt \
+  --exp-status unknown --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Unknown (RFC6960) (POST, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --exp-status unknown \
+  --exp-sig-alg $CA_SIGALG --url $URL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Unknown (now is before notBefore) (GET, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt \
+  --http-get --exp-status unknown --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Unknown (RFC6960) (GET, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --http-get \
+  --exp-status unknown --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt --sign \
+  --exp-status unknown --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --sign \
+  --exp-status unknown --exp-sig-alg $CA_SIGALG --url $URL --nonce \
+  --resp-issuer output/rootca1.crt
+
+##### responder3 #####
+
+set URL http://localhost:$[ocsp.http.port]/ocsp/responder3
+
+echo "URL: $URL"
+
+echo "QA: Unknown (now is before notBefore) (POST, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt \
+  --exp-status unknown --url $URL --nonce
+
+echo "QA: Unknown (RFC6960) (POST, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --exp-status unknown \
+  --url $URL --nonce
+
+echo "QA: Unknown (now is before notBefore) (GET, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt \
+  --http-get --exp-status unknown --url $URL --nonce
+
+echo "QA: Unknown (RFC6960) (GET, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --http-get \
+  --exp-status unknown --url $URL --nonce
+
+echo "QA: Unknown (now is before notBefore) (POST, SIGNED, DB)"
+qa-ocsp-status --issuer output/subca1.crt --cert output/ee-complex1.crt --sign \
+  --exp-status unknown --url $URL --nonce
+
+echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
+qa-ocsp-status --issuer output/subca1.crt --serial 99999 --sign \
+  --exp-status unknown --url $URL --nonce
+
+echo "=====QA : OCSP responder====="
+echo "URL: $URL_CRL"
+
+sleep 7
+
+echo "QA: Good (POST, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --serial 99999 \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Good (GET, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --serial 99999 --http-get \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, SIGNED, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --serial 99999 --sign \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt \
+  --exp-status keyCompromise --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Good (GET, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp1.crt \
+  --http-get --exp-status good --exp-certhash forbidden \
+  --exp-sig-alg $CA_SIGALG --url $URL_CRL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt \
+  --http-get --exp-status keyCompromise --exp-certhash forbidden \
+  --exp-sig-alg $CA_SIGALG --url $URL_CRL --nonce \
+  --resp-issuer output/rootca1.crt
+
+
+echo "QA: Good (POST, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp1.crt \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, SIGNED, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp1.crt \
+  --sign --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt
+
+echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
+qa-ocsp-status --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt \
+  --sign --exp-status keyCompromise --exp-certhash forbidden \
+  --exp-sig-alg $CA_SIGALG --url $URL_CRL --nonce \
+  --resp-issuer output/rootca1.crt
+
+echo "QA: Good (POST, downloaded CRL)"
+qa-ocsp-status --issuer output/rootca1.crt --cert output/subca1.crt \
+  --exp-status good --exp-certhash forbidden --exp-sig-alg $CA_SIGALG \
+  --url $URL_CRL --nonce --resp-issuer output/rootca1.crt

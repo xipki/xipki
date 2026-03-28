@@ -1,89 +1,93 @@
 # Please adapt me
-CA_SUBJECT="O=$[organization],CN=$[ca.name]"
+set CA_SUBJECT "O=$[organization],CN=$[ca.name]"
 
-KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_P12 = ${KEYCERTS_DIR}/$[ca.name].p12
-CA_P12_PWD = CHANGEIT
-CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
+set KEYCERTS_DIR xipki/ca-setup/keycerts
+set CA_P12 ${KEYCERTS_DIR}/$[ca.name].p12
+set CA_P12_PWD CHANGEIT
+set CA_CERT ${KEYCERTS_DIR}/$[ca.name].pem
 
-if { "$1" equals "" | "$1" equals "help" } then {
-  printUsage = "true"
-} else {
-  keyspec = $1
-  TOMCAT_DIR = $2
-  XIPKI_DIR = $3
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+else
+  set keyspec $1
+  set TOMCAT_DIR $2
+  set XIPKI_DIR $3
 
-  printUsage = "false"
-  if { "$TOMCAT_DIR" equals "" } then {
+  set printUsage "false"
+  if "$TOMCAT_DIR" eq ""
     echo "TOMCAT_DIR is not specified"
-    printUsage = "true"
-  } else {
+    set printUsage "true"
+  else
     source xipki/ca-setup/c14n-keyspec.script
-    if { "$sigalg" equals "" } then {
-      printUsage = true
-    }
-  }
-}
+    if "$sigalg" eq ""
+      set printUsage true
+    fi
+  fi
+fi
 
-THIS_DIR = xipki/ca-setup/cacert-none-dbbased
+set THIS_DIR xipki/ca-setup/cacert-none-dbbased
 
-if { "$printUsage" equals "true" } then {
+if "$printUsage" eq "true"
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p12.script <key spec> <tomcat dir> [<xipki dir>]"
+  echo \
+    "source ${THIS_DIR}/setup-p12.script <key spec> <tomcat dir> [<xipki dir>]"
   source xipki/ca-setup/print-keyspecs.script
   echo "   xipki dir: optional, required if is not <tomcat dir>/xipki"
-} else {
-  if { "$XIPKI_DIR" equals "" } then {
-    XIPKI_DIR = ${TOMCAT_DIR}/xipki
-  }
 
-  echo "#################################################################"
-  echo "#                     Generate CA Keypair                       #"
-  echo "#################################################################"
+  # exit current script file
+  return
+fi
 
-  xi:keypair-p12 --password ${CA_P12_PWD} --out ${CA_P12} --keyspec ${keyspec}
+if "$XIPKI_DIR" eq ""
+  set XIPKI_DIR ${TOMCAT_DIR}/xipki
+fi
 
-  echo "#################################################################"
-  echo "#                  Configure ca-conf.json                       #"
-  echo "#################################################################"
+echo "#################################################################"
+echo "#                     Generate CA Keypair                       #"
+echo "#################################################################"
 
-  CONF_FILE = ${THIS_DIR}/ca-conf.json
+keypair-p12 --password ${CA_P12_PWD} --out ${CA_P12} --keyspec ${keyspec}
 
-  xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
+echo "#################################################################"
+echo "#                  Configure ca-conf.json                       #"
+echo "#################################################################"
 
-  xi:replace \
-    --old "REPLACEME-SUBJECT"       --new "${CA_SUBJECT}" \
-    --old "REPLACEME-TOKEN_TYPE"    --new "pkcs12" \
-    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${sigalg},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
-    ${CONF_FILE}
+set CONF_FILE ${THIS_DIR}/ca-conf.json
 
-  ## init databases
-  source xipki/ca-setup/initdb-dbbased.script
+copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  echo "#################################################################"
-  echo "#                      Configure ca.json                        #"
-  echo "#################################################################"
-  xi:copy-file -f ${XIPKI_DIR}/etc/ca/example/dbbased-ca.json ${XIPKI_DIR}/etc/ca/ca.json
+replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" \
+  --old "REPLACEME-TOKEN_TYPE" --new "pkcs12" \
+  --old "REPLACEME-CA_SIGNERCONF" \
+  --new "algo=${sigalg},password=${CA_P12_PWD},keystore=file:${CA_P12}" \
+  ${CONF_FILE}
 
-  echo "#################################################################"
-  echo "#                       Startup Tomcat                          #"
-  echo "#################################################################"
-  xi:exec "${TOMCAT_DIR}/bin/shutdown.sh"
-  xi:exec "${TOMCAT_DIR}/bin/startup.sh"
-  sleep 1
+## init databases
+source xipki/ca-setup/initdb-dbbased.script
 
-  echo "#################################################################"
-  echo "#                       Load ca-conf.json                       #"
-  echo "#################################################################"
+echo "#################################################################"
+echo "#                      Configure ca.json                        #"
+echo "#################################################################"
+copy-file -f ${XIPKI_DIR}/etc/ca/example/dbbased-ca.json \
+  ${XIPKI_DIR}/etc/ca/ca.json
 
-  ca:load-conf ${CONF_FILE}
+echo "#################################################################"
+echo "#                       Startup Tomcat                          #"
+echo "#################################################################"
+exec "${TOMCAT_DIR}/bin/shutdown.sh"
+exec "${TOMCAT_DIR}/bin/startup.sh"
+sleep 1
 
-  ca:cacert --outform pem --out ${CA_CERT} $[ca.name]
+echo "#################################################################"
+echo "#                       Load ca-conf.json                       #"
+echo "#################################################################"
 
-  echo "# Update the certificate in the p12 file"
-  xi:update-cert-p12 --p12 ${CA_P12} --password ${CA_P12_PWD} --cert ${CA_CERT}
+load-conf ${CONF_FILE}
 
-  ca:ca-info
+cacert --outform pem --out ${CA_CERT} $[ca.name]
 
-}
+echo "# Update the certificate in the p12 file"
+update-cert-p12 --p12 ${CA_P12} --password ${CA_P12_PWD} --cert ${CA_CERT}
+
+ca-info

@@ -1,20 +1,17 @@
 ## How to start XiPKI CLI
 
-`bin/karaf`
+`bin/xipki`
 
-* Note: You may access the CLI via SSH.
-  * Configure karaf to start the SSH server.
-    * Add `"ssh,"` to the field `featuresBoot` in the file `etc/org.apache.karaf.features.cfg`.
-    * Configure the SSH server. See https://karaf.apache.org/manual/latest/security for details.
-  * Start and stop karaf via `bin/start` and `bin/stop`.
-  * Use a SSH client (either `bin/client` or any ssh client) to access the SSH service. Supported authentication
-    methods are
-    * username and password
-    * public key (see Section `Managing authentication by key` at https://karaf.apache.org/manual/latest/security).
+Print each command in the script file (e.g. my.script) while it executes:
 
-## Available Karaf Commands
+```text
+set SCRIPT_TRACE true
+source my.script
+```
 
-Please refer to [commands.md](commands.md) for more details.
+## Available Commands
+
+Call `help` in the xipki shell.
 
 ## Enroll/Revoke Certificate
 

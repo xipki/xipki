@@ -1,0 +1,528 @@
+## DER or PEM
+set OUTFORM DER
+
+set printUsage "false"
+set argsValid "false"
+set errMsg ""
+
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  if "$1" eq "-l"
+    set TOKEN_TYPE $2
+    set CA_KEYSPEC $3
+    set KEYSPEC $4
+  else
+    set TOKEN_TYPE $1
+    set CA_KEYSPEC $2
+    set KEYSPEC $3
+  fi
+
+  set TOKEN_TYPE $(uppercase "$TOKEN_TYPE")
+  set CA_KEYSPEC $(uppercase "$CA_KEYSPEC")
+  set KEYSPEC $(uppercase "$KEYSPEC")
+
+  if "$KEYSPEC" eq ""
+    set KEYSPEC $CA_KEYSPEC
+  fi
+
+  set argsValid $($TOKEN_TYPE in PKCS11 PKCS12)
+
+  if "$argsValid" eq "false"
+    set errMsg "invalid TOKEN_TYPE $TOKEN_TYPE"
+  else
+    set keyspec $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
+    if "$sigalg" eq ""
+      set argsValid "false"
+    fi
+
+    set CA_KEYSPEC $keyspec
+    set CA_SIGALG $sigalg
+    set CA_RSAPSS $rsapss
+
+    if "$KEYSPEC" eq ""
+      set keyspec $CA_KEYSPEC
+    else
+      set keyspec $KEYSPEC
+    fi
+
+    source xipki/ca-setup/c14n-keyspec.script
+
+    if "$keyspec" eq ""
+      set argsValid "false"
+    fi
+    set KEYSPEC $keyspec
+    set RSAPSS $rsapss
+  fi
+fi
+
+if "$argsValid" eq "false"
+  echo "$errMsg"
+  echo ""
+  set printUsage "true"
+fi
+
+if "$printUsage" eq "true"
+  echo "Usage: "
+  echo ""
+  echo "source qa/camgmt-qa.script [option] <token type> <CA keyspec> [<EE keyspec>]"
+  echo "    token type:      PKCS11, PKCS12"
+  source xipki/ca-setup/print-keyspecs.script
+  echo "options"
+  echo "    -l               configure CAs using command 'load-conf'"
+
+  # exit current script file
+  return
+fi
+
+rm --recursive --force output
+
+echo "========================================================"
+echo "TOKEN_TYPE: $TOKEN_TYPE"
+echo "CA_KEYSPEC: $CA_KEYSPEC"
+echo "CA_SIGALG:  $CA_SIGALG"
+echo "KEYSPEC:    $KEYSPEC"
+echo "========================================================"
+
+source qa/qa.d/prepare-keys.script
+
+copy-file -f qa/qa.d/template.ca-load.script qa/qa.d/ca-load.script
+
+copy-file -f qa/qa.d/template.ca.script qa/qa.d/ca.script
+
+replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" qa/qa.d/ca-load.script \
+  qa/qa.d/ca.script
+
+if "$1" eq "-l"
+  source qa/qa.d/ca-load.script
+else
+  source qa/qa.d/ca.script
+fi
+
+sleep 1
+
+echo "#################################################################"
+echo "#                           Requestor                           #"
+echo "#################################################################"
+requestor-check --name requestor1 \
+  --cert xipki/keycerts/ra-sdk-client-cert.pem
+
+requestor-add --name qa-requestor1 \
+  --cert xipki/keycerts/gateway-server-cert.pem
+
+# name already exists
+neg-requestor-add --name qa-requestor1 \
+  --cert xipki/keycerts/gateway-server-cert.pem
+
+# invalid certificate
+neg-requestor-add --name qa-requestor1 --cert qa/camgmt-qa.script
+
+requestor-check --name qa-requestor1 \
+  --cert xipki/keycerts/gateway-server-cert.pem
+
+requestor-up --name qa-requestor1 --cert xipki/keycerts/ra-sdk-client-cert.pem
+
+requestor-check --name qa-requestor1 \
+  --cert xipki/keycerts/ra-sdk-client-cert.pem
+
+requestor-rm -f qa-requestor1
+
+# name does not exist
+neg-requestor-rm -f qa-requestor1
+
+echo "#################################################################"
+echo "#                            Signer                             #"
+echo "#################################################################"
+signer-add --name qa-responder1 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
+
+# name already exists
+neg-signer-add --name qa-responder1 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
+
+# password incorrect
+neg-signer-add --name qa-responder2 --type pkcs12 \
+  --conf password=ERROR,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
+
+# invalid algo
+neg-signer-add --name qa-responder2 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=INVALIDALGO
+
+signer-check --name qa-responder1 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
+
+signer-up --name qa-responder1 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA256withECDSA
+
+signer-check --name qa-responder1 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA256withECDSA
+
+signer-rm -f qa-responder1
+
+# name does not exist
+neg-signer-rm -f qa-responder1
+
+echo "#################################################################"
+echo "#                    Add certificate profile                    #"
+echo "#################################################################"
+profile-check --name subca --type xijson \
+  --conf-file qa/certprofile/certprofile-subca.json
+
+profile-add --name qa-subca \
+  --conf-file qa/certprofile/certprofile-subca-complex.json
+
+# name already exists
+neg-profile-add --name qa-subca \
+  --conf-file qa/certprofile/certprofile-subca-complex.json
+
+# unknown type
+neg-profile-add --name qa-subca2 --type java:packagename.classname
+
+# invalid conf for the given type
+neg-profile-add --name qa-subca --conf invalid-profile-conf
+
+# invalid type
+neg-profile-up --name qa-subca --type invalid-type
+
+# invalid conf
+neg-profile-up --name qa-subca --conf invalid-profile-conf
+
+profile-check --name qa-subca --type xijson \
+  --conf-file qa/certprofile/certprofile-subca-complex.json
+
+profile-rm -f qa-subca
+
+# name does not exist
+neg-profile-rm -f qa-subca
+
+echo "#################################################################"
+echo "#                              CA                               #"
+echo "#################################################################"
+
+ca-check --name subca1 --permission all --max-validity 5y --sn-len 20 \
+  --signer-type $TOKEN_TYPE \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --crl-uri "http://localhost:$[dummy.http.port]/dummy/crl/?type=crl&name=subca1" \
+  --ca-cert-uri http://myorg.org/subca1.der --certchain output/rootca1.crt
+
+ca-check --name rootca1 --permission all --sn-len 20 --max-validity 10y \
+  --signer-type $TOKEN_TYPE --cert output/rootca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der \
+  --crl-uri 'http://localhost:$[dummy.http.port]/dummy/crl/?type=crl&name=rootca1' \
+  --validity-mode cutoff --certchain NULL
+
+# change the CA configuration
+
+ca-up --name subca1 --certchain NULL
+
+ca-check --name subca1 --permission all --sn-len 20 --max-validity 5y \
+  --signer-type $TOKEN_TYPE --cert output/subca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --crl-uri "http://localhost:$[dummy.http.port]/dummy/crl/?type=crl&name=subca1" \
+  --ca-cert-uri http://myorg.org/subca1.der \
+  --revoke-suspended-control enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
+  --certchain output/rootca1.crt --certchain NULL
+
+ca-up --name rootca1 --permission enroll_cert --permission revoke_cert \
+  --max-validity 8y \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder2 \
+  --ca-cert-uri http://myorg.org/rootca1-2.der --validity-mode strict
+
+ca-check --name rootca1 --permission enroll_cert \
+  --permission revoke_cert --max-validity 8y --sn-len 20 \
+  --signer-type $TOKEN_TYPE --cert output/rootca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder2 \
+  --ca-cert-uri http://myorg.org/rootca1-2.der \
+  --crl-uri 'http://localhost:$[dummy.http.port]/dummy/crl/?type=crl&name=rootca1' \
+  --validity-mode strict
+
+# for commands neg-gen-rootca
+profile-add --name rootca --conf-file qa/certprofile/certprofile-rootca.json
+
+# The CA named rootca2 exists. No new CA with the same name is allowed
+
+if $TOKEN_TYPE eq "PKCS11"
+  set CA_SIGNER_CONF_RCA "algo=$CA_SIGNER_ALGO,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}rootca1"
+else
+  set CA_SIGNER_CONF_RCA "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGNER_ALGO"
+fi
+
+echo "neg-gen-rootca: CA named rootca1 already exists"
+
+neg-gen-rootca --name rootca1 --subject "CN=root cA,O=example.org,C=DE" \
+  --profile rootca --outform $OUTFORM --out output/rootca1-2.crt \
+  --permission all --sn-len 20 --next-crl-no 2 --max-validity 10y \
+  --signer-type $TOKEN_TYPE --signer-conf $CA_SIGNER_CONF_RCA \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --validity-mode cutoff
+
+profile-rm -f rootca
+
+echo "neg-ca-add: certificate and key do not match"
+
+neg-ca-add --name rootca2 --permission all --sn-len 20 --next-crl-no 2 \
+  --max-validity 10y --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA --cert output/subca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --validity-mode cutoff
+
+echo "neg-ca-add: certchain does not match"
+
+neg-ca-add --name rootca2 --permission all --sn-len 20 --next-crl-no 2 \
+  --max-validity 10y --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA --cert output/subca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --validity-mode cutoff \
+  --certchain output/subcawithcrl1.crt
+
+echo "neg-ca-add: sn-len not in [9, 20]"
+
+neg-ca-add --name rootca2 --permission all --sn-len 21 --next-crl-no 2 \
+  --max-validity 10y --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA --cert output/rootca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --validity-mode cutoff
+
+echo "neg-ca-add: CRL signer name does not exist"
+
+neg-ca-add --name rootca2 --permission all --sn-len 20 --next-crl-no 2 \
+  --max-validity 10y --signer-type $TOKEN_TYPE \
+  --signer-conf $CA_SIGNER_CONF_RCA --cert output/rootca1.crt \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --crl-signer crlsigner2 \
+  --validity-mode cutoff
+
+echo "#################################################################"
+echo "#                            CA alias                           #"
+echo "#################################################################"
+caalias-check --ca rootca1 --alias rootca
+
+caalias-check --ca subca1 --alias subca
+
+caalias-check --ca subcawithcrl1 --alias subcawithcrl
+
+caalias-add --ca rootca1 --alias rootca-1
+
+caalias-check --ca rootca1 --alias rootca-1
+
+caalias-rm -f rootca-1
+
+echo "#################################################################"
+echo "#                          CA-has-profile                       #"
+echo "#################################################################"
+
+caprofile-check --ca rootca1 --profile cross
+
+caprofile-check --ca rootca1 --profile subca
+
+caprofile-check --ca rootca1 --profile subca-complex
+
+caprofile-add --ca rootca1 --profile tls
+caprofile-check --ca rootca1 --profile tls
+caprofile-rm --force --ca rootca1 --profile tls
+
+## name == alias (alias will be ignored)
+caprofile-add --ca rootca1 --profile tls:tls
+caprofile-check --ca rootca1 --profile tls
+caprofile-rm --force --ca rootca1 --profile tls
+
+caprofile-add --ca rootca1 --profile tls:tls-alias1
+caprofile-check --ca rootca1 --profile tls:tls-alias1
+caprofile-rm --force --ca rootca1 --profile tls
+
+caprofile-add --ca rootca1 --profile tls:tls-alias1,tls-alias2
+caprofile-check --ca rootca1 --profile tls:tls-alias1,tls-alias2
+caprofile-rm --force --ca rootca1 --profile tls
+
+# CA name does not exist
+neg-caprofile-add --ca rootca10 --profile profile-dummy
+
+# profile name does not exist
+neg-caprofile-add --ca rootca1 --profile profile-dummy
+
+# invalid permission
+neg-caprofile-rm -f --ca rootca1 --profile profile-dummy
+
+echo "#################################################################"
+echo "#                         CA-has-publisher                      #"
+echo "#################################################################"
+capub-check --ca rootca1 --publisher ocsp-publisher
+
+# CA name does not exist
+neg-capub-add --ca rootca10 --publisher publisher-dummy
+
+# CA name does not exist
+neg-capub-rm -f --ca rootca10 --publisher publisher-dummy
+
+# Publisher name does not exist
+neg-capub-add --ca rootca1 --publisher publisher-dummy
+
+# Publisher name does not exist
+neg-capub-rm -f --ca rootca1 --publisher publisher-dummy
+
+echo "#################################################################"
+echo "#                         CA-has-requestor                      #"
+echo "#################################################################"
+careq-check --ca rootca1 --requestor requestor1 --permission all \
+  --profile all
+
+careq-rm -f --ca rootca1 --requestor requestor1
+careq-add --ca rootca1 --requestor requestor1 --permission enroll_cert \
+  --permission revoke_cert
+
+careq-check --ca rootca1 --requestor requestor1 \
+  --permission enroll_cert --permission revoke_cert --profile null
+
+# CA name does not exist
+neg-careq-add --ca rootca10 --requestor requestor-dummy \
+  --permission all --profile all
+
+# CA name does not exist
+neg-careq-rm -f --ca rootca10 --requestor requestor-dummy
+
+# Requestor name does not exist
+neg-careq-add --ca rootca1 --requestor requestor-dummy --permission all \
+  --profile all
+
+# Requestor name does not exist
+neg-careq-rm -f --ca rootca1 --requestor requestor-dummy
+
+# Requestor name does not exist
+neg-careq-add --ca rootca1 --requestor requestor-dummy --permission all \
+  --profile all
+
+## Positive CA qa script
+
+##### caalias #####
+
+caalias-info
+
+caalias-info rootca
+
+caalias-rm -f rootca
+
+caalias-add --alias rootca --ca rootca1
+
+##### caprofile #####
+
+caprofile-info --ca rootca1
+
+caprofile-rm -f --profile subca --ca rootca1
+
+caprofile-add --profile subca --ca rootca1
+
+##### capub #####
+
+capub-info --ca rootca1
+
+capub-rm -f --publisher ocsp-publisher --ca rootca1
+
+capub-add --ca rootca1 --publisher ocsp-publisher
+
+##### careq #####
+
+careq-info --ca rootca1
+
+careq-rm -f --requestor requestor1 --ca rootca1
+
+careq-add --requestor requestor1 --ca rootca1 --profile all --permission all
+
+##### profile #####
+
+profile-info
+
+profile-info ocsp
+
+profile-export --name subca --out output/certprofile-subca.export
+
+profile-up --name subca --conf-file output/certprofile-subca.export
+
+##### publisher #####
+
+publisher-info
+
+publisher-info ocsp-publisher
+
+publisher-export --name ocsp-publisher --out output/publisher.export
+
+publisher-up --name ocsp-publisher --conf-file output/publisher.export
+
+publisher-add --name ocsp-publisher2 --type ocsp \
+  --conf-file output/publisher.export
+
+publisher-rm -f ocsp-publisher2
+
+##### requestor #####
+
+requestor-add --name requestor2 --cert xipki/keycerts/ra-sdk-client-cert.pem
+
+requestor-info
+
+requestor-info requestor2
+
+requestor-up  --name requestor2 --cert xipki/keycerts/ra-sdk-client-cert.pem
+
+requestor-rm -f requestor2
+
+##### signer #####
+
+signer-add --name responder2 --type pkcs12 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA256withECDSA
+
+signer-info
+
+signer-info responder2
+
+signer-up --name responder2 \
+  --conf password=CHANGEIT,keystore=file:xipki/keycerts/ca-server.p12,algo=SHA1withECDSA
+
+signer-rm -f responder2
+
+##### cert #####
+
+revoke-cert --ca rootca1 --reason certificateHold \
+  --cert output/subcawithcrl1.crt
+
+unsuspend-cert --ca rootca1 --cert output/subcawithcrl1.crt
+
+revoke-cert --ca rootca1 --reason certificateHold \
+  --cert output/subcawithcrl1.crt
+
+unsuspend-cert --ca rootca1 --cert output/subcawithcrl1.crt
+
+revoke-cert --ca rootca1 --reason keyCompromise \
+  --cert output/subcawithcrl1.crt
+
+revoke-cert --ca rootca1 --reason keyCompromise --cert output/subca1.crt
+
+rm-cert -f --ca rootca1 --cert output/subcawithcrl1.crt
+
+rm-cert -f --ca rootca1 --cert output/subca1.crt
+
+##### CA #####
+
+ca-revoke --reason keyCompromise rootca1
+
+ca-unrevoke rootca1
+
+notify-change
+
+system-status
+
+unlock
+
+ca-info
+
+ca-info rootca1
+
+ca-up --name rootca1 --permission enroll_cert --permission revoke_cert \
+  --max-validity 8y \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder2 \
+  --ca-cert-uri http://myorg.org/rootca1-2.der --validity-mode strict
+
+ca-up --name rootca1 --permission all --max-validity 10y \
+  --ocsp-uri http://localhost:$[ocsp.http.port]/ocsp/responder1 \
+  --ca-cert-uri http://myorg.org/rootca1.der --validity-mode cutoff

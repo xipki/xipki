@@ -1,0 +1,73 @@
+set printUsage "false"
+
+set argsValid "false"
+
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  set action $1
+  set argsValid $($action in enroll ocsp)
+fi
+
+if "$argsValid" eq "false"
+  echo "invalid arguments $args"
+  echo ""
+  set printUsage "true"
+fi
+
+if "$printUsage" eq "true"
+  echo "Usage: "
+  echo ""
+  echo "source qa/benchmark.script <test type> [<duration> [<threads>]]"
+  echo "test type:       enroll, ocsp"
+  echo "duration:        duration in seconds, default is 15"
+  echo "threads:         number of threads, default is 5"
+
+  # exit current script file
+  return
+fi
+
+if "$2" eq ""
+  set argsValid "true"
+  set duration "15s"
+  set threads 5
+else
+  set argsValid "true"
+  set duration "$2"
+  if "$3" eq ""
+    set threads 5
+  else
+    set threads "$3"
+  fi
+fi
+
+set action $(lowercase "$action")
+
+if "$action" eq "enroll"
+  sleep 1
+
+  # Loadtest RSA key
+  echo "Benchmark Enroll"
+  benchmark-enroll --ca subca --duration $duration --thread $threads \
+    --keyspec rsa2048 --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
+    --profile TLS -n 5 --random-dn O
+
+  echo "Benchmark Enroll (server generate keypair)"
+  benchmark-enroll-serverkeygen --ca subca --duration $duration \
+    --thread $threads --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
+    --profile TLS -n 5 --random-dn O
+elif "$action" eq "ocsp"
+  set URL http://localhost:$[ocsp.http.port]/ocsp/responder1
+  set URL_CRL http://localhost:$[ocsp.http.port]/ocsp/responder2
+
+  sleep 1
+  echo "OCSP status benchmark"
+  benchmark-ocsp-status --duration $duration --thread $threads \
+    --issuer output/subca1.crt --cert output/tls-c2.crt --url $URL
+
+  echo "Loadtest OCSP status"
+  benchmark-ocsp-status --duration $duration --thread $threads \
+    --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL
+
+fi

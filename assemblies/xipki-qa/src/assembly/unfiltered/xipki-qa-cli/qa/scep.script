@@ -1,0 +1,19 @@
+set SCEP_URL http://localhost:$[gateway.http.port]/gw/scep/subcawithcrl/ocsp/pkiclient.exe
+set OUT_DIR output/scep-raw
+set OSUFFIX raw
+source qa/scep0.script
+
+set SCEP_URL http://localhost:$[gateway.http.port]/gw/scep/myalias/pkiclient.exe
+set OUT_DIR output/scep-alias
+set OSUFFIX alias
+source qa/scep0.script
+
+set SCEP_URL http://localhost:$[gateway.http.port]/gw/scep/pkiclient.exe
+set OUT_DIR output/scep-none
+set OSUFFIX none
+source qa/scep0.script
+
+set SCEP_URL https://localhost:$[gateway.https.port]/gw/scep/subcawithcrl/ocsp/pkiclient.exe
+set OUT_DIR output/scep-raw
+set OSUFFIX raw
+source qa/scep0.script

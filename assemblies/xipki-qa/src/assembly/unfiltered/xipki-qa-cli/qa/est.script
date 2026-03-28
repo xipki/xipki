@@ -1,0 +1,11 @@
+set BASE_URL https://localhost:$[gateway.https.port]/.well-known/est/subca/tls
+set OUT_DIR output/est-raw
+source qa/est0.script
+
+set BASE_URL https://localhost:$[gateway.https.port]/.well-known/est/myalias
+set OUT_DIR output/est-alias
+source qa/est0.script
+
+set BASE_URL https://localhost:$[gateway.https.port]/.well-known/est
+set OUT_DIR output/est-none
+source qa/est0.script

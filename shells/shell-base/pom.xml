@@ -6,28 +6,42 @@
   <parent>
     <groupId>org.xipki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>6.6.1-SNAPSHOT</version>
+    <version>6.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>shell-base</artifactId>
-  <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <Karaf-Commands>*</Karaf-Commands>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>osgi-placeholder</artifactId>
+      <artifactId>codec</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.karaf.shell</groupId>
-      <artifactId>org.apache.karaf.shell.core</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>util</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>util-extra</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,16 @@
+{
+  // Server Management URL, default to https://localhost:8444/ca/mgmt
+  "serverUrl": "https://$[ca.host]:$[ca.https.port]/ca/mgmt",
+  "useSslConf": true,
+  "ssl": {
+    "storeType": "PKCS12",
+    "keystore": "xipki/keycerts/ca-mgmt-client.p12",
+    "keystorePassword": "$[ca.mgmt.client.keyPassword]",
+    // list of (PEM or DER encoded) certificate files.
+    "trustanchors": [
+      "xipki/keycerts/ca-server-cert.pem"
+    ],
+    // 'no_op', 'default' or 'java:<class name>'. Default to 'default'
+    "hostnameVerifier": "default"
+  }
+}

@@ -31,7 +31,8 @@
         "suffixes": [
           ".json",
           ".script",
-          ".sh"
+          ".sh",
+          ".bat"
         ]
       },
       "replacements": {
@@ -51,7 +52,7 @@
           "xipki-mgmt-cli/"
         ],
         "suffixes": [
-          ".json", ".xml", ".cfg", ".script", ".properties", ".sh"
+          ".json", ".xml", ".cfg", ".script", ".properties", ".sh", ".bat"
         ]
       },
       "replacements": {

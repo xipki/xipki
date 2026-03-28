@@ -1,0 +1,16 @@
+set tokentypes [PKCS11 PKCS12]
+for it in $tokentypes
+  set tokentype $it
+
+  set keyspecs [ RSA2048 RSA2048/PSS P256 SM2 ED25519 MLDSA44 ]
+  for it in $keyspecs
+    set keyspec $it
+
+    echo "+++++source qa/camgmt.script    $tokentype $keyspec +++++"
+    source qa/camgmt.script    $tokentype $keyspec
+
+    echo "+++++source qa/camgmt.script -l $tokentype $keyspec +++++"
+    source qa/camgmt.script -l $tokentype $keyspec
+  done
+
+done

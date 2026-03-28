@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.6.1-SNAPSHOT</version>
+    <version>6.7.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
@@ -18,15 +18,20 @@
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>xipki-qa-cli</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <resources>
       <resource>
-        <directory>src/main/filtered</directory>
+        <directory>src/assembly/filtered</directory>
         <filtering>true</filtering>
       </resource>
       <resource>
-        <directory>src/main/unfiltered</directory>
+        <directory>src/assembly/unfiltered</directory>
         <filtering>false</filtering>
       </resource>
     </resources>
@@ -45,10 +50,53 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.xipki.tools</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <version>${xipki.dependency-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>download-qa-cli-shell</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>download</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/t2/xipki-qa-cli/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.shell</groupId>
+                  <artifactId>xipki-qa-cli</artifactId>
+                  <version>${project.version}</version>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!--  include additional artifacts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/t2</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.assembly</groupId>
+                  <artifactId>xipki-setup</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bcfips</classifier>
+                  <type>tar.gz</type>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
           <execution>
             <id>copy-dummy-servlet-war</id>
             <phase>generate-resources</phase>
@@ -68,95 +116,6 @@
               </artifactItems>
             </configuration>
           </execution>
-          <!--execution>
-            <id>copy-prepare-jar</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/setup/lib</outputDirectory>
-              <stripVersion>true</stripVersion>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-api</artifactId>
-                  <version>${slf4j.version}</version>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.slf4j</groupId>
-                  <artifactId>slf4j-simple</artifactId>
-                  <version>${slf4j.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution-->
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>karaf-maven-plugin</artifactId>
-        <extensions>true</extensions>
-        <executions>
-          <execution>
-            <id>add-features-to-repo</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>features-add-to-repository</goal>
-            </goals>
-            <configuration>
-              <repository>${project.build.directory}/t2/xipki-qa/system</repository>
-              <descriptors>
-                <descriptor>mvn:org.xipki/karaf-features/${project.version}/xml/features</descriptor>
-              </descriptors>
-              <features>
-                <!-- apache karaf -->
-                <feature>hidden-do-not-call-me</feature>
-                <feature>framework</feature>
-                <feature>shell</feature>
-                <feature>log</feature>
-                <feature>bundle</feature>
-                <feature>feature</feature>
-                <feature>scr</feature>
-                <!-- xipki -->
-                <feature>xipki-bc-lts</feature>
-                <feature>xipki-bc-fips</feature>
-                <feature>xipki-pki-client</feature>
-                <feature>xipki-ca-mgmt</feature>
-                <feature>xipki-qa</feature>
-              </features>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>prepare-package</phase>
-            <configuration>
-              <target>
-                <gunzip src="../xipki-setup/target/xipki-setup-${project.version}-bclts.tar.gz"/>
-                <untar src="../xipki-setup/target/xipki-setup-${project.version}-bclts.tar"
-                   dest="${project.build.directory}"/>
-                <delete file="../xipki-setup/target/xipki-setup-${project.version}-bclts.tar"/>
-
-                <move file="${project.build.directory}/xipki-setup-${project.version}/xipki-mgmt-cli/etc/org.apache.karaf.features.cfg"
-                  todir="${project.build.directory}/setup/bc-lts"/>
-
-                <replace file="${project.build.directory}/setup/bc-lts/org.apache.karaf.features.cfg"
-                  token="xipki-ca-mgmt" value="xipki-pki-client,xipki-ca-mgmt,xipki-qa"/>
-
-                <copy file="${project.build.directory}/setup/bc-lts/org.apache.karaf.features.cfg"
-                  todir="${project.build.directory}/setup/bc-fips"/>
-                <replace file="${project.build.directory}/setup/bc-fips/org.apache.karaf.features.cfg"
-                  token="xipki-bc-lts" value="xipki-bc-fips"/>
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -171,7 +130,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/main/descriptors/main.xml</descriptor>
+                <descriptor>src/assembly/descriptors/dist.xml</descriptor>
               </descriptors>
               <appendAssemblyId>false</appendAssemblyId>
               <tarLongFileMode>posix</tarLongFileMode>

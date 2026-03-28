@@ -1,92 +1,96 @@
 # Please adapt me
-CA_SUBJECT="O=$[organization],CN=$[ca.name]"
+set CA_SUBJECT "O=$[organization],CN=$[ca.name]"
 
-SLOT = 0
-LABEL = $[ca.name]
+set SLOT 0
+set LABEL $[ca.name]
 
-KEYCERTS_DIR = xipki/ca-setup/keycerts
-CA_CERT = ${KEYCERTS_DIR}/$[ca.name].pem
+set KEYCERTS_DIR xipki/ca-setup/keycerts
+set CA_CERT ${KEYCERTS_DIR}/$[ca.name].pem
 
-if { "$1" equals "" | "$1" equals "help" } then {
-  printUsage = "true"
-} else {
-  keyspec = $1
-  TOMCAT_DIR = $2
-  XIPKI_DIR = $3
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+else
+  set keyspec $1
+  set TOMCAT_DIR $2
+  set XIPKI_DIR $3
 
-  printUsage = "false"
-  if { "$TOMCAT_DIR" equals "" } then {
+  set printUsage "false"
+  if "$TOMCAT_DIR" eq ""
     echo "TOMCAT_DIR is not specified"
-    printUsage = "true"
-  } else {
+    set printUsage "true"
+  else
     source xipki/ca-setup/c14n-keyspec.script
-    LABEL = ${p11composite}${LABEL}
-    if { "$sigalg" equals "" } then {
-      printUsage = true
-    }
-  }
-}
+    set LABEL ${p11composite}${LABEL}
+    if "$sigalg" eq ""
+      set printUsage true
+    fi
+  fi
+fi
 
-THIS_DIR = xipki/ca-setup/cacert-none-filebased
+set THIS_DIR xipki/ca-setup/cacert-none-filebased
 
-if { "$printUsage" equals "true" } then {
+if "$printUsage" eq "true"
   echo "Usage: "
   echo ""
-  echo "source ${THIS_DIR}/setup-p11.script <key spec> <tomcat dir> [<xipki dir>]"
+  echo \
+    "source ${THIS_DIR}/setup-p11.script <key spec> <tomcat dir> [<xipki dir>]"
   source xipki/ca-setup/print-keyspecs.script
   echo "    xipki dir: optional, required if is not <tomcat dir>/xipki"
-} else {
-  if { "$XIPKI_DIR" equals "" } then {
-    XIPKI_DIR = $TOMCAT_DIR/xipki
-  }
 
-  TARGET_DIR = output/ca-setup/ca-conf
-  CONF_FILE = ${TARGET_DIR}/ca-conf.json
+  # exit current script file
+  return
+fi
 
-  xi:rm -r ${TARGET_DIR}
-  xi:mkdir ${TARGET_DIR}
+if "$XIPKI_DIR" eq ""
+  set XIPKI_DIR $TOMCAT_DIR/xipki
+fi
 
-  echo "#################################################################"
-  echo "#                     Generate CA Keypair                       #"
-  echo "#################################################################"
+set TARGET_DIR output/ca-setup/ca-conf
+set CONF_FILE ${TARGET_DIR}/ca-conf.json
 
-  xi:keypair-p11  --slot ${SLOT} --label ${LABEL} --keyspec ${keyspec}
+rm -r ${TARGET_DIR}
+mkdir ${TARGET_DIR}
 
-  echo "#################################################################"
-  echo "#                  Configure ca-conf.json                       #"
-  echo "#################################################################"
+echo "#################################################################"
+echo "#                     Generate CA Keypair                       #"
+echo "#################################################################"
 
-  xi:copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
+keypair-p11  --slot ${SLOT} --label ${LABEL} --keyspec ${keyspec}
 
-  xi:replace \
-    --old "REPLACEME-SUBJECT"       --new "${CA_SUBJECT}" \
-    --old "REPLACEME-TOKEN_TYPE"    --new "pkcs11" \
-    --old "REPLACEME-CA_SIGNERCONF" --new "algo=${sigalg},slot=${SLOT},key-label=${LABEL}" \
-    ${CONF_FILE}
+echo "#################################################################"
+echo "#                  Configure ca-conf.json                       #"
+echo "#################################################################"
 
-  xi:mkdir ${TARGET_DIR}/keycerts
-  xi:copy-file xipki/keycerts/ra-sdk-client-cert.pem ${TARGET_DIR}/keycerts
-  xi:copy-dir xipki/ca-setup/certprofile ${TARGET_DIR}/certprofile
+copy-file -f ${THIS_DIR}/template.ca-conf.json ${CONF_FILE}
 
-  xi:rm -r ${XIPKI_DIR}/etc/ca/ca-conf
-  xi:copy-dir ${TARGET_DIR} ${XIPKI_DIR}/etc/ca/ca-conf
+replace --old "REPLACEME-SUBJECT" --new "${CA_SUBJECT}" \
+  --old "REPLACEME-TOKEN_TYPE" --new "pkcs11" \
+  --old "REPLACEME-CA_SIGNERCONF" \
+  --new "algo=${sigalg},slot=${SLOT},key-label=${LABEL}" ${CONF_FILE}
 
-  ## init databases
-  source xipki/ca-setup/initdb-filebased.script
+mkdir ${TARGET_DIR}/keycerts
+copy-file xipki/keycerts/ra-sdk-client-cert.pem ${TARGET_DIR}/keycerts
+copy-dir xipki/ca-setup/certprofile ${TARGET_DIR}/certprofile
 
-  echo "#################################################################"
-  echo "#                      Configure ca.json                        #"
-  echo "#################################################################"
-  xi:copy-file -f ${XIPKI_DIR}/etc/ca/example/filebased-ca.json ${XIPKI_DIR}/etc/ca/ca.json
+rm -r ${XIPKI_DIR}/etc/ca/ca-conf
+copy-dir ${TARGET_DIR} ${XIPKI_DIR}/etc/ca/ca-conf
 
-  echo "#################################################################"
-  echo "#                       Startup Tomcat                          #"
-  echo "#################################################################"
-  xi:exec "${TOMCAT_DIR}/bin/shutdown.sh"
-  xi:exec "${TOMCAT_DIR}/bin/startup.sh"
-  sleep 1
+## init databases
+source xipki/ca-setup/initdb-filebased.script
 
-  ca:ca-info
+echo "#################################################################"
+echo "#                      Configure ca.json                        #"
+echo "#################################################################"
+copy-file -f ${XIPKI_DIR}/etc/ca/example/filebased-ca.json \
+  ${XIPKI_DIR}/etc/ca/ca.json
 
-  ca:cacert --outform pem --out ${CA_CERT} $[ca.name]
-}
+echo "#################################################################"
+echo "#                       Startup Tomcat                          #"
+echo "#################################################################"
+exec "${TOMCAT_DIR}/bin/shutdown.sh"
+exec "${TOMCAT_DIR}/bin/startup.sh"
+sleep 1
+
+ca-info
+
+cacert --outform pem --out ${CA_CERT} $[ca.name]

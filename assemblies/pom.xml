@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.6.1-SNAPSHOT</version>
+    <version>6.7.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.assembly</groupId>
   <artifactId>assemblies</artifactId>
@@ -15,25 +15,130 @@
   <properties>
     <skipDeploy>true</skipDeploy>
   </properties>
-  <modules>
-    <module>xipki-qa</module>
-    <module>xipki-setup</module>
-  </modules>
   <build>
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>3.2.0</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.xipki</groupId>
-              <artifactId>patch-karaf</artifactId>
-              <version>${project.version}</version>
-            </dependency>
-          </dependencies>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>jdbc-jars</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <stripVersion>false</stripVersion>
+                <outputDirectory>${project.build.directory}/t2/setup/jars/jdbc</outputDirectory>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.mariadb.jdbc</groupId>
+                    <artifactId>mariadb-java-client</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+            <execution>
+              <id>bcfips-jars</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <stripVersion>false</stripVersion>
+                <outputDirectory>${project.build.directory}/t2/setup/jars/bcfips</outputDirectory>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-fips</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpqc-fips</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bc-fips</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcutil-fips</artifactId>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+            <execution>
+              <id>bclts-jars</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <stripVersion>false</stripVersion>
+                <outputDirectory>${project.build.directory}/t2/setup/jars/bclts</outputDirectory>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-lts8on</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-lts8on</artifactId>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcutil-lts8on</artifactId>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+            <execution>
+              <id>bcbridge-jars</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <stripVersion>false</stripVersion>
+                <outputDirectory>${project.build.directory}/t2/setup/jars/xipki</outputDirectory>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.xipki</groupId>
+                    <artifactId>bcbridge-fips</artifactId>
+                    <version>${project.version}</version>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.xipki</groupId>
+                    <artifactId>bcbridge-lts8on</artifactId>
+                    <version>${project.version}</version>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+  <modules>
+    <module>xipki-setup</module>
+    <module>xipki-qa</module>
+  </modules>
 </project>

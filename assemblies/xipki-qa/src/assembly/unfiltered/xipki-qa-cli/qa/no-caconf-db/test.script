@@ -1,0 +1,47 @@
+set SRC_DIR qa/no-caconf-db
+set CA_DIR $[test.basedir]/ca-tomcat/xipki/etc/ca
+
+echo "Shutdown tomcat for CA server"
+
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+
+// initialize database
+sql --force --db-conf "$CA_DIR/database/ca-db.properties" xipki/sql/ca-init.sql
+
+rm -r -f ${CA_DIR}/caconf
+
+copy-dir $SRC_DIR/caconf $CA_DIR/caconf
+
+copy-file xipki/keycerts/ra-sdk-client-cert.pem ${CA_DIR}/caconf/keycerts
+
+mkdir ${CA_DIR}/caconf/profiles
+
+copy-file -f $SRC_DIR/../certprofile/certprofile-rootca.json \
+  $SRC_DIR/../certprofile/certprofile-subca.json \
+  $SRC_DIR/../certprofile/certprofile-tls.json \
+  $SRC_DIR/../certprofile/certprofile-tls-c.json $CA_DIR/caconf/profiles
+
+copy-file -f $SRC_DIR/ca-rootca.json $CA_DIR/ca.json
+
+echo "Start tomcat for CA server"
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
+sleep 5
+
+enroll-cert --ca rootca1 --csr $SRC_DIR/csr/subca1.csr --outform PEM \
+  --out output/subca1.pem --profile subca
+
+copy-file -f output/subca1.pem $CA_DIR/caconf/keycerts
+
+copy-file -f $SRC_DIR/ca.json $CA_DIR/ca.json
+
+echo "Re-start tomcat for CA server"
+
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+sleep 2
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
+sleep 3
+
+echo "Test CA"
+
+enroll-cert --ca subca1 --csr $SRC_DIR/csr/tls.csr --outform PEM \
+  --out output/tls.pem --profile tls

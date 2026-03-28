@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.shell</groupId>
+    <artifactId>shells</artifactId>
+    <version>6.7.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xipki-qa-cli</artifactId>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>shell-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>xi-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>security-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>pki-client-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>ca-mgmt-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>qa-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.shell</groupId>
+      <artifactId>demo-shell</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>

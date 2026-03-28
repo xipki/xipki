@@ -1,0 +1,143 @@
+set printUsage "false"
+set argsValid "false"
+set errMsg ""
+
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  set TOKEN_TYPE $1
+  set CA_KEYSPEC $2
+  set KEYSPEC $3
+
+
+  set TOKEN_TYPE $(uppercase "$TOKEN_TYPE")
+  set CA_KEYSPEC $(uppercase "$CA_KEYSPEC")
+  set KEYSPEC $(uppercase "$KEYSPEC")
+
+  set argsValid $($TOKEN_TYPE in PKCS11 PKCS12)
+
+  if "$argsValid" eq "false"
+    set errMsg "invalid TOKEN_TYPE $TOKEN_TYPE"
+  else
+    set keyspec $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
+
+    if $keyspec in RSA2048 RSA3072 RSA4096 P256 P384 P521
+      set CA_KEYSPEC $keyspec
+      set CA_SIGALG $sigalg
+      set CA_RSAPSS $rsapss
+    else
+      set argsValid "false"
+    fi
+
+    if "$argsValid" eq "true"
+      if "$KEYSPEC" eq ""
+        set KEYSPEC $CA_KEYSPEC
+        set RSAPSS $CA_RSAPSS
+      else
+        set keyspec $KEYSPEC
+
+        source xipki/ca-setup/c14n-keyspec.script
+
+        if $keyspec in RSA2048 RSA3072 RSA4096 P256 P384 P521
+          set KEYSPEC $keyspec
+          set RSAPSS $rsapss
+        else
+          set argsValid "false"
+        fi
+      fi
+    fi
+  fi
+fi
+
+if "$argsValid" eq "false"
+  echo "$errMsg"
+  echo ""
+  set printUsage "true"
+fi
+
+if "$printUsage" eq "true"
+  echo "Usage: "
+  echo ""
+  echo "source qa/cab/lifecycle.script <token type> <CA keyspec> [<EE keyspec>]"
+  echo "    token type:      PKCS11, PKCS12"
+  echo "    CA-keyspec:      RSA2048, RSA3072, RSA4096,"
+  echo "                     RSA2048/PSS, RSA3072/PSS, RSA4096/PSS,"
+  echo "                     P256, P384, P521"
+  echo "    EE-keyspec:      RSA2048, RSA3072, RSA4096,"
+  echo "                     P256, P384, P521"
+
+  # exit current script file
+  return
+fi
+
+echo "========================================================"
+echo "TOKEN_TYPE: $TOKEN_TYPE"
+echo "CA_KEYSPEC: $CA_KEYSPEC"
+echo "CA_SIGALG:  $CA_SIGALG"
+echo "KEYSPEC:    $KEYSPEC"
+echo "========================================================"
+
+# Start the h2 database
+if "$[database.type]" eq "h2"
+  start-h2-server
+fi
+
+source qa/qa.d/prepare-keys.script
+
+echo "Restart Gateway (tomcat) server!"
+exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/shutdown.sh'
+exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/startup.sh'
+sleep 5
+
+copy-file -f qa/cab/template.ca-load.script qa/cab/ca-load.script
+
+copy-file -f qa/cab/template.ra.script qa/cab/ra.script
+
+replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" qa/cab/ca-load.script
+
+replace --old "REPLACEME-RSAPSS" --new "${RSAPSS}" qa/cab/ra.script
+
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+sleep 2
+
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
+sleep 5
+
+source qa/cab/ca-load.script
+
+echo "#################################################################"
+echo "#                  CA certificate commands                      #"
+echo "#################################################################"
+
+#### list certs ####
+
+list-cert --ca rootca1 --subject "CN=*ca*,O=myorg" --order subject -n 100
+
+source qa/cab/ra.script
+
+sleep 1
+
+echo "#################################################################"
+echo "#                     CAQA:Check certificate                    #"
+echo "#################################################################"
+
+init-caqa
+
+check-cert --issuer rootca --profile cab-subca --csr output/subca1.csr \
+  --cert output/subca1.crt
+
+set list [ cab-domain-validated cab-domain-validated cab-org-validated ]
+
+for it in $list
+  set name $it
+  check-cert --issuer cab-subca --profile ${name} \
+    --csr output/${name}1.csr --cert output/${name}1.crt
+done
+
+for it in $list
+  set name $it
+  check-cert --issuer cab-subca --profile ${name} \
+    --csr output/${name}2.csr --cert output/${name}2.crt
+done

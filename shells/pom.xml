@@ -6,21 +6,22 @@
   <parent>
     <groupId>org.xipki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.6.1-SNAPSHOT</version>
+    <version>6.7.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xipki.shell</groupId>
   <artifactId>shells</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <skipDeploy>true</skipDeploy>
-  </properties>
   <modules>
     <module>shell-base</module>
+    <module>xi-shell</module>
+    <module>demo-shell</module>
     <module>security-shell</module>
     <module>pki-client-shell</module>
     <module>ca-mgmt-shell</module>
     <module>qa-shell</module>
-    <module>demo-shell</module>
+    <module>xipki-cli</module>
+    <module>xipki-mgmt-cli</module>
+    <module>xipki-qa-cli</module>
   </modules>
 </project>

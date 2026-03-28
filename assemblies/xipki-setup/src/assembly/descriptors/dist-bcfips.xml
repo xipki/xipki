@@ -1,0 +1,31 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>bcfips</id>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  <fileSets>
+    <!-- JDBC & BouncyCastle jars -->
+    <fileSet>
+      <directory>${project.build.directory}/t2/setup/jars/bcfips</directory>
+      <outputDirectory>setup/jars/bouncycastle</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${project.build.directory}/t2/setup/jars</directory>
+      <outputDirectory>setup/jars</outputDirectory>
+      <includes>
+        <include>jdbc/**</include>
+        <include>xipki/**</include>
+      </includes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+  </fileSets>
+  <componentDescriptors>
+    <componentDescriptor>src/assembly/descriptors/dist-common.xml</componentDescriptor>
+  </componentDescriptors>
+</assembly>

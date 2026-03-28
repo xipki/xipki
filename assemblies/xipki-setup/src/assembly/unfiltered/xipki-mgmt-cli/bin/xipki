@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+DIST_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
+LIB_DIR=$DIST_DIR/lib
+mkdir -p "$DIST_DIR/logs"
+if [ ! -d "$LIB_DIR" ]; then
+  echo "library directory not found: '$LIB_DIR'" >&2
+  exit 1
+fi
+
+JAVA_OPTS=
+if [ -f "$LIB_DIR/logging.properties" ]; then
+  JAVA_OPTS="-Djava.util.logging.config.file=$LIB_DIR/logging.properties"
+fi
+
+if [ "${1-}" = "debug" ]; then
+  if [ -n "$JAVA_OPTS" ]; then
+    JAVA_OPTS="$JAVA_OPTS "
+  fi
+  JAVA_OPTS="${JAVA_OPTS}-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+  shift
+fi
+
+CLASSPATH=$LIB_DIR/*
+
+cd "$DIST_DIR"
+exec java $JAVA_OPTS -Dorg.xipki.shell.home="$DIST_DIR" -cp "$CLASSPATH" \
+  org.xipki.shell.dist.XipkiMgmtCliMain "$@"

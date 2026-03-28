@@ -1,0 +1,88 @@
+echo "#################################################################"
+echo "#               Enroll Certificate via SCEP                     #"
+echo "# SCEP_URL: $SCEP_URL"
+echo "# OUT_DIR:  $OUT_DIR"
+echo "#################################################################"
+
+# Prepare keys
+
+rm --force --recursive $OUT_DIR
+mkdir $OUT_DIR
+
+copy-file output/scep-ocsp1.p12 output/scep-ocsp1-2.p12 output/scep-ocsp2.p12 \
+  $OUT_DIR/
+
+csr-p12 --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
+  --challenge-password \
+  $[gateway.requestor.user1]:$[gateway.requestor.password1] --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1.csr
+
+## Enroll certificate via PKCSReq
+scep-enroll --method pkcs --url $SCEP_URL --ca-cert output/subcawithcrl1.crt \
+  --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
+  --csr $OUT_DIR/scep-ocsp1.csr --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1.crt
+
+## Poll Cert
+scep-certpoll --url $SCEP_URL --ca-cert output/subcawithcrl1.crt \
+  --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
+  --csr $OUT_DIR/scep-ocsp1.csr --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1-certpoll.crt
+
+## Get Cert
+
+set SERIAL $(cert-info --serial --hex --in $OUT_DIR/scep-ocsp1-certpoll.crt)
+
+scep-get-cert --url $SCEP_URL --ca-cert output/subcawithcrl1.crt \
+  --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1-getcert.crt --serial $SERIAL
+
+## Update the certificate in PKCS#12 file
+update-cert-p12 --p12 $OUT_DIR/scep-ocsp1.p12 --password CHANGEIT \
+  --cert $OUT_DIR/scep-ocsp1.crt --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+## Get CRL
+scep-get-crl --url $SCEP_URL --ca-cert output/subcawithcrl1.crt \
+  --cert $OUT_DIR/scep-ocsp1.crt --p12 $OUT_DIR/scep-ocsp1.p12 \
+  --password CHANGEIT --outform $OUTFORM --out $OUT_DIR/subcawithcrl1-scep.crl
+
+## Renewal
+
+csr-p12 \
+  --challenge-password \
+  $[gateway.requestor.user1]:$[gateway.requestor.password1] \
+  --p12 $OUT_DIR/scep-ocsp1-2.p12 --password CHANGEIT \
+  --subject "CN=scep-ocsp1-2,O=myorg,C=DE" --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1-2.csr
+
+## Enroll certificate via Renewal, hence signed by the old key scep-ocsp1.p12
+scep-enroll --method renewal --url $SCEP_URL \
+  --ca-cert output/subcawithcrl1.crt --p12 $OUT_DIR/scep-ocsp1.p12 \
+  --password CHANGEIT --csr $OUT_DIR/scep-ocsp1-2.csr --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp1-2.crt
+
+## Update the certificate in PKCS#12 file
+update-cert-p12 --p12 $OUT_DIR/scep-ocsp1-2.p12 --password CHANGEIT \
+  --cert $OUT_DIR/scep-ocsp1-2.crt --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt
+
+## Renewal with different CommonName
+
+csr-p12 \
+  --challenge-password \
+  $[gateway.requestor.user1]:$[gateway.requestor.password1] \
+  --p12 $OUT_DIR/scep-ocsp2.p12 --password CHANGEIT \
+  --subject "CN=scep-ocsp2,O=myorg,C=DE" --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp2.csr
+
+## Enroll certificate via Renewal, hence signed by the old key scep-ocsp1.p12
+scep-enroll --method renewal --url $SCEP_URL \
+  --ca-cert output/subcawithcrl1.crt --p12 $OUT_DIR/scep-ocsp1.p12 \
+  --password CHANGEIT --csr $OUT_DIR/scep-ocsp2.csr --outform $OUTFORM \
+  --out $OUT_DIR/scep-ocsp2.crt
+
+## Update the certificate in PKCS#12 file
+update-cert-p12 --p12 $OUT_DIR/scep-ocsp2.p12 --password CHANGEIT \
+  --cert $OUT_DIR/scep-ocsp2.crt --ca-cert output/subcawithcrl1.crt \
+  --ca-cert output/rootca1.crt

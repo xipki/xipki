@@ -1,0 +1,125 @@
+echo "#################################################################"
+echo "#               Export-then-import CA and OCSP                  #"
+echo "#################################################################"
+## Restart the CA
+exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
+  '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
+  '$[test.basedir]/ca-tomcat/bin/startup.sh'
+
+source qa/setenv.script
+
+sleep 1
+
+rm -r -f output/dbexport
+
+## Export CA
+echo "========================================================================"
+echo "||                             Export CA Database                     ||"
+echo "========================================================================"
+
+export-ca --out-dir output/dbexport/ca --password CHANGEIT \
+  --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+
+## Export OCSP
+
+echo "========================================================================"
+echo "||                          Export OCSP Database                      ||"
+echo "========================================================================"
+
+export-ocsp --out-dir output/dbexport/ocsp --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
+
+echo "========================================================================"
+echo "||                           Import CA Database                       ||"
+echo "========================================================================"
+
+set OS_NAME $(osinfo --name)
+
+## CA Database
+
+# Re-init the CA configuration database
+
+set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties"
+sql --force --db-conf "${DB_CONF}" xipki/sql/caconf-init.sql
+
+sleep 1
+
+# Re-init the CA certstore database
+
+set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
+sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
+
+import-ca --in-dir output/dbexport/ca --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties \
+  --caconf-db-conf ${CA_XIPKI_DIR}/etc/ca/database/caconf-db.properties
+
+## Import OCSP
+
+echo "========================================================================"
+echo "||                          Import OCSP Database                      ||"
+echo "========================================================================"
+
+## OCSP Database
+
+echo "Re-init the OCSP database"
+
+set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
+sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
+
+import-ocsp --in-dir output/dbexport/ocsp --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
+
+## Import OCSP FROM CA
+
+echo "========================================================================"
+echo "||                     IMPORT OCSP DATABASE FROM CA                   ||"
+echo "========================================================================"
+
+echo "Re-init the OCSP database"
+
+set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties"
+sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
+
+import-ocspfromca --in-dir output/dbexport/ca --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ocsp-db.properties
+
+## Restart the CA
+
+sleep 1
+
+restart
+
+## Export CA CertStore ONLY
+echo "========================================================================"
+echo "||                       Export CA CertStore ONLY                     ||"
+echo "========================================================================"
+
+export-ca-certstore --out-dir output/dbexport-certstore/ca --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+
+echo "========================================================================"
+echo "||                Import CA CertStore ONLY Database                   ||"
+echo "========================================================================"
+
+set OS_NAME $(osinfo --name)
+
+## CA Database
+
+echo "Re-init the CA database"
+set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties"
+sql --force --db-conf "${DB_CONF}" xipki/sql/ca-init.sql
+
+import-ca-certstore --in-dir output/dbexport-certstore/ca --password CHANGEIT \
+  --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
+
+## Restart the CA
+exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
+  '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
+  '$[test.basedir]/ca-tomcat/bin/startup.sh'
+
+sleep 2
+
+ca-info

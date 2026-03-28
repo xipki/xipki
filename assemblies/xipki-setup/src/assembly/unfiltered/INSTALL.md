@@ -47,10 +47,10 @@ In all XiPKI components, you may configure the password using the following meth
 - In plaintext, e.g. `password=CHANGEIT`
 
 - In obfuscated format, e.g. `password=OBF:1izy1htq1fnf1ime1im01fnn1hts1j0w`.
-  Use karaf commands `xi:obfuscate` / `xi:deobfuscate`to obfuscate / deobfuscate the password.
+  Use xipki shell `obfuscate` / `deobfuscate`to obfuscate / deobfuscate the password.
 
 - Encrypted with master password, e.g. `password=PBE:AQfQcYk2+tR2nDzR0gCaQXMkmRBgqPIomrt5yfTsJPBqb30sCID5OqHFpH/mEKb3OIIw9Q`.
-  Use karaf commands `xi:pbe-enc` / `xi:pbe-dec` to encrypt / decrypt the password with master password.
+  Use xipki shell `pbe-enc` / `pbe-dec` to encrypt / decrypt the password with master password.
 
   You need to configure the master password callback and iteration count in the file `xipki/secuity/password.cfg`:
    ```

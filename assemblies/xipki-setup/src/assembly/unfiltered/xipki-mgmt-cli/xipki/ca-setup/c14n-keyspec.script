@@ -1,72 +1,70 @@
-rsapss = ""
-p11composite = ""
+set rsapss ""
+set p11composite ""
 
-keyspec = $(xi:uppercase "$keyspec")
+set keyspec $(uppercase "$keyspec")
 
-if { "$keyspec" equals "RSA2048" } then {
-  sigalg = RSA-SHA256
-} elif { "$keyspec" equals "RSA3072" } then {
-  sigalg = RSA-SHA256
-} elif { "$keyspec" equals "RSA4096" } then {
-  sigalg = RSA-SHA256
-} elif { "$keyspec" equals "RSA2048/PSS" } then {
-  sigalg = RSAPSS-SHA256
-  keyspec = RSA2048
-  rsapss = "--rsa-pss"
-} elif { "$keyspec" equals "RSA3072/PSS" } then {
-  sigalg = RSAPSS-SHA384
-  keyspec = RSA3072
-  rsapss = "--rsa-pss"
-} elif { "$keyspec" equals "RSA4096/PSS" } then {
-  sigalg = RSAPSS-SHA384
-  keyspec = RSA4096
-  rsapss = "--rsa-pss"
-} elif { "$keyspec" equals "ED25519" } then {
-  sigalg = ED25519
-} elif { "$keyspec" equals "ED448" } then {
-  sigalg = ED448
-} elif { $([ SM2 SM2P256V1 ] contains $keyspec) } then {
-  sigalg = SM2-SM3
-  keyspec = SM2
-} elif { $([ P256 P-256 SECP256R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA256
-  keyspec = P256
-} elif { $([ P384 P-384 SECP384R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA384
-  keyspec = P384
-} elif { $([ P521 P-521 SECP521R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA512
-  keyspec = P521
-} elif { $([ BRAINPOOLP256R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA256
-} elif { $([ BRAINPOOLP384R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA384
-} elif { $([ BRAINPOOLP512R1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA512
-} elif { $([ FRP256V1 ] contains $keyspec) } then {
-  sigalg = ECDSA-SHA256
-} elif { $([ MLDSA44 MLDSA65 MLDSA87 ] contains $keyspec) } then {
-  sigalg  = $keyspec
-} elif { $([ MLDSA44-RSA2048  MLDSA44-ED25519  MLDSA44-P256     \
-             MLDSA65-RSA3072  MLDSA65-RSA4096  MLDSA65-P256     \
-             MLDSA65-P384     MLDSA65-BP256    MLDSA65-ED25519  \
-             MLDSA87-P384     MLDSA87-BP384    MLDSA87-ED448    \
-             MLDSA87-RSA3072  MLDSA87-RSA4096  MLDSA87-P521 ] contains $keyspec) } then {
-  sigalg  = $keyspec
-  p11composite = "COMPOSITE:"
-} elif { $([ MLKEM512 MLKEM768 MLKEM1024 ] contains $keyspec) } then {
-  sigalg = ""
-} elif { $([ MLKEM768-RSA2048   MLKEM768-RSA3072  MLKEM768-RSA4096   \
-             MLKEM768-X25519    MLKEM768-P256     MLKEM768-P384  MLKEM768-BP256  \
-             MLKEM1024-RSA3072  MLKEM1024-P384    \
-             MLKEM1024-BP384    MLKEM1024-X448  MLKEM1024-P521 ] contains $keyspec) } then {
-  sigalg  = ""
-  p11composite = "COMPOSITE:"
-} elif { $([ X25519 X448 ] contains $keyspec) } then {
-  sigalg = ""
-} else {
+if "$keyspec" eq "RSA2048"
+  set sigalg RSA-SHA256
+elif "$keyspec" eq "RSA3072"
+  set sigalg RSA-SHA256
+elif "$keyspec" eq "RSA4096"
+  set sigalg RSA-SHA256
+elif "$keyspec" eq "RSA2048/PSS"
+  set sigalg RSAPSS-SHA256
+  set keyspec RSA2048
+  set rsapss "--rsa-pss"
+elif "$keyspec" eq "RSA3072/PSS"
+  set sigalg RSAPSS-SHA384
+  set keyspec RSA3072
+  set rsapss "--rsa-pss"
+elif "$keyspec" eq "RSA4096/PSS"
+  set sigalg RSAPSS-SHA384
+  set keyspec RSA4096
+  set rsapss "--rsa-pss"
+elif "$keyspec" eq "ED25519"
+  set sigalg ED25519
+elif "$keyspec" eq "ED448"
+  set sigalg ED448
+elif $keyspec in SM2 SM2P256V1
+  set sigalg SM2-SM3
+  set keyspec SM2
+elif $keyspec in P256 P-256 SECP256R1
+  set sigalg ECDSA-SHA256
+  set keyspec P256
+elif $keyspec in P384 P-384 SECP384R1
+  set sigalg ECDSA-SHA384
+  set keyspec P384
+elif $keyspec in P521 P-521 SECP521R1
+  set sigalg ECDSA-SHA512
+  set keyspec P521
+elif $keyspec in BRAINPOOLP256R1
+  set sigalg ECDSA-SHA256
+elif $keyspec in BRAINPOOLP384R1
+  set sigalg ECDSA-SHA384
+elif $keyspec in BRAINPOOLP512R1
+  set sigalg ECDSA-SHA512
+elif $keyspec in FRP256V1
+  set sigalg ECDSA-SHA256
+elif $keyspec in MLDSA44 MLDSA65 MLDSA87
+  set sigalg $keyspec
+elif $keyspec in MLDSA44-RSA2048 MLDSA44-ED25519 MLDSA44-P256 MLDSA65-RSA3072 \
+  MLDSA65-RSA4096 MLDSA65-P256 MLDSA65-P384 MLDSA65-BP256 MLDSA65-ED25519 \
+  MLDSA87-P384 MLDSA87-BP384 MLDSA87-ED448 MLDSA87-RSA3072 MLDSA87-RSA4096 \
+  MLDSA87-P521
+  set sigalg $keyspec
+  set p11composite "COMPOSITE:"
+elif $keyspec in MLKEM512 MLKEM768 MLKEM1024
+  set sigalg ""
+elif $keyspec in MLKEM768-RSA2048 MLKEM768-RSA3072 MLKEM768-RSA4096 \
+  MLKEM768-X25519 MLKEM768-P256 MLKEM768-P384 MLKEM768-BP256 MLKEM1024-RSA3072 \
+  MLKEM1024-P384 MLKEM1024-BP384 MLKEM1024-X448 MLKEM1024-P521
+  set sigalg ""
+  set p11composite "COMPOSITE:"
+elif $keyspec in X25519 X448
+  set sigalg ""
+else
   echo "Invalid keyspec $keyspec"
-  sigalg = ""
-  keyspec = ""
-}
+  set sigalg ""
+  set keyspec ""
+fi
 

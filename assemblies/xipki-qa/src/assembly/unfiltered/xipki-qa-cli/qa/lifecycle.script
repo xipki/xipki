@@ -1,0 +1,228 @@
+## DER or PEM
+set OUTFORM DER
+
+set WAIT_TOMCAT_START_TIME 3
+
+set printUsage "false"
+set argsValid "false"
+set errMsg ""
+
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  if "$1" eq "-l"
+    set TOKEN_TYPE $2
+    set CA_KEYSPEC $3
+    set KEYSPEC $4
+  else
+    set TOKEN_TYPE $1
+    set CA_KEYSPEC $2
+    set KEYSPEC $3
+  fi
+
+  set TOKEN_TYPE $(uppercase "$TOKEN_TYPE")
+  set CA_KEYSPEC $(uppercase "$CA_KEYSPEC")
+  set KEYSPEC $(uppercase "$KEYSPEC")
+
+  set argsValid $($TOKEN_TYPE in PKCS11 PKCS12)
+
+  if "$argsValid" eq "false"
+    set errMsg "invalid TOKEN_TYPE $TOKEN_TYPE"
+  else
+    set keyspec $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
+    if "$sigalg" eq ""
+      set argsValid "false"
+    fi
+
+    set CA_KEYSPEC $keyspec
+    set CA_SIGALG $sigalg
+    set CA_RSAPSS $rsapss
+    set CA_P11_LABEL_PREFIX $p11composite
+
+    if "$KEYSPEC" eq ""
+      set keyspec $CA_KEYSPEC
+    else
+      set keyspec $KEYSPEC
+    fi
+
+    source xipki/ca-setup/c14n-keyspec.script
+    set EE_P11_LABEL_PREFIX $p11composite
+
+    if "$keyspec" eq ""
+      set argsValid "false"
+    fi
+    set KEYSPEC $keyspec
+    set RSAPSS $rsapss
+  fi
+fi
+
+if "$argsValid" eq "false"
+  echo "$errMsg"
+  echo ""
+  set printUsage "true"
+fi
+
+if "$printUsage" eq "true"
+  echo "Usage: "
+  echo ""
+  echo "source qa/lifecycle.script [option] <token type> <CA keyspec> [<EE keyspec>]"
+  echo "    token type:      PKCS11, PKCS12"
+  echo ""
+  echo "    CA-keyspec:      RSA2048, RSA3072, RSA4096"
+  echo "                     RSA2048/PSS, RSA3072/PSS, RSA4096/PSS"
+  echo "                     P256, P384, P521, SM2, FRP256V1"
+  echo "                     BRAINPOOLP256R1,  BRAINPOOLP384R1, BRAINPOOLP512R1"
+  echo "                     MLDSA44, MLDSA65, MLDSA87"
+  echo "                     MLDSA44-RSA2048,  MLDSA44-ED25519, MLDSA44-P256"
+  echo "                     MLDSA65-RSA3072,  MLDSA65-RSA4096"
+  echo "                     MLDSA65-P256,     MLDSA65-P384"
+  echo "                     MLDSA65-BP256,    MLDSA65-ED25519"
+  echo "                     MLDSA87-P384,     MLDSA87-BP384"
+  echo "                     MLDSA87-ED448,    MLDSA87-RSA3072"
+  echo "                     MLDSA87-RSA4096,  MLDSA87-P521"
+  echo ""
+  echo "    EE-keyspec:      RSA2048, RSA3072, RSA4096"
+  echo "                     P256, P384, P521, SM2, FRP256V1"
+  echo "                     BRAINPOOLP256R1, BRAINPOOLP384R1, BRAINPOOLP512R1"
+  echo "                     MLDSA44, MLDSA65, MLDSA87"
+  echo "                     X25519, X448, MLKEM512, MLKEM768, MLKEM1024"
+  echo "                     MLDSA44-RSA2048,   MLDSA44-ED25519,   MLDSA44-P256"
+  echo "                     MLDSA65-RSA3072,   MLDSA65-RSA4096"
+  echo "                     MLDSA65-P256,      MLDSA65-P384"
+  echo "                     MLDSA65-BP256,     MLDSA65-ED25519"
+  echo "                     MLDSA87-P384,      MLDSA87-BP384"
+  echo "                     MLDSA87-ED448,     MLDSA87-RSA3072"
+  echo "                     MLDSA87-RSA4096,   MLDSA87-P521"
+  echo "                     MLKEM768-RSA2048,  MLKEM768-RSA3072"
+  echo "                     LKEM768-RSA4096,   MLKEM768-X25519,  MLKEM768-P256"
+  echo "                     MLKEM768-P384,     MLKEM768-BP256"
+  echo "                     MLKEM1024-RSA3072, MLKEM1024-P384"
+  echo "                     MLKEM1024-BP384,   MLKEM1024-X448"
+  echo "                     MLKEM1024-P521"
+  echo "options"
+  echo "    -l               configure CAs using command 'load-conf'"
+
+  # exit current script file
+  return
+fi
+
+echo "========================================================"
+echo "TOKEN_TYPE: $TOKEN_TYPE"
+echo "CA_KEYSPEC: $CA_KEYSPEC"
+echo "CA_SIGALG:  $CA_SIGALG"
+echo "KEYSPEC:    $KEYSPEC"
+echo "========================================================"
+
+# Start the h2 database
+if "$[database.type]" eq "h2"
+  start-h2-server
+fi
+
+source qa/qa.d/prepare-keys.script
+
+## Prepare OCSP responder configuration
+copy-file -f xipki/etc/ocsp/template.ocsp-responder.json \
+  xipki/etc/ocsp/ocsp-responder.json
+
+replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
+  --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" --old "REPLACEME-SIGALG" \
+  --new "$CA_SIGALG" xipki/etc/ocsp/ocsp-responder.json
+
+## Prepare scripts
+copy-file -f qa/template.rest0.script qa/rest0.script
+
+copy-file -f qa/template.est0.script  qa/est0.script
+
+copy-file -f qa/qa.d/template.ca-load.script qa/qa.d/ca-load.script
+
+copy-file -f qa/qa.d/template.ca.script qa/qa.d/ca.script
+
+copy-file -f qa/qa.d/template.ra.script qa/qa.d/ra.script
+
+replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" qa/qa.d/ca-load.script \
+  qa/qa.d/ca.script
+
+replace --old "REPLACEME-RSAPSS" --new "${RSAPSS}" qa/rest0.script \
+  qa/est0.script qa/qa.d/ra.script
+
+if "$1" eq "-l"
+  source qa/qa.d/ca-load.script
+else
+  source qa/qa.d/ca.script
+fi
+
+source qa/qa.d/scep-server.script
+
+echo "#################################################################"
+echo "#                  CA certificate commands                      #"
+echo "#################################################################"
+
+#### list certs ####
+
+list-cert --ca rootca1 --subject "O=myorg,CN=*ca*" --order subject -n 100
+
+source qa/qa.d/ra.script
+
+source qa/ca-qa.script
+
+source qa/rest.script
+
+source qa/est.script
+
+echo "#################################################################"
+echo "#                              CRL                              #"
+echo "#################################################################"
+
+echo "generate new CRL"
+gen-crl --ca subcawithcrl1 --out output/subcawithcrl1.crl
+
+# Copy the configuration of OCSP responder
+copy-file -f xipki/etc/ocsp/ocsp-responder.json \
+  ${OCSP_XIPKI_DIR}/etc/ocsp/ocsp-responder.json
+
+copy-file -f output/ocsp99.crt ${OCSP_XIPKI_DIR}/keycerts/ocsp.crt
+
+if "$TOKEN_TYPE" eq "PKCS12"
+  copy-file -f output/ocsp99.p12 ${OCSP_XIPKI_DIR}/keycerts/ocsp99.p12
+fi
+
+rm -r -f ${OCSP_XIPKI_DIR}/crls/example-crls
+
+copy-dir ${OCSP_XIPKI_DIR}/crls/template ${OCSP_XIPKI_DIR}/crls/example-crls
+
+# CRL will be provided via out-of-band mechanism
+
+rm -f ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/REVOCATION
+
+copy-file -f output/subcawithcrl1.crt \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crt
+
+copy-file -f output/subcawithcrl1.crl \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crl
+
+# CRL will be downloaded by the OCSP responder
+rm -f ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/REVOCATION
+
+copy-file -f output/rootca1.crt \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/ca.crt
+
+copy-file -f qa/qa.d/rootca.crl.download \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download
+
+echo "Restart ocsp (tomcat) server!"
+exec $[tomcat.java.home] '$[test.basedir]/dummy-tomcat/bin/shutdown.sh'
+exec $[tomcat.java.home] '$[test.basedir]/ocsp-tomcat/bin/shutdown.sh'
+
+exec $[tomcat.java.home] '$[test.basedir]/dummy-tomcat/bin/startup.sh'
+exec $[tomcat.java.home] '$[test.basedir]/ocsp-tomcat/bin/startup.sh'
+sleep 1
+
+source qa/ocsp.script
+
+echo "shutdown tomcats"
+exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+exec $[tomcat.java.home] '$[test.basedir]/ocsp-tomcat/bin/shutdown.sh'
+exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/shutdown.sh'
+exec $[tomcat.java.home] '$[test.basedir]/dummy-tomcat/bin/shutdown.sh'

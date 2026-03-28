@@ -1,133 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status.
 set -e
 
-helpFunction()
-{
-   echo ""
-   echo "Usage: $0 -t <dir of destination tomcat>"
-   exit 1 # Exit script after printing help
-}
+SCRIPT_DIR="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
+. "$SCRIPT_DIR/../setup/install-common.sh"
 
-#while getopts "a:b:" opt
-while getopts "t:" opt
-do
-   case "$opt" in
-      t ) tomcatDir="$OPTARG" ;;
-      ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
-   esac
-done
+TOMCAT_DIR=
+parse_tomcat_target "$@"
+require_no_conflicting_wars \
+  ca "CA is running in $TOMCAT_DIR, please use other tomcat instance." \
+  ocsp "OCSP responder is running in $TOMCAT_DIR, please use other tomcat instance."
 
-# Print helpFunction in case parameters are empty
-#if [ -z "$parameterA" ] || [ -z "$parameterB" ]
-if [ -z "$tomcatDir" ]
-then
-   echo "Some or all of the parameters are empty";
-   helpFunction
-fi
-
-## workding dir
-WDIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-#WDIR=`dirname $0`
-
-## check the pre-conditions
-if [ ! -d ${WDIR}/tomcat/xipki/keycerts ]; then
-   echo "Generate the key and certificate via ${WDIR}/../setup/generate-keycerts.sh first."
-   exit 1
-fi
-
-echo "Tomcat: $tomcatDir"
-
-## make sure the tomcat is only for Gateway
-if [ -f ${tomcatDir}/webapps/ca.war ]; then
-   echo "CA is running in $tomcatDir, please use other tomcat instance."
-   exit 1
-fi
-
-if [ -f ${tomcatDir}/webapps/ocsp.war ]; then
-   echo "OCSP responder is running in $tomcatDir, please use other tomcat instance."
-   exit 1
-fi
-
-## detect the major version of tomcat
-TOMCAT_VERSION=`${tomcatDir}/bin/version.sh | grep "Server number"`
-echo "Tomcat ${TOMCAT_VERSION}"
-
-TOMCAT_VERSION=`cut -d ":" -f2- <<< "${TOMCAT_VERSION}"`
-TOMCAT_VERSION=`cut -d "." -f1  <<< "${TOMCAT_VERSION}"`
-## Remove leading and trailing spaces and tabs
-TOMCAT_VERSION=`awk '{$1=$1};1'  <<< "${TOMCAT_VERSION}"`
-
-if [ "$TOMCAT_VERSION" -lt "10" ]; then
-  echo "Unsupported tomcat major version ${TOMCAT_VERSION}"
+TOMCAT_MAJOR="$(resolve_tomcat_major)"
+if [ "$TOMCAT_MAJOR" -lt 10 ]; then
+  echo "Unsupported tomcat major version $TOMCAT_MAJOR"
   exit 1
 fi
 
-## Backup the current files
-BDIR=$tomcatDir/backup-`date '+%Y%m%dT%H%M%S'`
-mkdir ${BDIR}
-mkdir ${BDIR}/bin
-mkdir ${BDIR}/lib
-mkdir ${BDIR}/conf
-mkdir ${BDIR}/webapps
-echo "backup dir: $BDIR"
+create_backup_layout
+backup_common_tomcat_files
+copy_tomcat_tree
+cp -r "$SCRIPT_DIR/tomcat/conf" "$TOMCAT_DIR/"
 
-SRC="${tomcatDir}/xipki"
-[ -d $SRC ] && cp -r $SRC ${BDIR}
-
-SRC="${tomcatDir}/conf/catalina.properties"
-[ -f $SRC ] && mv $SRC ${BDIR}/conf
-
-SRC="${tomcatDir}/conf/server.xml"
-[ -f $SRC ] && mv $SRC ${BDIR}/conf
-
-# mv if file exists
-# [ -f old ] && mv old nu
-
-SRC="${tomcatDir}/bin/setenv.*"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/bin; done
-
-SRC="${tomcatDir}/lib/password-*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/xipki-tomcat-password-*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/*pkcs11*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/bc*-jdk*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/bc*-lts*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/h2-*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-SRC="${tomcatDir}/lib/mariadb-java-*.jar"
-for X in $SRC; do [[ -e $X ]] && mv "$X" ${BDIR}/lib; done
-
-_DIR=tomcat
-
-cp -r ${WDIR}/tomcat/* ${tomcatDir}
-cp -r ${WDIR}/${_DIR}/conf ${tomcatDir}/
-
-wars=(
-    gw
-    acme
-    cmp
-    est
-    rest
-    scep
-)
-
-for i in "${wars[@]}"; do
-  war="${tomcatDir}/webapps/${i}"
-  [ -f ${war}.war ] && mv ${war}.war ${BDIR}/webapps
-  rm -rf "${war}"
+for war_name in gw acme cmp est rest scep; do
+  if [ -f "$TOMCAT_DIR/webapps/$war_name.war" ]; then
+    mv "$TOMCAT_DIR/webapps/$war_name.war" "$BACKUP_DIR/webapps"
+  fi
+  rm -rf "$TOMCAT_DIR/webapps/$war_name"
 done
 
-echo "Copying gw.war"
-cp ${WDIR}/${_DIR}/webapps/gw.war ${tomcatDir}/webapps
+cp "$SCRIPT_DIR/tomcat/webapps/gw.war" "$TOMCAT_DIR/webapps"
