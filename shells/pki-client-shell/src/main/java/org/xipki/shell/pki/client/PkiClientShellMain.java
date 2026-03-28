@@ -41,8 +41,6 @@ public class PkiClientShellMain {
   }, mixinStandardHelpOptions = true)
   /**
    * Root command for the PKI client shell.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
 

@@ -38,8 +38,6 @@ public class XiShellMain {
   }, mixinStandardHelpOptions = true)
   /**
    * Root command for the Xi utility shell.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
 

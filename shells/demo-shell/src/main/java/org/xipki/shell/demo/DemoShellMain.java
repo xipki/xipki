@@ -35,8 +35,6 @@ public class DemoShellMain {
   }, mixinStandardHelpOptions = true)
   /**
    * Root command for the demo shell.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
 

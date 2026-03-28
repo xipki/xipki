@@ -47,8 +47,6 @@ public class XipkiMgmtCliMain {
       mixinStandardHelpOptions = true)
   /**
    * Root command for the combined XiPKI management CLI.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
     @Override

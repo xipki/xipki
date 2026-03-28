@@ -99,10 +99,9 @@ public class CaMgmtShellMain {
       RequestorCommands.RequestorRmCommand.class,
       RequestorCommands.RequestorUpCommand.class
   }, mixinStandardHelpOptions = true)
+
   /**
    * Root command for the CA management shell.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
 

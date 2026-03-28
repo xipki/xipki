@@ -49,8 +49,6 @@ public class XipkiQaCliMain {
       mixinStandardHelpOptions = true)
   /**
    * Root command for the combined XiPKI QA CLI.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
     @Override

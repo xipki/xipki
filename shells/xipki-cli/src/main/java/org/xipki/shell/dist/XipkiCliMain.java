@@ -42,8 +42,6 @@ public class XipkiCliMain {
   @Command(name = "xipki-cli", description = "XiPKI client CLI", mixinStandardHelpOptions = true)
   /**
    * Root command for the combined XiPKI CLI.
-   *
-   * @author Lijun Liao (xipki)
    */
   public static class RootCommand extends ShellBaseCommand {
     @Override

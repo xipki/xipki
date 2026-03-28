@@ -10,6 +10,18 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>https://github.com/xipki/xipki</url>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>project-owner</id>
+      <name>Lijun Liao (xipki)</name>
+    </developer>
+  </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
@@ -50,7 +62,7 @@
     <maven.surefire-plugin.version>3.5.5</maven.surefire-plugin.version>
     <maven.war-plugin.version>3.5.1</maven.war-plugin.version>
     <central-publishing-maven-plugin.version>0.10.0</central-publishing-maven-plugin.version>
-    <xipki.dependency-plugin.version>1.0.0-SNAPSHOT</xipki.dependency-plugin.version>
+    <xipki.dependency-plugin.version>1.0.0</xipki.dependency-plugin.version>
   </properties>
   <modules>
     <!-- Base components -->
