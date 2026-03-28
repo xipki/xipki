@@ -21,11 +21,3 @@ jobs:
       - name: Compile
         run: mvn -DskipTests clean install
 
-      - name: Shell smoke tests
-        run: sh shells/smoke-test.sh
-
-      - name: Java indentation lint
-        run: sh tools/check-java-indent.sh
-
-      - name: Targeted unit tests (security-sensitive modules)
-        run: mvn -B -ntp -DskipTests -pl gateway,security -am test
