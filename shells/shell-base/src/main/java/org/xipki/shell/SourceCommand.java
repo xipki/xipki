@@ -229,9 +229,6 @@ class SourceCommand implements Callable<Integer> {
                             shell.expandText(expression, context));
       ParsedLine parsed = shell.parser().parse(normalized, 0);
       List<String> words = PicocliShell.restoreEmptyQuotedLiterals(parsed.words());
-      if (words.size() < 3) {
-        throw new IllegalArgumentException("invalid condition: " + header);
-      }
       return PicocliShell.evaluateConditionWords(words, header);
     } catch (RuntimeException ex) {
       throw new RuntimeException("could not parse condition: " + header, ex);

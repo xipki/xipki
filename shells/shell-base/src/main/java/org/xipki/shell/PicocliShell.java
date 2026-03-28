@@ -280,6 +280,13 @@ public class PicocliShell {
   }
 
   static boolean evaluateConditionWords(List<String> words, String header) {
+    if (!words.isEmpty() && isConditionOperator(words.get(0))) {
+      List<String> normalized = new ArrayList<>(words.size() + 1);
+      normalized.add("");
+      normalized.addAll(words);
+      words = normalized;
+    }
+
     int index = 0;
     while (index < words.size()) {
       if (index + 2 >= words.size()) {
@@ -322,6 +329,10 @@ public class PicocliShell {
 
   private static boolean isConditionSeparator(String token) {
     return "|".equals(token) || "or".equals(token);
+  }
+
+  private static boolean isConditionOperator(String token) {
+    return "eq".equals(token) || "neq".equals(token) || "in".equals(token);
   }
 
   static String normalizeEmptyQuotedLiterals(String text) {
