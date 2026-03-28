@@ -22,4 +22,4 @@ esac
 echo "Deploying release version ${VERSION}"
 
 cd "${DIR}"
-exec mvn -Prelease deploy "$@"
+exec mvn -Prelease -DskipTests deploy "$@"

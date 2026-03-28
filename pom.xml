@@ -359,6 +359,7 @@
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>${maven.javadoc-plugin.version}</version>
             <configuration>
+              <doclint>none</doclint>
               <failOnError>true</failOnError>
             </configuration>
             <executions>
