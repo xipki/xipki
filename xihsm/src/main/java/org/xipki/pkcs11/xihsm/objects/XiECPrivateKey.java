@@ -30,7 +30,7 @@ abstract class XiECPrivateKey extends XiPrivateKey {
    * <pre>
    * Parameters ::= CHOICE {
    *   ecParameters   ECParameters,
-   *   oId           CURVES.&id({CurveNames}),
+   *   oId           CURVES.&amp;id({CurveNames}),
    *   implicitlyCA   NULL,
    *   curveName     PrintableString
    * }

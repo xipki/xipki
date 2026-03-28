@@ -21,8 +21,8 @@ public class V1SubjectKeyIdentifierControl {
 
   /**
    * Format
-   *   - 'L':'&lt;size&gt: Use the left most size bytes.
-   *   - 'R':'&lt;size&gt: Use the right most size bytes.
+   *   - 'L':'&lt;size&gt;: Use the left most size bytes.
+   *   - 'R':'&lt;size&gt;: Use the right most size bytes.
    * <p/>
    */
   private final String truncateMethod;
