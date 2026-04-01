@@ -46,7 +46,7 @@
     <junit.version>4.13.2</junit.version>
     <!-- plugin versions -->
     <maven.assembly-plugin.version>3.8.0</maven.assembly-plugin.version>
-    <maven.build-helper-plugin.version>3.6.0</maven.build-helper-plugin.version>
+    <maven.build-helper-plugin.version>3.6.1</maven.build-helper-plugin.version>
     <maven.compiler-plugin.version>3.15.0</maven.compiler-plugin.version>
     <maven.buildnumber-plugin.version>3.3.0</maven.buildnumber-plugin.version>
     <maven.clean-plugin.version>3.5.0</maven.clean-plugin.version>
