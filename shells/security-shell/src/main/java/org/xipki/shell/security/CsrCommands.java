@@ -149,6 +149,9 @@ public class CsrCommands {
     @Option(names = "--biometric-uri", description = "Biometric source data URI")
     private String biometricUri;
 
+    @Option(names = "--microsoft-sid", description = "Microsoft SID, e.g. S-1-5-...")
+    private String microsoftSid;
+
     @Option(names = "--extensions-file", description = "DER-encoded Extensions file")
     @Completion(FilePathCompleter.class)
     private String extensionsFile;
@@ -267,6 +270,14 @@ public class CsrCommands {
               new DERSequence(bioData).getEncoded()));
         } else if (!(biometricType == null && biometricHashAlgo == null && biometricFile == null)) {
           throw new IOException("either all of biometric triples must be set or none");
+        }
+
+        if (StringUtil.isNotBlank(microsoftSid)) {
+          OtherName on = new OtherName(OIDs.Extn.id_microsoft_objectSid,
+              new DEROctetString(microsoftSid.getBytes(StandardCharsets.US_ASCII)));
+          GeneralName gn = new GeneralName(GeneralName.otherName, on);
+          GeneralNames gns = new GeneralNames(gn);
+          extensions.add(new Extension(OIDs.Extn.id_microsoft_SID, false, gns.getEncoded()));
         }
 
         List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());

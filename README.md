@@ -184,6 +184,10 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - TLSFeature
     - Car Connectivity Consortium
       - ExtensionSchema
+    - Microsoft
+      - Certificate Template Name (1.3.1.6.1.311.20.2)
+      - Certificate Template Information (1.3.1.6.1.311.21.7)
+      - Security Identifier (SID, 1.3.1.6.1.311.25.2)
   - Management of multiple CAs in one software instance
     - Support for database clusters
     - Multiple software instances (all can be in active mode) for the same CA

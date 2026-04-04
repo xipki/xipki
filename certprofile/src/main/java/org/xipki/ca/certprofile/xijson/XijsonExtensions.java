@@ -3,14 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
@@ -58,8 +51,6 @@ import java.util.*;
  */
 
 public class XijsonExtensions {
-
-  private final boolean keepOrder;
 
   private final List<ASN1ObjectIdentifier> extensionIDs;
 
@@ -109,12 +100,15 @@ public class XijsonExtensions {
 
   private ExtensionValue cccExtensionSchemaValue;
 
+  private ExtensionValue microsoftCertTemplateName;
+
+  private ExtensionValue microsoftCertTemplateInformation;
+
+  private ExtensionValueConf.MicrosoftSID microsoftSID;
+
   XijsonExtensions(XijsonCertprofileType conf, SubjectControl subjectControl)
       throws CertprofileException {
     Args.notNull(subjectControl, "subjectControl");
-
-    Boolean b = conf.keepExtensionsOrder();
-    this.keepOrder = b != null && b;
 
     List<ExtensionType> extensionsConf = conf.extensions();
     List<ASN1ObjectIdentifier> extensionIDs = new ArrayList<>(extensionsConf.size());
@@ -190,6 +184,9 @@ public class XijsonExtensions {
 
     // CCC
     initCCCExtensionSchemas(extnIds, extensions);
+
+    // Microsoft
+    initMicrosoftExtensions(extnIds, extensions);
 
     // constant extensions
     this.constantExtensions = conf.buildConstantExtensions();
@@ -781,6 +778,48 @@ public class XijsonExtensions {
     this.cccExtensionSchemaValue = new ExtensionValue(ex.isCritical(), new DERSequence(vec));
   }
 
+  private void initMicrosoftExtensions(
+      Set<ASN1ObjectIdentifier> extnIds, Map<String, ExtensionType> extensions) {
+    ASN1ObjectIdentifier type = OIDs.Extn.id_microsoft_CertificateTemplateName;
+    if (extensionsControl.containsID(type)) {
+      extnIds.remove(type);
+      ExtensionValueConf.MicrosoftCertificateTemplateName extConf =
+          getExtension(type, extensions).microsoftCertificateTemplateName();
+      if (extConf == null) {
+        return;
+      }
+
+      ASN1Encodable extnValue = extConf.toExtensionValue();
+      boolean critical = critical(type);
+      microsoftCertTemplateName = new ExtensionValue(critical, extnValue);
+    }
+
+    type = OIDs.Extn.id_microsoft_CertificateTemplateInformation;
+    if (extensionsControl.containsID(type)) {
+      extnIds.remove(type);
+      ExtensionValueConf.MicrosoftCertificateTemplateInformation extConf =
+          getExtension(type, extensions).microsoftCertificateTemplateInformation();
+      if (extConf == null) {
+        return;
+      }
+
+      boolean critical = critical(type);
+      microsoftCertTemplateInformation = new ExtensionValue(critical, extConf.toExtensionValue());
+    }
+
+
+    type = OIDs.Extn.id_microsoft_SID;
+    if (extensionsControl.containsID(type)) {
+      extnIds.remove(type);
+      ExtensionValueConf.MicrosoftSID extConf = getExtension(type, extensions).microsoftSID();
+      if (extConf == null) {
+        return;
+      }
+
+      microsoftSID = extConf;
+    }
+  }
+
   public static GeneralNames createRequestedSubjectAltNames(
       X500Name reqSubject, GeneralNames sanExtnValue, Set<GeneralNameTag> subjectAltNameModes,
       Map<ASN1ObjectIdentifier, GeneralNameTag> subjectToSubjectAltNameModes)
@@ -908,8 +947,16 @@ public class XijsonExtensions {
     return cccExtensionSchemaValue;
   }
 
-  public boolean isKeepOrder() {
-    return keepOrder;
+  public ExtensionValue microsoftCertTemplateName() {
+    return microsoftCertTemplateName;
+  }
+
+  public ExtensionValue microsoftCertTemplateInformation() {
+    return microsoftCertTemplateInformation;
+  }
+
+  public ExtensionValueConf.MicrosoftSID microsoftSID() {
+    return microsoftSID;
   }
 
   public List<ASN1ObjectIdentifier> extensionIDs() {

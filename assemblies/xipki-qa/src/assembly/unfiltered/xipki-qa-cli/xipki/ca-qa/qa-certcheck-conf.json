@@ -101,6 +101,9 @@
     "name":"x448",
     "file":"qa/certprofile/certprofile-x448.json"
   },{
+    "name":"microsoft",
+    "file":"qa/certprofile/certprofile-microsoft.json"
+  },{
     "name":"cab-rootca",
     "file":"qa/cab/certprofile/certprofile-cab-rootca.json"
   },{

@@ -74,3 +74,7 @@ check-cert --issuer subca --profile fixed-partial-subject \
 check-cert --issuer subca --profile fixed-partial-subject \
   --csr output/fixed-partial-subject2.csr \
   --cert output/fixed-partial-subject2.crt
+
+check-cert --issuer subca --profile microsoft \
+  --csr output/microsoft.csr \
+  --cert output/microsoft.crt

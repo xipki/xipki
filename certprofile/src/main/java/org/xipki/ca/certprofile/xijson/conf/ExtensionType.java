@@ -81,6 +81,13 @@ public class ExtensionType implements JsonEncodable {
 
   private ExtensionValueConf.CCCInstanceCAExtensionSchema cccInstanceCAExtensionSchema;
 
+  private ExtensionValueConf.MicrosoftCertificateTemplateName microsoftCertificateTemplateName;
+
+  private ExtensionValueConf.MicrosoftCertificateTemplateInformation
+      microsoftCertificateTemplateInformation;
+
+  private ExtensionValueConf.MicrosoftSID microsoftSID;
+
   public ExtensionType(ExtensionID type, Boolean critical, Boolean required) {
     this.type = type;
     this.critical  = (critical != null && critical);
@@ -270,6 +277,34 @@ public class ExtensionType implements JsonEncodable {
     this.cccInstanceCAExtensionSchema = cccInstanceCAExtensionSchema;
   }
 
+  public ExtensionValueConf.MicrosoftCertificateTemplateName microsoftCertificateTemplateName() {
+    return microsoftCertificateTemplateName;
+  }
+
+  public void setMicrosoftCertificateTemplateName(
+      ExtensionValueConf.MicrosoftCertificateTemplateName microsoftCertificateTemplateName) {
+    this.microsoftCertificateTemplateName = microsoftCertificateTemplateName;
+  }
+
+  public ExtensionValueConf.MicrosoftCertificateTemplateInformation
+      microsoftCertificateTemplateInformation() {
+    return microsoftCertificateTemplateInformation;
+  }
+
+  public void setMicrosoftCertificateTemplateInformation(
+      ExtensionValueConf.MicrosoftCertificateTemplateInformation
+          microsoftCertificateTemplateInformation) {
+    this.microsoftCertificateTemplateInformation = microsoftCertificateTemplateInformation;
+  }
+
+  public ExtensionValueConf.MicrosoftSID microsoftSID() {
+    return microsoftSID;
+  }
+
+  public void setMicrosoftSID(ExtensionValueConf.MicrosoftSID microsoftSID) {
+    this.microsoftSID = microsoftSID;
+  }
+
   @Override
   public JsonMap toCodec() {
     JsonMap ret = new JsonMap();
@@ -302,6 +337,9 @@ public class ExtensionType implements JsonEncodable {
     ret.put("tlsFeature", tlsFeature);
     ret.put("cccExtensionSchema", cccExtensionSchema);
     ret.put("cccInstanceCAExtensionSchema", cccInstanceCAExtensionSchema);
+    ret.put("microsoftCertificateTemplateName", microsoftCertificateTemplateName);
+    ret.put("microsoftCertificateTemplateInformation", microsoftCertificateTemplateInformation);
+    ret.put("microsoftSID", microsoftSID);
     return ret;
   }
 
@@ -413,6 +451,23 @@ public class ExtensionType implements JsonEncodable {
     if (map != null) {
       ret.setCccInstanceCAExtensionSchema(
           ExtensionValueConf.CCCInstanceCAExtensionSchema.parse(map));
+    }
+
+    map = json.getMap("microsoftCertificateTemplateName");
+    if (map != null) {
+      ret.setMicrosoftCertificateTemplateName(
+          ExtensionValueConf.MicrosoftCertificateTemplateName.decode(map));
+    }
+
+    map = json.getMap("microsoftCertificateTemplateInformation");
+    if (map != null) {
+      ret.setMicrosoftCertificateTemplateInformation(
+          ExtensionValueConf.MicrosoftCertificateTemplateInformation.decode(map));
+    }
+
+    map = json.getMap("microsoftSID");
+    if (map != null) {
+      ret.setMicrosoftSID(ExtensionValueConf.MicrosoftSID.decode(map));
     }
 
     return ret;

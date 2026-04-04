@@ -3,6 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -636,6 +637,37 @@ public class XijsonCertprofile extends Certprofile {
     type = extensions.cccExtensionSchemaType();
     if (type != null && tmpExtnTypes.remove(type)) {
       values.addExtension(type, extensions.cccExtensionSchemaValue());
+    }
+
+    // Microsoft Certificate Template Name
+    type = OIDs.Extn.id_microsoft_CertificateTemplateName;
+    ExtensionValue msTemplateName = extensions.microsoftCertTemplateName();
+    if (msTemplateName != null) {
+      if (tmpExtnTypes.remove(type)) {
+        values.addExtension(type, msTemplateName);
+      }
+    }
+
+    // Microsoft Certificate Template Information
+    type = OIDs.Extn.id_microsoft_CertificateTemplateInformation;
+    ExtensionValue msTemplateInformation = extensions.microsoftCertTemplateInformation();
+    if (msTemplateInformation != null) {
+      if (tmpExtnTypes.remove(type)) {
+        values.addExtension(type, msTemplateInformation);
+      }
+    }
+
+    // Microsoft Security Identifier
+    type = OIDs.Extn.id_microsoft_SID;
+    ExtensionValueConf.MicrosoftSID microsoftSID = extensions.microsoftSID();
+    if (tmpExtnTypes.contains(type) && requestedExtensions != null) {
+      Extension extn = requestedExtensions.get(type);
+      if (extn != null) {
+        ASN1Encodable extnValue = microsoftSID.checkExtensionValue(extn.getParsedValue());
+        ExtensionValue value = new ExtensionValue(isCritical(type), extnValue);
+        values.addExtension(type, value);
+        tmpExtnTypes.remove(type);
+      }
     }
 
     // constant extensions

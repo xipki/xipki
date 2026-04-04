@@ -3,14 +3,13 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
+import org.bouncycastle.asn1.x509.OtherName;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierId;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
@@ -27,6 +26,8 @@ import org.xipki.ca.certprofile.xijson.CertificatePolicyQualifier;
 import org.xipki.ca.certprofile.xijson.KeyUsageControl;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.KeySpec;
+import org.xipki.security.OIDs;
+import org.xipki.security.exception.BadCertTemplateException;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
@@ -36,14 +37,17 @@ import org.xipki.util.codec.json.JsonList;
 import org.xipki.util.codec.json.JsonMap;
 import org.xipki.util.extra.misc.CollectionUtil;
 
+import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * Extension Value Conf configuration.
@@ -1431,4 +1435,263 @@ public abstract class ExtensionValueConf implements JsonEncodable {
     }
 
   } // class ExtendedKeyUsage
+
+
+  public static class MicrosoftCertificateTemplateName implements JsonEncodable {
+
+    public enum NameType {
+      /**
+       * SEQUENCE {
+       *   name UTF8String
+       * }
+       */
+      STRICT, // strict as specified
+      /**
+       * UTF8String
+       */
+      UTF8String, // without external SEQUENCE
+      /**
+       * BMPString
+       */
+      BMPString; // without external SEQUENCE and use BMPString
+
+      static NameType of(String name) {
+        for (NameType m : NameType.values()) {
+          if (m.name().equalsIgnoreCase(name)) {
+            return m;
+          }
+        }
+
+        throw new IllegalArgumentException("invalid name " + name);
+      }
+    }
+
+    private final NameType nameType;
+
+    private final String name;
+
+    public MicrosoftCertificateTemplateName(NameType nameType, String name) {
+      this.nameType = nameType == null ? NameType.STRICT : nameType;
+      this.name = Args.notBlank(name, "name");
+    }
+
+    public NameType nameType() {
+      return nameType;
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public ASN1Encodable toExtensionValue() {
+      switch (nameType) {
+        case BMPString:
+          return new DERBMPString(name);
+        case UTF8String:
+          return new DERUTF8String(name);
+        case STRICT:
+          ASN1EncodableVector v = new ASN1EncodableVector(1);
+          v.add(new DERUTF8String(name));
+          return new DERSequence(v);
+        default:
+          throw new RuntimeException(
+              "shall not reach here, unknown nameType " + nameType);
+      }
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      ret.putEnum("nameType", nameType);
+      ret.put("name", name);
+      return ret;
+    }
+
+    public static MicrosoftCertificateTemplateName decode(JsonMap json) throws CodecException {
+      String s = json.getNnString("nameType");
+      try {
+        NameType nameType = NameType.of(s);
+        String name = json.getNnString("name");
+        return new MicrosoftCertificateTemplateName(nameType, name);
+      } catch (RuntimeException e) {
+        throw new CodecException(e);
+      }
+    }
+
+  }
+
+  /**
+   * CertificateTemplate ::= SEQUENCE {
+   *     templateID OBJECT IDENTIFIER,
+   *     templateMajorVersion INTEGER OPTIONAL,
+   *     templateMinorVersion INTEGER OPTIONAL
+   * }
+   */
+  public static class MicrosoftCertificateTemplateInformation implements JsonEncodable {
+
+    private final ASN1ObjectIdentifier ID;
+
+    private final Integer majorVersion;
+
+    private final Integer minorVersion;
+
+    public MicrosoftCertificateTemplateInformation(
+        ASN1ObjectIdentifier ID, Integer majorVersion, Integer minorVersion) {
+      this.ID = Args.notNull(ID, "ID");
+      this.majorVersion = majorVersion;
+      this.minorVersion = minorVersion;
+      if (minorVersion != null && majorVersion == null) {
+        throw new IllegalArgumentException("majorVersion must not be null if minorVersion is non-null");
+      }
+    }
+
+    public ASN1ObjectIdentifier ID() {
+      return ID;
+    }
+
+    public Integer majorVersion() {
+      return majorVersion;
+    }
+
+    public Integer minorVersion() {
+      return minorVersion;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap ret = new JsonMap();
+      ret.put("ID", ID.getId());
+      if (majorVersion != null) {
+        ret.put("majorVersion", majorVersion);
+      }
+
+      if (minorVersion != null) {
+        ret.put("minorVersion", minorVersion);
+      }
+      return ret;
+    }
+
+    public ASN1Encodable toExtensionValue() {
+      ASN1EncodableVector v = new ASN1EncodableVector();
+      v.add(ID);
+      if (majorVersion != null) {
+        v.add(new ASN1Integer(BigInteger.valueOf(majorVersion)));
+
+        if (minorVersion != null) {
+          v.add(new ASN1Integer(BigInteger.valueOf(minorVersion)));
+        }
+      }
+
+      return new DERSequence(v);
+    }
+
+    public static MicrosoftCertificateTemplateInformation decode(JsonMap json) throws CodecException {
+      try {
+        ASN1ObjectIdentifier ID = new ASN1ObjectIdentifier(json.getNnString("ID"));
+        Integer majorVersion = json.getInt("majorVersion");
+        Integer minorVersion = json.getInt("minorVersion");
+        return new MicrosoftCertificateTemplateInformation(ID, majorVersion, minorVersion);
+      } catch (RuntimeException e) {
+        throw new CodecException(e);
+      }
+    }
+
+  }
+
+  public static class MicrosoftSID implements JsonEncodable {
+
+    private final List<Long> revisions;
+
+    private final List<Long> authorities;
+
+    public MicrosoftSID(List<Long> revisions, List<Long> authorities) {
+      this.revisions = Args.notEmpty(revisions, "revisions");
+      this.authorities = Args.notEmpty(authorities, "authorities");
+    }
+
+    public ASN1Encodable checkExtensionValue(ASN1Encodable extnValue)
+        throws BadCertTemplateException {
+      GeneralNames generalNames = GeneralNames.getInstance(extnValue);
+      GeneralName[] gns = generalNames.getNames();
+      if (gns.length != 1) {
+        throw new BadCertTemplateException("Number of GeneralName != 1");
+      }
+
+      GeneralName gn = gns[0];
+      if (gn.getTagNo() != GeneralName.otherName) {
+        throw new BadCertTemplateException("GeneralName is an OtherName");
+      }
+
+      OtherName on = OtherName.getInstance(gn.getName());
+      if (!on.getTypeID().equals(OIDs.Extn.id_microsoft_objectSid)) {
+        throw new BadCertTemplateException(
+            "otherName.type != " + OIDs.Extn.id_microsoft_objectSid.getId() +
+                ", but " + on.getTypeID().getId());
+      }
+
+      ASN1Encodable onValue = on.getValue();
+      if (!(onValue instanceof ASN1OctetString)) {
+        throw new BadCertTemplateException(
+            "otherName.value != OCTET STRING, but " + onValue.getClass().getName());
+      }
+
+      String str = new String(((ASN1OctetString) onValue).getOctets(), StandardCharsets.US_ASCII);
+      if (!str.startsWith("S-")) {
+        throw new BadCertTemplateException("SID does not start with 'S-': " + str);
+      }
+
+      if (str.endsWith("-")) {
+        throw new BadCertTemplateException("SID ends with '-': " + str);
+      }
+
+      if (str.contains("--")) {
+        throw new BadCertTemplateException("SID contains '--': " + str);
+      }
+
+      StringTokenizer st = new StringTokenizer(str, "-");
+      st.nextToken();
+
+      long revision = Long.parseLong(st.nextToken());
+      if (!revisions.contains(revision)) {
+        throw new BadCertTemplateException("revision " + revision + " is not among " + revisions);
+      }
+
+      long authority = Long.parseLong(st.nextToken());
+      if (!authorities.contains(authority)) {
+        throw new BadCertTemplateException(
+            "authority " + authority + " is not among " + authorities);
+      }
+      return extnValue;
+    }
+
+    @Override
+    public JsonMap toCodec() {
+      JsonMap map = new JsonMap();
+      JsonList l = new JsonList();
+      for (Long i : revisions) {
+        l.add(i);
+      }
+
+      map.put("revisions", l);
+
+      l = new JsonList();
+      for (Long i : authorities) {
+        l.add(i);
+      }
+      map.put("authorities", l);
+      return map;
+    }
+
+    public static MicrosoftSID decode(JsonMap json) throws CodecException {
+      try {
+        JsonList revisions = json.getNnList("revisions");
+        JsonList authorities = json.getNnList("authorities");
+        return new MicrosoftSID(revisions.toLongList(), authorities.toLongList());
+      } catch (RuntimeException e) {
+        throw new CodecException(e);
+      }
+    }
+
+  }
+
 }

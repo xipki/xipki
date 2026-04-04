@@ -3,12 +3,14 @@
 
 package org.xipki.ca.certprofile.test;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.id.AttributeType;
 import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
 import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
@@ -88,6 +90,8 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-ed448.json", true, false);
       certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x25519.json", false, true);
       certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x448.json", false, false);
+
+      certprofileMicrosoft(qa_dir + "certprofile-microsoft.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -383,7 +387,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     certprofileTls(new String[]{destFilename}, keyUsageMode, keypairGenMode, modes);
   }
 
-  private static void certprofileTls( String[] destFilenames, KeyUsageMode keyUsageMode,
+  private static void certprofileTls(String[] destFilenames, KeyUsageMode keyUsageMode,
       KeypairGenMode keypairGenMode, AllowKeyMode... modes) {
     String desc = "certprofile tls";
     if (keyUsageMode == KeyUsageMode.SIGN_ONLY) {
@@ -524,5 +528,56 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
+
+
+  private static void certprofileMicrosoft(String... destFilenames) {
+    XijsonCertprofileType profile = getBaseProfile(
+        "certprofile microsoft", CertLevel.EndEntity, "5y",
+        KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
+
+    // Subject
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O),
+        rdn01(AttributeType.OU), rdn01(AttributeType.SN), rdn(AttributeType.CN));
+
+    // Extensions
+    List<ExtensionType> list = profile.extensions();
+
+    list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
+    list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
+    list.add(createExtension(ExtensionID.freshestCRL, false, false));
+    list.add(createExtension(ExtensionID.ocspNoCheck, true, false));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(ExtensionID.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(ExtensionID.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(ExtensionID.authorityKeyIdentifier, true, false));
+
+    // Extensions - Microsoft Certificate Template Name
+    list.add(createExtension(ExtensionID.microsoft_CertificateTemplateName, true, false));
+    last(list).setMicrosoftCertificateTemplateName(
+        new ExtensionValueConf.MicrosoftCertificateTemplateName(
+            ExtensionValueConf.MicrosoftCertificateTemplateName.NameType.BMPString,
+            "MyCertTemplateName"));
+
+    // Extensions - Microsoft Certificate Template Information
+    list.add(createExtension(ExtensionID.microsoft_CertificateTemplateInformation, true, false));
+    last(list).setMicrosoftCertificateTemplateInformation(
+        new ExtensionValueConf.MicrosoftCertificateTemplateInformation(
+            new ASN1ObjectIdentifier("1.2.3.4.5"), null, null));
+
+    // Extensions - Microsoft SID
+    list.add(createExtension(ExtensionID.microsoft_SID, true, false));
+    last(list).setMicrosoftSID(new ExtensionValueConf.MicrosoftSID(
+        List.of(1L), List.of(5L)));
+
+    for (String destFilename : destFilenames) {
+      marshall(profile, destFilename, true);
+    }
+  } // method certprofileMicrosoft
 
 }

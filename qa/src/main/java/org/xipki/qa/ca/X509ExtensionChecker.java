@@ -599,7 +599,7 @@ class X509ExtensionChecker {
   } // method checkExtnMappings
 
   void checkSmimeCapabilities(StringBuilder failureMsg, byte[] extnValue) {
-    byte[] expected = caller.getSmimeCapabilities().getValue();
+    byte[] expected = caller.smimeCapabilities().getValue();
     if (!Arrays.equals(expected, extnValue)) {
       addViolation(failureMsg, "extension valus", Hex.encode(extnValue), Hex.encode(expected));
     }
@@ -984,6 +984,66 @@ class X509ExtensionChecker {
       failureMsg.append("features ").append(diffs).append(" are absent but are required; ");
     }
   } // method checkExtnTlsFeature
+
+  void checkExtnMicrosoftCertificateTemplateName(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
+      ExtensionControl extnControl) {
+    ExtensionValueConf.MicrosoftCertificateTemplateName template =
+        caller.microsoftCertificateTemplateName();
+    if (template == null) {
+      caller.checkConstantExtnValue(OIDs.Extn.id_microsoft_CertificateTemplateName,
+          failureMsg, extnValue, requestedExtns, extnControl);
+      return;
+    }
+
+    checkExpectedAsn1(failureMsg, extnValue, template.toExtensionValue());
+  } // method checkExtnMicrosoftCertificateTemplateName
+
+  void checkExtnMicrosoftCertificateTemplateInformation(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns,
+      ExtensionControl extnControl) {
+    ExtensionValueConf.MicrosoftCertificateTemplateInformation template =
+        caller.microsoftCertificateTemplateInformation();
+    if (template == null) {
+      caller.checkConstantExtnValue(OIDs.Extn.id_microsoft_CertificateTemplateInformation,
+          failureMsg, extnValue, requestedExtns, extnControl);
+      return;
+    }
+
+    checkExpectedAsn1(failureMsg, extnValue, template.toExtensionValue());
+  } // method checkExtnMicrosoftCertificateTemplateInformation
+
+  void checkExtnMicrosoftSid(
+      StringBuilder failureMsg, byte[] extnValue, Extensions requestedExtns) {
+    ExtensionValueConf.MicrosoftSID template = caller.microsoftSID();
+    if (template == null) {
+      return;
+    }
+
+    try {
+      ASN1Encodable asn1ExtnValue = template.checkExtensionValue(
+          requestedExtns.getExtensionParsedValue(OIDs.Extn.id_microsoft_SID));
+      checkExpectedAsn1(failureMsg, extnValue, asn1ExtnValue);
+    } catch (BadCertTemplateException ex) {
+      CheckerUtil.addViolation(failureMsg, "extension value",
+          ex.getMessage(), "profile conform");
+    }
+  } // method checkExtnMicrosoftSid
+
+  private static void checkExpectedAsn1(
+      StringBuilder failureMsg, byte[] extnValue, ASN1Encodable expectedAsn1) {
+    byte[] expected;
+    try {
+      expected = expectedAsn1.toASN1Primitive().getEncoded();
+    } catch (IOException e) {
+      throw new RuntimeException("shall not happen", e);
+    }
+
+    if (!Arrays.equals(expected, extnValue)) {
+      CheckerUtil.addViolation(failureMsg, "extension values", Hex.encode(extnValue),
+          Hex.encode(expected));
+    }
+  }
 
   static Set<String> getKeyUsage(byte[] extensionValue) {
     Set<String> usages = new HashSet<>();

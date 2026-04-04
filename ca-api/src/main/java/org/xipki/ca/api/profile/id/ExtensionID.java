@@ -129,6 +129,16 @@ public class ExtensionID extends AbstractID {
   public static final ExtensionID CCC_M_VehicleOEMCACert =
       initOf(OIDs.Extn.id_ccc_M_VehicleOEM_CA_Cert, "CCC-M-VehicleOEMCACert");
 
+  public static final ExtensionID microsoft_CertificateTemplateName =
+      initOf(OIDs.Extn.id_microsoft_CertificateTemplateName, "Microsoft-CertificateTemplateName");
+
+  public static final ExtensionID microsoft_CertificateTemplateInformation =
+      initOf(OIDs.Extn.id_microsoft_CertificateTemplateInformation,
+          "Microsoft-CertificateTemplateInformation");
+
+  public static final ExtensionID microsoft_SID =
+      initOf(OIDs.Extn.id_microsoft_SID, "Microsoft-SID");
+
   private ExtensionID(ASN1ObjectIdentifier x509, List<String> aliases) {
     super(x509, aliases);
   }

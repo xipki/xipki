@@ -74,9 +74,10 @@
       "tls-montgomery",
       "tls-mldsa",
       "tls-mlkem",
-            "tls-compsig",
-            "tls-compkem",
-      "tls-sm2"
+      "tls-compsig",
+      "tls-compkem",
+      "tls-sm2",
+      "microsoft"
     ],
     "publishers":[
       "ocsp-publisher"

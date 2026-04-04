@@ -70,6 +70,13 @@ public class X509ExtensionsChecker {
 
   private QaExtensionValue smimeCapabilities;
 
+  private ExtensionValueConf.MicrosoftCertificateTemplateName microsoftCertificateTemplateName;
+
+  private ExtensionValueConf.MicrosoftCertificateTemplateInformation
+      microsoftCertificateTemplateInformation;
+
+  private ExtensionValueConf.MicrosoftSID microsoftSID;
+
   private ASN1ObjectIdentifier cccExtensionSchemaType;
 
   private byte[] cccExtensionSchemaValue;
@@ -161,6 +168,19 @@ public class X509ExtensionsChecker {
 
     // CCC
     initCCCExtensionSchemas(extensions);
+
+    // Microsoft
+    type = OIDs.Extn.id_microsoft_CertificateTemplateName;
+    if (extensionControls.containsID(type)) {
+      this.microsoftCertificateTemplateName =
+          extensions.get(type.getId()).microsoftCertificateTemplateName();
+    }
+
+    type = OIDs.Extn.id_microsoft_CertificateTemplateInformation;
+    if (extensionControls.containsID(type)) {
+      this.microsoftCertificateTemplateInformation =
+          extensions.get(type.getId()).microsoftCertificateTemplateInformation();
+    }
 
     // constant extensions
     Map<ASN1ObjectIdentifier, ExtensionValue> constExtns = certprofile.constantExtensions();
@@ -263,8 +283,21 @@ public class X509ExtensionsChecker {
     return tlsFeature;
   }
 
-  QaExtensionValue getSmimeCapabilities() {
+  QaExtensionValue smimeCapabilities() {
     return smimeCapabilities;
+  }
+
+  ExtensionValueConf.MicrosoftCertificateTemplateName microsoftCertificateTemplateName() {
+    return microsoftCertificateTemplateName;
+  }
+
+  ExtensionValueConf.MicrosoftSID microsoftSID() {
+    return microsoftSID;
+  }
+
+  ExtensionValueConf.MicrosoftCertificateTemplateInformation
+      microsoftCertificateTemplateInformation() {
+    return microsoftCertificateTemplateInformation;
   }
 
   XijsonCertprofile getCertprofile() {
@@ -382,6 +415,14 @@ public class X509ExtensionsChecker {
               cert.getTBSCertificate().getEndDate().getDate());
         } else if (OIDs.Extn.qCStatements.equals(oid)) {
           extnChecker.checkExtnQcStatements(failureMsg, extnValue, requestedExtns, extnControl);
+        } else if (OIDs.Extn.id_microsoft_CertificateTemplateName.equals(oid)) {
+          extnChecker.checkExtnMicrosoftCertificateTemplateName(failureMsg, extnValue,
+              requestedExtns, extnControl);
+        } else if (OIDs.Extn.id_microsoft_CertificateTemplateInformation.equals(oid)) {
+          extnChecker.checkExtnMicrosoftCertificateTemplateInformation(failureMsg, extnValue,
+              requestedExtns, extnControl);
+        } else if (OIDs.Extn.id_microsoft_SID.equals(oid)) {
+          extnChecker.checkExtnMicrosoftSid(failureMsg, extnValue, requestedExtns);
         } else {
           byte[] expected = getExpectedExtValue(oid, requestedExtns, extnControl);
           if (!Arrays.equals(expected, extnValue)) {

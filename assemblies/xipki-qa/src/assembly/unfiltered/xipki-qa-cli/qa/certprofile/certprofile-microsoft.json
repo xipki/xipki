@@ -1,0 +1,143 @@
+{
+  "metadata": {
+    "category": "A",
+    "details": "certprofile microsoft"
+  },
+  "certLevel": "EndEntity",
+  "maxSize": 8400,
+  "validity": "5y",
+  "notBeforeTime": "current",
+  "keypairGeneration": "InheritCA",
+  "keyAlgorithms": [
+    "BRAINPOOLP256R1",
+    "BRAINPOOLP384R1",
+    "BRAINPOOLP512R1",
+    "ED25519",
+    "ED448",
+    "FRP256V1",
+    "MLDSA44",
+    "MLDSA44-ED25519",
+    "MLDSA44-P256",
+    "MLDSA44-RSA2048",
+    "MLDSA65",
+    "MLDSA65-BP256",
+    "MLDSA65-ED25519",
+    "MLDSA65-P256",
+    "MLDSA65-P384",
+    "MLDSA65-RSA3072",
+    "MLDSA65-RSA4096",
+    "MLDSA87",
+    "MLDSA87-BP384",
+    "MLDSA87-ED448",
+    "MLDSA87-P384",
+    "MLDSA87-P521",
+    "MLDSA87-RSA3072",
+    "MLDSA87-RSA4096",
+    "MLKEM1024",
+    "MLKEM1024-BP384",
+    "MLKEM1024-P384",
+    "MLKEM1024-P521",
+    "MLKEM1024-RSA3072",
+    "MLKEM1024-X448",
+    "MLKEM512",
+    "MLKEM768",
+    "MLKEM768-BP256",
+    "MLKEM768-P256",
+    "MLKEM768-P384",
+    "MLKEM768-RSA2048",
+    "MLKEM768-RSA3072",
+    "MLKEM768-RSA4096",
+    "MLKEM768-X25519",
+    "P256",
+    "P384",
+    "P521",
+    "RSA2048",
+    "RSA3072",
+    "RSA4096",
+    "SM2",
+    "X25519",
+    "X448"
+  ],
+  "subject": [
+    {
+      "type": "country",
+      "minOccurs": 0
+    },
+    {
+      "type": "organization",
+      "minOccurs": 0
+    },
+    {
+      "type": "organizationalUnit",
+      "minOccurs": 0
+    },
+    {
+      "type": "serialNumber",
+      "minOccurs": 0
+    },
+    {
+      "type": "commonName"
+    }
+  ],
+  "extensions": [
+    {
+      "type": "SubjectKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "CRLDistributionPoints"
+    },
+    {
+      "type": "FreshestCRL"
+    },
+    {
+      "type": "OCSPNoCheck",
+      "required": true
+    },
+    {
+      "type": "BasicConstraints",
+      "required": true,
+      "critical": true
+    },
+    {
+      "type": "AuthorityInfoAccess",
+      "required": true,
+      "authorityInfoAccess": {
+        "includeCaIssuers": true,
+        "includeOcsp": true
+      }
+    },
+    {
+      "type": "AuthorityKeyIdentifier",
+      "required": true
+    },
+    {
+      "type": "Microsoft-CertificateTemplateName",
+      "required": true,
+      "microsoftCertificateTemplateName": {
+        "nameType": "BMPString",
+        "name": "MyCertTemplateName"
+      }
+    },
+    {
+      "type": "Microsoft-CertificateTemplateInformation",
+      "required": true,
+      "microsoftCertificateTemplateInformation": {
+        "ID": "1.2.3.4.5"
+      }
+    },
+    {
+      "type": "Microsoft-SID",
+      "required": true,
+      "inRequest": "required",
+      "microsoftSID": {
+        "revisions": [
+          1
+        ],
+        "authorities": [
+          5
+        ]
+      }
+    }
+  ]
+}

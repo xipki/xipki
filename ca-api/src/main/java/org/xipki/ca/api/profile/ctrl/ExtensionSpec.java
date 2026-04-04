@@ -125,14 +125,18 @@ public abstract class ExtensionSpec {
             OIDs.Extn.subjectKeyIdentifier, OIDs.Extn.issuerAlternativeName,
             OIDs.Extn.subjectDirectoryAttributes, OIDs.Extn.freshestCRL,
             OIDs.Extn.authorityInfoAccess, OIDs.Extn.subjectInfoAccess,
-            OIDs.Extn.id_pe_tlsfeature, OIDs.Extn.id_SignedCertificateTimestampList);
+            OIDs.Extn.id_pe_tlsfeature, OIDs.Extn.id_SignedCertificateTimestampList,
+            OIDs.Extn.id_microsoft_CertificateTemplateName,
+            OIDs.Extn.id_microsoft_CertificateTemplateInformation,
+            OIDs.Extn.id_microsoft_SID);
 
     private static final Set<ASN1ObjectIdentifier> NON_REQUEST_EXTENSIONS =
         Set.of(OIDs.Extn.authorityKeyIdentifier,
             OIDs.Extn.issuerAlternativeName, OIDs.Extn.cRLDistributionPoints,
             OIDs.Extn.authorityInfoAccess, OIDs.Extn.freshestCRL,
             OIDs.Extn.id_SignedCertificateTimestampList, OIDs.Extn.inhibitAnyPolicy,
-            OIDs.Extn.id_pkix_ocsp_nocheck);
+            OIDs.Extn.id_pkix_ocsp_nocheck, OIDs.Extn.id_microsoft_CertificateTemplateName,
+            OIDs.Extn.id_microsoft_CertificateTemplateInformation);
 
     public Set<ASN1ObjectIdentifier> requiredExtensions() {
       return REQUIRED_EXTENSIONS;

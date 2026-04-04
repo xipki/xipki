@@ -200,7 +200,14 @@
     "conf":{
       "file":"${profiles.dir}/certprofile-fixed-partial-subject.json"
     }
-  }],
+  },{
+    "name":"microsoft",
+    "type":"xijson",
+    "conf":{
+      "file":"${profiles.dir}/certprofile-microsoft.json"
+    }
+  }
+  ],
   "cas":[{
     "name":"rootca1",
     "aliases":[

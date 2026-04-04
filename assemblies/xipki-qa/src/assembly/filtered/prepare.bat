@@ -1,8 +1,12 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
 
+REM FIPS or LTS
 set "BOUNCYCASTLE_MODE_CLIENT=LTS"
+
+REM FIPS or LTS
 set "BOUNCYCASTLE_MODE_SERVER=LTS"
+
 set "TBDIR=%USERPROFILE%\test\xipki"
 set "DATABASE_TYPE=h2"
 set "TOMCAT_MAJOR_VERSION=10"

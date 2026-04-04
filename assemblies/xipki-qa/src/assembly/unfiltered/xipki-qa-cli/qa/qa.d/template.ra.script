@@ -371,6 +371,22 @@ cmp-revoke --ca subca1 --cert output/tls-c2.crt --ca-cert output/subca1.crt \
   --reason affiliationChanged --signer-password $[cmp.client.keyPassword] \
   --signer-p12 ${SIGNER_P12}
 
+# Certificate microsoft
+
+csr-p12 REPLACEME-RSAPSS --p12 output/microsoft.p12 --password CHANGEIT \
+  --subject "CN=microsoft.myorg.org,O=myorg,C=DE" \
+  --microsoft-sid "S-1-5-123456-234567-1234" \
+  --outform $OUTFORM \
+  --out output/microsoft.csr
+
+cmp-csr-enroll --csr output/microsoft.csr --ca subca --profile microsoft \
+  --outform $OUTFORM --out output/microsoft.crt \
+  --signer-password $[cmp.client.keyPassword] --signer-p12 ${SIGNER_P12}
+
+update-cert-p12 --p12 output/microsoft.p12 --password CHANGEIT \
+  --cert output/microsoft.crt --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
 # Certificate max-time1
 
 csr-p12 REPLACEME-RSAPSS --p12 output/max-time1.p12 --password CHANGEIT \

@@ -842,6 +842,7 @@ public class OIDs {
     public static final ASN1ObjectIdentifier authorityInfoAccess =
         initOid("1.3.6.1.5.5.7.1.1", "authorityInfoAccess");
 
+    // TODO: change the name for ipAddrBlocks* and autonomousSysIds*
     /**
      * ipAddrBlocks
      */
@@ -997,6 +998,21 @@ public class OIDs {
         initOid("1.3.6.1.4.1.41577.5.9", "CCC-J-VehicleOEM-CA-Cert");
     public static final ASN1ObjectIdentifier id_ccc_M_VehicleOEM_CA_Cert =
         initOid("1.3.6.1.4.1.41577.5.10", "CCC-M-VehicleOEM-CA-Cert");
+
+    // Enroll cert type
+    // see https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wcce/3aec3e50-511a-42f9-a5d5-240af503e470
+    public static final ASN1ObjectIdentifier id_microsoft_CertificateTemplateName=
+        initOid("1.3.6.1.4.1.311.20.2", "Microsoft-CertificateTemplateName");
+
+    public static final ASN1ObjectIdentifier id_microsoft_CertificateTemplateInformation =
+        initOid("1.3.6.1.4.1.311.21.7", "Microsoft-CertificateTemplateInformation");
+
+    public static final ASN1ObjectIdentifier id_microsoft_SID =
+        initOid("1.3.6.1.4.1.311.25.2", "Microsoft-SecurityIdentifier");
+
+    public static final ASN1ObjectIdentifier id_microsoft_objectSid =
+        initOid("1.3.6.1.4.1.311.25.2.1", "Microsoft-ObjectSID");
+
   }
 
   /**
