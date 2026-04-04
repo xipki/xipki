@@ -9,6 +9,8 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
@@ -49,6 +51,7 @@ import java.util.Set;
 
 public class IdentifiedCertprofile {
 
+  private static final Logger log = LoggerFactory.getLogger(IdentifiedCertprofile.class);
   private final CertprofileEntry dbEntry;
   private final Certprofile certprofile;
 
@@ -176,8 +179,14 @@ public class IdentifiedCertprofile {
       ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
       for (ASN1ObjectIdentifier m : oids) {
         ExtensionControl control = controls.getControl(m);
-        if (control == null || control.isPermittedInRequest()) {
-          requestedExtns.put(m, requestedExtensions.getExtension(m));
+        if (control == null) {
+          log.warn("ignore extension {}, it is defined in the profile", m.getId());
+        } else {
+          if (control.isPermittedInRequest()) {
+            requestedExtns.put(m, requestedExtensions.getExtension(m));
+          } else {
+            log.warn("ignore extension {}, it is allowed in the request", m.getId());
+          }
         }
       }
     }

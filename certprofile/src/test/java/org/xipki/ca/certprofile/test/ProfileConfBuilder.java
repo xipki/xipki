@@ -39,11 +39,11 @@ import java.util.List;
 public class ProfileConfBuilder extends ExtensionConfBuilder {
 
   protected static final String qa_dir   =
-      "assemblies/xipki-qa/src/main/unfiltered/qa/certprofile";
+      "assemblies/xipki-qa/src/assembly/unfiltered/xipki-qa-cli/qa/certprofile/";
   protected static final String qa_cab_dir  =
-      "assemblies/xipki-qa/src/main/unfiltered/qa/cab/certprofile";
+      "assemblies/xipki-qa/src/assembly/unfiltered/xipki-qa-cli/qa/cab/certprofile/";
   protected static final String mgmt_dir =
-    "assemblies/xipki-mgmt-cli/src/main/unfiltered/xipki/ca-setup/certprofile";
+      "assemblies/xipki-setup/src/assembly/unfiltered/xipki-mgmt-cli/xipki/ca-setup/certprofile/";
 
   protected static final String REGEX_FQDN = ":FQDN";
 
