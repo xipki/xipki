@@ -25,7 +25,7 @@ public class SecurityShellMain {
       PasswordCommands.PbeDecCommand.class,
       PasswordCommands.PbeEncCommand.class,
       SecurityCommands.CertInfoCommand.class,
-      CsrCommands.CrlInfoCommand.class,
+      SecurityCommands.CrlInfoCommand.class,
       SecurityCommands.ConvertKeystoreCommand.class,
       SecurityCommands.ImportCertCommand.class,
       SecurityCommands.ExportCertP7mCommand.class,

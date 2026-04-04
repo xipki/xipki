@@ -10,10 +10,11 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.OtherName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.qualified.BiometricData;
 import org.bouncycastle.asn1.x509.qualified.Iso4217CurrencyCode;
@@ -45,7 +46,6 @@ import org.xipki.security.util.EcCurveEnum;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
 import org.xipki.util.codec.Args;
@@ -66,7 +66,7 @@ import javax.crypto.SecretKey;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -80,80 +80,6 @@ import java.util.*;
  * @author Lijun Liao (xipki)
  */
 public class CsrCommands {
-  @Command(name = "crl-info", description = "print CRL information",
-      mixinStandardHelpOptions = true)
-  static class CrlInfoCommand extends ShellBaseCommand {
-
-    @Option(names = "--in", description = "CRL file", required = true)
-    @Completion(FilePathCompleter.class)
-    private String inFile;
-
-    @Option(names = "--hex", description = "print hex number")
-    private boolean hex;
-
-    @Option(names = "--crlnumber", description = "print CRL number")
-    private boolean crlNumber;
-
-    @Option(names = "--issuer", description = "print issuer")
-    private boolean issuer;
-
-    @Option(names = "--this-update", description = "print thisUpdate")
-    private boolean thisUpdate;
-
-    @Option(names = "--next-update", description = "print nextUpdate")
-    private boolean nextUpdate;
-
-    @Override
-    public void run() {
-      try {
-        CertificateList crl = CertificateList.getInstance(
-                                X509Util.toDerEncoded(IoUtil.read(inFile)));
-        String result;
-        if (crlNumber) {
-          ASN1Encodable asn1 = crl.getTBSCertList().getExtensions()
-              .getExtensionParsedValue(OIDs.Extn.cRLNumber);
-          result = asn1 == null ? "null"
-                                : getNumber(ASN1Integer.getInstance(asn1).getPositiveValue());
-        } else if (issuer) {
-          result = crl.getIssuer().toString();
-        } else if (thisUpdate) {
-          result = toUtcTime(crl.getThisUpdate().getDate().toInstant());
-        } else if (nextUpdate) {
-          result = crl.getNextUpdate() == null ? "null"
-              : toUtcTime(crl.getNextUpdate().getDate().toInstant());
-        } else {
-          result = crl.toString();
-        }
-        println(result);
-      } catch (Exception ex) {
-        throw new RuntimeException(ex.getMessage(), ex);
-      }
-    }
-
-    private String toUtcTime(Instant instant) {
-      return DateUtil.toUtcTimeyyyyMMddhhmmss(instant) + "Z";
-    }
-
-    private String getNumber(Number no) {
-      if (!hex) {
-        return no.toString();
-      }
-
-      if (no instanceof Byte) {
-        return "0X" + Hex.encode(new byte[]{(byte) no});
-      } else if (no instanceof Short) {
-        return "0X" + Integer.toHexString((short) no);
-      } else if (no instanceof Integer) {
-        return "0X" + Integer.toHexString((int) no);
-      } else if (no instanceof Long) {
-        return "0X" + Long.toHexString((long) no);
-      } else if (no instanceof BigInteger) {
-        return "0X" + ((BigInteger) no).toString(16);
-      } else {
-        return no.toString();
-      }
-    }
-  }
 
   abstract static class CsrGenCommand extends SecurityCommands.SecurityCommand {
 

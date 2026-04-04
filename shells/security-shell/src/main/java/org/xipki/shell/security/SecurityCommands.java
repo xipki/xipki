@@ -3,9 +3,12 @@
 
 package org.xipki.shell.security;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.cms.SignedData;
+import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
@@ -13,6 +16,7 @@ import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.xipki.security.HashAlgo;
+import org.xipki.security.OIDs;
 import org.xipki.security.Securities;
 import org.xipki.security.pkcs12.PKCS12KeyStore;
 import org.xipki.security.pkix.JceX509Certificate;
@@ -603,4 +607,78 @@ class SecurityCommands {
     }
   }
 
+  @Command(name = "crl-info", description = "print CRL information",
+      mixinStandardHelpOptions = true)
+  static class CrlInfoCommand extends ShellBaseCommand {
+
+    @Option(names = "--in", description = "CRL file", required = true)
+    @Completion(FilePathCompleter.class)
+    private String inFile;
+
+    @Option(names = "--hex", description = "print hex number")
+    private boolean hex;
+
+    @Option(names = "--crlnumber", description = "print CRL number")
+    private boolean crlNumber;
+
+    @Option(names = "--issuer", description = "print issuer")
+    private boolean issuer;
+
+    @Option(names = "--this-update", description = "print thisUpdate")
+    private boolean thisUpdate;
+
+    @Option(names = "--next-update", description = "print nextUpdate")
+    private boolean nextUpdate;
+
+    @Override
+    public void run() {
+      try {
+        CertificateList crl = CertificateList.getInstance(
+                                X509Util.toDerEncoded(IoUtil.read(inFile)));
+        String result;
+        if (crlNumber) {
+          ASN1Encodable asn1 = crl.getTBSCertList().getExtensions()
+              .getExtensionParsedValue(OIDs.Extn.cRLNumber);
+          result = asn1 == null ? "null"
+                                : getNumber(ASN1Integer.getInstance(asn1).getPositiveValue());
+        } else if (issuer) {
+          result = crl.getIssuer().toString();
+        } else if (thisUpdate) {
+          result = toUtcTime(crl.getThisUpdate().getDate().toInstant());
+        } else if (nextUpdate) {
+          result = crl.getNextUpdate() == null ? "null"
+              : toUtcTime(crl.getNextUpdate().getDate().toInstant());
+        } else {
+          result = crl.toString();
+        }
+        println(result);
+      } catch (Exception ex) {
+        throw new RuntimeException(ex.getMessage(), ex);
+      }
+    }
+
+    private String toUtcTime(Instant instant) {
+      return DateUtil.toUtcTimeyyyyMMddhhmmss(instant) + "Z";
+    }
+
+    private String getNumber(Number no) {
+      if (!hex) {
+        return no.toString();
+      }
+
+      if (no instanceof Byte) {
+        return "0X" + Hex.encode(new byte[]{(byte) no});
+      } else if (no instanceof Short) {
+        return "0X" + Integer.toHexString((short) no);
+      } else if (no instanceof Integer) {
+        return "0X" + Integer.toHexString((int) no);
+      } else if (no instanceof Long) {
+        return "0X" + Long.toHexString((long) no);
+      } else if (no instanceof BigInteger) {
+        return "0X" + ((BigInteger) no).toString(16);
+      } else {
+        return no.toString();
+      }
+    }
+  }
 }
