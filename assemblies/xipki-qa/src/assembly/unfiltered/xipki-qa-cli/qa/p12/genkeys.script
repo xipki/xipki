@@ -16,7 +16,7 @@ keypair-p12 --keyspec RSA2048 --password CHANGEIT \
 
 set list [ multiple-ous1 multiple-ous2 qc1 ee-complex1 ee-complex2 smime1 \
   smime-legacy1 tls1 tls-neg tls2 rest-tls1 rest-tls-rekey1 tls-c1 tls-c2 \
-  max-time1 fixed-partial-subject1 fixed-partial-subject2 constant-ext1 ]
+  max-time1 fixed-partial-subject1 fixed-partial-subject2 constant-ext1 microsoft ]
 
 for it in $list
   set filename $it
