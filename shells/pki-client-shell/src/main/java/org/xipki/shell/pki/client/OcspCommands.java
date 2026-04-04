@@ -6,6 +6,7 @@ package org.xipki.shell.pki.client;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.OCSPResp;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -98,6 +100,10 @@ public class OcspCommands {
     @Option(names = {"--cert", "-c"}, split = ",", description = "certificate files")
     @Completion(FilePathCompleter.class)
     private List<String> certFiles;
+
+    @Option(names = {"--ocsp-cert-out"}, description = "file to save the OCSP signer certificate")
+    @Completion(FilePathCompleter.class)
+    private String ocspCertOutFile;
 
     @Override
     public void run() {
@@ -180,6 +186,18 @@ public class OcspCommands {
             if (StringUtil.isNotBlank(respout) && reqResp.response() != null) {
               IoUtil.save(respout, reqResp.response());
             }
+          }
+        }
+
+        if (ocspCertOutFile != null) {
+          X509CertificateHolder[] ocspSignerCerts =
+              ((BasicOCSPResp) response.getResponseObject()).getCerts();
+          if (ocspSignerCerts != null && ocspSignerCerts.length > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (X509CertificateHolder m : ocspSignerCerts) {
+              sb.append(X509Util.toPemCert(new X509Cert(m.toASN1Structure())));
+            }
+            IoUtil.save(ocspCertOutFile, sb.toString().getBytes(StandardCharsets.US_ASCII));
           }
         }
 
