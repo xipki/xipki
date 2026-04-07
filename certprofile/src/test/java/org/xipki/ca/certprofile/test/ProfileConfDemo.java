@@ -529,7 +529,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     marshall(profile, destFilename, true);
   } // method certprofileMaxTime
 
-
   private static void certprofileMicrosoft(String... destFilenames) {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile microsoft", CertLevel.EndEntity, "5y",

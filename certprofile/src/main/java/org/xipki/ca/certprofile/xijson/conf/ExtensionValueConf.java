@@ -1436,7 +1436,6 @@ public abstract class ExtensionValueConf implements JsonEncodable {
 
   } // class ExtendedKeyUsage
 
-
   public static class MicrosoftCertificateTemplateName implements JsonEncodable {
 
     public enum NameType {
@@ -1541,7 +1540,8 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       this.majorVersion = majorVersion;
       this.minorVersion = minorVersion;
       if (minorVersion != null && majorVersion == null) {
-        throw new IllegalArgumentException("majorVersion must not be null if minorVersion is non-null");
+        throw new IllegalArgumentException(
+            "majorVersion must not be null if minorVersion is non-null");
       }
     }
 
@@ -1585,7 +1585,8 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       return new DERSequence(v);
     }
 
-    public static MicrosoftCertificateTemplateInformation decode(JsonMap json) throws CodecException {
+    public static MicrosoftCertificateTemplateInformation decode(JsonMap json)
+        throws CodecException {
       try {
         ASN1ObjectIdentifier ID = new ASN1ObjectIdentifier(json.getNnString("ID"));
         Integer majorVersion = json.getInt("majorVersion");

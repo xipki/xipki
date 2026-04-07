@@ -426,7 +426,8 @@ class ShellCompleter implements Completer {
     return ret;
   }
 
-  private static String appendDisplaySegment(String displayBase, String name, boolean windowsStyle) {
+  private static String appendDisplaySegment(
+      String displayBase, String name, boolean windowsStyle) {
     if (displayBase == null || displayBase.isEmpty() || ".".equals(displayBase)) {
       return name;
     }

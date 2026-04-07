@@ -807,7 +807,6 @@ public class XijsonExtensions {
       microsoftCertTemplateInformation = new ExtensionValue(critical, extConf.toExtensionValue());
     }
 
-
     type = OIDs.Extn.id_microsoft_SID;
     if (extensionsControl.containsID(type)) {
       extnIds.remove(type);

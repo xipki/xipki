@@ -5,6 +5,8 @@ package org.xipki.pkcs11test;
 
 /**
  * Marker class to keep the pkcs11test main artifact non-empty.
+ *
+ * @author Lijun Liao (xipki)
  */
 public final class Pkcs11testMarker {
 
