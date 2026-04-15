@@ -82,7 +82,8 @@ public class NativePKCS11 extends PKCS11 {
         data, data2, ckm, mechParams, template, template2);
   }
 
-  public CkVersion getVersion(int moduleId) throws PKCS11Exception {
+  @Override
+  public CkVersion getVersion() throws PKCS11Exception {
     int version = Libpkcs11.getVersion(moduleId);
     if (version == 0) {
       throw new PKCS11Exception(JniResp.CKR_JNI_NO_MODULE);

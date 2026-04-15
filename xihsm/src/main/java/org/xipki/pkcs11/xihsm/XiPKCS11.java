@@ -31,7 +31,8 @@ public class XiPKCS11 extends PKCS11 {
     XiLibpkcs11.closeModule(moduleId);
   }
 
-  public CkVersion getVersion(int moduleId) throws PKCS11Exception {
+  @Override
+  public CkVersion getVersion() throws PKCS11Exception {
     int version = XiLibpkcs11.getVersion(moduleId);
     if (version == 0) {
       throw new PKCS11Exception(JniResp.CKR_JNI_NO_MODULE);

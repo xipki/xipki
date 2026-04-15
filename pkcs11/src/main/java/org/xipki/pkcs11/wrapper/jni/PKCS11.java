@@ -74,7 +74,7 @@ public abstract class PKCS11 {
       int size, byte[] data, byte[] data2,
       long ckm, byte[] mechParams, byte[] template, byte[] template2);
 
-  public abstract CkVersion getVersion(int moduleId) throws PKCS11Exception;
+  public abstract CkVersion getVersion() throws PKCS11Exception;
 
   /* *****************************
    * cryptoki v2.x Functions
@@ -1166,10 +1166,11 @@ public abstract class PKCS11 {
     } while (mid == 0 || moduleIds.contains(mid));
 
     initModule(mid, modulePath);
-    CkVersion version = getVersion(mid);
+    this.moduleId = mid;
+
+    CkVersion version = getVersion();
     log.info("cryptoki version for {} is {}", modulePath, version);
 
-    this.moduleId = mid;
     moduleIds.add(mid);
   }
 
