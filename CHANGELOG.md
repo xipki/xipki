@@ -4,13 +4,20 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 6.7.x
 - Release date: 202x/mm/dd
+- xipki-ca
+  - Added native support of Microsoft proprietary extensions
+    - Certificate Template Name (1.3.1.6.1.311.20.2)
+    - Certificate Template Information (1.3.1.6.1.311.21.7)
+    - Security Identifier (SID, 1.3.1.6.1.311.25.2)  
+- Dependencies
+  - bcpqc-fips: 2.0.0 -> 2.1.0
 
 ## 6.7.0
 - Release date: 2026/03/28
 - xipki-gateway
   - Harden ACME
 - xipki-cli and xipki-mgmt-cli
-  - Replace karaf with picocli + jline
+  - Replaced karaf with picocli + jline
 - Dependencies
   - bc-fips: 2.0.1 -> 2.1.2
   - bcutil-fips: 2.0.5 -> 2.1.5
