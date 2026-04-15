@@ -21,6 +21,10 @@
       <artifactId>shell-base</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

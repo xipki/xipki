@@ -3,12 +3,11 @@
 
 package org.xipki.shell.demo;
 
+import org.h2.tools.Server;
 import org.xipki.shell.PicocliShell;
 import org.xipki.shell.ShellBaseCommand;
-import org.xipki.util.extra.misc.ReflectiveUtil;
 import picocli.CommandLine.Command;
 
-import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 /**
@@ -18,10 +17,7 @@ import java.util.function.Consumer;
  */
 public class DemoShellMain {
 
-  // use reflective method to avoid the dependency of h2.
-  private static final String CLASS_SERVER = "org.h2.tools.Server";
-
-  private static Object server;
+  private static Server server;
   private static long startedWebPort;
   private static long startedTcpPort;
 
@@ -50,11 +46,9 @@ public class DemoShellMain {
         printer.accept("H2 TCP server and Web console server have been started before with tcpPort="
             + startedTcpPort + " and webPort=" + startedWebPort);
       } else {
-        server = ReflectiveUtil.newInstance(CLASS_SERVER);
-        Method runToolMethod = server.getClass().getMethod("runTool", String[].class);
-        runToolMethod.invoke(server, (Object) new String[] {
-            "-ifNotExists", "-tcp", "-tcpPort", Integer.toString(tcpPort),
-            "-tcpAllowOthers", "-web", "-webPort", Integer.toString(webPort), "-webAllowOthers"});
+        server = new Server();
+        server.runTool("-ifNotExists", "-tcp", "-tcpPort", Integer.toString(tcpPort),
+            "-tcpAllowOthers", "-web", "-webPort", Integer.toString(webPort), "-webAllowOthers");
         startedWebPort = webPort;
         startedTcpPort = tcpPort;
         printer.accept("Started H2 TCP server and Web console server.");
@@ -82,13 +76,8 @@ public class DemoShellMain {
   }
 
   private static void shutdownServer() {
-    try {
-      Method shutdownMethod = server.getClass().getMethod("shutdown");
-      shutdownMethod.invoke(server);
-      server = null;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    server.shutdown();
+    server = null;
   }
 
 }
