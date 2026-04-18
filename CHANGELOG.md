@@ -8,7 +8,12 @@ See also <https://github.com/xipki/xipki/releases>
   - Added native support of Microsoft proprietary extensions
     - Certificate Template Name (1.3.1.6.1.311.20.2)
     - Certificate Template Information (1.3.1.6.1.311.21.7)
-    - Security Identifier (SID, 1.3.1.6.1.311.25.2)  
+    - Security Identifier (SID, 1.3.1.6.1.311.25.2)
+  - Added native support of China GM/T 0015-2023 extensions
+    - Resident Identity Card Number (1.2.156.10260.4.1.1.1)
+    - Passport Number (1.2.156.10260.4.1.1.2)
+    - Social Insurance Number (1.2.156.10260.4.1.2)
+    - Unified Social Credit Code  (1.2.156.10260.4.4)
 - Dependencies
   - bcpqc-fips: 2.0.0 -> 2.1.0
 

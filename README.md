@@ -188,6 +188,11 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - Certificate Template Name (1.3.1.6.1.311.20.2)
       - Certificate Template Information (1.3.1.6.1.311.21.7)
       - Security Identifier (SID, 1.3.1.6.1.311.25.2)
+    - China GM/T 0015-2023
+      - Resident Identity Card Number (1.2.156.10260.4.1.1.1)
+      - Passport Number (1.2.156.10260.4.1.1.2)
+      - Social Insurance Number (1.2.156.10260.4.1.2)
+      - Unified Social Credit Code  (1.2.156.10260.4.4)
   - Management of multiple CAs in one software instance
     - Support for database clusters
     - Multiple software instances (all can be in active mode) for the same CA

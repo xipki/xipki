@@ -78,3 +78,7 @@ check-cert --issuer subca --profile fixed-partial-subject \
 check-cert --issuer subca --profile microsoft \
   --csr output/microsoft.csr \
   --cert output/microsoft.crt
+
+check-cert --issuer subca --profile gmt0015 \
+  --csr output/gmt0015.csr \
+  --cert output/gmt0015.crt

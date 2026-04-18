@@ -3,12 +3,7 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Object;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
@@ -434,7 +429,7 @@ public class X509ExtensionsChecker {
         if (failureMsg.length() > 0) {
           issue.setFailureMessage(failureMsg.toString());
         }
-      } catch (IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException ex) {
+      } catch (RuntimeException ex) {
         LOG.debug("extension value does not have correct syntax", ex);
         issue.setFailureMessage("extension value does not have correct syntax");
       }
@@ -450,7 +445,21 @@ public class X509ExtensionsChecker {
     } else if (requestedExtns != null && extControl.isPermittedInRequest()) {
       Extension reqExt = requestedExtns.getExtension(type);
       if (reqExt != null) {
-        return reqExt.getExtnValue().getOctets();
+        if (OIDs.Extn.id_cn_residentIdCardNumber.equals(type)
+          || OIDs.Extn.id_cn_passportNumber.equals(type)
+          || OIDs.Extn.id_cn_socialInsuranceNumber.equals(type)
+          || OIDs.Extn.id_cn_UnifiedSocialCreditCode.equals(type)) {
+          String str = ((ASN1String) reqExt.getParsedValue()).getString();
+          ASN1Encodable extnValue = OIDs.Extn.id_cn_passportNumber.equals(type)
+              ? new DERUTF8String(str) : new DERPrintableString(str);
+          try {
+            return extnValue.toASN1Primitive().getEncoded();
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        } else {
+          return reqExt.getExtnValue().getOctets();
+        }
       }
     }
 

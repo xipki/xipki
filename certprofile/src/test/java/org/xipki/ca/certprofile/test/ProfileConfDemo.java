@@ -92,6 +92,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileTlsEdwardsOrMontgomery(qa_dir + "/certprofile-x448.json", false, false);
 
       certprofileMicrosoft(qa_dir + "certprofile-microsoft.json");
+      certprofileGMT0015(qa_dir + "certprofile-gmt0015.json");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -578,5 +579,43 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       marshall(profile, destFilename, true);
     }
   } // method certprofileMicrosoft
+
+  private static void certprofileGMT0015(String... destFilenames) {
+    XijsonCertprofileType profile = getBaseProfile(
+        "certprofile GM/T 0015-2023", CertLevel.EndEntity, "5y",
+        KeypairGenMode.INHERITCA, AllowKeyMode.ALL);
+
+    // Subject
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O),
+        rdn01(AttributeType.OU), rdn01(AttributeType.SN), rdn(AttributeType.CN));
+
+    // Extensions
+    List<ExtensionType> list = profile.extensions();
+
+    list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
+    list.add(createExtension(ExtensionID.crlDistributionPoints, false, false));
+    list.add(createExtension(ExtensionID.freshestCRL, false, false));
+    list.add(createExtension(ExtensionID.ocspNoCheck, true, false));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(ExtensionID.basicConstraints, true, true));
+
+    // Extensions - AuthorityInfoAccess
+    list.add(createExtension(ExtensionID.authorityInfoAccess, true, false));
+    last(list).setAuthorityInfoAccess(createAuthorityInfoAccess());
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(ExtensionID.authorityKeyIdentifier, true, false));
+
+    // Extensions - CN
+    list.add(createExtension(ExtensionID.CN_residentIdCardNumber, true, false));
+    list.add(createExtension(ExtensionID.CN_passportNumber, true, false));
+    list.add(createExtension(ExtensionID.CN_socialInsuranceNumber, true, false));
+    list.add(createExtension(ExtensionID.CN_UnifiedSocialCreditCode, true, false));
+
+    for (String destFilename : destFilenames) {
+      marshall(profile, destFilename, true);
+    }
+  } // method certprofileGMT0015
 
 }

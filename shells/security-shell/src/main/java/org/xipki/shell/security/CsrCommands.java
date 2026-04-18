@@ -152,6 +152,21 @@ public class CsrCommands {
     @Option(names = "--microsoft-sid", description = "Microsoft SID, e.g. S-1-5-...")
     private String microsoftSid;
 
+    @Option(names = {"--cn-residentIdCardNumber", "--cn-ricn"},
+        description = "Resident Identity Number (China)")
+    private String cnResidentIdCardNumber;
+
+    @Option(names = {"--cn-passportNumber", "--cn-pn"}, description = "Passport Number (China)")
+    private String cnPassportNumber;
+
+    @Option(names = {"--cn-socialInsuranceNumber", "--cn-sin"},
+        description = "Social Insurance Number (China)")
+    private String cnSocialInsuranceNumber;
+
+    @Option(names = {"--cn-unifiedSocialCreditCode", "--cn-uscc"},
+        description = "Unified Social Credit Code (China)")
+    private String cnUnifiedSocialCreditCode;
+
     @Option(names = "--extensions-file", description = "DER-encoded Extensions file")
     @Completion(FilePathCompleter.class)
     private String extensionsFile;
@@ -278,6 +293,27 @@ public class CsrCommands {
           GeneralName gn = new GeneralName(GeneralName.otherName, on);
           GeneralNames gns = new GeneralNames(gn);
           extensions.add(new Extension(OIDs.Extn.id_microsoft_SID, false, gns.getEncoded()));
+        }
+
+        // GM/T 0015
+        if (StringUtil.isNotBlank(cnResidentIdCardNumber)) {
+          extensions.add(new Extension(OIDs.Extn.id_cn_residentIdCardNumber, false,
+              new DERPrintableString(cnResidentIdCardNumber).getEncoded()));
+        }
+
+        if (StringUtil.isNotBlank(cnPassportNumber)) {
+          extensions.add(new Extension(OIDs.Extn.id_cn_passportNumber, false,
+              new DERUTF8String(cnPassportNumber).getEncoded()));
+        }
+
+        if (StringUtil.isNotBlank(cnSocialInsuranceNumber)) {
+          extensions.add(new Extension(OIDs.Extn.id_cn_socialInsuranceNumber, false,
+              new DERUTF8String(cnSocialInsuranceNumber).getEncoded()));
+        }
+
+        if (StringUtil.isNotBlank(cnUnifiedSocialCreditCode)) {
+          extensions.add(new Extension(OIDs.Extn.id_cn_UnifiedSocialCreditCode, false,
+              new DERUTF8String(cnUnifiedSocialCreditCode).getEncoded()));
         }
 
         List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());

@@ -387,6 +387,25 @@ update-cert-p12 --p12 output/microsoft.p12 --password CHANGEIT \
   --cert output/microsoft.crt --ca-cert output/subca1.crt \
   --ca-cert output/rootca1.crt
 
+# Certificate gmt0015
+
+csr-p12 REPLACEME-RSAPSS --p12 output/gmt0015.p12 --password CHANGEIT \
+  --subject "CN=gmt0015.myorg.org,O=myorg,C=DE" \
+  --cn-residentIdCardNumber "110101199001011234" \
+  --cn-passportNumber "E12345678" \
+  --cn-socialInsuranceNumber "110101199001013456" \
+  --cn-unifiedSocialCreditCode "91310000MA1K12345X" \
+  --outform $OUTFORM \
+  --out output/gmt0015.csr
+
+cmp-csr-enroll --csr output/gmt0015.csr --ca subca --profile gmt0015 \
+  --outform $OUTFORM --out output/gmt0015.crt \
+  --signer-password $[cmp.client.keyPassword] --signer-p12 ${SIGNER_P12}
+
+update-cert-p12 --p12 output/gmt0015.p12 --password CHANGEIT \
+  --cert output/gmt0015.crt --ca-cert output/subca1.crt \
+  --ca-cert output/rootca1.crt
+
 # Certificate max-time1
 
 csr-p12 REPLACEME-RSAPSS --p12 output/max-time1.p12 --password CHANGEIT \

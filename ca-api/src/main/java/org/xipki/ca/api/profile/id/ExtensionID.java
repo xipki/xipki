@@ -139,6 +139,18 @@ public class ExtensionID extends AbstractID {
   public static final ExtensionID microsoft_SID =
       initOf(OIDs.Extn.id_microsoft_SID, "Microsoft-SID");
 
+  public static final ExtensionID CN_residentIdCardNumber =
+      initOf(OIDs.Extn.id_cn_residentIdCardNumber, "CN-ResidentIdCardNumber");
+
+  public static final ExtensionID CN_passportNumber =
+      initOf(OIDs.Extn.id_cn_passportNumber, "CN-PassportNumber");
+
+  public static final ExtensionID CN_socialInsuranceNumber =
+      initOf(OIDs.Extn.id_cn_socialInsuranceNumber, "CN-SocialInsuranceNumber");
+
+  public static final ExtensionID CN_UnifiedSocialCreditCode =
+      initOf(OIDs.Extn.id_cn_UnifiedSocialCreditCode, "CN-UnifiedSocialCreditCode");
+
   private ExtensionID(ASN1ObjectIdentifier x509, List<String> aliases) {
     super(x509, aliases);
   }

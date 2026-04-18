@@ -128,7 +128,11 @@ public abstract class ExtensionSpec {
             OIDs.Extn.id_pe_tlsfeature, OIDs.Extn.id_SignedCertificateTimestampList,
             OIDs.Extn.id_microsoft_CertificateTemplateName,
             OIDs.Extn.id_microsoft_CertificateTemplateInformation,
-            OIDs.Extn.id_microsoft_SID);
+            OIDs.Extn.id_microsoft_SID,
+            OIDs.Extn.id_cn_residentIdCardNumber,
+            OIDs.Extn.id_cn_passportNumber,
+            OIDs.Extn.id_cn_socialInsuranceNumber,
+            OIDs.Extn.id_cn_UnifiedSocialCreditCode);
 
     private static final Set<ASN1ObjectIdentifier> NON_REQUEST_EXTENSIONS =
         Set.of(OIDs.Extn.authorityKeyIdentifier,

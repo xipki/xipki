@@ -77,7 +77,8 @@
       "tls-compsig",
       "tls-compkem",
       "tls-sm2",
-      "microsoft"
+      "microsoft",
+      "gmt0015"
     ],
     "publishers":[
       "ocsp-publisher"

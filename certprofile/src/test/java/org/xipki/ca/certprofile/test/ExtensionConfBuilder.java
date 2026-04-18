@@ -41,8 +41,13 @@ public class ExtensionConfBuilder {
   private static final Set<ExtensionID> OPTIONAL_REQUEST_EXTENSIONS;
 
   static {
-    REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet( ExtensionID.subjectAltName,
-        ExtensionID.subjectInfoAccess, ExtensionID.microsoft_SID);
+    REQUIRED_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
+        ExtensionID.subjectAltName,
+        ExtensionID.subjectInfoAccess, ExtensionID.microsoft_SID,
+        ExtensionID.CN_residentIdCardNumber,
+        ExtensionID.CN_passportNumber,
+        ExtensionID.CN_socialInsuranceNumber,
+        ExtensionID.CN_UnifiedSocialCreditCode);
 
     OPTIONAL_REQUEST_EXTENSIONS = CollectionUtil.asUnmodifiableSet(
         ExtensionID.keyUsage, ExtensionID.extKeyUsage);

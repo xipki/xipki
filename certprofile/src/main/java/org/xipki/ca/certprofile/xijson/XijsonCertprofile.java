@@ -3,13 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
@@ -27,6 +21,7 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ctrl.*;
+import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
@@ -667,6 +662,33 @@ public class XijsonCertprofile extends Certprofile {
         ExtensionValue value = new ExtensionValue(isCritical(type), extnValue);
         values.addExtension(type, value);
         tmpExtnTypes.remove(type);
+      }
+    }
+
+    // GM/T 0015 extensions
+    ASN1ObjectIdentifier[] gmtTypes = {
+        OIDs.Extn.id_cn_residentIdCardNumber,
+        OIDs.Extn.id_cn_passportNumber,
+        OIDs.Extn.id_cn_socialInsuranceNumber,
+        OIDs.Extn.id_cn_UnifiedSocialCreditCode};
+    for (ASN1ObjectIdentifier gmtType : gmtTypes) {
+      type = gmtType;
+      if (tmpExtnTypes.contains(type) && requestedExtensions != null) {
+        Extension extn = requestedExtensions.get(type);
+        if (extn != null) {
+          ASN1Encodable asn1 = extn.getParsedValue();
+          if (!(asn1 instanceof ASN1String)) {
+            throw new BadCertTemplateException(
+                OIDs.oidToDisplayName(type) + ": request extension value is not a String");
+          }
+
+          String str = ((ASN1String) asn1).getString();
+          ASN1Encodable extnValue = OIDs.Extn.id_cn_passportNumber.equals(type)
+              ? new DERUTF8String(str) : new DERPrintableString(str);
+          ExtensionValue value = new ExtensionValue(isCritical(type), extnValue);
+          values.addExtension(type, value);
+          tmpExtnTypes.remove(type);
+        }
       }
     }
 

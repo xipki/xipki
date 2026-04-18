@@ -104,6 +104,9 @@
     "name":"microsoft",
     "file":"qa/certprofile/certprofile-microsoft.json"
   },{
+    "name":"gmt0015",
+    "file":"qa/certprofile/certprofile-gmt0015.json"
+  },{
     "name":"cab-rootca",
     "file":"qa/cab/certprofile/certprofile-cab-rootca.json"
   },{

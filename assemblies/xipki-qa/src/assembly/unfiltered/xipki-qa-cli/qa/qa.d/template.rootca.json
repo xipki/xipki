@@ -206,6 +206,12 @@
     "conf":{
       "file":"${profiles.dir}/certprofile-microsoft.json"
     }
+  },{
+    "name":"gmt0015",
+    "type":"xijson",
+    "conf":{
+      "file":"${profiles.dir}/certprofile-gmt0015.json"
+    }
   }
   ],
   "cas":[{
