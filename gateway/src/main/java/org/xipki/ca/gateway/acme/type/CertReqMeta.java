@@ -31,7 +31,7 @@ public class CertReqMeta implements JsonEncodable {
   }
 
   public CertReqMeta(Instant notBefore, Instant notAfter, String ca,
-                    String certProfile, String subject) {
+                     String certProfile, String subject) {
     this.notBefore = notBefore;
     this.notAfter = notAfter;
     this.ca = ca;

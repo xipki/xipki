@@ -535,7 +535,7 @@ public class AcmeResponder {
     } else if (jwk != null) {
       if ((verificationKeyRequirement & MASK_JWK) == 0) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
-            "kid is specified, but jwk is allowed");
+            "jwk is specified, but only kid is allowed");
       }
 
       try {
@@ -547,7 +547,7 @@ public class AcmeResponder {
     } else if (kid != null) {
       if ((verificationKeyRequirement & MASK_KID) == 0) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
-            "jwk is specified, but only kid is allowed");
+            "kid is specified, but only jwk is allowed");
       }
 
       // extract the location
@@ -1042,7 +1042,7 @@ public class AcmeResponder {
           }
         }
 
-        Extensions csrExtensions = X509Util.getExtensions( csr.getCertificationRequestInfo());
+        Extensions csrExtensions = X509Util.getExtensions(csr.getCertificationRequestInfo());
 
         byte[] sanExtnValue = csrExtensions == null ? null
             : X509Util.getCoreExtValue(csrExtensions, OIDs.Extn.subjectAlternativeName);
@@ -1073,8 +1073,8 @@ public class AcmeResponder {
               identifiers.remove(matchedId);
             } else {
               throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
-                  "invalid DNS identifier in the extension" +
-                  " subjectAlternativeName in CSR: " + value);
+                  "invalid DNS identifier in the extension subjectAlternativeName in CSR: "
+                      + value);
             }
           } else {
             throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,

@@ -35,8 +35,7 @@ public class NonceManager {
 
   private final AtomicLong lastCleanUp = new AtomicLong();
 
-  private final ConcurrentHashMap<String, Long> noncePool =
-      new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Long> noncePool = new ConcurrentHashMap<>();
 
   private final int nonceNumBytes;
 
@@ -57,8 +56,7 @@ public class NonceManager {
     long maxNotAftter = now + 10000; // + 10 seconds
 
     int sum = 0;
-    try (BufferedReader reader =
-            new BufferedReader(new FileReader(nonceFile))) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(nonceFile))) {
       String line;
       while ((line = reader.readLine()) != null) {
         StringTokenizer tokenizer = new StringTokenizer(line, ":");

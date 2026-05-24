@@ -222,15 +222,15 @@ public class Hex {
   }
 
   public static void append(StringBuilder buf, byte[] data, int offset, int len,
-                            String sep, int numBytesPerLin, String indent) {
-    append(false, buf, data, offset, len, sep, numBytesPerLin, indent);
+                            String sep, int numBytesPerLine, String indent) {
+    append(false, buf, data, offset, len, sep, numBytesPerLine, indent);
   }
 
   public static void append(boolean uppercase, StringBuilder buf, byte[] data, int offset, int len,
-                            String sep, int numBytesPerLin, String indent) {
+                            String sep, int numBytesPerLine, String indent) {
     Args.notNegative(offset, "offset");
     Args.notNegative(len, "len");
-    Args.positive(numBytesPerLin, "numBytesPerLin");
+    Args.positive(numBytesPerLine, "numBytesPerLine");
 
     char[] digits = uppercase ? UPPER_DIGITS : DIGITS;
     int lastOffset = offset + len;
@@ -246,12 +246,12 @@ public class Hex {
         buf.append(sep);
       }
 
-      if (i1 != len && (i1 % numBytesPerLin) == 0) {
+      if (i1 != len && (i1 % numBytesPerLine) == 0) {
         buf.append("\n").append(indent);
       }
     }
 
-    if (numBytesPerLin != Integer.MAX_VALUE) {
+    if (numBytesPerLine != Integer.MAX_VALUE) {
       buf.append("\n");
     }
   }

@@ -26,7 +26,7 @@ public class ChallengeResponse implements JsonEncodable {
   private final String validated;
 
   public ChallengeResponse(ChallengeStatus status, String type, String url,
-                          String token, String validated) {
+                           String token, String validated) {
     this.status = status;
     this.type = type;
     this.url = url;
