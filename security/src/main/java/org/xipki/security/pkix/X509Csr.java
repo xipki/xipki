@@ -5,11 +5,14 @@ package org.xipki.security.pkix;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.ASN1String;
+import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.security.OIDs;
@@ -81,6 +84,20 @@ public class X509Csr {
         X509Cert.addIndent(sb, level + 1).append("X509v3 extensions:\n");
         X509Cert.printExtensions(sb, level + 2,
             Extensions.getInstance(attr.getAttributeValues()[0]));
+      } else if (attrOid.equals(OIDs.X509.id_at_statementOfPossession)) {
+        // PrivateKeyPossessionStatement
+        X509Cert.addIndent(sb, level + 1).append("PrivateKeyPossessionStatement:\n");
+        ASN1Sequence seq = ASN1Sequence.getInstance(attr.getAttributeValues()[0]);
+        IssuerAndSerialNumber signer = IssuerAndSerialNumber.getInstance(seq.getObjectAt(0));
+        X509Cert.addIndent(sb, level + 2).append("signer:\n");
+        X509Cert.printIssuerAndSerialNumber(sb, level + 3, signer);
+
+        if (seq.size() > 1) {
+          Certificate cert = Certificate.getInstance(seq.getObjectAt(1));
+          X509Cert.addIndent(sb, level + 2).append("cert:\n");
+          X509Cert x509Cert = new X509Cert(cert);
+          sb.append(x509Cert.toStringSimple(level + 3)).append("\n");
+        }
       } else {
         X509Cert.addIndent(sb, level + 1).append(attrOid.getId()).append(": <unsupported>\n");
       }

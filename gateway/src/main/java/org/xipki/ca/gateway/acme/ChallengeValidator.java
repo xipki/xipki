@@ -147,7 +147,6 @@ public class ChallengeValidator implements Runnable {
       switch (type) {
         case AcmeConstants.HTTP_01: {
           String host = identifier.value();
-          // host = "localhost:9081";
           String url = "http://" + host + "/.well-known/acme-challenge/" + chall.token();
           try {
             ensureAllowedChallengeHost(host);

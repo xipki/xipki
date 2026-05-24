@@ -133,6 +133,13 @@ public class OIDs {
     // otherName with SmtpUTF8Mailbox
     public static final ASN1ObjectIdentifier id_on_SmtpUTF8Mailbox = initOid(
         "1.3.6.1.5.5.7.8.9", "SmtpUTF8Mailbox");
+
+    // otherName with SmtpUTF8Mailbox
+    public static final ASN1ObjectIdentifier id_on_MACAddress = initOid(
+        "1.3.6.1.5.5.7.8.12", "MACAddress");
+
+    public static final ASN1ObjectIdentifier id_at_statementOfPossession = initOid(
+        "1.3.6.1.4.1.22112.2.1", "d-at-statementOfPossession");
   }
 
   /**

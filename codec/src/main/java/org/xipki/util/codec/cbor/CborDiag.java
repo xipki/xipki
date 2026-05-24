@@ -705,6 +705,16 @@ public class CborDiag {
     writeNewLine();
   }
 
+  protected byte[] printByteStringObj(int level, String prefix) throws CodecException {
+    CborType type = peekType();
+    if (type.isNull()) {
+      printNull(level, prefix);
+      return null;
+    } else {
+      return printByteString(level, prefix);
+    }
+  }
+
   protected byte[] printByteString(int level, String prefix) throws CodecException {
     int len = readByteStringLength();
     writeLine(level, readResetBuffer(), concat(prefix, "byte[" + len + "]"));
@@ -713,6 +723,15 @@ public class CborDiag {
       writeBytesBlock(level + 1, bytes);
     }
     return bytes;
+  }
+
+  protected void printTextStringObj(int level, String prefix) throws CodecException {
+    CborType type = peekType();
+    if (type.isNull()) {
+      printNull(level, prefix);
+    } else {
+      printTextString(level, prefix);
+    }
   }
 
   protected void printTextString(int level, String prefix) throws CodecException {
@@ -872,6 +891,40 @@ public class CborDiag {
   }
 
   private static List<String> splitText(String text, int numPerLine) {
+    List<String> lines = splitTextBySpaces(text, numPerLine);
+    boolean ok = true;
+    for (String line : lines) {
+      if (line.length() > numPerLine) {
+        ok = false;
+        break;
+      }
+    }
+
+    if (ok) {
+      return lines;
+    }
+
+    // we need to split the long lines
+    List<String> ret =  new ArrayList<>(lines.size() + 1);
+    for (String line : lines) {
+      int len = line.length();
+      if (len <= numPerLine) {
+        ret.add(line);
+      } else {
+        int numBlocks = (len + numPerLine - 1) / numPerLine;
+        int start = 0;
+        for (int i = 0; i < numBlocks - 1; i++) {
+          ret.add(line.substring(start, start + numPerLine));
+          start += numPerLine;
+        }
+        ret.add(line.substring(start));
+      }
+    }
+
+    return ret;
+  }
+
+  private static List<String> splitTextBySpaces(String text, int numPerLine) {
     StringTokenizer tokenizer = new StringTokenizer(text, " ");
     List<String> tokens = new LinkedList<>();
     while (tokenizer.hasMoreTokens()) {
@@ -1395,14 +1448,83 @@ public class CborDiag {
     return readUInt(length, false /* breakAllowed */, true);
   }
 
+  protected long printTag(int level, String prefix) throws CodecException {
+    long tag = readTag();
+
+    String prefix1 = prefix + ": tag=" + tag;
+    // 121-127: alternatives 0..6, 1+1 encoding
+    if (tag >= 121 && tag <= 127) {
+      writeLine(level, readResetBuffer(), prefix1 + ": alternative " + (tag - 121));
+      // 1280-1400: alternatives 7..127, 1+2 encoding
+    } else if (tag >= 1280 && tag <= 1400) {
+      writeLine(level, readResetBuffer(), prefix1 + ": alternative " + (tag - 1280 + 7));
+    } else {
+      writeLine(level, readResetBuffer(), prefix1);
+    }
+    return tag;
+  }
+
   protected String concat(String prefix, String text) {
     if (prefix == null || prefix.isEmpty()) {
       return text;
-    } else if (prefix.charAt(prefix.length() - 1) == '=') {
+    }
+
+    char last = prefix.charAt(prefix.length() - 1);
+    if (last == '=' || last == ' ') {
       return prefix + text;
     } else {
       return prefix + "=" + text;
     }
+  }
+
+  protected int printAndReadEntryLen(
+      int level, String fielName, int numPerEntry, String entryName) throws CodecException {
+    int len = readArrayLength();
+    if (len < 0 || (len % numPerEntry) != 0) {
+      throw new CodecException(
+          "#array of field " + fielName + " is not multiple of " + numPerEntry + ": " + len);
+    }
+
+    int entryLen = len / numPerEntry;
+    String desc = concat(fielName,  "array[" + len + "], " + entryLen + " " + entryName);
+    if (entryLen > 1) {
+      desc += "s";
+    }
+
+    writeLine(level, readResetBuffer(), desc);
+    return entryLen;
+  }
+
+  protected int printAndReadArrayLen(int level, String prefix) throws CodecException {
+    int arrayLen = readArrayLength();
+    writeLine(level, readResetBuffer(), concat(prefix, "array[" + arrayLen + "]"));
+    return arrayLen;
+  }
+
+  protected long printLong(int level, String prefix) throws CodecException {
+    long v = readLong();
+    writeLine(level, readResetBuffer(), concat(prefix, Long.toString(v)));
+    return v;
+  }
+
+  protected Long printLongObj(int level, String prefix) throws CodecException {
+    CborType cborType = peekType();
+    if (cborType.isNull()) {
+      printNull(level, prefix);
+      return null;
+    } else {
+      return printLong(level, prefix);
+    }
+  }
+
+  protected void printNull(int level, String prefix) throws CodecException {
+    readNull();
+    writeLine(level, readResetBuffer(), concat(prefix, "<null>"));
+  }
+
+  protected void printNoContentLine(int level, String text) throws CodecException {
+    writeLine(" ".repeat(offsetLen + 2 // ": ".length() = 2
+        + 2 * level + numSpacesBeforeComment()) + "#---" + text + "---");
   }
 
 }

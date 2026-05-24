@@ -5,7 +5,9 @@ package org.xipki.security.pkix;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
 import org.bouncycastle.asn1.crmf.DhSigStatic;
 import org.bouncycastle.asn1.pkcs.RSAPublicKey;
@@ -422,6 +424,25 @@ public class X509Cert {
     return sb.toString();
   }
 
+  public String toStringSimple() {
+    return toStringSimple(cert, 0);
+  }
+
+  public String toStringSimple(int level) {
+    return toStringSimple(cert, level);
+  }
+
+  public static String toStringSimple(Certificate cert, int level) {
+    StringBuilder sb = new StringBuilder(1000);
+    addIndent(sb, level).append("Certificate:\n");
+    printTbsCert(sb, level + 1, cert);
+    printSignature(sb, level, cert.getSignatureAlgorithm(), Asn1Util.getSignature(cert));
+
+    sb.deleteCharAt(sb.length() - 1);
+    return sb.toString();
+  }
+
+
   static void printSignature(StringBuilder sb, int level,
                             AlgorithmIdentifier sigAlg, byte[] sigValue) {
     boolean ecdhPop = false;
@@ -454,24 +475,36 @@ public class X509Cert {
       signAlgoText = sigAlg.getAlgorithm().getId();
     }
     addIndent(sb, level + 1).append("Signature Algorithm: ").append(signAlgoText).append("\n");
-    addIndent(sb, level + 1).append("Signature Value:\n");
 
     if (ecdhPop) {
+      addIndent(sb, level + 1).append("Signature Value:\n");
+
       DhSigStatic dhSig = DhSigStatic.getInstance(sigValue);
       IssuerAndSerialNumber isn = dhSig.getIssuerAndSerial();
       if (isn != null) {
-        toString(sb, level + 2, "Issuer", isn.getName());
-        addIndent(sb, level + 2).append("Serial Number:\n");
-        byte[] snBytes = BigIntegers.asUnsignedByteArray(isn.getSerialNumber().getPositiveValue());
-        Hex.append(sb, snBytes, 0, snBytes.length, ":", 100, "  ".repeat(level + 3));
+        printIssuerAndSerialNumber(sb, level + 2, isn);
       }
 
       addIndent(sb, level + 2).append("Hash Value:\n");
       byte[] hashValue = dhSig.getHashValue();
-      Hex.append(sb, hashValue, 0, hashValue.length, ":", 18, "  ".repeat(level + 3));
+      Hex.append(sb, hashValue, 0, hashValue.length, ":",
+          getNumBytesPerLine(level + 3), "  ".repeat(level + 3));
+    } else if (sigValue.length > 0) {
+      addIndent(sb, level + 1).append("Signature Value:\n");
+
+      Hex.append(sb, sigValue, 0, sigValue.length, ":",
+          getNumBytesPerLine(level + 2), "  ".repeat(level + 2));
     } else {
-      Hex.append(sb, sigValue, 0, sigValue.length, ":", 18, "  ".repeat(level + 2));
+      addIndent(sb, level + 1).append("Signature Value: <empty>\n");
     }
+  }
+
+  public static void printIssuerAndSerialNumber(
+      StringBuilder sb, int level, IssuerAndSerialNumber isn) {
+    toString(sb, level, "Issuer", isn.getName());
+    addIndent(sb, level).append("Serial Number:\n");
+    byte[] snBytes = BigIntegers.asUnsignedByteArray(isn.getSerialNumber().getPositiveValue());
+    Hex.append(sb, snBytes, 0, snBytes.length, ":", 69, "  ".repeat(level + 1));
   }
 
   private static void printTbsCert(StringBuilder sb, int level, Certificate cert) {
@@ -483,7 +516,7 @@ public class X509Cert {
     // serial number
     addIndent(sb, level).append("Serial Number:\n");
     byte[] snBytes = BigIntegers.asUnsignedByteArray(tbs.getSerialNumber().getValue());
-    Hex.append(sb, snBytes, 0, snBytes.length, ":", 100, "  ".repeat(level + 1));
+    Hex.append(sb, snBytes, 0, snBytes.length, ":", 69, "  ".repeat(level + 1));
 
     // issuer
     toString(sb, level, "Issuer", cert.getIssuer());
@@ -523,18 +556,29 @@ public class X509Cert {
     }
     sb.append("\n");
 
+    int numBytesPerLine = getNumBytesPerLine(level + 2);
+
     if (keySpec != null && keySpec.isRSA()) {
       RSAPublicKey pk = RSAPublicKey.getInstance(pkData);
       addIndent(sb, level + 1).append("Modulus:\n");
       byte[] bytes = pk.getModulus().toByteArray();
-      Hex.append(sb, bytes, 0, bytes.length, ":", 18, "  ".repeat(level + 2));
+      Hex.append(sb, bytes, 0, bytes.length, ":", numBytesPerLine, "  ".repeat(level + 2));
       addIndent(sb, level + 1).append("Exponent:\n");
       bytes = pk.getPublicExponent().toByteArray();
-      Hex.append(sb, bytes, 0, bytes.length, ":", 18, "  ".repeat(level + 2));
+      Hex.append(sb, bytes, 0, bytes.length, ":", numBytesPerLine, "  ".repeat(level + 2));
     } else {
       addIndent(sb, level + 1).append("Pub:\n");
-      Hex.append(sb, pkData, 0, pkData.length, ":", 18, "  ".repeat(level + 2));
+      Hex.append(sb, pkData, 0, pkData.length, ":", numBytesPerLine, "  ".repeat(level + 2));
     }
+  }
+
+  // (level + 2) * 2 + numBytesPerLine * 3 <= 69
+  private static int getNumBytesPerLine(int level) {
+    int numBytesPerLine = Math.min(18, (69 - level * 2) / 3);
+    if (numBytesPerLine <= 8) {
+      numBytesPerLine = 8;
+    }
+    return numBytesPerLine;
   }
 
   static void printExtensions(StringBuilder sb, int level, Extensions extensions) {
@@ -606,7 +650,7 @@ public class X509Cert {
           addIndent(sb, level1).append("Issuer: ");
           GeneralName[] gns = aki.getAuthorityCertIssuer().getNames();
           if (gns.length == 1) {
-            sb.append(toString(gns[0])).append("\n");
+            sb.append(toString(gns[0], level2)).append("\n");
           } else {
             sb.append("\n");
             print(sb, level2, aki.getAuthorityCertIssuer());
@@ -617,7 +661,7 @@ public class X509Cert {
           addIndent(sb, level1).append("Serial Number:\n");
           byte[] snBytes = BigIntegers.asUnsignedByteArray(aki.getAuthorityCertSerialNumber());
 
-          Hex.append(sb, snBytes, 0, snBytes.length, ":", 100, "  ".repeat(level2));
+          Hex.append(sb, snBytes, 0, snBytes.length, ":", 69, "  ".repeat(level2));
         }
       } else if (Extension.subjectKeyIdentifier.equals(oid)) {
         byte[] bytes = Asn1Util.getOctetStringOctets(extnValue);
@@ -637,7 +681,7 @@ public class X509Cert {
           }
 
           addIndent(sb, level1).append(name0).append(": ")
-              .append(toString(ad.getAccessLocation())).append("\n");
+              .append(toString(ad.getAccessLocation(), level2)).append("\n");
         }
       } else if (Extension.certificatePolicies.equals(oid)) {
         PolicyInformation[] policies =
@@ -848,7 +892,7 @@ public class X509Cert {
       StringBuilder sb, int level, String title, GeneralSubtree[] subtrees) {
     addIndent(sb, level).append(title).append("\n");
     for (GeneralSubtree subtree : subtrees) {
-      addIndent(sb, level + 1).append(toString(subtree.getBase()));
+      addIndent(sb, level + 1).append(toString(subtree.getBase(), level + 1));
       BigInteger min = subtree.getMinimum();
       BigInteger max = subtree.getMaximum();
 
@@ -869,13 +913,17 @@ public class X509Cert {
 
   private static void print(StringBuilder sb, int level, GeneralNames gns) {
     for (GeneralName gn : gns.getNames()) {
-      addIndent(sb, level).append(toString(gn)).append("\n");
+      addIndent(sb, level).append(toString(gn, level)).append("\n");
     }
   }
 
   static void toString(StringBuilder sb, int level, String title, X500Name name) {
     String nameStr = name.toString();
-    int numPerLine = 70 - (2 * level + title.length() + 2);
+    if (nameStr.isEmpty()) {
+      addIndent(sb, level).append(title).append(": <empty>\n");
+      return;
+    }
+    int numPerLine = 69 - (2 * level + title.length() + 2);
     int numLines = (nameStr.length() + numPerLine - 1) / numPerLine;
     for (int i = 0; i < numLines; i++) {
       if (i == 0) {
@@ -889,7 +937,7 @@ public class X509Cert {
     }
   }
 
-  private static String toString(GeneralName gn) {
+  private static String toString(GeneralName gn, int level) {
     StringBuilder sb = new StringBuilder();
     sb.append(getGeneralNameType(gn)).append(": ");
 
@@ -921,12 +969,19 @@ public class X509Cert {
         } else if (onId.equals(OIDs.X509.id_on_hardwareModuleName)) {
           sb.append("hardwareModuleName:");
           ASN1Sequence seq = ASN1Sequence.getInstance(value);
-          sb.append(seq.getObjectAt(0)).append(":"); // OID
-          sb.append("<unsupported>"); // value
+          sb.append(seq.getObjectAt(0)).append(" = ").append("\n"); // OID
+          addIndent(sb, level + 1);
+          appendASN1(sb, seq.getObjectAt(1)); // value
+        } else if (onId.equals(OIDs.X509.id_on_MACAddress)) {
+          sb.append("MACAddress:");
+          byte[] macValue = ASN1OctetString.getInstance(on.getValue()).getOctets();
+          Hex.append(true, sb, macValue, 0, macValue.length, "-");
         } else if (onId.equals(OIDs.Spdm.id_DMTF_device_info)) {
           sb.append("DMTF device info:").append(value);
         } else {
-          sb.append(onId.getId()).append(":<unsupported>");
+          sb.append(onId.getId());
+          sb.append(" = ");
+          appendASN1(sb, on.getValue());
         }
         break;
       }
@@ -934,6 +989,19 @@ public class X509Cert {
     }
 
     return sb.toString();
+  }
+
+  private static void appendASN1(StringBuilder sb, ASN1Encodable asn1) {
+    if (asn1 instanceof ASN1String) {
+      sb.append(((ASN1String) asn1).getString());
+    } else if (asn1 instanceof ASN1ObjectIdentifier) {
+      sb.append(((ASN1ObjectIdentifier) asn1).getId());
+    } else if (asn1 instanceof ASN1OctetString) {
+      sb.append("h'").append(Hex.encodeUpper(((ASN1OctetString) asn1).getOctets()))
+          .append("'");
+    } else {
+      sb.append("<unsupported>");
+    }
   }
 
   private static String getGeneralNameType(GeneralName gn) {
