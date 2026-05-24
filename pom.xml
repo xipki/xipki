@@ -32,7 +32,7 @@
     <picocli.version>4.7.7</picocli.version>
     <slf4j.version>2.0.17</slf4j.version>
     <!-- BouncyCastle -->
-    <bc-lts.version>2.73.10</bc-lts.version>
+    <bc-lts.version>2.73.11</bc-lts.version>
     <bc-fips.version>2.1.2</bc-fips.version>
     <bcpkix-fips.version>2.1.11</bcpkix-fips.version>
     <bcpqc-fips.version>2.1.0</bcpqc-fips.version>
