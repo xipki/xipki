@@ -25,7 +25,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
-    <dnsjava.version>3.6.4</dnsjava.version>
+    <dnsjava.version>3.6.5</dnsjava.version>
     <hikaricp.version>7.0.2</hikaricp.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <jline.version>4.0.13</jline.version>
