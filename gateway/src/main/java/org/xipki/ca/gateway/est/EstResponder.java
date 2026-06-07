@@ -65,6 +65,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -129,6 +130,11 @@ public class EstResponder {
   private static final String CMD_serverkeygen = "serverkeygen";
 
   /**
+   * XiPKI own command. The response returns the CA's capabilities.
+   */
+  private static final String CMD_ucaps = "ucaps";
+
+  /**
    * XiPKI own command. The response returns the CA's certificate as raw
    * certificate.
    */
@@ -141,7 +147,12 @@ public class EstResponder {
   private static final String CMD_ucacerts = "ucacerts";
 
   /**
-   * XiPKI own command. Returns the raw CRL.
+   * XiPKI own command. Returns the meta information of the latest CRL.
+   */
+  private static final String CMD_ucrlinfo = "ucrlinfo";
+
+  /**
+   * XiPKI own command. Returns the raw latest CRL.
    */
   private static final String CMD_ucrl = "ucrl";
 
@@ -164,6 +175,8 @@ public class EstResponder {
   private static final String CMD_csrattrs = "csrattrs";
 
   private static final String CMD_fullcmc = "fullcmc";
+
+  private static final String CT_text_plain = "text/plain";
 
   private static final String CT_pkix_cert = "application/pkix-cert";
 
@@ -201,11 +214,20 @@ public class EstResponder {
 
   private static final Set<String> knownCommands;
 
+  private static final byte[] ucapsResp;
+
   static {
     knownCommands = CollectionUtil.asUnmodifiableSet(
         CMD_cacerts, CMD_simpleenroll, CMD_simplereenroll, CMD_serverkeygen,
-        CMD_cacerts, CMD_csrattrs, CMD_fullcmc, CMD_ucacerts, CMD_ucacert,
-        CMD_ucrl, CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen);
+        CMD_cacerts, CMD_csrattrs, CMD_fullcmc, CMD_ucaps, CMD_ucacerts, CMD_ucacert,
+        CMD_ucrlinfo, CMD_ucrl, CMD_usimpleenroll, CMD_usimplereenroll, CMD_userverkeygen);
+    StringBuilder buf = new StringBuilder();
+    for (String m : knownCommands) {
+      if (!CMD_fullcmc.equals(m)) {
+        buf.append(m).append("\n");
+      }
+    }
+    ucapsResp = buf.toString().getBytes(StandardCharsets.US_ASCII);
   }
 
   public EstResponder(
@@ -297,6 +319,9 @@ public class EstResponder {
       }
 
       switch (command) {
+        case CMD_ucaps: {
+          return toHttpResponse(HttpRespContent.ofOk(CT_text_plain,false, ucapsResp));
+        }
         case CMD_cacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
           return toHttpResponse(HttpRespContent.ofOk(CT_pkcs7_mime,
@@ -310,6 +335,10 @@ public class EstResponder {
         case CMD_ucacert: {
           byte[] certBytes = sdk.cacert(caName);
           return toHttpResponse(HttpRespContent.ofOk(CT_pkix_cert, true, certBytes));
+        }
+        case CMD_ucrlinfo: {
+          byte[] crlInfo = sdk.currentCrlInfo(caName);
+          return toHttpResponse(HttpRespContent.ofOk(CT_text_plain,false, crlInfo));
         }
         case CMD_ucrl: {
           byte[] crlBytes = sdk.currentCrl(caName);
@@ -326,7 +355,7 @@ public class EstResponder {
           return toHttpResponse(getCsrAttrs(caName, profile));
         }
         case CMD_fullcmc: {
-          String message = "supported command '" + command + "'";
+          String message = "unsupported command '" + command + "'";
           LOG.error(message);
           throw new HttpRespAuditException(HttpStatusCode.SC_NOT_FOUND,
               message, AuditLevel.INFO, AuditStatus.FAILED);
@@ -486,10 +515,14 @@ public class EstResponder {
   } // method service
 
   private HttpResponse toHttpResponse(HttpRespContent respContent) {
-    return respContent == null
-        ? new HttpResponse(HttpStatusCode.SC_OK)
-        : new HttpResponse(HttpStatusCode.SC_OK, respContent.contentType(),
+    if (respContent == null) {
+      return new HttpResponse(HttpStatusCode.SC_OK);
+    }
+
+    HttpResponse resp = new HttpResponse(HttpStatusCode.SC_OK, respContent.contentType(),
               null, respContent.isBase64(), respContent.content());
+    resp.setIgnoreBase64CTE(true);
+    return resp;
   }
 
   private HttpRespContent enrollCert(
@@ -589,7 +622,7 @@ public class EstResponder {
     os.write(boundaryBytes);
     os.write(NEWLINE);
     writeLine(os, "Content-Type: " + ct);
-    writeLine(os, "Content-Transfer-Encoding: base64");
+    //writeLine(os, "Content-Transfer-Encoding: base64");
     os.write(NEWLINE);
     os.write(Base64.encodeToByte(data, true));
     os.write(NEWLINE);

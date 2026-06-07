@@ -203,6 +203,23 @@ public class SdkClient {
     return resp.crl();
   }
 
+  public byte[] currentCrlInfo(String ca) throws SdkErrorResponseException {
+    return currentCrlInfo(ca, null, null, null);
+  }
+
+  public byte[] currentCrlInfo(String ca, BigInteger crlNumber, Instant thisUpdate, String crlDp)
+      throws SdkErrorResponseException {
+    GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
+    byte[] respBytes = send(ca, CMD_crlinfo, req);
+    CrlResponse resp;
+    try {
+      resp = CrlResponse.decode(respBytes);
+    } catch (CodecException e) {
+      throw new SdkErrorResponseException(ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
+    }
+    return resp.crl();
+  }
+
   public byte[] currentCrl(String ca) throws SdkErrorResponseException {
     return currentCrl(ca, null, null, null);
   }

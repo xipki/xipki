@@ -9,7 +9,7 @@ import org.xipki.util.codec.cbor.CborDecoder;
 import org.xipki.util.codec.cbor.CborEncoder;
 
 /**
- * Crl Response response payload.
+ * Crl Response payload.
  *
  * @author Lijun Liao (xipki)
  */

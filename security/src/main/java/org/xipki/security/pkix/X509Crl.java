@@ -4,6 +4,7 @@
 package org.xipki.security.pkix;
 
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CRLHolder;
@@ -61,6 +62,10 @@ public class X509Crl {
   public BigInteger baseCrlNumber() {
     Extension extn = x509.getExtension(OIDs.Extn.deltaCRLIndicator);
     return extn == null ? null : ((ASN1Integer) extn.getParsedValue()).getValue();
+  }
+
+  public X500Name issuer() {
+    return x509.getIssuer();
   }
 
   public Instant thisUpdate() {

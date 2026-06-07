@@ -80,6 +80,15 @@ echo "#        Manage certificate via EST extended by XiPKI           #"
 echo "#################################################################"
 
 #####
+set CMD ucaps
+
+echo "=====EST /${CMD}====="
+
+set FILE $OUT_DIR/${CMD}
+
+curl --out ${FILE}.txt $BASE_URL/${CMD}
+
+#####
 set CMD ucacerts
 
 echo "=====EST /${CMD}====="
@@ -97,6 +106,15 @@ set FILE $OUT_DIR/${CMD}
 
 curl --out ${FILE}.crt.b64 $BASE_URL/${CMD}
 base64 -d ${FILE}.crt.b64 ${FILE}.crt
+
+#####
+set CMD ucrlinfo
+
+echo "=====EST /${CMD}====="
+
+set FILE $OUT_DIR/${CMD}
+
+curl --out ${FILE}.txt $BASE_URL/${CMD}
 
 #####
 set CMD ucrl

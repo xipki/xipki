@@ -51,14 +51,16 @@ FILE="${OUT_DIR}/${CMD}"
 
 curl --insecure --output "${FILE}.csrattrs.b64" "${CA_URL}/${CMD}"
 
-openssl enc -d -base64 -in ${FILE}.csrattrs.b64 -out ${FILE}.csrattrs
+openssl enc -d -base64 -in "${FILE}.csrattrs.b64" -out "${FILE}.csrattrs"
 
 #####
 CMD=cacerts
 echo "-----${CMD}-----"
 FILE="${OUT_DIR}/${CMD}"
 
-curl --insecure --output "${FILE}.p7m" "${CA_URL}/${CMD}"
+curl --insecure --output "${FILE}.p7m.b64" "${CA_URL}/${CMD}"
+
+openssl enc -d -base64 -in "${FILE}.p7m.b64" -out "${FILE}.p7m"
 
 #####
 CMD=simpleenroll
@@ -82,7 +84,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.p7m \
     "${CA_URL}/${CMD}"
@@ -112,7 +113,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.p7m \
     "${CA_URL}/${CMD}"
@@ -140,7 +140,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.p7m \
     "${CA_URL}/${CMD}"
@@ -148,6 +147,13 @@ curl ${OPTS} \
 echo "#################################################################"
 echo "#      Manage certificate via EST interface (XiPKI extension)   #"
 echo "#################################################################"
+
+#####
+CMD=ucaps
+echo "-----${CMD}-----"
+FILE="${OUT_DIR}/${CMD}"
+
+curl --insecure --output "${FILE}.txt" "${CA_URL}/${CMD}"
 
 #####
 CMD=ucacerts
@@ -164,6 +170,13 @@ FILE="${OUT_DIR}/${CMD}"
 curl --insecure --output ${FILE}.crt.b64 "${CA_URL}/${CMD}"
 
 openssl enc -d -base64 -in ${FILE}.crt.b64 -out ${FILE}.crt
+
+#####
+CMD=ucrlinfo
+echo "-----${CMD}-----"
+FILE="${OUT_DIR}/${CMD}"
+
+curl --insecure --output ${FILE}.txt "${CA_URL}/${CMD}"
 
 #####
 CMD=ucrl
@@ -196,7 +209,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.crt.b64 \
     "${CA_URL}/${CMD}"
@@ -228,7 +240,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.crt.b64 \
     "${CA_URL}/${CMD}"
@@ -258,7 +269,6 @@ openssl enc -base64 -in ${FILE}.csr -out ${FILE}.csr.b64
 # Do not forget the @-symbol of --data-binary.
 curl ${OPTS} \
     --header "Content-Type: application/pkcs10" \
-    --header "Content-Transfer-Encoding: base64" \
     --data-binary "@${FILE}.csr.b64" \
     --output ${FILE}.pem \
     "${CA_URL}/${CMD}"

@@ -20,6 +20,7 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.sdk.*;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.exception.ErrorCode;
 import org.xipki.security.exception.OperationException;
@@ -29,6 +30,7 @@ import org.xipki.security.pkix.X509Crl;
 import org.xipki.security.util.TlsHelper;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.Base64;
 import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.extra.exception.InsufficientPermissionException;
@@ -40,6 +42,7 @@ import org.xipki.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -259,9 +262,11 @@ public class SdkResponder {
       }
 
       switch (command) {
-        case CMD_health: return ca.healthy() ? null
+        case CMD_health:
+          return ca.healthy() ? null
               : new ErrorResponse(null, SYSTEM_UNAVAILABLE, "CA is not healthy");
-        case CMD_cacert: return buildCertChainResponse(ca.caInfo().cert(), null);
+        case CMD_cacert:
+          return buildCertChainResponse(ca.caInfo().cert(), null);
         case CMD_cacerts:
           return buildCertChainResponse(ca.caInfo().cert(), ca.caInfo().certchain());
         case CMD_enroll: assertPermitted(requestor, ENROLL_CERT);
@@ -297,19 +302,26 @@ public class SdkResponder {
               false, "-".equals(caName));
         case CMD_gen_crl: assertPermitted(requestor, GEN_CRL);
           return genCrl(requestor, ca, requireNonNullRequest(request));
-        case CMD_crl: return getCrl(requestor, ca, requireNonNullRequest(request));
+        case CMD_crl:
+          return getCrl(requestor, ca, requireNonNullRequest(request));
+        case CMD_crlinfo:
+          return getCrlInfo(requestor, ca, requireNonNullRequest(request));
         case CMD_get_cert: assertPermitted(requestor, GET_CERT);
           return getCert(ca, requireNonNullRequest(request));
-        case CMD_profileinfo: return getProfileInfo(requireNonNullRequest(request));
-        case CMD_cacert2: return buildCertChainResponse(ca.caCert(), null);
-        case CMD_cacerts2: return buildCertChainResponse(ca.caCert(), ca.caInfo.certchain());
+        case CMD_profileinfo:
+          return getProfileInfo(requireNonNullRequest(request));
+        case CMD_cacert2:
+          return buildCertChainResponse(ca.caCert(), null);
+        case CMD_cacerts2:
+          return buildCertChainResponse(ca.caCert(), ca.caInfo.certchain());
         case CMD_caname: String name = ca.caIdent().name();
           Set<String> aliases = caManager.getAliasesForCa(name);
           String[] aliasArray = CollectionUtil.isEmpty(aliases) ? null
               : aliases.toArray(new String[0]);
 
           return new CaNameResponse(name, aliasArray);
-        default: return new ErrorResponse(null, PATH_NOT_FOUND,
+        default:
+          return new ErrorResponse(null, PATH_NOT_FOUND,
               "invalid command '" + command + "'");
       }
     } catch (CodecException ex) {
@@ -712,6 +724,13 @@ public class SdkResponder {
     return buildCrlResp(crl, "get CRL");
   }
 
+  private SdkResponse getCrlInfo(RequestorInfo requestor, X509Ca ca, byte[] request)
+      throws OperationException, CodecException {
+    GetCRLRequest req = GetCRLRequest.decode(request);
+    X509Crl crl = ca.getCrl(requestor, req.crlNumber());
+    return buildCrlInfoResp(crl, "get CRL");
+  }
+
   private static SdkResponse buildCrlResp(X509Crl crl, String desc) {
     if (crl == null) {
       String message = "could not " + desc;
@@ -720,6 +739,42 @@ public class SdkResponder {
     }
 
     return new CrlResponse(crl.getEncoded());
+  }
+
+  private static SdkResponse buildCrlInfoResp(X509Crl crl, String desc) {
+    if (crl == null) {
+      String message = "could not " + desc;
+      LOG.warn(message);
+      return new ErrorResponse(null, SYSTEM_FAILURE, message);
+    }
+
+    byte[] issuer;
+    try {
+      issuer = crl.issuer().getEncoded();
+    } catch (IOException e) {
+      String message = "could not parse CRL";
+      LOG.warn(message, e);
+      return new ErrorResponse(null, SYSTEM_FAILURE, message);
+    }
+
+    byte[] sha256sum = HashAlgo.SHA256.hash(crl.getEncoded());
+    Instant thisUpdate = crl.thisUpdate();
+    Instant nextUpdate = crl.nextUpdate();
+    BigInteger crlNumber = crl.crlNumber();
+
+    StringBuilder sb = new StringBuilder();
+    sb.append("sha256sum=").append(Base64.encodeToString(sha256sum)).append("\n");
+    sb.append("issuer=").append(Base64.encodeToString(issuer)).append("\n");
+    sb.append("thisupdate=").append(thisUpdate.getEpochSecond()).append("\n");
+    if (nextUpdate != null) {
+      sb.append("nextupdate=").append(nextUpdate.getEpochSecond()).append("\n");
+    }
+
+    if (crlNumber != null) {
+      sb.append("crlnumber=").append(crlNumber.toString(10)).append("\n");
+    }
+
+    return new CrlInfoResponse(sb.toString().getBytes(StandardCharsets.US_ASCII));
   }
 
   private SdkResponse getCert(X509Ca ca, byte[] request)

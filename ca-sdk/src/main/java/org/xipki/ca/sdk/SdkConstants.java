@@ -45,6 +45,8 @@ public class SdkConstants {
 
   public static final String CMD_crl = "crl";
 
+  public static final String CMD_crlinfo = "crlinfo";
+
   public static final String CMD_gen_crl = "gen_crl";
 
   public static final String CMD_revoke_pending_cert = "revoke_pending_cert";

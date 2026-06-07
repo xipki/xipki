@@ -29,6 +29,8 @@ public class HttpResponse {
 
   private final boolean base64;
 
+  private boolean ignoreBase64CTE;
+
   private final byte[] body;
 
   public HttpResponse(int statusCode) {
@@ -52,6 +54,14 @@ public class HttpResponse {
       }
     }
     this.body = body;
+  }
+
+  public boolean isIgnoreBase64CTE() {
+    return ignoreBase64CTE;
+  }
+
+  public void setIgnoreBase64CTE(boolean ignoreBase64CTE) {
+    this.ignoreBase64CTE = ignoreBase64CTE;
   }
 
   public boolean isBase64() {
@@ -98,7 +108,9 @@ public class HttpResponse {
     } else {
       byte[] content;
       if (base64) {
-        resp.setHeader("Content-Transfer-Encoding", "base64");
+        if (!ignoreBase64CTE) {
+          resp.setHeader("Content-Transfer-Encoding", "base64");
+        }
         content = Base64.getEncoder().encodeToByte(body, true);
       } else {
         content = body;
