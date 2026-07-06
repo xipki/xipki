@@ -48,7 +48,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -537,7 +536,6 @@ class SecurityCommands {
       StringBuilder sb = new StringBuilder();
       String line;
       String contentType = null;
-      String encoding = null;
       boolean isLastBlock = false;
       boolean bodyStarted = false;
       boolean bodyFinished = false;
@@ -557,8 +555,6 @@ class SecurityCommands {
           bodyStarted = true;
         } else if (StringUtil.startsWithIgnoreCase(line, "content-type:")) {
           contentType = line.substring("content-type:".length()).trim();
-        } else if (StringUtil.startsWithIgnoreCase(line, "content-transfer-encoding:")) {
-          encoding = line.substring("content-transfer-encoding:".length()).trim();
         }
       }
 
@@ -566,14 +562,9 @@ class SecurityCommands {
         throw new IOException("invalid block");
       }
 
-      byte[] content;
-      if ("base64".equalsIgnoreCase(encoding)) {
-        content = Base64.decodeFast(sb.toString());
-      } else if (StringUtil.isBlank(encoding)) {
-        content = sb.toString().getBytes(StandardCharsets.UTF_8);
-      } else {
-        throw new IOException("unknown content-transfer-encoding " + encoding);
-      }
+      // RFC 8951: the parts are base64-encoded, any Content-Transfer-Encoding
+      // header MUST be ignored.
+      byte[] content = Base64.decodeFast(sb.toString());
 
       return new Object[]{isLastBlock, contentType, content};
     }
