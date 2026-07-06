@@ -847,7 +847,7 @@ public class CborDiag {
         }
       }
 
-      int numPerLine = maxCharsPerLine - lineOffset - 2 - leading.length();
+      int numPerLine = Math.max(1, maxCharsPerLine - lineOffset - 2 - leading.length());
       List<String> splitTexts = splitText(text, numPerLine);
       boolean firstLine = true;
       for (String line0 : splitTexts) {
