@@ -211,13 +211,13 @@ public class SdkClient {
       throws SdkErrorResponseException {
     GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crlinfo, req);
-    CrlResponse resp;
+    CrlInfoResponse resp;
     try {
-      resp = CrlResponse.decode(respBytes);
+      resp = CrlInfoResponse.decode(respBytes);
     } catch (CodecException e) {
       throw new SdkErrorResponseException(ErrorCode.CLIENT_RESPONSE_DECODE_ERROR, e.getMessage());
     }
-    return resp.crl();
+    return resp.crlInfo();
   }
 
   public byte[] currentCrl(String ca) throws SdkErrorResponseException {
