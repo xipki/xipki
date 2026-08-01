@@ -36,7 +36,7 @@
     <bc-fips.version>2.1.2</bc-fips.version>
     <bcpkix-fips.version>2.1.11</bcpkix-fips.version>
     <bcpqc-fips.version>2.1.0</bcpqc-fips.version>
-    <bcutil-fips.version>2.1.6</bcutil-fips.version>
+    <bcutil-fips.version>2.1.7</bcutil-fips.version>
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
     <jdbc.h2.version>2.4.240</jdbc.h2.version>
