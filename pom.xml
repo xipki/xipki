@@ -34,7 +34,7 @@
     <!-- BouncyCastle -->
     <bc-lts.version>2.73.11</bc-lts.version>
     <bc-fips.version>2.1.2</bc-fips.version>
-    <bcpkix-fips.version>2.1.11</bcpkix-fips.version>
+    <bcpkix-fips.version>2.1.12</bcpkix-fips.version>
     <bcpqc-fips.version>2.1.0</bcpqc-fips.version>
     <bcutil-fips.version>2.1.6</bcutil-fips.version>
     <!-- only for runtime -->
