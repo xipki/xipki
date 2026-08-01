@@ -968,22 +968,14 @@ public class X509Cert {
           sb.append("SmtpUTF8Mailbox:").append(value);
         } else if (onId.equals(OIDs.X509.id_on_hardwareModuleName)) {
           sb.append("hardwareModuleName:");
-          ASN1Sequence seq = (value instanceof ASN1Sequence) ? (ASN1Sequence) value : null;
-          if (seq != null && seq.size() >= 2) {
-            sb.append(seq.getObjectAt(0)).append(" = ").append("\n"); // OID
-            addIndent(sb, level + 1);
-            appendASN1(sb, seq.getObjectAt(1)); // value
-          } else {
-            appendASN1(sb, value);
-          }
+          ASN1Sequence seq = ASN1Sequence.getInstance(value);
+          sb.append(seq.getObjectAt(0)).append(" = ").append("\n"); // OID
+          addIndent(sb, level + 1);
+          appendASN1(sb, seq.getObjectAt(1)); // value
         } else if (onId.equals(OIDs.X509.id_on_MACAddress)) {
           sb.append("MACAddress:");
-          if (value instanceof ASN1OctetString) {
-            byte[] macValue = ((ASN1OctetString) value).getOctets();
-            Hex.append(true, sb, macValue, 0, macValue.length, "-");
-          } else {
-            appendASN1(sb, value);
-          }
+          byte[] macValue = ASN1OctetString.getInstance(on.getValue()).getOctets();
+          Hex.append(true, sb, macValue, 0, macValue.length, "-");
         } else if (onId.equals(OIDs.Spdm.id_DMTF_device_info)) {
           sb.append("DMTF device info:").append(value);
         } else {
