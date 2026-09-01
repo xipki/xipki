@@ -28,7 +28,7 @@
     <dnsjava.version>3.6.5</dnsjava.version>
     <hikaricp.version>7.1.0</hikaricp.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <jline.version>4.3.1</jline.version>
+    <jline.version>4.4.0</jline.version>
     <picocli.version>4.7.7</picocli.version>
     <slf4j.version>2.0.18</slf4j.version>
     <!-- BouncyCastle -->
