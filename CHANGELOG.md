@@ -103,10 +103,12 @@ See also <https://github.com/xipki/xipki/releases>
     - CCC-T-SBxDKisIntermediateCACert (1.3.6.1.4.1.41577.5.16)
     - CCC-U-SBxDKisRootCACert         (1.3.6.1.4.1.41577.5.17)
 - Dependencies
-  - bouncycastle LTS: 2.73.10 -> 2.73.12.1
-  - dnsjava           3.6.4   -> 3.6.5
+  - bcprov-lts8on:    2.73.10 -> 2.73.12.1
+  - bcutil-lts8on:    2.73.10 -> 2.73.12
+  - bcpkix-lts8on:    2.73.10 -> 2.73.12
+  - dnsjava:          3.6.4   -> 3.6.5
   - hikaricp:         7.0.2   -> 7.1.0
-  - jline:            4.0.9   -> 4.3.1
+  - jline:            4.0.9   -> 4.4.1
   - mariadb jdbc:     3.5.7   -> 3.5.10
   - postgres jdbc:    42.7.10 -> 42.7.13
 

@@ -229,7 +229,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
         - id-on-SmtpUTF8Mailbox (1.3.6.1.5.5.7.8.9)
     - BRSKI (RFC 8995)
       - MASA-URL (1.3.6.1.5.5.7.1.32)
-    - I-D.ietf-lamps-macaddress-on-07
+    - RFC 10031
       - SubjectAltNames with otherName types
         - id-on-MACAddress (1.3.6.1.5.5.7.8.12)
     - TCG DICE (Calipta)

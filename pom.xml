@@ -28,11 +28,13 @@
     <dnsjava.version>3.6.5</dnsjava.version>
     <hikaricp.version>7.1.0</hikaricp.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <jline.version>4.4.0</jline.version>
+    <jline.version>4.4.1</jline.version>
     <picocli.version>4.7.7</picocli.version>
     <slf4j.version>2.0.18</slf4j.version>
     <!-- BouncyCastle -->
-    <bc-lts.version>2.73.12</bc-lts.version>
+    <bcprov.version>2.73.12.1</bcprov.version>
+    <bcutil.version>2.73.12</bcutil.version>
+    <bcpkix.version>2.73.12</bcpkix.version>
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
     <jdbc.h2.version>2.4.240</jdbc.h2.version>
@@ -222,17 +224,17 @@
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcprov-lts8on</artifactId>
-        <version>${bc-lts.version}</version>
+        <version>${bcprov.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcpkix-lts8on</artifactId>
-        <version>${bc-lts.version}</version>
+        <version>${bcpkix.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcutil-lts8on</artifactId>
-        <version>${bc-lts.version}</version>
+        <version>${bcutil.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
