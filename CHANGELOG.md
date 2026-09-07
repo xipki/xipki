@@ -2,8 +2,15 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
+## 6.7.2
+- Release date: 202y/mm/dd
+- XXX
+  - N/A
+- Dependencies
+  - N/A
+
 ## 6.7.1
-- Release date: 202x/mm/dd
+- Release date: 2026/09/07
 - All components
   - bouncycastle: use only the lts8on jars, remove the fips jars.
 - xipki-ca
