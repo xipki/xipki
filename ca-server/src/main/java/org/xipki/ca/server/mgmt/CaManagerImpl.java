@@ -587,7 +587,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   }
 
-  public int getDbSchemaVersion() {
+  public int getCaConfDbSchemaVersion() {
     return caConfStore.getDbSchemaVersion();
   }
 

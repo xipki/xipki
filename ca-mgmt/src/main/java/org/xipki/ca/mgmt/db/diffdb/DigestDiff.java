@@ -235,15 +235,7 @@ class DigestDiff {
     try {
       String dbSchemaVersion = datasource.getDbSchemaEntry(null, "VERSION");
       if (datasource.tableExists(conn, "CA")) {
-        if ("4".equals(dbSchemaVersion)) {
-          return DbType.XIPKI_CA_v4;
-        } else if ("5".equals(dbSchemaVersion)) {
-          return DbType.XIPKI_CA_v5;
-        } else if ("6".equals(dbSchemaVersion)) {
-          return DbType.XIPKI_CA_v6;
-        } else if ("7".equals(dbSchemaVersion)) {
-          return DbType.XIPKI_CA_v7;
-        } else if ("8".equals(dbSchemaVersion)) {
+        if ("8".equals(dbSchemaVersion)) {
           return DbType.XIPKI_CA_v8;
         } else {
           throw new IllegalArgumentException("unknown DBSCHEMA version " + dbSchemaVersion);

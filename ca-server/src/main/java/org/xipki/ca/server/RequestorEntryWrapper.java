@@ -20,6 +20,7 @@ import java.security.cert.CertificateException;
  * @author Lijun Liao (xipki)
  */
 public class RequestorEntryWrapper {
+
   private static final Logger LOG = LoggerFactory.getLogger(RequestorEntryWrapper.class);
 
   private RequestorEntry dbEntry;

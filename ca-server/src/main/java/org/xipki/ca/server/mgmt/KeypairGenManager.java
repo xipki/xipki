@@ -58,11 +58,12 @@ class KeypairGenManager {
     manager.keypairGenDbEntries.clear();
     manager.keypairGens.clear();
 
-    int dbSchemaVersion = manager.getDbSchemaVersion();
+    int caConfDbSchemaVersion = manager.getCaConfDbSchemaVersion();
 
     List<KeypairGenEntry> entries;
-    if (dbSchemaVersion < 9) {
-      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
+    if (caConfDbSchemaVersion < 9) {
+      throw new CaMgmtException("caConf with dbSchemaVersion < 9 unsupported: "
+          + caConfDbSchemaVersion);
     }
 
     List<String> names = manager.caConfStore.getKeyPairGenNames();

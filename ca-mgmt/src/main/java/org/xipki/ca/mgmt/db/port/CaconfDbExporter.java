@@ -399,7 +399,22 @@ class CaconfDbExporter extends DbPorter {
 
     str = rs.getString("CRL_CONTROL");
     if (StringUtil.isNotBlank(str)) {
-      ccc.setCrlControl(new CrlControl(str));
+      ConfPairs props = new ConfPairs(str);
+
+      String KEY_OVERLAP_MINUTES = CrlControl.KEY_OVERLAP_MINUTES;
+      String KEY_OVERLAP_DAYS = CrlControl.KEY_OVERLAP_DAYS;
+      if (props.value(KEY_OVERLAP_DAYS) != null) {
+        Validity ov = new Validity(props.integerValue(KEY_OVERLAP_DAYS, 1), Validity.Unit.DAY);
+        props.removePair(KEY_OVERLAP_DAYS);
+        props.putPair(KEY_OVERLAP_DAYS, ov.toString());
+      } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
+        Validity ov = new Validity(props.integerValue(KEY_OVERLAP_MINUTES, 24 * 60),
+              Validity.Unit.MINUTE);
+        props.removePair(KEY_OVERLAP_MINUTES);
+        props.putPair(KEY_OVERLAP_DAYS, ov.toString());
+      }
+
+      ccc.setCrlControl(new CrlControl(props));
     }
 
     str = rs.getString("CTLOG_CONTROL");

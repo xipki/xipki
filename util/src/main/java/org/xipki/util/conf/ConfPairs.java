@@ -414,6 +414,45 @@ public class ConfPairs implements JsonEncodable {
     return true;
   }
 
+  public int integerValue(String propKey, int dfltValue) throws InvalidConfException {
+    String str = value(propKey);
+    if (str != null) {
+      try {
+        return Integer.parseInt(str.trim());
+      } catch (NumberFormatException ex) {
+        throw new InvalidConfException(propKey + " does not have numeric value: " + str);
+      }
+    }
+    return dfltValue;
+  }
+
+  public long longValue(String propKey, long dfltValue) throws InvalidConfException {
+    String str = value(propKey);
+    if (str != null) {
+      try {
+        return Long.parseLong(str.trim());
+      } catch (NumberFormatException ex) {
+        throw new InvalidConfException(propKey + " does not have numeric value: " + str);
+      }
+    }
+    return dfltValue;
+  }
+
+  public boolean booleanValue(String propKey, boolean dfltValue) throws InvalidConfException {
+    String str = value(propKey);
+    if (str != null) {
+      str = str.trim();
+      if ("true".equalsIgnoreCase(str)) {
+        return Boolean.TRUE;
+      } else if ("false".equalsIgnoreCase(str)) {
+        return Boolean.FALSE;
+      } else {
+        throw new InvalidConfException(propKey + " does not have boolean value: " + str);
+      }
+    }
+    return dfltValue;
+  }
+
   public ConfPairs unmodifiable() {
     return new Unmodifiable(this);
   }

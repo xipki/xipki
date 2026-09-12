@@ -18,7 +18,6 @@
       <outputDirectory>xipki-mgmt-cli</outputDirectory>
       <excludes>
         <exclude>lib/bc*-lts8on*</exclude>
-        <exclude>lib/bc*-fips*</exclude>
       </excludes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>

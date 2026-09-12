@@ -141,7 +141,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
   private static final String SQL_REMOVE_CERT_FOR_ID = "DELETE FROM CERT WHERE ID=?";
 
-  private final int dbSchemaVersion;
+  private final int caConfDbSchemaVersion;
 
   private final int maxX500nameLen;
 
@@ -170,9 +170,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       throw new CaMgmtException("unsupported vendor " + vendor);
     }
 
-    this.dbSchemaVersion = Integer.parseInt(caConfDbSchemaInfo.get("VERSION"));
-    if (this.dbSchemaVersion < 9) {
-      throw new CaMgmtException("dbSchemaVersion < 9 unsupported: " + dbSchemaVersion);
+    this.caConfDbSchemaVersion = Integer.parseInt(caConfDbSchemaInfo.get("VERSION"));
+    if (this.caConfDbSchemaVersion < 9) {
+      throw new CaMgmtException("caConfDbSchemaVersion < 9 unsupported: " + caConfDbSchemaVersion);
     }
 
     String str = caConfDbSchemaInfo.get("X500NAME_MAXLEN");

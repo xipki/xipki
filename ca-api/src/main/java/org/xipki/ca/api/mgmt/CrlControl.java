@@ -92,14 +92,14 @@ public class CrlControl implements JsonEncodable {
 
   /**
    * Overlap in minutes.
-   * @deprecated use {@link #KEY_OVERLAP} instead.
+   * @deprecated use {@link #KEY_OVERLAP} instead. Will be deleted later.
    */
   @Deprecated
   public static final String KEY_OVERLAP_MINUTES = "overlap.minutes";
 
   /**
    * Overlap in days.
-   * @deprecated use {@link #KEY_OVERLAP} instead.
+   * @deprecated use {@link #KEY_OVERLAP} instead. Will be deleted later.
    */
   @Deprecated
   public static final String KEY_OVERLAP_DAYS = "overlap.days";
