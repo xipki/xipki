@@ -34,7 +34,7 @@
     <!-- BouncyCastle -->
     <bcprov.version>2.73.12.1</bcprov.version>
     <bcutil.version>2.73.12</bcutil.version>
-    <bcpkix.version>2.73.12</bcpkix.version>
+    <bcpkix.version>2.73.13</bcpkix.version>
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
     <jdbc.h2.version>2.4.240</jdbc.h2.version>
