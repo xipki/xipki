@@ -30,7 +30,7 @@
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <jline.version>4.4.1</jline.version>
     <picocli.version>4.7.7</picocli.version>
-    <slf4j.version>2.0.18</slf4j.version>
+    <slf4j.version>2.0.20</slf4j.version>
     <!-- BouncyCastle -->
     <bcprov.version>2.73.12.1</bcprov.version>
     <bcutil.version>2.73.12</bcutil.version>
