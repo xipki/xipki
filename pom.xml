@@ -33,7 +33,7 @@
     <slf4j.version>2.0.18</slf4j.version>
     <!-- BouncyCastle -->
     <bcprov.version>2.73.12.1</bcprov.version>
-    <bcutil.version>2.73.12</bcutil.version>
+    <bcutil.version>2.73.13</bcutil.version>
     <bcpkix.version>2.73.12</bcpkix.version>
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
