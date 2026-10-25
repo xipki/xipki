@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.codec.asn1.GenerationException;
 
 import java.util.Set;
 
@@ -35,9 +35,9 @@ public interface CertprofileFactory {
    * @param type
    *          Type of the certificate profile. Must not be {@code null}.
    * @return the new created certificate profile.
-   * @throws ObjectCreationException
+   * @throws GenerationException
    *           if certificate profile could not be created.
    */
-  Certprofile newCertprofile(String type) throws ObjectCreationException;
+  Certprofile newCertprofile(String type) throws GenerationException;
 
 }

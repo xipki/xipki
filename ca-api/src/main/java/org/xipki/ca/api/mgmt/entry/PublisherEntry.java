@@ -4,11 +4,11 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 /**
  * Publisher Entry.

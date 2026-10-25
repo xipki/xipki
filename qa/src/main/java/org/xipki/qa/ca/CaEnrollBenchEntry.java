@@ -3,14 +3,17 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.OIDs;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Utf8String;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.X509Util;
+
+import java.util.List;
 
 /**
  * CA Enroll Bench entry.
@@ -48,7 +51,7 @@ public class CaEnrollBenchEntry {
 
     private final X500Name subjectTemplate;
 
-    private final ASN1ObjectIdentifier subjectRdnForIncrement;
+    private final Asn1Oid subjectRdnForIncrement;
 
     private IncreasableSubject(String subjectTemplate, RandomDn randomDn) {
       Args.notNull(randomDn, "randomDn");
@@ -57,49 +60,49 @@ public class CaEnrollBenchEntry {
 
       switch (randomDn) {
         case GIVENNAME:
-          this.subjectRdnForIncrement = OIDs.DN.givenName;
+          this.subjectRdnForIncrement = AttributeOIDs.givenName;
           break;
         case SURNAME:
-          this.subjectRdnForIncrement = OIDs.DN.surname;
+          this.subjectRdnForIncrement = AttributeOIDs.surname;
           break;
         case STREET:
-          this.subjectRdnForIncrement = OIDs.DN.street;
+          this.subjectRdnForIncrement = AttributeOIDs.street;
           break;
         case POSTALCODE:
-          this.subjectRdnForIncrement = OIDs.DN.postalCode;
+          this.subjectRdnForIncrement = AttributeOIDs.postalCode;
           break;
         case O:
-          this.subjectRdnForIncrement = OIDs.DN.organization;
+          this.subjectRdnForIncrement = AttributeOIDs.organization;
           break;
         case OU:
-          this.subjectRdnForIncrement = OIDs.DN.organizationalUnit;
+          this.subjectRdnForIncrement = AttributeOIDs.organizationalUnit;
           break;
         case CN:
-          this.subjectRdnForIncrement = OIDs.DN.commonName;
+          this.subjectRdnForIncrement = AttributeOIDs.commonName;
           break;
         default:
           throw new IllegalStateException("should not reach here, unknown randomDn " + randomDn);
       }
 
-      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).length == 0) {
+      if (this.subjectTemplate.getRDNs(this.subjectRdnForIncrement).isEmpty()) {
         throw new IllegalArgumentException("subjectTemplate does not contain DN field " +
             OIDs.oidToDisplayName(this.subjectRdnForIncrement));
       }
     } // constructor
 
     private X500Name getX500Name(long index) {
-      RDN[] baseRdns = subjectTemplate.getRDNs();
+      List<RDN> baseRdns = subjectTemplate.getRDNs();
 
-      final int n = baseRdns.length;
+      final int n = baseRdns.size();
       RDN[] newRdns = new RDN[n];
 
       boolean incremented = false;
       for (int i = 0; i < n; i++) {
-        RDN rdn = baseRdns[i];
+        RDN rdn = baseRdns.get(i);
         if (!incremented) {
           if (rdn.getFirst().getType().equals(subjectRdnForIncrement)) {
             String text = X509Util.rdnValueToString(rdn.getFirst().getValue());
-            rdn = new RDN(subjectRdnForIncrement, new DERUTF8String(text + index));
+            rdn = new RDN(subjectRdnForIncrement, new Asn1Utf8String(text + index));
             incremented = true;
           }
         }

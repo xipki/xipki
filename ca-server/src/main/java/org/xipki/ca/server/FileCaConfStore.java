@@ -5,6 +5,7 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaConf;
@@ -25,26 +26,27 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,7 +130,7 @@ public class FileCaConfStore implements CaConfStore {
 
     String baseDir = null;
     for (String confFile : confFiles) {
-      File fileobj = new File(IoUtil.expandFilepath(confFile, true));
+      File fileobj = new File(XipkiIoUtil.expandFilepath(confFile, true));
       if (baseDir == null) {
         baseDir = fileobj.getParent();
       } else {
@@ -461,10 +463,25 @@ public class FileCaConfStore implements CaConfStore {
         }
       } else {
         CaConfType.GenSelfIssued gsi = ci.genSelfIssued();
-        Instant notBefore = gsi.notBefore() == null ? null
-            : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notBefore());
-        Instant notAfter = gsi.notAfter() == null ? null
-            : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notAfter());
+
+        Instant notBefore = null;
+        if (gsi.notBefore() != null) {
+          try {
+            notBefore = DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notBefore());
+          } catch (CodecException ex) {
+            throw new CaMgmtException("error parsing notBefore " + gsi.notBefore());
+          }
+        }
+
+        Instant notAfter = null;
+        if (gsi.notAfter() != null) {
+          try {
+            notAfter = DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notAfter());
+          } catch (CodecException ex) {
+            throw new CaMgmtException("error parsing notAfter " + gsi.notAfter());
+          }
+        }
+
         CaConf.GenSelfIssued genSelfIssued = new CaConf.GenSelfIssued(
             gsi.profile(), gsi.subject(), gsi.serialNumber(), notBefore, notAfter);
 
@@ -476,7 +493,7 @@ public class FileCaConfStore implements CaConfStore {
 
           certprofile0.initialize(certprofileConfEntry.conf());
           certprofile = new IdentifiedCertprofile(certprofileConfEntry, certprofile0);
-        } catch (ObjectCreationException | CertprofileException | RuntimeException ex) {
+        } catch (GenerationException | CertprofileException | RuntimeException ex) {
           throw new CaMgmtException("error initializing certprofile " + gsi.profile());
         }
 
@@ -527,7 +544,7 @@ public class FileCaConfStore implements CaConfStore {
         } finally {
           signer.close();
         }
-      } catch (IOException | ObjectCreationException | XiSecurityException ex) {
+      } catch (IOException | GenerationException | XiSecurityException ex) {
         throw new InvalidConfException("could not create CA signer for CA " + ident, ex);
       }
     }
@@ -582,7 +599,7 @@ public class FileCaConfStore implements CaConfStore {
   private static CaConfType.CaSystem mergeConfs(List<String> confFiles)
       throws InvalidConfException {
     CaConfType.CaSystem conf0 = CaConfType.CaSystem.parse(
-        Paths.get(IoUtil.expandFilepath(confFiles.get(0), true)));
+        Paths.get(XipkiIoUtil.expandFilepath(confFiles.get(0), true)));
 
     Map<String, String> dbSchemas = conf0.dbSchemas();
     if (dbSchemas == null) {
@@ -628,7 +645,7 @@ public class FileCaConfStore implements CaConfStore {
 
     for (int i = 1; i < confFiles.size(); i++) {
       CaConfType.CaSystem root = CaConfType.CaSystem.parse(
-          Paths.get(IoUtil.expandFilepath(confFiles.get(i), true)));
+          Paths.get(XipkiIoUtil.expandFilepath(confFiles.get(i), true)));
 
       // Db Schemas
       if (root.dbSchemas() != null) {

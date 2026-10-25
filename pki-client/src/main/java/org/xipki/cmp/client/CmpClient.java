@@ -3,12 +3,12 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.xipki.security.encap.KemEncapKey;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.extra.misc.ReqRespDebug;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.util.http.ReqRespDebug;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -166,7 +166,7 @@ public interface CmpClient extends Closeable {
    * @throws CmpClientException
    *          if client error occurs.
    */
-  X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
+  CertificateList downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException;
 
   /**

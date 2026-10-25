@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 /**
  * Ext Key Usage Control settings.
@@ -13,16 +13,16 @@ import org.xipki.util.codec.Args;
  */
 public class ExtKeyUsageControl {
 
-  private final ASN1ObjectIdentifier extKeyUsage;
+  private final Asn1Oid extKeyUsage;
 
   private final boolean required;
 
-  public ExtKeyUsageControl(ASN1ObjectIdentifier extKeyUsage, boolean required) {
+  public ExtKeyUsageControl(Asn1Oid extKeyUsage, boolean required) {
     this.extKeyUsage = Args.notNull(extKeyUsage, "extKeyUsage");
     this.required = required;
   }
 
-  public ASN1ObjectIdentifier extKeyUsage() {
+  public Asn1Oid extKeyUsage() {
     return extKeyUsage;
   }
 

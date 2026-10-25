@@ -3,28 +3,33 @@
 
 package org.xipki.ca.gateway.est;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Encoding;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Set;
+import org.xipki.pkix.asn1.cms.CertificateChoice;
+import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.pkix.asn1.cms.RevocationInfoChoice;
+import org.xipki.pkix.asn1.cms.SignedData;
+import org.xipki.pkix.asn1.cms.SignerInfos;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.pkix.asn1.est.AttrOrOID;
+import org.xipki.pkix.asn1.est.CsrAttrs;
+import org.xipki.pkix.asn1.est.EstAttribute;
+import org.xipki.pkix.asn1.est.ChangeSubjectName;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.CmsOIDs;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
@@ -34,31 +39,31 @@ import org.xipki.ca.sdk.OldCertInfo;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.security.KeySpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.auth.Requestor;
-import org.xipki.security.auth.RequestorAuthenticator;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.EcCurveEnum;
-import org.xipki.security.util.TlsHelper;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.http.HttpRespContent;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.extra.type.EmbedCertsMode;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.auth.Requestor;
+import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -66,6 +71,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -79,42 +85,6 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 public class EstResponder {
-
-  private static class HttpRespAuditException extends Exception {
-
-    private final int httpStatus;
-
-    private final String auditMessage;
-
-    private final AuditLevel auditLevel;
-
-    private final AuditStatus auditStatus;
-
-    public HttpRespAuditException(
-        int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
-      this.httpStatus = httpStatus;
-      this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
-      this.auditLevel = Args.notNull(auditLevel, "auditLevel");
-      this.auditStatus = Args.notNull(auditStatus, "auditStatus");
-    }
-
-    public int httpStatus() {
-      return httpStatus;
-    }
-
-    public String auditMessage() {
-      return auditMessage;
-    }
-
-    public AuditLevel auditLevel() {
-      return auditLevel;
-    }
-
-    public AuditStatus auditStatus() {
-      return auditStatus;
-    }
-
-  } // class HttpRespAuditException
 
   private static final byte[] NEWLINE = new byte[]{'\r', '\n'};
 
@@ -364,7 +334,14 @@ public class EstResponder {
         byte[] password = null;
         if (hdrValue.length() > 6) {
           String b64 = hdrValue.substring(6);
-          byte[] userPwd = Base64.decodeFast(b64);
+          byte[] userPwd;
+          try {
+            // RFC 7617: standard base64 encoding
+            userPwd = java.util.Base64.getDecoder().decode(b64.trim());
+          } catch (IllegalArgumentException ex) {
+            // malformed, will be rejected as unauthorized below
+            userPwd = new byte[0];
+          }
           int idx = -1;
           for (int i = 0; i < userPwd.length; i++) {
             if (userPwd[i] == ':') {
@@ -412,8 +389,17 @@ public class EstResponder {
             message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
-        throw new OperationException(ErrorCode.NOT_PERMITTED, "ENROLL_CERT is not allowed");
+      boolean reenroll = CMD_simplereenroll.equals(command)
+          || CMD_usimplereenroll.equals(command);
+      Requestor.Permission permission = reenroll
+          ? Requestor.Permission.REENROLL_CERT : Requestor.Permission.ENROLL_CERT;
+      if (!requestor.isPermitted(permission)) {
+        throw new OperationException(ErrorCode.NOT_PERMITTED, permission + " is not allowed");
+      }
+
+      if ((CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command))
+          && !requestor.isPermitted(Requestor.Permission.GEN_KEYPAIR)) {
+        throw new OperationException(ErrorCode.NOT_PERMITTED, "GEN_KEYPAIR is not allowed");
       }
 
       if (!requestor.isCertprofilePermitted(caName, profile)) {
@@ -428,8 +414,7 @@ public class EstResponder {
         }
       }
 
-      HttpRespContent respContent = CMD_simplereenroll.equals(command)
-          || CMD_usimplereenroll.equals(command)
+      HttpRespContent respContent = reenroll
               ? reenrollCert(command, caName, profile, csr, event)
               :   enrollCert(command, caName, profile, csr, event);
 
@@ -521,11 +506,10 @@ public class EstResponder {
 
   private HttpRespContent enrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-      throws HttpRespAuditException, IOException, SdkErrorResponseException {
+          throws HttpRespAuditException, IOException, SdkErrorResponseException, CodecException {
     boolean caGenKeyPair = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
-    CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-    X500Name subject = certTemp.getSubject();
+    X500Name subject = csr.getSubject();
 
     BigInteger reqId = BigInteger.ONE;
     EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
@@ -537,22 +521,8 @@ public class EstResponder {
     event.addEventData(CaAuditConstants.NAME_req_subject,
         "\"" + X509Util.x500NameText(subject) + "\"");
 
-    Extensions extensions = X509Util.getExtensions(certTemp);
-
-    try {
-      template.extensions(extensions);
-    } catch (IOException e) {
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
-          "could not encode extensions", AuditLevel.INFO, AuditStatus.FAILED);
-    }
-
     if (!caGenKeyPair) {
-      try {
-        template.subjectPublicKey(certTemp.getSubjectPublicKeyInfo());
-      } catch (IOException e) {
-        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
-            "could not encode SubjectPublicKeyInfo", AuditLevel.INFO, AuditStatus.FAILED);
-      }
+      template.subjectPublicKey(csr.getSubjectPKInfo());
     }
 
     EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[]{template};
@@ -624,92 +594,50 @@ public class EstResponder {
 
   private HttpRespContent reenrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-      throws HttpRespAuditException, IOException, SdkErrorResponseException {
-    CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-
+      throws HttpRespAuditException, CodecException, SdkErrorResponseException {
     event.addEventData(CaAuditConstants.NAME_certprofile, profile);
-    X500Name oldSubject = certTemp.getSubject();
+    X500Name oldSubject = csr.getSubject();
 
     BigInteger reqId = BigInteger.ONE;
     EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(reqId);
     template.setCertprofile(profile);
-
-    try {
-      template.subjectPublicKey(certTemp.getSubjectPublicKeyInfo());
-    } catch (IOException e) {
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
-          "could not encode SubjectPublicKeyInfo", AuditLevel.INFO, AuditStatus.FAILED);
-    }
+    template.subjectPublicKey(csr.getSubjectPKInfo());
 
     // set the oldCertInfo
-    Extensions csrExtns = X509Util.getExtensions(certTemp);
-    byte[] extnValue = X509Util.getCoreExtValue(csrExtns, OIDs.Extn.subjectAlternativeName);
+    Extensions csrExtns = csr.getExtensionRequest();
+    Extension extn = (csrExtns == null) ? null
+        : csrExtns.getExtension(ExtensionOIDs.subjectAlternativeName);
+    byte[] extnValue = (csrExtns == null) ? null : extn.extnValue();
 
     OldCertInfo oldCertInfo = new OldCertInfo(false,
         new OldCertInfo.BySubject(oldSubject.getEncoded(), extnValue));
 
     template.setOldCertInfo(oldCertInfo);
 
-    Attribute attr = X509Util.getAttribute(certTemp, OIDs.CMC.id_cmc_changeSubjectName);
+    Attribute attr = X509Util.getAttribute(csr, AttributeOIDs.id_cmc_changeSubjectName);
     Extensions requestedExtns = csrExtns;
     X500Name requestedSubject = oldSubject;
 
     if (attr != null) {
-      /*
-        ChangeSubjectName ::= SEQUENCE {
-          subject             Name OPTIONAL,
-          subjectAlt          GeneralNames OPTIONAL
-        }
+      ChangeSubjectName change = attr.getChangeSubjectName();
 
-        Name ::= CHOICE { -- only one possibility for now --
-          rdnSequence  RDNSequence }
-
-        RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
-
-        RelativeDistinguishedName ::=
-          SET SIZE (1..MAX) OF AttributeTypeAndValue
-
-        GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
-       */
-      ASN1Sequence seq = ASN1Sequence.getInstance(attr.getAttributeValues()[0]);
-      int size = seq.size();
-
-      X500Name newSubject = null;
-      GeneralNames newSubjectAlt = null;
-
-      if (size == 2) {
-        newSubject = X500Name.getInstance(seq.getObjectAt(0));
-        newSubjectAlt = GeneralNames.getInstance(seq.getObjectAt(1));
-      } else if (size == 1) {
-        // error in the definition, so we have to guess
-        ASN1Encodable obj = seq.getObjectAt(0);
-        try {
-          newSubject = X500Name.getInstance(obj);
-        } catch (Exception e) {
-          newSubjectAlt = GeneralNames.getInstance(obj);
-        }
-      } else {
-        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
-            "invalid ChangeSubjectName", AuditLevel.INFO, AuditStatus.FAILED);
+      if (change.getSubject() != null) {
+        requestedSubject = change.getSubject();
       }
 
-      if (newSubject != null) {
-        requestedSubject = newSubject;
-      }
-
-      if (newSubjectAlt != null) {
+      if (change.getSubjectAlt() != null) {
         // replace the subjectAltNames extension
         List<Extension> v = new LinkedList<>();
 
-        ASN1ObjectIdentifier sanOid = OIDs.Extn.subjectAlternativeName;
+        Asn1Oid sanOid = ExtensionOIDs.subjectAlternativeName;
         Extension sanExtn = null;
 
         // copy the extensions except SAN.
         if (csrExtns != null) {
           sanExtn = csrExtns.getExtension(sanOid);
-          ASN1ObjectIdentifier[] csrExtnOids = csrExtns.getExtensionOIDs();
-          for (ASN1ObjectIdentifier oid : csrExtnOids) {
+          Set<Asn1Oid> csrExtnOids = csrExtns.getExtensionIds();
+          for (Asn1Oid oid : csrExtnOids) {
             // ignore extension SAN
             if (!sanOid.equals(oid)) {
               v.add(csrExtns.getExtension(oid));
@@ -719,7 +647,7 @@ public class EstResponder {
 
         // set the extension SAN
         boolean critical = sanExtn != null && sanExtn.isCritical();
-        v.add(new Extension(sanOid, critical, newSubjectAlt.getEncoded()));
+        v.add(Extension.ofSubjectAlternativeName(critical, change.getSubjectAlt()));
 
         requestedExtns = new Extensions(v.toArray(new Extension[0]));
       }
@@ -729,13 +657,7 @@ public class EstResponder {
     event.addEventData(CaAuditConstants.NAME_req_subject,
         "\"" + X509Util.x500NameText(requestedSubject) + "\"");
 
-    try {
-      template.extensions(requestedExtns);
-    } catch (IOException e) {
-      String message = "could not encode extensions";
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
-          message, AuditLevel.INFO, AuditStatus.FAILED);
-    }
+    template.extensions(requestedExtns);
 
     EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[] {template};
 
@@ -756,35 +678,39 @@ public class EstResponder {
   } // method reenrollCert
 
   private HttpRespContent getCsrAttrs(String caName, String profile)
-      throws IOException, SdkErrorResponseException {
+      throws SdkErrorResponseException {
     CertprofileInfoResponse sdkResp = sdk.profileInfo(caName, profile);
-    ASN1EncodableVector csrAttrs = new ASN1EncodableVector();
+    List<AttrOrOID> csrAttrs = new LinkedList<>();
 
     String[] extnTypes = sdkResp.requiredExtensionTypes();
     if (extnTypes != null && extnTypes.length != 0) {
-      ASN1EncodableVector asn1ExtnTypes = new ASN1EncodableVector();
+      // allowed extension IDs.
+      List<Asn1Oid> asn1ExtnIds = new LinkedList<>();
       for (String extnType : extnTypes) {
-        asn1ExtnTypes.add(new ASN1ObjectIdentifier(extnType));
+        asn1ExtnIds.add(new Asn1Oid(extnType));
       }
 
-      csrAttrs.add(new Attribute(OIDs.PKCS9.pkcs9_at_extensionRequest, new DERSet(asn1ExtnTypes)));
+      csrAttrs.add(AttrOrOID.ofAttribute(
+          new EstAttribute(AttributeOIDs.pkcs9_at_extensionRequest, new Asn1Set(asn1ExtnIds))));
     }
 
     KeySpec[] keyTypes = sdkResp.keyTypes();
     if (keyTypes != null) {
       for (KeySpec keyType : keyTypes) {
-        ASN1ObjectIdentifier typeOid = keyType.algorithmIdentifier().getAlgorithm();
+        Asn1Oid typeOid = keyType.algorithmIdentifier().getAlgorithm();
         if (keyType.isWeierstrassEC()) {
           EcCurveEnum curve = keyType.ecCurve();
           assert curve != null;
-          csrAttrs.add(new Attribute(typeOid, new DERSet(curve.oid())));
+          csrAttrs.add(AttrOrOID.ofAttribute(
+              new EstAttribute(typeOid, new Asn1Set(curve.oid()))));
         } else {
-          csrAttrs.add(typeOid);
+          csrAttrs.add(AttrOrOID.ofOid(typeOid));
         }
       }
     }
 
-    return HttpRespContent.ofOk(CT_csrattrs, true, new DERSequence(csrAttrs).getEncoded("DER"));
+    return HttpRespContent.ofOk(CT_csrattrs, true,
+        new CsrAttrs(csrAttrs).getEncoded(Asn1Encoding.DER));
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
@@ -819,18 +745,18 @@ public class EstResponder {
         "found no response entry with certReqId " + certReqId, AuditLevel.INFO, AuditStatus.FAILED);
   }
 
-  private static byte[] buildCertsOnly(byte[]... certsBytes) throws IOException {
-    ASN1EncodableVector v = new ASN1EncodableVector();
+  private static byte[] buildCertsOnly(byte[]... certsBytes) throws CodecException {
+    List<CertificateChoice> v = new LinkedList<>();
     for (byte[] certBytes : certsBytes) {
-      v.add(Certificate.getInstance(certBytes));
+      v.add(CertificateChoice.ofCertificate(Certificate.fromEncoded(certBytes)));
     }
-    ASN1Set certs = new DERSet(v);
 
-    SignedData sd = new SignedData(new DERSet(),
-        new ContentInfo(OIDs.CMS.data, null), certs, new DERSet(), new DERSet());
+    SignedData sd = new SignedData(new AlgorithmIdentifier.Set0(),
+        new ContentInfo(CmsOIDs.data, null), new CertificateChoice.Set0(v),
+        new RevocationInfoChoice.Set0(), new SignerInfos());
 
-    ContentInfo ci = new ContentInfo(OIDs.CMS.signedData, sd);
-    return ci.getEncoded("DER");
+    ContentInfo ci = ContentInfo.build(CmsOIDs.signedData, sd);
+    return ci.getEncoded(Asn1Encoding.DER);
   }
 
   private static void writeLine(OutputStream os, String line) throws IOException {

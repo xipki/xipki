@@ -3,20 +3,19 @@
 
 package org.xipki.ocsp.server;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.util.codec.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
 
-import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
@@ -49,7 +48,7 @@ class ResponseSigner {
 
   private final boolean macSigner;
 
-  ResponseSigner(List<ConcurrentSigner> signers) throws CertificateException, IOException {
+  ResponseSigner(List<ConcurrentSigner> signers) throws CertificateException, CodecException {
     this.signers = Args.notEmpty(signers, "signers");
     ConcurrentSigner firstSigner = signers.get(0);
     this.macSigner = firstSigner.isMac();
@@ -90,10 +89,10 @@ class ResponseSigner {
       }
       this.sequenceOfCertChain = new TaggedCertSequence(encodedCertChain);
 
-      Certificate bcCertificate = Certificate.getInstance(encodedCert);
+      Certificate bcCertificate = Certificate.fromEncoded(encodedCert);
       this.responderIdByName = new ResponderID(bcCertificate.getSubject());
-      byte[] keySha1 = HashAlgo.SHA1.hash(Asn1Util.getPublicKeyData(
-                          bcCertificate.getSubjectPublicKeyInfo()));
+      byte[] keySha1 = HashAlgo.SHA1.hash(
+                          bcCertificate.getSubjectPublicKeyInfo().subjectPublicKey());
       this.responderIdByKey = new ResponderID(keySha1);
     }
 
@@ -118,9 +117,9 @@ class ResponseSigner {
     }
 
     for (AlgorithmIdentifier sigAlgId : prefSigAlgs) {
-      if (sigAlgId.getAlgorithm().equals(OIDs.Algo.id_RSASSA_PSS)) {
+      if (sigAlgId.getAlgorithm().equals(AlgorithmOIDs.id_RSASSA_PSS)) {
         // return any RSAPSS with MGF1 algorithms
-        ASN1Encodable params = sigAlgId.getParameters();
+        Asn1Primitive params = sigAlgId.getParameters();
         if (params == null) {
           for (Entry<SignAlgo, ConcurrentSigner> entry : algoSignerMap.entrySet()) {
             SignAlgo m = entry.getKey();

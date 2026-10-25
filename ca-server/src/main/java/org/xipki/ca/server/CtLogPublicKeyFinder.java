@@ -3,15 +3,16 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.ca.server.CaServerConf.CtLogConf;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class CtLogPublicKeyFinder {
     String keydirName = conf.keydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
-      keydirName = IoUtil.expandFilepath(keydirName, true);
+      keydirName = XipkiIoUtil.expandFilepath(keydirName, true);
       keyFiles = new File(keydirName).listFiles(pathname -> {
         String name = pathname.getName();
         return pathname.isFile() &&
@@ -61,17 +62,17 @@ public class CtLogPublicKeyFinder {
     List<PublicKey> publicKeyList = new ArrayList<>(size);
 
     for (File m : keyFiles) {
-      byte[] keyBytes = IoUtil.read(m, true);
+      byte[] keyBytes = XipkiIoUtil.read(m, true);
       keyBytes = X509Util.toDerEncoded(keyBytes);
       try {
-        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(keyBytes);
+        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.fromEncoded(keyBytes);
         byte[] logId = HashAlgo.SHA256.hash(spki.getEncoded());
-        PublicKey key = KeyUtil.getPublicKey(spki);
+        PublicKey key = KeyInfoUtil.getPublicKey(spki);
 
         logIdList.add(logId);
         publicKeyList.add(key);
         LOG.info("loaded CtLog public key {}", m.getName());
-      } catch (IOException | InvalidKeySpecException ex) {
+      } catch (CodecException | InvalidKeySpecException ex) {
         LogUtil.error(LOG, ex, "could not load CtLog public key " + m.getName());
       }
     }

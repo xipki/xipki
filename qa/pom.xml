@@ -4,9 +4,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.pki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>qa</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>certprofile</artifactId>
+      <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -25,9 +25,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.xipki.pkix</groupId>
+      <artifactId>pkix</artifactId>
+      <version>${xipkix.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

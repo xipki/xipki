@@ -5,18 +5,18 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
+import org.xipki.codec.util.Args;
 import org.xipki.pkcs11.wrapper.TokenException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotId;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.pkcs11.P11Module;
+import org.xipki.pkix.pkcs11.P11Slot;
+import org.xipki.pkix.pkcs11.P11SlotId;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -134,7 +134,7 @@ class SignerManager {
     Args.notNull(entry, "entry");
     try {
       entry.initSigner(manager.securityFactory);
-    } catch (ObjectCreationException ex) {
+    } catch (GenerationException ex) {
       final String message = "error createSigner";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());

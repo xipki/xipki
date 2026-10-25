@@ -4,9 +4,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.pki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>gateway</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
@@ -24,9 +24,27 @@
     </dependency>
     <!-- For all components -->
     <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-be-jdk</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- crypto-be-jdk: ML-DSA with context string, and the expanded ML-DSA / ML-KEM private keys
+               from the seed, use the internals of the JDK -->
+          <argLine>--add-exports java.base/sun.security.provider=ALL-UNNAMED --add-exports java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

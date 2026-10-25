@@ -1,0 +1,90 @@
+// Copyright (c) 2013-2026 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.util.misc;
+
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.util.misc.StringUtil;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+/**
+ * Date Util.
+ *
+ * @author Lijun Liao (xipki)
+ */
+public class DateUtil {
+
+  private static final ZoneId ZONE_UTC = ZoneId.of("UTC");
+
+  private static final DateTimeFormatter SDF1 = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
+  private DateUtil() {
+  }
+
+  public static Instant parseRFC3339Timestamp(String timestamp) throws DateTimeParseException {
+    return CborDecoder.parseRFC3339Timestamp(timestamp);
+  }
+
+  public static Instant parseUtcTimeyyyyMMddhhmmss(String utcTime) throws CodecException {
+    String coreUtcTime = utcTime;
+    if (StringUtil.isNotBlank(utcTime)) {
+      char ch = utcTime.charAt(utcTime.length() - 1);
+      if (ch == 'z' || ch == 'Z') {
+        coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+      }
+    }
+
+    if (coreUtcTime == null || coreUtcTime.length() != 14) {
+      throw new IllegalArgumentException("invalid utcTime '" + utcTime + "'");
+    }
+
+    try {
+      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime, SDF1);
+      return localDate.atZone(ZONE_UTC).toInstant();
+    } catch (DateTimeParseException ex) {
+      throw new CodecException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
+    }
+  } // method parseUtcTimeyyyyMMddhhmmss
+
+  public static Instant parseUtcTimeyyyyMMdd(String utcTime) throws CodecException {
+    String coreUtcTime = utcTime;
+    if (StringUtil.isNotBlank(utcTime)) {
+      char ch = utcTime.charAt(utcTime.length() - 1);
+      if (ch == 'z' || ch == 'Z') {
+        coreUtcTime = utcTime.substring(0, utcTime.length() - 1);
+      }
+    }
+
+    if (coreUtcTime == null || coreUtcTime.length() != 8) {
+      throw new CodecException("invalid utcTime '" + utcTime + "'");
+    }
+
+    try {
+      LocalDateTime localDate = LocalDateTime.parse(coreUtcTime + "000000", SDF1);
+      return localDate.atZone(ZONE_UTC).toInstant();
+    } catch (DateTimeParseException ex) {
+      throw new CodecException("invalid utcTime '" + utcTime + "': " + ex.getMessage());
+    }
+  } // method parseUtcTimeyyyyMMdd
+
+  public static String toUtcTimeyyyyMMddhhmmss(Instant time) {
+    return SDF1.format(time.atZone(ZONE_UTC));
+  }
+
+  public static Instant getLastMsOfDay(ZonedDateTime cal) {
+    return ZonedDateTime.of(cal.getYear(), cal.getMonthValue(), cal.getDayOfMonth(),
+        23, 59, 59, 999, cal.getZone()).toInstant();
+  }
+
+  public static int getYyyyMMdd(ZonedDateTime cal) {
+    return cal.getYear() * 10000 + cal.getMonthValue() * 100 + cal.getDayOfMonth();
+  }
+
+}

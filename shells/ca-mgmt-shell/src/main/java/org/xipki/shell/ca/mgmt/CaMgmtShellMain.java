@@ -4,7 +4,7 @@
 package org.xipki.shell.ca.mgmt;
 
 import org.xipki.shell.PicocliShell;
-import org.xipki.shell.ShellBaseCommand;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 
 /**
@@ -103,7 +103,7 @@ public class CaMgmtShellMain {
   /**
    * Root command for the CA management shell.
    */
-  public static class RootCommand extends ShellBaseCommand {
+  public static class RootCommand extends XiShellBaseCommand {
 
     @Override
     public void run() {

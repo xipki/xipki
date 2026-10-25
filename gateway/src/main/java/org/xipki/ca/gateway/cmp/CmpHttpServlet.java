@@ -3,27 +3,27 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.cmp.PKIMessage;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.HttpRespAuditException;
 import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.TlsHelper;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditService;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.audit.Audits;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditService;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.audit.Audits;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class CmpHttpServlet {
       requestBytes = IoUtil.readAllBytes(req.getInputStream());
       PKIMessage pkiReq;
       try {
-        pkiReq = PKIMessage.getInstance(requestBytes);
+        pkiReq = PKIMessage.fromEncoded(requestBytes);
       } catch (Exception ex) {
         LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
         throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,

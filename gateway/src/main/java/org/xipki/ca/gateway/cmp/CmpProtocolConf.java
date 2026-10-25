@@ -5,11 +5,11 @@ package org.xipki.ca.gateway.cmp;
 
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.SdkClientConf;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.exception.InvalidConfException;
 
 import java.nio.file.Paths;
 import java.util.List;
@@ -106,6 +106,8 @@ public class CmpProtocolConf extends GatewayConf.ProtocolConf {
     private String responsePbmOwf;
 
     private Integer responsePbmIterationCount;
+
+    private Integer requestPbmMaxIterationCount;
 
     public Boolean confirmCert() {
       return confirmCert;
@@ -211,6 +213,14 @@ public class CmpProtocolConf extends GatewayConf.ProtocolConf {
       this.responsePbmIterationCount = responsePbmIterationCount;
     }
 
+    public Integer requestPbmMaxIterationCount() {
+      return requestPbmMaxIterationCount;
+    }
+
+    public void setRequestPbmMaxIterationCount(Integer requestPbmMaxIterationCount) {
+      this.requestPbmMaxIterationCount = requestPbmMaxIterationCount;
+    }
+
     public static CmpControlConf parse(JsonMap json) throws CodecException {
       CmpControlConf ret = new CmpControlConf();
       ret.setConfirmCert(json.getBool("confirmCert"));
@@ -226,6 +236,7 @@ public class CmpProtocolConf extends GatewayConf.ProtocolConf {
       ret.setResponsePbmMac(json.getString("responsePbmMac"));
       ret.setResponsePbmOwf(json.getString("responsePbmOwf"));
       ret.setResponsePbmIterationCount(json.getInt("responsePbmIterationCount"));
+      ret.setRequestPbmMaxIterationCount(json.getInt("requestPbmMaxIterationCount"));
       return ret;
     }
 

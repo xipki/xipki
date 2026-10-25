@@ -3,14 +3,16 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Null;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Util;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.*;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.PublicCaInfo;
@@ -19,20 +21,19 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ctrl.*;
-import org.xipki.security.KeySpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.BadCertTemplateException;
-import org.xipki.security.pkix.KeyUsage;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.pkix.cert.KeyUsage;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.conf.Validity;
 
-import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,7 +125,7 @@ public class IdentifiedCertprofile {
   }
 
   public SubjectInfo getSubject(X500Name requestedSubject)
-      throws CertprofileException, BadCertTemplateException {
+      throws BadCertTemplateException {
     return CertprofileUtil.getSubject(certprofile, requestedSubject);
   }
 
@@ -157,21 +158,22 @@ public class IdentifiedCertprofile {
   public ExtensionValues getExtensions(
       X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
       SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
-      Instant notBefore, Instant notAfter) throws CertprofileException, BadCertTemplateException {
+      Instant notBefore, Instant notAfter)
+      throws CertprofileException, BadCertTemplateException {
     Args.notNull(publicKeyInfo, "publicKeyInfo");
     ExtensionValues values = new ExtensionValues();
 
     ExtensionsControl controls = certprofile.extensionsControl();
-    List<ASN1ObjectIdentifier> types = new ArrayList<>(controls.types());
+    List<Asn1Oid> types = new ArrayList<>(controls.types());
 
     // CTLog extension will be processed by the CA
-    types.remove(OIDs.Extn.id_SignedCertificateTimestampList);
+    types.remove(ExtensionOIDs.id_SignedCertificateTimestampList);
 
-    Map<ASN1ObjectIdentifier, Extension> requestedExtns = new HashMap<>();
+    Map<Asn1Oid, Extension> requestedExtns = new HashMap<>();
     // remove the request extensions which are not permitted in the request
     if (requestedExtensions != null) {
-      ASN1ObjectIdentifier[] oids = requestedExtensions.getExtensionOIDs();
-      for (ASN1ObjectIdentifier m : oids) {
+      Set<Asn1Oid> oids = requestedExtensions.getExtensionIds();
+      for (Asn1Oid m : oids) {
         ExtensionControl control = controls.getControl(m);
         if (control == null) {
           log.warn("ignore extension {}, it is defined in the profile", m.getId());
@@ -207,7 +209,13 @@ public class IdentifiedCertprofile {
     addExtnBasicConstraints(values, types, controls, requestedExtns);
 
     // KeyUsage
-    KeySpec publicKeySpec = KeySpec.ofPublicKey(publicKeyInfo);
+    KeySpec publicKeySpec;
+    try {
+      publicKeySpec = KeySpec.ofPublicKey(publicKeyInfo);
+    } catch (CodecException e) {
+      throw new BadCertTemplateException("could not parsing SubjectPublicKeyInfo", e);
+    }
+
     if (publicKeySpec == null) {
       throw new BadCertTemplateException("Unknown public key spec");
     }
@@ -228,13 +236,18 @@ public class IdentifiedCertprofile {
     ExtensionValues subvalues = certprofile.getExtensions(types,
         requestedSubject, grantedSubject, requestedExtns, notBefore, notAfter, publicCaInfo);
 
-    for (ASN1ObjectIdentifier type : new ArrayList<>(types)) {
+    for (Asn1Oid type : new ArrayList<>(types)) {
       ExtensionControl extControl = controls.getControl(type);
       ExtensionValue value = subvalues.getExtensionValue(type);
       if (value == null && extControl.isPermittedInRequest()) {
         Extension reqExt = requestedExtns.get(type);
         if (reqExt != null) {
-          value = new ExtensionValue(extControl.isCritical(), reqExt);
+          try {
+            value = new ExtensionValue(extControl.isCritical(),
+                Asn1Util.readAsn1Object(reqExt.extnValue()));
+          } catch (CodecException e) {
+            throw new BadCertTemplateException("could not parse requested extension " + type, e);
+          }
         }
       }
 
@@ -244,8 +257,8 @@ public class IdentifiedCertprofile {
       }
     }
 
-    Set<ASN1ObjectIdentifier> unprocessedExtTypes = new HashSet<>();
-    for (ASN1ObjectIdentifier type : types) {
+    Set<Asn1Oid> unprocessedExtTypes = new HashSet<>();
+    for (Asn1Oid type : types) {
       if (controls.getControl(type).isRequired()) {
         unprocessedExtTypes.add(type);
       }
@@ -265,9 +278,9 @@ public class IdentifiedCertprofile {
   } // method getExtensions
 
   private void addExtnSubjectKeyIdentifier(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
       SubjectPublicKeyInfo publicKeyInfo) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.subjectKeyIdentifier;
+    Asn1Oid extType = ExtensionOIDs.subjectKeyIdentifier;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -279,14 +292,14 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnAuthorityKeyIdentifier(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
       PublicCaInfo publicCaInfo) throws CertprofileException {
     byte[] ikiValue = publicCaInfo.subjectKeyIdentifier();
     if (ikiValue == null) {
       return;
     }
 
-    ASN1ObjectIdentifier extType = OIDs.Extn.authorityKeyIdentifier;
+    Asn1Oid extType = ExtensionOIDs.authorityKeyIdentifier;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -297,9 +310,9 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnIssuerAltName(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionValues values, List<Asn1Oid> types,
       ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.issuerAlternativeName;
+    Asn1Oid extType = ExtensionOIDs.issuerAlternativeName;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -311,9 +324,9 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnAuthorityInfoAccess(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionValues values, List<Asn1Oid> types,
       ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.authorityInfoAccess;
+    Asn1Oid extType = ExtensionOIDs.authorityInfoAccess;
     ExtensionControl extControl = controls.getControl(extType);
     CaUris caUris = publicCaInfo.caUris();
 
@@ -336,17 +349,17 @@ public class IdentifiedCertprofile {
 
     boolean noUri = CollectionUtil.isEmpty(caIssuers) && CollectionUtil.isEmpty(ocspUris);
 
-    AuthorityInformationAccess value = noUri ? null
+    AuthorityInfoAccessSyntax value = noUri ? null
         : CaUtil.createAuthorityInformationAccess(caIssuers, ocspUris);
 
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnCRLDistributionPoints(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionValues values, List<Asn1Oid> types,
       ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
     // CRLDistributionPoints
-    ASN1ObjectIdentifier extType = OIDs.Extn.cRLDistributionPoints;
+    Asn1Oid extType = ExtensionOIDs.cRLDistributionPoints;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -359,16 +372,16 @@ public class IdentifiedCertprofile {
 
     List<String> uris = publicCaInfo.caUris().crlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
-    CRLDistPoint value = noUri ? null
+    CRLDistributionPoints value = noUri ? null
         : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
 
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnFreshestCRL(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
+      ExtensionValues values, List<Asn1Oid> types,
       ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.freshestCRL;
+    Asn1Oid extType = ExtensionOIDs.freshestCRL;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -382,15 +395,15 @@ public class IdentifiedCertprofile {
 
     List<String> uris = publicCaInfo.caUris().deltaCrlUris();
     boolean noUri = CollectionUtil.isEmpty(uris);
-    CRLDistPoint value = noUri ? null
+    CRLDistributionPoints value = noUri ? null
         : CaUtil.createCrlDistributionPoints(uris, x500CaPrincipal, crlSignerSubject);
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnBasicConstraints(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.basicConstraints;
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
+      Map<Asn1Oid, Extension> requestedExtns) throws CertprofileException {
+    Asn1Oid extType = ExtensionOIDs.basicConstraints;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -411,10 +424,9 @@ public class IdentifiedCertprofile {
     Extension requestedExtn = requestedExtns.get(extType);
 
     if (requestedExtn != null) {
-      BasicConstraints requested = BasicConstraints.getInstance(requestedExtn.getParsedValue());
+      BasicConstraints requested = requestedExtn.getBasicConstraints();
       boolean requestedIsCa = requested.isCA();
-      BigInteger bn = requested.getPathLenConstraint();
-      Integer requestedPathLen = (bn == null) ? null : bn.intValueExact();
+      Integer requestedPathLen = requested.pathLenConstraint();
 
       if (!requestedIsCa) {
         throw new CertprofileException(
@@ -435,10 +447,10 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnKeyUsage(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns, KeySpec keySpec)
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
+      Map<Asn1Oid, Extension> requestedExtns, KeySpec keySpec)
       throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.keyUsage;
+    Asn1Oid extType = ExtensionOIDs.keyUsage;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -550,16 +562,16 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnExtendedKeyUsage(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtns) throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.extendedKeyUsage;
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
+      Map<Asn1Oid, Extension> requestedExtns) throws CertprofileException {
+    Asn1Oid extType = ExtensionOIDs.extendedKeyUsage;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
     }
 
     types.remove(extType);
-    List<ASN1ObjectIdentifier> usages = new LinkedList<>();
+    List<Asn1Oid> usages = new LinkedList<>();
     Set<ExtKeyUsageControl> usageOccs = certprofile.extendedKeyUsages();
     for (ExtKeyUsageControl k : usageOccs) {
       if (k.isRequired()) {
@@ -570,12 +582,12 @@ public class IdentifiedCertprofile {
     // the optional ExtKeyUsage will only be set if requested explicitly
     CertprofileUtil.addRequestedExtKeyusage(usages, requestedExtns, usageOccs);
 
-    if (extControl.isCritical() && usages.contains(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
+    if (extControl.isCritical() && usages.contains(KeyPurposeOIDs.anyExtendedKeyUsage)) {
       extControl = new ExtensionControl(extControl.type(), false,
           extControl.isRequired(), extControl.inRequest());
     }
 
-    if (!extControl.isCritical() && usages.contains(OIDs.XKU.id_kp_timeStamping)) {
+    if (!extControl.isCritical() && usages.contains(KeyPurposeOIDs.id_kp_timeStamping)) {
       extControl = new ExtensionControl(extControl.type(), true,
           extControl.isRequired(), extControl.inRequest());
     }
@@ -584,9 +596,9 @@ public class IdentifiedCertprofile {
   }
 
   private void addExtnPkixOcspNoCheck(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls)
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls)
       throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.id_pkix_ocsp_nocheck;
+    Asn1Oid extType = ExtensionOIDs.id_pkix_ocsp_nocheck;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -594,29 +606,29 @@ public class IdentifiedCertprofile {
 
     types.remove(extType);
     // the extension ocsp-nocheck will only be set if requested explicitly
-    CertprofileUtil.addExtension(values, extType, extControl, DERNull.INSTANCE);
+    CertprofileUtil.addExtension(values, extType, extControl, Asn1Null.INSTANCE);
   }
 
   private void addExtnSubjectInfoAccess(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types,
-      ExtensionsControl controls, Map<ASN1ObjectIdentifier, Extension> requestedExtns)
+      ExtensionValues values, List<Asn1Oid> types,
+      ExtensionsControl controls, Map<Asn1Oid, Extension> requestedExtns)
       throws BadCertTemplateException, CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.subjectInfoAccess;
+    Asn1Oid extType = ExtensionOIDs.subjectInfoAccess;
     types.remove(extType);
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
     }
 
-    ASN1Sequence value = CertprofileUtil.createSubjectInfoAccess(
+    SubjectInfoAccessSyntax value = CertprofileUtil.createSubjectInfoAccess(
         requestedExtns, certprofile.subjectInfoAccessModes());
     CertprofileUtil.addExtension(values, extType, extControl, value);
   }
 
   private void addExtnCertificatePolicies(
-      ExtensionValues values, List<ASN1ObjectIdentifier> types, ExtensionsControl controls)
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls)
       throws CertprofileException {
-    ASN1ObjectIdentifier extType = OIDs.Extn.certificatePolicies;
+    Asn1Oid extType = ExtensionOIDs.certificatePolicies;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
       return;
@@ -633,18 +645,24 @@ public class IdentifiedCertprofile {
     String commonName = X509Util.getCommonName(subject);
     boolean commonNameInSan = commonName == null;
 
-    ExtensionValue extValue = values.getExtensionValue(OIDs.Extn.subjectAlternativeName);
+    ExtensionValue extValue = values.getExtensionValue(ExtensionOIDs.subjectAlternativeName);
 
     // No private IP address is permitted
-    GeneralName[] x509Names = GeneralNames.getInstance(extValue.value()).getNames();
+    GeneralNames x509Names;
+    try {
+      x509Names = GeneralNames.fromAsn1(extValue.value().asSequence());
+    } catch (CodecException e) {
+      throw new BadCertTemplateException(
+          "could not parsing extension value of subjectAlternativeName", e);
+    }
 
     for (GeneralName m : x509Names) {
       String domain = null;
       byte[] ipAddress = null;
-      if (GeneralName.dNSName == m.getTagNo()) {
-        domain = Asn1Util.getIA5String(m.getName());
-      } else if (GeneralName.iPAddress == m.getTagNo()) {
-        ipAddress = Asn1Util.getOctetStringOctets(m.getName());
+      if (GeneralName.tag_dNSName == m.getTagNo()) {
+        domain = m.getDNSName().getString();
+      } else if (GeneralName.tag_iPAddress == m.getTagNo()) {
+        ipAddress = m.getIPAddress().getOctets();
       }
 
       if (domain != null) {
@@ -717,7 +735,7 @@ public class IdentifiedCertprofile {
             }
           }
         } else {
-          throw new BadCertTemplateException("invalid IP address " + Hex.toHexString(ipAddress));
+          throw new BadCertTemplateException("invalid IP address " + Hex.encode(ipAddress));
         }
       }
     }

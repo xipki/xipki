@@ -63,13 +63,11 @@ backup_common_tomcat_files() {
   move_matches "$BACKUP_DIR/bin" \
     "$TOMCAT_DIR"/bin/setenv.*
 
+# TODO: check it: are the pkcs11 and util jar now in the tomcat's lib?
   move_matches "$BACKUP_DIR/lib" \
-    "$TOMCAT_DIR"/lib/password-*.jar \
-    "$TOMCAT_DIR"/lib/passwords-*.jar \
-    "$TOMCAT_DIR"/lib/xipki-tomcat-password-*.jar \
-    "$TOMCAT_DIR"/lib/*pkcs11*.jar \
-    "$TOMCAT_DIR"/lib/bc*-jdk*.jar \
-    "$TOMCAT_DIR"/lib/bc*-lts*.jar \
+    "$TOMCAT_DIR"/lib/org.xipki.crypto.password-*.jar \
+    "$TOMCAT_DIR"/lib/org.xipki.crypto.pkcs11-*.jar \
+    "$TOMCAT_DIR"/lib/bc*.jar \
     "$TOMCAT_DIR"/lib/h2-*.jar \
     "$TOMCAT_DIR"/lib/mariadb-java-*.jar
 }

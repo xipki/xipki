@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.security.pkix.KeyUsage;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.KeyUsage;
 
 /**
  * Key Single Usage.

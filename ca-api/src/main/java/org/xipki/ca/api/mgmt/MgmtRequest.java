@@ -11,11 +11,11 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -108,6 +108,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       return caEntry;
     }
 
+    @Override
     public JsonMap toCodec() {
       JsonMap ret = new JsonMap();
       ret.put("caEntry", caEntry.toCodec());
@@ -565,6 +566,7 @@ public abstract class MgmtRequest extends MgmtMessage {
       return notAfter;
     }
 
+    @Override
     protected void toJson(JsonMap json) {
       super.toJson(json);
       json.put("profileName", profileName);
@@ -942,14 +944,14 @@ public abstract class MgmtRequest extends MgmtMessage {
    */
   public static class GetCrl extends CaNameRequest {
 
-    private final BigInteger crlNumber;
+    private final Long crlNumber;
 
-    public GetCrl(String caName, BigInteger crlNumber) {
+    public GetCrl(String caName, Long crlNumber) {
       super(caName);
       this.crlNumber = crlNumber;
     }
 
-    public BigInteger crlNumber() {
+    public Long crlNumber() {
       return crlNumber;
     }
 
@@ -962,7 +964,7 @@ public abstract class MgmtRequest extends MgmtMessage {
     }
 
     public static GetCrl parse(JsonMap json) throws CodecException {
-      return new GetCrl(json.getNnString("caName"), json.getBigInteger("crlNumber"));
+      return new GetCrl(json.getNnString("caName"), json.getLong("crlNumber"));
     }
 
   } // class GetCrl

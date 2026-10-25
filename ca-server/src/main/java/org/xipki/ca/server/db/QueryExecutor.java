@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server.db;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
 

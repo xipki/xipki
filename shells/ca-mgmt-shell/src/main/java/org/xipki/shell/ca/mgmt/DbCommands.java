@@ -6,18 +6,18 @@ package org.xipki.shell.ca.mgmt;
 import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.diffdb.DigestDiffWorker;
 import org.xipki.ca.mgmt.db.port.DbPortWorker;
-import org.xipki.security.util.X509Util;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.conf.ConfigurableProperties;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.misc.ConfigurableProperties;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.util.datasource.ScriptRunner;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.password.PasswordResolverException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DbCommands {
 
-  abstract static class DbCommand extends ShellBaseCommand {
+  abstract static class DbCommand extends XiShellBaseCommand {
 
     protected final DataSourceFactory datasourceFactory = new DataSourceFactory();
 
@@ -157,7 +157,7 @@ public class DbCommands {
   }
 
   @Command(name = "sql", description = "run SQL script", mixinStandardHelpOptions = true)
-  static class SqlCommand extends ShellBaseCommand {
+  static class SqlCommand extends XiShellBaseCommand {
 
     @Option(names = "--db-conf", required = true, description = "database configuration file")
     @Completion(FilePathCompleter.class)

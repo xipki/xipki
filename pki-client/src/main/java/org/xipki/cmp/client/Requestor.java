@@ -3,14 +3,13 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.cmp.PBMParameter;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.util.codec.Args;
+import org.xipki.pkix.asn1.cmp.PBMParameter;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.sign.ConcurrentSigner;
 
 import java.security.SecureRandom;
 
@@ -21,12 +20,12 @@ import java.security.SecureRandom;
  */
 public abstract class Requestor {
 
-  private static final X500Name NULL_GENERALNAME = new X500Name(new RDN[0]);
+  private static final X500Name NULL_GENERALNAME = new X500Name();
 
   private final GeneralName name;
 
   private Requestor(X500Name name) {
-    this.name = new GeneralName(Args.notNull(name, "name"));
+    this.name = GeneralName.ofDirectoryName(Args.notNull(name, "name"));
   }
 
   public GeneralName name() {

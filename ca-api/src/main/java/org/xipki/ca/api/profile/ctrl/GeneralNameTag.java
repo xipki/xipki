@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.util.Locale;
 

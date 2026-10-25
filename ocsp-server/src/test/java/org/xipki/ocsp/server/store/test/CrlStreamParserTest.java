@@ -3,21 +3,25 @@
 
 package org.xipki.ocsp.server.store.test;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.asn1.Asn1Sequence;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.server.store.CrlStreamParser;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCertsIterator;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.pkix.util.X509Util;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.cert.CertificateEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CRL Stream Parser test.
@@ -28,17 +32,45 @@ public class CrlStreamParserTest {
 
   private static final String baseDir = "src/test/resources/crls/";
 
-  @BeforeClass
-  public static void init() {
-    KeyUtil.addProviders();
-  }
-
   private static Certificate getIssuerSigner() throws CertificateEncodingException, IOException {
     return parseCert(baseDir + "ca.crt");
   }
 
-  private static CrlStreamParser getParser(String crlFile) throws IOException {
+  private static CrlStreamParser getParser(String crlFile) throws IOException, CodecException {
     return new CrlStreamParser(new File(baseDir + crlFile));
+  }
+
+  @Test
+  public void parseCrlWithoutNextUpdate() throws Exception {
+    // remove the nextUpdate from a CRL without revoked certificates but with extensions:
+    // the crlExtensions follow directly the thisUpdate.
+    Asn1Sequence crl = Asn1Sequence.fromEncoded(
+        Files.readAllBytes(Paths.get(baseDir + "no-revoked-certs.crl")));
+    Asn1Sequence tbs = crl.getSequenceAt(0);
+    // version, signature, issuer, thisUpdate, nextUpdate, crlExtensions
+    Assert.assertEquals("tbsCertList.size", 6, tbs.size());
+
+    List<Asn1Primitive> tbsFields = new ArrayList<>(5);
+    for (int i = 0; i < tbs.size(); i++) {
+      if (i != 4) {
+        tbsFields.add(tbs.getObjectAt(i));
+      }
+    }
+
+    Asn1Sequence newCrl = new Asn1Sequence(
+        new Asn1Sequence(tbsFields), crl.getObjectAt(1), crl.getObjectAt(2));
+    Path crlFile = Files.createTempFile("crl-", ".crl");
+    try {
+      Files.write(crlFile, newCrl.getEncoded());
+      CrlStreamParser parser = new CrlStreamParser(crlFile.toFile());
+      Assert.assertNull("nextUpdate", parser.nextUpdate());
+      Assert.assertEquals("CRL number", BigInteger.valueOf(1), parser.crlNumber());
+      try (RevokedCertsIterator it = parser.revokedCertificates()) {
+        Assert.assertFalse("has revoked certificates", it.hasNext());
+      }
+    } finally {
+      Files.deleteIfExists(crlFile);
+    }
   }
 
   @Test
@@ -159,9 +191,9 @@ public class CrlStreamParserTest {
   private static Certificate parseCert(String fileName)
       throws IOException, CertificateEncodingException {
     try {
-      return Certificate.getInstance(
+      return Certificate.fromEncoded(
           X509Util.toDerEncoded(Files.readAllBytes(Paths.get(fileName))));
-    } catch (RuntimeException ex) {
+    } catch (CodecException ex) {
       throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage());
     }
   }

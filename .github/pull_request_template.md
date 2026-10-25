@@ -12,7 +12,7 @@ Describe what changed and why.
 
 - [ ] `gateway` touched
 - [ ] `ca-server` touched
-- [ ] `security` touched
+- [ ] `pkix` touched
 - [ ] None of the above
 
 ## Validation

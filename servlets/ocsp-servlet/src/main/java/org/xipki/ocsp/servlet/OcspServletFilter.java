@@ -6,7 +6,7 @@ package org.xipki.ocsp.servlet;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ocsp.server.servlet.OcspHttpFilter;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpFilter;
 
 /**
  * OCSP Servlet Filter.

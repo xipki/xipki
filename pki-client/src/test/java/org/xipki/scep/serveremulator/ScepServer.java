@@ -3,14 +3,15 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.util.Args;
 import org.xipki.scep.client.test.MyUtil;
-import org.xipki.security.KeySpec;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.scep.message.CaCaps;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.scep.message.CaCaps;
+import org.xipki.pkix.util.KeyUtil;
 
 import java.math.BigInteger;
 import java.security.KeyPair;
@@ -41,11 +42,15 @@ public class ScepServer {
 
   private Long maxSigningTimeBiasInMs;
 
+  private boolean separateRaKeys;
+
   private ScepServlet servlet;
 
   private X509Cert caCert;
 
   private X509Cert raCert;
+
+  private X509Cert raEncCert;
 
   private X509Cert nextCaCert;
 
@@ -69,12 +74,18 @@ public class ScepServer {
     this.maxSigningTimeBiasInMs = ms;
   }
 
+  /**
+   * Use separate RA keys for signature and encryption.
+   * @param separateRaKeys whether to use separate RA keys.
+   */
+  public void setSeparateRaKeys(boolean separateRaKeys) {
+    this.separateRaKeys = separateRaKeys;
+  }
+
   public ScepServlet getServlet() throws Exception {
     if (servlet != null) {
       return servlet;
     }
-
-    KeyUtil.addProviders();
 
     SecureRandom rnd = KeyUtil.random();
     X500Name rcaSubject;
@@ -96,8 +107,23 @@ public class ScepServer {
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
       subject = new X500Name("CN=RA1, OU=emulator, O=myorg.org, C=DE");
-      this.raCert = ca.generateCert(pkInfo, subject);
-      ra = new RaEmulator(keypair.getPrivate(), this.raCert);
+      if (separateRaKeys) {
+        Instant notBefore = Instant.now().minus(10, ChronoUnit.MINUTES);
+        this.raCert = ca.generateCert(pkInfo, subject, notBefore,
+            new KeyUsage(KeyUsage.digitalSignature));
+
+        KeyPair encKeypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+        this.raEncCert = ca.generateCert(
+            MyUtil.createSubjectPublicKeyInfo(encKeypair.getPublic()),
+            new X500Name("CN=RA1-ENC, OU=emulator, O=myorg.org, C=DE"), notBefore,
+            new KeyUsage(KeyUsage.keyEncipherment));
+        ra = new RaEmulator(keypair.getPrivate(), this.raCert,
+            encKeypair.getPrivate(), this.raEncCert);
+      } else {
+        this.raCert = ca.generateCert(pkInfo, subject);
+        this.raEncCert = this.raCert;
+        ra = new RaEmulator(keypair.getPrivate(), this.raCert);
+      }
     }
 
     NextCaAndRa nextCaAndRa = null;
@@ -141,6 +167,10 @@ public class ScepServer {
 
   public X509Cert raCert() {
     return raCert;
+  }
+
+  public X509Cert raEncCert() {
+    return raEncCert;
   }
 
   public X509Cert nextCaCert() {

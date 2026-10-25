@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -12,11 +12,11 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -689,12 +689,12 @@ public interface CaManager {
    * @param caName
    *          CA name. Must not be {@code null}.
    * @param crlNumber
-   *          CRL number. Must not be {@code null}.
+   *          CRL number.
    * @return the CRL.
    * @throws CaMgmtException
    *          if error occurs.
    */
-  X509Crl getCrl(String caName, BigInteger crlNumber) throws CaMgmtException;
+  X509Crl getCrl(String caName, long crlNumber) throws CaMgmtException;
 
   /**
    * Returns the latest CRL of CA {@code caName}.

@@ -3,10 +3,7 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x500.X500Name;
-
-import java.io.IOException;
+import org.xipki.pkix.asn1.x500.X500Name;
 
 /**
  * Responder ID.
@@ -19,13 +16,13 @@ public class ResponderID extends ASN1Type {
 
   private final int encodedLength;
 
-  public ResponderID(byte[] key) throws IOException {
-    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(new DEROctetString(key)).getEncoded();
+  public ResponderID(byte[] key) {
+    this.encoded = org.xipki.pkix.asn1.ocsp.ResponderID.ofByKey(key).getEncoded();
     this.encodedLength = encoded.length;
   }
 
-  public ResponderID(X500Name name) throws IOException {
-    this.encoded = new org.bouncycastle.asn1.ocsp.ResponderID(name).getEncoded();
+  public ResponderID(X500Name name) {
+    this.encoded = org.xipki.pkix.asn1.ocsp.ResponderID.ofByName(name).getEncoded();
     this.encodedLength = encoded.length;
   }
 

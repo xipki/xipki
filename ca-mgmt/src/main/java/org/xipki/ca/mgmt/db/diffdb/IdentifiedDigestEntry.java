@@ -3,7 +3,7 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * DigestEntry with the id and caId in database.

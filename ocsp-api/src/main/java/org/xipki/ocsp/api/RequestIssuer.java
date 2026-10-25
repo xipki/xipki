@@ -3,10 +3,11 @@
 
 package org.xipki.ocsp.api;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.security.HashAlgo;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -77,7 +78,11 @@ public class RequestIssuer {
     } else {
       final int start = from + 2;
       byte[] bytes = Arrays.copyOfRange(data, start, start + 2 + (0xFF & data[from + 3]));
-      return ASN1ObjectIdentifier.getInstance(bytes).getId();
+      try {
+        return Asn1Oid.fromEncoded(bytes).getId();
+      } catch (CodecException e) {
+        throw new RuntimeException(e);
+      }
     }
   }
 

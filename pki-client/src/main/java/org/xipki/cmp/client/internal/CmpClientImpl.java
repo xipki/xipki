@@ -3,31 +3,32 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.cmp.PKIFailureInfo;
-import org.bouncycastle.asn1.cmp.PKIStatus;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CRLHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.cmp.CMPCertificate;
+import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
+import org.xipki.pkix.asn1.cmp.PKIStatus;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
 import org.xipki.cmp.client.*;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.encap.KemEncapKey;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.security.verify.CollectionAlgorithmValidator;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.ReqRespDebug;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.codec.util.IoUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -141,7 +142,7 @@ public final class CmpClientImpl implements CmpClient {
       }
 
       signatureResponder = new Responder.SignatureCmpResponder(
-          cert, new CollectionAlgorithmValidator(algos));
+          cert, new AlgorithmValidator(algos));
     }
 
     Responder pbmMacResponder = null;
@@ -259,7 +260,7 @@ public final class CmpClientImpl implements CmpClient {
     X500Name issuer = requestEntries.get(0).issuer();
     for (int i = 1; i < requestEntries.size(); i++) {
       if (!issuer.equals(requestEntries.get(i).issuer())) {
-        throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+        throw new PkiErrorException(PKIStatus.rejection, PKIFailureInfo.badRequest,
             "revoking certificates issued by more than one CA is not allowed");
       }
     }
@@ -288,12 +289,12 @@ public final class CmpClientImpl implements CmpClient {
   }
 
   @Override
-  public X509CRLHolder downloadCrl(String caName, ReqRespDebug debug)
+  public CertificateList downloadCrl(String caName, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     return agent().downloadCurrentCrl(Args.toNonBlankLower(caName, "caName"), debug);
   }
 
-  private static X509Cert getCertificate(CMPCertificate cmpCert) {
+  private static X509Cert getCertificate(CMPCertificate cmpCert) throws CodecException {
     Certificate bcCert = cmpCert.getX509v3PKCert();
     return (bcCert == null) ? null : new X509Cert(bcCert);
   }
@@ -362,7 +363,7 @@ public final class CmpClientImpl implements CmpClient {
     X500Name issuer = requestEntries.get(0).issuer();
     for (int i = 1; i < requestEntries.size(); i++) {
       if (!issuer.equals(requestEntries.get(i).issuer())) {
-        throw new PkiErrorException(PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+        throw new PkiErrorException(PKIStatus.rejection, PKIFailureInfo.badRequest,
             "unsuspending certificates issued by more than one CA is not allowed");
       }
     }
@@ -377,8 +378,16 @@ public final class CmpClientImpl implements CmpClient {
       EnrollCertResult.CertifiedKeyPairOrError certOrError;
       if (resultEntry instanceof ResultEntry.EnrollCert) {
         ResultEntry.EnrollCert entry = (ResultEntry.EnrollCert) resultEntry;
-        X509Cert cert = getCertificate(entry.getCert());
-        certOrError = new EnrollCertResult.CertifiedKeyPairOrError(cert, entry.getPrivateKeyInfo());
+        try {
+          X509Cert cert = getCertificate(entry.getCert());
+          certOrError = new EnrollCertResult.CertifiedKeyPairOrError(
+                          cert, entry.getPrivateKeyInfo());
+        } catch (CodecException ex) {
+          String message = "Returned certificate is malformed";
+          LOG.warn(message, ex);
+          certOrError = new EnrollCertResult.CertifiedKeyPairOrError(
+              new PkiStatusInfo(CmpAgent.PKISTATUS_RESPONSE_ERROR, null, message));
+        }
       } else if (resultEntry instanceof ResultEntry.Error) {
         certOrError = new EnrollCertResult.CertifiedKeyPairOrError(
             ((ResultEntry.Error) resultEntry).getStatusInfo());
@@ -397,7 +406,12 @@ public final class CmpClientImpl implements CmpClient {
 
     List<X509Cert> caPubs = new ArrayList<>(cmpCaPubs.size());
     for (CMPCertificate cmpCaPub : cmpCaPubs) {
-      caPubs.add(getCertificate(cmpCaPub));
+      try {
+        caPubs.add(getCertificate(cmpCaPub));
+      } catch (CodecException ex) {
+        String message = "Returned CA certificate is malformed, ignore it";
+        LOG.warn(message, ex);
+      }
     }
 
     X509Cert caCert = null;

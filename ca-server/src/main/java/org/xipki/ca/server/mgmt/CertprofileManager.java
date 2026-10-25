@@ -3,9 +3,10 @@
 
 package org.xipki.ca.server.mgmt;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.CertprofileValidator;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
@@ -17,14 +18,13 @@ import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.PublicKeyControl;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.security.KeySpec;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.TripleState;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.ca.api.TripleState;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -238,7 +238,7 @@ class CertprofileManager {
 
     List<String> requiredExtensionsInReq = new LinkedList<>();
     List<String> optionalExtensionsInReq = new LinkedList<>();
-    for (ASN1ObjectIdentifier type : extnControls.types()) {
+    for (Asn1Oid type : extnControls.types()) {
       ExtensionControl extnCtrl = extnControls.getControl(type);
       TripleState inRequest = extnCtrl.inRequest();
       if (inRequest == null || inRequest == TripleState.forbidden) {
@@ -296,7 +296,7 @@ class CertprofileManager {
         LogUtil.warn(LOG, ex, "validating certprofile " + entry.ident().name() + " failed");
       }
       return identifiedCertprofile;
-    } catch (ObjectCreationException | CertprofileException ex) {
+    } catch (GenerationException | CertprofileException ex) {
       String msg = "could not initialize Certprofile " + entry.ident();
       LogUtil.error(LOG, ex, msg);
       throw new CaMgmtException(msg, ex);

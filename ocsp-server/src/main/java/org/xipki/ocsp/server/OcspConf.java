@@ -3,13 +3,13 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.security.Securities.SecurityConf;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.Securities.SecurityConf;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +38,7 @@ public class OcspConf {
   public static OcspConf readConfFromFile(String fileName) throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
-      Path path = Paths.get(IoUtil.expandFilepath(fileName, true));
+      Path path = Paths.get(XipkiIoUtil.expandFilepath(fileName, true));
       return parse(JsonParser.parseMap(path, true));
     } catch (RuntimeException | CodecException e) {
       throw new InvalidConfException("error parsing " + fileName + ": " + e.getMessage(), e);

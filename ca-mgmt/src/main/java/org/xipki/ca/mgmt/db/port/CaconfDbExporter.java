@@ -14,18 +14,19 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -403,15 +404,19 @@ class CaconfDbExporter extends DbPorter {
 
       String KEY_OVERLAP_MINUTES = CrlControl.KEY_OVERLAP_MINUTES;
       String KEY_OVERLAP_DAYS = CrlControl.KEY_OVERLAP_DAYS;
-      if (props.value(KEY_OVERLAP_DAYS) != null) {
-        Validity ov = new Validity(props.integerValue(KEY_OVERLAP_DAYS, 1), Validity.Unit.DAY);
-        props.removePair(KEY_OVERLAP_DAYS);
-        props.putPair(KEY_OVERLAP_DAYS, ov.toString());
-      } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
-        Validity ov = new Validity(props.integerValue(KEY_OVERLAP_MINUTES, 24 * 60),
-              Validity.Unit.MINUTE);
-        props.removePair(KEY_OVERLAP_MINUTES);
-        props.putPair(KEY_OVERLAP_DAYS, ov.toString());
+      try {
+        if (props.value(KEY_OVERLAP_DAYS) != null) {
+          Validity ov = new Validity(props.integerValue(KEY_OVERLAP_DAYS, 1), Validity.Unit.DAY);
+          props.removePair(KEY_OVERLAP_DAYS);
+          props.putPair(KEY_OVERLAP_DAYS, ov.toString());
+        } else if (props.value(KEY_OVERLAP_MINUTES) != null) {
+          Validity ov = new Validity(props.integerValue(KEY_OVERLAP_MINUTES, 24 * 60),
+                Validity.Unit.MINUTE);
+          props.removePair(KEY_OVERLAP_MINUTES);
+          props.putPair(KEY_OVERLAP_DAYS, ov.toString());
+        }
+      } catch (CodecException ex) {
+        throw new InvalidConfException(ex.getMessage(), ex);
       }
 
       ccc.setCrlControl(new CrlControl(props));

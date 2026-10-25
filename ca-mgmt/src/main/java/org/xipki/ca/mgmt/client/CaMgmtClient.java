@@ -3,9 +3,10 @@
 
 package org.xipki.ca.mgmt.client;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
@@ -15,22 +16,22 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.extra.http.SslContextConfWrapper;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.util.http.SslContextConfWrapper;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -85,7 +86,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   public void init(SslContextConfWrapper sslConf, String serverUrl)
-      throws ObjectCreationException, MalformedURLException {
+      throws GenerationException, MalformedURLException {
     this.sslContextConf = sslConf == null ? null : sslConf.toSslContextConf();
     if (this.sslContextConf != null) {
       this.sslContextConf.init();
@@ -159,6 +160,7 @@ public class CaMgmtClient implements CaManager {
     voidTransmit(MgmtAction.changeDbSchema, new MgmtRequest.AddOrChangeDbSchema(name, value));
   }
 
+  @Override
   public void removeDbSchema(String name) throws CaMgmtException {
     removeEntity(MgmtAction.removeDbSchema, name);
   }
@@ -648,7 +650,7 @@ public class CaMgmtClient implements CaManager {
   }
 
   @Override
-  public X509Crl getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509Crl getCrl(String caName, long crlNumber) throws CaMgmtException {
     JsonMap respJson = transmitJson(MgmtAction.getCrl, new MgmtRequest.GetCrl(caName, crlNumber));
     return parseCrl(respJson);
   }
@@ -674,12 +676,7 @@ public class CaMgmtClient implements CaManager {
   @Override
   public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
       throws CaMgmtException {
-    MgmtRequest.GetCert req;
-    try {
-      req = new MgmtRequest.GetCert(issuer.getEncoded(), serialNumber);
-    } catch (IOException ex) {
-      throw new CaMgmtException("could not encode issuer", ex);
-    }
+    MgmtRequest.GetCert req = new MgmtRequest.GetCert(issuer.getEncoded(), serialNumber);
 
     JsonMap respJson = transmitJson(MgmtAction.getCert, req);
     try {
@@ -719,11 +716,7 @@ public class CaMgmtClient implements CaManager {
       Instant validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
     MgmtRequest.ListCertificates req = new MgmtRequest.ListCertificates(caName);
     if (subjectPattern != null) {
-      try {
-        req.setEncodedSubjectDnPattern(subjectPattern.getEncoded());
-      } catch (IOException ex) {
-        throw new CaMgmtException("could not parse subjectPattern", ex);
-      }
+      req.setEncodedSubjectDnPattern(subjectPattern.getEncoded());
     }
 
     req.setValidFrom(validFrom);
@@ -886,7 +879,7 @@ public class CaMgmtClient implements CaManager {
             return null;
           } else {
             inClosed = true;
-            return IoUtil.readAllBytesAndClose(httpUrlConnection.getInputStream());
+            return XipkiIoUtil.readAllBytesAndClose(httpUrlConnection.getInputStream());
           }
         } finally {
           if (in != null & !inClosed) {

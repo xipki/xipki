@@ -3,12 +3,13 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -95,10 +96,16 @@ public class ExtendedExtension extends Extension {
     if (extnType == null) {
       byte[] bytes = new byte[hdrOid.readerIndex - hdrOid.tagIndex + hdrOid.len];
       System.arraycopy(encoded, hdrOid.tagIndex, bytes, 0, bytes.length);
-      ASN1ObjectIdentifier oid = ASN1ObjectIdentifier.getInstance(bytes);
+      Asn1Oid oid;
+      try {
+        oid = Asn1Oid.fromEncoded(bytes);
+      } catch (CodecException e) {
+        throw new EncodingException("could not parse OID: 0x" + Hex.encode(bytes), e);
+      }
+
       LOG.warn("unknown extension {}", oid.getId());
       if (critical) {
-        throw new EncodingException("unkown critical extension: " + oid.getId());
+        throw new EncodingException("unknown critical extension: " + oid.getId());
       } else {
         return null;
       }

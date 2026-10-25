@@ -8,12 +8,12 @@ import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.server.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;

@@ -43,6 +43,7 @@ public class CertID extends ASN1Type {
     return encodedLength;
   }
 
+  @Override
   public int write(byte[] out, int offset) {
     int idx = offset;
     idx += writeHeader((byte) 0x30, bodyLength, out, idx);

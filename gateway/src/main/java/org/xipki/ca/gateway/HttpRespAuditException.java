@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
+import org.xipki.codec.util.Args;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
 
 /**
  * Http Resp Audit Exception type.

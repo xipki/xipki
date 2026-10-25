@@ -2,12 +2,12 @@
 // License Apache License 2.0
 package org.xipki.qa;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.xipki.security.KeySpec;
-import org.xipki.security.pkcs12.KeyPairWithSubjectPublicKeyInfo;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.pkcs12.KeyPairWithSubjectPublicKeyInfo;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.codec.util.IoUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -20,7 +20,6 @@ import java.security.SecureRandom;
 public class GenerateKeyPoolResourcesMain {
 
   public static void main(String[] args) {
-    KeyUtil.addProviders();
     int n = 10;
 
     SecureRandom rnd = new SecureRandom();
@@ -35,7 +34,7 @@ public class GenerateKeyPoolResourcesMain {
           KeyPairWithSubjectPublicKeyInfo kp2 = KeyUtil.generateKeyPair2(keySpec, rnd);
           byte[] encodedSk = kp2.keypair().getPrivate().getEncoded();
           byte[] encodedPk = kp2.subjectPublicKeyInfo().getEncoded();
-          PrivateKeyInfo.getInstance(encodedSk);
+          PrivateKeyInfo.fromEncoded(encodedSk);
           sb.append(Base64.encodeToString(encodedSk)).append(":")
               .append(Base64.encodeToString(encodedPk)).append("\n");
         }

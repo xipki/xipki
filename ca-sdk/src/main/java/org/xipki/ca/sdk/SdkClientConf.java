@@ -3,13 +3,13 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.http.SslConf;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.util.http.SslConf;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.IOException;
 

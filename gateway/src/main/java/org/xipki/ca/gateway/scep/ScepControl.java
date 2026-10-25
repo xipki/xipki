@@ -3,8 +3,8 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
 
 /**
  * SCEP Control settings.

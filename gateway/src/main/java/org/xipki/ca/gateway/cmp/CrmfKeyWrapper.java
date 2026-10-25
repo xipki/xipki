@@ -3,11 +3,13 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.operator.OperatorException;
-import org.xipki.security.OIDs;
-import org.xipki.security.util.CrmfUtil;
+import org.xipki.codec.asn1.OperatorException;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.pkix.cmp.CmpUtil;
 
 import javax.crypto.Cipher;
 import java.security.PublicKey;
@@ -21,6 +23,8 @@ import java.security.interfaces.ECPublicKey;
  */
 abstract class CrmfKeyWrapper {
 
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
+
   abstract AlgorithmIdentifier getAlgorithmIdentifier();
 
   abstract byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException;
@@ -28,7 +32,7 @@ abstract class CrmfKeyWrapper {
   static class RSAOAEPAsymmetricKeyWrapper extends CrmfKeyWrapper {
 
     private static final AlgorithmIdentifier OAEP_DFLT =
-        new AlgorithmIdentifier(OIDs.Algo.id_RSAES_OAEP, new RSAESOAEPparams());
+        AlgorithmIdentifier.build(AlgorithmOIDs.id_RSAES_OAEP, new RSAESOAEPParams());
 
     private final PublicKey publicKey;
 
@@ -44,7 +48,7 @@ abstract class CrmfKeyWrapper {
     @Override
     public byte[] generateWrappedKey(byte[] encryptionKey) throws OperatorException {
       try {
-        Cipher cipher = Cipher.getInstance("RSA/NONE/OAEPPADDING");
+        Cipher cipher = cryptoApi.newCipher("RSA/NONE/OAEPPADDING");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         return cipher.doFinal(encryptionKey);
       } catch (Exception ex) {
@@ -64,7 +68,7 @@ abstract class CrmfKeyWrapper {
 
     public ECIESAsymmetricKeyWrapper(ECPublicKey publicKey, SecureRandom rnd) {
       this.publicKey = publicKey;
-      this.algorithmIdentifier = CrmfUtil.buildCrmfAlgId();
+      this.algorithmIdentifier = CmpUtil.buildCrmfAlgId();
       this.rnd = rnd == null ? new SecureRandom() : rnd;
     }
 
@@ -76,7 +80,7 @@ abstract class CrmfKeyWrapper {
     @Override
     public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
       try {
-        return CrmfUtil.wrapCrmfContentEncryptionKey(keyToWrap, publicKey, rnd);
+        return CmpUtil.wrapCrmfContentEncryptionKey(keyToWrap, publicKey, rnd);
       } catch (Exception ex) {
         throw new OperatorException("error while generateWrappedKey", ex);
       }

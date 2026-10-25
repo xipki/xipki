@@ -5,10 +5,10 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.codec.util.Args;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -60,10 +60,10 @@ public class CertprofileFactoryRegister {
    * @param type
    *          Type of the certificate. Must not be {@code null}.
    * @return new certificate profile.
-   * @throws ObjectCreationException
+   * @throws GenerationException
    *           If certificate profile could not be created.
    */
-  public Certprofile newCertprofile(String type) throws ObjectCreationException {
+  public Certprofile newCertprofile(String type) throws GenerationException {
     Args.notBlank(type, "type");
 
     for (CertprofileFactory service : factories) {
@@ -72,7 +72,7 @@ public class CertprofileFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException(
+    throw new GenerationException(
         "could not find factory to create Certprofile of type '" + type + "'");
   } // method newCertprofile
 

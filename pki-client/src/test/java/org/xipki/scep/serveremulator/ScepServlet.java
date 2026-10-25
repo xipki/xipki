@@ -4,22 +4,20 @@
 package org.xipki.scep.serveremulator;
 
 import com.sun.net.httpserver.HttpExchange;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.scep.message.CaCaps;
-import org.xipki.security.scep.message.NextCaMessage;
-import org.xipki.security.scep.transaction.Operation;
-import org.xipki.security.scep.util.ScepConstants;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.io.IoUtil;
+import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.cms.CmsException;
+import org.xipki.pkix.cms.CmsSignedData;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.scep.message.CaCaps;
+import org.xipki.pkix.scep.message.NextCaMessage;
+import org.xipki.pkix.scep.transaction.Operation;
+import org.xipki.pkix.scep.util.ScepUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -48,7 +46,7 @@ public class ScepServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(ScepServlet.class);
 
-  private static final String CT_RESPONSE = ScepConstants.CT_PKI_MESSAGE;
+  private static final String CT_RESPONSE = ScepUtil.CT_PKI_MESSAGE;
 
   private final SimulatorScepResponder responder;
 
@@ -102,14 +100,14 @@ public class ScepServlet {
 
       String operation = params.get("operation");
       if ("PKIOperation".equalsIgnoreCase(operation)) {
-        CMSSignedData reqMessage;
+        CmsSignedData reqMessage;
         // parse the request
         try {
           byte[] content = post
-              ? IoUtil.readAllBytesAndClose(exchange.getRequestBody())
+              ? XipkiIoUtil.readAllBytesAndClose(exchange.getRequestBody())
               : Base64.decode(params.get("message"));
 
-          reqMessage = new CMSSignedData(content);
+          reqMessage = new CmsSignedData(content);
         } catch (Exception ex) {
           auditMessage = "invalid request";
           sendError(exchange, SC_BAD_REQUEST);
@@ -134,23 +132,26 @@ public class ScepServlet {
       } else if (Operation.GetCACaps.code().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
         byte[] caCapsBytes = responder.caCaps().bytes();
-        sendToResponse(exchange, ScepConstants.CT_TEXT_PLAIN, caCapsBytes);
+        sendToResponse(exchange, ScepUtil.CT_TEXT_PLAIN, caCapsBytes);
       } else if (Operation.GetCACert.code().equalsIgnoreCase(operation)) {
         // CA-Ident is ignored
         byte[] respBytes;
         String ct;
         if (responder.raEmulator() == null) {
-          ct = ScepConstants.CT_X509_CA_CERT;
+          ct = ScepUtil.CT_X509_CA_CERT;
           respBytes = responder.caEmulator().caCertBytes();
         } else {
-          CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+          CmsSignedData.Builder cmsSignedDataGen = new CmsSignedData.Builder();
           try {
-            cmsSignedDataGen.addCertificate(responder.caEmulator().caCert().getCertHolder());
-            ct = ScepConstants.CT_X509_CA_RA_CERT;
-            cmsSignedDataGen.addCertificate(responder.raEmulator().raCert().getCertHolder());
-            CMSSignedData degenerateSignedData = cmsSignedDataGen.generate(new CMSAbsentContent());
+            cmsSignedDataGen.addCertificate(responder.caEmulator().caCert().getCert());
+            ct = ScepUtil.CT_X509_CA_RA_CERT;
+            cmsSignedDataGen.addCertificate(responder.raEmulator().raCert().getCert());
+            if (responder.raEmulator().raEncCert() != responder.raEmulator().raCert()) {
+              cmsSignedDataGen.addCertificate(responder.raEmulator().raEncCert().getCert());
+            }
+            CmsSignedData degenerateSignedData = cmsSignedDataGen.build();
             respBytes = degenerateSignedData.getEncoded();
-          } catch (CMSException ex) {
+          } catch (CmsException ex) {
             auditMessage = "system internal error";
             LOG.error(auditMessage, ex);
             sendError(exchange, SC_INTERNAL_SERVER_ERROR);
@@ -176,7 +177,7 @@ public class ScepServlet {
 
           ContentInfo signedData = responder.encode(nextCaMsg);
           byte[] respBytes = signedData.getEncoded();
-          sendToResponse(exchange, ScepConstants.CT_X509_NEXT_CA_CERT, respBytes);
+          sendToResponse(exchange, ScepUtil.CT_X509_NEXT_CA_CERT, respBytes);
         } catch (Exception ex) {
           auditMessage = "system internal error";
           LOG.error(auditMessage, ex);

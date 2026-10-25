@@ -3,112 +3,103 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cmp.*;
-import org.bouncycastle.asn1.cms.EnvelopedData;
-import org.bouncycastle.asn1.cms.GCMParameters;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.crmf.DhSigStatic;
-import org.bouncycastle.asn1.crmf.EncryptedValue;
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.bouncycastle.asn1.pkcs.ContentInfo;
-import org.bouncycastle.asn1.pkcs.EncryptionScheme;
-import org.bouncycastle.asn1.pkcs.KeyDerivationFunc;
-import org.bouncycastle.asn1.pkcs.PBES2Parameters;
-import org.bouncycastle.asn1.pkcs.PBKDF2Params;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.pkcs.RSAESOAEPparams;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.cmp.CMPException;
-import org.bouncycastle.cert.cmp.GeneralPKIMessage;
-import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
-import org.bouncycastle.cert.crmf.CRMFException;
-import org.bouncycastle.cert.crmf.CertificateRequestMessage;
-import org.bouncycastle.cert.crmf.PKMACBuilder;
-import org.bouncycastle.cert.crmf.jcajce.JcePKMACValuesCalculator;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSEnvelopedData;
-import org.bouncycastle.cms.CMSEnvelopedDataGenerator;
-import org.bouncycastle.cms.CMSProcessableByteArray;
-import org.bouncycastle.cms.RecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder;
-import org.bouncycastle.cms.jcajce.JceKeyAgreeRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator;
-import org.bouncycastle.cms.jcajce.JcePasswordRecipientInfoGenerator;
-import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1BitString;
+import org.xipki.codec.asn1.Asn1GeneralizedTime;
+import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.codec.asn1.Asn1OctetString;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.pkix.asn1.cmp.*;
+import org.xipki.pkix.asn1.cms.EnvelopedData;
+import org.xipki.codec.asn1.crypto.GCMParameters;
+import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.pkix.asn1.crmf.DhSigStatic;
+import org.xipki.pkix.asn1.crmf.EncryptedKey;
+import org.xipki.pkix.asn1.crmf.EncryptedValue;
+import org.xipki.pkix.asn1.crmf.POPOSigningKey;
+import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.crypto.PBES2Parameters;
+import org.xipki.codec.asn1.crypto.PBKDF2Params;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.asn1.oid.CmpOIDs;
+import org.xipki.codec.asn1.oid.PkcsOIDs;
+import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.pkix.asn1.util.ContentVerifierProvider;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.KeySpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.auth.Requestor;
-import org.xipki.security.auth.RequestorAuthenticator;
-import org.xipki.security.cmp.CmpUtil;
-import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.security.cmp.ProtectionResult;
-import org.xipki.security.cmp.ProtectionVerificationResult;
-import org.xipki.security.encap.KEMUtil;
-import org.xipki.security.encap.KemEncapKey;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.DHSigStaticKeyCertPair;
-import org.xipki.security.pkix.JceX509Certificate;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.KemHmacSignature;
-import org.xipki.security.util.EcCurveEnum;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.SecretKeyWithAlias;
-import org.xipki.security.verify.AlgorithmValidator;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.exception.InsufficientPermissionException;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.pkix.cmp.CmpException;
+import org.xipki.pkix.cmp.ProtectedPKIMessage;
+import org.xipki.pkix.cms.CmsAlgorithm;
+import org.xipki.pkix.cms.CmsEnvelopedData;
+import org.xipki.pkix.cmp.CertificateRequestMessage;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.auth.Requestor;
+import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.pkix.cmp.CmpUtil;
+import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.pkix.cmp.ProtectionResult;
+import org.xipki.pkix.cmp.ProtectionVerificationResult;
+import org.xipki.crypto.core.KemUtil;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.KemHmacSignature;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.crypto.core.SecretKeyWithAlias;
+import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.codec.exception.InsufficientPermissionException;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
-import java.text.ParseException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -117,6 +108,8 @@ import java.util.Map;
  * @author Lijun Liao (xipki)
  */
 public abstract class BaseCmpResponder {
+
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
 
   private static final int cmp2000 = 2;
 
@@ -159,7 +152,8 @@ public abstract class BaseCmpResponder {
   private static final AlgorithmIdentifier prf_hmacWithSHA256 =
       SignAlgo.HMAC_SHA256.algorithmIdentifier();
 
-  private static final Map<ErrorCode, Integer> errorCodeToPkiFailureMap = new HashMap<>(20);
+  private static final Map<ErrorCode, PKIFailureInfo> errorCodeToPkiFailureMap =
+      new HashMap<>(20);
 
   protected final SecurityFactory securityFactory;
 
@@ -194,36 +188,36 @@ public abstract class BaseCmpResponder {
   protected BaseCmpResponder(
       CmpControl cmpControl, SdkClient sdk, SecurityFactory securityFactory,
       CaNameSigners signers, RequestorAuthenticator authenticator, PopControl popControl)
-      throws NoSuchAlgorithmException {
+      throws NoSuchAlgorithmException, NoSuchProviderException {
     this.sdk = sdk;
     this.securityFactory = securityFactory;
     this.authenticator = authenticator;
     this.cmpControl = cmpControl;
     this.popControl = popControl;
     this.signers = signers;
-    this.aesKeyGen = KeyGenerator.getInstance("AES");
+    this.aesKeyGen = cryptoApi.newKeyGenerator("AES");
   }
 
   protected abstract PKIBody cmpEnrollCert(
       CmpVersion cmpVersion, String caName, String dfltCertprofileName, boolean groupEnroll,
-      PKIMessage request, PKIHeaderBuilder respHeader, PKIHeader reqHeader, PKIBody reqBody,
-      Requestor requestor, ASN1OctetString tid, AuditEvent event)
+      PKIMessage request, PKIHeader respHeader, PKIHeader reqHeader, PKIBody reqBody,
+      Requestor requestor, Asn1OctetString tid, AuditEvent event)
       throws InsufficientPermissionException, SdkErrorResponseException;
 
   protected abstract PKIBody cmpUnRevokeCertificates(
-      String caName, PKIMessage request, PKIHeaderBuilder respHeader,
+      String caName, PKIMessage request, PKIHeader respHeader,
       PKIHeader reqHeader, PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException;
 
   protected abstract PKIBody confirmCertificates(
-      String caName, ASN1OctetString transactionId, CertConfirmContent certConf)
+      String caName, Asn1OctetString transactionId, CertConfirmContent certConf)
       throws SdkErrorResponseException;
 
   protected abstract PKIBody revokePendingCertificates(
-      String caName, ASN1OctetString transactionId) throws SdkErrorResponseException;
+      String caName, Asn1OctetString transactionId) throws SdkErrorResponseException;
 
   private Requestor.CertRequestor getCertRequestor(
-      X500Name requestorSender, byte[] senderKID, CMPCertificate[] extraCerts) {
+      X500Name requestorSender, byte[] senderKID, CMPCertificate.Seq1 extraCerts) {
     if (extraCerts == null) {
       return null;
     }
@@ -239,7 +233,13 @@ public abstract class BaseCmpResponder {
         continue;
       }
 
-      X509Cert xc = new X509Cert(c);
+      X509Cert xc;
+      try {
+        xc = new X509Cert(c);
+      } catch (CodecException e) {
+        return null;
+      }
+
       match = senderKID == null || Arrays.equals(xc.subjectKeyId(), senderKID);
       if (match) {
         return getCertRequestor(xc);
@@ -257,11 +257,11 @@ public abstract class BaseCmpResponder {
   }
 
   protected static X500Name getX500Name(GeneralName name) {
-    if (name.getTagNo() != GeneralName.directoryName) {
+    if (name.getTagNo() != GeneralName.tag_directoryName) {
       return null;
     }
 
-    return (X500Name) name.getName();
+    return name.getDirectoryName();
   } // method getX500Sender
 
   /**
@@ -282,18 +282,18 @@ public abstract class BaseCmpResponder {
    * @return the response
    */
   private PKIMessage processPkiMessage0(
-      String caName, PKIMessage request, Requestor requestor, ASN1OctetString tid,
-      GeneralPKIMessage message, Map<String, String> parameters, AuditEvent event) {
+      String caName, PKIMessage request, Requestor requestor, Asn1OctetString tid,
+      PKIMessage message, Map<String, String> parameters, AuditEvent event) {
     event.addEventData(CaAuditConstants.NAME_requestor,
         requestor == null ? "null" : requestor.name());
 
     PKIHeader reqHeader = message.getHeader();
     CmpVersion cmpVersion = new CmpVersion(reqHeader);
 
-    PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-        reqHeader.getPvno().getValue().intValue(), reqHeader.getRecipient(), reqHeader.getSender());
+    PKIHeader respHeader = new PKIHeader(
+        reqHeader.pvno(), reqHeader.getRecipient(), reqHeader.getSender());
     respHeader.setTransactionID(tid);
-    ASN1OctetString senderNonce = reqHeader.getSenderNonce();
+    Asn1OctetString senderNonce = reqHeader.getSenderNonce();
     if (senderNonce != null) {
       respHeader.setRecipNonce(senderNonce);
     }
@@ -301,16 +301,17 @@ public abstract class BaseCmpResponder {
     PKIBody respBody;
 
     PKIBody reqBody = message.getBody();
-    final int type = reqBody.getType();
+    final int type = reqBody.getTagNo();
 
     try {
-      if (type == PKIBody.TYPE_INIT_REQ || type == PKIBody.TYPE_CERT_REQ
-          || type == PKIBody.TYPE_KEY_UPDATE_REQ || type == PKIBody.TYPE_P10_CERT_REQ
-          || type == PKIBody.TYPE_CROSS_CERT_REQ) {
-        String eventType = (PKIBody.TYPE_CERT_REQ == type) ? TYPE_cr
-            : (PKIBody.TYPE_INIT_REQ == type) ? TYPE_ir
-            : (PKIBody.TYPE_KEY_UPDATE_REQ == type) ? TYPE_kur
-            : (PKIBody.TYPE_P10_CERT_REQ == type) ? TYPE_p10cr
+      if (type == PKIBody.tag_ir     || type == PKIBody.tag_cr
+          || type == PKIBody.tag_kur || type == PKIBody.tag_p10cr
+          || type == PKIBody.tag_ccr) {
+        String eventType =
+              (PKIBody.tag_cr == type)    ? TYPE_cr
+            : (PKIBody.tag_ir == type)    ? TYPE_ir
+            : (PKIBody.tag_kur == type)   ? TYPE_kur
+            : (PKIBody.tag_p10cr == type) ? TYPE_p10cr
             : TYPE_ccr; // for (PKIBody.TYPE_CROSS_CERT_REQ == type)
 
         event.addEventType(eventType);
@@ -325,19 +326,19 @@ public abstract class BaseCmpResponder {
 
         respBody = cmpEnrollCert(cmpVersion, caName, dfltCertprofileName,
             groupEnroll, request, respHeader, reqHeader, reqBody, requestor, tid, event);
-      } else if (type == PKIBody.TYPE_CERT_CONFIRM) {
+      } else if (type == PKIBody.tag_certConf) {
         event.addEventType(TYPE_certConf);
-        CertConfirmContent certConf = (CertConfirmContent) reqBody.getContent();
+        CertConfirmContent certConf = reqBody.getCertConf();
         respBody = confirmCertificates(caName, tid, certConf);
-      } else if (type == PKIBody.TYPE_REVOCATION_REQ) {
+      } else if (type == PKIBody.tag_rr) {
         respBody = cmpUnRevokeCertificates(caName, request, respHeader,
                     reqHeader, reqBody, requestor, event);
-      } else if (type == PKIBody.TYPE_CONFIRM) {
+      } else if (type == PKIBody.tag_pkiconf) {
         event.addEventType(TYPE_pkiconf);
-        respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
-      } else if (type == PKIBody.TYPE_GEN_MSG) {
+        respBody = PKIBody.ofPkiconf();
+      } else if (type == PKIBody.tag_genm) {
         respBody = cmpGeneralMsg(caName, reqBody, event);
-      } else if (type == PKIBody.TYPE_ERROR) {
+      } else if (type == PKIBody.tag_error) {
         event.addEventType(TYPE_error);
         respBody = revokePendingCertificates(caName, tid);
       } else {
@@ -347,21 +348,20 @@ public abstract class BaseCmpResponder {
       }
     } catch (InsufficientPermissionException ex) {
       ErrorMsgContent emc = new ErrorMsgContent( new PKIStatusInfo(
-          PKIStatus.rejection, new PKIFreeText(ex.getMessage()),
-          new PKIFailureInfo(PKIFailureInfo.notAuthorized)));
+          PKIStatus.rejection, new PKIFreeText(ex.getMessage()), PKIFailureInfo.notAuthorized));
 
-      respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+      respBody = PKIBody.ofError(emc);
     } catch (SdkErrorResponseException ex) {
       LogUtil.error(LOG, ex);
       ErrorResponse errResp = ex.errorResponse();
-      respBody = new PKIBody(PKIBody.TYPE_ERROR,
+      respBody = PKIBody.ofError(
           new ErrorMsgContent(buildPKIStatusInfo(errResp.code(), errResp.message())));
     }
 
-    if (respBody.getType() == PKIBody.TYPE_ERROR) {
-      ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
+    if (respBody.getTagNo() == PKIBody.tag_error) {
+      ErrorMsgContent errorMsgContent = reqBody.getError();
 
-      PkiStatusInfo pkiStatus = new PkiStatusInfo(errorMsgContent.getPKIStatusInfo());
+      PkiStatusInfo pkiStatus = new PkiStatusInfo(errorMsgContent.getPkiStatusInfo());
 
       event.setStatus(AuditStatus.FAILED);
       String statusString = pkiStatus.statusMessage();
@@ -372,38 +372,31 @@ public abstract class BaseCmpResponder {
       event.setStatus(AuditStatus.SUCCESSFUL);
     }
 
-    PKIHeader responseHdr = respHeader.build();
-    if (cmpVersion.respVersion != responseHdr.getPvno().intValueExact()) {
+    if (cmpVersion.respVersion != respHeader.pvno()) {
       // change the cmp version in response
-      ASN1Sequence seq = ASN1Sequence.getInstance(responseHdr.toASN1Primitive());
-      ASN1EncodableVector v = new ASN1EncodableVector();
-      v.add(new ASN1Integer(BigInteger.valueOf(cmpVersion.respVersion)));
-      for (int i = 1; i < seq.size(); i++) {
-        v.add(seq.getObjectAt(i));
-      }
-      responseHdr = PKIHeader.getInstance(new DERSequence(v));
+      respHeader.setPvno(cmpVersion.respVersion);
     }
 
-    return new PKIMessage(responseHdr, respBody);
+    return new PKIMessage(respHeader, respBody);
   } // method processPKIMessage0
 
   public PKIMessage processPkiMessage(
       String caName, PKIMessage pkiMessage, X509Cert tlsClientCert,
       Map<String, String> parameters, AuditEvent event) {
     Args.notNull(event, "event");
-    GeneralPKIMessage message = new GeneralPKIMessage(Args.notNull(pkiMessage, "pkiMessage"));
+    PKIMessage message = Args.notNull(pkiMessage, "pkiMessage");
 
     PKIHeader reqHeader = message.getHeader();
-    ASN1OctetString tid = reqHeader.getTransactionID();
+    Asn1OctetString tid = reqHeader.getTransactionID();
     if (tid == null) {
-      tid = new DEROctetString(randomTransactionId());
+      tid = new Asn1OctetString(randomTransactionId());
     }
     String tidStr = Base64.encodeToString(tid.getOctets());
     event.addEventData(CaAuditConstants.NAME_tid, tidStr);
 
     final GeneralName respSender = reqHeader.getRecipient();
 
-    int reqPvno = reqHeader.getPvno().getValue().intValue();
+    int reqPvno = reqHeader.pvno();
     if (reqPvno < PVNO_CMP2000) {
       event.update(AuditLevel.INFO, AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, "unsupported version " + reqPvno);
@@ -411,16 +404,12 @@ public abstract class BaseCmpResponder {
           PKIFailureInfo.unsupportedVersion, null, respSender);
     }
 
-    Integer failureCode = null;
+    PKIFailureInfo failureCode = null;
     String statusText = null;
 
     Instant messageTime = null;
     if (reqHeader.getMessageTime() != null) {
-      try {
-        messageTime = reqHeader.getMessageTime().getDate().toInstant();
-      } catch (ParseException ex) {
-        LogUtil.error(LOG, ex, "tid=" + tidStr + ": could not parse messageTime");
-      }
+      messageTime = reqHeader.messageTime();
     }
 
     ConcurrentSigner signer = signers.getSigner(caName);
@@ -428,9 +417,9 @@ public abstract class BaseCmpResponder {
     GeneralName recipient = reqHeader.getRecipient();
     X500Name x500Name = getX500Name(recipient);
     if (x500Name != null) {
-      RDN[] rdns = x500Name.getRDNs();
+      List<RDN> rdns = x500Name.getRDNs();
       // consider the empty DN
-      if ((rdns != null && rdns.length > 0) // Not an empty DN
+      if ((rdns != null && !rdns.isEmpty()) // Not an empty DN
           && !signer.x509Cert().subject().equals(x500Name)) {
         LOG.warn("tid={}: I am not the intended recipient, but '{}'",
             tid, reqHeader.getRecipient());
@@ -517,8 +506,8 @@ public abstract class BaseCmpResponder {
       }
     } else {
       requestor = null;
-      final int type = message.getBody().getType();
-      if (type != PKIBody.TYPE_GEN_MSG) {
+      final int type = message.getBody().getTagNo();
+      if (type != PKIBody.tag_genm) {
         LOG.warn("tid={}: message is not protected", tid);
         errorStatus = "message is not protected";
       } else {
@@ -558,12 +547,12 @@ public abstract class BaseCmpResponder {
     return bytes;
   } // method randomBytes
 
-  private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
-      throws CMPException, InvalidKeyException {
+  private ProtectionVerificationResult verifyProtection(String tid, PKIMessage pkiMessage)
+      throws CmpException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
-    byte[] senderKID = header.getSenderKID() == null ? null : header.getSenderKID().getOctets();
+    byte[] senderKID = header.senderKID();
     AlgorithmIdentifier protectionAlg = header.getProtectionAlg();
 
     if (protectedMsg.hasPasswordBasedMacProtection()) {
@@ -572,8 +561,15 @@ public abstract class BaseCmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      PBMParameter parameter = PBMParameter.getInstance(
-          pkiMessage.getHeader().getProtectionAlg().getParameters());
+      PBMParameter parameter;
+      try {
+        parameter = PBMParameter.fromAsn1(
+          pkiMessage.getHeader().getProtectionAlg().getParameters().asSequence());
+      } catch (CodecException ex) {
+        LOG.warn("malformed protection algorithm", ex);
+        return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);
+      }
+
       HashAlgo owfAlg;
       try {
         owfAlg = HashAlgo.getInstance(parameter.getOwf());
@@ -604,22 +600,29 @@ public abstract class BaseCmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      int iterationCount = parameter.getIterationCount().getValue().intValue();
-      if (iterationCount < 1000) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} < 1000)", iterationCount);
+      int iterationCount = parameter.iterationCount();
+      if (iterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} < {})", iterationCount,
+            ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      PKMACBuilder pkMacBuilder = new PKMACBuilder(new JcePKMACValuesCalculator());
+      if (iterationCount > cmpControl.requestPbmMaxIterationCount()) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} > {})", iterationCount,
+            cmpControl.requestPbmMaxIterationCount());
+        return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
+      }
+
       Requestor.SimplePasswordRequestor requestor = getPasswordRequestor(senderKID);
 
       if (requestor == null) {
         LOG.warn("tid={}: not authorized requestor with senderKID '{}'",
-            tid, Hex.toHexString(senderKID));
+            tid, Hex.encode(senderKID));
         return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      boolean macValid = protectedMsg.verify(pkMacBuilder, requestor.password());
+      boolean macValid = protectedMsg.verify(requestor.password(),
+          cmpControl.requestPbmMaxIterationCount());
       return new ProtectionVerificationResult(requestor,
           macValid ? ProtectionResult.MAC_VALID : ProtectionResult.MAC_INVALID);
     } else {
@@ -631,7 +634,7 @@ public abstract class BaseCmpResponder {
 
       X500Name x500Sender = getX500Name(header.getSender());
       Requestor.CertRequestor requestor = (x500Sender == null) ? null
-          : getCertRequestor(x500Sender, senderKID, pkiMessage.toASN1Structure().getExtraCerts());
+          : getCertRequestor(x500Sender, senderKID, pkiMessage.getExtraCerts());
 
       ContentVerifierProvider verifierProvider = requestor == null ? null
           : securityFactory.getContentVerifierProvider(requestor.cert());
@@ -672,42 +675,39 @@ public abstract class BaseCmpResponder {
       event.update(AuditLevel.ERROR, AuditStatus.FAILED);
       event.addEventData(CaAuditConstants.NAME_message, "could not sign the PKIMessage");
       return new PKIMessage(pkiMessage.getHeader(),
-          new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status)));
+          PKIBody.ofError(new ErrorMsgContent(status)));
     }
   } // method addProtection
 
   private PKIMessage buildErrorPkiMessage(
-      ASN1OctetString tid, PKIHeader requestHeader, int failureCode,
+      Asn1OctetString tid, PKIHeader requestHeader, PKIFailureInfo failureCode,
       String statusText, GeneralName respSender) {
     GeneralName respRecipient = requestHeader.getSender();
 
-    PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-        requestHeader.getPvno().getValue().intValue(), respSender, respRecipient);
-    respHeader.setMessageTime(new ASN1GeneralizedTime(Date.from(Instant.now())));
+    PKIHeader respHeader = new PKIHeader(requestHeader.pvno(), respSender, respRecipient);
+    respHeader.setMessageTime(new Asn1GeneralizedTime(Instant.now()));
 
     if (tid != null) {
       respHeader.setTransactionID(tid);
     }
 
-    ASN1OctetString senderNonce = requestHeader.getSenderNonce();
+    Asn1OctetString senderNonce = requestHeader.getSenderNonce();
     if (senderNonce != null) {
       respHeader.setRecipNonce(senderNonce);
     }
 
     PKIStatusInfo status = generateRejectionStatus(failureCode, statusText);
 
-    return new PKIMessage(respHeader.build(),
-        new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status)));
+    return new PKIMessage(respHeader, PKIBody.ofError(new ErrorMsgContent(status)));
   } // method buildErrorPkiMessage
 
-  protected static PKIStatusInfo generateRejectionStatus(Integer info, String errorMessage) {
+  protected static PKIStatusInfo generateRejectionStatus(PKIFailureInfo info, String errorMessage) {
     return generateRejectionStatus(PKIStatus.rejection, info, errorMessage);
   }
 
   protected static PKIStatusInfo generateRejectionStatus(
-      PKIStatus status, Integer info, String errorMessage) {
+      PKIStatus status, PKIFailureInfo failureInfo, String errorMessage) {
     PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
-    PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
     return new PKIStatusInfo(status, statusMessage, failureInfo);
   }
 
@@ -719,40 +719,42 @@ public abstract class BaseCmpResponder {
   }
 
   protected static PKIBody buildErrorMsgPkiBody(
-      PKIStatus pkiStatus, int failureInfo, String statusMessage) {
-    PKIFreeText pkiStatusMsg = (statusMessage == null) ? null : new PKIFreeText(statusMessage);
+      PKIStatus pkiStatus, PKIFailureInfo failureInfo, String statusMessage) {
+    PKIFreeText pkiStatusMsg = (statusMessage == null)
+        ? null : new PKIFreeText(statusMessage);
     ErrorMsgContent emc = new ErrorMsgContent(new PKIStatusInfo(
-        pkiStatus, pkiStatusMsg, new PKIFailureInfo(failureInfo)));
-    return new PKIBody(PKIBody.TYPE_ERROR, emc);
+        pkiStatus, pkiStatusMsg, failureInfo));
+    return PKIBody.ofError(emc);
   }
 
   protected static CertRepMessage buildErrCertResp(
-      ASN1Integer certReqId, int pkiFailureInfo, String pkiStatusText) {
-    return new CertRepMessage(null, new CertResponse[]{new CertResponse(certReqId,
-            generateRejectionStatus(pkiFailureInfo, pkiStatusText))});
+      Asn1Integer certReqId, PKIFailureInfo pkiFailureInfo, String pkiStatusText) {
+    return new CertRepMessage(null,
+        new CertResponse.Seq0(
+            new CertResponse(certReqId, generateRejectionStatus(pkiFailureInfo, pkiStatusText))));
   }
 
   protected static void addErrCertResp(
-      Map<Integer, CertResponse> resps, int index, ASN1Integer certReqId,
-      int pkiFailureInfo, String pkiStatusText) {
+      Map<Integer, CertResponse> resps, int index, Asn1Integer certReqId,
+      PKIFailureInfo pkiFailureInfo, String pkiStatusText) {
     resps.put(index, new CertResponse(certReqId,
         generateRejectionStatus(pkiFailureInfo, pkiStatusText)));
   }
 
   protected boolean verifyPop(CertificateRequestMessage certRequest, SubjectPublicKeyInfo spki) {
     int popType = certRequest.getProofOfPossessionType();
-    if (popType == CertificateRequestMessage.popRaVerified) {
+    if (popType == CertificateRequestMessage.tag_popRaVerified) {
       return false;
     }
 
-    if (popType != CertificateRequestMessage.popSigningKey) {
+    if (popType != CertificateRequestMessage.tag_popSigningKey) {
       LOG.error("unsupported POP type: {}", popType);
       return false;
     }
 
     // check the POP signature algorithm
     ProofOfPossession pop = certRequest.toASN1Structure().getPop();
-    POPOSigningKey popSign = POPOSigningKey.getInstance(pop.getObject());
+    POPOSigningKey popSign = pop.getSignature();
     SignAlgo popAlg;
     try {
       popAlg = SignAlgo.getInstance(popSign.getAlgorithmIdentifier());
@@ -777,26 +779,26 @@ public abstract class BaseCmpResponder {
 
       DHSigStaticKeyCertPair kaKeyAndCert = null;
       if (SignAlgo.DHPOP_X25519 == popAlg || SignAlgo.DHPOP_X448 == popAlg) {
-        DhSigStatic dhSigStatic = DhSigStatic.getInstance(popSign.getSignature().getBytes());
+        DhSigStatic dhSigStatic = DhSigStatic.fromEncoded(popSign.signature());
         IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
 
-        ASN1ObjectIdentifier keyAlgOid = spki.getAlgorithm().getAlgorithm();
+        Asn1Oid keyAlgOid = spki.getAlgorithm().getAlgorithm();
         EcCurveEnum curve = EcCurveEnum.ofOid(keyAlgOid);
         assert curve != null;
 
         kaKeyAndCert = popControl.getDhKeyCertPair(isn.getName(),
-            isn.getSerialNumber().getValue(), curve.mainAlias());
+            isn.serialNumber(), curve.mainAlias());
 
         if (kaKeyAndCert == null) {
           LOG.warn("found no DH key and cert matching issuer={} and serial number={}",
-              isn.getName(), isn.getSerialNumber().getValue());
+              isn.getName(), isn.serialNumber());
           return false;
         }
       }
 
       SecretKey ownerMasterKey = null;
       if (SignAlgo.KEM_HMAC_SHA256 == popAlg) {
-        KemHmacSignature kemHmacSig = KemHmacSignature.decode(popSign.getSignature().getOctets());
+        KemHmacSignature kemHmacSig = KemHmacSignature.decode(popSign.signature());
         SecretKeyWithAlias km = popControl.kemMasterKey(kemHmacSig.id());
         if (km != null) {
           ownerMasterKey = km.secretKey();
@@ -806,19 +808,29 @@ public abstract class BaseCmpResponder {
       ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
           publicKey, kaKeyAndCert, ownerMasterKey);
       return certRequest.isValidSigningKeyPOP(cvp);
-    } catch (CodecException | InvalidKeyException | IllegalStateException | CRMFException ex) {
+    } catch (CodecException | InvalidKeyException | IllegalStateException | CmpException ex) {
       LogUtil.error(LOG, ex);
     }
     return false;
   } // method verifyPop
 
   protected CertResponse postProcessCertInfo(
-      CmpVersion cmpVersion, ASN1Integer certReqId, Requestor requestor,
+      CmpVersion cmpVersion, Asn1Integer certReqId, Requestor requestor,
       byte[] cert, byte[] privateKeyinfo, EphemeralKeyPair ephemeralKeyPair) {
-    CertOrEncCert cec = new CertOrEncCert(new CMPCertificate(Certificate.getInstance(cert)));
+    Certificate asn1Cert;
+    try {
+      asn1Cert = Certificate.fromEncoded(cert);
+    } catch (CodecException e) {
+      String m = "Certificate that will be sent to client is malformed";
+      LOG.error(m, e);
+      return new CertResponse(certReqId,
+          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(m)));
+    }
+
+    CertOrEncCert cec = CertOrEncCert.ofCertificate(CMPCertificate.ofX509v3PKCert(asn1Cert));
     if (privateKeyinfo == null) {
       // no private key will be returned.
-      return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.granted),
+      return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.accepted),
           new CertifiedKeyPair(cec), null);
     }
 
@@ -834,13 +846,22 @@ public abstract class BaseCmpResponder {
   }
 
   private CertResponse postProcessCertInfoCmp2000(
-      ASN1Integer certReqId, Requestor requestor, CertOrEncCert cec, byte[] privateKeyinfo) {
-    PKIStatusInfo statusInfo = new PKIStatusInfo(PKIStatus.granted);
+      Asn1Integer certReqId, Requestor requestor, CertOrEncCert cec, byte[] privateKeyinfo) {
+    PKIStatusInfo statusInfo = new PKIStatusInfo(PKIStatus.accepted);
 
     final int aesGcmTagByteLen = 16;
     final int aesGcmNonceLen = 12;
 
-    PrivateKeyInfo privKey = PrivateKeyInfo.getInstance(privateKeyinfo);
+    PrivateKeyInfo privKey;
+    try {
+      privKey = PrivateKeyInfo.fromEncoded(privateKeyinfo);
+    } catch (CodecException e) {
+      String m = "Private key that will be sent to client is malformed";
+      LOG.error(m, e);
+      return new CertResponse(certReqId,
+          new PKIStatusInfo(PKIStatus.rejection, new PKIFreeText(m)));
+    }
+
     AlgorithmIdentifier intendedAlg = privKey.getPrivateKeyAlgorithm();
     EncryptedValue encKey;
 
@@ -874,10 +895,10 @@ public abstract class BaseCmpResponder {
         AlgorithmIdentifier keyAlg = wrapper.getAlgorithmIdentifier();
 
         // encrypt the data
-        ASN1ObjectIdentifier symmAlgOid = OIDs.Algo.id_aes128_GCM;
+        Asn1Oid symmAlgOid = AlgorithmOIDs.id_aes128_GCM;
         byte[] nonce = randomBytes(aesGcmNonceLen);
 
-        Cipher dataCipher = Cipher.getInstance(symmAlgOid.getId(), KeyUtil.tradProviderName());
+        Cipher dataCipher = cryptoApi.newCipher(symmAlgOid.getId());
 
         try {
           dataCipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(symmKeyBytes, "AES"),
@@ -890,15 +911,15 @@ public abstract class BaseCmpResponder {
         byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
 
         GCMParameters params = new GCMParameters(nonce, aesGcmTagByteLen);
-        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(symmAlgOid, params);
+        AlgorithmIdentifier symmAlg = AlgorithmIdentifier.build(symmAlgOid, params);
 
         encKey = new EncryptedValue(intendedAlg, symmAlg,
-            (encSymmKey == null ? null : new DERBitString(encSymmKey)), keyAlg, null,
-            new DERBitString(encValue));
+            (encSymmKey == null ? null : new Asn1BitString(encSymmKey)), keyAlg, null,
+            new Asn1BitString(encValue));
       } else {
         Requestor.SimplePasswordRequestor passwordRequestor =
             (Requestor.SimplePasswordRequestor) requestor;
-        final ASN1ObjectIdentifier encAlgOid = OIDs.Algo.id_aes128_GCM;
+        final Asn1Oid encAlgOid = AlgorithmOIDs.id_aes128_GCM;
         // one of 128, 192 and 256. Must match the encAlgOid
         final int keysizeBits = 128;
         final int iterCount   = 10240; // >= 1000
@@ -910,27 +931,24 @@ public abstract class BaseCmpResponder {
         // use password of the requestor to encrypt the private key
         byte[] pbkdfSalt = randomBytes(keysizeBits / 8);
 
-        SecretKeyFactory keyFact = SecretKeyFactory.getInstance(OIDs.Algo.id_PBKDF2.getId());
-
-        SecretKey key = keyFact.generateSecret(new PBKDF2KeySpec(passwordRequestor.password(),
-            pbkdfSalt, iterCount, keysizeBits, prf_hmacWithSHA256));
-        key = new SecretKeySpec(key.getEncoded(), "AES");
+        SecretKey key = new SecretKeySpec(cryptoApi.pbkdf2(prf_hmacWithSHA256,
+            passwordRequestor.password(), pbkdfSalt, iterCount, keysizeBits / 8), "AES");
 
         GCMParameterSpec gcmParamSpec = new GCMParameterSpec(tagByteLen * 8, nonce);
 
-        Cipher dataCipher = Cipher.getInstance(encAlgOid.getId());
+        Cipher dataCipher = cryptoApi.newCipher(encAlgOid.getId());
         dataCipher.init(Cipher.ENCRYPT_MODE, key, gcmParamSpec);
         byte[] encValue = dataCipher.doFinal(privKey.getEncoded());
 
         PBES2Parameters algParams = new PBES2Parameters(
-            new KeyDerivationFunc(OIDs.Algo.id_PBKDF2,
+            AlgorithmIdentifier.build(AlgorithmOIDs.id_PBKDF2,
                 new PBKDF2Params(pbkdfSalt, iterCount, keysizeBits / 8, prf_hmacWithSHA256)),
-            new EncryptionScheme(encAlgOid, new GCMParameters(nonce, tagByteLen)));
+            AlgorithmIdentifier.build(encAlgOid, new GCMParameters(nonce, tagByteLen)));
 
-        AlgorithmIdentifier symmAlg = new AlgorithmIdentifier(OIDs.Algo.id_PBES2, algParams);
+        AlgorithmIdentifier symmAlg = AlgorithmIdentifier.build(AlgorithmOIDs.id_PBES2, algParams);
 
         encKey =  new EncryptedValue(intendedAlg, symmAlg, null, null, null,
-                    new DERBitString(encValue));
+                    new Asn1BitString(encValue));
       }
     } catch (Throwable th) {
       String msg = "error while encrypting the private key";
@@ -944,88 +962,50 @@ public abstract class BaseCmpResponder {
   }
 
   private CertResponse postProcessCertInfoCmp2021(
-      ASN1Integer certReqId, Requestor requestor, CertOrEncCert cec,
+      Asn1Integer certReqId, Requestor requestor, CertOrEncCert cec,
       byte[] privateKeyinfo, EphemeralKeyPair ephemeralKeyPair) {
-    String provName = KeyUtil.tradProviderName();
-    RecipientInfoGenerator recipient;
     try {
+      CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder().setSecureRandom(random);
       if (requestor instanceof Requestor.CertRequestor) {
         Requestor.CertRequestor certRequestor = (Requestor.CertRequestor) requestor;
         X509Cert  recipientX509Cert = certRequestor.cert();
         PublicKey publicKey = recipientX509Cert.publicKey();
-        X509Certificate recipientJceCert = new JceX509Certificate(recipientX509Cert.getCert());
         if (publicKey instanceof RSAPublicKey) {
           // Use RSA/OAEP instead RSA/PKCS1
           AlgorithmIdentifier hashAlgId = HashAlgo.SHA256.algorithmIdentifier();
           AlgorithmIdentifier mgfAlgId =
-              new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, hashAlgId);
-          AlgorithmIdentifier oaepAlgId = new AlgorithmIdentifier(OIDs.Algo.id_RSAES_OAEP,
-              new RSAESOAEPparams(hashAlgId, mgfAlgId, RSAESOAEPparams.DEFAULT_P_SOURCE_ALGORITHM));
-          recipient = new JceKeyTransRecipientInfoGenerator(recipientJceCert, oaepAlgId);
+              AlgorithmIdentifier.build(PkcsOIDs.id_mgf1, hashAlgId);
+          AlgorithmIdentifier oaepAlgId = AlgorithmIdentifier.build(AlgorithmOIDs.id_RSAES_OAEP,
+              new RSAESOAEPParams(hashAlgId, mgfAlgId, RSAESOAEPParams.DEFAULT_P_SOURCE_ALGORITHM));
+          builder.addKeyTransRecipient(recipientX509Cert.getCert(), oaepAlgId);
         } else {
           // We use ECDHE with AES Key Wrap (standard for EC-based CMS)
           KeySpec keySpec = KeySpec.ofPublicKey(recipientX509Cert.subjectPublicKeyInfo());
           if (ephemeralKeyPair.keyPair == null) {
             ephemeralKeyPair.keyPair = KeyUtil.generateKeyPair(keySpec, random);
           }
-          recipient = new JceKeyAgreeRecipientInfoGenerator(
-              CMSAlgorithm.ECDH_SHA256KDF, // Key Agreement Algorithm
-              ephemeralKeyPair.keyPair.getPrivate(), ephemeralKeyPair.keyPair.getPublic(),
-              CMSAlgorithm.AES256_WRAP // Algorithm to wrap the content key
-          ).setSecureRandom(random).addRecipient(recipientJceCert).setProvider(provName);
+          builder.addKeyAgreeRecipient(recipientX509Cert.getCert(),
+              CmsAlgorithm.ECDH_SHA256KDF, // Key Agreement Algorithm
+              CmsAlgorithm.AES256_WRAP, // Algorithm to wrap the content key
+              ephemeralKeyPair.keyPair);
         }
       } else {
         Requestor.SimplePasswordRequestor passwordRequestor =
             (Requestor.SimplePasswordRequestor) requestor;
-        char[] password = passwordRequestor.password();
 
-        // Initialize the Password Recipient Generator
-        // CMSAlgorithm.AES256_CBC is used here to wrap the content key
-        recipient = new JcePasswordRecipientInfoGenerator(CMSAlgorithm.AES128_WRAP, password)
-            .setProvider(provName).setSaltAndIterationCount(randomBytes(16), 10000);
+        // AES-256-CBC is used to wrap the content key (RFC 3211)
+        builder.addPasswordRecipient(passwordRequestor.password(), CmsAlgorithm.AES256_CBC,
+            prf_hmacWithSHA256, randomBytes(16), 10000);
       }
 
-      // 1. Initialize the Generator
-      CMSEnvelopedDataGenerator gen = new CMSEnvelopedDataGenerator();
+      // The content (private key) is encrypted with AES-256 GCM
+      CmsEnvelopedData envelopedData = builder.build(CmsAlgorithm.AES256_GCM, privateKeyinfo);
+      EnvelopedData envData = envelopedData.getEnvelopedData();
 
-      // 2. Add the Recipient (The person who can decrypt this)
-      gen.addRecipientInfoGenerator(recipient);
-
-      // 3. Define the Content Encryption Algorithm (e.g., AES-256 GCM)
-      // This is the symmetric key used to encrypt the actual payload
-      JceCMSContentEncryptorBuilder encryptorBuilder =
-          new JceCMSContentEncryptorBuilder(CMSAlgorithm.AES256_GCM).setProvider(provName);
-
-      // 4. Generate the EnvelopedData
-      CMSProcessableByteArray msg = new CMSProcessableByteArray(privateKeyinfo);
-      CMSEnvelopedData envelopedData = gen.generate(msg, encryptorBuilder.build());
-      ContentInfo contentInfo = ContentInfo.getInstance(envelopedData.toASN1Structure());
-
-      EnvelopedData envData = EnvelopedData.getInstance(contentInfo.getContent());
-
-      // TODO: uncomment me if supported by the BC FIPS.
-      // EncryptedKey encryptedKey = new EncryptedKey(envData);
-      // CertifiedKeyPair certifiedKeyPair =
-      //     new CertifiedKeyPair(cec, encryptedKey, null);
-      /*
-      EncryptedKey ::= CHOICE {
-          encryptedValue       EncryptedValue, -- deprecated
-          envelopedData    [0] IMPLICIT EnvelopedData }
-
-      CertifiedKeyPair ::= SEQUENCE {
-          certOrEncCert       CertOrEncCert,
-          privateKey      [0] EXPLICIT EncryptedKey      OPTIONAL,
-          publicationInfo [1] EXPLICIT PKIPublicationInfo  OPTIONAL }
-       */
-      ASN1EncodableVector vec = new ASN1EncodableVector();
-      vec.add(cec.toASN1Primitive()); // certOrEncCert
-      // privateKey privateKey      [0] EXPLICIT
-      // envelopedData    [0] IMPLICIT
-      vec.add(new DERTaggedObject(true, 0, new DERTaggedObject(false, 0, envData)));
-
-      ASN1Sequence seq = new DERSequence(vec);
-      CertifiedKeyPair certifiedKeyPair = CertifiedKeyPair.getInstance(seq);
-      return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.granted),
+      EncryptedKey encryptedKey = EncryptedKey.ofEnvelopedData(envData);
+      CertifiedKeyPair certifiedKeyPair =
+           new CertifiedKeyPair(cec, encryptedKey, null);
+      return new CertResponse(certReqId, new PKIStatusInfo(PKIStatus.accepted),
               certifiedKeyPair, null);
     } catch (Throwable th) {
       String msg = "error while encrypting the private key";
@@ -1037,16 +1017,15 @@ public abstract class BaseCmpResponder {
 
   protected PKIBody cmpGeneralMsg(String caName, PKIBody reqBody, AuditEvent event)
       throws SdkErrorResponseException {
-    GenMsgContent genMsgBody = GenMsgContent.getInstance(reqBody.getContent());
-    InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
+    GenMsgContent genMsgBody = reqBody.getGenm();
 
     InfoTypeAndValue itv = null;
-    if (itvs != null) {
-      for (InfoTypeAndValue entry : itvs) {
+    if (genMsgBody != null) {
+      for (InfoTypeAndValue entry : genMsgBody) {
         String itvType = entry.getInfoType().getId();
-        if (OIDs.CMP.id_it_caCerts.getId().equals(itvType)
-            || OIDs.CMP.it_currentCRL.getId().equals(itvType)
-            || OIDs.Xipki.id_xipki_cmp_kem_encapkey.getId().equals(itvType)) {
+        if (CmpOIDs.id_it_caCerts.getId().equals(itvType)
+            || CmpOIDs.it_currentCRL.getId().equals(itvType)
+            || XipkiOIDs.id_xipki_cmp_kem_encapkey.getId().equals(itvType)) {
           itv = entry;
           break;
         }
@@ -1054,15 +1033,15 @@ public abstract class BaseCmpResponder {
     }
 
     if (itv == null) {
-      String statusMessage = "PKIBody type " + PKIBody.TYPE_GEN_MSG
+      String statusMessage = "PKIBody type " + PKIBody.tag_genm
           + " with given sub-type is not supported";
       return buildErrorMsgPkiBody(PKIStatus.rejection, PKIFailureInfo.badRequest, statusMessage);
     }
 
     InfoTypeAndValue itvResp;
-    ASN1ObjectIdentifier infoType = itv.getInfoType();
+    Asn1Oid infoType = itv.getInfoType();
 
-    if (OIDs.CMP.it_currentCRL.equals(infoType)) {
+    if (CmpOIDs.it_currentCRL.equals(infoType)) {
       event.addEventType(TYPE_genm_current_crl);
       byte[] encodedCrl = sdk.currentCrl(caName);
       if (encodedCrl == null) {
@@ -1070,9 +1049,15 @@ public abstract class BaseCmpResponder {
             PKIFailureInfo.systemFailure, "no CRL is available");
       }
 
-      CertificateList crl = CertificateList.getInstance(encodedCrl);
-      itvResp = new InfoTypeAndValue(infoType, crl);
-    } else if (OIDs.CMP.id_it_caCerts.equals(infoType)) {
+      CertificateList crl;
+      try {
+        crl = CertificateList.fromEncoded(encodedCrl);
+        itvResp = InfoTypeAndValue.build(infoType, crl);
+      } catch (CodecException e) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.systemFailure, "malformed CRL is available");
+      }
+    } else if (CmpOIDs.id_it_caCerts.equals(infoType)) {
       event.addEventType(TYPE_genm_cacerts);
       byte[][] certchain = sdk.cacerts(caName);
       if (certchain == null || certchain.length == 0) {
@@ -1080,11 +1065,18 @@ public abstract class BaseCmpResponder {
             PKIFailureInfo.systemFailure, "no certchain is available");
       }
 
-      ASN1EncodableVector vec = new ASN1EncodableVector();
-      for (byte[] cert : certchain) {
-        vec.add(new CMPCertificate(Certificate.getInstance(cert)));
+      try {
+        List<CMPCertificate> vec = new ArrayList<>(certchain.length);
+        for (byte[] cert : certchain) {
+          vec.add(CMPCertificate.ofX509v3PKCert(Certificate.fromEncoded(cert)));
+        }
+
+        itvResp = InfoTypeAndValue.build(infoType, new CMPCertificate.Seq1(vec));
+      } catch (CodecException ex) {
+        LOG.warn("malformed certificate", ex);
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.systemFailure, "CodecException: " + ex.getMessage());
       }
-      itvResp = new InfoTypeAndValue(infoType, new DERSequence(vec));
     } else { // if (OIDs.Xipki.id_xipki_cmp_kem_encapkey.equals(infoType)) {
       event.addEventType(TYPE_genm_kem_keycap);
       SecretKeyWithAlias masterKey = popControl.defaultKemMasterKey();
@@ -1093,21 +1085,22 @@ public abstract class BaseCmpResponder {
             PKIFailureInfo.systemFailure, "no master key is available");
       }
 
-      byte[] bytes = ASN1OctetString.getInstance(itv.getInfoValue()).getOctets();
+      byte[] bytes = ((Asn1OctetString) itv.getInfoValue()).getOctets();
 
-      SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(bytes);
       KemEncapKey encapKey;
       try {
-        encapKey = KEMUtil.generateKemEncapKey(spki, masterKey, random);
-      } catch (XiSecurityException e) {
+        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.fromEncoded(bytes);
+
+        encapKey = KemUtil.generateKemEncapKey(spki, masterKey, random);
+      } catch (XiSecurityException | CodecException e) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "error generating KEM encap key");
       }
-      itvResp = new InfoTypeAndValue(infoType, new DEROctetString(encapKey.getEncoded()));
+      itvResp = new InfoTypeAndValue(infoType, new Asn1OctetString(encapKey.getEncoded()));
     }
 
     GenRepContent genRepContent = new GenRepContent(itvResp);
-    return new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
+    return PKIBody.ofGenp(genRepContent);
   } // method cmpGeneralMsg
 
   static PKIStatusInfo buildPKIStatusInfo(int errorCode, String message) {
@@ -1124,7 +1117,7 @@ public abstract class BaseCmpResponder {
   static PKIStatusInfo buildPKIStatusInfo(ErrorCode errorCode, String message) {
     PKIFreeText freeText = message == null ? null : new PKIFreeText(message);
 
-    int failureInfo;
+    PKIFailureInfo failureInfo;
     switch (errorCode) {
       case ALREADY_ISSUED:
         failureInfo = PKIFailureInfo.duplicateCertReq;
@@ -1161,7 +1154,7 @@ public abstract class BaseCmpResponder {
         break;
     }
 
-    return new PKIStatusInfo(PKIStatus.rejection, freeText, new PKIFailureInfo(failureInfo));
+    return new PKIStatusInfo(PKIStatus.rejection, freeText, failureInfo);
   }
 
   protected static class EphemeralKeyPair {

@@ -5,6 +5,9 @@ package org.xipki.ocsp.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;
@@ -13,23 +16,21 @@ import org.xipki.ocsp.server.store.DbCertStatusStore;
 import org.xipki.ocsp.server.store.EjbcaCertStatusStore;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.security.verify.CertPathValidationModel;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.ReflectiveUtil;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.ReflectiveUtil;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -137,7 +138,7 @@ public class OcspServerUtil {
 
     try {
       return new ResponseSigner(singleSigners);
-    } catch (CertificateException | IOException ex) {
+    } catch (CertificateException | CodecException ex) {
       throw new InvalidConfException(ex.getMessage(), ex);
     }
   } // method initSigner
@@ -152,7 +153,7 @@ public class OcspServerUtil {
       }
 
       if (StringUtil.isBlank(type)) {
-        throw new ObjectCreationException("OCSP store type is not specified");
+        throw new GenerationException("OCSP store type is not specified");
       } else if (STORE_TYPE_XIPKI_DB.equals(type)) {
         store = new DbCertStatusStore();
       } else if (STORE_TYPE_CRL.equals(type)) {
@@ -166,9 +167,9 @@ public class OcspServerUtil {
         String className = conf.source().type().substring(5).trim();
         store = ReflectiveUtil.newInstance(className, OcspServerUtil.class.getClassLoader());
       } else {
-        throw new ObjectCreationException("unknown OCSP store type " + type);
+        throw new GenerationException("unknown OCSP store type " + type);
       }
-    } catch (ObjectCreationException ex) {
+    } catch (GenerationException ex) {
       throw new InvalidConfException("ObjectCreationException of store "
           + conf.name() + ":" + ex.getMessage(), ex);
     }
@@ -272,7 +273,7 @@ public class OcspServerUtil {
   } // method parseCert
 
   static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
-    return OcspServerConf.readConfFromFile(IoUtil.expandFilepath(confFilename, true));
+    return OcspServerConf.readConfFromFile(XipkiIoUtil.expandFilepath(confFilename, true));
   }
 
   static ExtendedExtension removeExtension(List<ExtendedExtension> extensions, OID extnType) {

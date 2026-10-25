@@ -4,17 +4,14 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki</groupId>
+    <groupId>org.xipki.pki</groupId>
     <artifactId>xipki-parent</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
-  <groupId>org.xipki.assembly</groupId>
+  <groupId>org.xipki.pki.assembly</groupId>
   <artifactId>assemblies</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <packaging>pom</packaging>
-  <properties>
-    <skipDeploy>true</skipDeploy>
-  </properties>
   <build>
     <pluginManagement>
       <plugins>
@@ -37,10 +34,6 @@
                     <artifactId>mariadb-java-client</artifactId>
                   </artifactItem>
                   <artifactItem>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
-                  </artifactItem>
-                  <artifactItem>
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
                   </artifactItem>
@@ -48,26 +41,25 @@
               </configuration>
             </execution>
             <execution>
-              <id>bclts-jars</id>
+              <id>misc-jars</id>
               <phase>generate-resources</phase>
               <goals>
                 <goal>copy</goal>
               </goals>
               <configuration>
                 <stripVersion>false</stripVersion>
-                <outputDirectory>${project.build.directory}/t2/setup/jars/bouncycastle</outputDirectory>
+                <prependGroupId>true</prependGroupId>
+                <outputDirectory>${project.build.directory}/t2/setup/jars/misc</outputDirectory>
                 <artifactItems>
                   <artifactItem>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcpkix-lts8on</artifactId>
+                    <groupId>org.xipki.pki</groupId>
+                    <artifactId>ca-sdk</artifactId>
+                    <version>${project.version}</version>
                   </artifactItem>
                   <artifactItem>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-lts8on</artifactId>
-                  </artifactItem>
-                  <artifactItem>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcutil-lts8on</artifactId>
+                    <groupId>org.xipki.pki.servlet</groupId>
+                    <artifactId>servlet-common</artifactId>
+                    <version>${project.version}</version>
                   </artifactItem>
                 </artifactItems>
               </configuration>

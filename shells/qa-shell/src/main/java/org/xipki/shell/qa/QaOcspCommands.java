@@ -3,9 +3,9 @@
 
 package org.xipki.shell.qa;
 
-import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.qa.BigIntegerRange;
 import org.xipki.qa.FileBigIntegerIterator;
@@ -13,31 +13,31 @@ import org.xipki.qa.RangeBigIntegerIterator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ocsp.OcspBenchmark;
-import org.xipki.qa.ocsp.OcspCertStatus;
+import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.qa.ocsp.OcspQa;
 import org.xipki.qa.ocsp.OcspResponseOption;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.IssuerHash;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.IssuerHash;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.pki.client.PkiClientRuntime;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.TripleState;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.RandomUtil;
-import org.xipki.util.extra.misc.ReqRespDebug;
-import org.xipki.util.extra.misc.ReqRespDebug.ReqRespPair;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.util.http.ReqRespDebug.ReqRespPair;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.ca.api.TripleState;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -67,7 +67,7 @@ class QaOcspCommands {
 
   @Command(name = "batch-ocsp-status",
       description = "batch request status of certificates (QA)", mixinStandardHelpOptions = true)
-  static class BatchOcspStatusCommand extends ShellBaseCommand {
+  static class BatchOcspStatusCommand extends XiShellBaseCommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchOcspStatusCommand.class);
 
@@ -240,10 +240,10 @@ class QaOcspCommands {
           BigInteger serialNumber = new BigInteger(bytes);
           String resultText = lineNo + ": " + serialNumber.toString(16) + ",unknown: ";
           try {
-            ValidationResult result = processOcspQuery(ocspQa, serialNumber, OcspCertStatus.unknown,
-                null, messageDir, detailsDir, serverUrl, respIssuer, issuerCert, issuerHash,
-                requestOptions, expectedCerthashOccurrence, expectedNextUpdateOccurrence,
-                expectedNonceOccurrence);
+            ValidationResult result = processOcspQuery(ocspQa, serialNumber,
+                QaOcspCertStatus.unknown, null, messageDir, detailsDir, serverUrl,
+                respIssuer, issuerCert, issuerHash, requestOptions, expectedCerthashOccurrence,
+                expectedNextUpdateOccurrence, expectedNonceOccurrence);
             if (result.isAllSuccessful()) {
               numSucc++;
               resultText += "valid";
@@ -289,55 +289,55 @@ class QaOcspCommands {
       StringTokenizer tokens = new StringTokenizer(line, ",;:");
       int count = tokens.countTokens();
       BigInteger serialNumber;
-      OcspCertStatus status;
+      QaOcspCertStatus status;
       Instant revTime = null;
       try {
         serialNumber = toBigInt(tokens.nextToken(), hex);
         if (count > 1) {
           String token = tokens.nextToken();
           if ("unknown".equalsIgnoreCase(token)) {
-            status = OcspCertStatus.unknown;
+            status = QaOcspCertStatus.unknown;
           } else if ("good".equalsIgnoreCase(token)) {
-            status = OcspCertStatus.good;
+            status = QaOcspCertStatus.good;
           } else {
             CrlReason reason = CrlReason.forNameOrText(token);
             switch (reason) {
               case AA_COMPROMISE:
-                status = OcspCertStatus.aACompromise;
+                status = QaOcspCertStatus.aACompromise;
                 break;
               case CA_COMPROMISE:
-                status = OcspCertStatus.cACompromise;
+                status = QaOcspCertStatus.cACompromise;
                 break;
               case AFFILIATION_CHANGED:
-                status = OcspCertStatus.affiliationChanged;
+                status = QaOcspCertStatus.affiliationChanged;
                 break;
               case CERTIFICATE_HOLD:
-                status = OcspCertStatus.certificateHold;
+                status = QaOcspCertStatus.certificateHold;
                 break;
               case CESSATION_OF_OPERATION:
-                status = OcspCertStatus.cessationOfOperation;
+                status = QaOcspCertStatus.cessationOfOperation;
                 break;
               case KEY_COMPROMISE:
-                status = OcspCertStatus.keyCompromise;
+                status = QaOcspCertStatus.keyCompromise;
                 break;
               case PRIVILEGE_WITHDRAWN:
-                status = OcspCertStatus.privilegeWithdrawn;
+                status = QaOcspCertStatus.privilegeWithdrawn;
                 break;
               case SUPERSEDED:
-                status = OcspCertStatus.superseded;
+                status = QaOcspCertStatus.superseded;
                 break;
               case UNSPECIFIED:
-                status = OcspCertStatus.unspecified;
+                status = QaOcspCertStatus.unspecified;
                 break;
               default:
                 throw new Exception("invalid reason " + reason);
             }
           }
         } else {
-          status = OcspCertStatus.good;
+          status = QaOcspCertStatus.good;
         }
 
-        if (count > 2 && status != OcspCertStatus.good && status != OcspCertStatus.unknown) {
+        if (count > 2 && status != QaOcspCertStatus.good && status != QaOcspCertStatus.unknown) {
           revTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(tokens.nextToken());
         }
       } catch (Exception ex) {
@@ -350,14 +350,15 @@ class QaOcspCommands {
           expectedCerthashOccurrence, expectedNextUpdateOccurrence, expectedNonceOccurrence);
     }
 
-    private ValidationResult processOcspQuery(OcspQa ocspQa, BigInteger serialNumber,
-        OcspCertStatus status, Instant revTime, File messageDir, File detailsDir, URL serverUrl,
+    private ValidationResult processOcspQuery(
+        OcspQa ocspQa, BigInteger serialNumber,
+        QaOcspCertStatus status, Instant revTime, File messageDir, File detailsDir, URL serverUrl,
         X509Cert respIssuer, X509Cert issuerCert, IssuerHash issuerHash,
         RequestOptions requestOptions, TripleState expectedCerthashOccurrence,
         TripleState expectedNextUpdateOccurrence, TripleState expectedNonceOccurrence)
         throws Exception {
-      if (status == OcspCertStatus.unknown && StringUtil.isNotBlank(unknownAs)) {
-        status = OcspCertStatus.forName(unknownAs);
+      if (status == QaOcspCertStatus.unknown && StringUtil.isNotBlank(unknownAs)) {
+        status = QaOcspCertStatus.forName(unknownAs);
       }
 
       ReqRespDebug debug = null;
@@ -365,7 +366,7 @@ class QaOcspCommands {
         debug = new ReqRespDebug(saveReq, saveResp);
       }
 
-      OCSPResp response;
+      OCSPResponse response;
       try {
         response = PkiClientRuntime.getOcspRequestor().ask(
             issuerCert, serialNumber, serverUrl, requestOptions, debug);
@@ -420,7 +421,7 @@ class QaOcspCommands {
 
   @Command(name = "qa-ocsp-status", description = "request certificate status (QA)",
       mixinStandardHelpOptions = true)
-  static class QaOcspStatusCommand extends ShellBaseCommand {
+  static class QaOcspStatusCommand extends XiShellBaseCommand {
     @Option(names = {"--issuer", "-i"}, required = true, description = "issuer certificate file")
     @Completion(FilePathCompleter.class)
     private String issuerCertFile;
@@ -463,10 +464,11 @@ class QaOcspCommands {
     private Boolean signRequest = Boolean.FALSE;
 
     @Option(names = "--exp-error", description = "expected error")
+    @Completion(QaCompleters.OcspErrorCompleter.class)
     private String errorText;
 
     @Option(names = "--exp-status", split = ",", description = "expected status")
-    @Completion(Completers.StatusCompleter.class)
+    @Completion(QaCompleters.CertStatusCompleter.class)
     private List<String> statusTexts;
 
     @Option(names = "--rev-time", split = ",", description = "revocation time UTC yyyyMMddHHmmss")
@@ -491,7 +493,7 @@ class QaOcspCommands {
     private String certhashAlg;
 
     @Option(names = "--exp-nonce", description = "occurrence of nonce")
-    @Completion(Completers.TripleStateCompleter.class)
+    @Completion(QaCompleters.OccurrenceCompleter.class)
     private String nonceOccurrenceText = TripleState.optional.name();
 
     @Option(names = "--hex", description = "serial number without prefix is hex number")
@@ -550,7 +552,7 @@ class QaOcspCommands {
           options.setPreferredSignatureAlgorithms(algos);
         }
 
-        OCSPResp response = PkiClientRuntime.getOcspRequestor().ask(
+        OCSPResponse response = PkiClientRuntime.getOcspRequestor().ask(
             issuerCert, serialNumbers.toArray(new BigInteger[0]), new URL(serverUrl),
             options, null);
 
@@ -564,9 +566,10 @@ class QaOcspCommands {
                 + statusTexts.size() + ", it should be " + serialNumbers.size());
           }
 
-          Map<BigInteger, OcspCertStatus> expectedStatuses = new HashMap<>();
+          Map<BigInteger, QaOcspCertStatus> expectedStatuses = new HashMap<>();
           for (int i = 0; i < serialNumbers.size(); i++) {
-            expectedStatuses.put(serialNumbers.get(i), OcspCertStatus.forName(statusTexts.get(i)));
+            expectedStatuses.put(serialNumbers.get(i),
+                QaOcspCertStatus.forName(statusTexts.get(i)));
           }
 
           Map<BigInteger, Instant> expectedRevTimes = null;
@@ -621,7 +624,7 @@ class QaOcspCommands {
 
   @Command(name = "benchmark-ocsp-status", description = "OCSP benchmark",
       mixinStandardHelpOptions = true)
-  static class BenchmarkOcspStatusCommand extends ShellBaseCommand {
+  static class BenchmarkOcspStatusCommand extends XiShellBaseCommand {
     @Option(names = {"--issuer", "-i"}, required = true, description = "issuer certificate file")
     @Completion(FilePathCompleter.class)
     private String issuerCertFile;

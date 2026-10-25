@@ -6,18 +6,20 @@ package org.xipki.ca.mgmt.db.port;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.DbWorker;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.conf.ConfigurableProperties;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.cbor.ByteArrayCborDecoder;
+import org.xipki.codec.cbor.ByteArrayCborEncoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -41,6 +43,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
@@ -58,6 +61,8 @@ import java.util.zip.ZipOutputStream;
 public abstract class DbPortWorker extends DbWorker {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbPortWorker.class);
+
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
 
   private static final int algSuite_pbkdf2_cbc256_hmacsha256 = 1;
 
@@ -144,7 +149,7 @@ public abstract class DbPortWorker extends DbWorker {
       file.write(macValue);
     }
 
-    IoUtil.deleteDir(dir);
+    XipkiIoUtil.deleteDir(dir);
     IoUtil.deleteFile(zipFile);
   }
 
@@ -211,7 +216,7 @@ public abstract class DbPortWorker extends DbWorker {
       }
 
       byte[] computedMacValue = cipherSuite.mac.doFinal();
-      if (!Arrays.equals(macValue, computedMacValue)) {
+      if (!MessageDigest.isEqual(macValue, computedMacValue)) {
         throw new SignatureException("MAC value is not valid");
       }
     }
@@ -253,7 +258,7 @@ public abstract class DbPortWorker extends DbWorker {
     String kdfAlg = "PBKDF2WithHmacSHA256";
     int iteration = 1_000_000;
 
-    SecretKeyFactory factory = SecretKeyFactory.getInstance(kdfAlg, KeyUtil.providerName(kdfAlg));
+    SecretKeyFactory factory = cryptoApi.newSecretKeyFactory(kdfAlg);
 
     PBEKeySpec spec = new PBEKeySpec(password, salt, iteration, 256 + 256);
     byte[] compositeKey = factory.generateSecret(spec).getEncoded();
@@ -266,11 +271,11 @@ public abstract class DbPortWorker extends DbWorker {
 
     String macAlg = "HMAC-SHA256"; // 32-bit key
     // first check the mac
-    Mac mac = Mac.getInstance(macAlg, KeyUtil.providerName(macAlg));
+    Mac mac = cryptoApi.newMac(macAlg);
     mac.init(macKey);
 
     String symEncAlg = "AES/CBC/PKCS5Padding"; // 256-bit key
-    Cipher cipher = Cipher.getInstance(symEncAlg, KeyUtil.providerName(symEncAlg));
+    Cipher cipher = cryptoApi.newCipher(symEncAlg);
     cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE,
         aesKey, new IvParameterSpec(aesNonce));
 
@@ -431,7 +436,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("certStoreDataSource.close()", th);
         }
-        IoUtil.deleteDir(new File(srcFolder));
+        XipkiIoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     } // method run0
@@ -496,7 +501,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
 
-        IoUtil.deleteDir(new File(srcFolder));
+        XipkiIoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     } // method run0
@@ -772,7 +777,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        IoUtil.deleteDir(new File(srcFolder));
+        XipkiIoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     }
@@ -827,7 +832,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
 
-        IoUtil.deleteDir(new File(srcFolder));
+        XipkiIoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     }

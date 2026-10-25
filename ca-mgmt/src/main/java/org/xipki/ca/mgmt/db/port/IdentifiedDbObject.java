@@ -3,8 +3,8 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
 
 /**
  * Identified DB Object.

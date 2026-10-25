@@ -3,9 +3,9 @@
 
 package org.xipki.ca.server.publisher;
 
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.extra.exception.ObjectCreationException;
 
 import java.util.Collections;
 import java.util.Set;
@@ -32,11 +32,11 @@ public class OcspCertPublisherFactory implements CertPublisherFactory {
   }
 
   @Override
-  public CertPublisher newPublisher(String type) throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws GenerationException {
     if (TYPE.equalsIgnoreCase(type)) {
       return new OcspCertPublisher();
     } else {
-      throw new ObjectCreationException("unknown publisher type " + type);
+      throw new GenerationException("unknown publisher type " + type);
     }
   }
 

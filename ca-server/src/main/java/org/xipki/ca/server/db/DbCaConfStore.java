@@ -5,6 +5,7 @@ package org.xipki.ca.server.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
@@ -28,24 +29,23 @@ import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.ca.server.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.SqlUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.datasource.SqlUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -155,6 +155,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
    * @throws CaMgmtException
    *            If error occurs.
    */
+  @Override
   public SystemEvent getSystemEvent(String eventName) throws CaMgmtException {
     ResultRow rs = execQuery1PrepStmt0(sqlSelectSystemEvent, col2Str(eventName));
 
@@ -643,7 +644,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
                 signerType, new SignerConf(m.conf()), caCert);
             ignored.close();
           }
-        } catch (XiSecurityException | ObjectCreationException ex) {
+        } catch (XiSecurityException | GenerationException ex) {
           throw new CaMgmtException("could not create signer for CA '"
               + changeCaEntry.ident() + "'" + ex.getMessage(), ex);
         }

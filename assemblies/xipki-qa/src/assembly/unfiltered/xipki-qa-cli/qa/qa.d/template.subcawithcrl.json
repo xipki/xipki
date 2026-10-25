@@ -54,7 +54,8 @@
     },
     "profiles":[
       "ocsp",
-      "scep",
+      "scep-sign",
+      "scep-enc",
       "multiple-ous",
       "max-time",
       "tls", "tls-enc",

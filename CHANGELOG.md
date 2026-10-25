@@ -2,12 +2,23 @@
 
 See also <https://github.com/xipki/xipki/releases>
 
-## 6.7.2
+## 7.0.0
 - Release date: 202y/mm/dd
-- XXX
-  - N/A
+- Make the crypto backend plugable. Three backends have been implemented in https://github.com/xipki/xicrypto:
+  - JDK (JDK 11+, ML-DSA and ML-KEM require JDK 25+, EdDSA JDK 15+; with crypto-extra, which also
+    provides the SHA3 signatures and HMAC on JDK 11 to 15)
+  - bouncycastle FIPS (bc-fips and bcpqc-fips required)
+  - bouncycastle LTS (bcprov-lts8on required) and standard (bcprov-jdk8on required)
+- The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
+- The PKIX modules moved to https://github.com/xipki/xipkix and use the groupId `org.xipki.pkix`.
+- The shell-base module moved to https://github.com/xipki/xishell and use the groupId `org.xipki.shell`.
+- The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
+
 - Dependencies
-  - N/A
+  - bouncycastle (bcutil, bcpkix, bcprov): removed
+  - postgresql: removed
+  - jline: -> 4.4.8
+  - h2: 2.4.240 -> 2.5.252
 
 ## 6.7.1
 - Release date: 2026/09/07

@@ -3,23 +3,25 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.*;
 import org.xbill.DNS.Record;
 import org.xbill.DNS.dnssec.ValidatingResolver;
+import org.xipki.codec.asn1.Asn1OctetString;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.MiscOIDs;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.pkix.asn1.x509.GeneralNames;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
-import org.xipki.security.OIDs;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.http.HttpRespContent;
-import org.xipki.util.extra.http.XiHttpClient;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.XiHttpClient;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -186,15 +188,25 @@ public class ChallengeValidator implements Runnable {
           // check the SAN
           if (match) {
             X509Certificate cert = (X509Certificate) certs[0];
-            byte[] extnValue = cert.getExtensionValue(OIDs.Extn.subjectAlternativeName.getId());
-            byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
-            GeneralNames generalNames = GeneralNames.getInstance(octets);
-            GeneralName[] names = generalNames.getNames();
-            match = (names != null && names.length == 1
-                      && names[0].getTagNo() == GeneralName.dNSName);
-            if (match) {
-              String sanValue = Asn1Util.getIA5String(names[0].getName());
-              match = identifier.value().equals(sanValue);
+            byte[] extnValue = cert.getExtensionValue(ExtensionOIDs.subjectAlternativeName.getId());
+
+            GeneralNames generalNames;
+
+            try {
+              byte[] octets = Asn1OctetString.fromEncoded(extnValue).getOctets();
+              generalNames = GeneralNames.fromEncoded(octets);
+
+              match = generalNames.size() == 1
+                        && generalNames.get(0).getTagNo() == GeneralName.tag_dNSName;
+              if (match) {
+                String sanValue = generalNames.get(0).dNSName();
+                match = identifier.value().equals(sanValue);
+              }
+            } catch (CodecException ex) {
+              String message =  "error while validating challenge " + challId +
+                                " for identifier " + identifier;
+              LogUtil.error(LOG, ex, message);
+              match = false;
             }
           }
 
@@ -203,13 +215,25 @@ public class ChallengeValidator implements Runnable {
             // check the critical extension id_pe_acmeIdentifier
             var criticalExtensionOids = cert.getCriticalExtensionOIDs();
             match = criticalExtensionOids != null
-                && criticalExtensionOids.contains(OIDs.ACME.id_pe_acmeIdentifier.getId());
+                && criticalExtensionOids.contains(MiscOIDs.id_pe_acmeIdentifier.getId());
             if (match) {
-              byte[] extnValue = cert.getExtensionValue(OIDs.ACME.id_pe_acmeIdentifier.getId());
+              byte[] extnValue = cert.getExtensionValue(MiscOIDs.id_pe_acmeIdentifier.getId());
               if (extnValue != null) {
-                byte[] octets = Asn1Util.getOctetStringOctets(extnValue);
+                byte[] octets = null;
+                try {
+                  octets = Asn1OctetString.fromEncoded(extnValue).getOctets();
+                } catch (CodecException ex) {
+                  // do nothing
+                }
+
                 if (octets != null) {
-                  byte[] value  = Asn1Util.getOctetStringOctets(octets);
+                  byte[] value = null;
+                  try {
+                    value  = Asn1OctetString.fromEncoded(octets).getOctets();
+                  } catch (CodecException ex) {
+                    // do nothing
+                  }
+
                   if (value != null) {
                     receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(value);
                   }
@@ -272,7 +296,7 @@ public class ChallengeValidator implements Runnable {
 
     ValidatingResolver validatingResolver = new ValidatingResolver(resolver);
     validatingResolver.setAddReasonToAdditional(true);
-    String anchorFile = IoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true);
+    String anchorFile = XipkiIoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true);
     try (InputStream in = Files.newInputStream(Path.of(anchorFile))) {
       validatingResolver.loadTrustAnchors(in);
     } catch (IOException ex) {

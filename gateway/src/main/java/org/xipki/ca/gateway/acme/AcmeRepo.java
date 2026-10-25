@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
-import org.xipki.security.HashAlgo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.HashAlgo;
 import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.misc.LruCache;
 
 import java.time.Instant;
@@ -193,6 +193,8 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
   }
 
   public void start() {
+    dataSource.fixJwkSha256();
+
     Thread t = new Thread(new DataToDbWriter());
     t.setName("dataToDbWriter");
     t.setDaemon(true);

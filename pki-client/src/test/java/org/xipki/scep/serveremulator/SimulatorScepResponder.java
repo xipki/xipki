@@ -3,43 +3,40 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.IssuerAndSerialNumber;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cms.CMSAbsentContent;
-import org.bouncycastle.cms.CMSAlgorithm;
-import org.bouncycastle.cms.CMSException;
-import org.bouncycastle.cms.CMSSignedData;
-import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.scep.message.CaCaps;
-import org.xipki.security.scep.message.DecodedPkiMessage;
-import org.xipki.security.scep.message.EnvelopedDataDecryptor;
-import org.xipki.security.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
-import org.xipki.security.scep.message.IssuerAndSubject;
-import org.xipki.security.scep.message.NextCaMessage;
-import org.xipki.security.scep.message.PkiMessage;
-import org.xipki.security.scep.transaction.CaCapability;
-import org.xipki.security.scep.transaction.FailInfo;
-import org.xipki.security.scep.transaction.MessageType;
-import org.xipki.security.scep.transaction.Nonce;
-import org.xipki.security.scep.transaction.PkiStatus;
-import org.xipki.security.scep.transaction.TransactionId;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.scep.IssuerAndSubject;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.cms.CmsAlgorithm;
+import org.xipki.pkix.cms.CmsException;
+import org.xipki.pkix.cms.CmsSignedData;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.scep.message.CaCaps;
+import org.xipki.pkix.scep.message.DecodedPkiMessage;
+import org.xipki.pkix.scep.message.EnvelopedDataDecryptor;
+import org.xipki.pkix.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
+import org.xipki.pkix.scep.message.NextCaMessage;
+import org.xipki.pkix.scep.message.PkiMessage;
+import org.xipki.pkix.scep.transaction.CaCapability;
+import org.xipki.pkix.scep.transaction.FailInfo;
+import org.xipki.pkix.scep.transaction.MessageType;
+import org.xipki.pkix.scep.transaction.Nonce;
+import org.xipki.pkix.scep.transaction.PkiStatus;
+import org.xipki.pkix.scep.transaction.TransactionId;
+import org.xipki.pkix.sign.SignAlgos;
+import org.xipki.pkix.sign.SignerConf;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -98,11 +95,11 @@ public class SimulatorScepResponder {
     this.maxSigningTimeBiasInMs = ms;
   }
 
-  public ContentInfo servicePkiOperation(CMSSignedData requestContent)
+  public ContentInfo servicePkiOperation(CmsSignedData requestContent)
       throws CodecException, CaException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
-    PrivateKey recipientKey = (raEmulator != null) ? raEmulator.raKey() : caEmulator.caKey();
-    X509Cert recipientCert = (raEmulator != null) ? raEmulator.raCert() : caEmulator.caCert();
+    PrivateKey recipientKey = (raEmulator != null) ? raEmulator.raEncKey() : caEmulator.caKey();
+    X509Cert recipientCert = (raEmulator != null) ? raEmulator.raEncCert() : caEmulator.caCert();
 
     EnvelopedDataDecryptorInstance decInstance =
         new EnvelopedDataDecryptorInstance(recipientCert, recipientKey);
@@ -114,7 +111,7 @@ public class SimulatorScepResponder {
 
     SignerConf conf = new SignerConf();
     conf.setHash(req.digestAlgorithm());
-    SignAlgo signatureAlgorithm = SignAlgo.getInstance(signingKey(), conf);
+    SignAlgo signatureAlgorithm = SignAlgos.getInstance(signingKey(), conf);
 
     try {
       X509Cert jceSignerCert = signingCert();
@@ -193,13 +190,13 @@ public class SimulatorScepResponder {
     } // end if
 
     // check the content encryption algorithm
-    ASN1ObjectIdentifier encOid = req.contentEncryptionAlgorithm();
-    if (CMSAlgorithm.DES_EDE3_CBC.equals(encOid)) {
+    Asn1Oid encOid = req.contentEncryptionAlgorithm();
+    if (CmsAlgorithm.DES_EDE3_CBC.equals(encOid)) {
       if (!caCaps.supportsDES3()) {
         LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
       }
-    } else if (CMSAlgorithm.AES128_CBC.equals(encOid)) {
+    } else if (CmsAlgorithm.AES128_CBC.equals(encOid)) {
       if (!caCaps.supportsAES()) {
         LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
         return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badAlg);
@@ -235,7 +232,7 @@ public class SimulatorScepResponder {
           }
         }
 
-        String challengePwd = X509Util.getChallengePassword(csr.getCertificationRequestInfo());
+        String challengePwd = csr.challengePassword();
         if (!control.secret().equals(challengePwd)) {
           LOG.warn("challengePassword is not trusted");
           return buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
@@ -260,8 +257,15 @@ public class SimulatorScepResponder {
         return rep;
       }
       case CertPoll: {
-        IssuerAndSubject is = IssuerAndSubject.getInstance(req.messageData());
-        X509Cert cert = caEmulator.pollCert(is.issuer(), is.subject());
+        IssuerAndSubject is;
+        try {
+          is = IssuerAndSubject.fromAsn1(req.messageData().asSequence());
+        } catch (CodecException e) {
+          buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
+          return rep;
+        }
+
+        X509Cert cert = caEmulator.pollCert(is.getIssuer(), is.getSubject());
         if (cert != null) {
           rep.setMessageData(createSignedData(cert));
         } else {
@@ -271,8 +275,15 @@ public class SimulatorScepResponder {
         return rep;
       }
       case GetCert: {
-        IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.messageData());
-        X509Cert cert = caEmulator.getCert(isn.getName(), isn.getSerialNumber().getValue());
+        IssuerAndSerialNumber isn;
+        try {
+          isn = IssuerAndSerialNumber.fromAsn1(req.messageData().asSequence());
+        } catch (CodecException e) {
+          buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
+          return rep;
+        }
+
+        X509Cert cert = caEmulator.getCert(isn.getName(), isn.serialNumber());
         if (cert != null) {
           rep.setMessageData(createSignedData(cert));
         } else {
@@ -310,10 +321,11 @@ public class SimulatorScepResponder {
         return rep;
       }
       case GetCRL: {
-        IssuerAndSerialNumber isn = IssuerAndSerialNumber.getInstance(req.messageData());
         CertificateList crl;
         try {
-          crl = caEmulator.getCrl(isn.getName(), isn.getSerialNumber().getValue());
+          IssuerAndSerialNumber isn = IssuerAndSerialNumber.fromAsn1(
+              req.messageData().asSequence());
+          crl = caEmulator.getCrl(isn.getName(), isn.serialNumber());
         } catch (Exception ex) {
           throw new CaException("system failure: " + ex.getMessage(), ex);
         }
@@ -332,13 +344,13 @@ public class SimulatorScepResponder {
   } // method servicePkiOperation0
 
   private ContentInfo createSignedData(CertificateList crl) throws CaException {
-    CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
-    cmsSignedDataGen.addCRL(new X509CRLHolder(crl));
+    CmsSignedData.Builder cmsSignedDataGen = new CmsSignedData.Builder();
+    cmsSignedDataGen.addCRL(crl);
 
-    CMSSignedData cmsSigneddata;
+    CmsSignedData cmsSigneddata;
     try {
-      cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
-    } catch (CMSException ex) {
+      cmsSigneddata = cmsSignedDataGen.build();
+    } catch (CmsException ex) {
       throw new CaException(ex.getMessage(), ex);
     }
 
@@ -346,17 +358,17 @@ public class SimulatorScepResponder {
   } // method createSignedData
 
   private ContentInfo createSignedData(X509Cert cert) throws CaException {
-    CMSSignedDataGenerator cmsSignedDataGen = new CMSSignedDataGenerator();
+    CmsSignedData.Builder cmsSignedDataGen = new CmsSignedData.Builder();
 
-    CMSSignedData cmsSigneddata;
+    CmsSignedData cmsSigneddata;
     try {
-      cmsSignedDataGen.addCertificate(cert.getCertHolder());
+      cmsSignedDataGen.addCertificate(cert.getCert());
       if (control.isSendCaCert()) {
-        cmsSignedDataGen.addCertificate(caEmulator.caCert().getCertHolder());
+        cmsSignedDataGen.addCertificate(caEmulator.caCert().getCert());
       }
 
-      cmsSigneddata = cmsSignedDataGen.generate(new CMSAbsentContent());
-    } catch (CMSException ex) {
+      cmsSigneddata = cmsSignedDataGen.build();
+    } catch (CmsException ex) {
       throw new CaException(ex);
     }
 
@@ -394,10 +406,10 @@ public class SimulatorScepResponder {
     return message;
   }
 
-  private static CertificationRequest parseCsrInRequest(ASN1Encodable p10Asn1)
+  private static CertificationRequest parseCsrInRequest(Asn1Primitive p10Asn1)
       throws OperationException {
     try {
-      return CertificationRequest.getInstance(p10Asn1);
+      return CertificationRequest.fromAsn1(p10Asn1.asSequence());
     } catch (Exception ex) {
       throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
     }

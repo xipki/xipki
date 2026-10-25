@@ -3,9 +3,9 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.crmf.CertId;
-import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.codec.Args;
+import org.xipki.pkix.asn1.crmf.CertId;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cmp.PkiStatusInfo;
 
 /**
  * Cert Id Or Error.

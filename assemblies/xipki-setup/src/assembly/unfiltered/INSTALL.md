@@ -7,7 +7,7 @@ to one tomcat instance.
 Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 
 ## Prepare Tomcat Configuration, Keys and certificates for the Communication between XiPKI Components
-1. (Optional) If you use database other than H2, PostgreSQL, MariaDB and MySQL:
+1. (Optional) If you use database other than H2, MariaDB and MySQL:
    Download the JDBC driver to the folder `xipki-ca/tomcat/lib`.
 2. (Optional) Only if you use existing Keys and Certificates
    Copy the file `setup/keycerts.json` and folder `setup/keycerts` from old XiPKI folder to `setup`.
@@ -64,11 +64,11 @@ In all XiPKI components, you may configure the password using the following meth
     - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
     - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
     - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
-    - `java:<class name implements org.xipki.password.PasswordCallback> [<corresponding configuration>]`
-      e.g. `java:org.xipki.password.demo.PassThroughPasswordCallback qwert`.
+    - `java:<class name implements org.xipki.pkix.util.password.PasswordCallback> [<corresponding configuration>]`
+      e.g. `java:org.xipki.pkix.util.password.demo.PassThroughPasswordCallback qwert`.
 
 - Use you own password resolver, assumed the password protocol is `ABC`, then the password is
-  `ABC:<data>`. You need to write a Java class implements `org.xipki.password.PasswordResolver` which
+  `ABC:<data>`. You need to write a Java class implements `org.xipki.pkix.util.password.PasswordResolver` which
   can resolve password starting with `ABC:`.
   You need to add the password resolvers in the file `xipki/secuity/password.cfg`:
    ```

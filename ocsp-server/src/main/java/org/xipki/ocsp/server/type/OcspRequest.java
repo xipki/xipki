@@ -3,11 +3,12 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.asn1.ocsp.Request;
-import org.bouncycastle.asn1.ocsp.TBSRequest;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.pkix.asn1.ocsp.OCSPRequest;
+import org.xipki.pkix.asn1.ocsp.Request;
+import org.xipki.pkix.asn1.ocsp.TBSRequest;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ocsp.api.RequestIssuer;
 
 import java.io.ByteArrayOutputStream;
@@ -17,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * OCSP Request payload.
@@ -58,6 +60,15 @@ public class OcspRequest {
   }
 
   public static OcspRequest getInstance(byte[] request) throws EncodingException {
+    try {
+      return getInstance0(request);
+    } catch (RuntimeException ex) {
+      // e.g. IndexOutOfBoundsException caused by a malformed request.
+      throw new EncodingException("malformed request: " + ex.getMessage(), ex);
+    }
+  }
+
+  private static OcspRequest getInstance0(byte[] request) throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -88,6 +99,9 @@ public class OcspRequest {
 
     List<CertID> requestList = new LinkedList<>();
     Header hdrRequestList = hdr;
+    if (hdrRequestList.len == 0) {
+      throw new EncodingException("requestList is empty");
+    }
 
     Header hdrSingleReq = readHeader(request, hdr.readerIndex);
     // requestList
@@ -105,6 +119,9 @@ public class OcspRequest {
         throw new EncodingException(ex);
       }
 
+      if (hdrSerial.len == 0) {
+        throw new EncodingException("serialNumber is empty");
+      }
       BigInteger serialNumber = new BigInteger(readContent(request, hdrSerial));
       CertID certId = new CertID(issuer, serialNumber);
       requestList.add(certId);
@@ -153,22 +170,26 @@ public class OcspRequest {
   public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
     TBSRequest tbsReq = req.getTbsRequest();
 
-    org.bouncycastle.asn1.x509.Extensions extensions0 = tbsReq.getRequestExtensions();
-    ASN1Sequence requestList0 = tbsReq.getRequestList();
+    Extensions extensions0 = tbsReq.getRequestExtensions();
+    Request.Seq0 requestList0 = tbsReq.getRequestList();
 
     final int n = requestList0.size();
+    if (n == 0) {
+      throw new EncodingException("requestList is empty");
+    }
     List<CertID> requestList = new ArrayList<>(n);
     for (int i = 0; i < n; i++) {
-      Request singleReq0 = Request.getInstance(requestList0.getObjectAt(i));
-      org.bouncycastle.asn1.ocsp.CertID certId0 = singleReq0.getReqCert();
+      Request singleReq0 = requestList0.get(i);
+      org.xipki.pkix.asn1.ocsp.CertID certId0 = singleReq0.getReqCert();
       ByteArrayOutputStream out = new ByteArrayOutputStream();
+
       try {
         out.write(certId0.getHashAlgorithm().getEncoded());
         out.write(certId0.getIssuerNameHash().getEncoded());
         out.write(certId0.getIssuerKeyHash().getEncoded());
         byte[] encodedIssuer = out.toByteArray();
         RequestIssuer issuer = new RequestIssuer(encodedIssuer,0, encodedIssuer.length);
-        CertID certId = new CertID(issuer, certId0.getSerialNumber().getValue());
+        CertID certId = new CertID(issuer, certId0.serialNumber());
         requestList.add(certId);
       } catch (IOException | NoSuchAlgorithmException ex) {
         throw new EncodingException(ex.getMessage(), ex);
@@ -177,24 +198,27 @@ public class OcspRequest {
 
     List<ExtendedExtension> extensions = new LinkedList<>();
     if (extensions0 != null) {
-      ASN1ObjectIdentifier[] extOids = extensions0.getExtensionOIDs();
-      for (ASN1ObjectIdentifier oid : extOids) {
-        org.bouncycastle.asn1.x509.Extension extension0 = extensions0.getExtension(oid);
+      Set<Asn1Oid> extOids = extensions0.getExtensionIds();
+      for (Asn1Oid oid : extOids) {
+        Extension extension0 = extensions0.getExtension(oid);
 
-        byte[] encoded;
-        try {
-          encoded = extension0.getEncoded();
-        } catch (IOException ex) {
-          throw new EncodingException("error encoding Extension", ex);
-        }
+        byte[] encoded = extension0.getEncoded();
         extensions.add(ExtendedExtension.getInstance(encoded, 0, encoded.length));
       }
     }
 
-    return new OcspRequest(tbsReq.getVersion().getValue().intValue(), requestList, extensions);
+    return new OcspRequest(tbsReq.version(), requestList, extensions);
   } // method getInstance
 
   public static int readRequestVersion(byte[] request) throws EncodingException {
+    try {
+      return readRequestVersion0(request);
+    } catch (RuntimeException ex) {
+      throw new EncodingException("malformed request: " + ex.getMessage(), ex);
+    }
+  }
+
+  private static int readRequestVersion0(byte[] request) throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -224,11 +248,19 @@ public class OcspRequest {
   }
 
   static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
+    if (readerIndex < 0 || readerIndex + 2 > encoded.length) {
+      throw new EncodingException("truncated data at " + readerIndex);
+    }
+
     int off = readerIndex;
     byte tag = encoded[off++];
     int len = 0xFF & encoded[off++];
     if (len >= 0x80) {
       int lenSize = len & 0x7F;
+      if (off + lenSize > encoded.length) {
+        throw new EncodingException("truncated length field at " + readerIndex);
+      }
+
       if (lenSize == 1) {
         len = 0xFF & encoded[off++];
       } else if (lenSize == 2) {
@@ -242,6 +274,11 @@ public class OcspRequest {
       } else {
         throw new EncodingException("invalid length field at " + readerIndex);
       }
+    }
+
+    // len < 0: 4-byte length field larger than Integer.MAX_VALUE
+    if (len < 0 || len > encoded.length - off) {
+      throw new EncodingException("content exceeds the data at " + readerIndex);
     }
     return new Header(readerIndex, tag, len, off);
   } // method readHeader

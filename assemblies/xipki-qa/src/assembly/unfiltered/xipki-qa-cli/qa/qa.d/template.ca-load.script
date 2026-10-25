@@ -10,11 +10,9 @@ echo "#                        Load rootca.json                       #"
 echo "#################################################################"
 
 if $TOKEN_TYPE eq "PKCS11"
-  set CA_SIGNER_CONF \
-    "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}rootca1"
+  set CA_SIGNER_CONF "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}rootca1"
 else
-  set CA_SIGNER_CONF \
-    "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGALG"
+  set CA_SIGNER_CONF "password=CHANGEIT,keystore=file:output/rootca1.p12,algo=$CA_SIGALG"
 fi
 
 copy-file -f qa/qa.d/template.rootca.json qa/qa.d/rootca.json
@@ -113,11 +111,9 @@ echo "#################################################################"
 ## Add CA
 
 if $TOKEN_TYPE eq "PKCS11"
-  set CA_SIGNER_CONF \
-    "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subca1"
+  set CA_SIGNER_CONF "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subca1"
 else
-  set CA_SIGNER_CONF \
-    "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
+  set CA_SIGNER_CONF "password=CHANGEIT,keystore=file:output/subca1.p12,algo=$CA_SIGALG"
 fi
 
 copy-file -f qa/qa.d/template.subca.json qa/qa.d/subca.json
@@ -138,11 +134,9 @@ echo "#################################################################"
 ## Add CA
 
 if $TOKEN_TYPE eq "PKCS11"
-  set CA_SIGNER_CONF \
-    "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subcawithcrl1"
+  set CA_SIGNER_CONF "algo=$CA_SIGALG,slot=$SLOT,key-label=${CA_P11_LABEL_PREFIX}subcawithcrl1"
 else
-  set CA_SIGNER_CONF \
-    "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$CA_SIGALG"
+  set CA_SIGNER_CONF "password=CHANGEIT,keystore=file:output/subcawithcrl1.p12,algo=$CA_SIGALG"
 fi
 
 copy-file -f qa/qa.d/template.subcawithcrl.json qa/qa.d/subcawithcrl.json

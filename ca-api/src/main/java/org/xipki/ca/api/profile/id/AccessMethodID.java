@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.id;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ public class AccessMethodID extends AbstractID {
   public static final AccessMethodID caRepository = initOf(
       "1.3.6.1.5.5.7.48.5", "CARepository");
 
-  private AccessMethodID(ASN1ObjectIdentifier oid, List<String> aliases) {
+  private AccessMethodID(Asn1Oid oid, List<String> aliases) {
     super(oid, aliases);
   }
 
@@ -47,10 +47,10 @@ public class AccessMethodID extends AbstractID {
       l.addAll(Arrays.asList(aliases));
     }
     l.add(oid);
-    return addToMap(new AccessMethodID(new ASN1ObjectIdentifier(oid), l), typeMap);
+    return addToMap(new AccessMethodID(new Asn1Oid(oid), l), typeMap);
   }
 
-  public static AccessMethodID ofOid(ASN1ObjectIdentifier oid) {
+  public static AccessMethodID ofOid(Asn1Oid oid) {
     Args.notNull(oid, "oid");
     AccessMethodID attr = typeMap.get(oid.getId());
     if (attr == null) {
@@ -67,7 +67,7 @@ public class AccessMethodID extends AbstractID {
     }
 
     try {
-      return ofOid(new ASN1ObjectIdentifier(c14n));
+      return ofOid(new Asn1Oid(c14n));
     } catch (RuntimeException e) {
       return null;
     }

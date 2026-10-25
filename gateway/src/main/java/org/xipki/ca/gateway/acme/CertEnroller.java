@@ -3,11 +3,11 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
@@ -15,13 +15,11 @@ import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.EmbedCertsMode;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.EmbedCertsMode;
 
-import java.io.IOException;
 import java.util.Iterator;
 
 /**
@@ -104,13 +102,12 @@ public class CertEnroller implements Runnable {
         CertificationRequest p10Req;
         try {
           p10Req = GatewayUtil.parseCsrInRequest(csr);
-          Extensions extensions = X509Util.getExtensions(p10Req.getCertificationRequestInfo());
-          if (extensions != null) {
-            entry.setExtensions(extensions.getEncoded());
+          Extensions extns = p10Req.getExtensionRequest();
+          if (extns != null) {
+            entry.setExtensions(extns.getEncoded());
           }
-          entry.setSubjectPublicKey(p10Req.getCertificationRequestInfo()
-              .getSubjectPublicKeyInfo().getEncoded());
-        } catch (IOException | OperationException e) {
+          entry.setSubjectPublicKey(p10Req.getSubjectPKInfo().getEncoded());
+        } catch (OperationException e) {
           throw new AcmeSystemException(e);
         }
       }
@@ -128,7 +125,7 @@ public class CertEnroller implements Runnable {
         if (valid) {
           // check the certificate
           try {
-            Certificate.getInstance(certBytes);
+            Certificate.fromEncoded(certBytes);
           } catch (Exception ex) {
             LogUtil.error(LOG, ex, "Error parsing enrolled certificate for order " + orderIdStr);
             valid = false;

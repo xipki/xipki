@@ -3,18 +3,20 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.KeySpec;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.KeyInfoPair;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.KeyInfoPair;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.IoUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -32,7 +34,6 @@ import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.Clock;
@@ -48,6 +49,8 @@ import java.util.StringTokenizer;
  * @author Lijun Liao (xipki)
  */
 public class FillKeypool implements AutoCloseable {
+
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
 
   private static final int ENCALG_AES128GCM = 1;
 
@@ -72,8 +75,13 @@ public class FillKeypool implements AutoCloseable {
     }
   }
 
-  public void execute(int numKeypairs, String encAlg, char[] password) throws Exception {
+  public void execute(int numKeypairs, String encAlg, char[] password, List<KeySpec> keySpecs)
+      throws Exception {
     Args.notNull(password, "password");
+
+    if (keySpecs == null) {
+      keySpecs = List.of(KeySpec.values());
+    }
 
     int encAlgCode;
     int keyLength;
@@ -94,7 +102,6 @@ public class FillKeypool implements AutoCloseable {
     PreparedStatement ps = null;
     Statement stmt = null;
     String sql = null;
-    ResultSet rs = null;
     SecureRandom rnd = new SecureRandom();
 
     try {
@@ -132,9 +139,9 @@ public class FillKeypool implements AutoCloseable {
       stmt = conn.createStatement();
 
       PBEKeySpec spec = new PBEKeySpec(password, salt, iteration, keyLength);
-      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+      SecretKeyFactory factory = cryptoApi.newSecretKeyFactory("PBKDF2WithHmacSHA256");
       SecretKey key = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
-      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+      Cipher cipher = cryptoApi.newCipher("AES/GCM/NoPadding");
 
       sql = "DELETE FROM KEYPOOL";
       stmt.executeUpdate(sql);
@@ -142,18 +149,16 @@ public class FillKeypool implements AutoCloseable {
       sql = "DELETE FROM KEYSPEC";
       stmt.executeUpdate(sql);
 
-      KeySpec[] keyspecs = KeySpec.values();
-
       Map<KeySpec, Integer> keyspecToIdMap = new HashMap<>();
 
       int incrementKid = 1;
-      for (KeySpec keyspec : keyspecs) {
+      for (KeySpec keyspec : keySpecs) {
         keyspecToIdMap.put(keyspec, incrementKid++);
       }
 
       sql = "INSERT INTO KEYSPEC (ID,KEYSPEC) VALUES (?,?)";
       ps = datasource.prepareStatement(sql);
-      for (KeySpec keyspec : keyspecs) {
+      for (KeySpec keyspec : keySpecs) {
         int kid = keyspecToIdMap.get(keyspec);
         ps.setInt(1, kid);
         ps.setString(2, keyspec.text());
@@ -169,9 +174,13 @@ public class FillKeypool implements AutoCloseable {
       ps = datasource.prepareStatement(sql);
       int id = 1;
 
+      if (keySpecs == null) {
+        keySpecs = List.of(KeySpec.values());
+      }
+
       // loading the RSA pre-generated keypairs
       Map<KeySpec, List<KeyInfoPair>> preKeysMap = new HashMap<>();
-      for (KeySpec keyspec : KeySpec.values()) {
+      for (KeySpec keyspec : keySpecs) {
         String fn = "/keypool/" + keyspec.name() + ".txt";
 
         try (InputStream in = FillKeypool.class.getResourceAsStream(fn)) {
@@ -194,14 +203,14 @@ public class FillKeypool implements AutoCloseable {
             String b64Pk = tokenizer.nextToken();
             byte[] skBytes = Base64.decodeFast(b64Sk);
             byte[] pkBytes = Base64.decodeFast(b64Pk);
-            PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(skBytes);
-            SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(pkBytes);
+            PrivateKeyInfo skInfo = PrivateKeyInfo.fromEncoded(skBytes);
+            SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.fromEncoded(pkBytes);
             keys.add(new KeyInfoPair(pkInfo, skInfo));
           }
         }
       }
 
-      for (KeySpec keyspec : keyspecs) {
+      for (KeySpec keyspec : keySpecs) {
         int kid = keyspecToIdMap.get(keyspec);
         List<KeyInfoPair> preKeys = preKeysMap.get(keyspec);
 

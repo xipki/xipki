@@ -5,14 +5,14 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.X509Cert;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

@@ -39,7 +39,7 @@ install_component() {
 }
 
 "$java_exec" -cp "$classpath" -Ddemo.dir="$DEMO_DIR" \
-  org.xipki.util.extra.misc.BatchReplace setup/demo-conf.json
+  org.xipki.util.misc.BatchReplace setup/demo-conf.json
 
 sh "$script_dir/prepare.sh"
 

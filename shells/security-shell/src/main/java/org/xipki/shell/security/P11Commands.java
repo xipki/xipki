@@ -5,26 +5,26 @@ package org.xipki.shell.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Hex;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
-import org.xipki.security.KeySpec;
-import org.xipki.security.pkcs11.P11CompositeKey;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkcs11.P11Module;
-import org.xipki.security.pkcs11.P11Slot;
-import org.xipki.security.pkcs11.P11SlotId;
-import org.xipki.security.util.KeyUtil;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.pkcs11.P11CompositeKey;
+import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
+import org.xipki.pkix.pkcs11.P11Module;
+import org.xipki.pkix.pkcs11.P11Slot;
+import org.xipki.pkix.pkcs11.P11SlotId;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.PasswordResolverException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -76,11 +76,17 @@ public class P11Commands {
             spec.signVerify(true).decryptEncrypt(true).signVerifyRecover(true);
           } else if (keySpec.isEdwardsEC() || keySpec.isMldsa() || keySpec.isCompositeMLDSA()) {
             spec.signVerify(true);
-          } else if (keySpec.isMontgomeryEC() || keySpec.isMlkem()) {
-            spec.decryptEncrypt(true);
+          } else if (keySpec.isMontgomeryEC()) {
+            // X25519, X448: ECDH (CKM_ECDH1_DERIVE) with C_DeriveKey, e.g. for the DH POP,
+            // and with C_DecapsulateKey (PKCS#11 v3.2, table 78). No encryption.
+            spec.derive(true).deEncapsulate(true);
+          } else if (keySpec.isMlkem()) {
+            spec.decryptEncrypt(true).deEncapsulate(true);
           } else if (keySpec.isCompositeMLKEM()) {
             spec.deEncapsulate(true);
             KeySpec tradKeySpec = keySpec.compositeTradVariant();
+            assert tradKeySpec != null;
+
             if (tradKeySpec.isRSA()) {
               spec.decrypt(true);
             } else if (tradKeySpec.isMontgomeryEC() || tradKeySpec.isWeierstrassEC()) {

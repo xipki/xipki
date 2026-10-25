@@ -5,19 +5,20 @@ package org.xipki.dummyservlet.crl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpFilter;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.XipkiBaseDir;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.io.XipkiBaseDir;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -130,7 +131,7 @@ public class CrlHttpFilter implements XiHttpFilter {
 
       byte[] respContent;
       if (hashalgo != null && columnName.equals("CRL")) {
-        MessageDigest sha1 = MessageDigest.getInstance("SHA1");
+        MessageDigest sha1 = CryptoApiFactory.get().newMessageDigest("SHA1");
         respContent = sha1.digest(dbContent);
       } else {
         respContent = dbContent;

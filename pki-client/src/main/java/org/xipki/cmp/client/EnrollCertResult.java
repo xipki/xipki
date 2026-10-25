@@ -3,10 +3,10 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.pkix.cert.X509Cert;
 
 import java.util.Map;
 import java.util.Set;

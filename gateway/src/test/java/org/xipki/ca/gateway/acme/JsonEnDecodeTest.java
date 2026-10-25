@@ -7,10 +7,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

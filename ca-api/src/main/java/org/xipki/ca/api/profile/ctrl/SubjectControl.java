@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,33 +21,33 @@ import java.util.Set;
  */
 public class SubjectControl {
 
-  private final Map<ASN1ObjectIdentifier, RdnControl> controls;
+  private final Map<Asn1Oid, RdnControl> controls;
 
-  private final List<ASN1ObjectIdentifier> types;
+  private final List<Asn1Oid> types;
 
   public SubjectControl(List<RdnControl> controls, boolean keepRdnOrder) {
     Args.notEmpty(controls, "controls");
 
-    List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+    List<Asn1Oid> sortedOids = new ArrayList<>(controls.size());
     if (keepRdnOrder) {
       for (RdnControl m : controls) {
         sortedOids.add(m.type());
       }
     } else {
-      Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
+      Set<Asn1Oid> oidSet = new HashSet<>();
       for (RdnControl m : controls) {
         oidSet.add(m.type());
       }
 
-      List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
+      List<Asn1Oid> oids = SubjectDnSpec.getForwardDNs();
 
-      for (ASN1ObjectIdentifier oid : oids) {
+      for (Asn1Oid oid : oids) {
         if (oidSet.contains(oid)) {
           sortedOids.add(oid);
         }
       }
 
-      for (ASN1ObjectIdentifier oid : oidSet) {
+      for (Asn1Oid oid : oidSet) {
         if (!sortedOids.contains(oid)) {
           sortedOids.add(oid);
         }
@@ -65,11 +65,11 @@ public class SubjectControl {
     }
   } // constructor
 
-  public RdnControl getControl(ASN1ObjectIdentifier type) {
+  public RdnControl getControl(Asn1Oid type) {
     return controls.get(Args.notNull(type, "type"));
   }
 
-  public List<ASN1ObjectIdentifier> types() {
+  public List<Asn1Oid> types() {
     return types;
   }
 

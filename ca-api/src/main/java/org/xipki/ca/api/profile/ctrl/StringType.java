@@ -3,11 +3,11 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.AbstractAsn1String;
+import org.xipki.codec.asn1.Asn1IA5String;
+import org.xipki.codec.asn1.Asn1PrintableString;
+import org.xipki.codec.asn1.Asn1Utf8String;
+import org.xipki.codec.util.Args;
 
 /**
  * String Type enumeration.
@@ -20,15 +20,15 @@ public enum StringType {
   utf8String,
   ia5String;
 
-  public ASN1Encodable createString(String text) {
+  public AbstractAsn1String createString(String text) {
     Args.notNull(text, "text");
 
     if (printableString == this) {
-      return new DERPrintableString(text);
+      return new Asn1PrintableString(text);
     } else if (utf8String == this) {
-      return new DERUTF8String(text);
+      return new Asn1Utf8String(text);
     } else if (ia5String == this) {
-      return new DERIA5String(text, true);
+      return new Asn1IA5String(text);
     } else {
       throw new IllegalStateException("should not reach here, unknown StringType " + this.name());
     }

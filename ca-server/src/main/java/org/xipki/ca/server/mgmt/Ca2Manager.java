@@ -3,16 +3,16 @@
 
 package org.xipki.ca.server.mgmt;
 
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
@@ -37,29 +37,27 @@ import org.xipki.ca.server.CertTemplateData;
 import org.xipki.ca.server.CtLogClient;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.ca.server.X509Ca;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.HashSet;
@@ -295,7 +293,7 @@ class Ca2Manager {
           signer.close();
         }
       }
-    } catch (XiSecurityException | ObjectCreationException ex) {
+    } catch (XiSecurityException | GenerationException ex) {
       throw new CaMgmtException("could not create signer for new CA "
           + name + ": " + ex.getMessage(), ex);
     }
@@ -551,10 +549,11 @@ class Ca2Manager {
       throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage());
     }
 
-    Certificate targetCert = Certificate.getInstance(encodedTargetCert);
+    Certificate targetCert;
     try {
+      targetCert = Certificate.fromEncoded(encodedTargetCert);
       X509Util.assertCsrAndCertMatch(csr, targetCert, true);
-    } catch (XiSecurityException ex) {
+    } catch (XiSecurityException | CodecException ex) {
       throw new CaMgmtException(ex.getMessage());
     }
 
@@ -572,13 +571,13 @@ class Ca2Manager {
         notBefore = now;
       }
 
-      Instant targetCertNotBefore = targetCert.getStartDate().getDate().toInstant();
+      Instant targetCertNotBefore = targetCert.notBefore();
       if (notBefore.isBefore(targetCertNotBefore)) {
         notBefore = targetCertNotBefore;
       }
     }
 
-    Instant targetCertNotAfter = targetCert.getEndDate().getDate().toInstant();
+    Instant targetCertNotAfter = targetCert.notAfter();
     if (notAfter == null) {
       notAfter = targetCertNotAfter;
     } else {
@@ -623,12 +622,8 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    try {
-      return new KeyCertBytesPair(certInfo.privateKey().getEncoded(),
-          certInfo.cert().cert().getEncoded());
-    } catch (IOException ex) {
-      throw new CaMgmtException(ex.getMessage(), ex);
-    }
+    return new KeyCertBytesPair(certInfo.privateKey().getEncoded(),
+        certInfo.cert().cert().getEncoded());
   }
 
   X509Cert generateCertificate(
@@ -645,25 +640,23 @@ class Ca2Manager {
     try {
       csr = X509Util.parseCsr(encodedCsr);
     } catch (Exception ex) {
-      throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage());
+      throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage(), ex);
     }
 
-    CertificationRequestInfo cri = csr.getCertificationRequestInfo();
     if (!manager.securityFactory().verifyPop(csr, null, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
     Extensions extensions = null;
-    ASN1Set attrs = cri.getAttributes();
-    for (int i = 0; i < attrs.size(); i++) {
-      Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-      if (OIDs.PKCS9.pkcs9_at_extensionRequest.equals(attr.getAttrType())) {
-        extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+    Attribute.Set0 attrs = csr.getAttributes();
+    for (Attribute attr : attrs) {
+      if (AttributeOIDs.pkcs9_at_extensionRequest.equals(attr.getAttrType())) {
+        extensions = attr.getExtensionRequest();
       }
     }
 
-    X500Name subject = cri.getSubject();
-    SubjectPublicKeyInfo publicKeyInfo = cri.getSubjectPublicKeyInfo();
+    X500Name subject = csr.getSubject();
+    SubjectPublicKeyInfo publicKeyInfo = csr.getSubjectPKInfo();
 
     CertTemplateData certTemplateData = new CertTemplateData(subject,
         publicKeyInfo, notBefore, notAfter, extensions, profileName);
@@ -735,8 +728,7 @@ class Ca2Manager {
     }
   } // method generateCrlOnDemand
 
-  X509Crl getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
-    Args.notNull(crlNumber, "crlNumber");
+  X509Crl getCrl(String caName, Long crlNumber) throws CaMgmtException {
     X509Ca ca = getX509Ca(caName);
     try {
       X509Crl crl = ca.getCrl(manager.byCaRequestor, crlNumber);

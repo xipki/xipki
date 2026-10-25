@@ -5,15 +5,14 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.mgmt.db.diffdb.QueueEntry.DigestEntrySet;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -102,7 +101,7 @@ class RefDigestReader implements Closeable {
 
     private void query() throws InterruptedException {
       long startId = lastProcessedId + 1;
-      DigestEntrySet result = new DigestEntrySet(startId);
+      QueueEntry.DigestEntrySet result = new QueueEntry.DigestEntrySet(startId);
 
       ResultSet rs = null;
       try {
@@ -277,7 +276,7 @@ class RefDigestReader implements Closeable {
       return null;
     }
 
-    DigestEntrySet certSet;
+    QueueEntry.DigestEntrySet certSet;
 
     QueueEntry next = null;
     while (next == null) {
@@ -290,11 +289,11 @@ class RefDigestReader implements Closeable {
     if (next instanceof QueueEntry.EndOfQueue) {
       endReached.set(true);
       return null;
-    } else if (!(next instanceof DigestEntrySet)) {
+    } else if (!(next instanceof QueueEntry.DigestEntrySet)) {
       throw new IllegalStateException("unknown QueueEntry type: " + next.getClass().getName());
     }
 
-    certSet = (DigestEntrySet) next;
+    certSet = (QueueEntry.DigestEntrySet) next;
     if (certSet.getException() != null) {
       throw certSet.getException();
     }
@@ -323,6 +322,62 @@ class RefDigestReader implements Closeable {
 
   protected void releaseResources(PreparedStatement ps, ResultSet rs) {
     datasource.releaseResources(ps, rs);
+  }
+
+  /**
+   * Entry of a queue.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  private interface QueueEntry {
+
+    EndOfQueue END_OF_QUEUE = new EndOfQueue();
+
+    class EndOfQueue implements QueueEntry {
+
+      private EndOfQueue() {
+      }
+
+    } // class EndOfQueue
+
+    class DigestEntrySet implements QueueEntry, Comparable<DigestEntrySet> {
+
+      private final long startId;
+
+      private Exception exception;
+
+      private final List<IdentifiedDigestEntry> entries = new LinkedList<>();
+
+      public DigestEntrySet(long startId) {
+        this.startId = startId;
+      }
+
+      public void setException(Exception exception) {
+        this.exception = exception;
+      }
+
+      public Exception getException() {
+        return exception;
+      }
+
+      void addEntry(IdentifiedDigestEntry entry) {
+        entries.add(entry);
+      }
+
+      long getStartId() {
+        return startId;
+      }
+
+      List<IdentifiedDigestEntry> getEntries() {
+        return entries;
+      }
+
+      @Override
+      public int compareTo(DigestEntrySet obj) {
+        return Long.compare(startId, obj.startId);
+      }
+
+    } // class DigestEntrySet
   }
 
 }

@@ -3,13 +3,13 @@
 
 package org.xipki.shell.security;
 
-import org.xipki.security.Securities;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.Securities;
 import org.xipki.shell.ShellUtil;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.File;
 import java.nio.file.Path;

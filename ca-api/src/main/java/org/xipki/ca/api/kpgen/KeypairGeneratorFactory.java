@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.kpgen;
 
-import org.xipki.security.SecurityFactory;
-import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.pkix.SecurityFactory;
 
 import java.util.Set;
 
@@ -41,10 +41,10 @@ public interface KeypairGeneratorFactory {
    *          SecurityFactory.
    *
    * @return new keypair generator.
-   * @throws ObjectCreationException
+   * @throws GenerationException
    *         if signer could not be created.
    */
   KeypairGenerator newKeypairGenerator(String type, String conf, SecurityFactory securityFactory)
-      throws ObjectCreationException;
+      throws GenerationException;
 
 }

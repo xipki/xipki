@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.pkix.util.misc.StringUtil;
 
 /**
  * Mgmt Message.

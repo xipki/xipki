@@ -4,9 +4,9 @@
 package org.xipki.ca.server;
 
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.security.HashAlgo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.math.BigInteger;
 import java.time.Clock;

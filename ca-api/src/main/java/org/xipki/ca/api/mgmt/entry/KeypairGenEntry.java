@@ -3,12 +3,12 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.Arrays;
 import java.util.Collections;

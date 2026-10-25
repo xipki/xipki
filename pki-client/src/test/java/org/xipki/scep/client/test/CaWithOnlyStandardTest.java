@@ -3,7 +3,7 @@
 
 package org.xipki.scep.client.test;
 
-import org.xipki.security.scep.transaction.CaCapability;
+import org.xipki.pkix.scep.transaction.CaCapability;
 
 /**
  * Test CA with only the CACapability SCEPStandard.

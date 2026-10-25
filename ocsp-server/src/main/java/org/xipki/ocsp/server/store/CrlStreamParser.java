@@ -3,31 +3,29 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.ASN1BitString;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ASN1UTCTime;
-import org.bouncycastle.asn1.BERTags;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentVerifier;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.OIDs;
-import org.xipki.security.asn1.Asn1StreamParser;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.asn1.AbstractAsn1Time;
+import org.xipki.codec.asn1.Asn1BitString;
+import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.codec.asn1.Asn1Sequence;
+import org.xipki.codec.asn1.Asn1Tags;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.pkix.asn1.util.ContentVerifier;
+import org.xipki.pkix.asn1.util.ContentVerifierProvider;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.asn1.Asn1StreamParser;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
@@ -39,9 +37,10 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.text.ParseException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -98,7 +97,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     /**
      * CRLReason code.
      */
-    private final int reason;
+    private final CrlReason reason;
 
     /**
      * EPOCH seconds of revocationDate. Or 0 if not set.
@@ -108,7 +107,7 @@ public class CrlStreamParser extends Asn1StreamParser {
     private final X500Name certificateIssuer;
 
     private RevokedCert(
-        BigInteger serialNumber, Instant revocationDate, int reason,
+        BigInteger serialNumber, Instant revocationDate, CrlReason reason,
         Instant invalidityDate, X500Name certificateIssuer) {
       this.serialNumber = serialNumber;
       this.revocationDate = revocationDate.getEpochSecond();
@@ -127,7 +126,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       return revocationDate;
     }
 
-    public int reason() {
+    public CrlReason reason() {
       return reason;
     }
 
@@ -151,6 +150,11 @@ public class CrlStreamParser extends Asn1StreamParser {
     private RevokedCert next;
 
     private int offset;
+
+    // RFC 5280, Section 5.3.3: if the certificateIssuer extension is not present on an entry,
+    // the certificate issuer defaults to that of the preceding entry, and to the CRL issuer
+    // (null) for the first entry.
+    private X500Name lastCertIssuer;
 
     private RevokedCertsIterator() throws IOException {
       this.instream = new BufferedInputStream(Files.newInputStream(crlFile.toPath()));
@@ -197,42 +201,38 @@ public class CrlStreamParser extends Asn1StreamParser {
        *                           -- if present, shall be v2
        * }
        */
-      ASN1Sequence revCert = ASN1Sequence.getInstance(bytes);
-      BigInteger serialNumber = ASN1Integer.getInstance(revCert.getObjectAt(0)).getValue();
-      Instant revocationDate = readTime(revCert.getObjectAt(1));
+      BigInteger serialNumber;
+      Instant revocationDate;
       Instant invalidityDate = null;
-      int reason = 0;
-      X500Name certIssuer = null;
+      CrlReason reason = CrlReason.UNSPECIFIED;
+      X500Name certIssuer = lastCertIssuer;
 
-      if (revCert.size() > 2) {
-        Extensions extns = Extensions.getInstance(revCert.getObjectAt(2));
-        byte[] coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.certificateIssuer);
-        if (coreExtValue != null) {
-          certIssuer = X500Name.getInstance(
-              GeneralNames.getInstance(coreExtValue).getNames()[0].getName());
-        }
+      try {
+        Asn1Sequence revCert = Asn1Sequence.fromEncoded(bytes);
+        serialNumber = revCert.getNonNegativeIntegerAt(0).getValue();
+        revocationDate = readTime((AbstractAsn1Time) revCert.getObjectAt(1));
 
-        coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.invalidityDate);
-        if (coreExtValue != null) {
-          int tag = coreExtValue[0] & 0xFF;
-          try {
-            if (tag == BERTags.UTC_TIME) {
-              invalidityDate = ASN1UTCTime.getInstance(coreExtValue).getDate().toInstant();
-            } else if (tag == BERTags.GENERALIZED_TIME) {
-              invalidityDate = ASN1GeneralizedTime.getInstance(coreExtValue).getDate().toInstant();
-            } else {
-              throw new IllegalArgumentException("invalid tag " + tag);
-            }
-          } catch (ParseException ex) {
-            throw new IllegalArgumentException("error parsing time", ex);
+        if (revCert.size() > 2) {
+          Extensions extns = Extensions.fromAsn1(revCert.getSequenceAt(2));
+          Extension extn = extns.getExtension(ExtensionOIDs.certificateIssuer);
+          if (extn != null) {
+            certIssuer = extn.getCertificateIssuer().get(0).getDirectoryName();
           }
-        }
 
-        coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.reasonCode);
-        reason = coreExtValue == null ? CrlReason.UNSPECIFIED.code()
-            : CRLReason.getInstance(coreExtValue).getValue().intValue();
+          extn = extns.getExtension(ExtensionOIDs.invalidityDate);
+          if (extn != null) {
+            invalidityDate = extn.invalidityDate();
+          }
+
+          extn = extns.getExtension(ExtensionOIDs.reasonCode);
+          reason = extn == null ? CrlReason.UNSPECIFIED
+              : CrlReason.forReasonCode(extn.getReasonCode().getValue());
+        }
+      } catch (CodecException e) {
+        throw new IllegalStateException("error parsing CRLEntry", e);
       }
 
+      lastCertIssuer = certIssuer;
       next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate, certIssuer);
     } // method next0
 
@@ -278,7 +278,7 @@ public class CrlStreamParser extends Asn1StreamParser {
   // end index (exclusive) of tbsCertList
   private final int tbsCertListEndIndex;
 
-  public CrlStreamParser(File crlFile) throws IOException {
+  public CrlStreamParser(File crlFile) throws IOException, CodecException {
     this.crlFile = Args.notNull(crlFile, "crlFile");
     // Round 1
     try (BufferedInputStream instream = new BufferedInputStream(
@@ -317,12 +317,12 @@ public class CrlStreamParser extends Asn1StreamParser {
       tag = peekTag(instream);
       instream.reset();
 
-      if (tag == BERTags.INTEGER) {
+      if (tag == Asn1Tags.INTEGER) {
         // optional field version is available
         bytes = readBlock(instream, "tbsCertList.version");
         offset += bytes.length;
 
-        this.version = ASN1Integer.getInstance(bytes).getValue().intValue();
+        this.version = Asn1Integer.fromEncodedNonNegative(bytes).intValueExact();
       } else {
         this.version = 0; // default version v1
       }
@@ -331,12 +331,12 @@ public class CrlStreamParser extends Asn1StreamParser {
       bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "tbsCertList.signature");
       offset += bytes.length;
 
-      AlgorithmIdentifier tbsSignature = AlgorithmIdentifier.getInstance(bytes);
+      AlgorithmIdentifier tbsSignature = AlgorithmIdentifier.fromEncoded(bytes);
 
       //       issuer                  Name,
       bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "tbsCertList.issuer");
       offset += bytes.length;
-      this.issuer = X500Name.getInstance(bytes);
+      this.issuer = X500Name.fromEncoded(bytes);
 
       //       thisUpdate              Time,
       MyInt bytesLen = new MyInt();
@@ -344,27 +344,27 @@ public class CrlStreamParser extends Asn1StreamParser {
       offset += bytesLen.get();
 
       //       nextUpdate              Time OPTIONAL,
+      // the next field may be also the revokedCertificates (SEQUENCE) or
+      // crlExtensions ([0]), or be outside the tbsCertList.
       tag = peekTag(instream);
-      if (tag != TAG_CONSTRUCTED_SEQUENCE) {
-        instream.reset();
-        this.nextUpdate = readTime(bytesLen, instream, "tbsCertList.thisUpdate");
+      if (offset < tbsCertListEndIndex
+          && (tag == Asn1Tags.UTC_TIME || tag == Asn1Tags.GENERALIZED_TIME)) {
+        this.nextUpdate = readTime(bytesLen, instream, "tbsCertList.nextUpdate");
         offset += bytesLen.get();
         tag = peekTag(instream);
       } else {
         this.nextUpdate = null;
       }
 
-      offset++;
-
       // revokedCertificates     SEQUENCE OF SEQUENCE  { ... } OPTIONAL
-      if (offset < tbsCertListLength && TAG_CONSTRUCTED_SEQUENCE == tag) {
+      if (offset < tbsCertListEndIndex && TAG_CONSTRUCTED_SEQUENCE == tag) {
         markAndReadTag(instream);
-        int revokedCertificatesOffset = offset;
+        offset++;
         int revokedCertificatesLength = readLength(lenBytesSize, instream);
         offset += lenBytesSize.get();
 
-        this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
         this.firstRevokedCertificateOffset = offset;
+        this.revokedCertificatesEndIndex = offset + revokedCertificatesLength;
 
         // skip the revokedCertificates
         skip(instream, revokedCertificatesLength);
@@ -375,7 +375,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       }
 
       // [0] EXPLICIT
-      int crlExtensionsTag = BERTags.TAGGED | BERTags.CONSTRUCTED;
+      int crlExtensionsTag = Asn1Tags.CONTEXT_SPECIFIC | Asn1Tags.CONSTRUCTED;
 
       Extensions extns = null;
       if (offset < tbsCertListEndIndex) {
@@ -395,7 +395,7 @@ public class CrlStreamParser extends Asn1StreamParser {
             // crlExtensions           [0]  EXPLICIT Extensions OPTIONAL
             bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "crlExtensions");
             offset += bytes.length;
-            extns = Extensions.getInstance(bytes);
+            extns = Extensions.fromEncoded(bytes);
           }
         }
       }
@@ -403,12 +403,11 @@ public class CrlStreamParser extends Asn1StreamParser {
       this.crlExtensions = extns;
 
       if (this.crlExtensions != null) {
-        bytes = X509Util.getCoreExtValue(this.crlExtensions, OIDs.Extn.cRLNumber);
-        this.crlNumber = (bytes == null) ? null : ASN1Integer.getInstance(bytes).getValue();
+        Extension extn = this.crlExtensions.getExtension(ExtensionOIDs.cRLNumber);
+        this.crlNumber = (extn == null) ? null : extn.cRLNumber();
 
-        bytes = X509Util.getCoreExtValue(this.crlExtensions, OIDs.Extn.deltaCRLIndicator);
-        this.baseCrlNumber = (bytes == null) ? null
-                              : ASN1Integer.getInstance(bytes).getPositiveValue();
+        extn = this.crlExtensions.getExtension(ExtensionOIDs.deltaCRLIndicator);
+        this.baseCrlNumber = (extn == null) ? null : extn.deltaCRLIndicator();
       } else {
         this.crlNumber = null;
         this.baseCrlNumber = null;
@@ -417,13 +416,13 @@ public class CrlStreamParser extends Asn1StreamParser {
       // From now on, the offset will not be needed anymore, so do not update
       // it.
       bytes = readBlock(TAG_CONSTRUCTED_SEQUENCE, instream, "signatureAlgorithm");
-      this.algorithmIdentifier = AlgorithmIdentifier.getInstance(bytes);
+      this.algorithmIdentifier = AlgorithmIdentifier.fromEncoded(bytes);
       if (!tbsSignature.equals(this.algorithmIdentifier)) {
         throw new IllegalArgumentException("algorithmIdentifier != tbsCertList.signature");
       }
 
-      bytes = readBlock(BERTags.BIT_STRING, instream, "signature");
-      this.signature = ASN1BitString.getInstance(bytes).getOctets();
+      bytes = readBlock(Asn1Tags.BIT_STRING, instream, "signature");
+      this.signature = Asn1BitString.fromEncoded(bytes).getAlignedOctets();
     }
   } // constructor
 
@@ -470,7 +469,7 @@ public class CrlStreamParser extends Asn1StreamParser {
   public boolean verifySignature(SubjectPublicKeyInfo publicKeyInfo) throws IOException {
     PublicKey publicKey;
     try {
-      publicKey = KeyUtil.getPublicKey(publicKeyInfo);
+      publicKey = KeyInfoUtil.getPublicKey(publicKeyInfo);
     } catch (InvalidKeySpecException ex) {
       throw new IllegalArgumentException("error parsing public key", ex);
     }
@@ -515,7 +514,7 @@ public class CrlStreamParser extends Asn1StreamParser {
       sigOut.close();
 
       return verifier.verify(this.signature());
-    } catch (InvalidKeyException | OperatorCreationException ex) {
+    } catch (InvalidKeyException | GenerationException | SignatureException ex) {
       LogUtil.error(LOG, ex, "could not validate POP of CSR");
       return false;
     }

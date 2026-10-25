@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.id;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,13 +19,13 @@ import java.util.Map;
  */
 public class AbstractID {
 
-  private final ASN1ObjectIdentifier oid;
+  private final Asn1Oid oid;
 
   private final String mainAlias;
 
   private final List<String> aliases;
 
-  protected AbstractID(ASN1ObjectIdentifier oid, List<String> aliases) {
+  protected AbstractID(Asn1Oid oid, List<String> aliases) {
     Args.notEmpty(aliases, "aliases");
 
     this.oid = Args.notNull(oid, "oid");
@@ -44,7 +44,7 @@ public class AbstractID {
         .replace(" ", "").replace("-", "");
   }
 
-  public ASN1ObjectIdentifier oid() {
+  public Asn1Oid oid() {
     return oid;
   }
 

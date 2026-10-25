@@ -3,18 +3,21 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.PolicyInformation;
+import org.xipki.codec.asn1.Asn1Encodable;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.CertPolicyOIDs;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.pkix.asn1.util.IETFUtils;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.AccessDescription;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.PolicyInformation;
+import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
@@ -27,11 +30,10 @@ import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.security.OIDs;
-import org.xipki.security.exception.BadCertTemplateException;
-import org.xipki.security.pkix.KeyUsage;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.pkix.cert.KeyUsage;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -54,15 +56,15 @@ public class CertprofileUtil {
     }
 
     // check the country
-    ASN1ObjectIdentifier[] countryOids = new ASN1ObjectIdentifier[] {
-        OIDs.DN.country, OIDs.DN.countryOfCitizenship,
-        OIDs.DN.countryOfResidence, OIDs.DN.jurIncorporationCountry};
+    Asn1Oid[] countryOids = new Asn1Oid[] {
+        AttributeOIDs.country, AttributeOIDs.countryOfCitizenship,
+        AttributeOIDs.countryOfResidence, AttributeOIDs.jurIncorporationCountry};
 
-    ASN1ObjectIdentifier errorOid = null;
+    Asn1Oid errorOid = null;
     String errorCountry = null;
-    for (ASN1ObjectIdentifier oid : countryOids) {
+    for (Asn1Oid oid : countryOids) {
       X500Name gs = subjectInfo.grantedSubject();
-      RDN[] countryRdns = gs.getRDNs(oid);
+      List<RDN> countryRdns = gs.getRDNs(oid);
       if (countryRdns != null) {
         for (RDN rdn : countryRdns) {
           String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
@@ -81,10 +83,6 @@ public class CertprofileUtil {
 
     if (errorOid != null) {
       String name = OIDs.getName(errorOid);
-      if (name == null) {
-        name = errorOid.getId();
-      }
-
       throw new BadCertTemplateException("invalid country/area code '" +
           errorCountry + "' in subject attribute " + name);
     }
@@ -97,13 +95,13 @@ public class CertprofileUtil {
     if (certprofile.certLevel() == CertLevel.EndEntity) {
       // extract the policyIdentifier
       CertificatePolicies policies = certprofile.certificatePolicies();
-      ASN1ObjectIdentifier policyId = null;
+      Asn1Oid policyId = null;
       if (policies != null) {
-        for (PolicyInformation m : policies.getPolicyInformation()) {
-          ASN1ObjectIdentifier pid = m.getPolicyIdentifier();
-          if (OIDs.PolicyIdentifier.id_domain_validated.equals(pid)
-              || OIDs.PolicyIdentifier.id_organization_validated.equals(pid)
-              || OIDs.PolicyIdentifier.id_individual_validated.equals(pid)) {
+        for (PolicyInformation m : policies) {
+          Asn1Oid pid = m.getPolicyIdentifier();
+          if (CertPolicyOIDs.id_domain_validated.equals(pid)
+              || CertPolicyOIDs.id_organization_validated.equals(pid)
+              || CertPolicyOIDs.id_individual_validated.equals(pid)) {
             policyId = pid;
             break;
           }
@@ -111,10 +109,10 @@ public class CertprofileUtil {
       }
 
       // subject:street
-      if (containsRdn(subject, OIDs.DN.street)) {
-        if (!containsRdn(subject, OIDs.DN.organization)
-            && !containsRdn(subject, OIDs.DN.givenName)
-            && !containsRdn(subject, OIDs.DN.surname)) {
+      if (containsRdn(subject, AttributeOIDs.street)) {
+        if (!containsRdn(subject, AttributeOIDs.organization)
+            && !containsRdn(subject, AttributeOIDs.givenName)
+            && !containsRdn(subject, AttributeOIDs.surname)) {
           throw new BadCertTemplateException(
               "subject:street is prohibited if the subject:organizationName field, " +
               "subject:givenName, and subject:surname field are absent.");
@@ -122,19 +120,19 @@ public class CertprofileUtil {
       }
 
       // subject:localityName
-      if (containsRdn(subject, OIDs.DN.locality)) {
-        if (!containsRdn(subject, OIDs.DN.organization)
-            && !containsRdn(subject, OIDs.DN.givenName)
-            && !containsRdn(subject, OIDs.DN.surname)) {
+      if (containsRdn(subject, AttributeOIDs.locality)) {
+        if (!containsRdn(subject, AttributeOIDs.organization)
+            && !containsRdn(subject, AttributeOIDs.givenName)
+            && !containsRdn(subject, AttributeOIDs.surname)) {
           throw new BadCertTemplateException(
               "subject:localityName is prohibited if the subject:organizationName field, " +
                   "subject:givenName, and subject:surname field are absent.");
         }
       } else {
-        if (!containsRdn(subject, OIDs.DN.state) &&
-            (containsRdn(subject, OIDs.DN.organization)
-                || containsRdn(subject, OIDs.DN.givenName)
-                || containsRdn(subject, OIDs.DN.surname))) {
+        if (!containsRdn(subject, AttributeOIDs.state) &&
+            (containsRdn(subject, AttributeOIDs.organization)
+                || containsRdn(subject, AttributeOIDs.givenName)
+                || containsRdn(subject, AttributeOIDs.surname))) {
           throw new BadCertTemplateException(
               "subject:localityName is required if the subject:organizationName field, " +
                   "subject:givenName field, or subject:surname field are present and the " +
@@ -143,19 +141,19 @@ public class CertprofileUtil {
       }
 
       // subject:stateOrProvinceName
-      if (containsRdn(subject, OIDs.DN.state)) {
-        if (!containsRdn(subject, OIDs.DN.organization)
-            && !containsRdn(subject, OIDs.DN.givenName)
-            && !containsRdn(subject, OIDs.DN.surname)) {
+      if (containsRdn(subject, AttributeOIDs.state)) {
+        if (!containsRdn(subject, AttributeOIDs.organization)
+            && !containsRdn(subject, AttributeOIDs.givenName)
+            && !containsRdn(subject, AttributeOIDs.surname)) {
           throw new BadCertTemplateException(
               "subject:stateOrProvinceName is prohibited if the subject:organizationName field, " +
                   "subject:givenName, and subject:surname field are absent.");
         }
       } else {
-        if (!containsRdn(subject, OIDs.DN.locality) &&
-            (containsRdn(subject, OIDs.DN.organization)
-                || containsRdn(subject, OIDs.DN.givenName)
-                || containsRdn(subject, OIDs.DN.surname))) {
+        if (!containsRdn(subject, AttributeOIDs.locality) &&
+            (containsRdn(subject, AttributeOIDs.organization)
+                || containsRdn(subject, AttributeOIDs.givenName)
+                || containsRdn(subject, AttributeOIDs.surname))) {
           throw new BadCertTemplateException(
               "subject:stateOrProvinceName is required if the subject:organizationName field, " +
                   "subject:givenName field, or subject:surname field are present and the " +
@@ -164,10 +162,10 @@ public class CertprofileUtil {
       }
 
       // subject:postalCode
-      if (containsRdn(subject, OIDs.DN.postalCode)) {
-        if (!containsRdn(subject, OIDs.DN.organization)
-            && !containsRdn(subject, OIDs.DN.givenName)
-            && !containsRdn(subject, OIDs.DN.surname)) {
+      if (containsRdn(subject, AttributeOIDs.postalCode)) {
+        if (!containsRdn(subject, AttributeOIDs.organization)
+            && !containsRdn(subject, AttributeOIDs.givenName)
+            && !containsRdn(subject, AttributeOIDs.surname)) {
           throw new BadCertTemplateException(
               "subject:postalCode is prohibited if the subject:organizationName field, " +
                   "subject:givenName, and subject:surname field are absent.");
@@ -175,155 +173,151 @@ public class CertprofileUtil {
       }
 
       // subject:countryCode
-      if (!containsRdn(subject, OIDs.DN.country)) {
-        if (containsRdn(subject, OIDs.DN.organization)
-            || containsRdn(subject, OIDs.DN.givenName)
-            || containsRdn(subject, OIDs.DN.surname)) {
+      if (!containsRdn(subject, AttributeOIDs.country)) {
+        if (containsRdn(subject, AttributeOIDs.organization)
+            || containsRdn(subject, AttributeOIDs.givenName)
+            || containsRdn(subject, AttributeOIDs.surname)) {
           throw new BadCertTemplateException(
               "subject:countryCode is required if the subject:organizationName field, " +
                   "subject:givenName, and subject:surname field are present");
         }
       }
 
-      if (OIDs.PolicyIdentifier.id_domain_validated.equals(policyId)) {
-        ASN1ObjectIdentifier[] excludeSubjectFields =
-            new ASN1ObjectIdentifier[] {
-                OIDs.DN.organization, OIDs.DN.givenName, OIDs.DN.surname,
-                OIDs.DN.street,       OIDs.DN.locality,  OIDs.DN.state,   OIDs.DN.postalCode};
-        for (ASN1ObjectIdentifier m : excludeSubjectFields) {
+      if (CertPolicyOIDs.id_domain_validated.equals(policyId)) {
+        Asn1Oid[] excludeSubjectFields =
+            new Asn1Oid[] {
+                AttributeOIDs.organization, AttributeOIDs.givenName, AttributeOIDs.surname,
+                AttributeOIDs.street,       AttributeOIDs.locality,  AttributeOIDs.state,
+                AttributeOIDs.postalCode};
+        for (Asn1Oid m : excludeSubjectFields) {
           if (containsRdn(subject, m)) {
             throw new BadCertTemplateException("subject " + OIDs.getName(m)
                 + " is prohibited in domain validated certificate");
           }
         }
-      } else if (OIDs.PolicyIdentifier.id_organization_validated.equals(policyId)) {
-        ASN1ObjectIdentifier[] includeSubjectFields =
-            new ASN1ObjectIdentifier[] {OIDs.DN.organization, OIDs.DN.country};
+      } else if (CertPolicyOIDs.id_organization_validated.equals(policyId)) {
+        Asn1Oid[] includeSubjectFields =
+            new Asn1Oid[] {AttributeOIDs.organization, AttributeOIDs.country};
 
-        for (ASN1ObjectIdentifier m : includeSubjectFields) {
+        for (Asn1Oid m : includeSubjectFields) {
           if (!containsRdn(subject, m)) {
             throw new BadCertTemplateException("subject " + OIDs.getName(m)
                 + " is required in organization validated certificate");
           }
         }
 
-        if (!(containsRdn(subject, OIDs.DN.locality) || containsRdn(subject, OIDs.DN.state))) {
+        if (!(containsRdn(subject, AttributeOIDs.locality)
+            || containsRdn(subject, AttributeOIDs.state))) {
           throw new BadCertTemplateException("at least one of subject:localityName and " +
               "subject:stateOrProvinceName is required in organization validated certificate");
         }
-      } else if (OIDs.PolicyIdentifier.id_individual_validated.equals(policyId)) {
-        ASN1ObjectIdentifier[] includeSubjectFields = new ASN1ObjectIdentifier[] {OIDs.DN.country};
-        for (ASN1ObjectIdentifier m : includeSubjectFields) {
+      } else if (CertPolicyOIDs.id_individual_validated.equals(policyId)) {
+        Asn1Oid[] includeSubjectFields = new Asn1Oid[] {AttributeOIDs.country};
+        for (Asn1Oid m : includeSubjectFields) {
           if (!containsRdn(subject, m)) {
             throw new BadCertTemplateException("subject " + OIDs.getName(m)
                 + " is required in individual validated certificate");
           }
         }
 
-        if (!(containsRdn(subject, OIDs.DN.organization)
-            || (containsRdn(subject, OIDs.DN.givenName)
-                  && containsRdn(subject, OIDs.DN.surname)))) {
+        if (!(containsRdn(subject, AttributeOIDs.organization)
+            || (containsRdn(subject, AttributeOIDs.givenName)
+                  && containsRdn(subject, AttributeOIDs.surname)))) {
           throw new BadCertTemplateException("at least one of subject:organizationName and " +
             "(subject:givenName, subject:surName) is required in individual validated certificate");
         }
 
-        if (!(containsRdn(subject, OIDs.DN.locality) || containsRdn(subject, OIDs.DN.state))) {
+        if (!(containsRdn(subject, AttributeOIDs.locality)
+            || containsRdn(subject, AttributeOIDs.state))) {
           throw new BadCertTemplateException("at least one of subject:localityName and " +
               "subject:stateOrProvinceName is required in individual validated certificate");
         }
       }
     } else {
-      ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {
-          OIDs.DN.commonName, OIDs.DN.organization, OIDs.DN.country};
-      for (ASN1ObjectIdentifier m : requiredTypes) {
-        if (!containsRdn(subject, OIDs.DN.commonName)) {
+      Asn1Oid[] requiredTypes = new Asn1Oid[] {
+          AttributeOIDs.commonName, AttributeOIDs.organization, AttributeOIDs.country};
+      for (Asn1Oid m : requiredTypes) {
+        if (!containsRdn(subject, AttributeOIDs.commonName)) {
           throw new BadCertTemplateException("missing " + OIDs.getName(m) + " in subject");
         }
       }
     }
   }
 
-  static boolean containsRdn(X500Name name, ASN1ObjectIdentifier rdnType) {
-    RDN[] rdns = name.getRDNs(rdnType);
-    return rdns != null && rdns.length > 0;
+  static boolean containsRdn(X500Name name, Asn1Oid rdnType) {
+    List<RDN> rdns = name.getRDNs(rdnType);
+    return rdns != null && !rdns.isEmpty();
   }
 
   static void addRequestedKeyusage(
-      Set<KeyUsage> usages, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Set<KeyUsage> usages, Map<Asn1Oid, Extension> requestedExtensions,
       Set<KeySingleUsage> usageOccs) {
-    Extension extension = requestedExtensions.get(OIDs.Extn.keyUsage);
+    Extension extension = requestedExtensions.get(ExtensionOIDs.keyUsage);
     if (extension == null) {
       return;
     }
 
-    org.bouncycastle.asn1.x509.KeyUsage reqX509 =
-        org.bouncycastle.asn1.x509.KeyUsage.getInstance(extension.getParsedValue());
-
+    org.xipki.pkix.asn1.x509.KeyUsage reqX509 = extension.getKeyUsage();
     for (KeySingleUsage k : usageOccs) {
       if (k.isRequired()) {
         continue;
       }
 
-      if (reqX509.hasUsages(k.keyUsage().bcUsage())) {
+      if (reqX509.hasFlag(k.keyUsage().asn1())) {
         usages.add(k.keyUsage());
       }
     }
   } // method addRequestedKeyusage
 
   static void addRequestedExtKeyusage(
-      List<ASN1ObjectIdentifier> usages, Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      List<Asn1Oid> usages, Map<Asn1Oid, Extension> requestedExtensions,
       Set<ExtKeyUsageControl> usageOccs) {
-    Extension extension = requestedExtensions.get(OIDs.Extn.extendedKeyUsage);
+    Extension extension = requestedExtensions.get(ExtensionOIDs.extendedKeyUsage);
     if (extension == null) {
       return;
     }
 
-    ExtendedKeyUsage reqKeyUsage = ExtendedKeyUsage.getInstance(extension.getParsedValue());
-
+    ExtendedKeyUsage reqKeyUsage = extension.getExtendedKeyUsage();
     for (ExtKeyUsageControl k : usageOccs) {
       if (k.isRequired()) {
         continue;
       }
 
-      if (reqKeyUsage.hasKeyPurposeId(KeyPurposeId.getInstance(k.extKeyUsage()))) {
+      if (reqKeyUsage.hasKeyPurposeId(k.extKeyUsage())) {
         usages.add(k.extKeyUsage());
       }
     }
   } // method addRequestedExtKeyusage
 
-  static ASN1Sequence createSubjectInfoAccess(
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
-      Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> modes)
+  static SubjectInfoAccessSyntax createSubjectInfoAccess(
+      Map<Asn1Oid, Extension> requestedExtensions,
+      Map<Asn1Oid, Set<GeneralNameTag>> modes)
       throws BadCertTemplateException {
     if (modes == null) {
       return null;
     }
 
-    Extension extn = requestedExtensions.get(OIDs.Extn.subjectInfoAccess);
+    Extension extn = requestedExtensions.get(ExtensionOIDs.subjectInfoAccess);
     if (extn == null) {
       return null;
     }
 
-    ASN1Sequence reqSeq = ASN1Sequence.getInstance(extn.getParsedValue());
-    int size = reqSeq.size();
-
-    for (int i = 0; i < size; i++) {
-      AccessDescription ad = AccessDescription.getInstance(reqSeq.getObjectAt(i));
-
-      ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
+    SubjectInfoAccessSyntax sia = extn.getSubjectInfoAccess();
+    for (AccessDescription ad : sia) {
+      Asn1Oid accessMethod = ad.getAccessMethod();
       Optional.ofNullable(modes.get(accessMethod)).orElseThrow(() ->
           new BadCertTemplateException("subjectInfoAccess.accessMethod "
               + accessMethod.getId() + " is not allowed"));
     }
 
-    return reqSeq;
+    return sia;
   }
 
   static void addExtension(
-      ExtensionValues values, ASN1ObjectIdentifier extType,
-      ExtensionControl extControl, ASN1Encodable extValue) throws CertprofileException {
+      ExtensionValues values, Asn1Oid extType,
+      ExtensionControl extControl, Asn1Encodable extValue) throws CertprofileException {
     if (extValue != null) {
-      values.addExtension(extType, new ExtensionValue(extControl.isCritical(), extValue));
+      values.addExtension(extType, ExtensionValue.build(extControl.isCritical(), extValue));
     } else if (extControl.isRequired()) {
       String description = getExtensionIDDesc(extType);
       if (description == null) {
@@ -333,7 +327,7 @@ public class CertprofileUtil {
     }
   } // method addExtension
 
-  static String toString(Set<ASN1ObjectIdentifier> oids) {
+  static String toString(Set<Asn1Oid> oids) {
     if (oids == null) {
       return "null";
     }
@@ -341,7 +335,7 @@ public class CertprofileUtil {
     StringBuilder sb = new StringBuilder();
     sb.append("[");
 
-    for (ASN1ObjectIdentifier oid : oids) {
+    for (Asn1Oid oid : oids) {
       sb.append(getExtensionIDDesc(oid)).append(", ");
     }
 
@@ -354,7 +348,7 @@ public class CertprofileUtil {
     return sb.toString();
   } // method toString
 
-  private static String getExtensionIDDesc(ASN1ObjectIdentifier oid) {
+  private static String getExtensionIDDesc(Asn1Oid oid) {
     return ExtensionID.ofOid(oid).mainAlias();
   }
 

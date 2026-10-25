@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.security.KeySpec;
+import org.xipki.crypto.core.KeySpec;
 
 import java.util.List;
 

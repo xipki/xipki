@@ -4,18 +4,18 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.VariableResolver;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.VariableResolver;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -314,6 +314,7 @@ public class CaConfType {
           permissions, json.getStringList("profiles"));
     }
 
+    @Override
     public JsonMap toCodec() {
       JsonMap map = new JsonMap();
       map.put("requestorName", requestorName);

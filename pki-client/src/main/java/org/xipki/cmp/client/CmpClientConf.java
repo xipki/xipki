@@ -3,11 +3,11 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.http.SslConf;
-import org.xipki.util.io.FileOrBinary;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.util.http.SslConf;
+import org.xipki.pkix.util.conf.FileOrBinary;
 
 import java.util.List;
 

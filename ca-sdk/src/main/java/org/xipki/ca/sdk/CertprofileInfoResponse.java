@@ -3,12 +3,12 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.KeySpec;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.codec.cbor.ByteArrayCborDecoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.KeySpec;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

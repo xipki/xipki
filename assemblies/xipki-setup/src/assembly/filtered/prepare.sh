@@ -7,36 +7,6 @@ error() {
   exit 1
 }
 
-script_dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
-
-jars_jdbc_dir="setup/jars/jdbc"
-jars_bc_dir="setup/jars/bouncycastle"
-jars_xipki_dir="setup/jars/xipki"
-
-shopt -s nullglob
-jdbc_jars=("$jars_jdbc_dir"/*.jar)
-bc_jars=("$jars_bc_dir"/*.jar)
-bcutil_lts_jars=("$jars_bc_dir"/bcutil-lts8on-*.jar)
-bcutil_std_jars=("$jars_bc_dir"/bcutil-jdk8on-*.jar)
-shopt -u nullglob
-
-[ ${#jdbc_jars[@]} -gt 0 ] || error "no jar file found in $jars_jdbc_dir"
-[ ${#bc_jars[@]} -gt 0 ] || error "no jar file found in $jars_bc_dir"
-
-cd "$script_dir"
-echo "change to folder: $(pwd)"
-
-script_dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
-java_exec="${JAVA_HOME:+$JAVA_HOME/bin/}java"
-classpath="xipki-mgmt-cli/lib/*"
-
-copy_tree_contents() {
-  local src_dir="$1"
-  local dest_dir="$2"
-  mkdir -p "$dest_dir"
-  cp -r "$src_dir"/* "$dest_dir"/
-}
-
 copy_key_material() {
   local source_dir="$1"
   local target_dir="$2"
@@ -45,62 +15,100 @@ copy_key_material() {
   cp "$@" "$target_dir"
 }
 
+script_dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
+jars_dir="$script_dir"/setup/jars
+
 cd "$script_dir"
 echo "change to folder: $(pwd)"
 
-echo "Copy xipki-mgmt-cli's folders lib to xipki-cli"
-copy_tree_contents xipki-mgmt-cli/lib xipki-cli/lib
-rm -f xipki-cli/lib/ca-api*.jar \
-      xipki-cli/lib/ca-mgmt*.jar \
-      xipki-cli/lib/certprofile*.jar \
-      xipki-cli/lib/ca-mgmt-shell*.jar \
-      xipki-cli/lib/xipki-mgmt-cli*.jar \
-      xipki-cli/lib/demo-shell*.jar
+cd "$script_dir"
+echo "change to folder: $(pwd)"
 
-echo "Prepare tomcat"
-mkdir -p xipki-ca/tomcat/lib xipki-ocsp/tomcat/lib xipki-gateway/tomcat/lib
+echo "Copy jars to xipki-qa"
 
-echo "Copy bouncycastle jars"
-cp "$jars_bc_dir"/*.jar xipki-mgmt-cli/lib/
-cp "$jars_bc_dir"/*.jar xipki-cli/lib/
-cp "$jars_bc_dir"/*.jar xipki-ca/tomcat/lib/
-cp "$jars_bc_dir"/*.jar xipki-ocsp/tomcat/lib/
-cp "$jars_bc_dir"/*.jar xipki-gateway/tomcat/lib/
+cp "$jars_dir"/jdbc/*.jar \
+   "$jars_dir"/crypto/*   \
+   xipki-mgmt-cli/lib/
 
-echo "Copy JDBC driver jars"
-cp "$jars_jdbc_dir"/*.jar xipki-mgmt-cli/lib/
-cp "$jars_jdbc_dir"/*.jar xipki-ca/tomcat/lib/
-cp "$jars_jdbc_dir"/*.jar xipki-ocsp/tomcat/lib/
-cp "$jars_jdbc_dir"/*.jar xipki-gateway/tomcat/lib/
+echo "Replace Configuration and generate Key & Certificates"
 
-echo "Copy $script_dir/war-common/ to war files (ca.war, ocsp.war, gw.war)"
-rm -rf "$script_dir/war-common"
-mkdir -p "$script_dir/war-common/WEB-INF/lib"
-cp xipki-mgmt-cli/lib/HikariCP-${hikaricp.version}.jar \
-   xipki-mgmt-cli/lib/codec-${project.version}.jar \
-   xipki-mgmt-cli/lib/pkcs11-${project.version}.jar \
-   xipki-mgmt-cli/lib/security-${project.version}.jar \
-   xipki-mgmt-cli/lib/util-${project.version}.jar \
-   xipki-mgmt-cli/lib/util-extra-${project.version}.jar \
-   xipki-mgmt-cli/lib/xihsm-${project.version}.jar \
-   xipki-mgmt-cli/lib/slf4j-api-*.jar \
-   xipki-mgmt-cli/lib/slf4j-jdk14-*.jar \
-   "$script_dir/war-common/WEB-INF/lib"
-
-cd "$script_dir/war-common"
-zip -r "$script_dir/xipki-ocsp/tomcat/webapps/ocsp.war" .
-zip -r "$script_dir/xipki-gateway/tomcat/webapps/gw.war" .
-cp "$script_dir"/xipki-mgmt-cli/lib/ca-api-*.jar \
-   "$script_dir"/xipki-mgmt-cli/lib/certprofile-*.jar \
-   "$script_dir/war-common/WEB-INF/lib"
-zip -r "$script_dir/xipki-ca/tomcat/webapps/ca.war" .
-rm -rf "$script_dir/war-common"
+java_exec="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+classpath="xipki-mgmt-cli/lib/*"
 
 cd "$script_dir"
-"$java_exec" -cp "$classpath" org.xipki.util.extra.misc.BatchReplace setup/conf.json
+"$java_exec" -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
 
-kc_dir="setup/keycerts"
-"$java_exec" -cp "$classpath" org.xipki.security.util.GenerateCerts setup/keycerts.json "$kc_dir"
+kc_dir="$script_dir"/setup/keycerts
+"$java_exec" -cp "$classpath" org.xipki.pkix.util.GenerateCerts setup/keycerts.json "$kc_dir"
+
+echo "Copy xipki-mgmt-cli's folders lib to xipki-cli"
+cp xipki-mgmt-cli/lib/* xipki-cli/lib
+
+rm -f xipki-cli/lib/org.xipki.pki.ca-*-*.jar \
+      xipki-cli/lib/org.xipki.pki.xipki-mgmt-cli-*.jar \
+      xipki-cli/lib/org.xipki.pki.shell.ca-mgmt-shell-*.jar \
+      xipki-cli/lib/org.xipki.pki.shell.demo-shell-*.jar
+
+echo "Prepare tomcat"
+
+echo "Prepare tomcat instances"
+
+rm -rf "$script_dir"/war-common
+mkdir -p "$script_dir"/war-common/WEB-INF/lib
+cd "$script_dir"/war-common
+
+echo "1. Prepare xipki-ocsp"
+
+mkdir -p "$script_dir"/xipki-ocsp/tomcat/lib
+
+cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-ocsp/tomcat/lib/
+
+cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
+   "$script_dir"/xipki-ocsp/tomcat/lib/ 2>/dev/null || true
+
+cp $jars_dir/crypto/*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/com.zaxxer.HikariCP-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.slf4j.*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.crypto.*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pkix.*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pki.util-*.jar \
+   "$jars_dir"/misc/org.xipki.pki.servlet.servlet-common-*.jar \
+   "$script_dir"/war-common/WEB-INF/lib
+
+# bouncycastle already in the tomcat's lib dir
+rm -f "$script_dir"/war-common/WEB-INF/lib/org.bouncycastle.*.jar
+
+zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
+
+echo "2. Prepare xipki-gateway"
+
+mkdir -p "$script_dir"/xipki-gateway/tomcat/lib
+
+cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-gateway/tomcat/lib/
+
+cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
+   "$script_dir"/xipki-gateway/tomcat/lib/ 2>/dev/null || true
+
+cp "$jars_dir"/misc/org.xipki.pki.ca-sdk-*.jar \
+   "$script_dir"/war-common/WEB-INF/lib
+
+zip -r "$script_dir/xipki-gateway/tomcat/webapps/gw.war" .
+
+echo "3. Prepare xipki-ca"
+
+mkdir -p "$script_dir"/xipki-ca/tomcat/lib
+
+cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-ca/tomcat/lib/
+
+cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
+   "$script_dir"/xipki-ca/tomcat/lib/ 2>/dev/null || true
+
+cp "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pki.ca-api-*.jar \
+   "$script_dir"/war-common/WEB-INF/lib
+
+zip -r "$script_dir"/xipki-ca/tomcat/webapps/ca.war .
+
+rm -rf "$script_dir"/war-common
 
 ks_dir="$kc_dir/certstore"
 

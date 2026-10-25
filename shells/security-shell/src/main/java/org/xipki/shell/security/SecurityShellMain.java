@@ -3,9 +3,8 @@
 
 package org.xipki.shell.security;
 
-import org.xipki.security.util.KeyUtil;
 import org.xipki.shell.PicocliShell;
-import org.xipki.shell.ShellBaseCommand;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 
 /**
@@ -20,6 +19,7 @@ public class SecurityShellMain {
   }
 
   @Command(name = "security", description = "Security commands", subcommands = {
+      SecurityCommands.CryptoInfoCommand.class,
       PasswordCommands.DeobfuscateCommand.class,
       PasswordCommands.ObfuscateCommand.class,
       PasswordCommands.PbeDecCommand.class,
@@ -47,19 +47,14 @@ public class SecurityShellMain {
       P11Commands.SecretkeyP11Command.class,
       P11Commands.ImportSecretkeyP11Command.class,
       P11Commands.TokenInfoP11Command.class,
-      QaSecurityCommands.SpeedKeypairGenP11Command.class,
-      QaSecurityCommands.SpeedSignP11Command.class,
-      QaSecurityCommands.SpeedKeypairGenP12Command.class,
-      QaSecurityCommands.SpeedSignP12Command.class,
       CsrCommands.ValidateCsrCommand.class
   }, mixinStandardHelpOptions = true)
   /**
    * Root command for the security shell.
    */
-  public static class RootCommand extends ShellBaseCommand {
+  public static class RootCommand extends XiShellBaseCommand {
 
     public RootCommand() {
-      KeyUtil.addProviders();
     }
 
     @Override

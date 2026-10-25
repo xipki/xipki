@@ -6,10 +6,10 @@ package org.xipki.ca.gateway.acme;
 import org.xipki.ca.gateway.acme.msg.AccountResponse;
 import org.xipki.ca.gateway.acme.msg.JoseMessage;
 import org.xipki.ca.gateway.acme.type.AccountStatus;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
 
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -129,7 +129,16 @@ public class AcmeAccount {
   }
 
   public boolean hasJwk(Map<String, String> jwk) {
-    return jwk != null && jwk.equals(data.jwk);
+    if (jwk == null || data.jwk == null) {
+      return false;
+    }
+
+    try {
+      // compare the keys, not the JWK representations (which may contain optional members).
+      return AcmeUtils.jwkSha256(jwk).equals(getJwkSha256());
+    } catch (IllegalArgumentException ex) {
+      return false;
+    }
   }
 
   public long id() {
@@ -140,14 +149,14 @@ public class AcmeAccount {
     return idStr + " (" + id + ")";
   }
 
-  public String getJwkSha256() {
+  public synchronized String getJwkSha256() {
     if (jwkSha256 == null && data.jwk != null) {
       jwkSha256 = AcmeUtils.jwkSha256(data.jwk);
     }
     return jwkSha256;
   }
 
-  public void setJwkSha256(String jwkSha256) {
+  public synchronized void setJwkSha256(String jwkSha256) {
     markMe();
     this.jwkSha256 = jwkSha256;
   }
@@ -159,9 +168,12 @@ public class AcmeAccount {
     return publicKey;
   }
 
-  public void setJwk(Map<String, String> jwk) {
+  public synchronized void setJwk(Map<String, String> jwk) {
     markMe();
     this.data.jwk = jwk;
+    // both are derived from the jwk, and must be re-computed.
+    this.jwkSha256 = null;
+    this.publicKey = null;
   }
 
   public AccountStatus status() {
@@ -242,9 +254,9 @@ public class AcmeAccount {
     }
 
     AcmeAccount copy = new AcmeAccount(id, dataSource);
-    copy.setJwkSha256(jwkSha256);
     copy.data = new Data();
     copy.setJwk(new HashMap<>(data.jwk));
+    copy.setJwkSha256(jwkSha256);
     copy.setStatus(status);
     copy.setTermsOfServiceAgreed(data.termsOfServiceAgreed);
     if (data.externalAccountBinding != null) {

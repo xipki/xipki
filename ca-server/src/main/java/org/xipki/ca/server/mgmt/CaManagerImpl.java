@@ -3,9 +3,9 @@
 
 package org.xipki.ca.server.mgmt;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
@@ -26,31 +26,33 @@ import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.DbCaConfStore;
 import org.xipki.ca.server.db.DbCertStore;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkcs11.P11CryptServiceFactory;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceConf;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceMap;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.audit.Audits;
-import org.xipki.util.extra.audit.PciAuditEvent;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.audit.Audits;
+import org.xipki.util.audit.PciAuditEvent;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -84,6 +86,7 @@ public class CaManagerImpl implements CaManager, Closeable {
       this.underlying = underlying;
     }
 
+    @Override
     public DataSourceWrapper getDataSource(String name) {
       if (underlying == null) {
         return null;
@@ -237,7 +240,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   public CaManagerImpl() {
     this.datasourceFactory = new DataSourceFactory();
-    this.calockFilePath = IoUtil.expandFilepath("calock", true);
+    this.calockFilePath = XipkiIoUtil.expandFilepath("calock", true);
     String calockId = null;
 
     File calockFile = new File(calockFilePath);
@@ -1368,7 +1371,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Crl getCrl(String caName, BigInteger crlNumber) throws CaMgmtException {
+  public X509Crl getCrl(String caName, long crlNumber) throws CaMgmtException {
     return ca2Manager.getCrl(caName, crlNumber);
   }
 
@@ -1426,7 +1429,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     if (issuer != null) {
       try {
         x500Issuer = issuer.toX500Name();
-      } catch (IOException e) {
+      } catch (CodecException e) {
         return null;
       }
     }

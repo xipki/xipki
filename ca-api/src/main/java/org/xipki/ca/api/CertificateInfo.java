@@ -3,11 +3,11 @@
 
 package org.xipki.ca.api;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
 
 /**
  * Certificate information.

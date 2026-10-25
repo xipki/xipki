@@ -3,10 +3,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.xipki</groupId>
+  <groupId>org.xipki.pki</groupId>
   <artifactId>xipki-parent</artifactId>
   <packaging>pom</packaging>
-  <version>6.7.2-SNAPSHOT</version>
+  <version>7.0.0-SNAPSHOT</version>
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>https://github.com/xipki/xipki</url>
@@ -23,25 +23,31 @@
     </developer>
   </developers>
   <properties>
+    <!-- versions of the crypto (xicrypto) and PKIX (xipkix) modules -->
+    <xicrypto.version>1.0.0-SNAPSHOT</xicrypto.version>
+    <xipkix.version>2.0.0-SNAPSHOT</xipkix.version>
+    <xishell.version>3.0.0-SNAPSHOT</xishell.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
     <dnsjava.version>3.6.5</dnsjava.version>
     <hikaricp.version>7.1.0</hikaricp.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
-    <jline.version>4.4.1</jline.version>
+    <jline.version>4.4.8</jline.version>
     <picocli.version>4.7.7</picocli.version>
     <slf4j.version>2.0.18</slf4j.version>
-    <!-- BouncyCastle -->
-    <bcprov.version>2.73.12.1</bcprov.version>
-    <bcutil.version>2.73.12</bcutil.version>
-    <bcpkix.version>2.73.12</bcpkix.version>
+
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
-    <jdbc.h2.version>2.4.240</jdbc.h2.version>
+    <jdbc.h2.version>2.5.252</jdbc.h2.version>
     <jdbc.mariadb.version>3.5.10</jdbc.mariadb.version>
-    <jdbc.postgresql.version>42.7.13</jdbc.postgresql.version>
+    <!--jdbc.postgresql.version>42.7.13</jdbc.postgresql.version-->
+
     <!-- Only for test purpose -->
+    <bcprov.version>2.73.13</bcprov.version>
+    <bc-fips.version>2.1.3</bc-fips.version>
+    <bcpqc-fips.version>2.1.0</bcpqc-fips.version>
     <junit.version>4.13.2</junit.version>
+
     <!-- plugin versions -->
     <maven.assembly-plugin.version>3.8.0</maven.assembly-plugin.version>
     <maven.build-helper-plugin.version>3.6.1</maven.build-helper-plugin.version>
@@ -55,23 +61,22 @@
     <maven.jar-plugin.version>3.5.1</maven.jar-plugin.version>
     <maven.javadoc-plugin.version>3.12.0</maven.javadoc-plugin.version>
     <maven.resources-plugin.version>3.5.0</maven.resources-plugin.version>
-    <maven.site-plugin.version>3.23.0</maven.site-plugin.version>
+    <maven.site-plugin.version>3.22.0</maven.site-plugin.version>
     <maven.source-plugin.version>3.4.0</maven.source-plugin.version>
     <maven.surefire-plugin.version>3.5.6</maven.surefire-plugin.version>
     <maven.war-plugin.version>3.5.1</maven.war-plugin.version>
     <central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
-    <xipki.dependency-plugin.version>1.0.0</xipki.dependency-plugin.version>
   </properties>
   <modules>
+    <!-- Crypto: codec, crypto API and backends, PKCS#11, emulated HSM (groupId org.xipki.crypto) -->
+    <!-- JDK25+ is required for crypto-be-jdk -->
+    <module>xicrypto</module>
+    <!-- PKIX: ASN.1 structures, utilities, certificates, CMS, CMP, SCEP (groupId org.xipki.pkix) -->
+    <module>xipkix</module>
+    <!-- Shell: picocli/jline shell, third-party dependencies only (groupId org.xipki.shell) -->
+    <module>xishell</module>
     <!-- Base components -->
-    <module>codec</module>
-    <module>pkcs11</module>
     <module>util</module>
-    <module>xihsm</module>
-    <module>pkcs11test</module>
-    <module>util-extra</module>
-
-    <module>security</module>
     <!-- PKI SDK/Client -->
     <module>pki-client</module>
     <!-- PKI -->
@@ -84,7 +89,6 @@
     <module>ca-server</module>
     <module>ca-mgmt</module>
     <module>shells</module>
-    <module>certprofile</module>
     <module>qa</module>
     <module>servlets</module>
     <module>assemblies</module>
@@ -102,6 +106,8 @@
         <version>${maven.compiler-plugin.version}</version>
         <configuration>
           <release>11</release>
+          <!-- file names and line numbers for stack traces, no local variable tables -->
+          <debuglevel>source,lines</debuglevel>
         </configuration>
       </plugin>
       <plugin>
@@ -210,6 +216,10 @@
         <plugin>
           <artifactId>maven-war-plugin</artifactId>
           <version>${maven.war-plugin.version}</version>
+          <configuration>
+            <!-- jars in WEB-INF/lib named groupId.artifactId-version.jar -->
+            <outputFileNameMapping>@{groupId}@.@{artifactId}@-@{baseVersion}@@{dashClassifier?}@.@{extension}@</outputFileNameMapping>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -226,15 +236,16 @@
         <artifactId>bcprov-lts8on</artifactId>
         <version>${bcprov.version}</version>
       </dependency>
+      <!--FIPS BouncyCastle-->
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpkix-lts8on</artifactId>
-        <version>${bcpkix.version}</version>
+        <artifactId>bc-fips</artifactId>
+        <version>${bc-fips.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcutil-lts8on</artifactId>
-        <version>${bcutil.version}</version>
+        <artifactId>bcpqc-fips</artifactId>
+        <version>${bcpqc-fips.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>

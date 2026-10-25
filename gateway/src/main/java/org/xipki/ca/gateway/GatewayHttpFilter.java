@@ -5,6 +5,7 @@ package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.gateway.acme.AcmeHttpServlet;
 import org.xipki.ca.gateway.acme.AcmeProtocolConf;
 import org.xipki.ca.gateway.acme.AcmeResponder;
@@ -23,25 +24,24 @@ import org.xipki.ca.gateway.scep.ScepHttpServlet;
 import org.xipki.ca.gateway.scep.ScepProtocolConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
-import org.xipki.security.Securities;
-import org.xipki.security.auth.RequestorAuthenticator;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.audit.Audits;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpFilter;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.ReflectiveUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.io.XipkiBaseDir;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.Securities;
+import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.util.audit.Audits;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.ReflectiveUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.io.XipkiBaseDir;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,7 +85,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
     GatewayConf gatewayConf;
     try {
-      gatewayConf = GatewayConf.readConfFromFile(IoUtil.expandFilepath(DFLT_CFG, true));
+      gatewayConf = GatewayConf.readConfFromFile(XipkiIoUtil.expandFilepath(DFLT_CFG, true));
     } catch (InvalidConfException ex) {
       throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
@@ -139,7 +139,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private void initAcme(boolean gLogReqResp, SdkClient gSdkClient, PopControl gPopControl) {
     try {
       AcmeProtocolConf pconf = AcmeProtocolConf.readConfFromFile(
-          IoUtil.expandFilepath(ACME_CFG, true));
+          XipkiIoUtil.expandFilepath(ACME_CFG, true));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
@@ -166,7 +166,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
                       PopControl gPopControl, String reverseProxyMode) {
     try {
       CmpProtocolConf pconf = CmpProtocolConf.readConfFromFile(
-          IoUtil.expandFilepath(CMP_CFG, true));
+          XipkiIoUtil.expandFilepath(CMP_CFG, true));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
@@ -196,7 +196,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
                       PopControl gPopControl, String reverseProxyMode) {
     try {
       EstProtocolConf pconf = EstProtocolConf.readConfFromFile(
-          IoUtil.expandFilepath(EST_CFG, true));
+          XipkiIoUtil.expandFilepath(EST_CFG, true));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
@@ -226,7 +226,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
                         PopControl gPopControl, String reverseProxyMode) {
     try {
       RestProtocolConf pconf = RestProtocolConf.readConfFromFile(
-          IoUtil.expandFilepath(REST_CFG, true));
+          XipkiIoUtil.expandFilepath(REST_CFG, true));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp :  pconf.logReqResp();
 
@@ -255,7 +255,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private void initScep(boolean gLogReqResp, SdkClient gSdkClient, PopControl gPopControl) {
     try {
       ScepProtocolConf pconf = ScepProtocolConf.readConfFromFile(
-          IoUtil.expandFilepath(SCEP_CFG, true));
+          XipkiIoUtil.expandFilepath(SCEP_CFG, true));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
@@ -270,7 +270,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
           new GatewayConf.CaProfilesControl(pconf.caProfiles());
-      CaNameScepSigners signers = new CaNameScepSigners(newCaSigners(securities, pconf.signers()));
+      CaNameScepSigners signers = new CaNameScepSigners(
+          newCaSigners(securities, pconf.signers()), pconf.decryptors());
 
       ScepResponder responder = new ScepResponder(pconf.scep(), sdkClient,
           securities.securityFactory(), signers, authenticator, popControl, caProfilesControl);
@@ -363,7 +364,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     RequestorAuthenticator authenticator;
     try {
       authenticator = ReflectiveUtil.newInstance(clazzName);
-    } catch (ObjectCreationException e) {
+    } catch (GenerationException e) {
       String msg = "could not load RequestorAuthenticator " + clazzName;
       LOG.error(msg, e);
       throw new InvalidConfException(msg);
@@ -379,7 +380,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
   private static CaNameSigners newCaSigners(
       Securities securities, GatewayConf.CaNameSignersConf signersConf)
-      throws InvalidConfException, ObjectCreationException {
+      throws InvalidConfException, GenerationException {
     if (signersConf == null) {
       return null;
     }
@@ -402,13 +403,13 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
   private static ConcurrentSigner buildSigner(
       Securities securities, GatewayConf.SignerConf signerConf)
-      throws InvalidConfException, ObjectCreationException {
+      throws InvalidConfException, GenerationException {
     if (signerConf == null) {
       return null;
     }
 
     return securities.securityFactory().createSigner(signerConf.type(),
-            new org.xipki.security.sign.SignerConf(signerConf.conf()),
+            new org.xipki.pkix.sign.SignerConf(signerConf.conf()),
             X509Util.parseCerts(signerConf.certs()).toArray(new X509Cert[0]));
   }
 

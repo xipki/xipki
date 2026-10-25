@@ -3,15 +3,15 @@
 
 package org.xipki.ca.server.db;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.TBSCertList.CRLEntry;
-import org.bouncycastle.util.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.util.Pack;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.CRLEntry;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -26,34 +26,34 @@ import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertRevInfoWithSerial;
 import org.xipki.ca.server.CertStore;
 import org.xipki.ca.server.UniqueIdGenerator;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.FpIdCalculator;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.Hex;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.FpIdCalculator;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.SqlUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.datasource.SqlUtil;
 import org.xipki.util.misc.LruCache;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -68,13 +68,12 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.xipki.security.exception.ErrorCode.BAD_REQUEST;
-import static org.xipki.security.exception.ErrorCode.CERT_REVOKED;
-import static org.xipki.security.exception.ErrorCode.CERT_UNREVOKED;
-import static org.xipki.security.exception.ErrorCode.CRL_FAILURE;
-import static org.xipki.security.exception.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.security.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.pkix.exception.ErrorCode.BAD_REQUEST;
+import static org.xipki.pkix.exception.ErrorCode.CERT_REVOKED;
+import static org.xipki.pkix.exception.ErrorCode.CERT_UNREVOKED;
+import static org.xipki.pkix.exception.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
+import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * DB Cert Store definition.
@@ -84,6 +83,8 @@ import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
 public class DbCertStore extends QueryExecutor implements CertStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCertStore.class);
+
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
 
   private final String sqlCertForId;
 
@@ -385,7 +386,10 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         byte[] nonce = new byte[12];
         Pack.longToBigEndian(certId, nonce, 4);
         byte[] encodedPrivateKey = certInfo.privateKey().getEncoded();
-        Cipher cipher = Cipher.getInstance(keypairEncAlg, keypairEncProvider);
+        Cipher cipher = (keypairEncProvider != null)
+            ? Cipher.getInstance(keypairEncAlg, keypairEncProvider)
+            : cryptoApi.newCipher(keypairEncAlg);
+
         GCMParameterSpec spec = new GCMParameterSpec(96, nonce);
         cipher.init(Cipher.ENCRYPT_MODE, keypairEncKey, spec);
         byte[] encrypted = cipher.doFinal(encodedPrivateKey);
@@ -396,8 +400,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       String subjectText = X509Util.cutText(cert.cert().subjectText(), maxX500nameLen);
       long fpSubject = X509Util.fpCanonicalizedName(cert.cert().subject());
 
-      byte[] san = cert.cert().subjectAltNames();
-      Long fpSan = san == null ? null : FpIdCalculator.hash(san);
+      Extension extn = cert.cert().getCert().getExtension(ExtensionOIDs.subjectAlternativeName);
+      Long fpSan = extn == null ? null : FpIdCalculator.hash(extn.extnValue());
 
       String reqSubjectText = null;
       Long fpReqSubject = null;
@@ -485,16 +489,11 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   public void addCrl(NameId ca, X509Crl crl) throws OperationException {
     notNulls(ca, "ca", crl, "crl");
 
-    Extensions extns = crl.extensions();
-    byte[] extnValue = X509Util.getCoreExtValue(extns, OIDs.Extn.cRLNumber);
-    Long crlNumber = (extnValue == null) ? null
-        : ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
+    Extension extn = crl.getExtension(ExtensionOIDs.cRLNumber);
+    Long crlNumber = (extn == null) ? null : extn.cRLNumber().longValueExact();
 
-    extnValue = X509Util.getCoreExtValue(extns, OIDs.Extn.deltaCRLIndicator);
-    Long baseCrlNumber = null;
-    if (extnValue != null) {
-      baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
-    }
+    extn = crl.getExtension(ExtensionOIDs.deltaCRLIndicator);
+    Long baseCrlNumber = (extn == null) ? null : extn.deltaCRLIndicator().longValueExact();
 
     int currentMaxCrlId = (int) getMax("CRL", "ID");
     int crlId = Math.max(cachedCrlId.get(), currentMaxCrlId) + 1;
@@ -778,15 +777,14 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   } // method getEncodedCrl
 
   @Override
-  public byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException {
+  public byte[] getEncodedCrl(NameId ca, Long crlNumber) throws OperationException {
     Args.notNull(ca, "ca");
 
     if (crlNumber == null) {
       return getEncodedCrl(ca);
     }
 
-    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo, col2Int(ca.id()),
-                      col2Long(crlNumber.longValue()));
+    ResultRow rs = execQuery1PrepStmt0(sqlCrlWithNo, col2Int(ca.id()), col2Long(crlNumber));
 
     return rs == null ? null : Base64.decodeFast(rs.getString("CRL"));
   } // method getEncodedCrl
@@ -977,7 +975,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
       StringBuilder buffer = new StringBuilder(100);
       buffer.append("%");
-      RDN[] rdns = subjectPattern.getRDNs();
+      List<RDN> rdns = subjectPattern.getRDNs();
       for (RDN rdn : rdns) {
         X500Name rdnName = new X500Name(new RDN[]{rdn});
         String rdnStr = X509Util.x500NameText(rdnName);
@@ -1058,14 +1056,21 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
   @Override
   public List<CertRevInfoWithSerial> getCertsForDeltaCrl(
-      NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt) throws OperationException {
-    notNulls(ca, "ca", notExpiredAt, "notExpiredAt", baseCrlNumber, "baseCrlNumber");
+      NameId ca, long baseCrlNumber, Instant notExpiredAt) throws OperationException {
+    notNulls(ca, "ca", notExpiredAt, "notExpiredAt");
 
     // Get the Base FullCRL
     byte[] encodedCrl = getEncodedCrl(ca, baseCrlNumber);
-    CertificateList crl = CertificateList.getInstance(encodedCrl);
-    // Get revoked certs in CRL
-    Enumeration<?> revokedCertsInCrl = crl.getRevokedCertificateEnumeration();
+
+    CertificateList crl;
+    List<CRLEntry> revokedCertsInCrl;
+    try {
+      crl = CertificateList.fromEncoded(encodedCrl);
+      // Get revoked certs in CRL
+      revokedCertsInCrl = crl.getRevokedCertificates();
+    } catch (CodecException e) {
+      throw new OperationException(SYSTEM_FAILURE, "could not parse CRL");
+    }
 
     Set<BigInteger> allSnSet = null;
 
@@ -1076,15 +1081,14 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     PreparedStatement ps = null;
     try {
-      while (revokedCertsInCrl.hasMoreElements()) {
-        CRLEntry crlEntry = (CRLEntry) revokedCertsInCrl.nextElement();
+      for (CRLEntry crlEntry : revokedCertsInCrl) {
         if (allSnSet == null) {
           // guess the size of revoked certificate, very rough
           int averageSize = encodedCrl.length / crlEntry.getEncoded().length;
           allSnSet = new HashSet<>((int) (1.1 * averageSize));
         }
 
-        BigInteger sn = crlEntry.getUserCertificate().getPositiveValue();
+        BigInteger sn = crlEntry.getUserCertificate().getValue();
         snList.add(sn);
         allSnSet.add(sn);
 
@@ -1122,8 +1126,6 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     } catch (SQLException ex) {
       throw new OperationException(DATABASE_FAILURE,
           datasource.translate(sqlSelectUnrevokedSn100, ex).getMessage());
-    } catch (IOException ex) {
-      throw new OperationException(CRL_FAILURE, ex.getMessage());
     } finally {
       datasource.releaseResources(ps, null);
     }
@@ -1166,7 +1168,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     // -1: so that no entry is ignored: consider all revoked certificates with
     // Database.lastUpdate >= CRL.thisUpdate
-    final long updatedSince = DateUtil.toEpochSecond(crl.getThisUpdate().getDate()) - 1;
+    final long updatedSince = crl.thisUpdate().getEpochSecond() - 1;
 
     try {
       ResultSet rs;
@@ -1267,9 +1269,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       keypairEncProvider = "SunJCE";
     } catch (NoSuchProviderException | NoSuchAlgorithmException | NoSuchPaddingException ex) {
       try {
-        Cipher cipher = Cipher.getInstance(keypairEncAlg);
+        Cipher cipher = cryptoApi.newCipher(keypairEncAlg);
         keypairEncProvider = cipher.getProvider().getName();
-      } catch (NoSuchAlgorithmException | NoSuchPaddingException ex2) {
+      } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException ex2) {
         throw new IllegalStateException("Unsupported cipher " + keypairEncAlg);
       }
     }

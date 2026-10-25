@@ -18,7 +18,7 @@
 
 package org.xipki.util.misc;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -26,7 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Lru Cache.
+ * LRU Cache.
+ *
+ * @author original author
+ * @author Lijun Liao (xipki)
  */
 public class LruCache<K, V> {
 

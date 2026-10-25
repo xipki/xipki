@@ -28,10 +28,16 @@
       "file":"${profiles.dir}/certprofile-rootca.json"
     }
   },{
-    "name":"scep",
+    "name":"scep-sign",
     "type":"xijson",
     "conf":{
-      "file":"${profiles.dir}/certprofile-scep.json"
+      "file":"${profiles.dir}/certprofile-scep-sign.json"
+    }
+  },{
+    "name":"scep-enc",
+    "type":"xijson",
+    "conf":{
+      "file":"${profiles.dir}/certprofile-scep-enc.json"
     }
   },{
     "name":"ocsp",
@@ -111,7 +117,7 @@
       "status":"active",
       "validityMode":"cutoff"
     },
-    "profiles":["ocsp", "scep", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"],
+    "profiles":["ocsp", "scep-sign", "scep-enc", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"],
     "publishers":[
       // "ocsp-publisher"
     ],

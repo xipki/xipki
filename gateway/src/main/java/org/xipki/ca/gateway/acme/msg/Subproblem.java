@@ -4,9 +4,9 @@
 package org.xipki.ca.gateway.acme.msg;
 
 import org.xipki.ca.gateway.acme.type.Identifier;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
 
 /**
  * Subproblem.

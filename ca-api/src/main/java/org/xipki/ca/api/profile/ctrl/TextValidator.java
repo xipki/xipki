@@ -4,7 +4,7 @@
 package org.xipki.ca.api.profile.ctrl;
 
 import org.xipki.util.misc.LruCache;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.regex.Pattern;
 

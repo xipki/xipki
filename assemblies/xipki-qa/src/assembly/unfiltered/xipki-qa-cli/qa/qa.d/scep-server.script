@@ -1,5 +1,6 @@
 # Please adapt me
-set SUBJECT "CN=SCEP Responder 1,O=myorg,C=DE"
+set SIGN_SUBJECT "CN=SCEP Responder Signer 1,O=myorg,C=DE"
+set ENC_SUBJECT "CN=SCEP Responder Decryptor 1,O=myorg,C=DE"
 
 set KEYCERTS_DIR output/camgmt
 set CACERT_FILE output/subcawithcrl1.crt
@@ -8,25 +9,47 @@ echo "#################################################################"
 echo "#                 Generate Key, CSR and Certificate             #"
 echo "#################################################################"
 
-echo "# Generate PKCS#12 key and certificate for SCEP Responder"
+echo "# Generate PKCS#12 keys and certificates for SCEP Responder"
+
+# SCEP Signer
 
 keypair-p12 --keyspec RSA2048 --password CHANGEIT \
-  --out ${KEYCERTS_DIR}/scep-subcawithcrl.p12
+  --out ${KEYCERTS_DIR}/scep-sign-subcawithcrl.p12
 
-csr-p12 --password CHANGEIT --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
-  --out ${KEYCERTS_DIR}/scep-subcawithcrl.csr --subject "${SUBJECT}"
+csr-p12 --password CHANGEIT --p12 ${KEYCERTS_DIR}/scep-sign-subcawithcrl.p12 \
+  --out ${KEYCERTS_DIR}/scep-sign-subcawithcrl.csr --subject "${SIGN_SUBJECT}"
 
-enroll-cert --ca subcawithcrl1 --profile scep \
-  --csr ${KEYCERTS_DIR}/scep-subcawithcrl.csr \
-  --out ${KEYCERTS_DIR}/scep-subcawithcrl.der
+enroll-cert --ca subcawithcrl1 --profile scep-sign \
+  --csr ${KEYCERTS_DIR}/scep-sign-subcawithcrl.csr \
+  --out ${KEYCERTS_DIR}/scep-sign-subcawithcrl.der
 
 echo "# Update the certificate in the PKCS#12 file"
-update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
-  --password CHANGEIT --cert ${KEYCERTS_DIR}/scep-subcawithcrl.der \
+update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-sign-subcawithcrl.p12 \
+  --password CHANGEIT --cert ${KEYCERTS_DIR}/scep-sign-subcawithcrl.der \
   --ca-cert ${CACERT_FILE}
 
-copy-file -f ${KEYCERTS_DIR}/scep-subcawithcrl.p12 \
-  ${GATEWAY_XIPKI_DIR}/keycerts/scep-subcawithcrl.p12
+copy-file -f ${KEYCERTS_DIR}/scep-sign-subcawithcrl.p12 \
+  ${GATEWAY_XIPKI_DIR}/keycerts/scep-sign-subcawithcrl.p12
+
+# SCEP decryptor
+
+keypair-p12 --keyspec RSA2048 --password CHANGEIT \
+  --out ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12
+
+csr-p12 --password CHANGEIT --p12 ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12 \
+  --out ${KEYCERTS_DIR}/scep-enc-subcawithcrl.csr --subject "${ENC_SUBJECT}"
+
+enroll-cert --ca subcawithcrl1 --profile scep-enc \
+  --csr ${KEYCERTS_DIR}/scep-enc-subcawithcrl.csr \
+  --out ${KEYCERTS_DIR}/scep-enc-subcawithcrl.der
+
+echo "# Update the certificate in the PKCS#12 file"
+update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12 \
+  --password CHANGEIT --cert ${KEYCERTS_DIR}/scep-enc-subcawithcrl.der \
+  --ca-cert ${CACERT_FILE}
+
+copy-file -f ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12 \
+  ${GATEWAY_XIPKI_DIR}/keycerts/scep-enc-subcawithcrl.p12
 
 echo "restart gateway tomcat!"
 exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/shutdown.sh'

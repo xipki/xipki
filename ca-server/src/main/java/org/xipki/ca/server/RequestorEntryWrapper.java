@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.security.cert.CertificateException;
 

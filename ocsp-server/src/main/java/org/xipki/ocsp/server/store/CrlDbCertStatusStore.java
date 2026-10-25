@@ -5,22 +5,23 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.security.HashAlgo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.crypto.core.HashAlgo;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.http.Curl;
-import org.xipki.util.extra.http.DefaultCurl;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.http.Curl;
+import org.xipki.util.http.DefaultCurl;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -176,7 +177,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.sourceConf = Args.notNull(sourceConf, "sourceConf");
 
     // check the dir
-    this.dir = IoUtil.expandFilepath(sourceConf.getNnString("dir"), true);
+    this.dir = XipkiIoUtil.expandFilepath(sourceConf.getNnString("dir"), true);
     File dirObj = new File(this.dir);
     if (!dirObj.exists()) {
       throw new OcspStoreException("the dir " + this.dir + " does not exist");

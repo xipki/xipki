@@ -6,8 +6,8 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.InsufficientPermissionException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.InsufficientPermissionException;
 
 /**
  * Requestor Info interface.

@@ -3,11 +3,11 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.cert.CertRevocationInfo;
 
 import java.math.BigInteger;
 import java.time.Instant;

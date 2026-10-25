@@ -3,11 +3,9 @@
 
 package org.xipki.shell.qa;
 
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
@@ -24,6 +22,7 @@ import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
+import org.xipki.codec.Base64;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CaEnrollBenchEntry;
@@ -33,23 +32,20 @@ import org.xipki.qa.ca.CaEnrollBenchmark;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
-import org.xipki.security.KeySpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.ca.mgmt.CaCompleters;
 import org.xipki.shell.ca.mgmt.CaMgmtRuntime;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -72,13 +68,13 @@ import java.util.Set;
  */
 class QaCaCommands {
 
-  abstract static class QaCommand extends ShellBaseCommand {
+  abstract static class QaCommand extends XiShellBaseCommand {
     protected CaQaSystemManager qaManager() {
       return QaRuntime.getCaQaManager();
     }
   }
 
-  abstract static class QaMgmtCommand extends ShellBaseCommand {
+  abstract static class QaMgmtCommand extends XiShellBaseCommand {
     protected CaMgmtClient client() throws Exception {
       return CaMgmtRuntime.get();
     }
@@ -147,11 +143,11 @@ class QaCaCommands {
 
         CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
         CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
-        Extensions extensions = extractExtensions(reqInfo.getAttributes());
+        Extensions extensions = csr.getExtensionRequest();
 
         byte[] certBytes = IoUtil.read(certFile);
         ValidationResult result = qa.checkCert(certBytes, issuerInfo,
-            reqInfo.getSubject(), reqInfo.getSubjectPublicKeyInfo(), extensions);
+            reqInfo.getSubject(), reqInfo.getSubjectPKInfo(), extensions);
 
         StringBuilder sb = new StringBuilder();
         sb.append(certFile).append(" (certprofile ").append(profileName).append(")\n");
@@ -171,17 +167,6 @@ class QaCaCommands {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
             : new RuntimeException("could not check certificate: " + ex.getMessage(), ex);
       }
-    }
-
-    private static Extensions extractExtensions(ASN1Set attrs) {
-      Args.notNull(attrs, "attrs");
-      for (int i = 0; i < attrs.size(); i++) {
-        Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
-        if (OIDs.PKCS9.pkcs9_at_extensionRequest.equals(attr.getAttrType())) {
-          return Extensions.getInstance(attr.getAttributeValues()[0]);
-        }
-      }
-      return null;
     }
 
     private static void format(ValidationIssue issue, String prefix, StringBuilder sb) {
@@ -789,7 +774,7 @@ class QaCaCommands {
     }
   }
 
-  abstract static class AbstractBenchmarkEnrollCommand extends ShellBaseCommand {
+  abstract static class AbstractBenchmarkEnrollCommand extends XiShellBaseCommand {
 
     @Option(names = "--ca", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)

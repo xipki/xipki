@@ -3,12 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.codec.cbor.ByteArrayCborDecoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.exception.CodecException;
 
-import java.math.BigInteger;
 import java.time.Instant;
 
 /**
@@ -21,7 +20,7 @@ public class GetCRLRequest extends SdkRequest {
   /**
    * Returns CRL of this specified crlNumber.
    */
-  private final BigInteger crlNumber;
+  private final Long crlNumber;
 
   /**
    * Epoch time in seconds of thisUpdate of the known CRL.
@@ -34,13 +33,13 @@ public class GetCRLRequest extends SdkRequest {
    */
   private final String crlDp;
 
-  public GetCRLRequest(BigInteger crlNumber, Instant thisUpdate, String crlDp) {
+  public GetCRLRequest(Long crlNumber, Instant thisUpdate, String crlDp) {
     this.crlNumber = crlNumber;
     this.thisUpdate = thisUpdate;
     this.crlDp = crlDp;
   }
 
-  public BigInteger crlNumber() {
+  public Long crlNumber() {
     return crlNumber;
   }
 
@@ -54,14 +53,14 @@ public class GetCRLRequest extends SdkRequest {
 
   @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
-    encoder.writeArrayStart(3).writeBigInt(crlNumber)
+    encoder.writeArrayStart(3).writeLongObj(crlNumber)
         .writeInstant(thisUpdate).writeTextString(crlDp);
   }
 
   public static GetCRLRequest decode(byte[] encoded) throws CodecException {
     try (CborDecoder decoder = new ByteArrayCborDecoder(encoded)) {
       assertArrayStart("GetCRLRequest", decoder, 3);
-      return new GetCRLRequest(decoder.readBigInt(), decoder.readInstant(),
+      return new GetCRLRequest(decoder.readLongObj(), decoder.readInstant(),
               decoder.readTextString());
     } catch (RuntimeException ex) {
       throw new CodecException(buildDecodeErrMessage(ex, GetCRLRequest.class), ex);

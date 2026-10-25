@@ -4,45 +4,45 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.shell</groupId>
+    <groupId>org.xipki.pki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-qa-cli</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
-      <artifactId>shell-base</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>xi-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.shell</groupId>
+      <artifactId>xishell</artifactId>
+      <version>${xishell.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>security-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>pki-client-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>ca-mgmt-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>qa-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>demo-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -51,5 +51,34 @@
       <artifactId>slf4j-jdk14</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-be-jdk</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- the runtime jars as attached zip (classifier lib), unpacked by the assemblies -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>lib</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assembly/descriptors/cli-lib.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

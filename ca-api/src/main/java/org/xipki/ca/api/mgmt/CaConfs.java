@@ -3,16 +3,17 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,7 +69,7 @@ public class CaConfs {
       zipStream.setLevel(Deflater.BEST_SPEED);
 
       File confFile = new File(confFilename);
-      confFile = IoUtil.expandFilepath(confFile, false);
+      confFile = XipkiIoUtil.expandFilepath(confFile, false);
 
       CaConfType.CaSystem root = CaConfType.CaSystem.parse(confFile.toPath());
 

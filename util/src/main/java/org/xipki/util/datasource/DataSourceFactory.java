@@ -3,13 +3,13 @@
 
 package org.xipki.util.datasource;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.ConfigurableProperties;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
+import org.xipki.codec.util.Args;
+import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 
 import java.io.IOException;
 import java.io.InputStream;

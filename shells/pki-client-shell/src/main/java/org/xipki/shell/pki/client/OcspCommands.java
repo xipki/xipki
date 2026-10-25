@@ -3,30 +3,32 @@
 
 package org.xipki.shell.pki.client;
 
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.bouncycastle.cert.ocsp.RevokedStatus;
-import org.bouncycastle.cert.ocsp.SingleResp;
-import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.pkix.asn1.ocsp.OcspCertStatus;
+import org.xipki.pkix.asn1.ocsp.RevokedInfo;
+import org.xipki.pkix.asn1.ocsp.SingleResponse;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.X509OIDs;
+import org.xipki.pkix.asn1.x509.AccessDescription;
+import org.xipki.pkix.asn1.x509.AuthorityInfoAccessSyntax;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.ocsp.client.RequestOptions;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.ReqRespDebug;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -48,7 +50,7 @@ import java.util.List;
 public class OcspCommands {
   @Command(name = "ocsp-status", description = "request certificate status",
       mixinStandardHelpOptions = true)
-  static class OcspStatusCommand extends ShellBaseCommand {
+  static class OcspStatusCommand extends XiShellBaseCommand {
 
     @Option(names = {"--issuer", "-i"}, required = true, description = "issuer certificate file")
     @Completion(FilePathCompleter.class)
@@ -173,7 +175,7 @@ public class OcspCommands {
           debug = new ReqRespDebug(StringUtil.isNotBlank(reqout), StringUtil.isNotBlank(respout));
         }
 
-        OCSPResp response;
+        OCSPResponse response;
         try {
           response = PkiClientRuntime.getOcspRequestor().ask(issuerCert,
               serials.toArray(new BigInteger[0]), new URL(serverUrl), options, debug);
@@ -190,52 +192,52 @@ public class OcspCommands {
         }
 
         if (ocspCertOutFile != null) {
-          X509CertificateHolder[] ocspSignerCerts =
-              ((BasicOCSPResp) response.getResponseObject()).getCerts();
-          if (ocspSignerCerts != null && ocspSignerCerts.length > 0) {
+          Certificate.Seq0 ocspSignerCerts =
+              response.getResponseBytes().getBasicOCSPResponse().getCerts();
+          if (ocspSignerCerts != null && !ocspSignerCerts.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            for (X509CertificateHolder m : ocspSignerCerts) {
-              sb.append(X509Util.toPemCert(new X509Cert(m.toASN1Structure())));
+            for (Certificate m : ocspSignerCerts) {
+              sb.append(X509Util.toPemCert(new X509Cert(m)));
             }
             IoUtil.save(ocspCertOutFile, sb.toString().getBytes(StandardCharsets.US_ASCII));
           }
         }
 
-        if (response.getStatus() != 0) {
-          println("response status: " + response.getStatus());
+        if (!OCSPResponseStatus.SUCCESSFUL.equals(response.getResponseStatus()) ){
+          println("response status: " + response.getResponseStatus());
           return;
         }
 
-        BasicOCSPResp basicResp = (BasicOCSPResp) response.getResponseObject();
+        BasicOCSPResponse basicResp = response.getBasicOCSPResponse();
         if (Boolean.TRUE.equals(verbose)) {
-          println("producedAt=" + basicResp.getProducedAt());
-          if (basicResp.getSignatureAlgorithmID() != null) {
+          println("producedAt=" + basicResp.producedAt());
+          if (basicResp.getSignatureAlgorithm() != null) {
             try {
               println("signatureAlg=" + SignAlgo.getInstance(
-                  basicResp.getSignatureAlgorithmID()).jceName());
+                  basicResp.getSignatureAlgorithm()).jceName());
             } catch (Exception ex) {
-              println("signatureAlg=" + basicResp.getSignatureAlgorithmID().getAlgorithm().getId());
+              println("signatureAlg=" + basicResp.getSignatureAlgorithm().getAlgorithm().getId());
             }
           }
         }
 
-        SingleResp[] singleResponses = basicResp.getResponses();
-        for (int i = 0; i < singleResponses.length; i++) {
-          SingleResp singleResp = singleResponses[i];
-          CertificateStatus status = singleResp.getCertStatus();
+        SingleResponse.Seq0 singleResponses = basicResp.getResponses();
+        for (int i = 0; i < singleResponses.size(); i++) {
+          SingleResponse singleResp = singleResponses.get(i);
+          OcspCertStatus status = singleResp.getCertStatus();
           String statusText;
           if (status == null) {
             statusText = "good";
-          } else if (status instanceof RevokedStatus) {
-            RevokedStatus revokedStatus = (RevokedStatus) status;
+          } else if (status.getRevoked() != null) {
+            RevokedInfo revokedInfo = status.getRevoked();
             statusText = "revoked";
-            if (revokedStatus.hasRevocationReason()) {
-              statusText += " reason=" + revokedStatus.getRevocationReason();
+            if (revokedInfo.getRevocationReason() != null) {
+              statusText += " reason=" + revokedInfo.getRevocationReason();
             }
-            if (revokedStatus.getRevocationTime() != null) {
-              statusText += " revocationTime=" + revokedStatus.getRevocationTime();
+            if (revokedInfo.getRevocationTime() != null) {
+              statusText += " revocationTime=" + revokedInfo.getRevocationTime();
             }
-          } else if (status instanceof UnknownStatus) {
+          } else if (OcspCertStatus.UNKNOWN.equals(status)) {
             statusText = "unknown";
           } else {
             statusText = status.toString();
@@ -259,19 +261,19 @@ public class OcspCommands {
   }
 
   private static List<String> extractOcspUrls(X509Cert cert) {
-    byte[] extnValue = cert.getExtensionCoreValue(OIDs.Extn.authorityInfoAccess);
-    return extnValue == null ? Collections.emptyList()
-        : extractOcspUrls(AuthorityInformationAccess.getInstance(extnValue));
+    Extension extn = cert.getCert().getExtension(ExtensionOIDs.authorityInfoAccess);
+    return (extn == null) ? Collections.emptyList()
+        : extractOcspUrls(extn.getAuthorityInfoAccess());
   }
 
-  private static List<String> extractOcspUrls(AuthorityInformationAccess aia) {
-    AccessDescription[] accessDescriptions = aia.getAccessDescriptions();
+  private static List<String> extractOcspUrls(AuthorityInfoAccessSyntax aia) {
     List<String> ocspUris = new ArrayList<>();
-    for (AccessDescription accessDescription : accessDescriptions) {
-      if (accessDescription.getAccessMethod().equals(OIDs.X509.id_ad_ocsp)) {
+    for (AccessDescription accessDescription : aia) {
+      if (accessDescription.getAccessMethod().equals(X509OIDs.id_ad_ocsp)) {
         GeneralName accessLocation = accessDescription.getAccessLocation();
-        if (accessLocation.getTagNo() == GeneralName.uniformResourceIdentifier) {
-          ocspUris.add(accessLocation.getName().toString());
+        String uri = accessLocation.uri();
+        if (uri != null) {
+          ocspUris.add(uri);
         }
       }
     }

@@ -3,8 +3,10 @@
 
 package org.xipki.ca.api;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
@@ -16,14 +18,11 @@ import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.SubjectControl;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.util.codec.TripleState;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.extra.type.Validity.Unit;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.conf.Validity.Unit;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +43,7 @@ public class CertprofileValidator {
     StringBuilder msg = new StringBuilder();
 
     ExtensionsControl controls = certprofile.extensionsControl();
-    List<ASN1ObjectIdentifier> types = controls.types();
+    List<Asn1Oid> types = controls.types();
 
     CertLevel certLevel = certprofile.certLevel();
     CertDomain certDomain = certprofile.certDomain();
@@ -52,8 +51,8 @@ public class CertprofileValidator {
     ExtensionSpec spec = ExtensionSpec.getExtensionSpec(certDomain, certLevel);
 
     // make sure that non-request extensions are not permitted in requests
-    Set<ASN1ObjectIdentifier> set = new HashSet<>();
-    for (ASN1ObjectIdentifier type : types) {
+    Set<Asn1Oid> set = new HashSet<>();
+    for (Asn1Oid type : types) {
       ExtensionControl control = controls.getControl(type);
       if (control.isPermittedInRequest() && spec.isNonRequest(type)) {
         set.add(type);
@@ -66,7 +65,7 @@ public class CertprofileValidator {
 
     // make sure that non-permitted extensions are not configured
     set.clear();
-    for (ASN1ObjectIdentifier type : types) {
+    for (Asn1Oid type : types) {
       if (spec.isNotPermitted(type)) {
         set.add(type);
       }
@@ -78,7 +77,7 @@ public class CertprofileValidator {
 
     // make sure that critical only extensions are not marked as non-critical.
     set.clear();
-    for (ASN1ObjectIdentifier type : types) {
+    for (Asn1Oid type : types) {
       ExtensionControl control = controls.getControl(type);
       if (control.isCritical() && spec.isNonCriticalOnly(type)) {
         set.add(type);
@@ -92,7 +91,7 @@ public class CertprofileValidator {
 
     // make sure that non-critical only extensions are not marked as critical.
     set.clear();
-    for (ASN1ObjectIdentifier type : types) {
+    for (Asn1Oid type : types) {
       ExtensionControl control = controls.getControl(type);
       if (!control.isCritical() && spec.isCriticalOnly(type)) {
         set.add(type);
@@ -106,9 +105,9 @@ public class CertprofileValidator {
 
     // make sure that required extensions are present
     set.clear();
-    Set<ASN1ObjectIdentifier> requiredTypes = spec.requiredExtensions();
+    Set<Asn1Oid> requiredTypes = spec.requiredExtensions();
 
-    for (ASN1ObjectIdentifier type : requiredTypes) {
+    for (Asn1Oid type : requiredTypes) {
       ExtensionControl extCtrl = controls.getControl(type);
       if (extCtrl == null || !extCtrl.isRequired()) {
         set.add(type);
@@ -122,9 +121,8 @@ public class CertprofileValidator {
 
     if (certLevel == CertLevel.CROSS) {
       ExtensionsControl extnControls = certprofile.extensionsControl();
-      ASN1ObjectIdentifier[] extnTypes =
-          {OIDs.Extn.subjectKeyIdentifier, OIDs.Extn.basicConstraints};
-      for (ASN1ObjectIdentifier extnType : extnTypes) {
+      Asn1Oid[] extnTypes = { ExtensionOIDs.subjectKeyIdentifier, ExtensionOIDs.basicConstraints };
+      for (Asn1Oid extnType : extnTypes) {
         ExtensionControl control = extnControls.getControl(extnType);
         if (control == null) {
           msg.append("Mandatory extension ")
@@ -163,7 +161,7 @@ public class CertprofileValidator {
     // Subject with only one entry in a RDN is allowed
     SubjectControl subjectCtl = certprofile.subjectControl();
 
-    for (ASN1ObjectIdentifier m : subjectCtl.types()) {
+    for (Asn1Oid m : subjectCtl.types()) {
       RdnControl ctl = subjectCtl.getControl(m);
       if (ctl.maxOccurs() > 1) {
         msg.append("multiple RDNs of the same type are not permitted, ");
@@ -225,31 +223,31 @@ public class CertprofileValidator {
       boolean xkuTlsServerRequired = false;
       boolean xkuTlsClientRequired = false;
       for (ExtKeyUsageControl m : ekuControls) {
-        ASN1ObjectIdentifier oid = m.extKeyUsage();
+        Asn1Oid oid = m.extKeyUsage();
         if (m.isRequired()) {
-          if (OIDs.XKU.id_kp_serverAuth.equals(oid)) {
+          if (KeyPurposeOIDs.id_kp_serverAuth.equals(oid)) {
             xkuTlsServerRequired = true;
-          } else if (OIDs.XKU.id_kp_clientAuth.equals(oid)) {
+          } else if (KeyPurposeOIDs.id_kp_clientAuth.equals(oid)) {
             xkuTlsClientRequired = true;
           }
         }
 
-        if (!(OIDs.XKU.id_kp_serverAuth.equals(oid)
-            || OIDs.XKU.id_kp_clientAuth.equals(oid)
-            || OIDs.XKU.id_kp_emailProtection.equals(oid))) {
+        if (!(KeyPurposeOIDs.id_kp_serverAuth.equals(oid)
+            || KeyPurposeOIDs.id_kp_clientAuth.equals(oid)
+            || KeyPurposeOIDs.id_kp_emailProtection.equals(oid))) {
           msg.append("extendedKeyUsage ").append(oid.getId()).append(" is not permitted, ");
         }
       }
 
       if (!(xkuTlsClientRequired | xkuTlsServerRequired)) {
-        msg.append("none of ").append(OIDs.XKU.id_kp_clientAuth).append(" and ")
-          .append(OIDs.XKU.id_kp_serverAuth).append(" is not configured, ");
+        msg.append("none of ").append(KeyPurposeOIDs.id_kp_clientAuth).append(" and ")
+          .append(KeyPurposeOIDs.id_kp_serverAuth).append(" is not configured, ");
       }
     } else {
       if (ekuControls != null) {
         for (ExtKeyUsageControl m : ekuControls) {
-          if (m.extKeyUsage().equals(OIDs.XKU.id_kp_anyExtendedKeyUsage)) {
-            msg.append(OIDs.XKU.id_kp_clientAuth).append(" is not allowed, ");
+          if (m.extKeyUsage().equals(KeyPurposeOIDs.anyExtendedKeyUsage)) {
+            msg.append(KeyPurposeOIDs.id_kp_clientAuth).append(" is not allowed, ");
           }
         }
       }
@@ -257,7 +255,7 @@ public class CertprofileValidator {
 
   } // method validateCABForumBR
 
-  private static String toString(Collection<ASN1ObjectIdentifier> oids) {
+  private static String toString(Collection<Asn1Oid> oids) {
     if (oids == null) {
       return "null";
     }
@@ -265,7 +263,7 @@ public class CertprofileValidator {
     StringBuilder sb = new StringBuilder();
     sb.append("[");
 
-    for (ASN1ObjectIdentifier oid : oids) {
+    for (Asn1Oid oid : oids) {
       sb.append(getExtensionIDDesc(oid)).append(", ");
     }
 
@@ -278,7 +276,7 @@ public class CertprofileValidator {
     return sb.toString();
   } // method toString
 
-  private static String getExtensionIDDesc(ASN1ObjectIdentifier oid) {
+  private static String getExtensionIDDesc(Asn1Oid oid) {
     return ExtensionID.ofOid(oid).mainAlias();
   }
 

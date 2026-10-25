@@ -3,7 +3,7 @@
 
 package org.xipki.qa;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.math.BigInteger;
 import java.util.Iterator;

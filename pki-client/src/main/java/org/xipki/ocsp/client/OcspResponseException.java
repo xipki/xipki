@@ -3,11 +3,9 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.util.codec.Hex;
-import org.xipki.util.misc.StringUtil;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.codec.Hex;
+import org.xipki.pkix.util.misc.StringUtil;
 
 /**
  * OCSP Response Exception type.
@@ -83,35 +81,15 @@ public abstract class OcspResponseException extends Exception {
    */
   public static class Unsuccessful extends OcspResponseException {
 
-    private static final Map<Integer, String> codeStatusMap = new HashMap<>();
+    private final OCSPResponseStatus status;
 
-    private final int status;
-
-    static {
-      codeStatusMap.put(0, "successful");
-      codeStatusMap.put(1, "malformedRequest");
-      codeStatusMap.put(2, "internalError");
-      codeStatusMap.put(3, "tryLater");
-      codeStatusMap.put(5, "sigRequired");
-      codeStatusMap.put(6, "unauthorized");
-    }
-
-    public Unsuccessful(int status) {
-      super(getStatusText(status));
+    public Unsuccessful(OCSPResponseStatus status) {
+      super(status.getEnumeratedName());
       this.status = status;
     }
 
-    public int status() {
+    public OCSPResponseStatus status() {
       return status;
-    }
-
-    public String statusText() {
-      return getStatusText(status);
-    }
-
-    public static String getStatusText(int statusCode) {
-      String status = codeStatusMap.get(statusCode);
-      return (status == null) ? Integer.toString(statusCode) : status;
     }
 
   }

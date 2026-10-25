@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.id;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ public class CertificatePolicyID extends AbstractID {
   public static final CertificatePolicyID etsi_qcp_web_psd2 =
       initOf("0.4.0.19495.3.1", "ETSI-qcp-web-psd2");
 
-  private CertificatePolicyID(ASN1ObjectIdentifier x509, List<String> aliases) {
+  private CertificatePolicyID(Asn1Oid x509, List<String> aliases) {
     super(x509, aliases);
   }
 
@@ -78,10 +78,10 @@ public class CertificatePolicyID extends AbstractID {
       l.addAll(Arrays.asList(aliases));
     }
     l.add(oid);
-    return addToMap(new CertificatePolicyID(new ASN1ObjectIdentifier(oid), l), typeMap);
+    return addToMap(new CertificatePolicyID(new Asn1Oid(oid), l), typeMap);
   }
 
-  public static CertificatePolicyID ofOid(ASN1ObjectIdentifier oid) {
+  public static CertificatePolicyID ofOid(Asn1Oid oid) {
     Args.notNull(oid, "oid");
     CertificatePolicyID attr = ofOidOrName(typeMap, oid.getId());
     if (attr != null) {
@@ -99,7 +99,7 @@ public class CertificatePolicyID extends AbstractID {
     }
 
     try {
-      ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(c14n);
+      Asn1Oid oid = new Asn1Oid(c14n);
       return new CertificatePolicyID(oid, Collections.singletonList(oid.getId()));
     } catch (RuntimeException e) {
       return null;

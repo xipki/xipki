@@ -4,24 +4,21 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.assembly</groupId>
+    <groupId>org.xipki.pki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-setup</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <skipDeploy>false</skipDeploy>
-  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>xipki-cli</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>xipki-mgmt-cli</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -52,50 +49,47 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.xipki.tools</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <version>${xipki.dependency-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>download-mgmt-cli-shell</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>download</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/t2/xipki-mgmt-cli/lib</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.shell</groupId>
-                  <artifactId>xipki-mgmt-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>download-cli-shell</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>download</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/t2/xipki-cli/lib</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.shell</groupId>
-                  <artifactId>xipki-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <execution>
+            <id>unpack-mgmt-cli-lib</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.pki.shell</groupId>
+                  <artifactId>xipki-mgmt-cli</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <classifier>lib</classifier>
+                  <outputDirectory>${project.build.directory}/t2/xipki-mgmt-cli/lib</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-cli-lib</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.pki.shell</groupId>
+                  <artifactId>xipki-cli</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <classifier>lib</classifier>
+                  <outputDirectory>${project.build.directory}/t2/xipki-cli/lib</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
           <execution>
             <id>copy-wars</id>
             <phase>generate-resources</phase>
@@ -107,19 +101,19 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
+                  <groupId>org.xipki.pki.servlet</groupId>
                   <artifactId>ca-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
+                  <groupId>org.xipki.pki.servlet</groupId>
                   <artifactId>ocsp-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
+                  <groupId>org.xipki.pki.servlet</groupId>
                   <artifactId>gateway-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>
@@ -141,7 +135,7 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assembly/descriptors/dist-bclts.xml</descriptor>
+                <descriptor>src/assembly/descriptors/dist.xml</descriptor>
               </descriptors>
               <attach>true</attach>
               <appendAssemblyId>false</appendAssemblyId>

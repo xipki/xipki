@@ -5,6 +5,7 @@ package org.xipki.ca.api.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
@@ -14,24 +15,23 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -208,10 +208,22 @@ public class CaConf {
               throw new InvalidConfException("cert.file of CA " + name + " may not be set");
             }
 
-            Instant notBefore = gsi.notBefore() == null ? null
+            Instant notBefore;
+            try {
+              notBefore = gsi.notBefore() == null ? null
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notBefore());
-            Instant notAfter = gsi.notAfter() == null ? null
+            } catch (CodecException ex) {
+              throw new InvalidConfException("invalid notBefore " + gsi.notBefore());
+            }
+
+            Instant notAfter;
+            try {
+              notAfter = gsi.notAfter() == null ? null
                 : DateUtil.parseUtcTimeyyyyMMddhhmmss(gsi.notAfter());
+            } catch (CodecException ex) {
+              throw new InvalidConfException("invalid notBefore " + gsi.notAfter());
+            }
+
             genSelfIssued = new GenSelfIssued(gsi.profile(),
                 gsi.subject(), gsi.serialNumber(), notBefore, notAfter);
           }
@@ -244,7 +256,7 @@ public class CaConf {
                 } finally {
                   signer.close();
                 }
-              } catch (IOException | ObjectCreationException | XiSecurityException ex) {
+              } catch (IOException | GenerationException | XiSecurityException ex) {
                 throw new InvalidConfException("could not create CA signer for CA " + name, ex);
               }
             }

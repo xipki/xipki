@@ -3,14 +3,13 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.verify.AlgorithmValidator;
-import org.xipki.util.codec.Args;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.verify.AlgorithmValidator;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -26,7 +25,7 @@ abstract class Responder {
   private final GeneralName name;
 
   private Responder(X500Name name) {
-    this.name = new GeneralName(Args.notNull(name, "name"));
+    this.name = GeneralName.ofDirectoryName(Args.notNull(name, "name"));
   }
 
   GeneralName name() {
@@ -40,7 +39,7 @@ abstract class Responder {
     private final List<SignAlgo> macAlgos;
 
     PbmMacCmpResponder(List<String> owfs, List<String> macs) throws NoSuchAlgorithmException {
-      super(new X500Name(new RDN[0]));
+      super(new X500Name());
 
       this.owfAlgos = new ArrayList<>(owfs.size());
 

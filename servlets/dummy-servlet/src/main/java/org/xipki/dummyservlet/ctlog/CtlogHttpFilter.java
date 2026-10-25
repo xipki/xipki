@@ -5,10 +5,10 @@ package org.xipki.dummyservlet.ctlog;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpFilter;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 

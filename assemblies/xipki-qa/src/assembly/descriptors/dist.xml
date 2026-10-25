@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>main</id>
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+  <id>jdk</id>
   <includeBaseDirectory>true</includeBaseDirectory>
   <formats>
     <format>tar.gz</format>
   </formats>
-
   <fileSets>
+    <!-- extra (JDBC) jars -->
+    <fileSet>
+      <directory>${project.build.directory}/t2/setup/jars</directory>
+      <outputDirectory>setup/jars</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <!-- crypto jars -->
+    <fileSet>
+      <directory>${project.build.directory}/t2/xipki-qa-cli/lib</directory>
+      <outputDirectory>setup/jars/crypto</outputDirectory>
+      <includes>
+        <include>org.xipki.crypto.crypto-be-jdk-*</include>
+        <include>org.xipki.crypto.crypto-extra-*</include>
+      </includes>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
     <!-- target/classes: the filtered and unfiltered resources -->
     <fileSet>
       <directory>${project.build.outputDirectory}</directory>
@@ -33,13 +50,6 @@
     </fileSet>
 
     <fileSet>
-      <directory>${project.build.directory}/setup</directory>
-      <outputDirectory>setup</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-
-    <fileSet>
       <directory>${project.build.directory}/t2/xipki-qa-cli</directory>
       <outputDirectory>xipki-qa-cli</outputDirectory>
       <includes>
@@ -53,15 +63,10 @@
       <outputDirectory>xipki-qa-cli</outputDirectory>
       <excludes>
         <exclude>bin/xipki</exclude>
-        <exclude>lib/bc*-lts8on*</exclude>
+        <exclude>lib/org.xipki.crypto.crypto-be-jdk-*</exclude>
+        <exclude>lib/org.xipki.crypto.crypto-extra-*</exclude>
+        <exclude>lib/h2-*</exclude>
       </excludes>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-
-    <fileSet>
-      <directory>${project.build.directory}/t2/setup/</directory>
-      <outputDirectory>setup</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>

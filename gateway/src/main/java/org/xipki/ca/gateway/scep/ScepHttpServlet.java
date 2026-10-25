@@ -5,15 +5,15 @@ package org.xipki.ca.gateway.scep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.io.IOException;
 

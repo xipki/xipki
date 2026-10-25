@@ -4,22 +4,37 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.shell</groupId>
+    <groupId>org.xipki.pki.shell</groupId>
     <artifactId>shells</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xi-shell</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
+  <description>The xi commands (file, text, curl, base64, exec) and the completers of the shells</description>
   <dependencies>
     <dependency>
       <groupId>org.xipki.shell</groupId>
-      <artifactId>shell-base</artifactId>
+      <artifactId>xishell</artifactId>
+      <version>${xishell.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>codec</artifactId>
+      <version>${xicrypto.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.pkix</groupId>
+      <artifactId>pkix-util</artifactId>
+      <version>${xipkix.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.pki</groupId>
+      <artifactId>util</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>util-extra</artifactId>
-      <version>${project.version}</version>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
     </dependency>
   </dependencies>
   <build>

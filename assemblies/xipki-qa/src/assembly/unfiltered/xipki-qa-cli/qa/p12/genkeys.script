@@ -1,8 +1,5 @@
 echo " ----- generate SCEP keys (RSA only) -----"
 
-## SCEP responder
-keypair-p12 --keyspec RSA2048 --password CHANGEIT --out p12/shared/scep1.p12
-
 ## SCEP
 
 keypair-p12 --keyspec RSA2048 --password CHANGEIT \

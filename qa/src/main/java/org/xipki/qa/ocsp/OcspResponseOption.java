@@ -3,10 +3,10 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.TripleState;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.ca.api.TripleState;
 
 /**
  * OCSP Response Option options.

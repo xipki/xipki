@@ -4,16 +4,16 @@
 package org.xipki.ca.gateway;
 
 import org.xipki.ca.sdk.SdkClientConf;
-import org.xipki.security.Securities;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.audit.Audits;
-import org.xipki.util.extra.type.KeystoreConf;
-import org.xipki.util.io.FileOrBinary;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.Securities;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.util.audit.Audits;
+import org.xipki.pkix.util.conf.KeystoreConf;
+import org.xipki.pkix.util.conf.FileOrBinary;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

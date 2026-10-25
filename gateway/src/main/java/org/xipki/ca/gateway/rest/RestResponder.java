@@ -3,19 +3,17 @@
 
 package org.xipki.ca.gateway.rest;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.util.Arrays;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
@@ -26,35 +24,37 @@ import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.ca.sdk.UnsuspendOrRemoveCertsRequest;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.auth.Requestor;
-import org.xipki.security.auth.RequestorAuthenticator;
-import org.xipki.security.encap.KEMUtil;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.SecretKeyWithAlias;
-import org.xipki.security.util.TlsHelper;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.http.HttpRespContent;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.extra.misc.PemEncoder.PemLabel;
-import org.xipki.util.extra.type.EmbedCertsMode;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.core.pem.PemObject;
+import org.xipki.crypto.core.pem.PemReader;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.auth.Requestor;
+import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.crypto.core.KemUtil;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.crypto.core.SecretKeyWithAlias;
+import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.pkix.util.misc.PemEncoder.PemLabel;
+import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -65,6 +65,8 @@ import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,14 +74,15 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import static org.xipki.security.exception.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.security.exception.ErrorCode.BAD_POP;
-import static org.xipki.security.exception.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.security.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.util.extra.audit.AuditLevel.ERROR;
-import static org.xipki.util.extra.audit.AuditLevel.INFO;
-import static org.xipki.util.extra.audit.AuditStatus.FAILED;
+import static org.xipki.pkix.exception.ErrorCode.BAD_CERT_TEMPLATE;
+import static org.xipki.pkix.exception.ErrorCode.BAD_POP;
+import static org.xipki.pkix.exception.ErrorCode.BAD_REQUEST;
+import static org.xipki.pkix.exception.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
+import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.util.audit.AuditLevel.ERROR;
+import static org.xipki.util.audit.AuditLevel.INFO;
+import static org.xipki.util.audit.AuditStatus.FAILED;
 
 /**
  * Rest Responder.
@@ -87,42 +90,6 @@ import static org.xipki.util.extra.audit.AuditStatus.FAILED;
  * @author Lijun Liao (xipki)
  */
 public class RestResponder {
-
-  private static class HttpRespAuditException extends Exception {
-
-    private final int httpStatus;
-
-    private final String auditMessage;
-
-    private final AuditLevel auditLevel;
-
-    private final AuditStatus auditStatus;
-
-    public HttpRespAuditException(int httpStatus, String auditMessage,
-                                  AuditLevel auditLevel, AuditStatus auditStatus) {
-      this.httpStatus = httpStatus;
-      this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
-      this.auditLevel = Args.notNull(auditLevel, "auditLevel");
-      this.auditStatus = Args.notNull(auditStatus, "auditStatus");
-    }
-
-    public int httpStatus() {
-      return httpStatus;
-    }
-
-    public String auditMessage() {
-      return auditMessage;
-    }
-
-    public AuditLevel auditLevel() {
-      return auditLevel;
-    }
-
-    public AuditStatus auditStatus() {
-      return auditStatus;
-    }
-
-  } // class HttpRespAuditException
 
   private static final String CT_pkcs10 = "application/pkcs10";
 
@@ -365,7 +332,14 @@ public class RestResponder {
         byte[] password = null;
         if (hdrValue.length() > 6) {
           String b64 = hdrValue.substring(6);
-          byte[] userPwd = Base64.decodeFast(b64);
+          byte[] userPwd;
+          try {
+            // RFC 7617: standard base64 encoding
+            userPwd = Base64.getDecoder().decode(b64.trim());
+          } catch (IllegalArgumentException ex) {
+            // malformed, will be rejected as unauthorized below
+            userPwd = new byte[0];
+          }
           int idx = -1;
           for (int i = 0; i < userPwd.length; i++) {
             if (userPwd[i] == ':') {
@@ -547,10 +521,6 @@ public class RestResponder {
       String command, String caName, String profile, Requestor requestor,
       byte[] request, XiHttpRequest httpRetriever, AuditEvent event)
       throws HttpRespAuditException, OperationException, IOException, SdkErrorResponseException {
-    if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
-      throw new OperationException(NOT_PERMITTED, "ENROLL_CERT is not allowed");
-    }
-
     boolean twin = CMD_enroll_cert_twin.equals(command)
                     || CMD_enroll_serverkeygen_twin.equals(command);
     boolean caGenKeyPair = CMD_enroll_serverkeygen.equals(command)
@@ -558,6 +528,16 @@ public class RestResponder {
                     || CMD_rekey_serverkeygen.equals(command);
     boolean rekey = CMD_rekey_cert.equals(command)
                     || CMD_rekey_serverkeygen.equals(command);
+
+    Requestor.Permission permission = rekey
+        ? Requestor.Permission.REENROLL_CERT : Requestor.Permission.ENROLL_CERT;
+    if (!requestor.isPermitted(permission)) {
+      throw new OperationException(NOT_PERMITTED, permission + " is not allowed");
+    }
+
+    if (caGenKeyPair && !requestor.isPermitted(Requestor.Permission.GEN_KEYPAIR)) {
+      throw new OperationException(NOT_PERMITTED, "GEN_KEYPAIR is not allowed");
+    }
 
     String profileEnc = null;
 
@@ -568,15 +548,14 @@ public class RestResponder {
         throw new OperationException(NOT_PERMITTED,
             "certprofile " + profileEnc + " is not allowed");
       }
+    } else if (!requestor.isAllCertprofilesPermitted(caName)) {
+      // the CA may use any certprofile, e.g. that of the old certificate.
+      throw new OperationException(NOT_PERMITTED,
+          "certprofile is not specified, and not all certprofiles are allowed");
     }
 
-    String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
-    Instant notBefore = (strNotBefore == null) ? null
-        :  DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
-
-    String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
-    Instant notAfter = (strNotAfter == null) ? null
-        : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+    Instant notBefore = parseUtcTimeyyyyMMddhhmmss(httpRetriever, PARAM_not_before);
+    Instant notAfter = parseUtcTimeyyyyMMddhhmmss(httpRetriever, PARAM_not_after);
 
     X500Name subject = null;
     Extensions extensions;
@@ -607,9 +586,8 @@ public class RestResponder {
         // The PKCS#10 will only be used for transport of subject and extensions.
         // The associated key will not be used, so the verification of POP is skipped.
         CertificationRequest csr = GatewayUtil.parseCsrInRequest(request);
-        CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
-        subject = certTemp.getSubject();
-        extensions = X509Util.getExtensions(certTemp);
+        subject = csr.getSubject();
+        extensions = csr.getExtensionRequest();
       } else {
         throw new HttpRespAuditException(HttpStatusCode.SC_UNSUPPORTED_MEDIA_TYPE,
             "unsupported media type " + ct, INFO, FAILED);
@@ -628,8 +606,8 @@ public class RestResponder {
       CertificationRequestInfo certTemp = csr.getCertificationRequestInfo();
 
       subject = certTemp.getSubject();
-      subjectPublicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-      extensions = X509Util.getExtensions(certTemp);
+      subjectPublicKeyInfo = certTemp.getSubjectPKInfo();
+      extensions = csr.getExtensionRequest();
     }
 
     BigInteger certId = BigInteger.ONE;
@@ -639,8 +617,10 @@ public class RestResponder {
     template.setCertReqId(certId);
     template.setCertprofile(profile);
 
-    assert subject != null;
-    template.setSubject(new X500NameType(subject));
+    // subject is null only for rekey: the CA re-uses the subject of the old certificate.
+    if (subject != null) {
+      template.setSubject(new X500NameType(subject));
+    }
     template.setNotBefore(notBefore);
     template.setNotAfter(notAfter);
     if (rekey) {
@@ -674,22 +654,13 @@ public class RestResponder {
     if (profile != null) {
       event.addEventData(CaAuditConstants.NAME_certprofile, profile);
     }
-    event.addEventData(CaAuditConstants.NAME_req_subject,
-        "\"" + X509Util.x500NameText(subject) + "\"");
-
-    try {
-      template.extensions(extensions);
-    } catch (IOException e) {
-      String message  ="could not encode extensions";
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
+    if (subject != null) {
+      event.addEventData(CaAuditConstants.NAME_req_subject,
+          "\"" + X509Util.x500NameText(subject) + "\"");
     }
 
-    try {
-      template.subjectPublicKey(subjectPublicKeyInfo);
-    } catch (IOException e) {
-      String message  ="could not encode SubjectPublicKeyInfo";
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
-    }
+    template.extensions(extensions);
+    template.subjectPublicKey(subjectPublicKeyInfo);
 
     List<EnrollCertsRequest.Entry> templates = new ArrayList<>(twin ? 2 : 1);
     templates.add(template);
@@ -706,13 +677,7 @@ public class RestResponder {
       event.addEventData(CaAuditConstants.NAME_req_subject,
           "\"" + X509Util.x500NameText(subject) + "\"");
 
-      try {
-        template.extensions(extensions);
-      } catch (IOException e) {
-        String message  ="could not encode extensions";
-        throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
-      }
-
+      template.extensions(extensions);
       templates.add(template);
     }
 
@@ -750,6 +715,20 @@ public class RestResponder {
     }
   }
 
+  private static Instant parseUtcTimeyyyyMMddhhmmss(
+      XiHttpRequest request, String param) throws OperationException {
+    String str = request.getParameter(param);
+    if (str == null) {
+      return null;
+    }
+
+    try {
+      return DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+    } catch (CodecException ex) {
+      throw new OperationException(BAD_REQUEST, "invalid " + param + " " + str);
+    }
+  }
+
   private HttpRespContent enrollCrossCert(
       String caName, String profile, Requestor requestor, byte[] request,
       XiHttpRequest httpRetriever, AuditEvent event)
@@ -767,13 +746,8 @@ public class RestResponder {
           message, INFO, FAILED);
     }
 
-    String strNotBefore = httpRetriever.getParameter(PARAM_not_before);
-    Instant notBefore = (strNotBefore == null) ? null
-        : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotBefore);
-
-    String strNotAfter = httpRetriever.getParameter(PARAM_not_after);
-    Instant notAfter = (strNotAfter == null) ? null
-        : DateUtil.parseUtcTimeyyyyMMddhhmmss(strNotAfter);
+    Instant notBefore = parseUtcTimeyyyyMMddhhmmss(httpRetriever, PARAM_not_before);
+    Instant notAfter = parseUtcTimeyyyyMMddhhmmss(httpRetriever, PARAM_not_after);
 
     byte[] csrBytes = null;
     byte[] targetCertBytes = null;
@@ -821,10 +795,11 @@ public class RestResponder {
       throw new OperationException(BAD_POP);
     }
 
-    Certificate targetCert = Certificate.getInstance(targetCertBytes);
+    Certificate targetCert;
     try {
+      targetCert = Certificate.fromEncoded(targetCertBytes);
       X509Util.assertCsrAndCertMatch(csr, targetCert, true);
-    } catch (XiSecurityException ex) {
+    } catch (XiSecurityException | CodecException ex) {
       throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
           ex.getMessage(), INFO, FAILED);
     }
@@ -834,7 +809,7 @@ public class RestResponder {
     X500Name subject = targetCert.getSubject();
     BigInteger certId = BigInteger.ONE;
 
-    Instant targetCertEndDate = targetCert.getEndDate().getDate().toInstant();
+    Instant targetCertEndDate = targetCert.notAfter();
     if (notAfter == null || notAfter.isAfter(targetCertEndDate)) {
       notAfter = targetCertEndDate;
     }
@@ -850,19 +825,8 @@ public class RestResponder {
     event.addEventData(CaAuditConstants.NAME_req_subject,
         "\"" + X509Util.x500NameText(subject) + "\"");
 
-    try {
-      template.extensions(extensions);
-    } catch (IOException e) {
-      String message  ="could not encode extensions";
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
-    }
-
-    try {
-      template.subjectPublicKey(subjectPublicKeyInfo);
-    } catch (IOException e) {
-      String message  ="could not encode SubjectPublicKeyInfo";
-      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
-    }
+    template.extensions(extensions);
+    template.subjectPublicKey(subjectPublicKeyInfo);
 
     EnrollCertsRequest.Entry[] templates = new EnrollCertsRequest.Entry[]{template};
 
@@ -972,11 +936,7 @@ public class RestResponder {
       }
       event.addEventData(CaAuditConstants.NAME_reason, reason);
 
-      Instant invalidityTime = null;
-      String strInvalidityTime = httpRetriever.getParameter(PARAM_invalidity_time);
-      if (StringUtil.isNotBlank(strInvalidityTime)) {
-        invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(strInvalidityTime);
-      }
+      Instant invalidityTime = parseUtcTimeyyyyMMddhhmmss(httpRetriever, PARAM_invalidity_time);
 
       RevokeCertsRequest.Entry entry =
           new RevokeCertsRequest.Entry(serialNumber, reason, invalidityTime);
@@ -990,10 +950,10 @@ public class RestResponder {
   private HttpRespContent getCrl(String caName, XiHttpRequest httpRetriever)
       throws HttpRespAuditException, SdkErrorResponseException {
     String strCrlNumber = httpRetriever.getParameter(PARAM_crl_number);
-    BigInteger crlNumber = null;
+    Long crlNumber = null;
     if (StringUtil.isNotBlank(strCrlNumber)) {
       try {
-        crlNumber = StringUtil.toBigInt(strCrlNumber);
+        crlNumber = StringUtil.toLong(strCrlNumber);
       } catch (NumberFormatException ex) {
         String message = "invalid crlNumber '" + strCrlNumber + "'";
         LOG.warn(message);
@@ -1014,7 +974,15 @@ public class RestResponder {
 
   private HttpRespContent generateKemEncapKey(byte[] request)
       throws HttpRespAuditException {
-    SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.getInstance(request);
+    SubjectPublicKeyInfo spki;
+    try {
+      spki = SubjectPublicKeyInfo.fromEncoded(request);
+    } catch (CodecException e) {
+      String message = "malformed SubjectPublicKeyInfo in request";
+      LOG.warn(message, e);
+      throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST, message, INFO, FAILED);
+    }
+
     SecretKeyWithAlias mk = popControl.defaultKemMasterKey();
     if (mk == null) {
       String message = "could not find master key to generate the KEM encap key";
@@ -1025,7 +993,7 @@ public class RestResponder {
 
     byte[] respBytes;
     try {
-      respBytes = KEMUtil.generateKemEncapKey(spki, mk, securityFactory.random4Sign()).getEncoded();
+      respBytes = KemUtil.generateKemEncapKey(spki, mk, securityFactory.random4Sign()).getEncoded();
     } catch (Exception e) {
       String message = "error generating KEM encap key";
       LOG.warn(message);

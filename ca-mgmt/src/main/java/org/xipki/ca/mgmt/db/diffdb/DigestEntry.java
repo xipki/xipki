@@ -3,8 +3,8 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

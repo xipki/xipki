@@ -3,26 +3,26 @@
 
 package org.xipki.shell.security;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.xipki.security.KeySpec;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.KeyStoreWrapper;
-import org.xipki.security.pkcs12.KeypairWithCert;
-import org.xipki.security.pkcs12.KeystoreGenerationParameters;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkcs12.PKCS12KeyStoreWrapper;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.pkcs12.KeyStoreWrapper;
+import org.xipki.pkix.pkcs12.KeypairWithCert;
+import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStoreWrapper;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.password.PasswordResolverException;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -33,9 +33,10 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -46,7 +47,7 @@ import java.util.Set;
 public class P12Commands {
   @Command(name = "secretkey-p12", description = "generate secret key in JCEKS keystore",
       mixinStandardHelpOptions = true)
-  static class SecretkeyP12Command extends ShellBaseCommand {
+  static class SecretkeyP12Command extends XiShellBaseCommand {
 
     @Option(names = "--key-type", required = true, description = "keytype, e.g. AES, DES3, SM4")
     @Completion(SecurityCompleters.SecretKeyTypeCompleter.class)
@@ -87,7 +88,7 @@ public class P12Commands {
 
   @Command(name = "export-cert-p12", description = "export certificate from PKCS#12 keystore",
       mixinStandardHelpOptions = true)
-  static class ExportCertP12Command extends ShellBaseCommand {
+  static class ExportCertP12Command extends XiShellBaseCommand {
 
     @Option(names = "--outform", description = "output format of the certificate")
     @Completion(Completers.OutformCompleter.class)
@@ -107,11 +108,10 @@ public class P12Commands {
     @Override
     public void run() {
       try {
-        PKCS12KeyStore ks = getInKeyStore(p12File, passwordHint);
+        Pkcs12KeyStore ks = getInKeyStore(p12File, passwordHint);
         String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
+        Set<String> aliases = ks.aliases();
+        for (String alias : aliases) {
           if (ks.isKeyEntry(alias)) {
             keyname = alias;
             break;
@@ -133,7 +133,7 @@ public class P12Commands {
 
   @Command(name = "update-cert-p12",
       description = "update certificate in PKCS#12 keystore", mixinStandardHelpOptions = true)
-  static class UpdateCertP12Command extends ShellBaseCommand {
+  static class UpdateCertP12Command extends XiShellBaseCommand {
 
     @Option(names = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FilePathCompleter.class)
@@ -153,15 +153,14 @@ public class P12Commands {
     @Override
     public void run() {
       try {
-        PKCS12KeyStore inKs = getInKeyStore(p12File, passwordHint);
+        Pkcs12KeyStore inKs = getInKeyStore(p12File, passwordHint);
         char[] pwd = SecurityCommands.resolveP12Password(passwordHint);
         X509Cert newCert = X509Util.parseCert(new File(certFile));
         assertMatch(inKs, newCert, pwd);
 
         String keyname = null;
-        Enumeration<String> aliases = inKs.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
+        Set<String> aliases = inKs.aliases();
+        for (String alias : aliases) {
           if (inKs.isKeyEntry(alias)) {
             keyname = alias;
             break;
@@ -180,15 +179,14 @@ public class P12Commands {
           }
         }
         X509Cert[] certChain = X509Util.buildCertPath(newCert, caCerts);
-        Certificate[] jceCertChain = new Certificate[certChain.length];
-        for (int i = 0; i < certChain.length; i++) {
-          jceCertChain[i] = certChain[i].getCert();
+        List<Certificate> jceCertChain = new ArrayList<>(certChain.length);
+        for (X509Cert x509Cert : certChain) {
+          jceCertChain.add(x509Cert.getCert());
         }
 
-        PKCS12KeyStore outKs = KeyUtil.loadPKCS12KeyStore(null, null);
+        Pkcs12KeyStore outKs = KeyUtil.loadPKCS12KeyStore((byte[]) null, null);
         aliases = inKs.aliases();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
+        for (String alias : aliases) {
           if (alias.equalsIgnoreCase(keyname)) {
             outKs.setKeyEntry(keyname, key, jceCertChain);
           } else if (inKs.isKeyEntry(alias)) {
@@ -207,7 +205,7 @@ public class P12Commands {
       }
     }
 
-    private void assertMatch(PKCS12KeyStore ks, X509Cert cert, char[] password) throws Exception {
+    private void assertMatch(Pkcs12KeyStore ks, X509Cert cert, char[] password) throws Exception {
       KeypairWithCert kp = KeypairWithCert.fromKeystore(ks, null, password, null);
       byte[] expectedEncoded = kp.publicKey().getEncoded();
       byte[] encoded = cert.publicKey().getEncoded();
@@ -219,7 +217,7 @@ public class P12Commands {
 
   @Command(name = "keypair-p12", description = "generate keypair in PKCS#12 keystore",
       mixinStandardHelpOptions = true)
-  static class KeypairP12Command extends ShellBaseCommand {
+  static class KeypairP12Command extends XiShellBaseCommand {
 
     @Option(names = "--keyspec", required = true, description = "key spec")
     @Completion(SecurityCompleters.KeySpecCompleter.class)
@@ -240,7 +238,7 @@ public class P12Commands {
       try {
         KeySpec keySpec = KeySpec.ofKeySpec(keyspecStr);
         KeystoreGenerationParameters keyGenParams = getKeyGenParameters(passwordHint, unsigned);
-        PKCS12KeyStoreWrapper keypair = KeyUtil.generateKeyPair3(keySpec, keyGenParams);
+        Pkcs12KeyStoreWrapper keypair = KeyUtil.generateKeyPair3(keySpec, keyGenParams);
         saveVerbose("saved PKCS#12 keystore to file", keyOutFile,
             Args.notNull(keypair, "keypair").keystore());
       } catch (Exception ex) {
@@ -251,7 +249,7 @@ public class P12Commands {
 
   @Command(name = "pkcs12", description = "export PKCS#12 key store like openssl pkcs12",
       mixinStandardHelpOptions = true)
-  static class Pkcs12Command extends ShellBaseCommand {
+  static class Pkcs12Command extends XiShellBaseCommand {
 
     @Option(names = "--p12", required = true, description = "PKCS#12 keystore file")
     @Completion(FilePathCompleter.class)
@@ -288,7 +286,7 @@ public class P12Commands {
     }
   }
 
-  static PKCS12KeyStore getInKeyStore(String p12File, String passwordHint)
+  static Pkcs12KeyStore getInKeyStore(String p12File, String passwordHint)
       throws IOException, XiSecurityException, PasswordResolverException {
     try (InputStream in = Files.newInputStream(Paths.get(IoUtil.expandFilepath(p12File)))) {
       return KeyUtil.loadPKCS12KeyStore(in, SecurityCommands.resolveP12Password(passwordHint));

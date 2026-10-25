@@ -3,23 +3,22 @@
 
 package org.xipki.shell.pki.client;
 
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
-import org.bouncycastle.asn1.crmf.CertId;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
-import org.bouncycastle.asn1.crmf.Controls;
-import org.bouncycastle.asn1.crmf.OptionalValidity;
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.xipki.pkix.asn1.cmp.Controls;
+import org.xipki.pkix.asn1.crmf.CertId;
+import org.xipki.pkix.asn1.crmf.CertRequest;
+import org.xipki.pkix.asn1.crmf.CertTemplate;
+import org.xipki.pkix.asn1.crmf.OptionalValidity;
+import org.xipki.pkix.asn1.crmf.POPOSigningKey;
+import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.CmpOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.AttributeTypeAndValue;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.cmp.client.CertIdOrError;
 import org.xipki.cmp.client.CmpClient;
 import org.xipki.cmp.client.EnrollCertRequest;
@@ -27,30 +26,30 @@ import org.xipki.cmp.client.EnrollCertResult;
 import org.xipki.cmp.client.Requestor;
 import org.xipki.cmp.client.RevokeCertRequest;
 import org.xipki.cmp.client.UnsuspendCertRequest;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignAlgoMode;
-import org.xipki.security.sign.Signer;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.Hex;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.pkix.cmp.CertificateRequestMessage;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.crypto.core.SignAlgoMode;
+import org.xipki.pkix.sign.Signer;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.ReqRespDebug;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.Passwords;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -64,7 +63,6 @@ import java.security.PublicKey;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -211,7 +209,7 @@ public class CmpCommands {
     public void run() {
       try {
         ReqRespDebug debug = getReqRespDebug();
-        X509CRLHolder crl;
+        CertificateList crl;
         try {
           crl = client().downloadCrl(caName, debug);
         } finally {
@@ -434,16 +432,16 @@ public class CmpCommands {
 
         X509Cert[] caCertChain = result.caCertChain();
         int size = caCertChain == null ? 1 : 1 + caCertChain.length;
-        Certificate[] certchain = new Certificate[size];
-        certchain[0] = cert.getCert();
+        List<Certificate> certchain = new ArrayList<>(size);
+        certchain.add(cert.getCert());
         if (size > 1) {
-          for (int i = 0; i < caCertChain.length; i++) {
-            certchain[i + 1] = caCertChain[i].getCert();
+          for (X509Cert x509Cert : caCertChain) {
+            certchain.add(x509Cert.getCert());
           }
         }
 
         char[] pwd = getPassword();
-        PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, pwd);
+        Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
         ks.setKeyEntry("main", privateKeyInfo, certchain);
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
           ks.store(bout, pwd);
@@ -566,7 +564,7 @@ public class CmpCommands {
         }
 
         char[] pwd = getPassword();
-        PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(null, pwd);
+        Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
         ks.setKeyEntry("main", privateKeyInfo, cert.getCert());
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
           ks.store(bout, pwd);
@@ -637,7 +635,7 @@ public class CmpCommands {
     }
   }
 
-  abstract static class CmpClientCommand extends ShellBaseCommand {
+  abstract static class CmpClientCommand extends XiShellBaseCommand {
 
     @Option(names = "--ca", required = true, description = "CA name")
     protected String caName;
@@ -717,29 +715,30 @@ public class CmpCommands {
         String id, String profile, CertRequest certRequest) throws Exception;
 
     protected EnrollCertResult enroll() throws Exception {
-      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+      CertTemplate certTemplate = new CertTemplate();
       if (subject != null) {
-        certTemplateBuilder.setSubject(new X500Name(subject));
+        certTemplate.setSubject(new X500Name(subject));
       }
 
       SubjectPublicKeyInfo publicKey = getPublicKey();
       if (publicKey != null) {
-        certTemplateBuilder.setPublicKey(publicKey);
+        certTemplate.setPublicKey(publicKey);
       }
 
       if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
-        Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS))) : null;
-        Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS))) : null;
-        certTemplateBuilder.setValidity(new OptionalValidity(notBefore, notAfter));
+        Instant notBefore = StringUtil.isNotBlank(notBeforeS)
+            ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+        Instant notAfter = StringUtil.isNotBlank(notAfterS)
+            ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+        certTemplate.setValidity(new OptionalValidity(notBefore, notAfter));
       }
 
       X509Cert oldCert = X509Util.parseCert(new File(oldCertFile));
-      CertId oldCertId = new CertId(new GeneralName(oldCert.issuer()), oldCert.serialNumber());
+      CertId oldCertId = new CertId(
+          GeneralName.ofDirectoryName(oldCert.issuer()), oldCert.serialNumber());
       Controls controls = new Controls(
-          new AttributeTypeAndValue(OIDs.CMP.regCtrl_oldCertID, oldCertId));
-      CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), controls);
+          AttributeTypeAndValue.build(CmpOIDs.id_regCtrl_oldCertID, oldCertId));
+      CertRequest certReq = new CertRequest(1, certTemplate, controls);
 
       EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry("id-1", null, certReq);
       EnrollCertRequest request = new EnrollCertRequest(EnrollCertRequest.EnrollType.KEY_UPDATE);
@@ -787,17 +786,15 @@ public class CmpCommands {
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
       ConcurrentSigner signer = getSigner();
-      ProofOfPossessionSigningKeyBuilder popBuilder =
-          new ProofOfPossessionSigningKeyBuilder(certRequest);
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = popBuilder.build(signer0.x509Signer());
+        popSk = CertificateRequestMessage.buildSigningKeyPop(certRequest, signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }
 
-      ProofOfPossession pop = new ProofOfPossession(popSk);
+      ProofOfPossession pop = ProofOfPossession.ofSignature(popSk);
       return new EnrollCertRequest.Entry(id, profile, certRequest, pop, false, true);
     }
 
@@ -937,23 +934,23 @@ public class CmpCommands {
     protected abstract EnrollCertRequest.EnrollType getCmpReqType() throws Exception;
 
     protected EnrollCertResult enroll() throws Exception {
-      CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-      certTemplateBuilder.setSubject(new X500Name(subject));
+      CertTemplate certTemplate = new CertTemplate();
+      certTemplate.setSubject(new X500Name(subject));
 
       SubjectPublicKeyInfo publicKey = getPublicKey();
       if (publicKey != null) {
-        certTemplateBuilder.setPublicKey(publicKey);
+        certTemplate.setPublicKey(publicKey);
       }
 
       if (StringUtil.isNotBlank(notBeforeS) || StringUtil.isNotBlank(notAfterS)) {
-        Time notBefore = StringUtil.isNotBlank(notBeforeS)
-            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS))) : null;
-        Time notAfter = StringUtil.isNotBlank(notAfterS)
-            ? new Time(Date.from(DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS))) : null;
-        certTemplateBuilder.setValidity(new OptionalValidity(notBefore, notAfter));
+        Instant notBefore = StringUtil.isNotBlank(notBeforeS)
+            ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notBeforeS) : null;
+        Instant notAfter = StringUtil.isNotBlank(notAfterS)
+            ? DateUtil.parseUtcTimeyyyyMMddhhmmss(notAfterS) : null;
+        certTemplate.setValidity(new OptionalValidity(notBefore, notAfter));
       }
 
-      CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
+      CertRequest certReq = new CertRequest(1, certTemplate, null);
       EnrollCertRequest.Entry reqEntry = buildEnrollCertRequestEntry("id-1", profile, certReq);
       EnrollCertRequest request = new EnrollCertRequest(getCmpReqType());
       request.addRequestEntry(reqEntry);
@@ -1000,7 +997,7 @@ public class CmpCommands {
 
       PublicKey publicKey = signer.publicKey();
       if (publicKey != null) {
-        return SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+        return SubjectPublicKeyInfo.fromPublicKey(publicKey);
       }
 
       throw new IOException("could not extract public key");
@@ -1010,17 +1007,15 @@ public class CmpCommands {
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
       ConcurrentSigner signer = getSigner();
-      ProofOfPossessionSigningKeyBuilder popBuilder =
-          new ProofOfPossessionSigningKeyBuilder(certRequest);
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = popBuilder.build(signer0.x509Signer());
+        popSk = CertificateRequestMessage.buildSigningKeyPop(certRequest, signer0.x509Signer());
       } finally {
         signer.requiteSigner(signer0);
       }
 
-      ProofOfPossession pop = new ProofOfPossession(popSk);
+      ProofOfPossession pop = ProofOfPossession.ofSignature(popSk);
       return new EnrollCertRequest.Entry(id, profile, certRequest, pop);
     }
 

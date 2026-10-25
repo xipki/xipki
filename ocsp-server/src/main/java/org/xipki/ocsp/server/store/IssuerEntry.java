@@ -3,19 +3,19 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Encoding;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.api.RequestIssuer;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.misc.CompareUtil;
 
-import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.time.Instant;
 import java.util.Arrays;
@@ -55,10 +55,10 @@ public class IssuerEntry {
     byte[] encodedName;
     byte[] encodedKey;
     try {
-      Certificate bcCert = Certificate.getInstance(encodedCert);
-      encodedName = bcCert.getSubject().getEncoded("DER");
-      encodedKey  = Asn1Util.getPublicKeyData(bcCert.getSubjectPublicKeyInfo());
-    } catch (IllegalArgumentException | IOException ex) {
+      Certificate bcCert = Certificate.fromEncoded(encodedCert);
+      encodedName = bcCert.getSubject().getEncoded(Asn1Encoding.DER);
+      encodedKey  = bcCert.getSubjectPublicKeyInfo().subjectPublicKey();
+    } catch (IllegalArgumentException | CodecException ex) {
       throw new CertificateEncodingException(ex.getMessage(), ex);
     }
 

@@ -7,18 +7,12 @@ import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
-import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
-import org.xipki.ca.certprofile.xijsonv1.conf.V1XijsonCertprofileType;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -316,7 +310,7 @@ public class ProfileCommands {
   @Command(name = "convert-profile",
       description = "convert the profile file to the up-to-date format",
       mixinStandardHelpOptions = true)
-  static class ConvertProfileCommand extends ShellBaseCommand {
+  static class ConvertProfileCommand extends XiShellBaseCommand {
 
     @Option(names = "--in", required = true, description = "input certificate profile file")
     @Completion(FilePathCompleter.class)
@@ -330,17 +324,7 @@ public class ProfileCommands {
     public void run() {
       try {
         Path inPath = Paths.get(inFile);
-        JsonMap json = JsonParser.parseMap(inPath, true);
-        Object subject = json.getObject("subject");
-
-        byte[] outBytes;
-        if (subject instanceof JsonList) {
-          outBytes = Files.readAllBytes(inPath);
-        } else {
-          XijsonCertprofileType conf = V1XijsonCertprofileType.parse(json).toV2();
-          outBytes = StringUtil.toUtf8Bytes(JsonBuilder.toPrettyJson(conf.toCodec()));
-        }
-
+        byte[] outBytes = Files.readAllBytes(inPath);
         IoUtil.save(outFile, outBytes);
         println("converted profile file to " + outFile);
       } catch (Exception ex) {

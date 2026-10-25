@@ -3,11 +3,11 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborEncoder;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncodable;
-import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.codec.cbor.ByteArrayCborEncoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncodable;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.exception.CodecException;
 
 /**
  * Sdk Encodable.
@@ -36,8 +36,7 @@ public abstract class SdkEncodable implements CborEncodable {
     }
   }
 
-  protected static String buildDecodeErrMessage(Exception ex, Class<?> clazz)
-      throws CodecException {
+  protected static String buildDecodeErrMessage(Exception ex, Class<?> clazz) {
     return "error decoding " + clazz.getName() + ": " + ex.getMessage();
   }
 

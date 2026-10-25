@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.List;

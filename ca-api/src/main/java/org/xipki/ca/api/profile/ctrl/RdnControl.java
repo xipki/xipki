@@ -3,10 +3,10 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.type.Range;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
+import org.xipki.ca.api.Range;
+import org.xipki.pkix.util.misc.StringUtil;
 
 /**
  * Rdn Control settings.
@@ -19,7 +19,7 @@ public class RdnControl {
 
   private final int maxOccurs;
 
-  private final ASN1ObjectIdentifier type;
+  private final Asn1Oid type;
 
   private TextValidator pattern;
 
@@ -31,18 +31,18 @@ public class RdnControl {
 
   private GeneralNameTag toSAN;
 
-  public RdnControl(ASN1ObjectIdentifier type) {
+  public RdnControl(Asn1Oid type) {
     this(type, 1, 1);
   }
 
-  public RdnControl(ASN1ObjectIdentifier type, String value) {
+  public RdnControl(Asn1Oid type, String value) {
     this.type = Args.notNull(type, "type");
     this.minOccurs = 1;
     this.maxOccurs = 1;
     this.value = StringUtil.isBlank(value) ? null : value;
   }
 
-  public RdnControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs) {
+  public RdnControl(Asn1Oid type, int minOccurs, int maxOccurs) {
     if (minOccurs < 0 || maxOccurs < 0 || minOccurs > maxOccurs) {
       throw new IllegalArgumentException(String.format(
           "illegal minOccurs=%s, maxOccurs=%s", minOccurs, maxOccurs));
@@ -61,7 +61,7 @@ public class RdnControl {
     return maxOccurs;
   }
 
-  public ASN1ObjectIdentifier type() {
+  public Asn1Oid type() {
     return type;
   }
 

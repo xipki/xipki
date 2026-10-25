@@ -5,11 +5,11 @@ package org.xipki.ca.api.kpgen;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.KeySpec;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.KeyInfoPair;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.KeyInfoPair;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.security.NoSuchAlgorithmException;

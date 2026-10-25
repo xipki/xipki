@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.profile;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.CertprofileException;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
+import org.xipki.ca.api.CertprofileException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,9 +19,9 @@ import java.util.Set;
  */
 public class ExtensionValues {
 
-  private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
+  private final Map<Asn1Oid, ExtensionValue> extensions = new HashMap<>();
 
-  public void addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
+  public void addExtension(Asn1Oid type, ExtensionValue value)
       throws CertprofileException {
     Args.notNull(type, "type");
     Args.notNull(value, "value");
@@ -32,15 +32,15 @@ public class ExtensionValues {
     extensions.put(type, value);
   } // method addExtension
 
-  public Set<ASN1ObjectIdentifier> getExtensionTypes() {
+  public Set<Asn1Oid> getExtensionTypes() {
     return Collections.unmodifiableSet(extensions.keySet());
   }
 
-  public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type) {
+  public ExtensionValue getExtensionValue(Asn1Oid type) {
     return extensions.get(Args.notNull(type, "type"));
   }
 
-  public ExtensionValue removeExtensionValue(ASN1ObjectIdentifier type) {
+  public ExtensionValue removeExtensionValue(Asn1Oid type) {
     return extensions.remove(Args.notNull(type, "type"));
   }
 

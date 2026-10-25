@@ -3,7 +3,7 @@
 
 package org.xipki.shell.security;
 
-import org.xipki.security.KeySpec;
+import org.xipki.crypto.core.KeySpec;
 import org.xipki.shell.CompletionProvider;
 import org.xipki.shell.completer.AbstractSetCompleter;
 import picocli.CommandLine;

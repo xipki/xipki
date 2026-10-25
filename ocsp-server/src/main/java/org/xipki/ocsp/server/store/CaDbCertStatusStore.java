@@ -5,27 +5,25 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.RandomUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.math.BigInteger;
 import java.sql.PreparedStatement;
@@ -33,65 +31,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * CA DB Cert Status Store definition.
  *
  * @author Lijun Liao (xipki)
  */
-public class CaDbCertStatusStore extends OcspStore {
-
-  private class StoreUpdateService implements Runnable {
-
-    @Override
-    public void run() {
-      updateIssuerStore();
-    }
-
-  } // class StoreUpdateService
-
-  private DataSourceWrapper datasource;
+public class CaDbCertStatusStore extends AbstractDbCertStatusStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(CaDbCertStatusStore.class);
 
-  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
-
-  private final Object lock = new Object();
-
-  private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
-
   private String sqlCsNoRit;
 
-  private String sqlCs;
-
   private String sqlCsNoRitWithCertHash;
-
-  private String sqlCsWithCertHash;
-
-  private IssuerFilter issuerFilter;
 
   private final IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
-  private boolean initialized;
-
-  private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-
-  protected List<Runnable> scheduledServices() {
-    return Collections.singletonList(storeUpdateService);
-  }
-
-  private void updateIssuerStore() {
+  @Override
+  protected void updateIssuerStore() {
     if (storeUpdateInProcess.get()) {
       return;
     }
@@ -369,41 +333,10 @@ public class CaDbCertStatusStore extends OcspStore {
 
   } // method getCertStatus0
 
-  /**
-   * Borrow PreparedStatement.
-   * @return the next idle preparedStatement, {@code null} will be returned if
-   *         no PreparedStatement can be created within 5 seconds.
-   */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
-    return datasource.prepareStatement(sqlQuery);
-  }
-
   @Override
   public boolean isHealthy() {
-    if (!isInitialized()) {
-      return false;
-    }
-
-    final String sql = "SELECT ID FROM CA";
-
-    try {
-      PreparedStatement ps = preparedStatement(sql);
-      ResultSet rs = null;
-      try {
-        rs = ps.executeQuery();
-        return true;
-      } finally {
-        releaseDbResources(ps, rs);
-      }
-    } catch (Exception ex) {
-      LogUtil.error(LOG, ex);
-      return false;
-    }
+    return isHealthy("SELECT ID FROM CA");
   } // method isHealthy
-
-  private void releaseDbResources(PreparedStatement ps, ResultSet rs) {
-    datasource.releaseResources(ps, rs);
-  }
 
   /**
    * Initialize the store.
@@ -455,35 +388,8 @@ public class CaDbCertStatusStore extends OcspStore {
 
     updateIssuerStore();
 
-    if (this.scheduledThreadPoolExecutor != null) {
-      this.scheduledThreadPoolExecutor.shutdownNow();
-    }
-
-    if (updateInterval != null) {
-      List<Runnable> scheduledServices = scheduledServices();
-      int size = scheduledServices.size();
-      if (size > 0) {
-        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
-        long intervalSeconds = updateInterval.approxMinutes() * 60;
-        for (Runnable service : scheduledServices) {
-          this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
-        }
-      }
-    }
+    startScheduledServices();
   } // method init
-
-  @Override
-  public void close() {
-    if (scheduledThreadPoolExecutor != null) {
-      scheduledThreadPoolExecutor.shutdown();
-      scheduledThreadPoolExecutor = null;
-    }
-
-    if (datasource != null) {
-      datasource.close();
-    }
-  } // method close
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
@@ -495,9 +401,5 @@ public class CaDbCertStatusStore extends OcspStore {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.cert();
   } // method getIssuerCert
-
-  protected boolean isInitialized() {
-    return initialized;
-  }
 
 }

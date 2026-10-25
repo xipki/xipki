@@ -3,15 +3,15 @@
 
 package org.xipki.shell.security;
 
+import org.xipki.codec.util.Args;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.codec.Args;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.OBFPasswordService;
-import org.xipki.util.password.PBEPasswordService;
-import org.xipki.util.password.Passwords;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.OBFPasswordService;
+import org.xipki.pkix.util.password.PBEPasswordService;
+import org.xipki.pkix.util.password.Passwords;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -23,7 +23,7 @@ import picocli.CommandLine.Option;
 public class PasswordCommands {
   @Command(name = "deobfuscate", description = "deobfuscate password",
       mixinStandardHelpOptions = true)
-  static class DeobfuscateCommand extends ShellBaseCommand {
+  static class DeobfuscateCommand extends XiShellBaseCommand {
 
     @Option(names = "--password", description = "obfuscated password")
     private String passwordHint;
@@ -65,7 +65,7 @@ public class PasswordCommands {
   }
 
   @Command(name = "obfuscate", description = "obfuscate password", mixinStandardHelpOptions = true)
-  static class ObfuscateCommand extends ShellBaseCommand {
+  static class ObfuscateCommand extends XiShellBaseCommand {
 
     @Option(names = "--out", description = "where to save the obfuscated password")
     @Completion(FilePathCompleter.class)
@@ -105,7 +105,7 @@ public class PasswordCommands {
 
   @Command(name = "pbe-dec", description = "decrypt password with master password",
       mixinStandardHelpOptions = true)
-  static class PbeDecCommand extends ShellBaseCommand {
+  static class PbeDecCommand extends XiShellBaseCommand {
 
     @Option(names = "--password", description = "encrypted password")
     private String passwordHint;
@@ -149,7 +149,7 @@ public class PasswordCommands {
 
   @Command(name = "pbe-enc", description = "encrypt password with master password",
       mixinStandardHelpOptions = true)
-  static class PbeEncCommand extends ShellBaseCommand {
+  static class PbeEncCommand extends XiShellBaseCommand {
 
     @Option(names = "--out", description = "where to save the encrypted password")
     @Completion(FilePathCompleter.class)

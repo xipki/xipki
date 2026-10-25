@@ -3,7 +3,6 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.EnrollCertsRequest;
@@ -11,8 +10,9 @@ import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.ca.sdk.X500NameType;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Hex;
 import org.xipki.util.benchmark.BenchmarkExecutor;
-import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -127,7 +127,7 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     }
 
     EnrollCertsRequest req = new EnrollCertsRequest();
-    req.setTransactionId(Hex.toHexString(randomBytes(8)));
+    req.setTransactionId(Hex.encode(randomBytes(8)));
     req.setEntries(entries);
     return req;
   } // method nextCertRequest

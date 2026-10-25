@@ -3,21 +3,21 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.util.Pack;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.crypto.DssSigValue;
+import org.xipki.codec.asn1.crypto.RSAPublicKey;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.util.Pack;
 import org.xipki.ca.gateway.acme.type.AcmeError;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.EcCurveEnum;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.misc.DateUtil;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.misc.DateUtil;
 
 import java.math.BigInteger;
 import java.net.IDN;
@@ -27,13 +27,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import static org.xipki.util.codec.Base64.decodeFast;
 
 /**
  * ACME Utility class
@@ -56,16 +52,18 @@ final class AcmeUtils {
   }
 
   public static PublicKey jwkPublicKey(Map<String, String> jwk) throws InvalidKeySpecException {
+    // RFC 7517, Section 4.1: kty is case-sensitive.
     String kty = jwk.get("kty");
-    if ("RSA".equalsIgnoreCase(kty)) {
+    if ("RSA".equals(kty)) {
       return KeyUtil.getRSAPublicKey(new RSAPublicKeySpec(
-        new BigInteger(1, decodeFast(jwk.get("n"))), new BigInteger(1, decodeFast(jwk.get("e")))));
-    } else if ("EC".equalsIgnoreCase(kty)) {
+        new BigInteger(1, decodeJwkMember(jwk, "n")),
+        new BigInteger(1, decodeJwkMember(jwk, "e"))));
+    } else if ("EC".equals(kty)) {
       String curveName = jwk.get("crv");
       EcCurveEnum curve = EcCurveEnum.ofAlias(curveName);
       if (curve != null) {
         byte[] encodedPoint = buildECPublicKeyData(curve,
-          decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
+          decodeJwkMember(jwk, "x"), decodeJwkMember(jwk, "y"));
         return KeyUtil.createECPublicKey(curve, encodedPoint);
       }
     }
@@ -76,35 +74,39 @@ final class AcmeUtils {
   public static boolean matchKey(Map<String, String> jwk, SubjectPublicKeyInfo pkInfo)
     throws InvalidKeySpecException {
     AlgorithmIdentifier pkInfoAlgo = pkInfo.getAlgorithm();
-    ASN1ObjectIdentifier pkKeyAlgo = pkInfoAlgo.getAlgorithm();
+    Asn1Oid pkKeyAlgo = pkInfoAlgo.getAlgorithm();
 
     String kty = jwk.get("kty");
     if ("RSA".equalsIgnoreCase(kty)) {
-      if (!( pkKeyAlgo.equals(OIDs.Algo.id_rsaEncryption)
-        || pkKeyAlgo.equals(OIDs.Algo.id_RSASSA_PSS)
-        || pkKeyAlgo.equals(OIDs.Algo.sha1WithRSAEncryption)
-        || pkKeyAlgo.equals(OIDs.Algo.sha224WithRSAEncryption)
-        || pkKeyAlgo.equals(OIDs.Algo.sha256WithRSAEncryption)
-        || pkKeyAlgo.equals(OIDs.Algo.sha384WithRSAEncryption)
-        || pkKeyAlgo.equals(OIDs.Algo.sha512WithRSAEncryption))) {
+      if (!( pkKeyAlgo.equals(AlgorithmOIDs.id_rsaEncryption)
+        || pkKeyAlgo.equals(AlgorithmOIDs.id_RSASSA_PSS)
+        || pkKeyAlgo.equals(AlgorithmOIDs.sha1WithRSAEncryption)
+        || pkKeyAlgo.equals(AlgorithmOIDs.sha224WithRSAEncryption)
+        || pkKeyAlgo.equals(AlgorithmOIDs.sha256WithRSAEncryption)
+        || pkKeyAlgo.equals(AlgorithmOIDs.sha384WithRSAEncryption)
+        || pkKeyAlgo.equals(AlgorithmOIDs.sha512WithRSAEncryption))) {
         return false;
       }
 
-      BigInteger n = new BigInteger(1, decodeFast(jwk.get("n")));
-      BigInteger e = new BigInteger(1, decodeFast(jwk.get("e")));
+      BigInteger n = new BigInteger(1, Base64.decodeFast(jwk.get("n")));
+      BigInteger e = new BigInteger(1, Base64.decodeFast(jwk.get("e")));
 
-      ASN1Sequence seq = ASN1Sequence.getInstance(Asn1Util.getPublicKeyData(pkInfo));
-      BigInteger n2 = ASN1Integer.getInstance(seq.getObjectAt(0)).getPositiveValue();
-      BigInteger e2 = ASN1Integer.getInstance(seq.getObjectAt(1)).getPositiveValue();
-      return n.equals(n2) && e.equals(e2);
-    } else if ("EC".equalsIgnoreCase(kty)) {
-      if (!OIDs.Algo.id_ecPublicKey.equals(pkKeyAlgo)) {
-        return false;
-      }
-
-      ASN1ObjectIdentifier curveOid2;
+      RSAPublicKey rsaPublicKey;
       try {
-        curveOid2 = ASN1ObjectIdentifier.getInstance(pkInfoAlgo.getParameters());
+        rsaPublicKey = RSAPublicKey.fromEncoded(pkInfo.subjectPublicKey());
+      } catch (CodecException ex) {
+        throw new InvalidKeySpecException(ex);
+      }
+
+      return n.equals(rsaPublicKey.modulus()) && e.equals(rsaPublicKey.publicExponent());
+    } else if ("EC".equalsIgnoreCase(kty)) {
+      if (!AlgorithmOIDs.id_ecPublicKey.equals(pkKeyAlgo)) {
+        return false;
+      }
+
+      Asn1Oid curveOid2;
+      try {
+        curveOid2 = (Asn1Oid) pkInfoAlgo.getParameters();
       } catch (IllegalArgumentException ex) {
         return false;
       }
@@ -116,11 +118,78 @@ final class AcmeUtils {
       }
 
       byte[] encodedPoint = buildECPublicKeyData(curve,
-        decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
-      return Arrays.equals(Asn1Util.getPublicKeyData(pkInfo), encodedPoint);
+        Base64.decodeFast(jwk.get("x")), Base64.decodeFast(jwk.get("y")));
+      return Arrays.equals(pkInfo.subjectPublicKey(), encodedPoint);
     } else {
       throw new RuntimeException("unsupported kty " + kty);
     }
+  }
+
+  private static byte[] decodeJwkMember(Map<String, String> jwk, String name)
+      throws InvalidKeySpecException {
+    String value = jwk.get(name);
+    if (value == null) {
+      throw new InvalidKeySpecException("JWK member " + name + " is not present");
+    }
+
+    try {
+      return java.util.Base64.getUrlDecoder().decode(value);
+    } catch (IllegalArgumentException ex) {
+      throw new InvalidKeySpecException("JWK member " + name + " is not base64url-encoded");
+    }
+  }
+
+  /**
+   * Decodes the base64url-encoded text.
+   * @param text the base64url-encoded text.
+   * @param name name of the text, used in the error message.
+   * @return the decoded bytes.
+   * @throws AcmeProtocolException if text is absent or not base64url-encoded.
+   */
+  public static byte[] decodeBase64Url(String text, String name) throws AcmeProtocolException {
+    if (text == null) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST, AcmeError.malformed,
+          name + " is not present");
+    }
+
+    try {
+      return java.util.Base64.getUrlDecoder().decode(text);
+    } catch (IllegalArgumentException ex) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST, AcmeError.malformed,
+          name + " is not base64url-encoded");
+    }
+  }
+
+  /**
+   * Decodes the base64url-encoded text.
+   * @param text the base64url-encoded text.
+   * @return the decoded bytes, or {@code null} if text is not base64url-encoded.
+   */
+  public static byte[] decodeBase64UrlOrNull(String text) {
+    try {
+      return java.util.Base64.getUrlDecoder().decode(text);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
+  }
+
+  /**
+   * Converts the JWS ECDSA signature (R || S, RFC 7518 Section 3.4) to the DER-encoded one.
+   * @param sig the JWS ECDSA signature.
+   * @param fieldByteSize byte size of R and S.
+   * @return the DER-encoded signature.
+   * @throws AcmeProtocolException if the signature has an invalid length.
+   */
+  public static byte[] ecdsaJwsSigToDer(byte[] sig, int fieldByteSize)
+      throws AcmeProtocolException {
+    if (sig.length != 2 * fieldByteSize) {
+      throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST, AcmeError.malformed,
+          "signature is not valid");
+    }
+
+    BigInteger r = new BigInteger(1, Arrays.copyOfRange(sig, 0, fieldByteSize));
+    BigInteger s = new BigInteger(1, Arrays.copyOfRange(sig, fieldByteSize, sig.length));
+    return new DssSigValue(r, s).getEncoded();
   }
 
   private static byte[] buildECPublicKeyData(EcCurveEnum curve, byte[] x, byte[] y)
@@ -161,13 +230,42 @@ final class AcmeUtils {
     return Base64.getUrlNoPaddingEncoder().encodeToString(Pack.longToLittleEndian(label));
   }
 
+  /**
+   * Computes the JWK SHA-256 thumbprint as specified in RFC 7638.
+   * @param jwk the JWK.
+   * @return the base64url-encoded thumbprint.
+   * @throws IllegalArgumentException if a required member is absent.
+   */
   public static String jwkSha256(Map<String, String> jwk) {
-    List<String> jwkNames = new ArrayList<>(jwk.keySet());
-    Collections.sort(jwkNames);
+    String kty = jwk.get("kty");
+    // RFC 7638, Section 3.2: only the required members, in lexicographic order.
+    List<String> jwkNames;
+    if ("EC".equals(kty)) {
+      jwkNames = Arrays.asList("crv", "kty", "x", "y");
+    } else if ("RSA".equals(kty)) {
+      jwkNames = Arrays.asList("e", "kty", "n");
+    } else if ("OKP".equals(kty)) {
+      jwkNames = Arrays.asList("crv", "kty", "x");
+    } else if ("oct".equals(kty)) {
+      jwkNames = Arrays.asList("k", "kty");
+    } else {
+      throw new IllegalArgumentException("unsupported kty " + kty);
+    }
+
     StringBuilder canonJwk = new StringBuilder();
     canonJwk.append("{");
     for (String jwkName : jwkNames) {
-      canonJwk.append("\"").append(jwkName).append("\":\"").append(jwk.get(jwkName)).append("\",");
+      String value = jwk.get(jwkName);
+      if (value == null) {
+        throw new IllegalArgumentException("JWK member " + jwkName + " is not present");
+      }
+
+      // the value is written without escaping, it must contain only Base64 / Base64Url chars.
+      if (!Base64.containsOnlyValidChars(value.getBytes(StandardCharsets.UTF_8))) {
+        throw new IllegalArgumentException("JWK member " + jwkName
+            + " is not Base64 or Base64Url encoded");
+      }
+      canonJwk.append("\"").append(jwkName).append("\":\"").append(value).append("\",");
     }
     // remove the last ","
     canonJwk.deleteCharAt(canonJwk.length() - 1);

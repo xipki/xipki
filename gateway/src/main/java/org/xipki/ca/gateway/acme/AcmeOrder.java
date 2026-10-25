@@ -9,9 +9,9 @@ import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.ca.gateway.acme.type.Identifier;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
-import org.xipki.security.HashAlgo;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.HashAlgo;
 
 import java.time.Instant;
 import java.util.ArrayList;

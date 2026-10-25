@@ -3,14 +3,14 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.ocsp.CrlID;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.asn1.ocsp.CrlID;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.ConfPairs;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 
@@ -53,14 +53,18 @@ public class CrlInfo {
       this.baseCrlNumber = new BigInteger(str, 16);
     }
 
-    str = getNotBlankValue(pairs, THIS_UPDATE);
-    this.thisUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+    try {
+      str = getNotBlankValue(pairs, THIS_UPDATE);
+      this.thisUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
 
-    str = getNotBlankValue(pairs, NEXT_UPDATE);
-    this.nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+      str = getNotBlankValue(pairs, NEXT_UPDATE);
+      this.nextUpdate = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
 
-    str = getNotBlankValue(pairs, CRL_ID);
-    this.crlId = CrlID.getInstance(Base64.decodeFast(str));
+      str = getNotBlankValue(pairs, CRL_ID);
+      this.crlId = CrlID.fromEncoded(Base64.decodeFast(str));
+    } catch (CodecException e) {
+      throw new IllegalArgumentException("invalid CRL_ID " + str);
+    }
     initEncoded();
   } // constructor
 
@@ -91,12 +95,7 @@ public class CrlInfo {
       pairs.putPair(BASE_CRL_NUMBER, baseCrlNumber.toString(16));
     }
 
-    byte[] encodedCrlId;
-    try {
-      encodedCrlId = crlId.getEncoded();
-    } catch (IOException ex) {
-      throw new IllegalArgumentException("error encoding CrlID");
-    }
+    byte[] encodedCrlId = crlId.getEncoded();
     pairs.putPair(CRL_ID, Base64.getEncoder().encodeToString(encodedCrlId));
     this.encoded = pairs.getEncoded();
   } // method initEncoded

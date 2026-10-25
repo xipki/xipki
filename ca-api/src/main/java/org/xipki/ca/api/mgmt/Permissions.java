@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.exception.InvalidConfException;
 
 import java.util.Collection;
 import java.util.List;

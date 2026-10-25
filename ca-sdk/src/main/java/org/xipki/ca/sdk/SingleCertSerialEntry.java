@@ -3,9 +3,9 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.exception.CodecException;
 
 import java.math.BigInteger;
 

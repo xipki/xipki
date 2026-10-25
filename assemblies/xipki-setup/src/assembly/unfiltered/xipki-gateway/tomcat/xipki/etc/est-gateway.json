@@ -1,6 +1,6 @@
 {
   // WARNING: Replace the simple authenticator with your own.
-  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json"
+  "authenticator":"org.xipki.pkix.auth.SimpleRequestorAuthenticator etc/simple-requestors.json"
   // When "caProfiles" is configured, short URL is possible
   //   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
   //   For alias "default": https://<host>:<port>/.well-known/est

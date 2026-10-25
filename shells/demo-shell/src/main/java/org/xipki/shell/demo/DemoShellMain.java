@@ -7,7 +7,10 @@ import org.h2.tools.Server;
 import org.xipki.shell.PicocliShell;
 import org.xipki.shell.ShellBaseCommand;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.function.Consumer;
 
 /**
@@ -46,9 +49,27 @@ public class DemoShellMain {
         printer.accept("H2 TCP server and Web console server have been started before with tcpPort="
             + startedTcpPort + " and webPort=" + startedWebPort);
       } else {
-        server = new Server();
-        server.runTool("-ifNotExists", "-tcp", "-tcpPort", Integer.toString(tcpPort),
-            "-tcpAllowOthers", "-web", "-webPort", Integer.toString(webPort), "-webAllowOthers");
+        // assign the field only after the server has been started successfully, otherwise
+        // a second call would wrongly assume that the server is running.
+        Server newServer = new Server();
+        try {
+          newServer.runTool("-ifNotExists", "-tcp", "-tcpPort", Integer.toString(tcpPort),
+              "-tcpAllowOthers", "-web", "-webPort", Integer.toString(webPort),
+              "-webAllowOthers");
+        } catch (Exception ex) {
+          newServer.shutdown();
+          if (isH2TcpServerRunning(tcpPort)) {
+            printer.accept("Could not start H2 server: " + ex.getMessage());
+            printer.accept("Use the H2 TCP server already running on port " + tcpPort
+                + " (e.g. started by another xipki shell).");
+            return;
+          }
+
+          throw new RuntimeException("Could not start H2 server (tcpPort=" + tcpPort
+              + ", webPort=" + webPort + "): " + ex.getMessage()
+              + ". Is another xipki shell or H2 server still running?", ex);
+        }
+        server = newServer;
         startedWebPort = webPort;
         startedTcpPort = tcpPort;
         printer.accept("Started H2 TCP server and Web console server.");
@@ -66,6 +87,15 @@ public class DemoShellMain {
     }
   }
 
+  private static boolean isH2TcpServerRunning(int tcpPort) {
+    String url = "jdbc:h2:tcp://localhost:" + tcpPort + "/mem:xipki_h2_probe";
+    try (Connection conn = DriverManager.getConnection(url, "sa", "")) {
+      return conn.isValid(5);
+    } catch (Exception ex) {
+      return false;
+    }
+  }
+
   static void shutdownH2Server(Consumer<String> printer) {
     if (server != null) {
       printer.accept("Shutdown H2 TCP server and Web console server.");
@@ -78,6 +108,41 @@ public class DemoShellMain {
   private static void shutdownServer() {
     server.shutdown();
     server = null;
+  }
+
+  /**
+   * Demo shell commands.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  static class DemoCommands {
+
+    @Command(name = "start-h2-server", description = "Start H2 server",
+        mixinStandardHelpOptions = true)
+    static class StartH2ServerCommand extends ShellBaseCommand {
+
+      @Option(names = "--web-port", description = "H2 server web port")
+      private int webPort = 8282;
+
+      @Option(names = "--tcp-port", description = "H2 server TCP port")
+      private int tcpPort = 9092;
+
+      @Override
+      public void run() {
+        DemoShellMain.startH2Server(this::println, webPort, tcpPort);
+      }
+    }
+
+    @Command(name = "shutdown-h2-server", description = "Shutdown H2 server",
+        mixinStandardHelpOptions = true)
+    static class ShutdownH2ServerCommand extends ShellBaseCommand {
+
+      @Override
+      public void run() {
+        DemoShellMain.shutdownH2Server(this::println);
+      }
+    }
+
   }
 
 }

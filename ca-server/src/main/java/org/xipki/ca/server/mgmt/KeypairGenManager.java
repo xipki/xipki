@@ -5,15 +5,15 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.KeypairGenEntryWrapper;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,7 +168,7 @@ class KeypairGenManager {
     try {
       ret.init(manager.securityFactory, manager.p11CryptServiceFactory,
           manager.keypairGeneratorFactories, manager.shardId, manager.getDataSourceMap());
-    } catch (ObjectCreationException ex) {
+    } catch (GenerationException ex) {
       final String message = "error createKeypairGen";
       LOG.debug(message, ex);
       throw new CaMgmtException(ex.getMessage());

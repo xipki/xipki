@@ -5,14 +5,15 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonParser;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -194,7 +195,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      IoUtil.closeQuietly(certsFileOs);
+      XipkiIoUtil.closeQuietly(certsFileOs);
     }
   } // method exportCert
 
@@ -242,7 +243,7 @@ class OcspCertstoreDbExporter extends DbPorter {
     processLog.printHeader();
 
     String sql = null;
-    Long id = null; // TODO: id -> long
+    Long id = null;
 
     try {
       boolean interrupted = false;

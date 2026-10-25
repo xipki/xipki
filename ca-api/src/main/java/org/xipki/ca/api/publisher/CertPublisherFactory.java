@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.publisher;
 
-import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.codec.asn1.GenerationException;
 
 import java.util.Set;
 
@@ -33,9 +33,9 @@ public interface CertPublisherFactory {
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return the new created publisher
-   * @throws ObjectCreationException
+   * @throws GenerationException
    *           if publisher could not be created.
    */
-  CertPublisher newPublisher(String type) throws ObjectCreationException;
+  CertPublisher newPublisher(String type) throws GenerationException;
 
 }

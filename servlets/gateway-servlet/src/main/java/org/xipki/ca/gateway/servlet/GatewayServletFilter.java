@@ -6,7 +6,7 @@ package org.xipki.ca.gateway.servlet;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ca.gateway.GatewayHttpFilter;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpFilter;
 
 /**
  * Gateway Servlet Filter.

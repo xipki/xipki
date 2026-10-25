@@ -1,7 +1,7 @@
 # XiPKI
 
 ```
-Copyright (c) 2014-2025 Lijun Liao (xipki)
+Copyright (c) 2014-2026 Lijun Liao (xipki)
 (https://github.com/xipki/xipki)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,32 +15,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-```
-
-# Bouncy Castle
-
-```
-Copyright (c) 2000 - 2024 The Legion of the Bouncy Castle Inc. 
-(https://www.bouncycastle.org)
-
-Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the 
-"Software"), to deal in the Software without restriction, including 
-without limitation the rights to use, copy, modify, merge, publish, 
-distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to
- the following conditions:
-
-The above copyright notice and this permission notice shall be included
- in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 ```
 
 # dnsjava
@@ -82,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Apache v2.0
 
-# JLine3
+# JLine
 
 ```
 Copyright (c) 2002-2023, the original author or authors.
@@ -158,35 +132,6 @@ Copyright (c) 2004-2025 QOS.ch
 The MariaDB client libraries for C, Java and ODBC are distributed under 
 the LGPL license, version 2.1 or later. The LGPL license allows you to 
 distribute these MariaDB client libraries freely with any application.
-```
-
-# postgresql JDBC driver
-
-```
-Copyright (c) 1997, PostgreSQL Global Development Group All rights 
-reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are 
-met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright 
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-This Software Is Provided By The Copyright Holders And Contributors 
-“as Is” And Any Express Or Implied Warranties, Including, But Not Limited
-To, The Implied Warranties Of Merchantability And Fitness For A 
-Particular Purpose Are Disclaimed. In No Event Shall The Copyright Owner
-Or Contributors Be Liable For Any Direct, Indirect, Incidental, Special, 
-Exemplary, Or Consequential Damages (including, But Not Limited To, 
-Procurement Of Substitute Goods Or Services; Loss Of Use, Data, Or 
-Profits; Or Business Interruption) However Caused And On Any Theory Of 
-Liability, Whether In Contract, Strict Liability, Or Tort (including 
-Negligence Or Otherwise) Arising In Any Way Out Of The Use Of This 
-Software, Even If Advised Of The Possibility Of Such Damage.
 ```
 
 # h2 JDBC driver

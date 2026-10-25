@@ -3,19 +3,19 @@
 
 package org.xipki.ca.sdk;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.HttpRespContent;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.extra.http.XiHttpClient;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.EmbedCertsMode;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.util.http.XiHttpClient;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -43,7 +43,7 @@ public class SdkClient {
 
   private boolean logReqResp = false;
 
-  public SdkClient(SdkClientConf conf) throws ObjectCreationException {
+  public SdkClient(SdkClientConf conf) throws GenerationException {
     this.serverUrl = conf.serverUrl();
     this.client = new XiHttpClient(SslContextConf.ofSslConf(conf.ssl()));
   }
@@ -91,11 +91,11 @@ public class SdkClient {
       }
     }
 
-    if (resp.isOK()) {
+    if (resp != null && resp.isOK()) {
       return resp.content();
     }
 
-    byte[] errorContent = resp.content();
+    byte[] errorContent = resp == null ? null : resp.content();
     if (errorContent == null) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, null);
     } else {
@@ -206,7 +206,7 @@ public class SdkClient {
     return currentCrlInfo(ca, null, null, null);
   }
 
-  public byte[] currentCrlInfo(String ca, BigInteger crlNumber, Instant thisUpdate, String crlDp)
+  public byte[] currentCrlInfo(String ca, Long crlNumber, Instant thisUpdate, String crlDp)
       throws SdkErrorResponseException {
     GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crlinfo, req);
@@ -223,7 +223,7 @@ public class SdkClient {
     return currentCrl(ca, null, null, null);
   }
 
-  public byte[] currentCrl(String ca, BigInteger crlNumber, Instant thisUpdate, String crlDp)
+  public byte[] currentCrl(String ca, Long crlNumber, Instant thisUpdate, String crlDp)
       throws SdkErrorResponseException {
     GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crl, req);

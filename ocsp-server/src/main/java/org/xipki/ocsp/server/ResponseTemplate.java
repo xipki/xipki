@@ -3,20 +3,18 @@
 
 package org.xipki.ocsp.server;
 
-import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.util.Arrays;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.pkix.asn1.ocsp.CertHash;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.Extension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.ocsp.server.type.WritableOnlyExtension;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.pkix.CrlReason;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CrlReason;
 
-import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,16 +43,10 @@ class ResponseTemplate {
       int hlen = h.length();
 
       AlgorithmIdentifier algId = h.algorithmIdentifier();
-      byte[] encoded;
-      try {
-        CertHash certHash = new CertHash(algId, new byte[hlen]);
-        org.bouncycastle.asn1.x509.Extension extn =
-            new org.bouncycastle.asn1.x509.Extension(
-                OIDs.Misc.isismtt_at_certHash, false, certHash.getEncoded());
-        encoded = extn.getEncoded();
-      } catch (IOException ex) {
-        throw new ExceptionInInitializerError("could not processing encoding of CertHash");
-      }
+      CertHash certHash = new CertHash(algId, new byte[hlen]);
+      org.xipki.pkix.asn1.x509.Extension extn =
+          org.xipki.pkix.asn1.x509.Extension.ofCertHash(false, certHash);
+      byte[] encoded = extn.getEncoded();
       byte[] prefix = Arrays.copyOf(encoded, encoded.length - hlen);
       extnCerthashPrefixMap.put(h, prefix);
     }

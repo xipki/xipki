@@ -8,8 +8,8 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine;
 
 import java.util.ArrayList;

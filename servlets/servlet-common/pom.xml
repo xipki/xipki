@@ -4,29 +4,29 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.servlet</groupId>
+    <groupId>org.xipki.pki.servlet</groupId>
     <artifactId>servlets</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>servlet-common</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki</groupId>
-      <artifactId>util-extra</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.pki</groupId>
       <artifactId>util</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki</groupId>
+      <groupId>org.xipki.crypto</groupId>
       <artifactId>codec</artifactId>
-      <version>${project.version}</version>
+      <version>${xicrypto.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-api</artifactId>
+      <version>${xicrypto.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

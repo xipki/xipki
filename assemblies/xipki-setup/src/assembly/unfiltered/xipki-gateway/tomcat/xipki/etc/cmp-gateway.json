@@ -19,10 +19,12 @@
     ],
     "responsePbmMac":"HMAC-SHA256",
     "responsePbmOwf":"SHA256",
-    "responsePbmIterationCount":10240
+    "responsePbmIterationCount":10240,
+    // maximal PBMParameter.iterationCount of the requests, default 100000
+    "requestPbmMaxIterationCount":100000
   },
   // WARNING: Replace the simple authenticator with your own.
-  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "authenticator":"org.xipki.pkix.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
   "signers":{
     "default":{
       "type":"pkcs12",

@@ -6,7 +6,7 @@
     "supportGetCrl":true,
     "maxSigningTimeBias":300
   },
-  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "authenticator":"org.xipki.pkix.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
   "caProfiles": [{
     "name": "default",
     "ca": "subcawithcrl",
@@ -21,7 +21,16 @@
       "names":["subcawithcrl"],
       "signer":{
         "type":"pkcs12",
-        "conf":"password=CHANGEIT,keystore=file:keycerts/scep-subcawithcrl.p12"
+        "conf":"password=CHANGEIT,keystore=file:keycerts/scep-sign-subcawithcrl.p12"
+      }
+    }]
+  },
+  "decryptors":{
+    "decryptors":[{
+      "names":["subcawithcrl"],
+      "decryptor":{
+        "type":"pkcs12",
+        "conf":"password=CHANGEIT,keystore=file:keycerts/scep-enc-subcawithcrl.p12"
       }
     }]
   }

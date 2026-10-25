@@ -1,0 +1,15 @@
+// Copyright (c) 2013-2026 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.util.misc;
+
+/**
+ * Embed Certs Mode enumeration.
+ *
+ * @author Lijun Liao (xipki)
+ */
+public enum EmbedCertsMode {
+  NONE,
+  CERT,
+  CHAIN
+}

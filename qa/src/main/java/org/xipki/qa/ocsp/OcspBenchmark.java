@@ -3,17 +3,17 @@
 
 package org.xipki.qa.ocsp;
 
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.codec.util.Args;
 import org.xipki.ocsp.client.HttpOcspRequestor;
 import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
-import org.xipki.security.pkix.X509Cert;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.benchmark.BenchmarkExecutor;
-import org.xipki.util.codec.Args;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -105,7 +105,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
   }
 
   public boolean ask(BigInteger[] serialNumbers) {
-    OCSPResp ocspResp;
+    OCSPResponse ocspResp;
     try {
       ocspResp = client.ask(issuerCert, serialNumbers, responderUrl, requestOptions, null);
     } catch (Exception e) {
@@ -113,20 +113,14 @@ public class OcspBenchmark extends BenchmarkExecutor {
       return false;
     }
 
-    Object respObject;
-    try {
-      respObject = ocspResp.getResponseObject();
-    } catch (OCSPException ex) {
-      LOG.warn("responseObject is invalid", ex);
+    if (OCSPResponseStatus.SUCCESSFUL.equals(ocspResp.getResponseStatus())) {
+      LOG.warn("bad response: response status is other than SUCCESSFUL: {}",
+          ocspResp.getResponseStatus());
       return false;
     }
 
-    if (ocspResp.getStatus() != 0) {
-      LOG.warn("bad response: response status is other than OK: {}", ocspResp.getStatus());
-      return false;
-    }
-
-    if (!(respObject instanceof BasicOCSPResp)) {
+    BasicOCSPResponse basicOCSPResponse = ocspResp.getBasicOCSPResponse();
+    if (basicOCSPResponse == null) {
       LOG.warn("bad response: response is not BasicOCSPResp");
       return false;
     }

@@ -4,22 +4,22 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xipki.assembly</groupId>
+    <groupId>org.xipki.pki.assembly</groupId>
     <artifactId>assemblies</artifactId>
-    <version>6.7.2-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>xipki-qa</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.assembly</groupId>
+      <groupId>org.xipki.pki.assembly</groupId>
       <artifactId>xipki-setup</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
+      <groupId>org.xipki.pki.shell</groupId>
       <artifactId>xipki-qa-cli</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -50,34 +50,29 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.xipki.tools</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <version>${xipki.dependency-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>download-qa-cli-shell</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>download</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/t2/xipki-qa-cli/lib</outputDirectory>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki.shell</groupId>
-                  <artifactId>xipki-qa-cli</artifactId>
-                  <version>${project.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <!--  include additional artifacts -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+          <execution>
+            <id>unpack-qa-cli-lib</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.xipki.pki.shell</groupId>
+                  <artifactId>xipki-qa-cli</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <classifier>lib</classifier>
+                  <outputDirectory>${project.build.directory}/t2/xipki-qa-cli/lib</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -88,7 +83,7 @@
               <outputDirectory>${project.build.directory}/t2</outputDirectory>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.assembly</groupId>
+                  <groupId>org.xipki.pki.assembly</groupId>
                   <artifactId>xipki-setup</artifactId>
                   <version>${project.version}</version>
                   <type>tar.gz</type>
@@ -107,7 +102,7 @@
               <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xipki.servlet</groupId>
+                  <groupId>org.xipki.pki.servlet</groupId>
                   <artifactId>dummy-servlet</artifactId>
                   <version>${project.version}</version>
                   <type>war</type>

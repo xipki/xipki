@@ -25,6 +25,28 @@ fi
 
 CLASSPATH=$LIB_DIR/*
 
+# Use the java of JAVA_HOME if set, otherwise the java in the PATH.
+JAVA_EXEC=${JAVA_HOME:+$JAVA_HOME/bin/}java
+if ! command -v "$JAVA_EXEC" >/dev/null 2>&1; then
+  echo "java not found: '$JAVA_EXEC'" >&2
+  exit 1
+fi
+
+# ML-DSA with context string (composite ML-DSA) with the crypto-be-jdk backend
+# uses the internals of the JDK.
+ADD_EXPORTS="--add-exports java.base/sun.security.provider=ALL-UNNAMED"
+
+# JLine uses the foreign function & memory API (restricted methods) for the terminal. The
+# option --enable-native-access is only known since Java 17.
+JAVA_MAJOR=$("$JAVA_EXEC" -version 2>&1 | sed -n 's/.* version "\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\1 \2/p' | head -n 1)
+case "$JAVA_MAJOR" in
+  "1 "*) JAVA_MAJOR=${JAVA_MAJOR#1 } ;;
+  *) JAVA_MAJOR=${JAVA_MAJOR%% *} ;;
+esac
+if [ -n "$JAVA_MAJOR" ] && [ "$JAVA_MAJOR" -ge 17 ] 2>/dev/null; then
+  ADD_EXPORTS="$ADD_EXPORTS --enable-native-access=ALL-UNNAMED"
+fi
+
 cd "$DIST_DIR"
-exec java $JAVA_OPTS -Dorg.xipki.shell.home="$DIST_DIR" -cp "$CLASSPATH" \
+exec "$JAVA_EXEC" $JAVA_OPTS $ADD_EXPORTS -Dorg.xipki.shell.home="$DIST_DIR" -cp "$CLASSPATH" \
   org.xipki.shell.dist.XipkiCliMain "$@"

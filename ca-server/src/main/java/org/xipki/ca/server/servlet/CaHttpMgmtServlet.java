@@ -3,9 +3,9 @@
 
 package org.xipki.ca.server.servlet;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.*;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -13,22 +13,22 @@ import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.TlsHelper;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.http.XiHttpResponse;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.util.http.XiHttpResponse;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,7 +113,7 @@ class CaHttpMgmtServlet {
           .orElseThrow(() -> new MyException(HttpStatusCode.SC_NOT_FOUND,
               "unknown action '" + actionStr + "'"));
 
-      reqBody = IoUtil.readAllBytesAndClose(request.getInputStream());
+      reqBody = XipkiIoUtil.readAllBytesAndClose(request.getInputStream());
 
       JsonMap json;
       try {
@@ -201,7 +201,7 @@ class CaHttpMgmtServlet {
         case exportConf: {
           MgmtRequest.ExportConf req = MgmtRequest.ExportConf.parse(nonNullReq(json));
           InputStream confStream = caManager.exportConf(req.caNames());
-          resp = new MgmtResponse.ByteArray(IoUtil.readAllBytesAndClose(confStream));
+          resp = new MgmtResponse.ByteArray(XipkiIoUtil.readAllBytesAndClose(confStream));
           break;
         }
         case generateCertificate: {
@@ -287,7 +287,7 @@ class CaHttpMgmtServlet {
           if (req.caName() != null) {
             cert = caManager.getCert(req.caName(), req.serialNumber());
           } else {
-            X500Name issuer = X500Name.getInstance(req.encodedIssuerDn());
+            X500Name issuer = X500Name.fromEncoded(req.encodedIssuerDn());
             cert = caManager.getCert(issuer, req.serialNumber());
           }
 
@@ -418,7 +418,7 @@ class CaHttpMgmtServlet {
         }
         case listCertificates: {
           MgmtRequest.ListCertificates req = MgmtRequest.ListCertificates.parse(nonNullReq(json));
-          X500Name subjectPattern = X500Name.getInstance(req.encodedSubjectDnPattern());
+          X500Name subjectPattern = X500Name.fromEncoded(req.encodedSubjectDnPattern());
           List<CertListInfo> result = caManager.listCertificates(
               req.caName(), subjectPattern, req.validFrom(),
               req.validTo(), req.orderBy(), req.numEntries());

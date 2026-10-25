@@ -3,25 +3,26 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,7 +218,7 @@ class CaCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      IoUtil.closeQuietly(entriesFileOs);
+      XipkiIoUtil.closeQuietly(entriesFileOs);
     }
   } // method exportEntries
 
@@ -381,8 +382,8 @@ class CaCertstoreDbExporter extends DbPorter {
                   : new CRLException(ex.getMessage(), ex);
             }
 
-            byte[] extnValue = X509Util.getCoreExtValue(x509Crl.extensions(), Extension.cRLNumber);
-            if (extnValue == null) {
+            Extension extn = x509Crl.getExtension(ExtensionOIDs.cRLNumber);
+            if (extn == null) {
               LOG.warn("CRL without CRL number, ignore it");
               continue;
             }
@@ -397,7 +398,7 @@ class CaCertstoreDbExporter extends DbPorter {
               currentEntriesZip.closeEntry();
             }
 
-            BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+            BigInteger crlNumber = extn.cRLNumber();
 
             CaCertstore.Crl crl = new CaCertstore.Crl(id, rs.getInt("CA_ID"), crlFilename,
                 crlNumber.toString(), rs.getInt("CRL_SCOPE"));

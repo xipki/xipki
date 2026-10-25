@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The runtime jars of a CLI (the CLI jar included), packaged as attached zip (classifier lib).
+  XiPKI's own jars (groupIds org.xipki*) are named groupId.artifactId-version.jar, third-party
+  jars keep their default names.
+-->
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.2.0 https://maven.apache.org/xsd/assembly-2.2.0.xsd">
+  <id>lib</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <scope>runtime</scope>
+      <outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</outputFileNameMapping>
+      <fileMode>0644</fileMode>
+    </dependencySet>
+  </dependencySets>
+</assembly>

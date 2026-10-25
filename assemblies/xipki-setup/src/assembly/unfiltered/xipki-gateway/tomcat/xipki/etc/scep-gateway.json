@@ -7,7 +7,7 @@
     "maxSigningTimeBias":300
   },
   // WARNING: Replace the simple authenticator with your own.
-  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "authenticator":"org.xipki.pkix.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
   // When "caProfiles" is configured, short URL is possible
   //   For all aliases:     https://<host>:<port>/.well-known/est/<alias>
   //   For alias "default": https://<host>:<port>/.well-known/est
@@ -26,7 +26,16 @@
       "names":["myca"],
       "signer":{
         "type":"pkcs12",
-        "conf":"password=$[scep.keyPassword],keystore=file:keycerts/scep1.p12"
+        "conf":"password=$[scep.keyPassword],keystore=file:keycerts/scep-sign.p12"
+      }
+    }]
+  },
+  "decryptors":{
+    "decryptors":[{
+      "names":["myca"],
+      "decryptor":{
+        "type":"pkcs12",
+        "conf":"password=$[scep.keyPassword],keystore=file:keycerts/scep-enc.p12"
       }
     }]
   }

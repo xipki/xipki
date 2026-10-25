@@ -3,21 +3,21 @@
 
 package org.xipki.ca.api.profile;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.profile.ctrl.*;
-import org.xipki.security.KeySpec;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.BadCertTemplateException;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.type.SubjectKeyIdentifierControl;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.ca.api.CertprofileException;
+import org.xipki.ca.api.SubjectKeyIdentifierControl;
+import org.xipki.pkix.util.conf.Validity;
 
 import java.time.Instant;
 import java.util.List;
@@ -64,7 +64,7 @@ public abstract class Certprofile {
     return null;
   }
 
-  public Map<ASN1ObjectIdentifier, Set<GeneralNameTag>> subjectInfoAccessModes() {
+  public Map<Asn1Oid, Set<GeneralNameTag>> subjectInfoAccessModes() {
     return null;
   }
 
@@ -141,7 +141,12 @@ public abstract class Certprofile {
       throws BadCertTemplateException {
     Args.notNull(publicKey, "publicKey");
 
-    KeySpec keySpec = KeySpec.ofPublicKey(publicKey);
+    KeySpec keySpec = null;
+    try {
+      keySpec = KeySpec.ofPublicKey(publicKey);
+    } catch (CodecException e) {
+      throw new BadCertTemplateException("malformed public key", e);
+    }
     if (keySpec == null) {
       throw new BadCertTemplateException("unknown type of subject public key");
     }
@@ -200,9 +205,9 @@ public abstract class Certprofile {
    *         if error occurs.
    */
   public abstract ExtensionValues getExtensions(
-      List<ASN1ObjectIdentifier> extensionsToProcess,
+      List<Asn1Oid> extensionsToProcess,
       X500Name requestedSubject, X500Name grantedSubject,
-      Map<ASN1ObjectIdentifier, Extension> requestedExtensions,
+      Map<Asn1Oid, Extension> requestedExtensions,
       Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException;
 
@@ -222,7 +227,7 @@ public abstract class Certprofile {
       control = new SubjectKeyIdentifierControl();
     }
 
-    byte[] keyData = Asn1Util.getPublicKeyData(subjectPublicKeyInfo);
+    byte[] keyData = subjectPublicKeyInfo.subjectPublicKey();
     return control.computeKeyIdentifier(keyData);
   }
 

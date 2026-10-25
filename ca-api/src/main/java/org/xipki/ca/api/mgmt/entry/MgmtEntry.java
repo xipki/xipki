@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.util.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonEncodable;
 
 /**
  * Mgmt Entry.

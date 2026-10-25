@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -12,11 +12,11 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.datasource.DataAccessException;
 
 import java.math.BigInteger;
@@ -111,7 +111,7 @@ public interface CertStore {
   List<SerialWithId> getSuspendedCertSerials(NameId ca, Instant latestLastUpdate, int numEntries)
       throws OperationException;
 
-  byte[] getEncodedCrl(NameId ca, BigInteger crlNumber) throws OperationException;
+  byte[] getEncodedCrl(NameId ca, Long crlNumber) throws OperationException;
 
   int cleanupCrls(NameId ca, int numCrls) throws OperationException;
 
@@ -151,7 +151,7 @@ public interface CertStore {
       NameId ca, Instant notExpiredAt, long startId, int numEntries) throws OperationException;
 
   List<CertRevInfoWithSerial> getCertsForDeltaCrl(
-      NameId ca, BigInteger baseCrlNumber, Instant notExpiredAt) throws OperationException;
+      NameId ca, long baseCrlNumber, Instant notExpiredAt) throws OperationException;
 
   CertStatus getCertStatusForSubject(NameId ca, X500Name subject) throws OperationException;
 

@@ -3,45 +3,40 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERGeneralizedTime;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v2CRLBuilder;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
+import org.xipki.pkix.asn1.x509.CRLDistributionPoints;
+import org.xipki.pkix.asn1.x509.CRLReason;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.pkix.asn1.x509.IssuingDistributionPoint;
 import org.xipki.ca.api.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.security.OIDs;
-import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyUsage;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.Signer;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.HourMinute;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.exception.NoIdleSignerException;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyUsage;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.Signer;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.ca.api.HourMinute;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
 import java.time.Duration;
@@ -51,7 +46,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -70,11 +64,11 @@ import static org.xipki.ca.sdk.CaAuditConstants.TYPE_cleanup_crl;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_downlaod_crl4number;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_download_crl;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_gen_crl;
-import static org.xipki.security.exception.ErrorCode.CRL_FAILURE;
-import static org.xipki.security.exception.ErrorCode.INVALID_EXTENSION;
-import static org.xipki.security.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.security.exception.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.security.exception.ErrorCode.SYSTEM_UNAVAILABLE;
+import static org.xipki.pkix.exception.ErrorCode.CRL_FAILURE;
+import static org.xipki.pkix.exception.ErrorCode.INVALID_EXTENSION;
+import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
+import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.pkix.exception.ErrorCode.SYSTEM_UNAVAILABLE;
 
 /**
  * X509 Crl Module.
@@ -92,11 +86,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         return;
       }
 
-      if (crlGenInProcess.get()) {
+      if (!crlGenInProcess.compareAndSet(false, true)) {
         return;
       }
-
-      crlGenInProcess.set(true);
 
       try {
         run0();
@@ -249,7 +241,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     return getCrl(requstor, null);
   }
 
-  public X509Crl getCrl(RequestorInfo requestor, BigInteger crlNumber)
+  public X509Crl getCrl(RequestorInfo requestor, Long crlNumber)
       throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.name(), crlNumber);
     boolean successful = false;
@@ -289,7 +281,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     return getBcCrl(requestor, null);
   }
 
-  public CertificateList getBcCrl(RequestorInfo requestor, BigInteger crlNumber)
+  public CertificateList getBcCrl(RequestorInfo requestor, Long crlNumber)
       throws OperationException {
     LOG.info("     START getCrl: ca={}, crlNumber={}", caIdent.name(), crlNumber);
     boolean successful = false;
@@ -308,14 +300,14 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
 
       try {
-        CertificateList crl = CertificateList.getInstance(encodedCrl);
+        CertificateList crl = CertificateList.fromEncoded(encodedCrl);
         successful = true;
         if (LOG.isInfoEnabled()) {
           LOG.info("SUCCESSFUL getCrl: ca={}, thisUpdate={}",
               caIdent.name(), crl.getThisUpdate().getTime());
         }
         return crl;
-      } catch (RuntimeException ex) {
+      } catch (RuntimeException | CodecException ex) {
         throw new OperationException(SYSTEM_FAILURE, ex);
       }
     } finally {
@@ -354,11 +346,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     CrlControl control = Optional.ofNullable(caInfo.crlControl())
         .orElseThrow(() -> new OperationException(NOT_PERMITTED, "CA could not generate CRL"));
 
-    if (crlGenInProcess.get()) {
+    if (!crlGenInProcess.compareAndSet(false, true)) {
       throw new OperationException(SYSTEM_UNAVAILABLE, "TRY_LATER");
     }
 
-    crlGenInProcess.set(true);
     try {
       Instant thisUpdate = Instant.now();
       Instant nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);
@@ -414,7 +405,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     CrlControl control = Optional.ofNullable(caInfo.crlControl())
         .orElseThrow(() -> new OperationException(NOT_PERMITTED, "CRL generation is not allowed"));
 
-    BigInteger baseCrlNumber = null;
+    Long baseCrlNumber = null;
     if (deltaCrl) {
       baseCrlNumber = Optional.ofNullable(caInfo.getMaxFullCrlNumber())
           .orElseThrow(() -> new OperationException(SYSTEM_FAILURE,
@@ -445,9 +436,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       boolean indirectCrl = (crlSigner != null);
       X500Name crlIssuer = indirectCrl ? crlSigner.certificate().subject() : pci.subject();
 
-      X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, Date.from(thisUpdate));
+      CertificateList.V2CRLBuilder crlBuilder =
+          new CertificateList.V2CRLBuilder(crlIssuer, thisUpdate);
       if (nextUpdate != null) {
-        crlBuilder.setNextUpdate(Date.from(nextUpdate));
+        crlBuilder.setNextUpdate(nextUpdate);
       }
 
       final int numEntries = 100;
@@ -490,7 +482,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         // add dummy entry, see https://github.com/xipki/xipki/issues/189
         Extensions extensions = new Extensions(createCertificateIssuerExtension(pci.subject()));
 
-        crlBuilder.addCRLEntry(BigInteger.ZERO, new Date(0), extensions);
+        crlBuilder.addCRLEntry(BigInteger.ZERO, Instant.ofEpochSecond(0), extensions);
         LOG.debug("added cert ca={} serial=0 to the indirect CRL", caIdent);
       } else {
         // sort the list by SerialNumber ASC
@@ -527,18 +519,21 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           LOG.debug("added cert ca={} serial={} to CRL", caIdent, serial);
 
           if (!indirectCrl || !isFirstCrlEntry) {
-            if (invalidityTime != null) {
-              crlBuilder.addCRLEntry(serial, Date.from(revocationTime),
-                  reason.code(), Date.from(invalidityTime));
-            } else {
-              crlBuilder.addCRLEntry(serial, Date.from(revocationTime), reason.code());
+            try {
+              if (invalidityTime != null) {
+                crlBuilder.addCRLEntry(serial, revocationTime, reason.asn1(), invalidityTime);
+              } else {
+                crlBuilder.addCRLEntry(serial, revocationTime, reason.asn1());
+              }
+            } catch (CodecException e) {
+              throw new OperationException(CRL_FAILURE, "error adding CRL entry");
             }
             continue;
           }
 
           List<Extension> extensions = new ArrayList<>(3);
           if (reason != CrlReason.UNSPECIFIED) {
-            Extension ext = createReasonExtension(reason.code());
+            Extension ext = createReasonExtension(reason.asn1());
             extensions.add(ext);
           }
           if (invalidityTime != null) {
@@ -549,7 +544,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           Extension ext = createCertificateIssuerExtension(pci.subject());
           extensions.add(ext);
 
-          crlBuilder.addCRLEntry(serial, Date.from(revocationTime),
+          crlBuilder.addCRLEntry(serial, revocationTime,
               new Extensions(extensions.toArray(new Extension[0])));
           isFirstCrlEntry = false;
         }
@@ -557,7 +552,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         allRevInfos.clear(); // free the memory
       }
 
-      BigInteger crlNumber = caInfo.nextCrlNumber();
+      long crlNumber = caInfo.nextCrlNumber();
       event.addEventData(NAME_crl_number, crlNumber);
       if (baseCrlNumber != null) {
         event.addEventData(NAME_basecrl_number, baseCrlNumber);
@@ -568,10 +563,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         byte[] akiValues = indirectCrl
             ? crlSigner.certificate().subjectKeyId() : pci.subjectKeyIdentifier();
         AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
-        crlBuilder.addExtension(OIDs.Extn.authorityKeyIdentifier, false, aki);
+        crlBuilder.addExtension(Extension.ofAuthorityKeyIdentifier(false, aki));
 
         // add extension CRL Number
-        crlBuilder.addExtension(OIDs.Extn.cRLNumber, false, new ASN1Integer(crlNumber));
+        crlBuilder.addExtension(Extension.ofCRLNumber(false, crlNumber));
 
         // IssuingDistributionPoint
         if (indirectCrl) {
@@ -583,29 +578,27 @@ public class X509CrlModule extends X509CaModule implements Closeable {
               true, // indirectCRL,
               false); // onlyContainsAttributeCerts
 
-          crlBuilder.addExtension(OIDs.Extn.issuingDistributionPoint, true, idp);
+          crlBuilder.addExtension(Extension.ofIssuingDistributionPoint(true, idp));
         }
 
         // Delta CRL Indicator
         if (deltaCrl) {
-          crlBuilder.addExtension(OIDs.Extn.deltaCRLIndicator, true,
-              new ASN1Integer(baseCrlNumber));
+          crlBuilder.addExtension(Extension.ofDeltaCRLIndicator(true, baseCrlNumber));
         }
 
         // freshestCRL
         List<String> deltaCrlUris = pci.caUris().deltaCrlUris();
         if (control.deltaCrlIntervals() > 0 && CollectionUtil.isNotEmpty(deltaCrlUris)) {
-          CRLDistPoint cdp = CaUtil.createCrlDistributionPoints(
+          CRLDistributionPoints cdp = CaUtil.createCrlDistributionPoints(
               deltaCrlUris, pci.subject(), crlIssuer);
 
-          crlBuilder.addExtension(OIDs.Extn.freshestCRL, false, cdp);
+          crlBuilder.addExtension(Extension.ofFreshestCRL(false, cdp));
         }
 
         if (withExpiredCerts) {
-          DERGeneralizedTime statusSince = new DERGeneralizedTime(Date.from(caCert.notBefore()));
-          crlBuilder.addExtension(OIDs.Extn.expiredCertsOnCRL, false, statusSince);
+          crlBuilder.addExtension(Extension.ofExpiredCertsOnCRL(false, caCert.notBefore()));
         }
-      } catch (CertIOException ex) {
+      } catch (GenerationException ex) {
         LogUtil.error(LOG, ex, "crlBuilder.addExtension");
         throw new OperationException(INVALID_EXTENSION, ex);
       }
@@ -638,7 +631,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         }
       }
 
-      caInfo.setNextCrlNumber(crlNumber.longValue() + 1);
+      caInfo.setNextCrlNumber(crlNumber + 1);
       caManager.commitNextCrlNo(caIdent, caInfo.getNextCrlNumber());
       publisher.publishCrl(crl);
 
@@ -710,31 +703,17 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     return true;
   }
 
-  private static Extension createReasonExtension(int reasonCode) {
-    CRLReason crlReason = CRLReason.lookup(reasonCode);
-    try {
-      return new Extension(OIDs.Extn.reasonCode, false, crlReason.getEncoded());
-    } catch (IOException ex) {
-      throw new IllegalArgumentException("error encoding reason: " + ex.getMessage(), ex);
-    }
+  private static Extension createReasonExtension(CRLReason reason) {
+    return Extension.ofReasonCode(false, reason);
   }
 
   private static Extension createInvalidityDateExtension(Instant invalidityDate) {
-    try {
-      ASN1GeneralizedTime asnTime = new ASN1GeneralizedTime(Date.from(invalidityDate));
-      return new Extension(OIDs.Extn.invalidityDate, false, asnTime.getEncoded());
-    } catch (IOException ex) {
-      throw new IllegalArgumentException("error encoding reason: " + ex.getMessage(), ex);
-    }
+    return Extension.ofInvalidityDate(false, invalidityDate);
   }
 
   private static Extension createCertificateIssuerExtension(X500Name certificateIssuer) {
-    try {
-      GeneralNames generalNames = new GeneralNames(new GeneralName(certificateIssuer));
-      return new Extension(OIDs.Extn.certificateIssuer, true, generalNames.getEncoded());
-    } catch (IOException ex) {
-      throw new IllegalArgumentException("error encoding reason: " + ex.getMessage(), ex);
-    }
+    GeneralNames generalNames = new GeneralNames(GeneralName.ofDirectoryName(certificateIssuer));
+    return Extension.ofCertificateIssuer(true, generalNames);
   }
 
 }

@@ -3,32 +3,29 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.FpIdCalculator;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.TBSCertificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.FpIdCalculator;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.SqlUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.datasource.SqlUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -372,12 +369,12 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String filename = cert.file();
         // rawcert
-        byte[] encodedCert = IoUtil.readAllBytesAndClose(
+        byte[] encodedCert = XipkiIoUtil.readAllBytesAndClose(
             zipFile.getInputStream(zipFile.getEntry(filename)));
 
         TBSCertificate tbsCert;
         try {
-          tbsCert = Certificate.getInstance(encodedCert).getTBSCertificate();
+          tbsCert = Certificate.fromEncoded(encodedCert).getTBSCertificate();
         } catch (RuntimeException ex) {
           LOG.error("could not parse certificate in file {}", filename);
           LOG.debug("could not parse certificate in file {}", filename, ex);
@@ -394,7 +391,7 @@ class CaCertstoreDbImporter extends DbPorter {
         if (cert.privateKeyFile() != null) {
           ZipEntry keyZipEntry = zipFile.getEntry(cert.privateKeyFile());
           if (keyZipEntry != null) {
-            privateKey = new String(IoUtil.readAllBytesAndClose(
+            privateKey = new String(XipkiIoUtil.readAllBytesAndClose(
                           zipFile.getInputStream(keyZipEntry)));
           }
         }
@@ -404,7 +401,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
           stmt.setLong(idx++, id);
           stmt.setLong(idx++, cert.update());
-          stmt.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
+          stmt.setString(idx++, tbsCert.getSerialNumber().getValue().toString(16));
 
           stmt.setString(idx++, subjectText);
           long fpSubject = X509Util.fpCanonicalizedName(tbsCert.getSubject());
@@ -416,16 +413,15 @@ class CaCertstoreDbImporter extends DbPorter {
             stmt.setNull(idx++, Types.BIGINT);
           }
 
-          byte[] san = X509Util.getCoreExtValue(tbsCert.getExtensions(),
-                        OIDs.Extn.subjectAlternativeName);
-          if (san != null) {
-            stmt.setLong(idx++, FpIdCalculator.hash(san));
+          Extension sanExtn = tbsCert.getExtension(ExtensionOIDs.subjectAlternativeName);
+          if (sanExtn != null) {
+            stmt.setLong(idx++, FpIdCalculator.hash(sanExtn.extnValue()));
           } else {
             stmt.setNull(idx++, Types.BIGINT);
           }
 
-          stmt.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getStartDate().getDate()));
-          stmt.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getEndDate().getDate()));
+          stmt.setLong(idx++, tbsCert.notBefore().getEpochSecond());
+          stmt.setLong(idx++, tbsCert.notAfter().getEpochSecond());
           setInt( stmt, idx++, cert.rev());
           setInt( stmt, idx++, cert.rr());
           setLong(stmt, idx++, cert.rt());
@@ -434,12 +430,12 @@ class CaCertstoreDbImporter extends DbPorter {
           setInt( stmt, idx++, cert.caId());
 
           setInt(stmt, idx++, cert.rid());
-          Extension extension = tbsCert.getExtensions().getExtension(OIDs.Extn.basicConstraints);
+          Extension extension = tbsCert.getExtensions().getExtension(
+              ExtensionOIDs.basicConstraints);
 
           boolean ee = true;
           if (extension != null) {
-            ASN1Encodable asn1 = extension.getParsedValue();
-            ee = !BasicConstraints.getInstance(asn1).isCA();
+            ee = !extension.getBasicConstraints().isCA();
           }
 
           stmt.setInt(idx++, ee ? 1 : 0);
@@ -541,7 +537,7 @@ class CaCertstoreDbImporter extends DbPorter {
         ZipEntry zipEntry = zipFile.getEntry(filename);
 
         // rawcert
-        byte[] encodedCrl = IoUtil.readAllBytesAndClose(zipFile.getInputStream(zipEntry));
+        byte[] encodedCrl = XipkiIoUtil.readAllBytesAndClose(zipFile.getInputStream(zipEntry));
         String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
 
         X509Crl x509crl;
@@ -559,17 +555,16 @@ class CaCertstoreDbImporter extends DbPorter {
 
         try {
           Extensions extns = x509crl.extensions();
-          byte[] extnValue = X509Util.getCoreExtValue(extns, OIDs.Extn.cRLNumber);
-          if (extnValue == null) {
+          Extension extn = extns.getExtension(ExtensionOIDs.cRLNumber);
+          if (extn == null) {
             LOG.warn("CRL without CRL number, ignore it");
             continue;
           }
-          BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+          BigInteger crlNumber = extn.cRLNumber();
 
-          extnValue = X509Util.getCoreExtValue(extns, OIDs.Extn.deltaCRLIndicator);
+          extn = extns.getExtension(ExtensionOIDs.deltaCRLIndicator);
 
-          BigInteger baseCrlNumber = (extnValue == null) ? null
-              : ASN1Integer.getInstance(extnValue).getPositiveValue();
+          BigInteger baseCrlNumber = (extn == null) ? null : extn.deltaCRLIndicator();
 
           int idx = 1;
           stmt.setLong(idx++, crl.id());

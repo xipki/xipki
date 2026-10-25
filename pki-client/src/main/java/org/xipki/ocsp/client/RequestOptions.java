@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
 
 import java.util.Arrays;
 import java.util.List;

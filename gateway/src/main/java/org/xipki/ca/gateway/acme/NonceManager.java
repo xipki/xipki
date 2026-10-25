@@ -5,8 +5,8 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.Base64;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;

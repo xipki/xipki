@@ -3,57 +3,53 @@
 
 package org.xipki.shell.security;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.pkcs.Attribute;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.encap.KemEncapKey;
-import org.xipki.security.exception.BadInputException;
-import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.DHSigStaticKeyCertPair;
-import org.xipki.security.pkix.KeyUsage;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.CsrControl;
-import org.xipki.security.sign.KemHmacSignature;
-import org.xipki.security.sign.SignAlgoMode;
-import org.xipki.security.sign.Signer;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.EcCurveEnum;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1PrintableString;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.est.ChangeSubjectName;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.DirectoryString;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Hex;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.pkix.exception.NoIdleSignerException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
+import org.xipki.pkix.cert.KeyUsage;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.CsrControl;
+import org.xipki.pkix.sign.KemHmacSignature;
+import org.xipki.crypto.core.SignAlgoMode;
+import org.xipki.pkix.sign.Signer;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -64,7 +60,13 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.PrivateKey;
-import java.util.*;
+import java.security.SignatureException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * XiPKI CSR commands.
@@ -129,7 +131,7 @@ public class CsrCommands {
       return control == null ? null : control.peerCerts();
     }
 
-    protected List<Extension> getAdditionalExtensions() throws BadInputException {
+    protected List<Extension> getAdditionalExtensions()  {
       return Collections.emptyList();
     }
 
@@ -138,13 +140,13 @@ public class CsrCommands {
     }
 
     protected KemEncapKey getKemEncapKey(SubjectPublicKeyInfo myPublicKey)
-        throws ObjectCreationException {
+        throws GenerationException {
       try {
         SecurityFactory securityFactory = securities().securityFactory();
         return securityFactory.csrControl().generateKemEncapKey(
             myPublicKey, securityFactory.random4Sign());
       } catch (Exception ex) {
-        throw new ObjectCreationException("error computing EncapKey: " + ex.getMessage(), ex);
+        throw new GenerationException("error computing EncapKey: " + ex.getMessage(), ex);
       }
     }
 
@@ -165,7 +167,7 @@ public class CsrCommands {
           for (String usage : extkeyusages) {
             String id = getExtKeyusageOid(usage);
             if (id == null) {
-              new ASN1ObjectIdentifier(usage);
+              new Asn1Oid(usage);
               list.add(usage);
             } else {
               list.add(id);
@@ -175,36 +177,34 @@ public class CsrCommands {
         }
 
         List<Extension> extensions = new LinkedList<>();
-        ASN1OctetString extnValue = CollectionUtil.isEmpty(subjectInfoAccesses) ? null
-            : X509Util.createExtnSubjectInfoAccess(
-                normalizeSubjectInfoAccesses(unescapeStructuredValues(subjectInfoAccesses)),
-                false).getExtnValue();
-        if (extnValue != null) {
-          extensions.add(new Extension(OIDs.Extn.subjectInfoAccess, false, extnValue));
+        if (CollectionUtil.isNotEmpty(subjectInfoAccesses)) {
+          Extension extn = X509Util.createExtnSubjectInfoAccess(
+              normalizeSubjectInfoAccesses(unescapeStructuredValues(subjectInfoAccesses)), false);
+          extensions.add(extn);
         }
 
         if (CollectionUtil.isNotEmpty(keyusages)) {
-          Set<KeyUsage> usages = new HashSet<>();
+          List<org.xipki.pkix.asn1.x509.KeyUsage> usages = new LinkedList<>();
           for (String usage : keyusages) {
-            usages.add(KeyUsage.getKeyUsage(usage));
+            usages.add(KeyUsage.getKeyUsage(usage).asn1());
           }
-          extensions.add(new Extension(OIDs.Extn.keyUsage, false,
-              X509Util.createKeyUsage(usages).getEncoded()));
+          extensions.add(Extension.ofKeyUsage(false,
+              new org.xipki.pkix.asn1.x509.KeyUsage(usages)));
         }
 
         if (CollectionUtil.isNotEmpty(extkeyusages)) {
-          extensions.add(new Extension(OIDs.Extn.extendedKeyUsage, false,
-              X509Util.createExtendedUsage(textToAsn1Oids(extkeyusages)).getEncoded()));
+          extensions.add(Extension.ofExtendedKeyUsage(false,
+              X509Util.createExtendedUsage(textToAsn1Oids(extkeyusages))));
         }
 
-        List<ASN1ObjectIdentifier> addedExtnTypes = new ArrayList<>(extensions.size());
+        List<Asn1Oid> addedExtnTypes = new ArrayList<>(extensions.size());
         for (Extension extn : extensions) {
           addedExtnTypes.add(extn.getExtnId());
         }
 
         if (extensionsFile != null) {
-          Extensions extns = Extensions.getInstance(IoUtil.read(extensionsFile));
-          for (ASN1ObjectIdentifier extnId : extns.getExtensionOIDs()) {
+          Extensions extns = Extensions.fromEncoded(IoUtil.read(extensionsFile));
+          for (Asn1Oid extnId : extns.getExtensionIds()) {
             if (addedExtnTypes.contains(extnId)) {
               throw new IOException("duplicated extension " + extnId.getId());
             }
@@ -218,22 +218,22 @@ public class CsrCommands {
             ? null : Passwords.resolvePassword(challengePasswordHint);
 
         if (certFile != null) {
-          Certificate cert = Certificate.getInstance(X509Util.toDerEncoded(IoUtil.read(certFile)));
+          Certificate cert = Certificate.fromEncoded(X509Util.toDerEncoded(IoUtil.read(certFile)));
           if (!Arrays.equals(subjectPublicKeyInfo.getEncoded(),
               cert.getSubjectPublicKeyInfo().getEncoded())) {
             throw new IOException("public key extracted from signer differs from certificate");
           }
 
           Extensions certExtns = cert.getTBSCertificate().getExtensions();
-          List<ASN1ObjectIdentifier> stdExcludeOids = Arrays.asList(
-              OIDs.Extn.authorityKeyIdentifier, OIDs.Extn.authorityInfoAccess,
-              OIDs.Extn.certificateIssuer, OIDs.Extn.certificatePolicies,
-              OIDs.Extn.cRLDistributionPoints, OIDs.Extn.freshestCRL,
-              OIDs.Extn.nameConstraints, OIDs.Extn.policyMappings,
-              OIDs.Extn.policyConstraints, OIDs.Extn.certificatePolicies,
-              OIDs.Extn.subjectInfoAccess, OIDs.Extn.subjectDirectoryAttributes);
+          List<Asn1Oid> stdExcludeOids = Arrays.asList(
+              ExtensionOIDs.authorityKeyIdentifier, ExtensionOIDs.authorityInfoAccess,
+              ExtensionOIDs.certificateIssuer, ExtensionOIDs.certificatePolicies,
+              ExtensionOIDs.cRLDistributionPoints, ExtensionOIDs.freshestCRL,
+              ExtensionOIDs.nameConstraints, ExtensionOIDs.policyMappings,
+              ExtensionOIDs.policyConstraints, ExtensionOIDs.certificatePolicies,
+              ExtensionOIDs.subjectInfoAccess, ExtensionOIDs.subjectDirectoryAttributes);
 
-          for (ASN1ObjectIdentifier certExtnOid : certExtns.getExtensionOIDs()) {
+          for (Asn1Oid certExtnOid : certExtns.getExtensionIds()) {
             boolean add = !addedExtnTypes.contains(certExtnOid);
             if (add) {
               add = CollectionUtil.isNotEmpty(includeCertExtns)
@@ -248,7 +248,7 @@ public class CsrCommands {
             }
           }
 
-          PKCS10CertificationRequest csr = generateRequest(
+          CertificationRequest csr = generateRequest(
               signer, subjectPublicKeyInfo, cert.getSubject(), challengePassword, extensions);
           saveVerbose("saved CSR to file", outputFilename, derPemEncode(
               csr.getEncoded(), outform, PemEncoder.PemLabel.CERTIFICATE_REQUEST));
@@ -269,41 +269,33 @@ public class CsrCommands {
           newSubjectDn = getSubject(subject);
         }
 
-        extnValue = CollectionUtil.isEmpty(subjectAltNames) ? null
-            : X509Util.createExtnSubjectAltName(
-                unescapeStructuredValues(subjectAltNames), false).getExtnValue();
         Extension newSubjectAltNames = null;
-        if (extnValue != null) {
-          newSubjectAltNames = new Extension(
-              OIDs.Extn.subjectAlternativeName, false, extnValue);
+        if (CollectionUtil.isNotEmpty(subjectAltNames)) {
+          newSubjectAltNames = X509Util.createExtnSubjectAltName(
+                          unescapeStructuredValues(subjectAltNames), false);
         }
 
         Attribute attrChangeSubjectName = null;
         X500Name subjectDn;
         if (updateOldCert) {
-          Certificate oldCert = Certificate.getInstance(
+          Certificate oldCert = Certificate.fromEncoded(
               X509Util.toDerEncoded(IoUtil.read(oldCertFile)));
           subjectDn = oldCert.getSubject();
           Extension oldSan = oldCert.getTBSCertificate().getExtensions()
-              .getExtension(OIDs.Extn.subjectAlternativeName);
+              .getExtension(ExtensionOIDs.subjectAlternativeName);
           if (oldSan != null) {
             extensions.add(oldSan);
           }
 
           if (newSubjectDn != null || newSubjectAltNames != null) {
-            ASN1EncodableVector vec = new ASN1EncodableVector();
-            vec.add(newSubjectDn == null ? subjectDn : newSubjectDn);
-            GeneralNames subjectAlt = null;
-            if (newSubjectAltNames != null) {
-              subjectAlt = GeneralNames.getInstance(newSubjectAltNames.getExtnValue().getOctets());
-            } else if (oldSan != null) {
-              subjectAlt = GeneralNames.getInstance(oldSan.getParsedValue());
-            }
-            if (subjectAlt != null) {
-              vec.add(subjectAlt);
-            }
-            attrChangeSubjectName = new Attribute(
-                OIDs.CMC.id_cmc_changeSubjectName, new DERSet(new DERSequence(vec)));
+            X500Name subject = newSubjectDn == null ? subjectDn : newSubjectDn;
+
+            GeneralNames subjectAlt = (newSubjectAltNames != null)
+                ? newSubjectAltNames.getSubjectAlternativeName()
+                : (oldSan == null) ? null : oldSan.getSubjectAlternativeName();
+
+            ChangeSubjectName change = new ChangeSubjectName(subject, subjectAlt);
+            attrChangeSubjectName = Attribute.ofChangeSubjectName(change);
           }
         } else {
           subjectDn = newSubjectDn;
@@ -312,7 +304,7 @@ public class CsrCommands {
           }
         }
 
-        PKCS10CertificationRequest csr = generateRequest(
+        CertificationRequest csr = generateRequest(
             signer, subjectPublicKeyInfo, subjectDn, challengePassword, extensions,
             attrChangeSubjectName);
         saveVerbose("saved CSR to file", outputFilename, derPemEncode(
@@ -322,7 +314,7 @@ public class CsrCommands {
       }
     }
 
-    private PKCS10CertificationRequest generateRequest(
+    private CertificationRequest generateRequest(
         ConcurrentSigner signer, SubjectPublicKeyInfo subjectPublicKeyInfo, X500Name subjectDn,
         char[] challengePassword, List<Extension> extensions, Attribute... attrs)
         throws XiSecurityException {
@@ -330,30 +322,35 @@ public class CsrCommands {
       Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
       Args.notNull(subjectDn, "subjectDn");
 
-      Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
+      List<Attribute> attributes = new ArrayList<>(2);
       if (CollectionUtil.isNotEmpty(extensions)) {
-        attributes.put(OIDs.PKCS9.pkcs9_at_extensionRequest,
-            new Extensions(extensions.toArray(new Extension[0])));
+        attributes.add(Attribute.ofExtensionRequest(new Extensions(extensions)));
       }
       if (challengePassword != null && challengePassword.length > 0) {
-        attributes.put(OIDs.PKCS9.pkcs9_at_challengePassword,
-            new DERPrintableString(new String(challengePassword)));
+        attributes.add(Attribute.ofChallengePassword(
+            new DirectoryString(new Asn1PrintableString(new String(challengePassword)))));
       }
 
-      PKCS10CertificationRequestBuilder csrBuilder =
-          new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
-      for (Map.Entry<ASN1ObjectIdentifier, ASN1Encodable> entry : attributes.entrySet()) {
-        csrBuilder.addAttribute(entry.getKey(), entry.getValue());
-      }
-      if (attrs != null) {
-        for (Attribute attr : attrs) {
-          if (attr != null) {
-            csrBuilder.addAttribute(attr.getAttrType(), attr.getAttrValues().toArray());
-          }
-        }
-      }
+      CertificationRequest.CsrBuilder csrBuilder =
+          new CertificationRequest.CsrBuilder(subjectDn, subjectPublicKeyInfo);
 
       Signer signer0;
+      try {
+        for (Attribute entry : attributes) {
+          csrBuilder.setAttribute(entry);
+        }
+
+        if (attrs != null) {
+          for (Attribute attr : attrs) {
+            if (attr != null) {
+              csrBuilder.setAttribute(attr);
+            }
+          }
+        }
+      } catch (GenerationException ex) {
+        throw new XiSecurityException(ex.getMessage(), ex);
+      }
+
       try {
         signer0 = signer.borrowSigner();
       } catch (NoIdleSignerException ex) {
@@ -362,21 +359,23 @@ public class CsrCommands {
 
       try {
         return csrBuilder.build(signer0.x509Signer());
+      } catch (SignatureException ex) {
+        throw new XiSecurityException(ex.getMessage(), ex);
       } finally {
         signer.requiteSigner(signer0);
       }
     }
 
-    private static List<ASN1ObjectIdentifier> textToAsn1Oids(List<String> oidTexts) {
+    private static List<Asn1Oid> textToAsn1Oids(List<String> oidTexts) {
       if (oidTexts == null) {
         return null;
       }
-      List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
+      List<Asn1Oid> ret = new ArrayList<>(oidTexts.size());
       for (String oidText : oidTexts) {
         if (oidText.isEmpty()) {
           continue;
         }
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(oidText);
+        Asn1Oid oid = new Asn1Oid(oidText);
         if (!ret.contains(oid)) {
           ret.add(oid);
         }
@@ -551,7 +550,7 @@ public class CsrCommands {
     }
 
     @Override
-    protected ConcurrentSigner getSigner() throws ObjectCreationException {
+    protected ConcurrentSigner getSigner() throws GenerationException {
       try {
         SignerConf conf = new SignerConf()
             .setPassword(new String(getPassword())).setParallelism(1)
@@ -562,12 +561,11 @@ public class CsrCommands {
         conf.setPeerCertificates(getPeerCertificates());
         return securities().securityFactory().createSigner("PKCS12", conf, (X509Cert) null);
       } catch (IOException | PasswordResolverException ex) {
-        throw new ObjectCreationException("could not read password: " + ex.getMessage(), ex);
+        throw new GenerationException("could not read password: " + ex.getMessage(), ex);
+      } catch (GenerationException ex) {
+        throw ex;
       } catch (Exception ex) {
-        if (ex instanceof ObjectCreationException) {
-          throw (ObjectCreationException) ex;
-        }
-        throw new ObjectCreationException(ex.getMessage(), ex);
+        throw new GenerationException(ex.getMessage(), ex);
       }
     }
   }
@@ -595,11 +593,11 @@ public class CsrCommands {
       try {
         byte[] encoded = X509Util.toDerEncoded(IoUtil.read(csrFile));
         CertificationRequest csr = X509Util.parseCsr(encoded);
-        ASN1ObjectIdentifier sigAlgOid = csr.getSignatureAlgorithm().getAlgorithm();
+        Asn1Oid sigAlgOid = csr.getSignatureAlgorithm().getAlgorithm();
 
-        boolean isKemMac = OIDs.Xipki.id_alg_KEM_HMAC_SHA256.equals(sigAlgOid);
-        boolean isXdh = OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid)
-            || OIDs.Xipki.id_alg_dhPop_x448.equals(sigAlgOid);
+        boolean isKemMac = XipkiOIDs.id_alg_KEM_HMAC_SHA256.equals(sigAlgOid);
+        boolean isXdh = XipkiOIDs.id_alg_dhPop_x25519.equals(sigAlgOid)
+            || XipkiOIDs.id_alg_dhPop_x448.equals(sigAlgOid);
 
         if ((isKemMac || isXdh) && (keystoreFile == null || keystorePasswordHint == null)) {
           throw new IllegalArgumentException(
@@ -610,7 +608,7 @@ public class CsrCommands {
         SecretKey peerMasterKey = null;
 
         if (isKemMac) {
-          KemHmacSignature kemHmacSig = KemHmacSignature.decode(csr.getSignature().getOctets());
+          KemHmacSignature kemHmacSig = KemHmacSignature.decode(csr.signature());
           peerMasterKey = readSecretKeyFromKeystore(
               keystoreFile, kemHmacSig.id(), keystorePasswordHint);
           if (peerMasterKey == null) {
@@ -621,16 +619,15 @@ public class CsrCommands {
             throw new IllegalArgumentException("keystoreType is not PKCS12: " + keystoreType);
           }
 
-          EcCurveEnum requiredKeyAlg = OIDs.Xipki.id_alg_dhPop_x25519.equals(sigAlgOid)
+          EcCurveEnum requiredKeyAlg = XipkiOIDs.id_alg_dhPop_x25519.equals(sigAlgOid)
               ? EcCurveEnum.X25519 : EcCurveEnum.X448;
 
           char[] password = Passwords.resolvePassword(keystorePasswordHint);
           File file = IoUtil.expandFilepath(new File(keystoreFile));
           try (InputStream is = Files.newInputStream(file.toPath())) {
-            PKCS12KeyStore ks = KeyUtil.loadPKCS12KeyStore(is, password);
-            Enumeration<String> aliases = ks.aliases();
-            while (aliases.hasMoreElements()) {
-              String alias = aliases.nextElement();
+            Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore(is, password);
+            Set<String> aliases = ks.aliases();
+            for (String alias : aliases) {
               if (!ks.isKeyEntry(alias)) {
                 continue;
               }
@@ -638,7 +635,7 @@ public class CsrCommands {
               PrivateKeyInfo keyInfo = ks.getKey(alias);
               if (requiredKeyAlg == EcCurveEnum.ofOid(
                   keyInfo.getPrivateKeyAlgorithm().getAlgorithm())) {
-                PrivateKey key = KeyUtil.getPrivateKey(keyInfo);
+                PrivateKey key = KeyInfoUtil.getPrivateKey(keyInfo);
                 peerKeyAndCert = new DHSigStaticKeyCertPair(key,
                                     new X509Cert(ks.getCertificate(alias)));
                 break;

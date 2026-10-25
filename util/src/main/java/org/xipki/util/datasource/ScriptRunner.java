@@ -16,8 +16,8 @@ package org.xipki.util.datasource;
  * detection, remove some ide warnings.
  */
 
-import org.xipki.util.conf.ConfigurableProperties;
-import org.xipki.util.io.IoUtil;
+import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.BufferedReader;
 import java.io.File;

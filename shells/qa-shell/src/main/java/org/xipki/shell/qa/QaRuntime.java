@@ -4,7 +4,6 @@
 package org.xipki.shell.qa;
 
 import org.xipki.qa.ca.CaQaSystemManager;
-import org.xipki.qa.ca.CaQaSystemManagerImpl;
 import org.xipki.shell.ShellUtil;
 
 /**
@@ -37,7 +36,7 @@ public class QaRuntime {
   }
 
   private static CaQaSystemManager newCaQaManager(String confFile) {
-    CaQaSystemManagerImpl manager = new CaQaSystemManagerImpl();
+    CaQaSystemManager manager = new CaQaSystemManager();
     manager.setConfFile(confFile);
     return manager;
   }

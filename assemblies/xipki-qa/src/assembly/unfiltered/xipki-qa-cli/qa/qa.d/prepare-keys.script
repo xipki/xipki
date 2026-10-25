@@ -40,6 +40,7 @@ for it in $list
   set label ${EE_P11_LABEL_PREFIX}${it}
 
   delete-key-p11 --force --slot $SLOT --label ${label}
+
   keypair-p11 --keyspec $KEYSPEC --slot $SLOT --label ${label}
 done
 

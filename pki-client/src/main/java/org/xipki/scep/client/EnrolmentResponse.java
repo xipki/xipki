@@ -3,17 +3,18 @@
 
 package org.xipki.scep.client;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.scep.message.PkiMessage;
-import org.xipki.security.scep.transaction.FailInfo;
-import org.xipki.security.scep.transaction.MessageType;
-import org.xipki.security.scep.transaction.PkiStatus;
-import org.xipki.security.scep.util.ScepUtil;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.pkix.asn1.cms.CertificateChoice;
+import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.pkix.asn1.cms.SignedData;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.scep.message.PkiMessage;
+import org.xipki.pkix.scep.transaction.FailInfo;
+import org.xipki.pkix.scep.transaction.MessageType;
+import org.xipki.pkix.scep.transaction.PkiStatus;
+import org.xipki.pkix.scep.util.ScepUtil;
 
 import java.security.cert.CertificateException;
 import java.util.Collections;
@@ -41,20 +42,23 @@ public final class EnrolmentResponse {
       return;
     }
 
-    ASN1Encodable messageData = pkcsRep.messageData();
-    if (!(messageData instanceof ContentInfo)) {
-      throw new ScepClientException("pkcsRep is not a ContentInfo");
-    }
+    Asn1Primitive messageData = pkcsRep.messageData();
 
-    SignedData sd = SignedData.getInstance(((ContentInfo) messageData).getContent());
-    ASN1Set asn1Certs = sd.getCertificates();
-    if (asn1Certs == null || asn1Certs.size() == 0) {
-      throw new ScepClientException("no certificate is embedded in pkcsRep");
-    }
-
+    ContentInfo content;
     try {
+      content = ContentInfo.fromAsn1(messageData.asSequence());
+    } catch (CodecException e) {
+      throw new ScepClientException("pkcsRep is not a ContentInfo", e);
+    }
+    try {
+      SignedData sd = SignedData.fromAsn1(content.getContent().asSequence());
+      CertificateChoice.Set0 asn1Certs = sd.getCertificates();
+      if (asn1Certs == null || asn1Certs.isEmpty()) {
+        throw new ScepClientException("no certificate is embedded in pkcsRep");
+      }
+
       this.certificates = Collections.unmodifiableList(ScepUtil.getCertsFromSignedData(sd));
-    } catch (CertificateException ex) {
+    } catch (CertificateException | CodecException ex) {
       throw new ScepClientException(ex);
     }
   }

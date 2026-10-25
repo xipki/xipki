@@ -3,11 +3,11 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.qa.ocsp.OcspCertStatus;
+import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.shell.CompletionProvider;
 import org.xipki.shell.completer.AbstractSetCompleter;
-import org.xipki.util.codec.TripleState;
+import org.xipki.ca.api.TripleState;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 
@@ -56,7 +56,7 @@ public class QaCompleters {
 
   public static class CertStatusCompleter extends AbstractSetCompleter {
     public CertStatusCompleter() {
-      setTokens(OcspCertStatus.values());
+      setTokens(QaOcspCertStatus.values());
     }
   }
 

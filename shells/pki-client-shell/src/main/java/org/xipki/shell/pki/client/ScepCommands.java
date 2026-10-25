@@ -3,23 +3,24 @@
 
 package org.xipki.shell.pki.client;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.cert.X509CRLHolder;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.Passwords;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.Passwords;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -30,8 +31,8 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.Set;
 
 /**
  * SCEP client commands.
@@ -39,7 +40,7 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 public class ScepCommands {
-  abstract static class ScepClientCommand extends ShellBaseCommand {
+  abstract static class ScepClientCommand extends XiShellBaseCommand {
 
     private static final class Identity {
       private final PrivateKey privateKey;
@@ -84,15 +85,14 @@ public class ScepCommands {
       char[] pwd = passwordHint == null
           ? readPassword("Enter the keystore password")
           : Passwords.resolvePassword(passwordHint);
-      PKCS12KeyStore ks;
+      Pkcs12KeyStore ks;
       try (InputStream is = Files.newInputStream(Paths.get(p12File))) {
         ks = KeyUtil.loadPKCS12KeyStore(is, pwd);
       }
 
       String keyname = null;
-      Enumeration<String> aliases = ks.aliases();
-      while (aliases.hasMoreElements()) {
-        String alias = aliases.nextElement();
+      Set<String> aliases = ks.aliases();
+      for (String alias : aliases) {
         if (ks.isKeyEntry(alias)) {
           keyname = alias;
           break;
@@ -103,7 +103,7 @@ public class ScepCommands {
         throw new IOException("no key entry is contained in the keystore");
       }
 
-      PrivateKey identityKey = KeyUtil.getPrivateKey(ks.getKey(keyname));
+      PrivateKey identityKey = KeyInfoUtil.getPrivateKey(ks.getKey(keyname));
       X509Cert identityCert = new X509Cert(ks.getCertificate(keyname));
       return new Identity(identityKey, identityCert);
     }
@@ -211,7 +211,7 @@ public class ScepCommands {
 
   @Command(name = "scep-cacert", description = "get CA certificate",
       mixinStandardHelpOptions = true)
-  static class ScepCacertCommand extends ShellBaseCommand {
+  static class ScepCacertCommand extends XiShellBaseCommand {
 
     @Option(names = "--url", required = true, description = "URL of the SCEP server")
     private String url;
@@ -301,7 +301,7 @@ public class ScepCommands {
     public void run() {
       try {
         X509Cert cert = X509Util.parseCert(new File(certFile));
-        X509CRLHolder crl = getScepClient().scepGetCrl(
+        CertificateList crl = getScepClient().scepGetCrl(
             getIdentityKey(), getIdentityCert(), cert.issuer(), cert.serialNumber());
         if (crl == null) {
           throw new IOException("received no CRL from server");

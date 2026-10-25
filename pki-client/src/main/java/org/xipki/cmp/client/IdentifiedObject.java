@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * Identified Object.

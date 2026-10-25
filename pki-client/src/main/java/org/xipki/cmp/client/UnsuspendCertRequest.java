@@ -3,8 +3,8 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.codec.Args;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.util.Args;
 
 import java.math.BigInteger;
 import java.util.Collections;

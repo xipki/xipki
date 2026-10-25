@@ -3,9 +3,9 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.security.scep.transaction.Operation;
-import org.xipki.util.codec.Args;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.scep.transaction.Operation;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;

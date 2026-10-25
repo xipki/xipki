@@ -5,10 +5,10 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.exception.ObjectCreationException;
+import org.xipki.codec.util.Args;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -49,10 +49,10 @@ public class CertPublisherFactoryRegister {
    * @param type
    *          Type of the publisher. Must not be {@code null}.
    * @return new publisher.
-   * @throws ObjectCreationException
+   * @throws GenerationException
    *           if publisher could not be created.
    */
-  public CertPublisher newPublisher(String type) throws ObjectCreationException {
+  public CertPublisher newPublisher(String type) throws GenerationException {
     Args.notBlank(type, "type");
 
     for (CertPublisherFactory service : factories) {
@@ -61,7 +61,7 @@ public class CertPublisherFactoryRegister {
       }
     }
 
-    throw new ObjectCreationException("could not find factory to create Publisher of type " + type);
+    throw new GenerationException("could not find factory to create Publisher of type " + type);
   } // method newPublisher
 
   /**
@@ -76,10 +76,6 @@ public class CertPublisherFactoryRegister {
     return Collections.unmodifiableSet(types);
   }
 
-  public void bindService(CertPublisherFactory service) {
-    registFactory(service);
-  }
-
   public void registFactory(CertPublisherFactory factory) {
     //might be null if dependency is optional
     if (factory == null) {
@@ -92,10 +88,6 @@ public class CertPublisherFactoryRegister {
 
     String action = replaced ? "replaced" : "added";
     LOG.info("{} CertPublisherFactory binding for {}", action, factory);
-  }
-
-  public void unbindService(CertPublisherFactory service) {
-    unregistFactory(service);
   }
 
   public void unregistFactory(CertPublisherFactory factory) {

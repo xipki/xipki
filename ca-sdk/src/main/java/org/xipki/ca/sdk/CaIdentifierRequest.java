@@ -3,14 +3,12 @@
 
 package org.xipki.ca.sdk;
 
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.cbor.ByteArrayCborDecoder;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
-
-import java.io.IOException;
+import org.xipki.codec.cbor.ByteArrayCborDecoder;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.pkix.util.X509Util;
 
 /**
  * CA Identifier Request payload.
@@ -55,18 +53,18 @@ public class CaIdentifierRequest extends SdkRequest{
       sb.append("subject=");
       try {
         sb.append(X509Util.x500NameText(issuer.toX500Name()));
-      } catch (IOException ex) {
+      } catch (CodecException ex) {
         sb.append("<ERROR>");
       }
       sb.append(",");
     }
 
     if (issuerCertSha1Fp != null) {
-      sb.append("SHA1(cert)=").append(Hex.toHexString(issuerCertSha1Fp)).append(",");
+      sb.append("SHA1(cert)=").append(Hex.encode(issuerCertSha1Fp)).append(",");
     }
 
     if (authorityKeyIdentifier != null) {
-      sb.append("AKI=").append(Hex.toHexString(authorityKeyIdentifier)).append(",");
+      sb.append("AKI=").append(Hex.encode(authorityKeyIdentifier)).append(",");
     }
     sb.deleteCharAt(sb.length() - 1);
     sb.append(")");

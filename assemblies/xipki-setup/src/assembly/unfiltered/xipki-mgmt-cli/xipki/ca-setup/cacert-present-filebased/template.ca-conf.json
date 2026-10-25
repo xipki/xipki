@@ -29,10 +29,17 @@
     }
   },{
     "id":2,
-    "name":"scep",
+    "name":"scep-sign",
     "type":"xijson",
     "conf":{
-      "file":"certprofile/certprofile-scep.json"
+      "file":"certprofile/certprofile-scep-sign.json"
+    }
+  },{
+    "id":2,
+    "name":"scep-enc",
+    "type":"xijson",
+    "conf":{
+      "file":"certprofile/certprofile-scep-enc.json"
     }
   },{
     "id":3,
@@ -117,7 +124,7 @@
       "status":"active",
       "validityMode":"cutoff"
     },
-    "profiles":["ocsp", "scep", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"],
+    "profiles":["ocsp", "scep-sign", "scep-enc", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"],
     "publishers":[
       //"ocsp-publisher"
     ],

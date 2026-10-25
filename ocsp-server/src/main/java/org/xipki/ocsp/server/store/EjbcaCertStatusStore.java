@@ -3,33 +3,32 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Encoding;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.RandomUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,57 +49,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Ejbca Cert Status Store definition.
  *
  * @author Lijun Liao (xipki)
  */
-public class EjbcaCertStatusStore extends OcspStore {
-
-  private class StoreUpdateService implements Runnable {
-
-    @Override
-    public void run() {
-      updateIssuerStore();
-    }
-
-  } // class StoreUpdateService
+public class EjbcaCertStatusStore extends AbstractDbCertStatusStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(EjbcaCertStatusStore.class);
 
   private final HashAlgo certHashAlgo = HashAlgo.SHA1;
 
-  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
-
-  private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
-
-  private final Object lock = new Object();
-
-  private DataSourceWrapper datasource;
-
-  private String sqlCs;
-
-  private String sqlCsWithCertHash;
-
-  private IssuerFilter issuerFilter;
-
   private EjbcaIssuerStore issuerStore;
-
-  private boolean initialized;
 
   private boolean initializationFailed;
 
-  private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-
-  protected List<Runnable> getScheduledServices() {
-    return Collections.singletonList(storeUpdateService);
-  }
-
-  private void updateIssuerStore() {
+  @Override
+  protected void updateIssuerStore() {
     if (storeUpdateInProcess.get()) {
       return;
     }
@@ -370,45 +336,14 @@ public class EjbcaCertStatusStore extends OcspStore {
 
   } // method getCertStatus0
 
-  /**
-   * Borrow PreparedStatement.
-   * @return the next idle preparedStatement, {@code null} will be returned if
-   *         no PreparedStatement can be created within 5 seconds.
-   */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
-    return datasource.prepareStatement(sqlQuery);
-  }
-
   @Override
   public boolean isHealthy() {
-    if (!isInitialized()) {
-      return false;
-    }
-
     if (isInitializationFailed()) {
       return false;
     }
 
-    final String sql = "SELECT cAId FROM CAData";
-
-    try {
-      PreparedStatement ps = preparedStatement(sql);
-      ResultSet rs = null;
-      try {
-        rs = ps.executeQuery();
-        return true;
-      } finally {
-        releaseDbResources(ps, rs);
-      }
-    } catch (Exception ex) {
-      LogUtil.error(LOG, ex);
-      return false;
-    }
+    return isHealthy("SELECT cAId FROM CAData");
   } // method isHealthy
-
-  private void releaseDbResources(PreparedStatement ps, ResultSet rs) {
-    datasource.releaseResources(ps, rs);
-  }
 
   /**
    * Initialize the store.
@@ -458,35 +393,8 @@ public class EjbcaCertStatusStore extends OcspStore {
 
     updateIssuerStore();
 
-    if (this.scheduledThreadPoolExecutor != null) {
-      this.scheduledThreadPoolExecutor.shutdownNow();
-    }
-
-    if (updateInterval != null) {
-      List<Runnable> scheduledServices = getScheduledServices();
-      int size = scheduledServices.size();
-      if (size > 0) {
-        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
-        long intervalSeconds = updateInterval.approxMinutes() * 60;
-        for (Runnable service : scheduledServices) {
-          this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
-        }
-      }
-    }
+    startScheduledServices();
   } // method init
-
-  @Override
-  public void close() {
-    if (scheduledThreadPoolExecutor != null) {
-      scheduledThreadPoolExecutor.shutdown();
-      scheduledThreadPoolExecutor = null;
-    }
-
-    if (datasource != null) {
-      datasource.close();
-    }
-  }
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
@@ -497,10 +405,6 @@ public class EjbcaCertStatusStore extends OcspStore {
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     EjbcaIssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.cert();
-  }
-
-  protected boolean isInitialized() {
-    return initialized;
   }
 
   protected boolean isInitializationFailed() {
@@ -568,10 +472,10 @@ public class EjbcaCertStatusStore extends OcspStore {
       byte[] encodedName;
       byte[] encodedKey;
       try {
-        Certificate bcCert = Certificate.getInstance(encodedCert);
-        encodedName = bcCert.getSubject().getEncoded("DER");
-        encodedKey  = Asn1Util.getPublicKeyData(bcCert.getSubjectPublicKeyInfo());
-      } catch (IllegalArgumentException | IOException ex) {
+        Certificate bcCert = Certificate.fromEncoded(encodedCert);
+        encodedName = bcCert.getSubject().getEncoded(Asn1Encoding.DER);
+        encodedKey  = bcCert.getSubjectPublicKeyInfo().subjectPublicKey();
+      } catch (IllegalArgumentException | CodecException ex) {
         throw new CertificateEncodingException(ex.getMessage(), ex);
       }
 

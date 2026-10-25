@@ -65,14 +65,15 @@ The gateway handles multiple enrollment protocols (ACME, CMP, EST, SCEP, REST) a
 ### Module Categories
 
 **Base & Utilities** (foundation layer)
-- `codec` - CBOR encoding/decoding and protocol utilities
-- `util`, `util-extra` - General utilities and extensions
+- `codec` - ASN.1, CBOR and JSON encoding/decoding, and basic utilities
+- `pkix-util` - Utilities used by `pkix` (`org.xipki.pkix.util.*`): misc, password, conf, io
+- `util` - Utilities for the servers (HikariCP): audit, datasource, http, benchmark, misc
 - `pkcs11` - PKCS#11 wrapper for HSM access
 - `xihsm` - XiPKI HSM abstraction layer
 - `pkcs11test` - PKCS#11 integration tests
 
 **Cryptography & Security**
-- `security` - Cryptographic operations and certificate handling
+- `pkix` - Certificates, CMS, CMP, SCEP, signers and verifiers, PKCS#11 and PKCS#12 keys
 - `bcbridge-lts8on`, `bcbridge-fips` - Bouncy Castle LTS and FIPS bridge modules
   - Allows switching between LTS and FIPS variants
   - LTS: `bcbridge-lts8on`, FIPS: `bcbridge-fips`
@@ -102,8 +103,8 @@ The gateway handles multiple enrollment protocols (ACME, CMP, EST, SCEP, REST) a
 ### Module Dependencies
 
 Key dependency layers (modules lower in list depend on modules above):
-1. Base: `codec`, `util`, `pkcs11`, `xihsm`
-2. Crypto: `security`, `bcbridge-*`
+1. Base: `codec`, `pkix-util`, `util`, `pkcs11`, `xihsm`
+2. Crypto: `pkix`, `bcbridge-*`
 3. API: `ca-api`, `ocsp-api`
 4. SDK/Implementation: `ca-sdk`, `ca-server`, `ocsp-server`
 5. Integration: `gateway`, `ca-mgmt`, `shells`, `pki-client`
@@ -118,7 +119,7 @@ Key dependency layers (modules lower in list depend on modules above):
 
 ### Testing Patterns
 - Test classes use suffix `Test` (e.g., `GetInfoTest`, `DeleteObjectTest`)
-- Only some modules have test suites: `util`, `security`, `ocsp-server`, `pkcs11test`, `shells`
+- Only some modules have test suites: `codec`, `pkix`, `ocsp-server`, `pkcs11test`, `shells`
 - Many modules (ca-server, gateway, etc.) are primarily tested via integration tests in `qa`
 - Run tests with `mvn test -pl :<module-name>` for module-specific testing
 
@@ -152,7 +153,7 @@ Key dependency layers (modules lower in list depend on modules above):
 ## Important Notes
 
 ### When Modifying Core Modules
-- Changes to `codec`, `util`, `security`, or `bcbridge-*` affect all dependent services
+- Changes to `codec`, `pkix-util`, `util`, `pkix`, or `bcbridge-*` affect all dependent services
 - Always run `mvn test` on changed modules
 - Test integration with CA and OCSP in `qa` module if making cryptographic changes
 

@@ -8,12 +8,12 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.datasource.DataSourceMap;
-import org.xipki.util.extra.exception.CertPublisherException;
+import org.xipki.ca.api.CertPublisherException;
 
 import java.io.Closeable;
 

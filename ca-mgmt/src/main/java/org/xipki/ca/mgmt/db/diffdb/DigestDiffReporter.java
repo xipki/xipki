@@ -5,10 +5,10 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;

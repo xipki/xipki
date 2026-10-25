@@ -36,4 +36,25 @@ sql --force --db-conf "${DB_CONF}" xipki/sql/ocsp-init.sql
 set DB_CONF "${CA_XIPKI_DIR}/etc/ca/database/keypool-db.properties"
 sql --force --db-conf "${DB_CONF}" xipki/sql/keypool-init.sql
 
-fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT
+
+set crypto $(crypto-info)
+
+set java_version $(java-version)
+
+if "$crypto" neq "CryptoJdk" | "$java_version" ge "24"
+  fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT
+elif "$java_version" ge "15"
+  fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT \
+    --keyspec RSA2048 --keyspec RSA3072 --keyspec RSA4096 \
+    --keyspec P256    --keyspec P384    --keyspec P521 \
+    --keyspec ED25519 --keyspec ED448   --keyspec X25519 --keyspec X448 \
+    --keyspec BRAINPOOLP256R1 --keyspec BRAINPOOLP384R1 --keyspec BRAINPOOLP512R1 \
+    --keyspec FRP256V1 --keyspec SM2
+else
+  fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT \
+    --keyspec RSA2048 --keyspec RSA3072 --keyspec RSA4096 \
+    --keyspec P256    --keyspec P384    --keyspec P521 \
+    --keyspec X25519  --keyspec X448 \
+    --keyspec BRAINPOOLP256R1 --keyspec BRAINPOOLP384R1 --keyspec BRAINPOOLP512R1 \
+    --keyspec FRP256V1 --keyspec SM2
+fi

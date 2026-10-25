@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.security.exception.ErrorCode;
+import org.xipki.pkix.exception.ErrorCode;
 
 /**
  * Sdk Error Response Exception type.

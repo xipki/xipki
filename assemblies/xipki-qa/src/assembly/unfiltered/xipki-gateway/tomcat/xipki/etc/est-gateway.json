@@ -1,5 +1,5 @@
 {
-  "authenticator":"org.xipki.security.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
+  "authenticator":"org.xipki.pkix.auth.SimpleRequestorAuthenticator etc/simple-requestors.json",
   "caProfiles": [{
     "name": "default",
     "ca": "subca",

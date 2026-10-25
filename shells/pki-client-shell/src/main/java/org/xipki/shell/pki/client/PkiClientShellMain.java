@@ -4,7 +4,7 @@
 package org.xipki.shell.pki.client;
 
 import org.xipki.shell.PicocliShell;
-import org.xipki.shell.ShellBaseCommand;
+import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 
 /**
@@ -42,7 +42,7 @@ public class PkiClientShellMain {
   /**
    * Root command for the PKI client shell.
    */
-  public static class RootCommand extends ShellBaseCommand {
+  public static class RootCommand extends XiShellBaseCommand {
 
     @Override
     public void run() {

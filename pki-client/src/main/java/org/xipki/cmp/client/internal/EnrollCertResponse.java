@@ -3,8 +3,8 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.xipki.util.codec.Args;
+import org.xipki.pkix.asn1.cmp.CMPCertificate;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.List;

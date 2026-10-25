@@ -6,9 +6,9 @@ package org.xipki.ca.api.mgmt;
 import org.xipki.ca.api.mgmt.entry.MgmtEntry;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
 
 /**
  * Simple information of a certificate profile.

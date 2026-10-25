@@ -3,11 +3,11 @@
 
 package org.xipki.util.datasource;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.io.FileOrValue;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.util.conf.FileOrValue;
 
 import java.util.ArrayList;
 import java.util.List;

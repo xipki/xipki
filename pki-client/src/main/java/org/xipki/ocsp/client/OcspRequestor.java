@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.client;
 
-import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.extra.misc.ReqRespDebug;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.util.http.ReqRespDebug;
 
 import java.math.BigInteger;
 import java.net.URL;
@@ -37,8 +37,8 @@ public interface OcspRequestor {
    *         if the OCSP responder cannot be reached or the response does not
    *         match the requested certificate.
    */
-  OCSPResp ask(X509Cert issuerCert, X509Cert cert, URL responderUrl,
-              RequestOptions requestOptions, ReqRespDebug debug)
+  OCSPResponse ask(X509Cert issuerCert, X509Cert cert, URL responderUrl,
+                   RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -61,8 +61,8 @@ public interface OcspRequestor {
    *         if the OCSP responder cannot be reached or the response does not
    *         match the requested certificate.
    */
-  OCSPResp ask(X509Cert issuerCert, X509Cert[] certs, URL responderUrl,
-              RequestOptions requestOptions, ReqRespDebug debug)
+  OCSPResponse ask(X509Cert issuerCert, X509Cert[] certs, URL responderUrl,
+                   RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -85,8 +85,8 @@ public interface OcspRequestor {
    *         if the OCSP responder cannot be reached or the response does not
    *         match the requested certificate.
    */
-  OCSPResp ask(X509Cert issuerCert, BigInteger serialNumber, URL responderUrl,
-              RequestOptions requestOptions, ReqRespDebug debug)
+  OCSPResponse ask(X509Cert issuerCert, BigInteger serialNumber, URL responderUrl,
+                   RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
   /**
@@ -109,8 +109,8 @@ public interface OcspRequestor {
    *         if the OCSP responder cannot be reached or the response does not
    *         match the requested certificates.
    */
-  OCSPResp ask(X509Cert issuerCert, BigInteger[] serialNumbers,
-              URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
+  OCSPResponse ask(X509Cert issuerCert, BigInteger[] serialNumbers,
+                   URL responderUrl, RequestOptions requestOptions, ReqRespDebug debug)
       throws OcspResponseException, OcspRequestorException;
 
 }

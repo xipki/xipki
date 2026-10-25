@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * CA Status enumeration.

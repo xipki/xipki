@@ -3,39 +3,40 @@
 
 package org.xipki.shell.security;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.cms.ContentInfo;
-import org.bouncycastle.asn1.cms.SignedData;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.openssl.PKCS8Generator;
-import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
-import org.bouncycastle.operator.OutputEncryptor;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.Securities;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.JceX509Certificate;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.pkix.asn1.cms.CertificateChoice;
+import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.pkix.asn1.cms.SignedData;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.pkix.util.PKCS8Encryptor;
+import org.xipki.crypto.core.pem.PemObject;
+import org.xipki.crypto.core.pem.PemReader;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.Securities;
+import org.xipki.pkix.cert.JceX509Certificate;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -52,7 +53,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.time.Instant;
 import java.util.Enumeration;
@@ -67,9 +67,29 @@ import java.util.Set;
  */
 class SecurityCommands {
 
+  @Command(name = "crypto-info", description = "print the crypto API service information",
+      mixinStandardHelpOptions = true)
+  static class CryptoInfoCommand extends XiShellBaseCommand {
+
+    @Option(names = "--qualified", description = "print only the class name with package name")
+    private boolean qualified;
+
+    @Override
+    public void run() {
+      try {
+        CryptoApi cryptoApi = CryptoApiFactory.get();
+        String clazzName = qualified ? cryptoApi.getClass().getName()
+            : cryptoApi.getClass().getSimpleName();
+        println(clazzName);
+      } catch (Exception ex) {
+        throw new RuntimeException(ex.getMessage(), ex);
+      }
+    }
+  }
+
   @Command(name = "cert-info", description = "print certificate information",
       mixinStandardHelpOptions = true)
-  static class CertInfoCommand extends ShellBaseCommand {
+  static class CertInfoCommand extends XiShellBaseCommand {
 
     @Option(names = "--in", description = "certificate file", required = true)
     @Completion(FilePathCompleter.class)
@@ -161,7 +181,7 @@ class SecurityCommands {
 
   @Command(name = "convert-keystore", description = "Convert keystore",
       mixinStandardHelpOptions = true)
-  static class ConvertKeystoreCommand extends ShellBaseCommand {
+  static class ConvertKeystoreCommand extends XiShellBaseCommand {
 
     @Option(names = "--in", required = true, description = "source keystore file")
     @Completion(FilePathCompleter.class)
@@ -221,14 +241,6 @@ class SecurityCommands {
               ? readPasswordIfNotSet("password of the destination keystore", outPwdHint)
               : null;
 
-          OutputEncryptor pemOe = null;
-          if ("PEM".equalsIgnoreCase(outType) && outPassword != null) {
-            JceOpenSSLPKCS8EncryptorBuilder eb =
-                new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
-            eb.setPassword(outPassword);
-            pemOe = eb.build();
-          }
-
           Enumeration<String> aliases = inKs.aliases();
           while (aliases.hasMoreElements()) {
             String alias = aliases.nextElement();
@@ -242,9 +254,9 @@ class SecurityCommands {
                   outPemKs.write(PemEncoder.encode(key.getEncoded(),
                                   PemEncoder.PemLabel.PRIVATE_KEY));
                 } else {
-                  JcaPKCS8Generator gen = new JcaPKCS8Generator((PrivateKey) key, pemOe);
-                  PemObject po = gen.generate();
-                  outPemKs.write(PemEncoder.encode(po.getContent(),
+                  EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(
+                      PrivateKeyInfo.fromEncoded(key.getEncoded()), outPassword, null);
+                  outPemKs.write(PemEncoder.encode(encKey.getEncoded(),
                       PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
                 }
 
@@ -290,7 +302,7 @@ class SecurityCommands {
 
   @Command(name = "import-cert", description = "import certificates to a keystore",
       mixinStandardHelpOptions = true)
-  static class ImportCertCommand extends ShellBaseCommand {
+  static class ImportCertCommand extends XiShellBaseCommand {
 
     @Option(names = "--keystore", required = true, description = "keystore file")
     @Completion(FilePathCompleter.class)
@@ -316,7 +328,7 @@ class SecurityCommands {
 
         Set<String> aliases = new HashSet<>(10);
         KeyStore ks = null;
-        PKCS12KeyStore pkcs12Ks = null;
+        Pkcs12KeyStore pkcs12Ks = null;
         boolean isPkcs12Ks = StringUtil.orEqualsIgnoreCase(ksType, "PKCS12", "PKCS#12");
 
         if (realKsFile.exists()) {
@@ -328,13 +340,17 @@ class SecurityCommands {
             }
           }
 
-          Enumeration<String> strs = isPkcs12Ks ? pkcs12Ks.aliases() : ks.aliases();
-          while (strs.hasMoreElements()) {
-            aliases.add(strs.nextElement());
+          if (isPkcs12Ks) {
+            aliases.addAll(pkcs12Ks.aliases());
+          } else {
+            Enumeration<String> strs = ks.aliases();
+            while (strs.hasMoreElements()) {
+              aliases.add(strs.nextElement());
+            }
           }
         } else {
           if (isPkcs12Ks) {
-            pkcs12Ks = KeyUtil.loadPKCS12KeyStore(null, null);
+            pkcs12Ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, null);
           } else {
             ks = KeyUtil.loadKeyStore(ksType, null, null);
           }
@@ -374,7 +390,7 @@ class SecurityCommands {
 
   @Command(name = "export-cert-p7m", description = "export first certificate from CMS signed data",
       mixinStandardHelpOptions = true)
-  static class ExportCertP7mCommand extends ShellBaseCommand {
+  static class ExportCertP7mCommand extends XiShellBaseCommand {
 
     @Option(names = "--outform", description = "output format of the certificate")
     @Completion(Completers.OutformCompleter.class)
@@ -401,7 +417,7 @@ class SecurityCommands {
 
   @Command(name = "export-keycert-pem", description = "export key and certificate from PEM file",
       mixinStandardHelpOptions = true)
-  static class ExportKeyCertPemCommand extends ShellBaseCommand {
+  static class ExportKeyCertPemCommand extends XiShellBaseCommand {
 
     @Option(names = "--outform", description = "output format of the key and certificate")
     @Completion(Completers.OutformCompleter.class)
@@ -458,7 +474,7 @@ class SecurityCommands {
   @Command(name = "export-keycert-est",
       description = "export key and certificate from EST response",
       mixinStandardHelpOptions = true)
-  static class ExportKeyCertEstCommand extends ShellBaseCommand {
+  static class ExportKeyCertEstCommand extends XiShellBaseCommand {
 
     @Option(names = "--outform", description = "output format of the key and certificate")
     @Completion(Completers.OutformCompleter.class)
@@ -571,13 +587,14 @@ class SecurityCommands {
     }
   }
 
-  private static byte[] extractCertFromSignedData(byte[] cmsBytes) throws IOException {
-    ContentInfo ci = ContentInfo.getInstance(X509Util.toDerEncoded(cmsBytes));
-    ASN1Set certs = SignedData.getInstance(ci.getContent()).getCertificates();
-    if (certs == null || certs.size() == 0) {
-      throw new IOException("Found no certificate");
+  private static byte[] extractCertFromSignedData(byte[] cmsBytes) throws CodecException {
+    ContentInfo ci = ContentInfo.fromEncoded(X509Util.toDerEncoded(cmsBytes));
+    CertificateChoice.Set0 certs = SignedData.fromAsn1(ci.getContent().asSequence())
+                                      .getCertificates();
+    if (certs == null || certs.isEmpty()) {
+      throw new CodecException("Found no certificate");
     }
-    return certs.getObjectAt(0).toASN1Primitive().getEncoded();
+    return certs.get(0).getEncoded();
   }
 
   static char[] resolveP12Password(String passwordHint)
@@ -592,7 +609,7 @@ class SecurityCommands {
     throw new IOException("password required");
   }
 
-  abstract static class SecurityCommand extends ShellBaseCommand {
+  abstract static class SecurityCommand extends XiShellBaseCommand {
 
     protected Securities securities() throws Exception {
       return SecurityRuntime.get();
@@ -601,7 +618,7 @@ class SecurityCommands {
 
   @Command(name = "crl-info", description = "print CRL information",
       mixinStandardHelpOptions = true)
-  static class CrlInfoCommand extends ShellBaseCommand {
+  static class CrlInfoCommand extends XiShellBaseCommand {
 
     @Option(names = "--in", description = "CRL file", required = true)
     @Completion(FilePathCompleter.class)
@@ -625,21 +642,18 @@ class SecurityCommands {
     @Override
     public void run() {
       try {
-        CertificateList crl = CertificateList.getInstance(
-                                X509Util.toDerEncoded(IoUtil.read(inFile)));
+        CertificateList crl = CertificateList.fromEncoded(
+            X509Util.toDerEncoded(IoUtil.read(inFile)));
         String result;
         if (crlNumber) {
-          ASN1Encodable asn1 = crl.getTBSCertList().getExtensions()
-              .getExtensionParsedValue(OIDs.Extn.cRLNumber);
-          result = asn1 == null ? "null"
-                                : getNumber(ASN1Integer.getInstance(asn1).getPositiveValue());
+          Extension extn = crl.getExtension(ExtensionOIDs.cRLNumber);
+          result = extn == null ? "null" : getNumber(extn.cRLNumber());
         } else if (issuer) {
           result = crl.getIssuer().toString();
         } else if (thisUpdate) {
-          result = toUtcTime(crl.getThisUpdate().getDate().toInstant());
+          result = toUtcTime(crl.thisUpdate());
         } else if (nextUpdate) {
-          result = crl.getNextUpdate() == null ? "null"
-              : toUtcTime(crl.getNextUpdate().getDate().toInstant());
+          result = crl.getNextUpdate() == null ? "null" : toUtcTime(crl.nextUpdate());
         } else {
           result = crl.toString();
         }

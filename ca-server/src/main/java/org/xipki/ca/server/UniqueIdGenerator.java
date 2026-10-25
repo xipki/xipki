@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.time.Clock;
 import java.util.concurrent.atomic.AtomicInteger;

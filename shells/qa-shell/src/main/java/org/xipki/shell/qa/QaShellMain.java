@@ -3,9 +3,19 @@
 
 package org.xipki.shell.qa;
 
+import org.xipki.qa.ca.FillKeypool;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.shell.Completion;
 import org.xipki.shell.PicocliShell;
-import org.xipki.shell.ShellBaseCommand;
+import org.xipki.shell.completer.FilePathCompleter;
+import org.xipki.shell.security.SecurityCompleters;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.datasource.DataSourceFactory;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Qa Shell Main.
@@ -23,6 +33,11 @@ public class QaShellMain {
       QaOcspCommands.BenchmarkOcspStatusCommand.class,
       QaOcspCommands.BatchOcspStatusCommand.class,
       QaOcspCommands.QaOcspStatusCommand.class,
+
+      QaSecurityCommands.SpeedKeypairGenP11Command.class,
+      QaSecurityCommands.SpeedSignP11Command.class,
+      QaSecurityCommands.SpeedKeypairGenP12Command.class,
+      QaSecurityCommands.SpeedSignP12Command.class,
 
       QaCaCommands.InitCaQaCommand.class,
       QaCaCommands.CheckCertCommand.class,
@@ -82,7 +97,7 @@ public class QaShellMain {
   /**
    * Root command for the QA shell.
    */
-  public static class RootCommand extends ShellBaseCommand {
+  public static class RootCommand extends XiShellBaseCommand {
 
     @Override
     public void run() {
@@ -90,4 +105,64 @@ public class QaShellMain {
     }
 
   }
+
+  /**
+   * The QA shell.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  static class QaFillKeyPoolCommands {
+
+    @Command(name = "fill-keypool", description = "Fill the keypool",
+        mixinStandardHelpOptions = true)
+    static class FillKeypoolCommand extends XiShellBaseCommand {
+
+      @Option(names = "--db-conf", required = true,
+          description = "database configuration file of the keypool")
+      @Completion(FilePathCompleter.class)
+      private String dbconfFile;
+
+      @Option(names = "--num", description = "number of keypairs for each keyspec")
+      private int num = 10;
+
+      @Option(names = "--enc-algo", description = "algorithm to encrypt the generated keypair")
+      private String encAlg = "AES128/GCM";
+
+      @Option(names = "--password", description = "password to encrypt the generated keypair")
+      private String passwordHint;
+
+      @Option(names = "--keyspec",
+          description = "KeySpecs of keypairs to be filled, absent for all")
+      @Completion(SecurityCompleters.KeySpecCompleter.class)
+      private List<String> keySpecs;
+
+      @Override
+      public void run() {
+        try {
+          if (num < 1) {
+            throw new IllegalArgumentException("invalid num " + num);
+          }
+
+          List<KeySpec> keySpecList = null;
+          if (keySpecs != null && !keySpecs.isEmpty()) {
+            keySpecList = new ArrayList<>(keySpecs.size());
+            for (String keySpec : keySpecs) {
+              keySpecList.add(KeySpec.ofKeySpec(keySpec));
+            }
+          }
+
+          char[] passwordChars = readPasswordIfNotSet(
+              "Please enter password to encrypt the generated keypair", passwordHint);
+          try (FillKeypool fillKeytool = new FillKeypool(new DataSourceFactory(), dbconfFile)) {
+            fillKeytool.execute(num, encAlg, passwordChars, keySpecList);
+          }
+        } catch (Exception ex) {
+          throw ex instanceof RuntimeException ? (RuntimeException) ex
+              : new RuntimeException("could not fill keypool: " + ex.getMessage(), ex);
+        }
+      }
+    }
+
+  }
+
 }

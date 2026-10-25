@@ -10,25 +10,27 @@ import org.xipki.ca.gateway.acme.type.AuthzStatus;
 import org.xipki.ca.gateway.acme.type.CertReqMeta;
 import org.xipki.ca.gateway.acme.type.ChallengeStatus;
 import org.xipki.ca.gateway.acme.type.OrderStatus;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonParser;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +173,7 @@ public class AcmeDataSource {
       throw new IllegalArgumentException("oldAccount and newAccount does not have the same id");
     }
 
-    boolean updateJwkFp = oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
+    boolean updateJwkFp = !oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
     boolean updateStatus = oldAccount.status() != newAccount.status();
     String oldData = toJson(oldAccount.data());
     String newData = toJson(newAccount.data());
@@ -225,6 +227,65 @@ public class AcmeDataSource {
     }
   }
 
+  /**
+   * Re-computes the column JWK_SHA256 of all accounts whose value differs from the
+   * RFC 7638 JWK thumbprint. Previous versions computed it over all JWK members.
+   */
+  public void fixJwkSha256() {
+    final String sql = "SELECT ID,JWK_SHA256,DATA FROM ACCOUNT";
+    final String updateSql = "UPDATE ACCOUNT SET JWK_SHA256=? WHERE ID=?";
+
+    Map<Long, String> toFix = new HashMap<>();
+    Statement stmt = null;
+    ResultSet rs = null;
+    try {
+      stmt = dataSource.createStatement();
+      rs = stmt.executeQuery(sql);
+      while (rs.next()) {
+        long id = rs.getLong("ID");
+        try {
+          AcmeAccount.Data data = AcmeAccount.Data.parse(
+              JsonParser.parseMap(rs.getString("DATA"), false));
+          String sha256 = AcmeUtils.jwkSha256(data.jwk());
+          if (!sha256.equals(rs.getString("JWK_SHA256"))) {
+            toFix.put(id, sha256);
+          }
+        } catch (CodecException | RuntimeException ex) {
+          LOG.warn("could not compute JWK_SHA256 of account {}: {}", id, ex.getMessage());
+        }
+      }
+    } catch (DataAccessException ex) {
+      LOG.error("could not fix JWK_SHA256", ex);
+      return;
+    } catch (SQLException ex) {
+      LOG.error("could not fix JWK_SHA256", dataSource.translate(sql, ex));
+      return;
+    } finally {
+      dataSource.releaseResources(stmt, rs);
+    }
+
+    if (toFix.isEmpty()) {
+      return;
+    }
+
+    PreparedStatement ps = null;
+    try {
+      ps = dataSource.prepareStatement(updateSql);
+      for (Map.Entry<Long, String> entry : toFix.entrySet()) {
+        ps.setString(1, entry.getValue());
+        ps.setLong(2, entry.getKey());
+        ps.executeUpdate();
+      }
+      LOG.info("Database: fixed JWK_SHA256 of {} accounts", toFix.size());
+    } catch (DataAccessException ex) {
+      LOG.error("could not fix JWK_SHA256", ex);
+    } catch (SQLException ex) {
+      LOG.error("could not fix JWK_SHA256", dataSource.translate(updateSql, ex));
+    } finally {
+      dataSource.releaseResources(ps, null);
+    }
+  }
+
   public AcmeAccount getAccountForJwk(Map<String, String> jwk) throws AcmeSystemException {
     String sha256 = AcmeUtils.jwkSha256(jwk);
     final String sql = sqlGetAccountFowJwkSha256;
@@ -256,7 +317,6 @@ public class AcmeDataSource {
       AcmeAccount ret = new AcmeAccount(id, this);
       ret.setData(data);
       ret.setStatus(status);
-      ret.setJwkSha256(rs.getString("JWK_SHA256"));
       ret.setInDb(true);
       ret.mark();
 
@@ -290,7 +350,13 @@ public class AcmeDataSource {
       if (certBytes == null) {
         ps.setNull(index++, Types.BIGINT);
       } else {
-        ps.setLong(index++, X509Util.extractCertNotAfter(certBytes));
+        long notAfter;
+        try {
+          notAfter = X509Util.extractCertNotAfter(certBytes);
+        } catch (CodecException e) {
+          throw new AcmeSystemException("could not extract NotAfter from certificate", e);
+        }
+        ps.setLong(index++, notAfter);
       }
       ps.setString(index++, order.getCertSha256());
 
@@ -419,7 +485,15 @@ public class AcmeDataSource {
 
       if (updateCert) {
         byte[] certBytes = newOrder.cert();
-        ps.setLong(index++, X509Util.extractCertNotAfter(certBytes));
+
+        long notAfter;
+        try {
+          notAfter = X509Util.extractCertNotAfter(certBytes);
+        } catch (CodecException e) {
+          throw new AcmeSystemException("could not extract NotAfter from certificate", e);
+        }
+
+        ps.setLong(index++, notAfter);
         ps.setString(index++, newOrder.getCertSha256());
         ps.setString(index, Base64.getUrlNoPaddingEncoder().encodeToString(certBytes));
       }

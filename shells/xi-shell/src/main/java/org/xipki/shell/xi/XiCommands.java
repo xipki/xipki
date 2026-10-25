@@ -3,18 +3,20 @@
 
 package org.xipki.shell.xi;
 
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
 import org.xipki.shell.Completion;
 import org.xipki.shell.ShellBaseCommand;
+import org.xipki.shell.ShellUtil;
 import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.extra.http.Curl;
-import org.xipki.util.extra.http.Curl.CurlResult;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.io.FileUtils;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.http.Curl.CurlResult;
+import org.xipki.util.http.Curl;
+import org.xipki.util.http.DefaultCurl;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -23,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -37,7 +40,6 @@ import java.util.StringTokenizer;
  *
  * @author Lijun Liao (xipki)
  */
-
 class XiCommands {
   abstract static class XiCommand extends ShellBaseCommand {
 
@@ -115,7 +117,7 @@ class XiCommands {
 
         File destDir = new File(expand(dest));
         IoUtil.mkdirs(destDir);
-        FileUtils.copyDirectory(sourceDir, destDir);
+        IoUtil.copyDirectory(sourceDir, destDir);
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
       }
@@ -189,7 +191,7 @@ class XiCommands {
         IoUtil.mkdirsParent(destFile.toPath());
       }
 
-      FileUtils.copyFile(sourceFile, destFile, true);
+      IoUtil.copyFile(sourceFile, destFile, true);
     }
   }
 
@@ -409,8 +411,8 @@ class XiCommands {
           IoUtil.mkdirs(destDir);
         }
 
-        FileUtils.copyDirectory(sourceDir, destDir);
-        FileUtils.deleteDirectory(sourceDir);
+        IoUtil.copyDirectory(sourceDir, destDir);
+        IoUtil.deleteDirectory(sourceDir);
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
       }
@@ -454,7 +456,7 @@ class XiCommands {
           IoUtil.mkdirsParent(destFile.toPath());
         }
 
-        FileUtils.copyFile(sourceFile, destFile, true);
+        IoUtil.copyFile(sourceFile, destFile, true);
         IoUtil.deleteFile0(sourceFile);
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
@@ -555,7 +557,7 @@ class XiCommands {
               return;
             }
             if (force || confirmAction("Do you want to remove directory " + targetPath)) {
-              FileUtils.deleteDirectory(target);
+              IoUtil.deleteDirectory(target);
               println("removed directory " + targetPath);
             }
           } else if (force || confirmAction("Do you want to remove file " + targetPath)) {
@@ -635,7 +637,7 @@ class XiCommands {
     @Override
     public void run() {
       try {
-        List<String> args = splitCommand(IoUtil.expandFilepath(command, false));
+        List<String> args = splitCommand(XipkiIoUtil.expandFilepath(command, false));
         ProcessBuilder pb = new ProcessBuilder(args);
         if (envs != null) {
           for (String env : envs) {
@@ -693,4 +695,45 @@ class XiCommands {
       return tokens;
     }
   }
+
+  /**
+   * Curl Runtime.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  private static class CurlRuntime {
+
+    private static final String DEFAULT_CURL_CONF = "xipki/etc/curl.json";
+
+    private static Curl cachedCurl;
+
+    private CurlRuntime() {
+    }
+
+    /**
+     * Returns the lazily initialized curl runtime configured from shell home.
+     *
+     * @return configured curl instance
+     */
+    public static synchronized Curl get() {
+      if (cachedCurl != null) {
+        return cachedCurl;
+      }
+
+      String expanded = ShellUtil.resolveRequired(DEFAULT_CURL_CONF);
+
+      DefaultCurl curl = new DefaultCurl();
+      if (Path.of(expanded).toFile().isFile()) {
+        curl.setConfFile(expanded);
+      } else {
+        curl.setConfFile(null);
+        curl.setUseSslConf(false);
+      }
+
+      cachedCurl = curl;
+      return curl;
+    }
+
+  }
+
 }

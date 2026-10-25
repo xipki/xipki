@@ -9,14 +9,14 @@ import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.conf.Validity;
 
 import java.util.List;
 

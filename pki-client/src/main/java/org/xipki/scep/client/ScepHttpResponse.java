@@ -3,8 +3,8 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class ScepHttpResponse {
     }
 
     try {
-      return IoUtil.readAllBytesAndClose(content);
+      return XipkiIoUtil.readAllBytesAndClose(content);
     } catch (IOException ex) {
       throw new ScepClientException(ex);
     }

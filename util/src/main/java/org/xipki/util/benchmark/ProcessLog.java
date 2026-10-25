@@ -3,7 +3,7 @@
 
 package org.xipki.util.benchmark;
 
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.time.Duration;
 import java.time.Instant;

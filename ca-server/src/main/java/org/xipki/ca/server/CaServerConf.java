@@ -3,19 +3,19 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.security.Securities.SecurityConf;
-import org.xipki.security.util.TlsHelper;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.Securities.SecurityConf;
+import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceConf;
-import org.xipki.util.extra.audit.Audits.AuditConf;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.io.FileOrBinary;
+import org.xipki.util.audit.Audits.AuditConf;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.pkix.util.conf.FileOrBinary;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -301,7 +301,7 @@ public class CaServerConf {
         SslContextConf conf = new SslContextConf(m.trustanchors, m.hostverifier);
         try {
           conf.init();
-        } catch (ObjectCreationException e) {
+        } catch (GenerationException e) {
           throw new RuntimeException(e);
         }
         sslContextConfMap.put(m.name, conf);

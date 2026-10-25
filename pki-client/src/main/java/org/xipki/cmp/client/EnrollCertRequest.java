@@ -3,10 +3,10 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.pkix.asn1.crmf.CertRequest;
+import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.codec.util.Args;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -92,7 +92,7 @@ public class EnrollCertRequest {
 
   public boolean addRequestEntry(Entry requestEntry) {
     String id = Args.notNull(requestEntry, "requestEntry").id();
-    ASN1Integer certReqId = requestEntry.certReq().getCertReqId();
+    Asn1Integer certReqId = requestEntry.certReq().getCertReqId();
     for (Entry re : requestEntries) {
       if (re.id().equals(id)) {
         return false;

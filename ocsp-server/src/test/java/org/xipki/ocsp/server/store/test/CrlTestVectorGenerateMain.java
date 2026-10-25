@@ -3,22 +3,20 @@
 
 package org.xipki.ocsp.server.store.test;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.cert.X509v2CRLBuilder;
-import org.xipki.security.OIDs;
-import org.xipki.security.Securities;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.Signer;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.util.io.IoUtil;
+import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
+import org.xipki.pkix.asn1.x509.CRLReason;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.Securities;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.Signer;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.codec.util.IoUtil;
 
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 /**
  * Generate CRL test vectors.
@@ -50,12 +48,12 @@ public class CrlTestVectorGenerateMain {
 
       Signer signer = csigner.borrowSigner();
       // no revoked certs
-      X509v2CRLBuilder builder = getBuilder(caCert, true, true);
+      CertificateList.V2CRLBuilder builder = getBuilder(caCert, true, true);
       buildCrl(builder, signer, "no-revoked-certs.crl");
 
       Instant now = Instant.now();
-      Date revokedDate = Date.from(now.minus(1, ChronoUnit.DAYS));
-      Date invalidityDate = Date.from(now.minus(2, ChronoUnit.DAYS));
+      Instant revokedDate = now.minus(1, ChronoUnit.DAYS);
+      Instant invalidityDate = now.minus(2, ChronoUnit.DAYS);
 
       // with revoked certs
       builder = getBuilder(caCert, true, true);
@@ -83,24 +81,26 @@ public class CrlTestVectorGenerateMain {
     }
   }
 
-  private static void buildCrl(X509v2CRLBuilder builder, Signer signer, String fn)
+  private static void buildCrl(CertificateList.V2CRLBuilder builder, Signer signer, String fn)
       throws Exception {
     byte[] encoded = builder.build(signer.x509Signer()).getEncoded();
     IoUtil.save("output/" + fn, encoded);
   }
 
-  private static X509v2CRLBuilder getBuilder(X509Cert caCert, boolean addCrlNumber, boolean addAki)
+  private static CertificateList.V2CRLBuilder getBuilder(
+      X509Cert caCert, boolean addCrlNumber, boolean addAki)
       throws Exception {
     Instant thisUpdate = Instant.now();
-    X509v2CRLBuilder builder = new X509v2CRLBuilder(caCert.subject(), Date.from(thisUpdate));
-    builder.setNextUpdate(Date.from(thisUpdate.plus(50 * 365, ChronoUnit.DAYS)));
+    CertificateList.V2CRLBuilder builder =
+        new CertificateList.V2CRLBuilder(caCert.subject(), thisUpdate);
+    builder.setNextUpdate(thisUpdate.plus(50 * 365, ChronoUnit.DAYS));
     if (addCrlNumber) {
-      builder.addExtension(OIDs.Extn.cRLNumber, false, new ASN1Integer(BigInteger.ONE));
+      builder.addExtension(Extension.ofCRLNumber(false, 1));
     }
 
     if (addAki) {
-      builder.addExtension(OIDs.Extn.authorityKeyIdentifier, false,
-          new AuthorityKeyIdentifier(caCert.subjectKeyId()));
+      builder.addExtension(Extension.ofAuthorityKeyIdentifier(false,
+          new AuthorityKeyIdentifier(caCert.subjectKeyId())));
     }
 
     return builder;

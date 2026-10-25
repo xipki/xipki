@@ -8,22 +8,37 @@ echo "#################################################################"
 echo "#                 Generate Key, CSR and Certificate             #"
 echo "#################################################################"
 
-echo "# Generate PKCS#12 key and certificate for SCEP Responder"
+echo "# Generate PKCS#12 keys and certificates for SCEP Responder"
 
 keypair-p12 --keyspec RSA2048 --password $[scep.keyPassword] \
-  --out ${KEYCERTS_DIR}/scep1.p12
+  --out ${KEYCERTS_DIR}/scep-sign.p12
 
-csr-p12 --password $[scep.keyPassword] --p12 ${KEYCERTS_DIR}/scep1.p12 \
-  --out ${KEYCERTS_DIR}/scep1.csr --subject "${SUBJECT}"
+csr-p12 --password $[scep.keyPassword] --p12 ${KEYCERTS_DIR}/scep-sign.p12 \
+  --out ${KEYCERTS_DIR}/scep-sign.csr --subject "${SUBJECT}"
 
-enroll-cert --ca $[ca.name] --csr ${KEYCERTS_DIR}/scep1.csr \
-  --out ${KEYCERTS_DIR}/scep1.der --profile scep
+enroll-cert --ca $[ca.name] --csr ${KEYCERTS_DIR}/scep-sign.csr \
+  --out ${KEYCERTS_DIR}/scep-sign.der --profile scep-sign
 
 echo "# Update the certificate in the PKCS#12 file"
-update-cert-p12 --p12 ${KEYCERTS_DIR}/scep1.p12 --password $[scep.keyPassword] \
-  --cert ${KEYCERTS_DIR}/scep1.der --ca-cert ${CACERT_FILE}
+update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-sign.p12 --password $[scep.keyPassword] \
+  --cert ${KEYCERTS_DIR}/scep-sign.der --ca-cert ${CACERT_FILE}
+
+keypair-p12 --keyspec RSA2048 --password $[scep.keyPassword] \
+  --out ${KEYCERTS_DIR}/scep-enc.p12
+
+csr-p12 --password $[scep.keyPassword] --p12 ${KEYCERTS_DIR}/scep-enc.p12 \
+  --out ${KEYCERTS_DIR}/scep-enc.csr --subject "${SUBJECT}"
+
+enroll-cert --ca $[ca.name] --csr ${KEYCERTS_DIR}/scep-enc.csr \
+  --out ${KEYCERTS_DIR}/scep-enc.der --profile scep-enc
+
+echo "# Update the certificate in the PKCS#12 file"
+update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-enc.p12 --password $[scep.keyPassword] \
+  --cert ${KEYCERTS_DIR}/scep-enc.der --ca-cert ${CACERT_FILE}
 
 echo "Please"
-echo "  1. Copy ${KEYCERTS_DIR}/scep1.p12 to replace"
-echo "     <SCEP\'s tomcat.dir>/xipki/keycerts/scep1.p12"
+echo "  1. Copy ${KEYCERTS_DIR}/scep-sign.p12 to replace"
+echo "     <SCEP\'s tomcat.dir>/xipki/keycerts/scep-sign.p12"
+echo "  2. Copy ${KEYCERTS_DIR}/scep-enc.p12 to replace"
+echo "     <SCEP\'s tomcat.dir>/xipki/keycerts/scep-enc.p12"
 echo "  2. Restart SCEP\'s tomcat."

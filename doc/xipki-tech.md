@@ -62,8 +62,8 @@ Client <-- EST  --> Gateway <-- CBOR Messages --> CA
 
 # XiPKI Repository Structure
 
-- Base modules: `codec`, `util`, `util-extra`
-- Security modules: `security`, `pkcs11`, `xihsm`, `bcbridge-lts8on`, `bcbridge-fips`
+- Base modules: `codec`, `pkix-util`, `util`
+- Security modules: `pkix`, `pkcs11`, `xihsm`, `bcbridge-lts8on`, `bcbridge-fips`
 - PKI services: `ca-api`, `ca-server`, `ca-mgmt`, `ocsp-api`, `ocsp-server`, `gateway`
 - Operations: `shells`, `servlets`, `assemblies`
 - QA: `qa`

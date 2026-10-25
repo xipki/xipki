@@ -3,34 +3,36 @@
 
 package org.xipki.dummyservlet.ctlog;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.pkix.CtLog;
-import org.xipki.security.pkix.CtLog.AddPreChainRequest;
-import org.xipki.security.pkix.CtLog.AddPreChainResponse;
-import org.xipki.security.pkix.CtLog.DigitallySigned;
-import org.xipki.security.pkix.CtLog.HashAlgorithm;
-import org.xipki.security.pkix.CtLog.SignatureAlgorithm;
-import org.xipki.security.pkix.CtLog.SignatureAndHashAlgorithm;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.HttpStatusCode;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.asn1.cert.CtLog;
+import org.xipki.pkix.asn1.cert.CtLog.AddPreChainRequest;
+import org.xipki.pkix.asn1.cert.CtLog.AddPreChainResponse;
+import org.xipki.pkix.asn1.cert.CtLog.DigitallySigned;
+import org.xipki.pkix.asn1.cert.CtLog.HashAlgorithm;
+import org.xipki.pkix.asn1.cert.CtLog.SignatureAlgorithm;
+import org.xipki.pkix.asn1.cert.CtLog.SignatureAndHashAlgorithm;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.HttpStatusCode;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.pkix.util.misc.LogUtil;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.InvalidKeySpecException;
@@ -118,26 +120,24 @@ public class CtLogServlet {
   private final SignatureAndHashAlgorithm signatureAndHashAlgorithm;
 
   private CtLogServlet(byte[] pkcs8PrivateKeyBytes, byte[] publicKeyInfoBytes) {
-    SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfo.getInstance(publicKeyInfoBytes);
-    byte[] canonicalizedBytes;
+    SubjectPublicKeyInfo publicKeyInfo;
     try {
-      canonicalizedBytes = publicKeyInfo.getEncoded();
-    } catch (IOException ex) {
-      String msg = "invalid public key";
-      LogUtil.error(LOG, ex, msg);
-      throw new IllegalStateException(msg);
+      publicKeyInfo = SubjectPublicKeyInfo.fromEncoded(publicKeyInfoBytes);
+    } catch (CodecException e) {
+      throw new RuntimeException(e);
     }
+    byte[] canonicalizedBytes = publicKeyInfo.getEncoded();
     this.logId = HashAlgo.SHA256.hash(canonicalizedBytes);
 
-    ASN1ObjectIdentifier keyAlgId = publicKeyInfo.getAlgorithm().getAlgorithm();
+    Asn1Oid keyAlgId = publicKeyInfo.getAlgorithm().getAlgorithm();
 
     SignatureAlgorithm signatureAlgorithm;
     String keyType;
-    if (OIDs.Algo.id_rsaEncryption.equals(keyAlgId)) {
+    if (AlgorithmOIDs.id_rsaEncryption.equals(keyAlgId)) {
       keyType = "RSA";
       this.signatureAlgo = "SHA256withRSA";
       signatureAlgorithm = SignatureAlgorithm.rsa;
-    } else if (OIDs.Algo.id_ecPublicKey.equals(keyAlgId)) {
+    } else if (AlgorithmOIDs.id_ecPublicKey.equals(keyAlgId)) {
       keyType = "EC";
       this.signatureAlgo = "SHA256withECDSA";
       signatureAlgorithm = SignatureAlgorithm.ecdsa;
@@ -151,9 +151,9 @@ public class CtLogServlet {
         new SignatureAndHashAlgorithm(HashAlgorithm.sha256, signatureAlgorithm);
 
     try {
-      KeyFactory kf = KeyFactory.getInstance(keyType);
+      KeyFactory kf = CryptoApiFactory.get().newKeyFactory(keyType);
       this.signingKey = kf.generatePrivate(new PKCS8EncodedKeySpec(pkcs8PrivateKeyBytes));
-    } catch (InvalidKeySpecException | NoSuchAlgorithmException ex) {
+    } catch (InvalidKeySpecException | NoSuchAlgorithmException | NoSuchProviderException ex) {
       String msg = "error creating private key";
       LogUtil.error(LOG, ex, msg);
       throw new IllegalStateException(msg + ": " + ex.getMessage());
@@ -172,15 +172,15 @@ public class CtLogServlet {
         return new HttpResponse(HttpStatusCode.SC_BAD_REQUEST);
       }
 
-      Certificate cert = Certificate.getInstance(chain.get(0));
-      Certificate caCert = Certificate.getInstance(chain.get(1));
+      Certificate cert = Certificate.fromEncoded(chain.get(0));
+      Certificate caCert = Certificate.fromEncoded(chain.get(1));
       byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.getSubjectPublicKeyInfo().getEncoded());
       byte[] preCertTbsCert = CtLog.getPreCertTbsCert(cert.getTBSCertificate());
 
       byte sctVersion = 0;
       long timestamp = Clock.systemUTC().millis();
 
-      Signature sig = Signature.getInstance(signatureAlgo);
+      Signature sig = CryptoApiFactory.get().newSignature(signatureAlgo);
       sig.initSign(signingKey);
       CtLog.update(sig, sctVersion, timestamp, null, issuerKeyHash, preCertTbsCert);
       byte[] signature = sig.sign();

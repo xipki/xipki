@@ -3,15 +3,13 @@
 
 package org.xipki.ca.sdk;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.codec.cbor.CborDecoder;
-import org.xipki.util.codec.cbor.CborEncoder;
-import org.xipki.util.codec.cbor.CborType;
-
-import java.io.IOException;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.cbor.CborDecoder;
+import org.xipki.codec.cbor.CborEncoder;
+import org.xipki.codec.cbor.CborType;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
 
 /**
  * X500 Name type definition.
@@ -36,21 +34,17 @@ public class X500NameType extends SdkEncodable {
   }
 
   public X500NameType(X500Name name) {
-    try {
-      this.encoded = name.getEncoded();
-      this.name = name;
-      this.text = null;
-    } catch (IllegalArgumentException | IOException ex) {
-      throw new IllegalStateException("error encoding X500Name " + name);
-    }
+    this.encoded = name.getEncoded();
+    this.name = name;
+    this.text = null;
   }
 
   public X500NameType(byte[] encoded) {
     try {
       this.encoded = encoded;
-      this.name = X500Name.getInstance(encoded);
+      this.name = X500Name.fromEncoded(encoded);
       this.text = null;
-    } catch (IllegalArgumentException ex) {
+    } catch (CodecException ex) {
       throw new IllegalStateException("error encoding X500Name");
     }
   }
@@ -64,16 +58,16 @@ public class X500NameType extends SdkEncodable {
     return encoded;
   }
 
-  public X500Name toX500Name() throws IOException {
+  public X500Name toX500Name() throws CodecException {
     if (name != null) {
       return name;
     }
 
     try {
-      name = (encoded != null) ? X500Name.getInstance(encoded) : new X500Name(text);
+      name = (encoded != null) ? X500Name.fromEncoded(encoded) : new X500Name(text);
       return name;
     } catch (Exception e) {
-      throw new IOException("error parsing X500Name " + (encoded == null
+      throw new CodecException("error parsing X500Name " + (encoded == null
           ? text : "0x" + Hex.encode(encoded)));
     }
   }

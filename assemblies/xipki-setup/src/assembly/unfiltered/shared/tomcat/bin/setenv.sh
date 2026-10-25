@@ -13,3 +13,6 @@ fi
 
 export JAVA_OPTS="${JAVA_OPTS} -DXIPKI_BASE=${XI_TOMCAT_BASE}/xipki"
 
+# ML-DSA with context string (composite ML-DSA) with the crypto-be-jdk backend
+# uses the internals of the JDK.
+export JAVA_OPTS="${JAVA_OPTS} --add-exports java.base/sun.security.provider=ALL-UNNAMED"

@@ -8,8 +8,8 @@ import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.IoUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -44,7 +44,7 @@ public class MiscCommands {
     public void run() {
       try (InputStream in = client().exportConf(caNames)) {
         saveVerbose("exported configuration to file", confFile,
-            IoUtil.readAllBytesAndClose(in));
+            XipkiIoUtil.readAllBytesAndClose(in));
       } catch (Exception ex) {
         throw new RuntimeException("could not export configuration: " + ex.getMessage(), ex);
       }

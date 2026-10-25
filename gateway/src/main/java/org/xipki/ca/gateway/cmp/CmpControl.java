@@ -3,13 +3,13 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.verify.AlgorithmValidator;
-import org.xipki.security.verify.CollectionAlgorithmValidator;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.EmbedCertsMode;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cmp.ProtectedPKIMessage;
+import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.EmbedCertsMode;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -29,6 +29,8 @@ public class CmpControl {
   private static final Duration DFLT_CONFIRM_WAIT_TIME = Duration.ofSeconds(300); // 300 seconds
 
   private static final int DFLT_PBM_ITERATIONCOUNT = 10240;
+
+  private static final int DFLT_REQUEST_PBM_MAX_ITERATIONCOUNT = 100_000;
 
   private final boolean confirmCert;
 
@@ -54,7 +56,9 @@ public class CmpControl {
 
   private final int responsePbmIterationCount;
 
-  private final CollectionAlgorithmValidator sigAlgoValidator;
+  private final int requestPbmMaxIterationCount;
+
+  private final AlgorithmValidator sigAlgoValidator;
 
   public CmpControl(CmpProtocolConf.CmpControlConf conf) throws InvalidConfException {
     this.confirmCert = getBoolean(conf.confirmCert(), false);
@@ -73,7 +77,7 @@ public class CmpControl {
       throw new InvalidConfException("requestSigAlgos is not set");
     }
     try {
-      this.sigAlgoValidator = CollectionAlgorithmValidator.buildAlgorithmValidator(requestSigAlgos);
+      this.sigAlgoValidator = AlgorithmValidator.buildAlgorithmValidator(requestSigAlgos);
     } catch (NoSuchAlgorithmException ex) {
       throw new InvalidConfException("invalid signature algorithm", ex);
     }
@@ -100,10 +104,26 @@ public class CmpControl {
       pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
     }
 
-    if (pbmIterationCount <= 0) {
-      throw new InvalidConfException("invalid pbmIterationCount " + pbmIterationCount);
+    if (pbmIterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
+        || pbmIterationCount > ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
+      throw new InvalidConfException("invalid responsePbmIterationCount " + pbmIterationCount
+          + ", shall be between " + ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
+          + " and " + ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT);
     }
     this.responsePbmIterationCount = pbmIterationCount;
+
+    Integer maxIterationCount = conf.requestPbmMaxIterationCount();
+    if (maxIterationCount == null) {
+      maxIterationCount = DFLT_REQUEST_PBM_MAX_ITERATIONCOUNT;
+    }
+
+    if (maxIterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
+        || maxIterationCount > ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
+      throw new InvalidConfException("invalid requestPbmMaxIterationCount " + maxIterationCount
+          + ", shall be between " + ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
+          + " and " + ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT);
+    }
+    this.requestPbmMaxIterationCount = maxIterationCount;
 
     if (CollectionUtil.isEmpty(pbmOwfs)) {
       pbmOwfs = Collections.singletonList("SHA256");
@@ -188,6 +208,15 @@ public class CmpControl {
 
   public int responsePbmIterationCount() {
     return responsePbmIterationCount;
+  }
+
+  /**
+   * Returns the maximal PBMParameter.iterationCount of the requests. It protects against the
+   * CPU exhaustion caused by a huge iteration count, which is computed before the MAC is
+   * verified.
+   */
+  public int requestPbmMaxIterationCount() {
+    return requestPbmMaxIterationCount;
   }
 
   public boolean isRequestPbmOwfPermitted(HashAlgo pbmOwf) {

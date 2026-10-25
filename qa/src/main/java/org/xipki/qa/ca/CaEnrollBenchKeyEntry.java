@@ -3,9 +3,9 @@
 
 package org.xipki.qa.ca;
 
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.security.KeySpec;
-import org.xipki.security.util.KeyUtil;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.util.KeyUtil;
 
 import java.security.SecureRandom;
 

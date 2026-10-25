@@ -92,7 +92,7 @@
 
     // customized audit type
     //
-    //"type": "java:<name of class that implements org.xipki.audit.AuditService>",
+    //"type": "java:<name of class that implements org.xipki.util.audit.AuditService>",
     //"conf": {
     //  ... name value pairs ...
     //},

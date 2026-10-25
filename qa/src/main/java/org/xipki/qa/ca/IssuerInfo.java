@@ -3,10 +3,10 @@
 
 package org.xipki.qa.ca;
 
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.security.cert.CertificateException;
 import java.time.Instant;

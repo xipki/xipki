@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.security.KeySpec;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.KeySpec;
 
 import java.security.NoSuchAlgorithmException;
 

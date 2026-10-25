@@ -5,28 +5,26 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.RandomUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +37,6 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,61 +44,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * DB Cert Status Store definition.
  *
  * @author Lijun Liao (xipki)
  */
-public class DbCertStatusStore extends OcspStore {
-
-  private class StoreUpdateService implements Runnable {
-
-    @Override
-    public void run() {
-      updateIssuerStore();
-    }
-
-  } // class StoreUpdateService
-
-  protected DataSourceWrapper datasource;
+public class DbCertStatusStore extends AbstractDbCertStatusStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
 
   private static final int SECONDS_PER_5MIN = 300;
 
-  private final Object lock = new Object();
-
-  private final AtomicBoolean storeUpdateInProcess = new AtomicBoolean(false);
-
-  private final StoreUpdateService storeUpdateService = new StoreUpdateService();
-
   private String sqlCsNoRit;
 
-  private String sqlCs;
-
   private String sqlCsNoRitWithCertHash;
-
-  private String sqlCsWithCertHash;
-
-  private IssuerFilter issuerFilter;
 
   private final IssuerStore issuerStore = new IssuerStore();
 
   private HashAlgo certHashAlgo;
 
-  private boolean initialized;
-
-  private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-
-  protected List<Runnable> scheduledServices() {
-    return Collections.singletonList(storeUpdateService);
-  }
-
-  private synchronized void updateIssuerStore() {
+  @Override
+  protected synchronized void updateIssuerStore() {
     updateIssuerStore(false);
   }
 
@@ -112,17 +76,9 @@ public class DbCertStatusStore extends OcspStore {
       }
     }
 
+    // storeUpdateInProcess is only set while holding the lock, so a forced update
+    // just waits for the lock.
     synchronized (lock) {
-      if (force) {
-        while (storeUpdateInProcess.get()) {
-          try {
-            wait(1000);
-          } catch (InterruptedException ex) {
-            LOG.warn("interrupted, continue waiting");
-          }
-        }
-      }
-
       storeUpdateInProcess.set(true);
       try {
         updateIssuers();
@@ -463,41 +419,10 @@ public class DbCertStatusStore extends OcspStore {
 
   } // method getCertStatus0
 
-  /**
-   * Borrow PreparedStatement.
-   * @return the next idle preparedStatement, {@code null} will be returned if
-   *         no PreparedStatement can be created within 5 seconds.
-   */
-  private PreparedStatement preparedStatement(String sqlQuery) throws DataAccessException {
-    return datasource.prepareStatement(sqlQuery);
-  }
-
   @Override
   public boolean isHealthy() {
-    if (!isInitialized()) {
-      return false;
-    }
-
-    final String sql = "SELECT ID FROM ISSUER";
-
-    try {
-      PreparedStatement ps = preparedStatement(sql);
-      ResultSet rs = null;
-      try {
-        rs = ps.executeQuery();
-        return true;
-      } finally {
-        releaseDbResources(ps, rs);
-      }
-    } catch (Exception ex) {
-      LogUtil.error(LOG, ex);
-      return false;
-    }
+    return isHealthy("SELECT ID FROM ISSUER");
   } // method isHealthy
-
-  private void releaseDbResources(PreparedStatement ps, ResultSet rs) {
-    datasource.releaseResources(ps, rs);
-  }
 
   /**
    * Initialize the store.
@@ -554,35 +479,8 @@ public class DbCertStatusStore extends OcspStore {
 
     updateIssuerStore();
 
-    if (this.scheduledThreadPoolExecutor != null) {
-      this.scheduledThreadPoolExecutor.shutdownNow();
-    }
-
-    if (updateInterval != null) {
-      List<Runnable> scheduledServices = scheduledServices();
-      int size = scheduledServices == null ? 0 : scheduledServices.size();
-      if (size > 0) {
-        this.scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(size);
-        long intervalSeconds = updateInterval.approxMinutes() * 60;
-        for (Runnable service : scheduledServices) {
-          this.scheduledThreadPoolExecutor.scheduleAtFixedRate(service,
-              intervalSeconds + RandomUtil.nextInt(60), intervalSeconds, TimeUnit.SECONDS);
-        }
-      }
-    }
+    startScheduledServices();
   } // method init
-
-  @Override
-  public void close() {
-    if (scheduledThreadPoolExecutor != null) {
-      scheduledThreadPoolExecutor.shutdown();
-      scheduledThreadPoolExecutor = null;
-    }
-
-    if (datasource != null) {
-      datasource.close();
-    }
-  }
 
   @Override
   public boolean knowsIssuer(RequestIssuer reqIssuer) {
@@ -593,10 +491,6 @@ public class DbCertStatusStore extends OcspStore {
   public X509Cert getIssuerCert(RequestIssuer reqIssuer) {
     IssuerEntry issuer = issuerStore.getIssuerForFp(reqIssuer);
     return (issuer == null) ? null : issuer.cert();
-  }
-
-  protected boolean isInitialized() {
-    return initialized;
   }
 
   static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {

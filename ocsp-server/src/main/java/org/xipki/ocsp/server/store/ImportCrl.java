@@ -3,33 +3,34 @@
 
 package org.xipki.ocsp.server.store;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERIA5String;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.ocsp.CrlID;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Encodable;
+import org.xipki.codec.asn1.Asn1GeneralizedTime;
+import org.xipki.codec.asn1.Asn1IA5String;
+import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.codec.asn1.Asn1Sequence;
+import org.xipki.codec.asn1.Asn1TaggedObject;
+import org.xipki.pkix.asn1.ocsp.CrlID;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.TBSCertificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCert;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCertsIterator;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.SqlUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.datasource.SqlUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,8 +47,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -75,7 +77,7 @@ class ImportCrl {
 
     boolean isDifferent(RevokedCert revokedCert, int crlId) {
       return this.crlId != crlId || !revoked
-          || revocationReason != revokedCert.reason()
+          || revocationReason != revokedCert.reason().code()
           || revocationTime != revokedCert.revocationDate()
           || invalidityTime != revokedCert.invalidityDate();
     }
@@ -291,15 +293,20 @@ class ImportCrl {
 
         String str = props.getProperty(KEY_CA_REVOCATION_TIME);
         if (StringUtil.isNotBlank(str)) {
-          Instant revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
-          Instant invalidityTime = null;
+          try {
+            Instant revocationTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+            Instant invalidityTime = null;
 
-          str = props.getProperty(KEY_CA_INVALIDITY_TIME);
-          if (StringUtil.isNotBlank(str)) {
-            invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+            str = props.getProperty(KEY_CA_INVALIDITY_TIME);
+            if (StringUtil.isNotBlank(str)) {
+              invalidityTime = DateUtil.parseUtcTimeyyyyMMddhhmmss(str);
+            }
+            caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED,
+                          revocationTime, invalidityTime);
+          } catch (CodecException ex) {
+            LOG.error("error reading {}", revFile.getPath(), ex);
+            return false;
           }
-
-          caRevInfo = new CertRevocationInfo(CrlReason.UNSPECIFIED, revocationTime, invalidityTime);
         }
       }
 
@@ -497,13 +504,13 @@ class ImportCrl {
         LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
         File urlFile = new File(basedir, "crl.url");
         // Construct CrlID
-        ASN1EncodableVector vec = new ASN1EncodableVector();
+        List<Asn1Encodable> vec = new LinkedList<>();
         if (crlDirInfo.crlDownloded) {
           File crlDownloadFile = new File(basedir, "crl.download");
           Properties props = CrlDbCertStatusStore.loadProperties(crlDownloadFile);
           String crldp = props.getProperty("crldp");
           if (StringUtil.isNotBlank(crldp)) {
-            vec.add(new DERTaggedObject(true, 0, new DERIA5String(crldp, true)));
+            vec.add(new Asn1TaggedObject(true, 0, new Asn1IA5String(crldp)));
           }
 
           if (urlFile.exists()) {
@@ -513,14 +520,14 @@ class ImportCrl {
           if (urlFile.exists()) {
             String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
             if (StringUtil.isNotBlank(crlUrl)) {
-              vec.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+              vec.add(new Asn1TaggedObject(true, 0, new Asn1IA5String(crlUrl)));
             }
           }
         }
 
-        vec.add(new DERTaggedObject(true, 1, new ASN1Integer(crl.crlNumber())));
-        vec.add(new DERTaggedObject(true, 2, new ASN1GeneralizedTime(Date.from(crl.thisUpdate()))));
-        CrlID crlId = CrlID.getInstance(new DERSequence(vec));
+        vec.add(new Asn1TaggedObject(true, 1, new Asn1Integer(crl.crlNumber())));
+        vec.add(new Asn1TaggedObject(true, 2, new Asn1GeneralizedTime(crl.thisUpdate())));
+        CrlID crlId = CrlID.fromAsn1(new Asn1Sequence(vec));
 
         BigInteger crlNumber = crl.crlNumber();
         BigInteger baseCrlNumber = crl.baseCrlNumber();
@@ -820,7 +827,7 @@ class ImportCrl {
         BigInteger serial = revCert.serialNumber();
         long rt = revCert.revocationDate();
         long rit = revCert.invalidityDate();
-        int reason = revCert.reason();
+        CrlReason reason = revCert.reason();
         X500Name issuer = revCert.certificateIssuer();
         if (issuer != null && !issuer.equals(caCert.subject)) {
           throw new ImportCrlException("invalid CRLEntry for certificate number " + serial);
@@ -828,7 +835,7 @@ class ImportCrl {
 
         String sql = null;
         try {
-          if (reason == CrlReason.REMOVE_FROM_CRL.code()) {
+          if (reason == CrlReason.REMOVE_FROM_CRL) {
             if (isDeltaCrl) {
               // delete the entry
               sql = SQL_DELETE_CERT;
@@ -854,7 +861,7 @@ class ImportCrl {
             ps.setInt(offset++, caId);
             ps.setString(offset++, serial.toString(16));
             ps.setInt(offset++, 1);
-            ps.setInt(offset++, reason);
+            ps.setInt(offset++, reason.code());
             ps.setLong(offset++, rt);
             if (rit != 0) {
               ps.setLong(offset++, rit);
@@ -870,7 +877,7 @@ class ImportCrl {
               int offset = 1;
 
               ps.setInt(offset++, 1);
-              ps.setInt(offset++, reason);
+              ps.setInt(offset++, reason.code());
               ps.setLong(offset++, rt);
               if (rit != 0) {
                 ps.setLong(offset++, rit);
@@ -1031,7 +1038,13 @@ class ImportCrl {
     String b64CertHash = certhashAlgo.base64Hash(encodedCert);
 
     if (caCert.subjectKeyIdentifier != null) {
-      byte[] aki = cert.authorityKeyId();
+      byte[] aki;
+      try {
+        aki = cert.authorityKeyId();
+      } catch (CodecException ex) {
+        LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
+        return;
+      }
 
       if (aki == null || !Arrays.equals(caCert.subjectKeyIdentifier, aki)) {
         LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
@@ -1068,11 +1081,11 @@ class ImportCrl {
         // last update LUPDATE
         ps.setLong(offset++, Instant.now().getEpochSecond());
 
-        TBSCertificate tbsCert = cert.getCertHolder().toASN1Structure().getTBSCertificate();
+        TBSCertificate tbsCert = cert.getCert().getTBSCertificate();
         // not before NBEFORE
-        ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
+        ps.setLong(offset++, tbsCert.notBefore().getEpochSecond());
         // not after NAFTER
-        ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
+        ps.setLong(offset++, tbsCert.notAfter().getEpochSecond());
         ps.setInt(offset++, crlInfoId);
 
         ps.setString(offset, b64CertHash);
@@ -1085,11 +1098,11 @@ class ImportCrl {
           // last update LUPDATE
           ps.setLong(offset++, Instant.now().getEpochSecond());
 
-          TBSCertificate tbsCert = cert.getCertHolder().toASN1Structure().getTBSCertificate();
+          TBSCertificate tbsCert = cert.getCert().getTBSCertificate();
           // not before NBEFORE
-          ps.setLong(offset++, tbsCert.getStartDate().getDate().toInstant().getEpochSecond());
+          ps.setLong(offset++, tbsCert.notBefore().getEpochSecond());
           // not after NAFTER
-          ps.setLong(offset++, tbsCert.getEndDate().getDate().toInstant().getEpochSecond());
+          ps.setLong(offset++, tbsCert.notAfter().getEpochSecond());
           ps.setInt(offset++, crlInfoId);
 
           ps.setString(offset++, b64CertHash);

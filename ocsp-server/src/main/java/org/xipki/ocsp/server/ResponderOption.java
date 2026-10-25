@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

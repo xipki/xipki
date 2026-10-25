@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.util.Pack;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
+import org.xipki.codec.util.Pack;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
 
 /**
  * Chall Id.

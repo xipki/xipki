@@ -3,8 +3,8 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.CrlReason;
 
 import java.math.BigInteger;
 import java.time.Instant;

@@ -3,9 +3,11 @@
 
 package org.xipki.cmp.client;
 
-import org.bouncycastle.asn1.cmp.PKIStatusInfo;
-import org.xipki.security.cmp.CmpUtil;
-import org.xipki.security.cmp.PkiStatusInfo;
+import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
+import org.xipki.pkix.asn1.cmp.PKIStatus;
+import org.xipki.pkix.asn1.cmp.PKIStatusInfo;
+import org.xipki.pkix.cmp.CmpUtil;
+import org.xipki.pkix.cmp.PkiStatusInfo;
 
 /**
  * Pki Error Exception type.
@@ -14,9 +16,9 @@ import org.xipki.security.cmp.PkiStatusInfo;
  */
 public class PkiErrorException extends Exception {
 
-  private final int status;
+  private final PKIStatus status;
 
-  private final int pkiFailureInfo;
+  private final PKIFailureInfo pkiFailureInfo;
 
   private final String statusMessage;
 
@@ -28,18 +30,18 @@ public class PkiErrorException extends Exception {
     this(statusInfo.status(), statusInfo.pkiFailureInfo(), statusInfo.statusMessage());
   }
 
-  public PkiErrorException(int status, int pkiFailureInfo, String statusMessage) {
+  public PkiErrorException(PKIStatus status, PKIFailureInfo pkiFailureInfo, String statusMessage) {
     super(CmpUtil.formatPkiStatusInfo(status, pkiFailureInfo, statusMessage));
     this.status = status;
     this.pkiFailureInfo = pkiFailureInfo;
     this.statusMessage = statusMessage;
   }
 
-  public int status() {
+  public PKIStatus status() {
     return status;
   }
 
-  public int pkiFailureInfo() {
+  public PKIFailureInfo pkiFailureInfo() {
     return pkiFailureInfo;
   }
 

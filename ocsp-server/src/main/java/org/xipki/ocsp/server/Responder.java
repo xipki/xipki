@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.server;
 
+import org.xipki.codec.util.Args;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
-import org.xipki.util.codec.Args;
 
 import java.util.List;
 

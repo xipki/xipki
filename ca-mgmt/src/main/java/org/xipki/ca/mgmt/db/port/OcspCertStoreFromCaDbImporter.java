@@ -3,26 +3,27 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.TBSCertificate;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.ConfPairs;
+import org.xipki.codec.ConfPairs;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -207,8 +208,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
 
       Certificate cert;
       try {
-        cert = Certificate.getInstance(encodedCert);
-      } catch (RuntimeException ex) {
+        cert = Certificate.fromEncoded(encodedCert);
+      } catch (CodecException ex) {
         String msg = "could not parse certificate of issuer " + issuer.id();
         LogUtil.error(LOG, ex, msg);
         throw new CertificateException(ex.getMessage(), ex);
@@ -223,8 +224,8 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
       int idx = 1;
       ps.setInt(idx++, issuer.id());
       ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-      ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getStartDate().getDate()));
-      ps.setLong(idx++, DateUtil.toEpochSecond(cert.getTBSCertificate().getEndDate().getDate()));
+      ps.setLong(idx++, cert.notBefore().getEpochSecond());
+      ps.setLong(idx++, cert.notAfter().getEpochSecond());
       ps.setString(idx++, HashAlgo.SHA1.base64Hash(encodedCert));
       ps.setString(idx++, revInfoStr);
       ps.setString(idx++, Base64.encodeToString(encodedCert));
@@ -371,14 +372,14 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             String filename = cert.file();
 
             // rawcert
-            byte[] encodedCert = IoUtil.readAllBytesAndClose(
+            byte[] encodedCert = XipkiIoUtil.readAllBytesAndClose(
                 zipFile.getInputStream(zipFile.getEntry(filename)));
             String certhash = certhashAlgo.base64Hash(encodedCert);
 
             TBSCertificate tbsCert;
             try {
-              tbsCert = Certificate.getInstance(encodedCert).getTBSCertificate();
-            } catch (RuntimeException ex) {
+              tbsCert = Certificate.fromEncoded(encodedCert).getTBSCertificate();
+            } catch (CodecException ex) {
               LogUtil.error(LOG, ex, "could not parse certificate in file " + filename);
               throw new CertificateException(ex.getMessage(), ex);
             }
@@ -390,10 +391,10 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
               int idx = 1;
               psCert.setLong(idx++, id);
               psCert.setInt(idx++, caId);
-              psCert.setString(idx++, tbsCert.getSerialNumber().getPositiveValue().toString(16));
+              psCert.setString(idx++, tbsCert.getSerialNumber().getValue().toString(16));
               psCert.setLong(idx++, cert.update());
-              psCert.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getStartDate().getDate()));
-              psCert.setLong(idx++, DateUtil.toEpochSecond(tbsCert.getEndDate().getDate()));
+              psCert.setLong(idx++, tbsCert.notBefore().getEpochSecond());
+              psCert.setLong(idx++, tbsCert.notAfter().getEpochSecond());
               setInt(psCert, idx++, cert.rev());
               setInt(psCert, idx++, cert.rr());
               setLong(psCert, idx++, cert.rt());

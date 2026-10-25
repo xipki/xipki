@@ -6,7 +6,7 @@ package org.xipki.ca.servlet;
 import jakarta.servlet.FilterConfig;
 import org.xipki.ca.server.servlet.CaHttpFilter;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpFilter;
 
 /**
  * CA Servlet Filter.

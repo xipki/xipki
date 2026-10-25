@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server;
 
-import org.bouncycastle.cert.ocsp.OCSPException;
+import org.xipki.codec.Hex;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.Extensions;
@@ -11,11 +11,11 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.Signer;
-import org.xipki.util.codec.Hex;
+import org.xipki.pkix.exception.OCSPException;
+import org.xipki.pkix.exception.NoIdleSignerException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.Signer;
 
 import java.time.Instant;
 import java.util.LinkedList;

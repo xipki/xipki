@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api;
 
-import org.xipki.security.pkix.X509Cert;
+import org.xipki.pkix.cert.X509Cert;
 
 /**
  * Cert With DB Id.

@@ -6,15 +6,16 @@ package org.xipki.shell.ca.mgmt;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
-import org.xipki.shell.ShellBaseCommand;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.conf.ConfigurableProperties;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.ConfPairs;
+import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.util.misc.ConfigurableProperties;
 import org.xipki.util.datasource.DatabaseType;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +32,7 @@ import java.util.Set;
  * @author Lijun Liao (xipki)
  */
 class CaMgmtUtil {
-  abstract static class CaMgmtCommand extends ShellBaseCommand {
+  abstract static class CaMgmtCommand extends XiShellBaseCommand {
 
     protected CaMgmtClient client() throws Exception {
       return CaMgmtRuntime.get();
@@ -83,7 +84,7 @@ class CaMgmtUtil {
     }
   }
 
-  static Instant parseDate(String dateStr) {
+  static Instant parseDate(String dateStr) throws CodecException {
     return StringUtil.isBlank(dateStr) ? null
         : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
   }

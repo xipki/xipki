@@ -14,7 +14,7 @@ dbschema-add --name KEYPAIR_ENC_KEY --value 00112233445566778899AABBCCDDEEFF
 
 ## Certificate Profiles
 
-set list [ cross subca subca-complex ocsp scep multiple-ous qc ee-complex \
+set list [ cross subca subca-complex ocsp scep-sign scep-enc multiple-ous qc ee-complex \
   smime smime-legacy tls tls-enc tls-c max-time fixed-partial-subject \
   constant-ext tls-rsa tls-ec tls-edwards tls-montgomery tls-mldsa tls-mlkem \
   tls-compsig tls-compkem tls-sm2 tls-sm2-enc \
@@ -253,7 +253,8 @@ caalias-add --ca subcawithcrl1 --alias subcawithcrl
 
 ## Add cert profile to CA
 caprofile-add --ca subcawithcrl1 --profile ocsp --profile tls \
-  --profile tls-enc --profile scep --profile multiple-ous --profile max-time \
+  --profile tls-enc --profile scep-sign --profile scep-enc \
+  --profile multiple-ous --profile max-time \
   --profile tls-sm2 --profile tls-sm2-enc
 
 ## Add CMP requestor to CA

@@ -3,22 +3,23 @@
 
 package org.xipki.ca.gateway;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.jcajce.interfaces.XDHPrivateKey;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.DHSigStaticKeyCertPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.SecretKeyWithAlias;
-import org.xipki.security.verify.AlgorithmValidator;
-import org.xipki.security.verify.CollectionAlgorithmValidator;
-import org.xipki.util.conf.InvalidConfException;
-import org.xipki.util.extra.type.KeystoreConf;
-import org.xipki.util.misc.StringUtil;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.crypto.core.SecretKeyWithAlias;
+import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.conf.KeystoreConf;
+import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Pop Control settings.
@@ -47,7 +49,7 @@ import java.util.Map;
  */
 public class PopControl {
 
-  private final CollectionAlgorithmValidator popAlgoValidator;
+  private final AlgorithmValidator popAlgoValidator;
 
   private final List<DHSigStaticKeyCertPair> dhKeyAndCerts = new ArrayList<>(1);
 
@@ -60,11 +62,11 @@ public class PopControl {
   public PopControl(GatewayConf.PopControlConf conf) throws InvalidConfException {
     // pop signature algorithms
     if (conf.sigAlgos() == null) {
-      this.popAlgoValidator = CollectionAlgorithmValidator.INSTANCE;
+      this.popAlgoValidator = AlgorithmValidator.INSTANCE;
     } else {
       try {
         this.popAlgoValidator =
-            CollectionAlgorithmValidator.buildAlgorithmValidator(conf.sigAlgos());
+            AlgorithmValidator.buildAlgorithmValidator(conf.sigAlgos());
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid signature algorithm", ex);
       }
@@ -76,23 +78,24 @@ public class PopControl {
     } else {
       try {
         LoadedKeyStore res = loadKeyStore(conf.dh());
-        PKCS12KeyStore ks = res.pkcs12KeyStore;
+        Pkcs12KeyStore ks = res.pkcs12KeyStore;
         if (ks == null) {
           throw new InvalidConfException("invalid dhSig keystore configuration: " +
               "keystore type is not PKCS12: " + conf.dh().type());
         }
 
-        Enumeration<String> aliases = ks.aliases();
+        Set<String> aliases = ks.aliases();
         List<X509Cert> certs = new LinkedList<>();
-        while (aliases.hasMoreElements()) {
-          String alias = aliases.nextElement();
+        for (String alias : aliases) {
           if (!ks.isKeyEntry(alias)) {
             continue;
           }
 
           PrivateKeyInfo keyInfo = ks.getKey(alias);
-          PrivateKey key = KeyUtil.getPrivateKey(keyInfo);
-          if (!(key instanceof XDHPrivateKey)) {
+          PrivateKey key = KeyInfoUtil.getPrivateKey(keyInfo);
+          // by the algorithm OID: Key.getAlgorithm() is provider-specific (the JDK returns "XDH")
+          EcCurveEnum curve = KeyInfoUtil.getCurve(key);
+          if (curve != EcCurveEnum.X25519 && curve != EcCurveEnum.X448) {
             // we consider only XDH key
             continue;
           }
@@ -103,7 +106,7 @@ public class PopControl {
         }
 
         this.dhCerts = certs.toArray(new X509Cert[0]);
-      } catch (GeneralSecurityException | ClassCastException ex) {
+      } catch (GeneralSecurityException | CodecException ex) {
         throw new InvalidConfException("invalid dhStatic pop configuration", ex);
       }
     }
@@ -193,7 +196,7 @@ public class PopControl {
 
     for (DHSigStaticKeyCertPair m : dhKeyAndCerts) {
       if (m.issuer().equals(issuer) && m.serialNumber().equals(serial)
-          && m.privateKey().getAlgorithm().equalsIgnoreCase(keyAlgorithm)) {
+          && KeyInfoUtil.getCurve(m.privateKey()) == EcCurveEnum.ofAlias(keyAlgorithm)) {
         return m;
       }
     }
@@ -219,7 +222,7 @@ public class PopControl {
 
     private KeyStore keyStore;
 
-    private PKCS12KeyStore pkcs12KeyStore;
+    private Pkcs12KeyStore pkcs12KeyStore;
 
   }
 

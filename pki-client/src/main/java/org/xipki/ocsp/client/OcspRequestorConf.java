@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.io.FileOrBinary;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.util.conf.FileOrBinary;
 
 /**
  * OCSP Requestor configuration.

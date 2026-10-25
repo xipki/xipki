@@ -3,45 +3,41 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLReason;
-import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.X509CRLHolder;
-import org.bouncycastle.cert.X509v2CRLBuilder;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.ContentVerifierProvider;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.util.ContentSigner;
+import org.xipki.pkix.asn1.util.ContentVerifierProvider;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.BasicConstraints;
+import org.xipki.pkix.asn1.x509.CRLReason;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.SignatureSigner;
+import org.xipki.pkix.util.KeyUtil;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -102,8 +98,7 @@ public class CaEmulator {
     if (!verifyPop(csr)) {
       throw new Exception("CSR invalid");
     }
-    CertificationRequestInfo reqInfo = csr.getCertificationRequestInfo();
-    return generateCert(reqInfo.getSubjectPublicKeyInfo(), reqInfo.getSubject());
+    return generateCert(csr.getSubjectPKInfo(), csr.getSubject());
   }
 
   public X509Cert generateCert(SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn)
@@ -114,25 +109,29 @@ public class CaEmulator {
   public X509Cert generateCert(
       SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn, Instant notBefore)
       throws Exception {
+    return generateCert(pubKeyInfo, subjectDn, notBefore,
+        new KeyUsage(KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyAgreement, KeyUsage.keyEncipherment));
+  }
+
+  public X509Cert generateCert(
+      SubjectPublicKeyInfo pubKeyInfo, X500Name subjectDn, Instant notBefore, KeyUsage ku)
+      throws Exception {
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(notBefore, "notBefore");
 
     Instant notAfter = notBefore.plus(730, ChronoUnit.DAYS);
     BigInteger tmpSerialNumber = BigInteger.valueOf(serialNumber.getAndAdd(1));
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        caSubject, tmpSerialNumber, Date.from(notBefore), Date.from(notAfter),
-        subjectDn, pubKeyInfo);
+    Certificate.V3CertBuilder certGenerator = new Certificate.V3CertBuilder(
+        caSubject, tmpSerialNumber, notBefore, notAfter, subjectDn, pubKeyInfo);
 
-    KeyUsage ku = new KeyUsage(
-        KeyUsage.digitalSignature | KeyUsage.dataEncipherment |
-        KeyUsage.keyAgreement | KeyUsage.keyEncipherment);
-    certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
+    certGenerator.addExtension(Extension.ofKeyUsage(true, ku));
     BasicConstraints bc = new BasicConstraints(false);
-    certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
+    certGenerator.addExtension(Extension.ofBasicConstraints(true, bc));
 
-    String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
-    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
+    ContentSigner contentSigner = SignatureSigner.newContentSigner(
+        SignAlgo.getInstance(caKey), caKey);
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
     serialCertMap.put(tmpSerialNumber, cert);
@@ -159,35 +158,32 @@ public class CaEmulator {
   public synchronized CertificateList getCrl(X500Name issuer, BigInteger serialNumber)
       throws Exception {
     Instant thisUpdate = Instant.now();
-    X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(caSubject, Date.from(thisUpdate));
+    CertificateList.V2CRLBuilder crlBuilder =
+        new CertificateList.V2CRLBuilder(caSubject, thisUpdate);
     Instant nextUpdate = thisUpdate.plus(30, ChronoUnit.DAYS);
-    crlBuilder.setNextUpdate(Date.from(nextUpdate));
+    crlBuilder.setNextUpdate(nextUpdate);
     Instant caStartTime = caCert.notBefore();
     Instant revocationTime = caStartTime.plus(1, ChronoUnit.MILLIS);
     if (revocationTime.isAfter(thisUpdate)) {
       revocationTime = caStartTime;
     }
-    crlBuilder.addCRLEntry(BigInteger.valueOf(2), Date.from(revocationTime),
-        CRLReason.keyCompromise);
-    crlBuilder.addExtension(OIDs.Extn.cRLNumber, false,
-        new ASN1Integer(BigInteger.valueOf(crlNumber.getAndAdd(1))));
+    crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
+    crlBuilder.addExtension(Extension.ofCRLNumber(false, crlNumber.getAndAdd(1)));
 
-    String signatureAlgorithm = SignAlgo.getInstance(caKey).jceName();
-    ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(caKey);
-    X509CRLHolder crl = crlBuilder.build(contentSigner);
-    return crl.toASN1Structure();
+    ContentSigner contentSigner = SignatureSigner.newContentSigner(
+        SignAlgo.getInstance(caKey), caKey);
+    return crlBuilder.build(contentSigner);
   } // method getCrl
 
   private boolean verifyPop(CertificationRequest csr) {
     Args.notNull(csr, "csr");
     try {
-      PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(csr);
-      SubjectPublicKeyInfo pkInfo = p10Req.getSubjectPublicKeyInfo();
+      SubjectPublicKeyInfo pkInfo = csr.getSubjectPKInfo();
       PublicKey pk = generatePublicKey(pkInfo);
 
       ContentVerifierProvider cvp = getContentVerifierProvider(pk);
-      return p10Req.isSignatureValid(cvp);
-    } catch (InvalidKeyException | PKCSException | InvalidKeySpecException ex) {
+      return csr.isSignatureValid(cvp);
+    } catch (InvalidKeyException | SignatureException | InvalidKeySpecException ex) {
       LOG.error("could not validate POP of CSR", ex);
       return false;
     }
@@ -202,18 +198,13 @@ public class CaEmulator {
       throws InvalidKeySpecException {
     Args.notNull(pkInfo, "pkInfo");
 
-    X509EncodedKeySpec keyspec;
-    try {
-      keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
-    } catch (IOException ex) {
-      throw new InvalidKeySpecException(ex.getMessage(), ex);
-    }
-    ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
+    X509EncodedKeySpec keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
+    Asn1Oid aid = pkInfo.getAlgorithm().getAlgorithm();
 
     String algorithm;
-    if (OIDs.Algo.id_rsaEncryption.equals(aid)) {
+    if (AlgorithmOIDs.id_rsaEncryption.equals(aid)) {
       algorithm = "RSA";
-    } else if (OIDs.Algo.id_ecPublicKey.equals(aid)) {
+    } else if (AlgorithmOIDs.id_ecPublicKey.equals(aid)) {
       algorithm = "EC";
     } else {
       throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
@@ -221,8 +212,8 @@ public class CaEmulator {
 
     KeyFactory kf;
     try {
-      kf = KeyFactory.getInstance(algorithm);
-    } catch (NoSuchAlgorithmException ex) {
+      kf = CryptoApiFactory.get().newKeyFactory(algorithm);
+    } catch (NoSuchAlgorithmException | NoSuchProviderException ex) {
       throw new InvalidKeySpecException("could not find KeyFactory for "
           + algorithm + ": " + ex.getMessage());
     }

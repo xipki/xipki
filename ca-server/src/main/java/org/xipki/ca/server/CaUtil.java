@@ -3,21 +3,13 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
-import org.bouncycastle.asn1.x509.DistributionPoint;
-import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.X509OIDs;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -25,18 +17,17 @@ import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.io.FileOrBinary;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -60,36 +51,37 @@ public class CaUtil {
 
   private static final String id_pen_prefix = "1.3.6.1.4.1.";
 
-  private static final List<ASN1ObjectIdentifier> SORTED_EXTENSIONS;
+  private static final List<Asn1Oid> SORTED_EXTENSIONS;
 
   static {
-    SORTED_EXTENSIONS = List.of(OIDs.Extn.subjectKeyIdentifier,
-        OIDs.Extn.authorityKeyIdentifier, OIDs.Extn.basicConstraints,
-        OIDs.Extn.keyUsage,               OIDs.Extn.extendedKeyUsage,
-        OIDs.Extn.privateKeyUsagePeriod,  OIDs.Extn.subjectAlternativeName,
-        OIDs.Extn.issuerAlternativeName,  OIDs.Extn.authorityInfoAccess,
-        OIDs.Extn.cRLDistributionPoints,  OIDs.Extn.freshestCRL,
-        OIDs.Extn.certificatePolicies,    OIDs.Extn.qCStatements,
-        OIDs.Extn.nameConstraints,        OIDs.Extn.policyConstraints,
-        OIDs.Extn.policyMappings,         OIDs.Extn.subjectInfoAccess,
-        OIDs.Extn.subjectDirectoryAttributes);
+    SORTED_EXTENSIONS = List.of(ExtensionOIDs.subjectKeyIdentifier,
+        ExtensionOIDs.authorityKeyIdentifier, ExtensionOIDs.basicConstraints,
+        ExtensionOIDs.keyUsage,               ExtensionOIDs.extendedKeyUsage,
+        ExtensionOIDs.privateKeyUsagePeriod,  ExtensionOIDs.subjectAlternativeName,
+        ExtensionOIDs.issuerAlternativeName,  ExtensionOIDs.authorityInfoAccess,
+        ExtensionOIDs.cRLDistributionPoints,  ExtensionOIDs.freshestCRL,
+        ExtensionOIDs.certificatePolicies,    ExtensionOIDs.qCStatements,
+        ExtensionOIDs.nameConstraints,        ExtensionOIDs.policyConstraints,
+        ExtensionOIDs.policyMappings,         ExtensionOIDs.subjectInfoAccess,
+        ExtensionOIDs.subjectDirectoryAttributes);
   }
 
   private CaUtil() {
   }
 
   public static void addExtensions(
-      ExtensionValues extensionValues, X509v3CertificateBuilder certBuilder,
-      ExtensionsControl control) throws CertIOException {
+      ExtensionValues extensionValues, Certificate.V3CertBuilder certBuilder,
+      ExtensionsControl control) throws GenerationException {
     if (extensionValues == null) {
       return;
     }
 
     if (control.isKeepOrder()) {
-      for (ASN1ObjectIdentifier type : control.types()) {
+      for (Asn1Oid type : control.types()) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
         if (value != null) {
-          certBuilder.addExtension(type, value.isCritical(), value.value());
+          certBuilder.addExtension(
+              Extension.createNoParse(type, value.isCritical(), value.value()));
         }
       }
 
@@ -98,35 +90,39 @@ public class CaUtil {
 
     // sort the extensions
     // 1. extensions with given order
-    for (ASN1ObjectIdentifier type : SORTED_EXTENSIONS) {
+    for (Asn1Oid type : SORTED_EXTENSIONS) {
       ExtensionValue value = extensionValues.removeExtensionValue(type);
       if (value != null) {
-        certBuilder.addExtension(type, value.isCritical(), value.value());
+        certBuilder.addExtension(
+            Extension.createNoParse(type, value.isCritical(), value.value()));
       }
     }
 
     // 2. id-ce
     // Get a copy of the types, without copy concurrent access exception may
     // be thrown.
-    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (Asn1Oid type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (type.getId().startsWith(id_ce_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
-        certBuilder.addExtension(type, value.isCritical(), value.value());
+        certBuilder.addExtension(Extension.createNoParse(
+            type, value.isCritical(), value.value()));
       }
     }
 
     // 3. non-PEN extensions
-    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (Asn1Oid type : new HashSet<>(extensionValues.getExtensionTypes())) {
       if (!type.getId().startsWith(id_pen_prefix)) {
         ExtensionValue value = extensionValues.removeExtensionValue(type);
-        certBuilder.addExtension(type, value.isCritical(), value.value());
+        certBuilder.addExtension(Extension.createNoParse(
+            type, value.isCritical(), value.value()));
       }
     }
 
     // 4. PEN extensions
-    for (ASN1ObjectIdentifier type : new HashSet<>(extensionValues.getExtensionTypes())) {
+    for (Asn1Oid type : new HashSet<>(extensionValues.getExtensionTypes())) {
       ExtensionValue value = extensionValues.removeExtensionValue(type);
-      certBuilder.addExtension(type, value.isCritical(), value.value());
+      certBuilder.addExtension(Extension.createNoParse(
+          type, value.isCritical(), value.value()));
     }
   }
 
@@ -142,60 +138,60 @@ public class CaUtil {
         : (pathLen != null) ? new BasicConstraints(pathLen) : new BasicConstraints(true);
   } // method createBasicConstraints
 
-  public static AuthorityInformationAccess createAuthorityInformationAccess(
+  public static AuthorityInfoAccessSyntax createAuthorityInformationAccess(
       List<String> caIssuerUris, List<String> ocspUris) {
     if (CollectionUtil.isEmpty(caIssuerUris) && CollectionUtil.isEmpty(ocspUris)) {
       throw new IllegalArgumentException("caIssuerUris and ospUris may not be both empty");
     }
 
-    ASN1EncodableVector accessDescriptions = new ASN1EncodableVector();
+    List<AccessDescription> accessDescriptions = new LinkedList<>();
 
     if (CollectionUtil.isNotEmpty(caIssuerUris)) {
       for (String uri : caIssuerUris) {
-        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(new AccessDescription(OIDs.X509.id_ad_caIssuers, gn));
+        GeneralName gn = GeneralName.ofUri(uri);
+        accessDescriptions.add(new AccessDescription(X509OIDs.id_ad_caIssuers, gn));
       }
     }
 
     if (CollectionUtil.isNotEmpty(ocspUris)) {
       for (String uri : ocspUris) {
-        GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-        accessDescriptions.add(new AccessDescription(OIDs.X509.id_ad_ocsp, gn));
+        GeneralName gn = GeneralName.ofUri(uri);
+        accessDescriptions.add(new AccessDescription(X509OIDs.id_ad_ocsp, gn));
       }
     }
 
-    return AuthorityInformationAccess.getInstance(new DERSequence(accessDescriptions));
+    return new AuthorityInfoAccessSyntax(accessDescriptions);
   } // method createX509AuthorityInformationAccess
 
-  public static CRLDistPoint createCrlDistributionPoints(
+  public static CRLDistributionPoints createCrlDistributionPoints(
       List<String> crlUris, X500Name caSubject, X500Name crlSignerSubject) {
     int size = Args.notEmpty(crlUris, "crlUris").size();
     DistributionPoint[] points = new DistributionPoint[1];
 
     GeneralName[] names = new GeneralName[size];
     for (int i = 0; i < size; i++) {
-      names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
+      names[i] = GeneralName.ofUri(crlUris.get(i));
     }
     // Distribution Point
-    DistributionPointName pointName = new DistributionPointName(new GeneralNames(names));
+    DistributionPointName pointName = DistributionPointName.ofName(new GeneralNames(names));
 
     GeneralNames crlIssuer = null;
     if (crlSignerSubject != null && !crlSignerSubject.equals(caSubject)) {
-      GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
+      GeneralName crlIssuerName = GeneralName.ofDirectoryName(crlSignerSubject);
       crlIssuer = new GeneralNames(crlIssuerName);
     }
 
     points[0] = new DistributionPoint(pointName, null, crlIssuer);
 
-    return new CRLDistPoint(points);
+    return new CRLDistributionPoints(points);
   } // method createCrlDistributionPoints
 
   public static X500Name sortX509Name(X500Name name) {
-    RDN[] requestedRdns = name.getRDNs();
+    List<RDN> requestedRdns = name.getRDNs();
     List<RDN> rdns = new LinkedList<>();
 
-    List<ASN1ObjectIdentifier> sortedDNs = SubjectDnSpec.getForwardDNs();
-    for (ASN1ObjectIdentifier type : sortedDNs) {
+    List<Asn1Oid> sortedDNs = SubjectDnSpec.getForwardDNs();
+    for (Asn1Oid type : sortedDNs) {
       RDN[] thisRdns = getX509Rdns(requestedRdns, type);
       if (thisRdns == null || thisRdns.length == 0) {
         continue;
@@ -206,7 +202,7 @@ public class CaUtil {
 
     // add all remaining RDNs
     for (RDN rdn : requestedRdns) {
-      ASN1ObjectIdentifier type = rdn.getFirst().getType();
+      Asn1Oid type = rdn.getFirst().getType();
       if (!sortedDNs.contains(type)) {
         rdns.add(rdn);
       }
@@ -215,7 +211,7 @@ public class CaUtil {
     return new X500Name(rdns.toArray(new RDN[0]));
   }
 
-  private static RDN[] getX509Rdns(RDN[] rdns, ASN1ObjectIdentifier type) {
+  private static RDN[] getX509Rdns(List<RDN> rdns, Asn1Oid type) {
     Args.notNull(rdns, "rdns");
     Args.notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
@@ -251,7 +247,7 @@ public class CaUtil {
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
       String keystoreFile = keystoreConf.substring("file:".length());
       try {
-        ksBytes = IoUtil.read(keystoreFile, true);
+        ksBytes = XipkiIoUtil.read(keystoreFile, true);
       } catch (IOException ex) {
         throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
       }
@@ -408,8 +404,8 @@ public class CaUtil {
 
   // remove the RDNs with empty content
   public static X500Name removeEmptyRdns(X500Name name) {
-    RDN[] rdns = name.getRDNs();
-    List<RDN> tmpRdns = new ArrayList<>(rdns.length);
+    List<RDN> rdns = name.getRDNs();
+    List<RDN> tmpRdns = new ArrayList<>(rdns.size());
     boolean changed = false;
     for (RDN rdn : rdns) {
       String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());

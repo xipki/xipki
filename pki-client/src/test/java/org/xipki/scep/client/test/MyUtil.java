@@ -3,43 +3,39 @@
 
 package org.xipki.scep.client.test;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.cert.CertIOException;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.security.OIDs;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.asn1.Asn1PrintableString;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.util.ContentSigner;
+import org.xipki.pkix.asn1.x500.DirectoryString;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.pkix.asn1.x509.BasicConstraints;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.SignatureSigner;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Utility class.
@@ -51,74 +47,68 @@ public class MyUtil {
 
   public static X509Cert issueSubCaCert(
       PrivateKey rcaKey, X500Name issuer, SubjectPublicKeyInfo pubKeyInfo,
-      X500Name subject, BigInteger serialNumber, Instant startTime)
-      throws OperatorCreationException {
+      X500Name subject, BigInteger serialNumber, Instant startTime) throws GenerationException {
     Instant notAfter = startTime.plus(3650, ChronoUnit.DAYS);
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        issuer, serialNumber, Date.from(startTime), Date.from(notAfter), subject, pubKeyInfo);
-    KeyUsage ku = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign);
+    Certificate.V3CertBuilder certGenerator = new Certificate.V3CertBuilder(
+        issuer, serialNumber, startTime, notAfter, subject, pubKeyInfo);
+    KeyUsage ku = new KeyUsage(KeyUsage.keyCertSign, KeyUsage.cRLSign);
     try {
-      certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
+      certGenerator.addExtension(Extension.ofKeyUsage(true, ku));
       BasicConstraints bc = new BasicConstraints(0);
-      certGenerator.addExtension(OIDs.Extn.basicConstraints, true, bc);
-      String signatureAlgorithm = SignAlgo.getInstance(rcaKey).jceName();
-      ContentSigner contentSigner = new JcaContentSignerBuilder(signatureAlgorithm).build(rcaKey);
+      certGenerator.addExtension(Extension.ofBasicConstraints(true, bc));
+      ContentSigner contentSigner = SignatureSigner.newContentSigner(
+          SignAlgo.getInstance(rcaKey), rcaKey);
       return new X509Cert(certGenerator.build(contentSigner));
-    } catch (CertIOException | NoSuchAlgorithmException ex) {
-      throw new OperatorCreationException(ex.getMessage(), ex);
+    } catch (CodecException | NoSuchAlgorithmException | XiSecurityException ex) {
+      throw new GenerationException(ex.getMessage(), ex);
     }
   } // method issueSubCaCert
 
-  public static PKCS10CertificationRequest generateRequest(
+  public static CertificationRequest generateRequest(
       PrivateKey privateKey, SubjectPublicKeyInfo subjectPublicKeyInfo,
       X500Name subjectDn, String challengePassword, List<Extension> extensions)
-      throws OperatorCreationException {
+          throws GenerationException {
     Args.notNull(privateKey, "privateKey");
     Args.notNull(subjectPublicKeyInfo, "subjectPublicKeyInfo");
     Args.notNull(subjectDn, "subjectDn");
 
-    Map<ASN1ObjectIdentifier, ASN1Encodable> attributes = new HashMap<>();
+    CertificationRequest.CsrBuilder csrBuilder =
+        new CertificationRequest.CsrBuilder(subjectDn, subjectPublicKeyInfo);
 
     if (StringUtil.isNotBlank(challengePassword)) {
-      attributes.put(OIDs.PKCS9.pkcs9_at_challengePassword,
-          new DERPrintableString(challengePassword));
+      csrBuilder.setAttribute(Attribute.ofChallengePassword(
+          new DirectoryString(new Asn1PrintableString(challengePassword))));
     }
 
     if (CollectionUtil.isNotEmpty(extensions)) {
-      attributes.put(OIDs.PKCS9.pkcs9_at_extensionRequest,
-          new Extensions(extensions.toArray(new Extension[0])));
+      csrBuilder.setAttribute(Attribute.ofExtensionRequest(new Extensions(extensions)));
     }
 
-    PKCS10CertificationRequestBuilder csrBuilder =
-        new PKCS10CertificationRequestBuilder(subjectDn, subjectPublicKeyInfo);
-
-    for (ASN1ObjectIdentifier attrType : attributes.keySet()) {
-      csrBuilder.addAttribute(attrType, attributes.get(attrType));
-    }
-
-    String sigAlgName;
+    ContentSigner contentSigner;
     try {
-      sigAlgName = SignAlgo.getInstance(privateKey).jceName();
-    } catch (NoSuchAlgorithmException ex) {
-      throw new OperatorCreationException(ex.getMessage(), ex);
+      contentSigner = SignatureSigner.newContentSigner(
+          SignAlgo.getInstance(privateKey), privateKey);
+    } catch (NoSuchAlgorithmException | XiSecurityException ex) {
+      throw new GenerationException(ex.getMessage(), ex);
     }
-
-    ContentSigner contentSigner = new JcaContentSignerBuilder(sigAlgName)
-        .setProvider(KeyUtil.providerName(sigAlgName)).build(privateKey);
-    return csrBuilder.build(contentSigner);
+    try {
+      return csrBuilder.build(contentSigner);
+    } catch (SignatureException e) {
+      throw new GenerationException(e.getMessage(), e);
+    }
   } // method generateRequest
 
   public static X509Cert generateSelfsignedCert(
       CertificationRequest csr, PrivateKey identityKey)
-      throws CertificateException {
+      throws CertificateException, GenerationException, CodecException {
     return generateSelfsignedCert(
         Args.notNull(csr, "csr").getCertificationRequestInfo().getSubject(),
-        csr.getCertificationRequestInfo().getSubjectPublicKeyInfo(), identityKey);
+        csr.getSubjectPKInfo(), identityKey);
   }
 
   public static X509Cert generateSelfsignedCert(
       X500Name subjectDn, SubjectPublicKeyInfo pubKeyInfo, PrivateKey identityKey)
-      throws CertificateException {
+      throws CertificateException, GenerationException, CodecException {
     Args.notNull(subjectDn, "subjectDn");
     Args.notNull(pubKeyInfo, "pubKeyInfo");
     Args.notNull(identityKey, "identityKey");
@@ -126,26 +116,24 @@ public class MyUtil {
     Instant notBefore = Instant.now().minus(5, ChronoUnit.MINUTES);
     Instant notAfter = notBefore.plus(30, ChronoUnit.DAYS);
 
-    X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
-        subjectDn, BigInteger.ONE, Date.from(notBefore), Date.from(notAfter),
-        subjectDn, pubKeyInfo);
+    Certificate.V3CertBuilder certGenerator = new Certificate.V3CertBuilder(
+        subjectDn, BigInteger.ONE, notBefore, notAfter, subjectDn, pubKeyInfo);
 
-    KeyUsage ku = new KeyUsage(KeyUsage.digitalSignature
-        | KeyUsage.dataEncipherment | KeyUsage.keyAgreement
-        | KeyUsage.keyEncipherment);
+    KeyUsage ku = new KeyUsage(KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+        KeyUsage.keyAgreement, KeyUsage.keyEncipherment);
+
     try {
-      certGenerator.addExtension(OIDs.Extn.keyUsage, true, ku);
-    } catch (CertIOException ex) {
+      certGenerator.addExtension(Extension.ofKeyUsage(true, ku));
+    } catch (GenerationException ex) {
       throw new CertificateException(
           "could not generate self-signed certificate: " + ex.getMessage(), ex);
     }
 
     ContentSigner contentSigner;
     try {
-      String sigAlgorithm = SignAlgo.getInstance(identityKey).jceName();
-      contentSigner = new JcaContentSignerBuilder(sigAlgorithm)
-          .setProvider(KeyUtil.providerName(sigAlgorithm)).build(identityKey);
-    } catch (OperatorCreationException | NoSuchAlgorithmException ex) {
+      contentSigner = SignatureSigner.newContentSigner(
+          SignAlgo.getInstance(identityKey), identityKey);
+    } catch (XiSecurityException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }
 

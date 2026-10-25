@@ -3,12 +3,12 @@
 
 package org.xipki.ca.api;
 
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.ConfPairs;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.ConfPairs;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -49,8 +49,7 @@ public class PublicCaInfo {
     this.c14nSubject = X509Util.canonicalizeName(subject);
     this.subjectKeyIdentifier = caCert.subjectKeyId();
     this.extraControl = extraControl;
-    this.subjectAltName = (caCert.subjectAltNames() == null) ? null
-        : GeneralNames.getInstance(caCert.subjectAltNames());
+    this.subjectAltName = caCert.subjectAltNames();
   } // constructor
 
   public PublicCaInfo(

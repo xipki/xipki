@@ -3,20 +3,20 @@
 
 package org.xipki.ocsp.server;
 
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonList;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.security.verify.CertPathValidationModel;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonList;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceConf;
-import org.xipki.util.extra.type.Validity;
-import org.xipki.util.extra.type.Validity.Unit;
-import org.xipki.util.io.FileOrBinary;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.conf.Validity.Unit;
+import org.xipki.pkix.util.conf.FileOrBinary;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

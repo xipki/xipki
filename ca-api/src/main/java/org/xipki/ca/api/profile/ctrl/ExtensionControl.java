@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.TripleState;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
+import org.xipki.ca.api.TripleState;
 
 /**
  * Extension Control settings.
@@ -20,9 +20,9 @@ public class ExtensionControl {
 
   private final TripleState inRequest;
 
-  private final ASN1ObjectIdentifier type;
+  private final Asn1Oid type;
 
-  public ExtensionControl(ASN1ObjectIdentifier type, boolean critical,
+  public ExtensionControl(Asn1Oid type, boolean critical,
                           boolean required, TripleState inRequest) {
     this.type = Args.notNull(type, "type");
     this.critical = critical;
@@ -30,7 +30,7 @@ public class ExtensionControl {
     this.inRequest = inRequest == null ? TripleState.forbidden : inRequest;
   }
 
-  public ASN1ObjectIdentifier type() {
+  public Asn1Oid type() {
     return type;
   }
 

@@ -5,11 +5,11 @@ package org.xipki.shell.ca.mgmt;
 
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.Base64;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.io.IoUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -46,8 +46,8 @@ public class SignerCommands {
       try {
         String base64Cert = null;
         if (certFile != null) {
-          base64Cert = IoUtil.base64Encode(X509Util.parseCert(new File(certFile)).getEncoded(),
-                        false);
+          base64Cert = Base64.getEncoder().encodeToString(
+              X509Util.parseCert(new File(certFile)).getEncoded(), false);
         }
 
         String effectiveConf = CaMgmtUtil.canonicalizeSignerConf(type, conf);

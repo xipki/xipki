@@ -5,13 +5,13 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.security.cert.CertificateException;
 

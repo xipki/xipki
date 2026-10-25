@@ -3,13 +3,13 @@
 
 package org.xipki.ca.api;
 
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +83,7 @@ public class CaUris implements JsonEncodable {
     return deltaCrlUris;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

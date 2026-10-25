@@ -3,22 +3,25 @@
 
 package org.xipki.ca.server.kpgen;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.security.KeySpec;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.KeyInfoPair;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.conf.ConfPairs;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.KeyInfoPair;
+import org.xipki.codec.ConfPairs;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceMap;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -150,6 +153,8 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
 
   }
 
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
+
   private int shardId;
 
   private KeypoolQueryExecutor queryExecutor;
@@ -235,7 +240,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
         throw new XiSecurityException("Invalid PBE_ITERATION " + iteration);
       }
 
-      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+      SecretKeyFactory factory = cryptoApi.newSecretKeyFactory("PBKDF2WithHmacSHA256");
       char[] passwordChars = password.toCharArray();
 
       int[] keyLengths = {128, 192, 256};
@@ -251,7 +256,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
         }
       }
 
-      cipher = Cipher.getInstance("AES/GCM/NoPadding");
+      cipher = cryptoApi.newCipher("AES/GCM/NoPadding");
     } catch (Exception ex) {
       throw new IllegalStateException("could not initialize Cipher", ex);
     } finally {
@@ -300,12 +305,16 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       throw new XiSecurityException("error decrypting ciphertext", ex);
     }
 
-    PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.getInstance(plain);
-    SubjectPublicKeyInfo publicKeyInfo = null;
-    if (cd.pukData != null) {
-      publicKeyInfo = SubjectPublicKeyInfo.getInstance(cd.pukData);
+    try {
+      PrivateKeyInfo privateKeyInfo = PrivateKeyInfo.fromEncoded(plain);
+      SubjectPublicKeyInfo publicKeyInfo = null;
+      if (cd.pukData != null) {
+        publicKeyInfo = SubjectPublicKeyInfo.fromEncoded(cd.pukData);
+      }
+      return new KeyInfoPair(publicKeyInfo, privateKeyInfo);
+    } catch (CodecException e) {
+      throw new XiSecurityException(e);
     }
-    return new KeyInfoPair(publicKeyInfo, privateKeyInfo);
   }
 
   @Override

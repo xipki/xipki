@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,9 +21,9 @@ import java.util.Set;
  */
 public class ExtensionsControl {
 
-  private final Map<ASN1ObjectIdentifier, ExtensionControl> controls;
+  private final Map<Asn1Oid, ExtensionControl> controls;
 
-  private final List<ASN1ObjectIdentifier> types;
+  private final List<Asn1Oid> types;
 
   private final boolean keepOrder;
 
@@ -31,26 +31,26 @@ public class ExtensionsControl {
     Args.notEmpty(controls, "controls");
     this.keepOrder = keepOrder;
 
-    List<ASN1ObjectIdentifier> sortedOids = new ArrayList<>(controls.size());
+    List<Asn1Oid> sortedOids = new ArrayList<>(controls.size());
     if (keepOrder) {
       for (ExtensionControl m : controls) {
         sortedOids.add(m.type());
       }
     } else {
-      Set<ASN1ObjectIdentifier> oidSet = new HashSet<>();
+      Set<Asn1Oid> oidSet = new HashSet<>();
       for (ExtensionControl m : controls) {
         oidSet.add(m.type());
       }
 
-      List<ASN1ObjectIdentifier> oids = SubjectDnSpec.getForwardDNs();
+      List<Asn1Oid> oids = SubjectDnSpec.getForwardDNs();
 
-      for (ASN1ObjectIdentifier oid : oids) {
+      for (Asn1Oid oid : oids) {
         if (oidSet.contains(oid)) {
           sortedOids.add(oid);
         }
       }
 
-      for (ASN1ObjectIdentifier oid : oidSet) {
+      for (Asn1Oid oid : oidSet) {
         if (!sortedOids.contains(oid)) {
           sortedOids.add(oid);
         }
@@ -69,7 +69,7 @@ public class ExtensionsControl {
 
   } // constructor
 
-  public ExtensionControl getControl(ASN1ObjectIdentifier type) {
+  public ExtensionControl getControl(Asn1Oid type) {
     return controls.get(Args.notNull(type, "type"));
   }
 
@@ -77,11 +77,11 @@ public class ExtensionsControl {
     return keepOrder;
   }
 
-  public List<ASN1ObjectIdentifier> types() {
+  public List<Asn1Oid> types() {
     return types;
   }
 
-  public boolean containsID(ASN1ObjectIdentifier extensionID) {
+  public boolean containsID(Asn1Oid extensionID) {
     return this.types.contains(extensionID);
   }
 

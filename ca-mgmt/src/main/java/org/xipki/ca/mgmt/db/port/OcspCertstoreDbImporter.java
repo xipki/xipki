@@ -3,22 +3,22 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.util.X509Util;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.TBSCertificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.benchmark.ProcessLog;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.DateUtil;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -121,8 +121,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
 
           Certificate cert;
           try {
-            cert = Certificate.getInstance(encodedCert);
-          } catch (RuntimeException ex) {
+            cert = Certificate.fromEncoded(encodedCert);
+          } catch (CodecException ex) {
             LOG.error("could not parse certificate of issuer {}", issuer.id());
             LOG.debug("could not parse certificate of issuer {}", issuer.id(), ex);
             throw new CertificateException(ex.getMessage(), ex);
@@ -132,8 +132,8 @@ class OcspCertstoreDbImporter extends AbstractOcspCertstoreDbImporter {
           int idx = 1;
           ps.setInt(idx++, issuer.id());
           ps.setString(idx++, X509Util.cutX500Name(cert.getSubject(), maxX500nameLen));
-          ps.setLong(idx++, DateUtil.toEpochSecond(tbs.getStartDate().getDate()));
-          ps.setLong(idx++, DateUtil.toEpochSecond(tbs.getEndDate().getDate()));
+          ps.setLong(idx++, tbs.notBefore().getEpochSecond());
+          ps.setLong(idx++, tbs.notAfter().getEpochSecond());
           ps.setString(idx++, sha1(encodedCert));
           ps.setString(idx++, issuer.revInfo());
           ps.setString(idx++, b64Cert);

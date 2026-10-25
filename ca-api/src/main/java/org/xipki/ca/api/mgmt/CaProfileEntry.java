@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

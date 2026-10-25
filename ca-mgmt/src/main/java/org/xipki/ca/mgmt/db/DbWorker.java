@@ -6,11 +6,11 @@ package org.xipki.ca.mgmt.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.port.DbPorter;
-import org.xipki.util.conf.ConfigurableProperties;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.io.IoUtil;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.IOException;
 import java.nio.file.Paths;

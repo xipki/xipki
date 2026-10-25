@@ -3,8 +3,8 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.X509Cert;
 
 /**
  * Contains the next CA certificate and next RA certificate.

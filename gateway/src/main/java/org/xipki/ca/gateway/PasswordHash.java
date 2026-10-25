@@ -3,15 +3,18 @@
 
 package org.xipki.ca.gateway;
 
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.RandomUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
@@ -24,6 +27,8 @@ public class PasswordHash {
 
   // see 'http://stackoverflow.com/questions/22580853/reliable-implementation-of-pbkdf2-hmac-sha256-for-java'
   // public static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA1";
+
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
 
   // The following constants may be changed without breaking existing hashes.
   public static final int SALT_BYTE_SIZE = 24;
@@ -141,9 +146,9 @@ public class PasswordHash {
       KeySpec spec = new PBEKeySpec(new String(password, StandardCharsets.UTF_8).toCharArray(),
           salt, iterations, bytes * 8);
       try {
-        SecretKeyFactory fact = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        SecretKeyFactory fact = cryptoApi.newSecretKeyFactory("PBKDF2WithHmacSHA256");
         return fact.generateSecret(spec).getEncoded();
-      } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+      } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e) {
         throw new IllegalStateException(e);
       }
   }

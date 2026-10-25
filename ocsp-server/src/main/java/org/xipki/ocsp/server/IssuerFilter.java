@@ -3,10 +3,10 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.security.HashAlgo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.util.HashSet;
 import java.util.Set;

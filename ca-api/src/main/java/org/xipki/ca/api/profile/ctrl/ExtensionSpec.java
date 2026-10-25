@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.security.OIDs;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,15 +44,15 @@ public abstract class ExtensionSpec {
 
   private static final AtomicBoolean instancesInitialized = new AtomicBoolean(false);
 
-  public abstract Set<ASN1ObjectIdentifier> requiredExtensions();
+  public abstract Set<Asn1Oid> requiredExtensions();
 
-  public abstract boolean isNotPermitted(ASN1ObjectIdentifier type);
+  public abstract boolean isNotPermitted(Asn1Oid type);
 
-  public abstract boolean isCriticalOnly(ASN1ObjectIdentifier type);
+  public abstract boolean isCriticalOnly(Asn1Oid type);
 
-  public abstract boolean isNonCriticalOnly(ASN1ObjectIdentifier type);
+  public abstract boolean isNonCriticalOnly(Asn1Oid type);
 
-  public abstract boolean isNonRequest(ASN1ObjectIdentifier type);
+  public abstract boolean isNonRequest(Asn1Oid type);
 
   public static boolean isValidPublicDomain(String domain) {
     if (!DomainValidator.getInstance().isValid(domain)) {
@@ -113,10 +113,10 @@ public abstract class ExtensionSpec {
 
   private static class Rfc5280 extends ExtensionSpec {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS =
         Set.of(
             ExtensionID.keyUsage.oid(),
             ExtensionID.policyMappings.oid(),
@@ -138,7 +138,7 @@ public abstract class ExtensionSpec {
             ExtensionID.CCC_T_SBxDKisEndpointCert.oid(),
             ExtensionID.CCC_U_SBxDKisRootCACert.oid());
 
-    private static final Set<ASN1ObjectIdentifier>
+    private static final Set<Asn1Oid>
         NON_CRITICAL_ONLY_EXTENSIONS = Set.of(
             ExtensionID.authorityKeyIdentifier.oid(),
             ExtensionID.subjectKeyIdentifier.oid(),
@@ -159,11 +159,10 @@ public abstract class ExtensionSpec {
             ExtensionID.SPDM_Extension.oid(),
             ExtensionID.STIR_TNAuthList.oid(),
             ExtensionID.STIR_JWTClaimConstraints.oid(),
-            ExtensionID.noRevAvail.oid(),
             ExtensionID.MRTD_DocumentTypeList.oid()
         );
 
-    private static final Set<ASN1ObjectIdentifier> NON_REQUEST_EXTENSIONS =
+    private static final Set<Asn1Oid> NON_REQUEST_EXTENSIONS =
         Set.of(ExtensionID.authorityKeyIdentifier.oid(),
             ExtensionID.issuerAltName.oid(),
             ExtensionID.crlDistributionPoints.oid(),
@@ -186,32 +185,32 @@ public abstract class ExtensionSpec {
             ExtensionID.CCC_S_SBxDKisIntermediateCACert.oid(),
             ExtensionID.CCC_U_SBxDKisRootCACert.oid(),
             ExtensionID.STIR_JWTClaimConstraints.oid(),
-            ExtensionID.noRevAvail.oid(),
             ExtensionID.MRTD_NameChange.oid(),
             ExtensionID.MRTD_DocumentTypeList.oid()
             );
 
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    @Override
+    public Set<Asn1Oid> requiredExtensions() {
       return REQUIRED_EXTENSIONS;
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
-      return CRITICAL_ONLY_EXTENSIONS.contains(type) || type.on(OIDs.Extn.id_ccc_extn);
+    public boolean isCriticalOnly(Asn1Oid type) {
+      return CRITICAL_ONLY_EXTENSIONS.contains(type) || type.on(ExtensionOIDs.id_ccc_extn);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type);
     }
 
     @Override
-    public boolean isNonRequest(ASN1ObjectIdentifier type) {
+    public boolean isNonRequest(Asn1Oid type) {
       return NON_REQUEST_EXTENSIONS.contains(type);
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return false;
     }
 
@@ -219,50 +218,50 @@ public abstract class ExtensionSpec {
 
   private static class Rfc5280RootCA extends Rfc5280 {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Set.of(ExtensionID.basicConstraints.oid(),
             ExtensionID.subjectKeyIdentifier.oid(),
             ExtensionID.keyUsage.oid());
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
+    private static final Set<Asn1Oid> NON_PERMITTED_EXTENSIONS =
         Set.of(ExtensionID.certificatePolicies.oid(),
             ExtensionID.extendedKeyUsage.oid(),
             // not required in RFC5280, forbidden by several national standards,
             // e.g. chinese GM/T 0015 and German Gematik.
             ExtensionID.authorityKeyIdentifier.oid());
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS =
         Set.of(ExtensionID.basicConstraints.oid(), ExtensionID.keyUsage.oid());
 
-    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS
+    private static final Set<Asn1Oid> NON_CRITICAL_ONLY_EXTENSIONS
         = Collections.emptySet();
 
-    private final Set<ASN1ObjectIdentifier> requiredExtensions;
+    private final Set<Asn1Oid> requiredExtensions;
 
     private Rfc5280RootCA() {
-      Set<ASN1ObjectIdentifier> set = new HashSet<>();
+      Set<Asn1Oid> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
       set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    public Set<Asn1Oid> requiredExtensions() {
       return requiredExtensions;
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isCriticalOnly(Asn1Oid type) {
       return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
@@ -270,51 +269,51 @@ public abstract class ExtensionSpec {
 
   private static class Rfc5280SubCA extends Rfc5280 {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Set.of(ExtensionID.basicConstraints.oid(),
             ExtensionID.subjectKeyIdentifier.oid(), ExtensionID.keyUsage.oid());
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS
+    private static final Set<Asn1Oid> NON_PERMITTED_EXTENSIONS
         = Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS =
         Set.of(ExtensionID.basicConstraints.oid(), // BR
             ExtensionID.keyUsage.oid(), // BR
             ExtensionID.nameConstraints.oid()); // BR
 
-    private static final Set<ASN1ObjectIdentifier>
+    private static final Set<Asn1Oid>
         NON_CRITICAL_ONLY_EXTENSIONS = Set.of(
             ExtensionID.certificatePolicies.oid(), // BR
             ExtensionID.crlDistributionPoints.oid(), // BR
             ExtensionID.authorityInfoAccess.oid(), // BR
             ExtensionID.extendedKeyUsage.oid()); // BR
 
-    private final Set<ASN1ObjectIdentifier> requiredExtensions;
+    private final Set<Asn1Oid> requiredExtensions;
 
     private Rfc5280SubCA() {
-      Set<ASN1ObjectIdentifier> set = new HashSet<>();
+      Set<Asn1Oid> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
       set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    public Set<Asn1Oid> requiredExtensions() {
       return requiredExtensions;
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isCriticalOnly(Asn1Oid type) {
       return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
@@ -322,37 +321,37 @@ public abstract class ExtensionSpec {
 
   private static class Rfc5280EndEntity extends Rfc5280 {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Set.copyOf(Collections.singletonList(ExtensionID.subjectKeyIdentifier.oid()));
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
+    private static final Set<Asn1Oid> NON_PERMITTED_EXTENSIONS =
         Set.of(ExtensionID.policyMappings.oid(),
             ExtensionID.nameConstraints.oid(),
             ExtensionID.policyConstraints.oid());
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS
         = Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> NON_CRITICAL_ONLY_EXTENSIONS
+    private static final Set<Asn1Oid> NON_CRITICAL_ONLY_EXTENSIONS
         = Collections.emptySet();
 
     @Override
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    public Set<Asn1Oid> requiredExtensions() {
       return REQUIRED_EXTENSIONS;
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isCriticalOnly(Asn1Oid type) {
       return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
@@ -364,54 +363,54 @@ public abstract class ExtensionSpec {
 
   private static class BrowserForumBRSubCA extends Rfc5280SubCA {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Set.of(ExtensionID.certificatePolicies.oid(), // BR
             ExtensionID.crlDistributionPoints.oid(), // BR
             ExtensionID.authorityInfoAccess.oid(), // BR
             ExtensionID.basicConstraints.oid(), // BR
             ExtensionID.keyUsage.oid()); // BR
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
+    private static final Set<Asn1Oid> NON_PERMITTED_EXTENSIONS =
         Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS =
         Set.of(ExtensionID.basicConstraints.oid(), // BR
             ExtensionID.keyUsage.oid(), // BR
             ExtensionID.nameConstraints.oid()); // BR
 
-    private static final Set<ASN1ObjectIdentifier>
+    private static final Set<Asn1Oid>
         NON_CRITICAL_ONLY_EXTENSIONS = Set.of(
             ExtensionID.certificatePolicies.oid(), // BR
             ExtensionID.crlDistributionPoints.oid(), // BR
             ExtensionID.authorityInfoAccess.oid(), // BR
             ExtensionID.extendedKeyUsage.oid()); // BR
 
-    private final Set<ASN1ObjectIdentifier> requiredExtensions;
+    private final Set<Asn1Oid> requiredExtensions;
 
     private BrowserForumBRSubCA() {
-      Set<ASN1ObjectIdentifier> set = new HashSet<>();
+      Set<Asn1Oid> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
       set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    public Set<Asn1Oid> requiredExtensions() {
       return requiredExtensions;
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isCriticalOnly(Asn1Oid type) {
       return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 
@@ -419,50 +418,50 @@ public abstract class ExtensionSpec {
 
   private static class BrowserForumBREndEntity extends Rfc5280EndEntity {
 
-    private static final Set<ASN1ObjectIdentifier> REQUIRED_EXTENSIONS =
+    private static final Set<Asn1Oid> REQUIRED_EXTENSIONS =
         Set.of(ExtensionID.certificatePolicies.oid(), // BR
             ExtensionID.authorityInfoAccess.oid(), // BR
             ExtensionID.extendedKeyUsage.oid(), // BR
             ExtensionID.subjectAlternativeName.oid()); // BR
 
-    private static final Set<ASN1ObjectIdentifier> NON_PERMITTED_EXTENSIONS =
+    private static final Set<Asn1Oid> NON_PERMITTED_EXTENSIONS =
         Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier> CRITICAL_ONLY_EXTENSIONS =
+    private static final Set<Asn1Oid> CRITICAL_ONLY_EXTENSIONS =
         Collections.emptySet();
 
-    private static final Set<ASN1ObjectIdentifier>
+    private static final Set<Asn1Oid>
         NON_CRITICAL_ONLY_EXTENSIONS = Set.of(
             ExtensionID.certificatePolicies.oid(), // BR
             ExtensionID.crlDistributionPoints.oid(), // BR
             ExtensionID.authorityInfoAccess.oid()); // BR
 
-    private final Set<ASN1ObjectIdentifier> requiredExtensions;
+    private final Set<Asn1Oid> requiredExtensions;
 
     private BrowserForumBREndEntity() {
-      Set<ASN1ObjectIdentifier> set = new HashSet<>();
+      Set<Asn1Oid> set = new HashSet<>();
       set.addAll(REQUIRED_EXTENSIONS);
       set.addAll(super.requiredExtensions());
       this.requiredExtensions = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public Set<ASN1ObjectIdentifier> requiredExtensions() {
+    public Set<Asn1Oid> requiredExtensions() {
       return requiredExtensions;
     }
 
     @Override
-    public boolean isNotPermitted(ASN1ObjectIdentifier type) {
+    public boolean isNotPermitted(Asn1Oid type) {
       return NON_PERMITTED_EXTENSIONS.contains(type) || super.isNotPermitted(type);
     }
 
     @Override
-    public boolean isCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isCriticalOnly(Asn1Oid type) {
       return CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isCriticalOnly(type);
     }
 
     @Override
-    public boolean isNonCriticalOnly(ASN1ObjectIdentifier type) {
+    public boolean isNonCriticalOnly(Asn1Oid type) {
       return NON_CRITICAL_ONLY_EXTENSIONS.contains(type) || super.isNonCriticalOnly(type);
     }
 

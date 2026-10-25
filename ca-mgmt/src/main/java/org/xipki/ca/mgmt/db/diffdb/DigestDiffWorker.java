@@ -5,13 +5,13 @@ package org.xipki.ca.mgmt.db.diffdb;
 
 import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.ca.mgmt.db.port.DbPorter;
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.ConfigurableProperties;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

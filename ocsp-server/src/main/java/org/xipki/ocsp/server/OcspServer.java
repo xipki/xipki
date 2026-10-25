@@ -3,18 +3,20 @@
 
 package org.xipki.ocsp.server;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.ocsp.OCSPRequest;
-import org.bouncycastle.asn1.ocsp.OCSPResponse;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.cert.ocsp.OCSPReq;
-import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Sequence;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.pkix.asn1.ocsp.OCSPRequest;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.pkix.asn1.util.ContentVerifierProvider;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
@@ -28,26 +30,23 @@ import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.IssuerEntry;
 import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.*;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.NoIdleSignerException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.pkix.exception.OCSPException;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.NoIdleSignerException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceConf;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -58,6 +57,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
+import java.security.SignatureException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -149,14 +149,8 @@ public class OcspServer implements Closeable {
         continue;
       }
       OCSPResponse resp = new OCSPResponse(
-          new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.status()), null);
-      byte[] encoded;
-      try {
-        encoded = resp.getEncoded();
-      } catch (IOException ex) {
-        throw new ExceptionInInitializerError("could not encode OCSPResp for status " +
-            status + ": " + ex.getMessage());
-      }
+          OCSPResponseStatus.getInstance(status.status()), null);
+      byte[] encoded = resp.getEncoded();
       unsuccesfulOCSPRespMap.put(status, new OcspRespWithCacheInfo(encoded, null));
     }
 
@@ -555,11 +549,11 @@ public class OcspServer implements Closeable {
           // we need to parse the extension
           byte[] extnValue = new byte[ocspRespExtn.extnValueLength()];
           ocspRespExtn.writeExtnValue(extnValue, 0);
-          ASN1Sequence seq = ASN1Sequence.getInstance(extnValue);
+          Asn1Sequence seq = Asn1Sequence.fromEncoded(extnValue);
           final int size = seq.size();
           for (int i = 0; i < size; i++) {
-            ASN1ObjectIdentifier oid = ASN1ObjectIdentifier.getInstance(seq.getObjectAt(i));
-            if (OIDs.OCSP.id_pkix_ocsp_basic.equals(oid)) {
+            Asn1Oid oid = seq.getOidAt(i);
+            if (OcspOIDs.id_pkix_ocsp_basic.equals(oid)) {
               containsBasic = true;
               break;
             }
@@ -610,14 +604,12 @@ public class OcspServer implements Closeable {
       if (responder.responderOption().mode() != OcspMode.RFC2560) {
         ExtendedExtension extn = removeExtension(reqExtensions, OID.ID_PKIX_OCSP_PREFSIGALGS);
         if (extn != null) {
-          List<AlgorithmIdentifier> prefSigAlgs;
-          try (ASN1InputStream asn1Stream = new ASN1InputStream(extn.extnValueStream())) {
-            ASN1Sequence seq = ASN1Sequence.getInstance(asn1Stream.readObject());
-            final int size = seq.size();
-            prefSigAlgs = new ArrayList<>(size);
-            for (int i = 0; i < size; i++) {
-              prefSigAlgs.add(AlgorithmIdentifier.getInstance(seq.getObjectAt(i)));
-            }
+          Asn1Sequence seq = Asn1Sequence.fromStream(extn.extnValueStream());
+
+          final int size = seq.size();
+          List<AlgorithmIdentifier> prefSigAlgs = new ArrayList<>(size);
+          for (int i = 0; i < size; i++) {
+            prefSigAlgs.add(AlgorithmIdentifier.fromAsn1((Asn1Sequence) seq.getObjectAt(i)));
           }
           concurrentSigner = signer.getSignerForPreferredSigAlgs(prefSigAlgs);
         }
@@ -969,24 +961,29 @@ public class OcspServer implements Closeable {
       }
 
       try {
-        req = OCSPRequest.getInstance(request);
-      } catch (IllegalArgumentException ex) {
+        req = OCSPRequest.fromEncoded(request);
+      } catch (IllegalArgumentException | CodecException ex) {
         throw new EncodingException("could not parse OCSP request", ex);
       }
     } catch (EncodingException ex) {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
     }
 
-    OCSPReq ocspReq = new OCSPReq(req);
-    X509CertificateHolder[] bcCerts = ocspReq.getCerts();
-    if (bcCerts == null || bcCerts.length < 1) {
+    List<Certificate> bcCerts = req.getCertificates();
+    if (bcCerts == null || bcCerts.isEmpty()) {
       LOG.warn("no certificate found in request to verify the signature");
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
 
-    X509Cert[] certs = new X509Cert[bcCerts.length];
+    X509Cert[] certs = new X509Cert[bcCerts.size()];
     for (int i = 0; i < certs.length; i++) {
-      certs[i] = new X509Cert(bcCerts[i]);
+      try {
+        certs[i] = new X509Cert(bcCerts.get(i));
+      } catch (CodecException ex) {
+        String message = ex.getMessage();
+        LOG.warn("building X509Cert from ASN.1 Certificate, CodecException: {}", message);
+        return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
+      }
     }
 
     ContentVerifierProvider cvp;
@@ -998,7 +995,14 @@ public class OcspServer implements Closeable {
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
 
-    if (!ocspReq.isSignatureValid(cvp)) {
+    boolean sigValid;
+    try {
+      sigValid = req.isSignatureValid(cvp);
+    } catch (SignatureException ex) {
+      sigValid = false;
+    }
+
+    if (!sigValid) {
       LOG.warn("request signature is invalid");
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
@@ -1020,7 +1024,7 @@ public class OcspServer implements Closeable {
   private static InputStream getInputStream(FileOrValue conf)
       throws IOException {
     return (conf.file() != null)
-        ? Files.newInputStream(Paths.get(IoUtil.expandFilepath(conf.file(), true)))
+        ? Files.newInputStream(Paths.get(XipkiIoUtil.expandFilepath(conf.file(), true)))
         : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.value()));
   }
 

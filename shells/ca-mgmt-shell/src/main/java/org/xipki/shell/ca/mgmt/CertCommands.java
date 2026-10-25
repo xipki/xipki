@@ -3,35 +3,31 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.openssl.PKCS8Generator;
-import org.bouncycastle.openssl.jcajce.JcaPKCS8Generator;
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
-import org.bouncycastle.util.io.pem.PemObject;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.security.OIDs;
-import org.xipki.security.pkcs12.PKCS12KeyStore;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.pkix.KeyCertBytesPair;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.pkix.X509Crl;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.security.util.X509Util;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.pkix.util.PKCS8Encryptor;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.io.IoUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -184,13 +180,13 @@ public class CertCommands {
         saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
 
         if (withBaseCrl) {
-          byte[] extnValue = X509Util.getCoreExtValue(crl.extensions(),
-                                OIDs.Extn.deltaCRLIndicator);
-          if (extnValue != null) {
+          BigInteger bn = crl.baseCrlNumber();
+          if (bn != null) {
             if (baseCrlOut == null) {
               baseCrlOut = outFile + "-baseCRL";
             }
-            BigInteger baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
+            long baseCrlNumber = bn.longValueExact();
             X509Crl base = Optional.ofNullable(client().getCrl(caName, baseCrlNumber))
                 .orElseThrow(() -> new CaMgmtException("received no baseCRL from server"));
             saveVerbose("saved baseCRL to file", baseCrlOut,
@@ -416,10 +412,10 @@ public class CertCommands {
         String certOutFile, String keyOutform, char[] keyPwd, KeyCertBytesPair pair)
         throws Exception {
       String ksFilePrefix = certOutFile.substring(0, certOutFile.lastIndexOf('.'));
-      PrivateKeyInfo privKeyInfo = PrivateKeyInfo.getInstance(pair.key());
+      PrivateKeyInfo privKeyInfo = PrivateKeyInfo.fromEncoded(pair.key());
       if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
-        Certificate cert = Certificate.getInstance(pair.cert());
-        PKCS12KeyStore p12Ks = KeyUtil.loadPKCS12KeyStore(null, keyPwd);
+        Certificate cert = Certificate.fromEncoded(pair.cert());
+        Pkcs12KeyStore p12Ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, keyPwd);
         p12Ks.setKeyEntry("main", privKeyInfo, cert);
         byte[] ksBytes;
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
@@ -431,15 +427,10 @@ public class CertCommands {
         saveVerbose("save unencrypted key to file", ksFilePrefix + "-key.pem",
             PemEncoder.encode(pair.key(), PemEncoder.PemLabel.PRIVATE_KEY));
       } else {
-        JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
-            new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.PBE_SHA1_3DES);
-        encryptorBuilder.setRandom(SecureRandom.getInstanceStrong());
-        encryptorBuilder.setPassword(keyPwd);
-        JcaPKCS8Generator generator = new JcaPKCS8Generator(
-            KeyUtil.getPrivateKey(privKeyInfo), encryptorBuilder.build());
-        PemObject obj = generator.generate();
+        EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(
+            privKeyInfo, keyPwd, SecureRandom.getInstanceStrong());
         saveVerbose("save key to file", ksFilePrefix + "-key.pem",
-            PemEncoder.encode(obj.getContent(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
+            PemEncoder.encode(encKey.getEncoded(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
       }
     }
   }

@@ -29,10 +29,10 @@
     }
   },{
     "id":2,
-    "name":"scep",
+    "name":"scep-sign",
     "type":"xijson",
     "conf":{
-      "file":"certprofile/certprofile-scep.json"
+      "file":"certprofile/certprofile-scep-sign.json"
     }
   },{
     "id":3,
@@ -75,6 +75,13 @@
     "type":"xijson",
     "conf":{
       "file":"certprofile/certprofile-tls-sm2-enc.json"
+    }
+  },{
+    "id":9,
+    "name":"scep-enc",
+    "type":"xijson",
+    "conf":{
+      "file":"certprofile/certprofile-scep-enc.json"
     }
   }],
   "cas":[{
@@ -119,7 +126,7 @@
       "status":"active",
       "validityMode":"cutoff"
     },
-    "profiles":["ocsp", "scep", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"
+    "profiles":["ocsp", "scep-sign", "scep-enc", "smime", "tls", "tls-c", "tls-sm2", "tls-sm2-enc"
     ],
     "publishers":[
       // "ocsp-publisher"

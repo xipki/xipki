@@ -3,18 +3,18 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.misc.CompareUtil;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.security.cert.CertificateEncodingException;
 
@@ -60,7 +60,7 @@ public class SignerEntry extends MgmtEntry {
     }
   }
 
-  public void initSigner(SecurityFactory securityFactory) throws ObjectCreationException {
+  public void initSigner(SecurityFactory securityFactory) throws GenerationException {
     Args.notNull(securityFactory, "securityFactory");
     if (signer != null) {
       return;
@@ -69,7 +69,7 @@ public class SignerEntry extends MgmtEntry {
     faulty = true;
     signer = securityFactory.createSigner(type, new SignerConf(conf), certificate);
     if (signer.x509Cert() == null) {
-      throw new ObjectCreationException("signer without certificate is not allowed");
+      throw new GenerationException("signer without certificate is not allowed");
     }
     faulty = false;
 

@@ -3,12 +3,12 @@
 
 package org.xipki.ocsp.api;
 
+import org.xipki.codec.util.Args;
+import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.json.JsonMap;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.pkix.util.conf.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;

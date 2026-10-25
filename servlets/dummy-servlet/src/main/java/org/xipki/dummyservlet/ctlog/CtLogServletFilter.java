@@ -5,7 +5,7 @@ package org.xipki.dummyservlet.ctlog;
 
 import jakarta.servlet.FilterConfig;
 import org.xipki.servlet.ServletFilter;
-import org.xipki.util.extra.http.XiHttpFilter;
+import org.xipki.util.http.XiHttpFilter;
 
 /**
  * CT Log Servlet Filter.

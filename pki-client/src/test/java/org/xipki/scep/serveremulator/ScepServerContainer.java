@@ -6,7 +6,7 @@ package org.xipki.scep.serveremulator;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

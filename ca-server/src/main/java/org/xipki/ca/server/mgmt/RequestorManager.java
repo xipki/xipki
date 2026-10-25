@@ -11,8 +11,8 @@ import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.LogUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;

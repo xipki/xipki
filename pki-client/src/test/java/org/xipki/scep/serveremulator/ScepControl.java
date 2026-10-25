@@ -3,7 +3,7 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * SCEP control.

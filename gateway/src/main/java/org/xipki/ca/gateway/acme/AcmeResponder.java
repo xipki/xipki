@@ -3,16 +3,20 @@
 
 package org.xipki.ca.gateway.acme;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.util.Pack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.codec.util.Pack;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.pkix.asn1.x509.GeneralNames;
 import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.gateway.acme.msg.*;
 import org.xipki.ca.gateway.acme.type.AccountStatus;
@@ -29,45 +33,43 @@ import org.xipki.ca.sdk.RevokeCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.OIDs;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.pkix.CrlReason;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.conf.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.Base64;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.extra.audit.AuditEvent;
-import org.xipki.util.extra.audit.AuditLevel;
-import org.xipki.util.extra.audit.AuditStatus;
-import org.xipki.util.extra.exception.ObjectCreationException;
-import org.xipki.util.extra.http.HttpConstants;
-import org.xipki.util.extra.http.HttpRespContent;
-import org.xipki.util.extra.http.HttpResponse;
-import org.xipki.util.extra.http.XiHttpRequest;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.misc.ReflectiveUtil;
-import org.xipki.util.io.FileOrValue;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.http.HttpConstants;
+import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.XiHttpRequest;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.ReflectiveUtil;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.misc.StringUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.Signature;
@@ -88,7 +90,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.ca.gateway.acme.AcmeConstants.*;
-import static org.xipki.util.codec.Base64.decodeFast;
+import static org.xipki.ca.gateway.acme.AcmeUtils.decodeBase64Url;
 
 /**
  * ACME Responder.
@@ -97,42 +99,6 @@ import static org.xipki.util.codec.Base64.decodeFast;
  */
 public class AcmeResponder {
 
-  private static class HttpRespAuditException extends Exception {
-
-    private final int httpStatus;
-
-    private final String auditMessage;
-
-    private final AuditLevel auditLevel;
-
-    private final AuditStatus auditStatus;
-
-    public HttpRespAuditException(
-        int httpStatus, String auditMessage, AuditLevel auditLevel, AuditStatus auditStatus) {
-      this.httpStatus = httpStatus;
-      this.auditMessage = Args.notBlank(auditMessage, "auditMessage");
-      this.auditLevel = Args.notNull(auditLevel, "auditLevel");
-      this.auditStatus = Args.notNull(auditStatus, "auditStatus");
-    }
-
-    public int httpStatus() {
-      return httpStatus;
-    }
-
-    public String auditMessage() {
-      return auditMessage;
-    }
-
-    public AuditLevel auditLevel() {
-      return auditLevel;
-    }
-
-    public AuditStatus auditStatus() {
-      return auditStatus;
-    }
-
-  } // class HttpRespAuditException
-
   private static class StringContainer {
     String text;
   }
@@ -140,6 +106,8 @@ public class AcmeResponder {
   private static final Logger LOG = LoggerFactory.getLogger(AcmeResponder.class);
 
   private static final Map<String, SignAlgo> joseAlgMap = new HashMap<>();
+
+  private static final Map<String, Integer> ecdsaFieldByteSizeMap = new HashMap<>();
 
   private final SdkClient sdk;
 
@@ -196,10 +164,13 @@ public class AcmeResponder {
     // See https://www.rfc-editor.org/rfc/rfc7518.html#section-3.1
     // ECDSA using P-256 and SHA-256
     joseAlgMap.put("ES256", SignAlgo.ECDSA_SHA256);
+    ecdsaFieldByteSizeMap.put("ES256", 32);
     // ECDSA using P-234 and SHA-384
     joseAlgMap.put("ES384", SignAlgo.ECDSA_SHA384);
+    ecdsaFieldByteSizeMap.put("ES384", 48);
     // ECDSA using P-521 and SHA-512
     joseAlgMap.put("ES512", SignAlgo.ECDSA_SHA512);
+    ecdsaFieldByteSizeMap.put("ES512", 66);
 
     // RSASSA-PKCS1-v1_5 using SHA-256
     joseAlgMap.put("RS256", SignAlgo.RSA_SHA256);
@@ -311,7 +282,7 @@ public class AcmeResponder {
     } else {
       try {
         this.contactVerifier = ReflectiveUtil.newInstance(str);
-      } catch (ObjectCreationException ex) {
+      } catch (GenerationException ex) {
         throw new InvalidConfException("invalid contactVerifier '" + str + "'", ex);
       }
     }
@@ -385,7 +356,15 @@ public class AcmeResponder {
         auditMessage = ex.getMessage();
         Problem problem = new Problem(ex.acmeError().qualifiedCode(), ex.acmeDetail(), null);
         return buildProblemResp(ex.httpError(), problem);
-      } catch (DataAccessException | CodecException | AcmeSystemException ex) {
+      } catch (CodecException ex) {
+        // all CodecExceptions thrown in doService are caused by decoding the request.
+        LOG.warn("could not decode request: {}", ex.getMessage());
+        auditLevel = AuditLevel.WARN;
+        auditStatus = AuditStatus.FAILED;
+        auditMessage = "invalid request";
+        Problem problem = new Problem(AcmeError.malformed.qualifiedCode(), "invalid request", null);
+        return buildProblemResp(SC_BAD_REQUEST, problem);
+      } catch (DataAccessException | AcmeSystemException ex) {
         LogUtil.error(LOG, ex, null);
         auditLevel = AuditLevel.ERROR;
         auditStatus = AuditStatus.FAILED;
@@ -496,7 +475,7 @@ public class AcmeResponder {
     }
 
     JoseMessage body = JoseMessage.parse(toJsonMap(request));
-    JsonMap protected_= toJsonMap(decodeFast(body.getProtected()));
+    JsonMap protected_= toJsonMap(decodeBase64Url(body.getProtected(), "protected"));
 
     String protectedUrl = protected_.getString("url");
     if (protectedUrl == null) {
@@ -593,7 +572,7 @@ public class AcmeResponder {
     switch (command) {
       case CMD_newAccount: {
         NewAccountPayload reqPayload = NewAccountPayload.parse(toJsonMap(
-            decodeFast(body.payload())));
+            decodeBase64Url(body.payload(), "payload")));
 
         AcmeAccount existingAccount = repo.getAccountForJwk(jwk);
         if (existingAccount != null) {
@@ -637,29 +616,26 @@ public class AcmeResponder {
             .putHeader(HDR_LOCATION, newAccount.getLocation(baseUrl));
       }
       case CMD_keyChange: {
-        JoseMessage reqPayload = JoseMessage.parse(toJsonMap(decodeFast(body.payload())));
-        JsonMap innerProtected = toJsonMap(decodeFast(reqPayload.getProtected()));
+        // RFC 8555, Section 7.3.5
+        JoseMessage reqPayload = JoseMessage.parse(
+            toJsonMap(decodeBase64Url(body.payload(), "payload")));
+        JsonMap innerProtected = toJsonMap(
+            decodeBase64Url(reqPayload.getProtected(), "inner protected"));
 
         Map<String, String> newJwk = innerProtected.getStringMap("jwk");
-        AcmeAccount accountForNewJwk = repo.getAccountForJwk(newJwk);
-        if (accountForNewJwk != null) {
-          // jwk not exists.
-          return toHttpResponse(HttpRespContent.of(SC_CONFLICT, null, null))
-              .putHeader(HDR_LOCATION, accountForNewJwk.getLocation(baseUrl));
+        if (newJwk == null) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+              "inner JWS does not have the jwk header parameter");
         }
 
-        // check payload.account, and payload.oldKey
-        JsonMap innerPayload = toJsonMap(decodeFast(reqPayload.payload()));
-        String innerAccount = innerPayload.getString("account");
-        if (!innerAccount.equals(kid)) {
+        if (innerProtected.getString("nonce") != null) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
-              "invalid payload.account");
+              "inner JWS must not have the nonce header parameter");
         }
 
-        Map<String, String> oldKey = innerPayload.getStringMap("oldKey");
-        if (!account.hasJwk(oldKey)) {
+        if (!protectedUrl.equals(innerProtected.getString("url"))) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
-              "oldKey does not match the account");
+              "url of the inner JWS and outer JWS do not match");
         }
 
         // check inner signature (by the new key)
@@ -671,7 +647,29 @@ public class AcmeResponder {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
         }
 
-        verifySignature(protected_.getString("alg"), newPubKey, reqPayload);
+        verifySignature(innerProtected.getString("alg"), newPubKey, reqPayload);
+
+        // check payload.account, and payload.oldKey
+        JsonMap innerPayload = toJsonMap(
+            decodeBase64Url(reqPayload.payload(), "inner payload"));
+        String innerAccount = innerPayload.getString("account");
+        if (!kid.equals(innerAccount)) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+              "invalid payload.account");
+        }
+
+        Map<String, String> oldKey = innerPayload.getStringMap("oldKey");
+        if (!account.hasJwk(oldKey)) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+              "oldKey does not match the account");
+        }
+
+        AcmeAccount accountForNewJwk = repo.getAccountForJwk(newJwk);
+        if (accountForNewJwk != null) {
+          // the new key is already used by an account.
+          return toHttpResponse(HttpRespContent.of(SC_CONFLICT, null, null))
+              .putHeader(HDR_LOCATION, accountForNewJwk.getLocation(baseUrl));
+        }
 
         account.setJwk(newJwk);
 
@@ -680,7 +678,8 @@ public class AcmeResponder {
             .putHeader(HDR_LOCATION, account.getLocation(baseUrl));
       }
       case CMD_account: {
-        AccountResponse reqPayload = AccountResponse.parse(toJsonMap(decodeFast(body.payload())));
+        AccountResponse reqPayload = AccountResponse.parse(
+            toJsonMap(decodeBase64Url(body.payload(), "payload")));
         AccountStatus status = reqPayload.status();
 
         if (status == AccountStatus.revoked) {
@@ -705,7 +704,7 @@ public class AcmeResponder {
       }
       case CMD_revokeCert: {
         RevokeCertPayload reqPayload = RevokeCertPayload.parse(
-            toJsonMap(decodeFast(body.payload())));
+            toJsonMap(decodeBase64Url(body.payload(), "payload")));
         Integer reasonCode = reqPayload.reason();
         CrlReason reason;
         try {
@@ -719,12 +718,12 @@ public class AcmeResponder {
               "bad revocation reason " + reasonCode);
         }
 
-        byte[] certBytes = decodeFast(reqPayload.certificate());
+        byte[] certBytes = decodeBase64Url(reqPayload.certificate(), "certificate");
 
         Certificate cert;
         byte[] encodedIssuer;
         try {
-          cert = Certificate.getInstance(certBytes);
+          cert = Certificate.fromEncoded(certBytes);
           encodedIssuer = cert.getIssuer().getEncoded();
         } catch (Exception e) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
@@ -766,7 +765,7 @@ public class AcmeResponder {
         }
 
         RevokeCertsRequest.Entry sdkEntry = new RevokeCertsRequest.Entry(
-            cert.getSerialNumber().getPositiveValue(), reason, null);
+            cert.serialNumber(), reason, null);
 
         RevokeCertsRequest sdkReq = new RevokeCertsRequest(null,
             new X500NameType(encodedIssuer), null,
@@ -817,7 +816,8 @@ public class AcmeResponder {
         return buildSuccJsonResp(SC_OK, new OrdersResponse(urls));
       }
       case CMD_newOrder: {
-        NewOrderPayload newOrderReq = NewOrderPayload.parse(toJsonMap(decodeFast(body.payload())));
+        NewOrderPayload newOrderReq = NewOrderPayload.parse(
+            toJsonMap(decodeBase64Url(body.payload(), "payload")));
         List<Identifier> identifiers = newOrderReq.identifiers();
         int size = identifiers == null ? 0 : identifiers.size();
 
@@ -1000,19 +1000,18 @@ public class AcmeResponder {
         }
 
         FinalizeOrderPayload finalizeOrderReq = FinalizeOrderPayload.parse(
-            toJsonMap(decodeFast(body.payload())));
+            toJsonMap(decodeBase64Url(body.payload(), "payload")));
 
         byte[] csrBytes;
         CertificationRequest csr;
         try {
-          csrBytes = decodeFast(finalizeOrderReq.csr());
+          csrBytes = decodeBase64Url(finalizeOrderReq.csr(), "csr");
           csr = GatewayUtil.parseCsrInRequest(csrBytes);
         } catch (Exception e) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR, "could not parse CSR");
         }
 
-        String keyAlgOid = csr.getCertificationRequestInfo()
-            .getSubjectPublicKeyInfo().getAlgorithm().getAlgorithm().getId();
+        String keyAlgOid = csr.getSubjectPKInfo().getAlgorithm().getAlgorithm().getId();
 
         AcmeProtocolConf.CaProfile caProfile = Optional.ofNullable(
             getCaProfile(keyAlgOid)).orElseThrow(
@@ -1025,7 +1024,7 @@ public class AcmeResponder {
           identifiers.add(authz.identifier().toIdentifier());
         }
 
-        X500Name csrSubject = csr.getCertificationRequestInfo().getSubject();
+        X500Name csrSubject = csr.getSubject();
         String cn = X509Util.getCommonName(csrSubject);
         if (cn != null && !cn.isEmpty()) {
           boolean match = false;
@@ -1042,21 +1041,21 @@ public class AcmeResponder {
           }
         }
 
-        Extensions csrExtensions = X509Util.getExtensions(csr.getCertificationRequestInfo());
+        Extensions csrExtensions = csr.getExtensionRequest();
 
-        byte[] sanExtnValue = csrExtensions == null ? null
-            : X509Util.getCoreExtValue(csrExtensions, OIDs.Extn.subjectAlternativeName);
-        if (sanExtnValue == null) {
+        Extension extn = (csrExtensions == null) ? null
+            : csrExtensions.getExtension(ExtensionOIDs.subjectAlternativeName);
+        if (extn == null) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badCSR,
               "no extension subjectAlternativeName in CSR");
         }
 
-        GeneralNames generalNames = GeneralNames.getInstance(sanExtnValue);
+        GeneralNames generalNames = extn.getSubjectAlternativeName();
         String firstSanValue = null;
-        for (GeneralName gn : generalNames.getNames()) {
+        for (GeneralName gn : generalNames) {
           int tagNo = gn.getTagNo();
-          if (tagNo == GeneralName.dNSName) {
-            String value = Asn1Util.getIA5String(gn.getName());
+          if (tagNo == GeneralName.tag_dNSName) {
+            String value = gn.dNSName();
             if (firstSanValue == null) {
               firstSanValue = value;
             }
@@ -1162,8 +1161,8 @@ public class AcmeResponder {
               AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        AuthzId id = new AuthzId(decodeFast(tokens[1]));
-        AcmeAuthz authz = Optional.ofNullable(repo.getAuthz(id)).orElseThrow(
+        AuthzId id = toAuthzId(tokens[1]);
+        AcmeAuthz authz = Optional.ofNullable(id == null ? null : repo.getAuthz(id)).orElseThrow(
             () -> new HttpRespAuditException(SC_NOT_FOUND, "unknown authz",
                 AuditLevel.ERROR, AuditStatus.FAILED));
 
@@ -1179,9 +1178,9 @@ public class AcmeResponder {
               AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        ChallId challId = new ChallId(decodeFast(tokens[1]));
+        ChallId challId = toChallId(tokens[1]);
         AcmeChallenge2 chall2 = Optional.ofNullable(
-            repo.getChallenge(challId)).orElseThrow(
+            challId == null ? null : repo.getChallenge(challId)).orElseThrow(
                 () -> new HttpRespAuditException(SC_NOT_FOUND,
                     "unknown challenge", AuditLevel.ERROR, AuditStatus.FAILED));
 
@@ -1236,11 +1235,21 @@ public class AcmeResponder {
 
   private void verifySignature(String sigAlg, PublicKey pubKey, JoseMessage joseMessage)
       throws AcmeProtocolException {
+    if (sigAlg == null) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "alg is not present");
+    }
+
     sigAlg = sigAlg.toUpperCase(Locale.ROOT);
     SignAlgo signAlgo = joseAlgMap.get(sigAlg);
     if (signAlgo == null) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badSignatureAlgorithm,
           "unsupported signature algorithm " + sigAlg);
+    }
+
+    byte[] sigValue = decodeBase64Url(joseMessage.signature(), "signature");
+    if (signAlgo.isECDSASigAlgo()) {
+      // RFC 7518, Section 3.4: the JWS ECDSA signature is R || S, not DER-encoded.
+      sigValue = AcmeUtils.ecdsaJwsSigToDer(sigValue, ecdsaFieldByteSizeMap.get(sigAlg));
     }
 
     try {
@@ -1249,12 +1258,12 @@ public class AcmeResponder {
       sig.update(joseMessage.getProtected().getBytes(StandardCharsets.UTF_8));
       sig.update((byte) 0x2e); // 0x2e = '.'
       sig.update(joseMessage.payload().getBytes(StandardCharsets.UTF_8));
-      boolean sigValid = sig.verify(decodeFast(joseMessage.signature()));
+      boolean sigValid = sig.verify(sigValue);
       if (!sigValid) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
             "signature is not valid");
       }
-    } catch (NoSuchAlgorithmException e) {
+    } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
       throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badSignatureAlgorithm,
           e.getMessage());
     } catch (InvalidKeyException e) {
@@ -1324,7 +1333,18 @@ public class AcmeResponder {
   }
 
   private static Long toLongId(String id) {
-    return (id.length() != 11) ? null : Pack.littleEndianToLong(decodeFast(id), 0);
+    byte[] bytes = (id.length() != 11) ? null : AcmeUtils.decodeBase64UrlOrNull(id);
+    return (bytes == null || bytes.length != 8) ? null : Pack.littleEndianToLong(bytes, 0);
+  }
+
+  private static AuthzId toAuthzId(String id) {
+    byte[] bytes = AcmeUtils.decodeBase64UrlOrNull(id);
+    return (bytes == null || bytes.length != 10) ? null : new AuthzId(bytes);
+  }
+
+  private static ChallId toChallId(String id) {
+    byte[] bytes = AcmeUtils.decodeBase64UrlOrNull(id);
+    return (bytes == null || bytes.length != 12) ? null : new ChallId(bytes);
   }
 
   private AcmeProtocolConf.CaProfile getCaProfile(String keyAlgId) {

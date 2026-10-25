@@ -3,13 +3,15 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.crmf.CertId;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.cmp.CMPCertificate;
+import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
+import org.xipki.pkix.asn1.cmp.PKIStatus;
+import org.xipki.pkix.asn1.crmf.CertId;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.cmp.client.IdentifiedObject;
-import org.xipki.security.cmp.PkiStatusInfo;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cmp.PkiStatusInfo;
 
 import java.math.BigInteger;
 
@@ -28,12 +30,12 @@ abstract class ResultEntry extends IdentifiedObject {
 
     private final PkiStatusInfo statusInfo;
 
-    Error(String id, int status, int pkiFailureInfo, String statusMessage) {
+    Error(String id, PKIStatus status, PKIFailureInfo pkiFailureInfo, String statusMessage) {
       super(id);
       this.statusInfo = new PkiStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
-    Error(String id, int status) {
+    Error(String id, PKIStatus status) {
       super(id);
       this.statusInfo = new PkiStatusInfo(status);
     }
@@ -50,9 +52,9 @@ abstract class ResultEntry extends IdentifiedObject {
 
     private final PrivateKeyInfo privateKeyInfo;
 
-    private final int status;
+    private final PKIStatus status;
 
-    EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo, int status) {
+    EnrollCert(String id, CMPCertificate cert, PrivateKeyInfo privateKeyInfo, PKIStatus status) {
       super(id);
       this.cert = cert;
       this.privateKeyInfo = privateKeyInfo;
@@ -67,7 +69,7 @@ abstract class ResultEntry extends IdentifiedObject {
       return privateKeyInfo;
     }
 
-    int getStatus() {
+    PKIStatus getStatus() {
       return status;
     }
 

@@ -3,36 +3,36 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.cert.X509CertificateHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.HashAlgo;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.pkix.CtLog;
-import org.xipki.security.pkix.CtLog.AddPreChainRequest;
-import org.xipki.security.pkix.CtLog.AddPreChainResponse;
-import org.xipki.security.pkix.CtLog.DigitallySigned;
-import org.xipki.security.pkix.CtLog.SerializedSCT;
-import org.xipki.security.pkix.CtLog.SignatureAlgorithm;
-import org.xipki.security.pkix.CtLog.SignatureAndHashAlgorithm;
-import org.xipki.security.pkix.CtLog.SignedCertificateTimestamp;
-import org.xipki.security.pkix.CtLog.SignedCertificateTimestampList;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.util.KeyUtil;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.Hex;
-import org.xipki.util.codec.json.JsonBuilder;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.codec.json.JsonParser;
-import org.xipki.util.extra.http.Curl;
-import org.xipki.util.extra.http.Curl.CurlResult;
-import org.xipki.util.extra.http.DefaultCurl;
-import org.xipki.util.extra.http.SslContextConf;
-import org.xipki.util.misc.StringUtil;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.Hex;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.json.JsonParser;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.asn1.cert.CtLog;
+import org.xipki.pkix.asn1.cert.CtLog.AddPreChainRequest;
+import org.xipki.pkix.asn1.cert.CtLog.AddPreChainResponse;
+import org.xipki.pkix.asn1.cert.CtLog.DigitallySigned;
+import org.xipki.pkix.asn1.cert.CtLog.SerializedSCT;
+import org.xipki.pkix.asn1.cert.CtLog.SignatureAlgorithm;
+import org.xipki.pkix.asn1.cert.CtLog.SignatureAndHashAlgorithm;
+import org.xipki.pkix.asn1.cert.CtLog.SignedCertificateTimestamp;
+import org.xipki.pkix.asn1.cert.CtLog.SignedCertificateTimestampList;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.util.http.Curl;
+import org.xipki.util.http.Curl.CurlResult;
+import org.xipki.util.http.DefaultCurl;
+import org.xipki.util.http.SslContextConf;
+import org.xipki.pkix.util.misc.StringUtil;
 
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -56,6 +56,8 @@ public class CtLogClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(CtLogClient.class);
 
+  private static final CryptoApi cryptoApi = CryptoApiFactory.get();
+
   private final Curl curl;
 
   private final List<String> addPreChainUrls;
@@ -75,28 +77,17 @@ public class CtLogClient {
   } // constructor
 
   public SignedCertificateTimestampList getCtLogScts(
-      X509CertificateHolder precert, X509Cert caCert, List<X509Cert> certchain,
+      Certificate precert, X509Cert caCert, List<X509Cert> certchain,
       CtLogPublicKeyFinder publicKeyFinder) throws OperationException {
     List<byte[]> chain = new LinkedList<>();
 
-    byte[] encodedPreCert;
-    try {
-      encodedPreCert = precert.getEncoded();
-    } catch (IOException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-    }
-
-    byte[] issuerKeyHash;
-    try {
-      issuerKeyHash = HashAlgo.SHA256.hash(caCert.subjectPublicKeyInfo().getEncoded());
-    } catch (IOException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
-    }
+    byte[] encodedPreCert = precert.getEncoded();
+    byte[] issuerKeyHash = HashAlgo.SHA256.hash(caCert.subjectPublicKeyInfo().getEncoded());
 
     byte[] preCertTbsCert;
     try {
-      preCertTbsCert = CtLog.getPreCertTbsCert(precert.toASN1Structure().getTBSCertificate());
-    } catch (IOException ex) {
+      preCertTbsCert = CtLog.getPreCertTbsCert(precert.getTBSCertificate());
+    } catch (CodecException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex.getMessage());
     }
 
@@ -160,7 +151,7 @@ public class CtLogClient {
 
         boolean sigValid;
         try {
-          Signature sig = Signature.getInstance(signAlgo, KeyUtil.providerName(signAlgo));
+          Signature sig = cryptoApi.newSignature(signAlgo);
           sig.initVerify(verifyKey);
           CtLog.update(sig, sctVersion, timestamp, extensions, issuerKeyHash, preCertTbsCert);
           sigValid = sig.verify(ds.signature());

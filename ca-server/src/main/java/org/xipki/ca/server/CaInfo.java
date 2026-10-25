@@ -16,22 +16,25 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.KeySpec;
-import org.xipki.security.SecurityFactory;
-import org.xipki.security.SignAlgo;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.CertRevocationInfo;
-import org.xipki.security.pkix.X509Cert;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.sign.SignerConf;
-import org.xipki.util.codec.Args;
-import org.xipki.util.conf.ConfPairs;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.conf.Validity;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -87,15 +90,20 @@ public class CaInfo {
     this.selfSigned = cert.isSelfSigned();
 
     BaseCaInfo base = caEntry.base();
-    this.publicCaInfo = new PublicCaInfo(cert, base.caUris(), base.extraControl());
+
     List<X509Cert> certs = caEntry.certchain();
     this.certchain = certs == null ? Collections.emptyList() : certs;
     this.noNewCertificateAfter = notAfter.minus(base.expirationPeriod(), ChronoUnit.DAYS);
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = base.extraControl();
 
-    // keyspec
-    caKeySpec = KeySpec.ofPublicKey(caEntry.cert().subjectPublicKeyInfo());
+    try {
+      this.publicCaInfo = new PublicCaInfo(cert, base.caUris(), base.extraControl());
+      // keyspec
+      caKeySpec = KeySpec.ofPublicKey(caEntry.cert().subjectPublicKeyInfo());
+    } catch (CodecException e) {
+      throw new OperationException(ErrorCode.SYSTEM_FAILURE, e);
+    }
   } // constructor
 
   public KeySpec caKeySpec() {
@@ -239,7 +247,7 @@ public class CaInfo {
     return randomSnGenerator.nextSerialNumber(caEntry.base().snSize());
   }
 
-  public BigInteger nextCrlNumber() throws OperationException {
+  public long nextCrlNumber() throws OperationException {
     BaseCaInfo base = caEntry.base();
     long crlNo = base.nextCrlNo();
     long currentMaxNo = certStore.getMaxCrlNumber(caEntry.ident());
@@ -247,12 +255,12 @@ public class CaInfo {
       crlNo = currentMaxNo + 1;
     }
     base.setNextCrlNo(crlNo + 1);
-    return BigInteger.valueOf(crlNo);
+    return crlNo;
   }
 
-  public BigInteger getMaxFullCrlNumber() throws OperationException {
+  public Long getMaxFullCrlNumber() throws OperationException {
     long crlNumber = certStore.getMaxFullCrlNumber(caEntry.ident());
-    return crlNumber == 0 ? null : BigInteger.valueOf(crlNumber);
+    return crlNumber == 0 ? null : crlNumber;
   }
 
   public ConcurrentSigner getSigner(List<SignAlgo> algos) {
@@ -314,6 +322,46 @@ public class CaInfo {
 
   public RevokeSuspendedControl revokeSuspendedCertsControl() {
     return caEntry.base().revokeSuspendedControl();
+  }
+
+  /**
+   * Random serial number generator.
+   *
+   * @author Lijun Liao (xipki)
+   */
+  private static class RandomSerialNumberGenerator {
+
+    private static RandomSerialNumberGenerator instance;
+
+    private final SecureRandom random;
+
+    private RandomSerialNumberGenerator() {
+      this.random = new SecureRandom();
+    }
+
+    /**
+     * Generate the next serial number.
+     * @param byteLen byte length of the serial number.
+     * @return the serial number.
+     */
+    public BigInteger nextSerialNumber(int byteLen) {
+      final byte[] rndBytes = new byte[byteLen];
+      random.nextBytes(rndBytes);
+      // clear the highest bit.
+      rndBytes[0] &= 0x7F;
+      // set the second-highest bit
+      rndBytes[0] |= 0x40;
+      return new BigInteger(rndBytes);
+
+    } // method nextSerialNumber
+
+    public static synchronized RandomSerialNumberGenerator getInstance() {
+      if (instance == null) {
+        instance = new RandomSerialNumberGenerator();
+      }
+      return instance;
+    } // method RandomSerialNumberGenerator
+
   }
 
 }

@@ -4,7 +4,7 @@
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.type.AcmeError;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * ACME Protocol Exception type.

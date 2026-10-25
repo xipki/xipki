@@ -3,11 +3,10 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.security.OIDs;
-import org.xipki.util.extra.misc.CompareUtil;
-
-import java.io.IOException;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 /**
  * OID enumeration.
@@ -15,26 +14,22 @@ import java.io.IOException;
  * @author Lijun Liao (xipki)
  */
 public enum OID {
-  ID_PKIX_OCSP_NONCE(OIDs.OCSP.id_pkix_ocsp_nonce),
-  ID_PKIX_OCSP_PREFSIGALGS(OIDs.Extn.id_pkix_ocsp_prefSigAlgs),
-  ID_PKIX_OCSP_EXTENDEDREVOKE(OIDs.Extn.id_pkix_ocsp_extendedRevoke),
-  ID_ISISMTT_AT_CERTHASH(OIDs.Misc.isismtt_at_certHash),
+  ID_PKIX_OCSP_NONCE(OcspOIDs.id_pkix_ocsp_nonce),
+  ID_PKIX_OCSP_PREFSIGALGS(ExtensionOIDs.id_pkix_ocsp_prefSigAlgs),
+  ID_PKIX_OCSP_EXTENDEDREVOKE(ExtensionOIDs.id_pkix_ocsp_extendedRevoke),
+  ID_ISISMTT_AT_CERTHASH(ExtensionOIDs.isismtt_at_certHash),
 
-  ID_INVALIDITY_DATE(OIDs.Extn.invalidityDate),
-  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OIDs.OCSP.id_pkix_ocsp_archive_cutoff),
-  ID_PKIX_OCSP_RESPONSE(OIDs.OCSP.id_pkix_ocsp_response);
+  ID_INVALIDITY_DATE(ExtensionOIDs.invalidityDate),
+  ID_PKIX_OCSP_ARCHIVE_CUTOFF(OcspOIDs.id_pkix_ocsp_archive_cutoff),
+  ID_PKIX_OCSP_RESPONSE(OcspOIDs.id_pkix_ocsp_response);
 
   private final String id;
 
   private final byte[] encoded;
 
-  OID(ASN1ObjectIdentifier oid) {
+  OID(Asn1Oid oid) {
     this.id = oid.getId();
-    try {
-      this.encoded = oid.getEncoded();
-    } catch (IOException ex) {
-      throw new IllegalStateException("should not happen", ex);
-    }
+    this.encoded = oid.getEncoded();
   }
 
   public String id() {

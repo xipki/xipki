@@ -3,9 +3,9 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.cmp.client.IdentifiedObject;
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * CMP request to enroll certificate for given CSR.

@@ -3,35 +3,32 @@
 
 package org.xipki.ca.server;
 
-import org.bouncycastle.asn1.ASN1BitString;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.asn1.Asn1BitString;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.RSAPublicKey;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.security.KeySpec;
-import org.xipki.security.OIDs;
-import org.xipki.security.exception.BadCertTemplateException;
-import org.xipki.security.exception.ErrorCode;
-import org.xipki.security.exception.OperationException;
-import org.xipki.security.exception.XiSecurityException;
-import org.xipki.security.pkix.KeyInfoPair;
-import org.xipki.security.sign.ConcurrentSigner;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.extra.exception.CertprofileException;
-import org.xipki.util.extra.misc.LogUtil;
-import org.xipki.util.extra.type.Validity;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.pkix.exception.ErrorCode;
+import org.xipki.pkix.exception.OperationException;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.KeyInfoPair;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.conf.Validity;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -130,12 +127,13 @@ class GrandCertTemplateBuilder {
       grantedPublicKeyInfo = X509Util.toRfc3279Style(grantedPublicKeyInfo);
 
       BigInteger rsaModulus = null;
-      if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm().equals(OIDs.Algo.id_rsaEncryption)) {
+      if (grantedPublicKeyInfo.getAlgorithm().getAlgorithm()
+          .equals(AlgorithmOIDs.id_rsaEncryption)) {
         try {
-          ASN1Sequence seq = ASN1Sequence.getInstance(
-              Asn1Util.getPublicKeyData(grantedPublicKeyInfo));
-          rsaModulus = ((ASN1Integer) seq.getObjectAt(0)).getValue();
-        } catch (IllegalArgumentException ex) {
+          RSAPublicKey rsaPublicKey = RSAPublicKey.fromEncoded(
+              grantedPublicKeyInfo.subjectPublicKey());
+          rsaModulus = rsaPublicKey.modulus();
+        } catch (CodecException ex) {
           throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
               "invalid format of RSA public key", ex);
         }
@@ -186,20 +184,16 @@ class GrandCertTemplateBuilder {
       // adapt the algorithm identifier in private key and public key
       AlgorithmIdentifier keyAlgId = keyspec.algorithmIdentifier();
       if (!privateKey.getPrivateKeyAlgorithm().equals(keyAlgId)) {
-        ASN1BitString asn1PublicKeyData = privateKey.getPublicKeyData();
-        try {
-          privateKey = new PrivateKeyInfo(keyAlgId,
-              privateKey.getPrivateKey().toASN1Primitive(), privateKey.getAttributes(),
-              asn1PublicKeyData == null ? null : asn1PublicKeyData.getOctets());
-        } catch (IOException ex) {
-          throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
-        }
+        Asn1BitString asn1PublicKeyData = privateKey.getPublicKey();
+        privateKey = new PrivateKeyInfo(keyAlgId,
+            privateKey.getPrivateKey(), privateKey.getAttributes(),
+            asn1PublicKeyData == null ? null : asn1PublicKeyData.getOctets());
       }
 
       if (!grantedPublicKeyInfo.getAlgorithm().equals(keyAlgId)) {
         try {
           grantedPublicKeyInfo = new SubjectPublicKeyInfo(keyAlgId,
-              Asn1Util.getPublicKeyData(grantedPublicKeyInfo));
+              grantedPublicKeyInfo.subjectPublicKey());
         } catch (Exception e) {
           throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e);
         }
@@ -221,9 +215,6 @@ class GrandCertTemplateBuilder {
     SubjectInfo subjectInfo;
     try {
       subjectInfo = certprofile.getSubject(requestedSubject);
-    } catch (CertprofileException ex) {
-      throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "exception in cert profile " + certprofileIdent);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);
     }

@@ -4,7 +4,7 @@
     "details": "certprofile TCG"
   },
   "certLevel": "EndEntity",
-  "maxSize": 8400,
+  "maxSize": 12000,
   "validity": "5y",
   "notBeforeTime": "current",
   "keypairGeneration": "P256",

@@ -3,7 +3,7 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.util.codec.Args;
+import org.xipki.codec.util.Args;
 
 /**
  * OCSP Error enumeration.

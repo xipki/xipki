@@ -7,14 +7,12 @@
 # XiPKI
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure)
 is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical infrastructure.
-Built with minimal dependencies and a compact codebase of ~120,000 lines, it offers native support
+Built with minimal dependencies (only SLF4J, dnsjava, HikariCP, jline and Picocli, besides JDBC drivers) and a compact codebase of ~73,000 lines, it offers native support
 for post-quantum algorithms (ML-DSA, ML-KEM, composite), HSM integration via PKCS#11, 
 SM2/SM3 for Chinese national standards, and fast OCSP at scale. 
-Bouncy Castle can be switched between LTS and FIPS variants to meet different compliance 
-requirements. 
 
-The thin XiPKI distribution is now under 6 MB without bundled JDBC drivers and
-Bouncy Castle jars.
+The complete distribution, including all third-party libraries and the H2 and MariaDB
+JDBC drivers, is under 10 MB.
 
 The project author actively contributes to IETF standardization, including co-authoring the 
 C509 specification (CBOR-encoded X.509 certificates) and its test vectors in the COSE Working 
@@ -32,24 +30,29 @@ JRE/JDK, and the steps required to reproduce the bug.
 ## Get Started
 
 ### Binaries
+XiPKI provides the binary `xipki-setup-<version>.tar.gz` with the following requirements on JDK:
+  - Java 11+ is required for this runtime
+  - Java 15+ for ED25519 and ED448
+  - Java 24+ for ML-DSA, ML-KEM.
+
 The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the following ways: 
   - Download the binary from https://github.com/xipki/xipki/releases
   - Download the binary from the central maven repository.
     ```
     <dependency>
-      <groupId>org.xipki.assembly</groupId>
+      <groupId>org.xipki.pki.assembly</groupId>
       <artifactId>xipki-setup</artifactId>
       <type>tar.gz</type>
-      <version>placeholder-version</version>
+      <version>[placeholder-version]</version>
     </dependency>
     ```
-    Where `placeholder-version` is the version, e.g. 6.7.0.
+    Where `[placeholder-version]` is the version, e.g. 7.0.0.
   - Build it from source
     - Get a copy of the project code, for example:
       ```sh
       git clone https://github.com/xipki/xipki
       ```
-
+      
     - Build the project
       * In the `xipki` folder:
         ```sh
@@ -58,19 +61,31 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
  
       The binaries will then be available in `assemblies/xipki-setup/target/`.
 
+      If the SNAPSHOT dependencies cannot be retrieved, build and install the
+      corresponding repositories locally first, then rerun `./install.sh`:
+      - [xipki/xishell](https://github.com/xipki/xishell) (groupId `org.xipki.shell`)
+      - [xipki/xicrypto](https://github.com/xipki/xicrypto) (groupId `org.xipki.crypto`)
+      - [xipki/xipkix](https://github.com/xipki/xipkix) (groupId `org.xipki.pkix`),
+        which depends on `xicrypto`, so build it after `xicrypto`.
+
+      In each of these repositories:
+      ```sh
+      mvn clean install -DskipTests
+      ```
+
 ### Just Try The Demo
 
 1. Unpack the binary.
    - Unpack `xipki-setup-<version>.tar.gz` 
 2. In the unpacked folder `xipki-setup-<version>`:  
    Run `./demo.sh` to prepare the system and start the XiPKI console.
-   
+
    Once the system has been prepared, you only need to start the XiPKI
    console by running `./xipki-setup-<version>/xipki-mgmt-cli/bin/xipki`.
 3. In the xipki console:  
-   Run `source demo/demo-single.script` to print the usage information, and 
+   Run `source demo/demo.script` to print the usage information, and 
    then follow it, for example:
-   `source demo/demo-single.script DB PKCS12 RSA2048`
+   `source demo/demo.script DB PKCS12 RSA2048`
 4. (Optional) Point the browser to http://localhost:8282 to open the H2 database
    console. You can view the database content using username `root` and 
    password `123456` with the following JDBC URLs:
@@ -94,7 +109,9 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 * OS
   * Linux, MacOS
 * JRE / JDK
-  * Java 11+.
+  * Java 24+ for ML-DSA / ML-KEM
+  * Java 15+ for Ed25519 and Ed448
+  * Java 11+ for the other algorithms
 * Database
   * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
@@ -117,7 +134,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
   - SCEP (RFC 8894)
   - CMP (RFC 4210, RFC 4211, RFC 9045, RFC 9480, RFC 9810, RFC 9811)
   - ACME (RFC 8555, RFC 8737)
-    - Challenge types: dns-01, http-01, tls-apln-01
+    - Challenge types: dns-01, http-01, tls-alpn-01
   - RESTful API (XiPKI own API)
 
 ### CA (Certification Authority)
@@ -170,7 +187,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - IssuerAltName (2.5.29.18)
       - KeyUsage (2.5.29.15)
       - NameConstraints (2.5.29.30)
-      - PolicyConstrains (2.5.29.36)
+      - PolicyConstraints (2.5.29.36)
       - PolicyMappings (2.5.29.33)
       - PrivateKeyUsagePeriod (2.5.29.16)
       - SubjectAltName (2.5.29.17)
@@ -181,7 +198,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - OcspNoCheck (1.3.6.1.5.5.7.48.1.5)
     - RFC 6962
       - CT Pre-certificate SCTs (1.3.6.1.4.1.11129.2.4.2)
-    - RfC 7633
+    - RFC 7633
       - TLSFeature (1.3.6.1.5.5.7.1.24)
     - Car Connectivity Consortium
       - CCC-K-Vehicle-Cert     (1.3.6.1.4.1.41577.5.1)
@@ -190,7 +207,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - CCC-H-Endpoint-Cert    (1.3.6.1.4.1.41577.5.4)
       - CCC-P-VehicleOEM-Enc-Cert (1.3.6.1.4.1.41577.5.5)
       - CCC-Q-VehicleOEM-Sig-Cert (1.3.6.1.4.1.41577.5.6)
-      - CCC-Device-Enc-Cert       ( 1.3.6.1.4.1.41577.5.7)
+      - CCC-Device-Enc-Cert       (1.3.6.1.4.1.41577.5.7)
       - CCC-Vehicle-Intermediate-Cert (1.3.6.1.4.1.41577.5.8)
       - CCC-J-VehicleOEM-CA-Cert (1.3.6.1.4.1.41577.5.9)
       - CCC-M-VehicleOEM-CA-Cert (1.3.6.1.4.1.41577.5.10)
@@ -199,9 +216,9 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
       - CCC-T-SBxD/KIS-Endpoint-Cert (1.3.6.1.4.1.41577.5.16)
       - CCC-U-SBxD/KIS-RootCA-Cert (1.3.6.1.4.1.41577.5.17)
     - Microsoft
-      - Certificate Template Name (1.3.1.6.1.311.20.2)
-      - Certificate Template Information (1.3.1.6.1.311.21.7)
-      - Security Identifier (SID, 1.3.1.6.1.311.25.2)
+      - Certificate Template Name (1.3.6.1.4.1.311.20.2)
+      - Certificate Template Information (1.3.6.1.4.1.311.21.7)
+      - Security Identifier (SID, 1.3.6.1.4.1.311.25.2)
     - China GM/T 0015-2023
       - Resident Identity Card Number (1.2.156.10260.4.1.1.1)
       - Passport Number (1.2.156.10260.4.1.1.2)
@@ -232,7 +249,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
     - RFC 10031
       - SubjectAltNames with otherName types
         - id-on-MACAddress (1.3.6.1.5.5.7.8.12)
-    - TCG DICE (Calipta)
+    - TCG DICE (Caliptra)
       - dice-ueid (2.23.133.5.4.4)
     - TCG Platform Certificate Profile
       - SubjectAltNames with OtherName types
@@ -290,7 +307,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
   - Management of multiple CAs in one software instance
     - Support for database clusters
     - Multiple software instances (all can be in active mode) for the same CA
-    - Native support for CA management via embedded OSGi commands
+    - Native support for CA management via JLine and Picocli.
     - API to manage the CA. This allows implementation of a proprietary CLI or
       website to manage the CA.
     - A database tool (export and import of the CA database) simplifies switching
@@ -319,7 +336,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 
 ### Mgmt CLI (Management Client)
   - Configuring CA
-  - Generating key pairs of RSA, EC, Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM, 
+  - Generating key pairs of RSA, EC (including SM2), Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM, 
     composite-MLDSA, and composite-MLKEM in the token
   - Deleting key pairs and certificates from the token
   - Updating certificates in the token

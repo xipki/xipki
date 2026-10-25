@@ -4,11 +4,11 @@
 package org.xipki.ca.gateway.acme;
 
 import org.xipki.ca.gateway.acme.type.Identifier;
-import org.xipki.util.codec.Args;
-import org.xipki.util.codec.CodecException;
-import org.xipki.util.codec.json.JsonEncodable;
-import org.xipki.util.codec.json.JsonMap;
-import org.xipki.util.extra.misc.CompareUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.json.JsonEncodable;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 /**
  * ACME Identifier.
@@ -43,6 +43,7 @@ public class AcmeIdentifier implements JsonEncodable {
     return new AcmeIdentifier(json.getNnString("type"), json.getNnString("value"));
   }
 
+  @Override
   public boolean equals(Object other) {
     if (!(other instanceof AcmeIdentifier)) {
       return false;

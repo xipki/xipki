@@ -3,13 +3,16 @@
 
 package org.xipki.ca.api.profile;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.x500.DirectoryString;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Attribute;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.OtherName;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.pkix.asn1.x509.EDIPartyName;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.pkix.asn1.x509.OtherName;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.StringType;
@@ -17,18 +20,13 @@ import org.xipki.ca.api.profile.ctrl.SubjectControl;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.ctrl.TextValidator;
-import org.xipki.ca.api.profile.id.OtherNameID;
 import org.xipki.ca.api.profile.id.SubjectDirectoryAttributeType;
-import org.xipki.security.OIDs;
-import org.xipki.security.asn1.rfc4108.HardwareModuleName;
-import org.xipki.security.asn1.spdm.SpdmParser;
-import org.xipki.security.asn1.tcg.TcgParser;
-import org.xipki.security.exception.BadCertTemplateException;
-import org.xipki.security.util.Asn1Util;
-import org.xipki.security.util.X509Util;
-import org.xipki.util.codec.Args;
-import org.xipki.util.extra.misc.CollectionUtil;
-import org.xipki.util.extra.type.Range;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.ca.api.Range;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -45,10 +43,10 @@ public class ProfileUtil {
   public static SubjectInfo getSubject(X500Name requestedSubject, SubjectControl scontrol)
       throws BadCertTemplateException {
     Args.notNull(requestedSubject, "requestedSubject");
-    RDN[] requestedRdns = requestedSubject.getRDNs();
+    List<RDN> requestedRdns = requestedSubject.getRDNs();
     List<RDN> rdns = new LinkedList<>();
 
-    for (ASN1ObjectIdentifier type : scontrol.types()) {
+    for (Asn1Oid type : scontrol.types()) {
       RdnControl control = scontrol.getControl(type);
       if (control == null || control.maxOccurs() < 1) {
         continue;
@@ -75,7 +73,7 @@ public class ProfileUtil {
       } else {
         // cvalue must be null here.
         for (int i = 0; i < requestedRdnNum; i++) {
-          ASN1Encodable value = thisRdns[i].getFirst().getValue();
+          Asn1Primitive value = thisRdns[i].getFirst().getValue();
           rdns.add(createSubjectRdn(type, value, control));
         }
       }
@@ -85,8 +83,7 @@ public class ProfileUtil {
     return new SubjectInfo(grantedSubject, null);
   } // method getSubject
 
-  private static RDN createSubjectRdn(
-      ASN1ObjectIdentifier type, ASN1Encodable value, RdnControl option)
+  private static RDN createSubjectRdn(Asn1Oid type, Asn1Primitive value, RdnControl option)
       throws BadCertTemplateException {
     String text = X509Util.rdnValueToString(value);
     return new RDN(type, createRdnValue(type, text, option));
@@ -107,13 +104,22 @@ public class ProfileUtil {
    *         not allowed in the modes.
    */
   public static GeneralName createGeneralName(
-      GeneralName requestedName, Set<GeneralNameTag> modes,
-      Set<ASN1ObjectIdentifier> otherNameTypes)
+      GeneralName requestedName, Set<GeneralNameTag> modes, Set<Asn1Oid> otherNameTypes)
       throws BadCertTemplateException {
+    try {
+      return doCreateGeneralName(requestedName, modes, otherNameTypes);
+    } catch (CodecException e) {
+      throw new BadCertTemplateException("error creating GeneralName", e);
+    }
+  }
+
+  private static GeneralName doCreateGeneralName(
+      GeneralName requestedName, Set<GeneralNameTag> modes, Set<Asn1Oid> otherNameTypes)
+      throws BadCertTemplateException, CodecException {
     Args.notNull(requestedName, "requestedName");
 
     int tag = requestedName.getTagNo();
-    if (tag != GeneralName.otherName) {
+    if (tag != GeneralName.tag_otherName) {
       GeneralNameTag mode = null;
 
       if (modes != null) {
@@ -130,40 +136,29 @@ public class ProfileUtil {
       }
 
       switch (tag) {
-        case GeneralName.rfc822Name:
-        case GeneralName.dNSName:
-        case GeneralName.uniformResourceIdentifier:
-        case GeneralName.iPAddress:
-        case GeneralName.registeredID:
-        case GeneralName.directoryName:
-          return new GeneralName(tag, requestedName.getName());
-        case GeneralName.ediPartyName: {
-          ASN1Sequence reqSeq = ASN1Sequence.getInstance(requestedName.getName());
-
-          int size = reqSeq.size();
-          String nameAssigner = null;
-          int idx = 0;
-          if (size > 1) {
-            ASN1TaggedObject taggedObj = ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx++));
-            nameAssigner = DirectoryString.getInstance(taggedObj.getBaseObject()).getString();
-          }
-
-          ASN1TaggedObject taggedObj = ASN1TaggedObject.getInstance(reqSeq.getObjectAt(idx));
-          String partyName = DirectoryString.getInstance(taggedObj.getBaseObject()).getString();
-
-          ASN1EncodableVector vector = new ASN1EncodableVector();
-          if (nameAssigner != null) {
-            vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-          }
-          vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-          return new GeneralName(GeneralName.ediPartyName, new DERSequence(vector));
+        case GeneralName.tag_rfc822Name:
+          return GeneralName.ofRfc822Name(requestedName.getRfc822Name());
+        case GeneralName.tag_dNSName:
+          return GeneralName.ofDnsName(requestedName.getDNSName());
+        case GeneralName.tag_uri:
+          return GeneralName.ofUri(requestedName.getUri());
+        case GeneralName.tag_iPAddress:
+          return GeneralName.ofIPAddress(requestedName.getIPAddress());
+        case GeneralName.tag_registeredID:
+          return GeneralName.ofRegisteredID(requestedName.getRegisteredID());
+        case GeneralName.tag_directoryName:
+          return GeneralName.ofDirectoryName(requestedName.getDirectoryName());
+        case GeneralName.tag_ediPartyName: {
+          EDIPartyName reqEdi = requestedName.getEdiPartyName();
+          return GeneralName.ofEdiPartyName(
+              new EDIPartyName(reqEdi.nameAssigner(), reqEdi.partyName()));
         }
         default:
           throw new IllegalStateException("should not reach here, unknown GeneralName tag " + tag);
       }
     } else {
-      OtherName reqOtherName = OtherName.getInstance(requestedName.getName());
-      ASN1ObjectIdentifier type = reqOtherName.getTypeID();
+      OtherName reqOtherName = requestedName.getOtherName();
+      Asn1Oid type = reqOtherName.getTypeID();
       String typeText = type.getId();
 
       if (!modes.contains(GeneralNameTag.otherName)) {
@@ -174,108 +169,62 @@ public class ProfileUtil {
         throw new BadCertTemplateException("otherName with type " + typeText + " is not allowed");
       }
 
-      // customized checker and process
-      OtherName resOtherName;
-      try {
-        if (type.on(OIDs.TCG.tcg)) {
-          resOtherName = new OtherName(type, TcgParser.parseTcgOtherName(reqOtherName));
-        } else if (type.on(OIDs.Spdm.id_spdm)) {
-          resOtherName = new OtherName(type, SpdmParser.parseSpdmOtherName(reqOtherName));
-        } else if (type.equals(OtherNameID.hardwareModuleName.oid())) {
-          HardwareModuleName hmName = HardwareModuleName.getInstance(reqOtherName.getValue());
-          resOtherName = new OtherName(type, hmName);
-        } else if (type.equals(OtherNameID.macAddress.oid())) {
-          ASN1OctetString os = ASN1OctetString.getInstance(reqOtherName.getValue());
-          int len = os.getOctets().length;
-          if (!(len == 6 || len == 8 || len == 12 || len == 16)) {
-            throw new BadCertTemplateException("invalid length of MAC address: " + len);
-          }
-          resOtherName = reqOtherName;
-        } else if (type.equals(OtherNameID.smtpUTF8Mailbox.oid())) {
-          String text = Asn1Util.getUTF8String(reqOtherName.getValue());
-          boolean withNonAscii = false;
-          for (int i = 0; i < text.length(); i++) {
-            int c = text.charAt(i);
-            if (c > 127) {
-              withNonAscii = true;
-              break;
-            }
-          }
-
-          if (!withNonAscii) {
-            throw new BadCertTemplateException(
-                "smtpUTF8Mailbox shall not contain ASCII-only mailbox");
-          }
-          resOtherName = reqOtherName;
-        } else {
-          resOtherName = reqOtherName;
-        }
-      } catch (RuntimeException e) {
-        throw new BadCertTemplateException("invalid value of otherName type " + type);
-      }
-
-      return new GeneralName(GeneralName.otherName, resOtherName);
+      return GeneralName.ofOtherName(reqOtherName);
     }
   } // method createGeneralName
 
   public static Attribute canonicalizeSubjectDirectoryAttribute(Attribute reqAttr)
       throws BadCertTemplateException {
-    ASN1ObjectIdentifier attrType = reqAttr.getAttrType();
-    ASN1Set reqAttrValues = reqAttr.getAttrValues();
-
-    if (SubjectDirectoryAttributeType.title.oid().equals(attrType) ||
-        SubjectDirectoryAttributeType.gender.oid().equals(attrType) ||
-        SubjectDirectoryAttributeType.placeOfBirth.oid().equals(attrType) ||
-        SubjectDirectoryAttributeType.dateOfBirth.oid().equals(attrType) ||
-        SubjectDirectoryAttributeType.countryOfCitizenship.oid().equals(attrType) ||
-        SubjectDirectoryAttributeType.countryOfResidence.oid().equals(attrType)) {
-      int setSize = reqAttrValues.size();
-      if (setSize != 1) {
-        throw new IllegalArgumentException("invalid attrValue.size() " + setSize);
-      }
-
-      ASN1Primitive sAttrValue = reqAttrValues.getObjectAt(0).toASN1Primitive();
-
-      if (SubjectDirectoryAttributeType.title.oid().equals(attrType)) {
-        if (sAttrValue instanceof ASN1T61String ||
-            sAttrValue instanceof ASN1PrintableString ||
-            sAttrValue instanceof ASN1UniversalString ||
-            sAttrValue instanceof ASN1UTF8String ||
-            sAttrValue instanceof ASN1BMPString) {
-          int sLen = ((ASN1String) sAttrValue).getString().length();
-          if (sLen == 0) {
-            throw new BadCertTemplateException("invalid length of title: 0");
-          }
-        }
-
-        return new Attribute(attrType, new DERSet(sAttrValue));
-      } else if (SubjectDirectoryAttributeType.countryOfCitizenship.oid().equals(attrType) ||
-                 SubjectDirectoryAttributeType.countryOfResidence.oid().equals(attrType)) {
-        String country = ASN1PrintableString.getInstance(sAttrValue).getString();
-        if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
-          throw new BadCertTemplateException(
-              "invalid country (" + attrType.getId() + "): " + country);
-        }
-      } else if (SubjectDirectoryAttributeType.gender.oid().equals(attrType)) {
-        String gender = Asn1Util.getPrintableString(sAttrValue);
-        if (!("M".equalsIgnoreCase(gender) || "F".equalsIgnoreCase(gender))) {
-          throw new BadCertTemplateException("invalid gender: " + gender);
-        }
-      } else if (SubjectDirectoryAttributeType.dateOfBirth.oid().equals(attrType)) {
-        ASN1GeneralizedTime.getInstance(sAttrValue);
-      } else { // placeOfBirth
-        DirectoryString.getInstance(sAttrValue);
-      }
-      return reqAttr;
-    } else if (attrType.on(OIDs.TCG.tcg_attribute)) {
-      ASN1Encodable sAttrValue = TcgParser.parseTcgAttributeValue(attrType, reqAttrValues);
-      return new Attribute(attrType, new DERSet(sAttrValue));
-    } else {
-      return reqAttr;
+    try {
+      return doCanonicalizeSubjectDirectoryAttribute(reqAttr);
+    } catch (CodecException | IllegalArgumentException e) {
+      throw new BadCertTemplateException("error canonicalizing SubjectDirectoryAttribute", e);
     }
   }
 
-  private static RDN[] getRdns(RDN[] rdns, ASN1ObjectIdentifier type) {
+  private static Attribute doCanonicalizeSubjectDirectoryAttribute(Attribute reqAttr)
+      throws BadCertTemplateException, CodecException {
+    Asn1Oid attrType = reqAttr.getAttrType();
+
+    if (!(SubjectDirectoryAttributeType.title.oid().equals(attrType) ||
+        SubjectDirectoryAttributeType.gender.oid().equals(attrType) ||
+        SubjectDirectoryAttributeType.dateOfBirth.oid().equals(attrType) ||
+        SubjectDirectoryAttributeType.countryOfCitizenship.oid().equals(attrType) ||
+        SubjectDirectoryAttributeType.countryOfResidence.oid().equals(attrType))) {
+      return reqAttr;
+    }
+
+    if (SubjectDirectoryAttributeType.title.oid().equals(attrType)) {
+      int sLen = reqAttr.titleAttr().length();
+      if (sLen == 0) {
+        throw new BadCertTemplateException("invalid length of title: 0");
+      }
+    } else if (AttributeOIDs.countryOfCitizenship.equals(attrType) ||
+               AttributeOIDs.countryOfResidence.equals(attrType)) {
+      String country = AttributeOIDs.countryOfCitizenship.equals(attrType)
+          ? reqAttr.countryOfCitizenship() : reqAttr.countryOfResidence();
+      if (!SubjectDnSpec.isValidCountryAreaCode(country)) {
+        throw new BadCertTemplateException(
+            "invalid country (" + attrType.getId() + "): " + country);
+      }
+    } else if (AttributeOIDs.gender.equals(attrType)) {
+      String gender = reqAttr.gender();
+      if (!("M".equalsIgnoreCase(gender) || "F".equalsIgnoreCase(gender))) {
+        throw new BadCertTemplateException("invalid gender: " + gender);
+      }
+    } else { // if (AttributeOIDs.dateOfBirth.equals(attrType)) {
+      String dateOfBirth = reqAttr.getDateOfBirth().getText();
+      for (int i = 8; i < 14; i++) {
+        char c = dateOfBirth.charAt(i);
+        if (c != '0') {
+          throw new BadCertTemplateException("invalid dateOfBirth: " + dateOfBirth);
+        }
+      }
+    }
+    return reqAttr;
+  }
+
+  private static RDN[] getRdns(List<RDN> rdns, Asn1Oid type) {
     Args.notNull(rdns, "rdns");
     Args.notNull(type, "type");
 
@@ -289,10 +238,10 @@ public class ProfileUtil {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  private static ASN1Encodable createRdnValue(
-      ASN1ObjectIdentifier type, String text, RdnControl option)
+  private static Asn1Primitive createRdnValue(
+      Asn1Oid type, String text, RdnControl option)
       throws BadCertTemplateException {
-    if (OIDs.DN.emailAddress.equals(type)) {
+    if (AttributeOIDs.emailAddress.equals(type)) {
       text = text.toLowerCase();
     }
 
