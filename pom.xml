@@ -10,6 +10,18 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <description>XiPKI Parent</description>
   <url>https://github.com/xipki/xipki</url>
+  <repositories>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
