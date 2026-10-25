@@ -41,7 +41,7 @@ set crypto $(crypto-info)
 
 set java_version $(java-version)
 
-if "$crypto" neq "CryptoJdk" | "$java_version" ge "24"
+if "$crypto" neq "CryptoJdk" | "$java_version" ge "25"
   fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT
 elif "$java_version" ge "15"
   fill-keypool --db-conf "${DB_CONF}" --password CHANGEIT \

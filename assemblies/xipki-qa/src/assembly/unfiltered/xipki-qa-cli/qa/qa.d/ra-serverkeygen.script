@@ -3,7 +3,7 @@ set crypto $(crypto-info)
 
 set java_version $(java-version)
 
-if "$crypto" neq "CryptoJdk" | "$java_version" ge "24"
+if "$crypto" neq "CryptoJdk" | "$java_version" ge "25"
   set list [ tls-rsa tls-ec tls-edwards tls-montgomery tls-sm2 tls-mldsa \
              tls-mlkem tls-compsig tls-compkem ]
 elif "$java_version" ge "15"

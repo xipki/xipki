@@ -33,7 +33,7 @@ JRE/JDK, and the steps required to reproduce the bug.
 XiPKI provides the binary `xipki-setup-<version>.tar.gz` with the following requirements on JDK:
   - Java 11+ is required for this runtime
   - Java 15+ for ED25519 and ED448
-  - Java 24+ for ML-DSA, ML-KEM.
+  - Java 25+ for ML-DSA, ML-KEM.
 
 The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the following ways: 
   - Download the binary from https://github.com/xipki/xipki/releases
@@ -109,7 +109,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 * OS
   * Linux, MacOS
 * JRE / JDK
-  * Java 24+ for ML-DSA / ML-KEM
+  * Java 25+ for ML-DSA / ML-KEM
   * Java 15+ for Ed25519 and Ed448
   * Java 11+ for the other algorithms
 * Database
