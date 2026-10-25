@@ -23,10 +23,9 @@
     </developer>
   </developers>
   <properties>
-    <!-- versions of the crypto (xicrypto) and PKIX (xipkix) modules -->
-    <xicrypto.version>1.0.0-SNAPSHOT</xicrypto.version>
-    <xipkix.version>2.0.0-SNAPSHOT</xipkix.version>
-    <xishell.version>3.0.0-SNAPSHOT</xishell.version>
+    <xicrypto.version>7.0.0-SNAPSHOT</xicrypto.version>
+    <xipkix.version>7.0.0-SNAPSHOT</xipkix.version>
+    <xishell.version>7.0.0-SNAPSHOT</xishell.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipDeploy>false</skipDeploy>
     <dnsjava.version>3.6.5</dnsjava.version>
