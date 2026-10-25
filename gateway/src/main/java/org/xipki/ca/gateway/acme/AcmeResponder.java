@@ -88,7 +88,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.xipki.ca.gateway.acme.AcmeConstants.*;
-import static org.xipki.util.codec.Base64.decodeFast;
 
 /**
  * ACME Responder.
@@ -648,10 +647,16 @@ public class AcmeResponder {
               .putHeader(HDR_LOCATION, accountForNewJwk.getLocation(baseUrl));
         }
 
+        // RFC 8555 Section 7.3.5: the inner JWS MUST have the same "url" as the outer JWS
+        if (!protectedUrl.equals(innerProtected.getString("url"))) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+              "inner url does not match the outer url");
+        }
+
         // check payload.account, and payload.oldKey
         JsonMap innerPayload = toJsonMap(decodeFast(reqPayload.payload()));
         String innerAccount = innerPayload.getString("account");
-        if (!innerAccount.equals(kid)) {
+        if (!kid.equals(innerAccount)) {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
               "invalid payload.account");
         }
@@ -671,7 +676,7 @@ public class AcmeResponder {
           throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.badPublicKey, null);
         }
 
-        verifySignature(protected_.getString("alg"), newPubKey, reqPayload);
+        verifySignature(innerProtected.getString("alg"), newPubKey, reqPayload);
 
         account.setJwk(newJwk);
 
@@ -1162,7 +1167,13 @@ public class AcmeResponder {
               AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        AuthzId id = new AuthzId(decodeFast(tokens[1]));
+        AuthzId id;
+        try {
+          id = new AuthzId(decodeFast(tokens[1]));
+        } catch (AcmeProtocolException | IllegalArgumentException ex) {
+          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown authz",
+              AuditLevel.ERROR, AuditStatus.FAILED);
+        }
         AcmeAuthz authz = Optional.ofNullable(repo.getAuthz(id)).orElseThrow(
             () -> new HttpRespAuditException(SC_NOT_FOUND, "unknown authz",
                 AuditLevel.ERROR, AuditStatus.FAILED));
@@ -1179,7 +1190,13 @@ public class AcmeResponder {
               AuditLevel.ERROR, AuditStatus.FAILED);
         }
 
-        ChallId challId = new ChallId(decodeFast(tokens[1]));
+        ChallId challId;
+        try {
+          challId = new ChallId(decodeFast(tokens[1]));
+        } catch (AcmeProtocolException | IllegalArgumentException ex) {
+          throw new HttpRespAuditException(SC_NOT_FOUND, "unknown challenge",
+              AuditLevel.ERROR, AuditStatus.FAILED);
+        }
         AcmeChallenge2 chall2 = Optional.ofNullable(
             repo.getChallenge(challId)).orElseThrow(
                 () -> new HttpRespAuditException(SC_NOT_FOUND,
@@ -1236,6 +1253,10 @@ public class AcmeResponder {
 
   private void verifySignature(String sigAlg, PublicKey pubKey, JoseMessage joseMessage)
       throws AcmeProtocolException {
+    if (sigAlg == null) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed, "alg is not present");
+    }
+
     sigAlg = sigAlg.toUpperCase(Locale.ROOT);
     SignAlgo signAlgo = joseAlgMap.get(sigAlg);
     if (signAlgo == null) {
@@ -1249,7 +1270,18 @@ public class AcmeResponder {
       sig.update(joseMessage.getProtected().getBytes(StandardCharsets.UTF_8));
       sig.update((byte) 0x2e); // 0x2e = '.'
       sig.update(joseMessage.payload().getBytes(StandardCharsets.UTF_8));
-      boolean sigValid = sig.verify(decodeFast(joseMessage.signature()));
+      byte[] sigValue = decodeFast(joseMessage.signature());
+      if (signAlgo.isECDSASigAlgo()) {
+        // RFC 7518 Section 3.4: JWS ECDSA signature is R || S, each of the curve's field size.
+        int expectedLen = signAlgo == SignAlgo.ECDSA_SHA256 ? 64
+            : signAlgo == SignAlgo.ECDSA_SHA384 ? 96 : 132;
+        if (sigValue.length != expectedLen) {
+          throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+              "signature is not valid");
+        }
+        sigValue = org.xipki.util.codec.asn1.Asn1Util.dsaSigPlainToX962(sigValue);
+      }
+      boolean sigValid = sig.verify(sigValue);
       if (!sigValid) {
         throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
             "signature is not valid");
@@ -1324,7 +1356,24 @@ public class AcmeResponder {
   }
 
   private static Long toLongId(String id) {
-    return (id.length() != 11) ? null : Pack.littleEndianToLong(decodeFast(id), 0);
+    if (id.length() != 11) {
+      return null;
+    }
+
+    try {
+      return Pack.littleEndianToLong(Base64.decodeFast(id), 0);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
+  }
+
+  private static byte[] decodeFast(String b64) throws AcmeProtocolException {
+    try {
+      return Base64.decodeFast(b64);
+    } catch (IllegalArgumentException ex) {
+      throw new AcmeProtocolException(SC_BAD_REQUEST, AcmeError.malformed,
+          "invalid base64url encoding");
+    }
   }
 
   private AcmeProtocolConf.CaProfile getCaProfile(String keyAlgId) {

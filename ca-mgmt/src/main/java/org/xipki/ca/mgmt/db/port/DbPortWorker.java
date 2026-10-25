@@ -41,6 +41,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.SignatureException;
@@ -211,7 +212,7 @@ public abstract class DbPortWorker extends DbWorker {
       }
 
       byte[] computedMacValue = cipherSuite.mac.doFinal();
-      if (!Arrays.equals(macValue, computedMacValue)) {
+      if (!MessageDigest.isEqual(macValue, computedMacValue)) {
         throw new SignatureException("MAC value is not valid");
       }
     }

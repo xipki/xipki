@@ -92,11 +92,9 @@ public class X509CrlModule extends X509CaModule implements Closeable {
         return;
       }
 
-      if (crlGenInProcess.get()) {
+      if (!crlGenInProcess.compareAndSet(false, true)) {
         return;
       }
-
-      crlGenInProcess.set(true);
 
       try {
         run0();
@@ -354,11 +352,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
     CrlControl control = Optional.ofNullable(caInfo.crlControl())
         .orElseThrow(() -> new OperationException(NOT_PERMITTED, "CA could not generate CRL"));
 
-    if (crlGenInProcess.get()) {
+    if (!crlGenInProcess.compareAndSet(false, true)) {
       throw new OperationException(SYSTEM_UNAVAILABLE, "TRY_LATER");
     }
 
-    crlGenInProcess.set(true);
     try {
       Instant thisUpdate = Instant.now();
       Instant nearestScheduledIssueTime = getScheduledCrlGenTimeNotAfter(thisUpdate);

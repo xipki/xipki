@@ -261,7 +261,7 @@ public class KeyUtil {
             : (keySpec == KeySpec.MLDSA65) ? MLDSAParameterSpec.ml_dsa_65
             : MLDSAParameterSpec.ml_dsa_87;
 
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ML-DSA");
+        KeyPairGenerator kpGen = getKeyPairGenerator("ML-DSA");
         if (random == null) {
           kpGen.initialize(spec);
         } else {
@@ -277,7 +277,7 @@ public class KeyUtil {
             : keySpec == KeySpec.MLKEM768 ? MLKEMParameterSpec.ml_kem_768
             : MLKEMParameterSpec.ml_kem_1024;
 
-        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ML-KEM");
+        KeyPairGenerator kpGen = getKeyPairGenerator("ML-KEM");
         if (random == null) {
           kpGen.initialize(spec);
         } else {
@@ -703,46 +703,55 @@ public class KeyUtil {
     }
   }
 
+  /**
+   * HKDF as specified in RFC 5869.
+   */
   public static byte[] hkdf(HashAlgo hashAlgo, byte[] salt, byte[] ikm, byte[] info, int outSize) {
-    // TODO: check the correctness
+    int hmacSize = hashAlgo.length();
+    // RFC 5869: L <= 255 * HashLen
+    int num = (outSize + hmacSize - 1) / hmacSize;
+    if (num > 255) {
+      throw new IllegalArgumentException("outSize too big: " + outSize);
+    }
+
+    if (salt == null || salt.length == 0) {
+      // RFC 5869: if salt not provided, it is set to a string of HashLen zeros.
+      salt = new byte[hmacSize];
+    }
+
+    if (info == null) {
+      info = new byte[0];
+    }
+
     // Step 1: Extract: HKDF-Extract(salt, IKM) -> PRK
-    String hmacAlgName = "HMAC-" + hashAlgo.jceName();
+    String hmacAlgName = "Hmac" + hashAlgo.jceName();
 
     Mac mac;
+    SecretKeySpec prk;
     try {
       mac = Mac.getInstance(hmacAlgName);
       mac.init(new SecretKeySpec(salt, hmacAlgName));
+      prk = new SecretKeySpec(mac.doFinal(ikm), hmacAlgName);
+      mac.init(prk);
     } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
       throw new IllegalStateException(ex);
     }
 
-    SecretKeySpec prk = new SecretKeySpec(mac.doFinal(ikm), hmacAlgName);
-
-    int hmacSize = hashAlgo.length();
     // Step 2: Expand: HKDF-Expand(PRK, info, L) -> OKM
-
-    int num = (outSize + hmacSize - 1) / hmacSize;
-    if (num > 254) {
-      throw new IllegalArgumentException("outSize too big: " + outSize);
-    }
-
+    // T(0) = empty, T(i) = HMAC(PRK, T(i-1) | info | i), i = 1..N
     byte[] okm = new byte[outSize];
 
     int off = 0;
     byte[] ti_1 = new byte[0];
 
-    for (int i = 0; i < num; i++) {
-      try {
-        mac.init(prk);
-      } catch (InvalidKeyException e) {
-        throw new RuntimeException(e);
-      }
-
+    for (int i = 1; i <= num; i++) {
       mac.update(ti_1);
       mac.update(info);
       mac.update((byte) i);
       byte[] t_i = mac.doFinal();
-      System.arraycopy(t_i, 0, okm, off, Math.min(outSize - off, hmacSize));
+      int len = Math.min(outSize - off, hmacSize);
+      System.arraycopy(t_i, 0, okm, off, len);
+      off += len;
       ti_1 = t_i;
     }
     return okm;
@@ -827,8 +836,8 @@ public class KeyUtil {
         algo.contains(OIDs.Algo.sm2sign_with_sm3.getId()) ||
         algo.contains(OIDs.Algo.id_sm3.getId())) {
       return SM2_PROVIDER_NAME;
-    } else if (StringUtil.orEqualsIgnoreCase(algo, "RSAPSSIWTHSHAKE128",
-        "RSAPSSIWTHSHAKE256", "SHAKE128WITHRSAPSS", "SHAKE256WITHRSAPSS")) {
+    } else if (StringUtil.orEqualsIgnoreCase(algo, "RSAPSSWITHSHAKE128",
+        "RSAPSSWITHSHAKE256", "SHAKE128WITHRSAPSS", "SHAKE256WITHRSAPSS")) {
       return RSAPSSSHAKE_PROVIDER_NAME;
     } else {
       return BouncyCastleProvider.PROVIDER_NAME;

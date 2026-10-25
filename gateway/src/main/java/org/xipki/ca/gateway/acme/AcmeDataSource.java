@@ -171,7 +171,7 @@ public class AcmeDataSource {
       throw new IllegalArgumentException("oldAccount and newAccount does not have the same id");
     }
 
-    boolean updateJwkFp = oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
+    boolean updateJwkFp = !oldAccount.getJwkSha256().equals(newAccount.getJwkSha256());
     boolean updateStatus = oldAccount.status() != newAccount.status();
     String oldData = toJson(oldAccount.data());
     String newData = toJson(newAccount.data());

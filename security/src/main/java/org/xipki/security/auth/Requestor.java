@@ -35,7 +35,7 @@ public interface Requestor {
     REVOKE_CERT;
 
     static Permission of(String str) {
-      str = str.toUpperCase(Locale.ROOT).replace('_', '-');
+      str = str.toUpperCase(Locale.ROOT).replace('-', '_');
       return valueOf(str);
     }
 

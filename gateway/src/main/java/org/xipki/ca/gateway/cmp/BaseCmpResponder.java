@@ -156,6 +156,11 @@ public abstract class BaseCmpResponder {
 
   private static final int PVNO_CMP2000 = 2;
 
+  private static final int MIN_PBM_ITERATION_COUNT = 1000;
+
+  // upper bound to limit the CPU time an unauthenticated request can consume.
+  private static final int MAX_PBM_ITERATION_COUNT = 1_000_000;
+
   private static final AlgorithmIdentifier prf_hmacWithSHA256 =
       SignAlgo.HMAC_SHA256.algorithmIdentifier();
 
@@ -604,9 +609,11 @@ public abstract class BaseCmpResponder {
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
-      int iterationCount = parameter.getIterationCount().getValue().intValue();
-      if (iterationCount < 1000) {
-        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} < 1000)", iterationCount);
+      BigInteger iterationCount = parameter.getIterationCount().getValue();
+      if (iterationCount.compareTo(BigInteger.valueOf(MIN_PBM_ITERATION_COUNT)) < 0
+          || iterationCount.compareTo(BigInteger.valueOf(MAX_PBM_ITERATION_COUNT)) > 0) {
+        LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} not in [{}, {}])",
+            iterationCount, MIN_PBM_ITERATION_COUNT, MAX_PBM_ITERATION_COUNT);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 

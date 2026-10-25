@@ -228,6 +228,11 @@ public abstract class CborDecoder implements AutoCloseable {
    */
   public BigInteger readUint() throws CodecException {
     int ib = read1Byte();
+    int majorType = (ib & 0xFF) >>> 5;
+    if (majorType != TYPE_UNSIGNED_INTEGER) {
+      fail("Unexpected type: %s, expected type %s!", CborType.getName(majorType),
+          CborType.getName(TYPE_UNSIGNED_INTEGER));
+    }
 
     // in case of negative integers does a ones complement
     long value = readUInt(ib & 0x1f, false /* breakAllowed */, true);
@@ -457,13 +462,13 @@ public abstract class CborDecoder implements AutoCloseable {
     } else if (tag >= 1280 && tag <= 1400) {
       return tag - 1273;
     } else if (tag == 101) {
+      // 101([uint, any]): alternative uint + 128
       readArrayLength(2);
       BigInteger a = readUint();
-      long v = a.longValueExact() + 128;
-      if (v < 128) {
-        throw new CodecException("invalid alternative " + v);
+      if (a.compareTo(BigInteger.valueOf(Long.MAX_VALUE - 128)) > 0) {
+        throw new CodecException("alternative too large: " + a + " + 128");
       }
-      return v;
+      return a.longValue() + 128;
     } else {
       throw new CodecException("Unexpected tag: " + tag +
           ", expected 101, 121-127 and 1280-1400");

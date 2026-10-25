@@ -131,7 +131,27 @@ public class ByteArrayCborDecoder extends CborDecoder {
     if (position >= maxPosition) {
       throw new CodecException("bytes too short");
     }
-    return m_is[position++];
+    return m_is[position++] & 0xFF;
+  }
+
+  @Override
+  public int readArrayLength() throws CodecException {
+    int len = super.readArrayLength();
+    // each element is encoded in at least one byte
+    if (len > maxPosition - position) {
+      throw new CodecException("bytes too short");
+    }
+    return len;
+  }
+
+  @Override
+  public int readMapLength() throws CodecException {
+    int len = super.readMapLength();
+    // each entry (key and value) is encoded in at least two bytes
+    if (len > (maxPosition - position) / 2) {
+      throw new CodecException("bytes too short");
+    }
+    return len;
   }
 
   boolean hasMoreBytes() {
@@ -248,7 +268,7 @@ public class ByteArrayCborDecoder extends CborDecoder {
 
   @Override
   protected byte[] readExactly(int len) throws CodecException {
-    if (position + len > maxPosition) {
+    if (len < 0 || len > maxPosition - position) {
       throw new CodecException("bytes too short");
     }
     byte[] ret = Arrays.copyOfRange(m_is, position, position + len);

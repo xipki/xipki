@@ -42,6 +42,14 @@ public abstract class Base64 {
     IA['_'] = 63;
   }
 
+  private static int ia(char c) {
+    return c < IA.length ? IA[c] : -1;
+  }
+
+  private static int ia(byte b) {
+    return IA[b & 0xff];
+  }
+
   public static Encoder getEncoder() {
     return encoder;
   }
@@ -145,13 +153,13 @@ public abstract class Base64 {
     // Number of separator characters. (Actually illegal characters, but
     // that's a bonus...)
     for (int i = 0; i < sLen; ++i) {
-      if (IA[sArr[i]] < 0) {
+      if (ia(sArr[i]) < 0) {
         ++sepCnt;
       }
     }
 
     int pad = 0;
-    for (int i = sLen; i > 1 && IA[sArr[--i]] <= 0;) {
+    for (int i = sLen; i > 1 && ia(sArr[--i]) <= 0;) {
       if (sArr[i] == '=') {
         ++pad;
       }
@@ -166,7 +174,7 @@ public abstract class Base64 {
       // Assemble three bytes into an int from four "valid" characters.
       int i = 0;
       for (int j = 0; j < 4 && s < maxSArrIndex;) {   // j only increased if a valid char was found.
-        int c = IA[sArr[s++]];
+        int c = ia(sArr[s++]);
         if (c >= 0) {
           i |= c << (18 - j * 6);
           j++;
@@ -208,29 +216,37 @@ public abstract class Base64 {
     int sIx = 0, eIx = sLen - 1;    // Start and end index after trimming.
 
     // Trim illegal chars from start
-    while (sIx < eIx && IA[sArr[sIx]] < 0) {
+    while (sIx < eIx && ia(sArr[sIx]) < 0) {
       ++sIx;
     }
 
     // Trim illegal chars from end
-    while (eIx > 0 && IA[sArr[eIx]] < 0) {
+    while (eIx > 0 && ia(sArr[eIx]) < 0) {
       --eIx;
     }
 
     // get the padding count (=) (0, 1 or 2)
-    int pad = sArr[eIx] == '=' ? (sArr[eIx - 1] == '=' ? 2 : 1) : 0;  // Count '=' at end.
+    int pad = sArr[eIx] != '=' ? 0
+        : (eIx > 0 && sArr[eIx - 1] == '=') ? 2 : 1;  // Count '=' at end.
     int cCnt = eIx - sIx + 1;   // Content count including possible separators
     int sepCnt = sLen > 76 ? (sArr[76] == '\r' ? cCnt / 78 : 0) << 1 : 0;
 
     int len = ((cCnt - sepCnt) * 6 >> 3) - pad; // The number of decoded bytes
+    if (len < 0) {
+      throw new IllegalArgumentException("invalid Base64 encoded data");
+    }
     byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
 
     // Decode all but the last 0 - 2 bytes.
     int d = 0;
     for (int cc = 0, eLen = (len / 3) * 3; d < eLen;) {
       // Assemble three bytes into an int from four "valid" characters.
-      int i = IA[sArr[sIx++]] << 18 | IA[sArr[sIx++]] << 12
-          | IA[sArr[sIx++]] << 6 | IA[sArr[sIx++]];
+      int i = ia(sArr[sIx++]) << 18 | ia(sArr[sIx++]) << 12
+          | ia(sArr[sIx++]) << 6 | ia(sArr[sIx++]);
+      if (i < 0) {
+        // at least one invalid character
+        throw new IllegalArgumentException("invalid Base64 character");
+      }
 
       // Add the bytes
       dArr[d++] = (byte) (i >> 16);
@@ -248,7 +264,11 @@ public abstract class Base64 {
       // Decode last 1-3 bytes (incl '=') into 1-3 bytes
       int i = 0;
       for (int j = 0; sIx <= eIx - pad; ++j) {
-        i |= IA[sArr[sIx++]] << (18 - j * 6);
+        i |= ia(sArr[sIx++]) << (18 - j * 6);
+      }
+
+      if (i < 0) {
+        throw new IllegalArgumentException("invalid Base64 character");
       }
 
       for (int r = 16; d < len; r -= 8) {
@@ -313,13 +333,13 @@ public abstract class Base64 {
     // Number of separator characters. (Actually illegal characters, but that's a bonus...)
     int sepCnt = 0;
     for (byte b : sArr) {
-      if (IA[b & 0xff] < 0) {
+      if (ia(b) < 0) {
         ++sepCnt;
       }
     }
 
     int pad = 0;
-    for (int i = sLen; i > 1 && IA[sArr[--i] & 0xff] <= 0;) {
+    for (int i = sLen; i > 1 && ia(sArr[--i]) <= 0;) {
       if (sArr[i] == '=') {
         ++pad;
       }
@@ -334,7 +354,7 @@ public abstract class Base64 {
       // Assemble three bytes into an int from four "valid" characters.
       int i = 0;
       for (int j = 0; j < 4 && s < maxSArrIndex;) { // j only increased if a valid char was found.
-        int c = IA[sArr[s++] & 0xff];
+        int c = ia(sArr[s++]);
         if (c >= 0) {
           i |= c << (18 - j * 6);
           j++;
@@ -377,29 +397,37 @@ public abstract class Base64 {
     int sIx = 0, eIx = sLen - 1;    // Start and end index after trimming.
 
     // Trim illegal chars from start
-    while (sIx < eIx && IA[sArr[sIx] & 0xff] < 0) {
+    while (sIx < eIx && ia(sArr[sIx]) < 0) {
       ++sIx;
     }
 
     // Trim illegal chars from end
-    while (eIx > 0 && IA[sArr[eIx] & 0xff] < 0) {
+    while (eIx > 0 && ia(sArr[eIx]) < 0) {
       --eIx;
     }
 
     // get the padding count (=) (0, 1 or 2)
-    int pad = sArr[eIx] == '=' ? (sArr[eIx - 1] == '=' ? 2 : 1) : 0;  // Count '=' at end.
+    int pad = sArr[eIx] != '=' ? 0
+        : (eIx > 0 && sArr[eIx - 1] == '=') ? 2 : 1;  // Count '=' at end.
     int cCnt = eIx - sIx + 1;   // Content count including possible separators
     int sepCnt = sLen > 76 ? (sArr[76] == '\r' ? cCnt / 78 : 0) << 1 : 0;
 
     int len = ((cCnt - sepCnt) * 6 >> 3) - pad; // The number of decoded bytes
+    if (len < 0) {
+      throw new IllegalArgumentException("invalid Base64 encoded data");
+    }
     byte[] dArr = new byte[len];       // Preallocate byte[] of exact length
 
     // Decode all but the last 0 - 2 bytes.
     int d = 0;
     for (int cc = 0, eLen = (len / 3) * 3; d < eLen;) {
       // Assemble three bytes into an int from four "valid" characters.
-      int i = IA[sArr[sIx++]] << 18 | IA[sArr[sIx++]] << 12
-          | IA[sArr[sIx++]] << 6 | IA[sArr[sIx++]];
+      int i = ia(sArr[sIx++]) << 18 | ia(sArr[sIx++]) << 12
+          | ia(sArr[sIx++]) << 6 | ia(sArr[sIx++]);
+      if (i < 0) {
+        // at least one invalid character
+        throw new IllegalArgumentException("invalid Base64 character");
+      }
 
       // Add the bytes
       dArr[d++] = (byte) (i >> 16);
@@ -417,7 +445,11 @@ public abstract class Base64 {
       // Decode last 1-3 bytes (incl '=') into 1-3 bytes
       int i = 0;
       for (int j = 0; sIx <= eIx - pad; ++j) {
-        i |= IA[sArr[sIx++]] << (18 - j * 6);
+        i |= ia(sArr[sIx++]) << (18 - j * 6);
+      }
+
+      if (i < 0) {
+        throw new IllegalArgumentException("invalid Base64 character");
       }
 
       for (int r = 16; d < len; r -= 8) {

@@ -152,6 +152,10 @@ public class CrlStreamParser extends Asn1StreamParser {
 
     private int offset;
 
+    // RFC 5280 Section 5.3.3: the certificateIssuer extension applies to this entry
+    // and all subsequent entries until another certificateIssuer extension appears.
+    private X500Name currentCertIssuer;
+
     private RevokedCertsIterator() throws IOException {
       this.instream = new BufferedInputStream(Files.newInputStream(crlFile.toPath()));
       skip(this.instream, firstRevokedCertificateOffset);
@@ -202,13 +206,12 @@ public class CrlStreamParser extends Asn1StreamParser {
       Instant revocationDate = readTime(revCert.getObjectAt(1));
       Instant invalidityDate = null;
       int reason = 0;
-      X500Name certIssuer = null;
 
       if (revCert.size() > 2) {
         Extensions extns = Extensions.getInstance(revCert.getObjectAt(2));
         byte[] coreExtValue = X509Util.getCoreExtValue(extns, OIDs.Extn.certificateIssuer);
         if (coreExtValue != null) {
-          certIssuer = X500Name.getInstance(
+          currentCertIssuer = X500Name.getInstance(
               GeneralNames.getInstance(coreExtValue).getNames()[0].getName());
         }
 
@@ -233,7 +236,8 @@ public class CrlStreamParser extends Asn1StreamParser {
             : CRLReason.getInstance(coreExtValue).getValue().intValue();
       }
 
-      next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate, certIssuer);
+      next = new RevokedCert(serialNumber, revocationDate, reason, invalidityDate,
+          currentCertIssuer);
     } // method next0
 
     @Override
@@ -345,26 +349,23 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       //       nextUpdate              Time OPTIONAL,
       tag = peekTag(instream);
-      if (tag != TAG_CONSTRUCTED_SEQUENCE) {
-        instream.reset();
-        this.nextUpdate = readTime(bytesLen, instream, "tbsCertList.thisUpdate");
+      if (tag == BERTags.UTC_TIME || tag == BERTags.GENERALIZED_TIME) {
+        this.nextUpdate = readTime(bytesLen, instream, "tbsCertList.nextUpdate");
         offset += bytesLen.get();
         tag = peekTag(instream);
       } else {
         this.nextUpdate = null;
       }
 
-      offset++;
-
       // revokedCertificates     SEQUENCE OF SEQUENCE  { ... } OPTIONAL
-      if (offset < tbsCertListLength && TAG_CONSTRUCTED_SEQUENCE == tag) {
+      if (offset < tbsCertListEndIndex && TAG_CONSTRUCTED_SEQUENCE == tag) {
         markAndReadTag(instream);
-        int revokedCertificatesOffset = offset;
+        offset++;
         int revokedCertificatesLength = readLength(lenBytesSize, instream);
         offset += lenBytesSize.get();
 
-        this.revokedCertificatesEndIndex = revokedCertificatesOffset + revokedCertificatesLength;
         this.firstRevokedCertificateOffset = offset;
+        this.revokedCertificatesEndIndex = offset + revokedCertificatesLength;
 
         // skip the revokedCertificates
         skip(instream, revokedCertificatesLength);

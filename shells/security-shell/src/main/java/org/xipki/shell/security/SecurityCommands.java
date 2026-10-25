@@ -565,7 +565,7 @@ class SecurityCommands {
 
       // RFC 8951: the parts are base64-encoded, any Content-Transfer-Encoding
       // header MUST be ignored.
-      byte[] content = Base64.decodeFast(sb.toString());
+      byte[] content = Base64.decode(sb.toString());
 
       return new Object[]{isLastBlock, contentType, content};
     }

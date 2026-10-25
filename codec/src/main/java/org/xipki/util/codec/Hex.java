@@ -130,7 +130,8 @@ public class Hex {
 
     // two characters form the hex value.
     for (int i = 0, j = 0; j < len; i++) {
-      out[i] = (byte) (HINTS[0xff & array[j++]] | LINTS[0xff & array[j++]]);
+      out[i] = (byte) (HINTS[assertValidHex(0xff & array[j++])]
+                     | LINTS[assertValidHex(0xff & array[j++])]);
     }
 
     return out;

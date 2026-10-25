@@ -156,7 +156,8 @@ public class KEMUtil {
     } else if (tag == BERTags.OCTET_STRING) {
       byte[] expanded = ASN1OctetString.getInstance(skData).getOctets();
       return new MLKEMPrivateKeyParameters(variant, expanded);
-    } else if (tag == 0x0) {
+    } else if (tag == (byte) (BERTags.CONTEXT_SPECIFIC | 0)) {
+      // seed [0] IMPLICIT OCTET STRING
       ASN1Primitive asn1Obj = Asn1Util.getImplicitBaseObject(
                   ASN1TaggedObject.getInstance(skData), BERTags.OCTET_STRING)
                   .toASN1Primitive();

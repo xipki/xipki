@@ -536,14 +536,15 @@ public class ScepResponder {
 
           String challengePwd = X509Util.getChallengePassword(csrReqInfo);
           if (challengePwd != null) {
-            String[] strs = challengePwd.split(":");
-            if (strs.length != 2) {
+            // the password may contain ':'
+            int idx = challengePwd.indexOf(':');
+            if (idx < 1 || idx == challengePwd.length() - 1) {
               LOG.warn("tid={}: challengePassword does not have the format <user>:<password>", tid);
               throw FailInfoException.BAD_REQUEST;
             }
 
-            String user = strs[0];
-            String password = strs[1];
+            String user = challengePwd.substring(0, idx);
+            String password = challengePwd.substring(idx + 1);
             Requestor.PasswordRequestor requestor0 = getRequestor(user);
             requestor = requestor0;
 

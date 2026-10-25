@@ -192,18 +192,30 @@ public class Asn1Util {
     return Arrays.copyOfRange(encoded, origOfs, offset.addAndGet(len));
   }
 
+  /**
+   * Reads the value of the TLV starting at offset (the tag is skipped).
+   */
   public static byte[] readValue(byte[] encoded, AtomicInteger offset) throws CodecException {
-    int len = readDerLen(encoded, offset);
-    return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(len));
+    return readValue(encoded, offset, false);
   }
 
+  /**
+   * Reads the value of the TLV starting at offset (the tag is skipped).
+   * If bitString is true, the leading unused-bits byte is removed from the value.
+   */
   public static byte[] readValue(byte[] encoded, AtomicInteger offset, boolean bitString)
       throws CodecException {
+    offset.getAndIncrement(); // tag
     int len = readDerLen(encoded, offset);
+    if (len < 0 || offset.get() + len > encoded.length) {
+      throw new CodecException("invalid DER encoded bytes");
+    }
+
     if (bitString) {
-      if (encoded[offset.getAndIncrement()] != 0) {
+      if (len < 1 || encoded[offset.getAndIncrement()] != 0) {
         throw new CodecException("unused-bits != 0");
       }
+      len--;
     }
 
     return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(len));
@@ -275,8 +287,7 @@ public class Asn1Util {
     String errMsg = "encodedSeq is not a SEQUENCE";
 
     AtomicInteger offset = new AtomicInteger();
-    int len = readSeqPrefix(encoded, offset, errMsg);
-    int endIndex = offset.get() + len;
+    int endIndex = readSeqPrefix(encoded, offset, errMsg);
     byte[][] ret = new byte[num][];
 
     int i = 0;
@@ -306,6 +317,9 @@ public class Asn1Util {
     offset.incrementAndGet();
 
     int eLen = readDerLen(encoded, offset);
+    if (eLen < 1 || offset.get() + eLen > encoded.length) {
+      throw new CodecException("invalid INTEGER");
+    }
     return Arrays.copyOfRange(encoded, offset.get(), offset.addAndGet(eLen));
   }
 

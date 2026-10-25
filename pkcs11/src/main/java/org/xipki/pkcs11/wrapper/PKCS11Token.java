@@ -1298,7 +1298,7 @@ public class PKCS11Token {
       attrs.id(id);
     }
 
-    if (!Args.isNotBlank(label)) {
+    if (Args.isNotBlank(label)) {
       attrs.label(label);
     }
 

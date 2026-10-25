@@ -219,10 +219,17 @@ public class CmpResponder extends BaseCmpResponder {
       } // end if(reenroll)
 
       String certprofileName = certprofileNames[i];
-      if (StringUtil.isNotBlank(certprofileName)
-          && !requestor.isCertprofilePermitted(caName, certprofileName)) {
+      if (StringUtil.isNotBlank(certprofileName)) {
+        if (!requestor.isCertprofilePermitted(caName, certprofileName)) {
+          addErrCertResp(failureResps, i, certReqId, notAuthorized,
+              "certprofile " + certprofileName + " is not allowed");
+          continue;
+        }
+      } else if (!requestor.isCertprofilePermitted(caName, "all")) {
+        // reenroll without certprofile: the CA uses the profile of the old certificate,
+        // which is unknown here. Only allowed if the requestor is permitted all profiles.
         addErrCertResp(failureResps, i, certReqId, notAuthorized,
-            "certprofile " + certprofileName + " is not allowed");
+            "certprofile must be specified");
         continue;
       }
 

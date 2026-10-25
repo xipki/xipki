@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
-import java.util.Arrays;
 
 /**
  * XDHContent Verifier Provider.
@@ -90,8 +90,13 @@ public class XDHContentVerifierProvider implements ContentVerifierProvider {
 
     @Override
     public boolean verify(byte[] expected) {
-      byte[] expectedHashValue = DhSigStatic.getInstance(expected).getHashValue();
-      return Arrays.equals(expectedHashValue, hmac.doFinal());
+      byte[] expectedHashValue;
+      try {
+        expectedHashValue = DhSigStatic.getInstance(expected).getHashValue();
+      } catch (IllegalArgumentException ex) {
+        return false;
+      }
+      return MessageDigest.isEqual(expectedHashValue, hmac.doFinal());
     }
 
   } // class XDHContentVerifier

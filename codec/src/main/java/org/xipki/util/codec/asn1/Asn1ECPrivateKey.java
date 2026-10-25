@@ -58,19 +58,22 @@ public class Asn1ECPrivateKey {
       Asn1Util.skipCurrentTLV(encoded, offset);
 
       // PrivateKey
-      byte[] privateKey = Asn1Util.readOctetsFromASN1BitString(encoded, offset);
+      byte[] privateKey = Asn1Util.readOctetsFromASN1OctetString(encoded, offset);
 
-      // AlgorithmIdentifier
-      Asn1AlgorithmIdentifier algId = Asn1AlgorithmIdentifier.getInstance(encoded, offset);
       byte[] publicKey = null;
       String namedCurve = null;
 
       while (offset.get() < endIndex) {
         byte tag = encoded[offset.get()];
         if (tag == Asn1Const.TAG_EXPLICIT_ALT_0) {
-          namedCurve = Asn1Util.decodeOid(Asn1Util.readValue(encoded, offset)); // explicit
+          // parameters [0] EXPLICIT ECParameters, only namedCurve is supported
+          byte[] params = Asn1Util.readValue(encoded, offset);
+          if (params.length > 0 && params[0] == Asn1Const.TAG_OID) {
+            namedCurve = Asn1Util.decodeOid(params);
+          }
         } else if (tag == Asn1Const.TAG_EXPLICIT_ALT_1) {
-          publicKey = Asn1Util.readValue(encoded, offset); // explicit
+          // publicKey [1] EXPLICIT BIT STRING
+          publicKey = Asn1Util.readOctetsFromASN1BitString(Asn1Util.readValue(encoded, offset));
           break;
         } else {
           Asn1Util.skipCurrentTLV(encoded, offset);

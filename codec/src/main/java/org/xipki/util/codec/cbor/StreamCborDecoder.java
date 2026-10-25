@@ -210,7 +210,7 @@ public class StreamCborDecoder extends CborDecoder {
 
   @Override
   protected byte[] readExactly(int len) throws CodecException {
-    Args.positive(len, "len");
+    Args.notNegative(len, "len");
     byte[] ret = new byte[len];
 
     try {

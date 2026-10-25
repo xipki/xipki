@@ -12,6 +12,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -191,6 +192,20 @@ public class SdkResponder {
       }
 
       CaIdentifierRequest req = null;
+      switch (command) {
+        case CMD_poll_cert:
+          req = PollCertRequest.decode(requireNonNullRequest(request));
+          break;
+        case CMD_revoke_cert:
+          req = RevokeCertsRequest.decode(requireNonNullRequest(request));
+          break;
+        case CMD_remove_cert:
+        case CMD_unsuspend_cert:
+          req = UnsuspendOrRemoveCertsRequest.decode(requireNonNullRequest(request));
+          break;
+        default:
+          break;
+      }
 
       // get the CA instance
       X509Ca ca;
@@ -215,16 +230,9 @@ public class SdkResponder {
           case CMD_poll_cert:
           case CMD_remove_cert:
           case CMD_revoke_cert:
-          case CMD_unsuspend_cert: {
-            if (CMD_poll_cert.equals(command)) {
-              req = PollCertRequest.decode(requireNonNullRequest(request));
-            } else if (CMD_revoke_cert.equals(command)) {
-              req = RevokeCertsRequest.decode(requireNonNullRequest(request));
-            } else {
-              req = UnsuspendOrRemoveCertsRequest.decode(requireNonNullRequest(request));
-            }
+          case CMD_unsuspend_cert:
+            // already decoded
             break;
-          }
           default:
             return new ErrorResponse(null, PATH_NOT_FOUND,
                 "invalid command '" + command + "'");
@@ -627,7 +635,9 @@ public class SdkResponder {
       } else {
         Instant invalidityTime = entry.invalidityTime();
         try {
-          ca.revokeCert(requestor, serialNumber, reason, invalidityTime);
+          if (ca.revokeCert(requestor, serialNumber, reason, invalidityTime) == null) {
+            errorEntry = new ErrorEntry(UNKNOWN_CERT, "could not revoke non-existing certificate");
+          }
         } catch (OperationException e) {
           errorEntry = new ErrorEntry(e.errorCode(), e.errorMessage());
         }
@@ -653,10 +663,11 @@ public class SdkResponder {
       ErrorEntry error = null;
 
       try {
-        if (unsuspend) {
-          ca.unsuspendCert(requestor, serialNumber);
-        } else {
-          ca.removeCert(requestor,serialNumber);
+        CertWithDbId ret = unsuspend ? ca.unsuspendCert(requestor, serialNumber)
+            : ca.removeCert(requestor, serialNumber);
+        if (ret == null) {
+          error = new ErrorEntry(UNKNOWN_CERT, unsuspend
+              ? "could not unsuspend non-existing certificate" : "could not remove certificate");
         }
       } catch (OperationException e) {
         error = new ErrorEntry(e.errorCode(), e.errorMessage());
@@ -703,7 +714,7 @@ public class SdkResponder {
     if (issuerCertSha1Fp != null) {
       if (!Hex.encode(issuerCertSha1Fp).equalsIgnoreCase( ca.hexSha1OfCert())) {
         throw new OperationException(BAD_CERT_TEMPLATE,
-            "IssuerCertSha256Fp does not target at the CA");
+            "IssuerCertSha1Fp does not target at the CA");
       }
     }
   }

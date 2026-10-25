@@ -41,7 +41,7 @@ public class Args {
   }
 
   public static boolean isNotBlank(String str) {
-    return str == null || str.isEmpty();
+    return str != null && !str.isEmpty();
   }
 
   public static boolean isNumber(String str) {

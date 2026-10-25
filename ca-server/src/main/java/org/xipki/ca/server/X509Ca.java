@@ -288,7 +288,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     try {
       CertWithRevocationInfo ret = revokerModule.revokeCert(
           serialNumber, reason, invalidityTime, event);
-      finish(event, true);
+      finish(event, ret != null);
       return ret;
     } catch (OperationException ex) {
       if (!(ex instanceof OperationExceptionWithIndex)) {
@@ -304,7 +304,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_unsuspend_cert, requestor);
     try {
       CertWithDbId ret = revokerModule.unsuspendCert(serialNumber, event);
-      finish(event, true);
+      finish(event, ret != null);
       return ret;
     } catch (OperationException ex) {
       if (!(ex instanceof OperationExceptionWithIndex)) {
@@ -320,7 +320,7 @@ public class X509Ca extends X509CaModule implements Closeable {
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_remove_cert, requestor);
     try {
       CertWithDbId ret = removerModule.removeCert(serialNumber, event);
-      finish(event, true);
+      finish(event, ret != null);
       return ret;
     } catch (OperationException ex) {
       if (!(ex instanceof OperationExceptionWithIndex)) {

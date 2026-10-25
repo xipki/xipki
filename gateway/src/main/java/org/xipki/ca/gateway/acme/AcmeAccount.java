@@ -159,9 +159,12 @@ public class AcmeAccount {
     return publicKey;
   }
 
-  public void setJwk(Map<String, String> jwk) {
+  public synchronized void setJwk(Map<String, String> jwk) {
     markMe();
     this.data.jwk = jwk;
+    // invalidate the values derived from the old key
+    this.publicKey = null;
+    this.jwkSha256 = null;
   }
 
   public AccountStatus status() {

@@ -10,6 +10,7 @@ import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.x509.Time;
 
 import java.io.BufferedInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -60,7 +61,7 @@ public class Asn1StreamParser {
     instream.reset();
 
     byte[] bytes = new byte[1 + lenBytesSize.get() + length];
-    if (bytes.length != instream.read(bytes)) {
+    if (bytes.length != instream.readNBytes(bytes, 0, bytes.length)) {
       throw new IOException("error reading " + name);
     }
     return bytes;
@@ -76,7 +77,7 @@ public class Asn1StreamParser {
     int length = readLength(lenBytesSize, instream);
 
     byte[] bytes = new byte[length];
-    if (bytes.length != instream.read(bytes)) {
+    if (bytes.length != instream.readNBytes(bytes, 0, bytes.length)) {
       throw new IOException("error reading " + name);
     }
     return bytes;
@@ -97,23 +98,33 @@ public class Asn1StreamParser {
   public static int readLength(MyInt lenBytesSize, InputStream instream) throws IOException {
     // Length SEQUENCE of CertificateList
     int b = instream.read();
+    if (b == -1) {
+      throw new EOFException("not enough data to read");
+    }
+
     if ((b & 0x80) == 0) {
       lenBytesSize.set(1);
       return b;
     } else {
       byte[] lengthBytes = new byte[b & 0x7F];
-      if (lengthBytes.length > 4) {
+      if (lengthBytes.length == 0) {
+        throw new IOException("indefinite length is not supported");
+      } else if (lengthBytes.length > 4) {
         throw new IOException("length too long");
       }
       lenBytesSize.set(1 + lengthBytes.length);
 
-      if (lengthBytes.length > instream.read(lengthBytes)) {
+      if (lengthBytes.length != instream.readNBytes(lengthBytes, 0, lengthBytes.length)) {
         throw new IOException("not enough data to read");
       }
 
       int length = 0xFF & lengthBytes[0];
       for (int i = 1; i < lengthBytes.length; i++) {
         length = (length << 8) + (0xFF & lengthBytes[i]);
+      }
+
+      if (length < 0) {
+        throw new IOException("length too long");
       }
       return length;
     }
@@ -154,7 +165,15 @@ public class Asn1StreamParser {
   public static void skip(InputStream instream, long count) throws IOException {
     long remaining = count;
     while (remaining > 0) {
-      remaining -= instream.skip(remaining);
+      long skipped = instream.skip(remaining);
+      if (skipped > 0) {
+        remaining -= skipped;
+      } else if (instream.read() == -1) {
+        // skip() returns 0 at the end of stream.
+        throw new EOFException("not enough data to skip");
+      } else {
+        remaining--;
+      }
     }
   }
 

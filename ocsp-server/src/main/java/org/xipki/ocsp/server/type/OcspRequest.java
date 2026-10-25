@@ -58,6 +58,14 @@ public class OcspRequest {
   }
 
   public static OcspRequest getInstance(byte[] request) throws EncodingException {
+    try {
+      return getInstance0(request);
+    } catch (RuntimeException ex) {
+      throw new EncodingException("invalid OCSP request", ex);
+    }
+  }
+
+  private static OcspRequest getInstance0(byte[] request) throws EncodingException {
     // OCSPRequest
     Header hdr = readHeader(request, 0);
     // tbsRequest
@@ -88,6 +96,9 @@ public class OcspRequest {
 
     List<CertID> requestList = new LinkedList<>();
     Header hdrRequestList = hdr;
+    if (hdrRequestList.len == 0) {
+      throw new EncodingException("requestList is empty");
+    }
 
     Header hdrSingleReq = readHeader(request, hdr.readerIndex);
     // requestList
@@ -224,11 +235,19 @@ public class OcspRequest {
   }
 
   static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
+    if (readerIndex < 0 || readerIndex + 2 > encoded.length) {
+      throw new EncodingException("data too short at " + readerIndex);
+    }
+
     int off = readerIndex;
     byte tag = encoded[off++];
     int len = 0xFF & encoded[off++];
     if (len >= 0x80) {
       int lenSize = len & 0x7F;
+      if (off + lenSize > encoded.length) {
+        throw new EncodingException("data too short at " + readerIndex);
+      }
+
       if (lenSize == 1) {
         len = 0xFF & encoded[off++];
       } else if (lenSize == 2) {
@@ -242,6 +261,10 @@ public class OcspRequest {
       } else {
         throw new EncodingException("invalid length field at " + readerIndex);
       }
+    }
+
+    if (len < 0 || len > encoded.length - off) {
+      throw new EncodingException("invalid length field at " + readerIndex);
     }
     return new Header(readerIndex, tag, len, off);
   } // method readHeader

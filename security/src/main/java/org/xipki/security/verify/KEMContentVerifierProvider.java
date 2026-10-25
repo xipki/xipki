@@ -24,8 +24,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.PublicKey;
-import java.util.Arrays;
 
 /**
  * KEMContent Verifier Provider.
@@ -66,7 +66,7 @@ public class KEMContentVerifierProvider implements ContentVerifierProvider {
 
       byte[] rawSignature = expectedSig.signature();
       byte[] computedMacValue = verifier.x509Signer().getSignature();
-      return Arrays.equals(rawSignature, computedMacValue);
+      return MessageDigest.isEqual(rawSignature, computedMacValue);
     }
 
   } // class MyContentVerifier

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -245,12 +246,13 @@ public class SimpleRequestorAuthenticator implements RequestorAuthenticator {
 
     @Override
     public boolean authenticate(char[] password) {
-      return Arrays.equals(this.password.password, password);
+      return password != null && MessageDigest.isEqual(this.password.bytePassword,
+          new String(password).getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public boolean authenticate(byte[] password) {
-      return Arrays.equals(this.password.bytePassword, password);
+      return password != null && MessageDigest.isEqual(this.password.bytePassword, password);
     }
 
     boolean applyTo(Requestor.Protocol protocol, String user) {

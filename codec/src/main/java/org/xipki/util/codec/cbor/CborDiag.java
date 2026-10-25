@@ -1446,6 +1446,9 @@ public class CborDiag {
       // 1280-1400: alternatives 7..127, 1+2 encoding
     } else if (tag >= 1280 && tag <= 1400) {
       writeLine(level, readResetBuffer(), prefix1 + ": alternative " + (tag - 1280 + 7));
+      // 101: [uint, any], alternatives as given by the uint + 128
+    } else if (tag == 101) {
+      writeLine(level, readResetBuffer(), prefix1 + ": alternative (first element + 128)");
     } else {
       writeLine(level, readResetBuffer(), prefix1);
     }

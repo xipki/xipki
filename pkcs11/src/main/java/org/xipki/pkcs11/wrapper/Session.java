@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.xipki.pkcs11.wrapper.PKCS11T.*;
 
@@ -427,6 +428,34 @@ public class Session {
         asn1Sk.privateKey(), publicKeyData, template);
   }
 
+  /**
+   * Sets the CKA_SEED and/or CKA_VALUE of an ML-DSA or ML-KEM private key.
+   * <pre>
+   * PrivateKey ::= CHOICE {
+   *   seed [0] IMPLICIT OCTET STRING,
+   *   expandedKey OCTET STRING,
+   *   both SEQUENCE {
+   *     seed OCTET STRING,
+   *     expandedKey OCTET STRING } }
+   * </pre>
+   */
+  private static void setMlPrivateKey(Template template, byte[] privateKeyData)
+      throws CodecException {
+    byte tag = privateKeyData[0];
+    if (tag == Asn1Const.TAG_IMPLICIT_ALT_0) {
+      template.seed(Asn1Util.readValue(privateKeyData, new AtomicInteger()));
+    } else if (tag == Asn1Const.TAG_OCTET_STRING) {
+      template.value(Asn1Util.readOctetsFromASN1OctetString(privateKeyData));
+    } else if (tag == Asn1Const.TAG_SEQUENCE) {
+      AtomicInteger offset = new AtomicInteger();
+      Asn1Util.readDerLen(Asn1Const.TAG_SEQUENCE, privateKeyData, offset);
+      template.seed(Asn1Util.readOctetsFromASN1OctetString(privateKeyData, offset));
+      template.value(Asn1Util.readOctetsFromASN1OctetString(privateKeyData, offset));
+    } else {
+      throw new CodecException("invalid private key tag " + (0xFF & tag));
+    }
+  }
+
   private long importPrivateKey(
       Asn1AlgorithmIdentifier algId, byte[] privateKeyData, byte[] publicKeyData, Template template)
       throws InvalidKeySpecException, PKCS11Exception {
@@ -493,8 +522,8 @@ public class Session {
           dfltKeyType = CKK_ML_DSA;
           long variant = Asn1Const.id_mldsa44.equals(oid) ? CKP_ML_DSA_44
               : Asn1Const.id_mldsa65.equals(oid) ? CKP_ML_DSA_65 : CKP_ML_DSA_87;
-          template.parameterSet(variant)
-              .value(Asn1Util.readOctetsFromASN1OctetString(privateKeyData));
+          template.parameterSet(variant);
+          setMlPrivateKey(template, privateKeyData);
           break;
         }
         case Asn1Const.id_mlkem512:
@@ -503,8 +532,8 @@ public class Session {
           dfltKeyType = CKK_ML_KEM;
           long variant = Asn1Const.id_mlkem512.equals(oid) ? CKP_ML_KEM_512
               : Asn1Const.id_mlkem768.equals(oid) ? CKP_ML_KEM_768 : CKP_ML_KEM_1024;
-          template.parameterSet(variant)
-              .value(Asn1Util.readOctetsFromASN1OctetString(privateKeyData));
+          template.parameterSet(variant);
+          setMlPrivateKey(template, privateKeyData);
           break;
         }
         default:

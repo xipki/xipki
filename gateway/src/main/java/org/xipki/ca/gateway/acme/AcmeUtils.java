@@ -161,9 +161,23 @@ final class AcmeUtils {
     return Base64.getUrlNoPaddingEncoder().encodeToString(Pack.longToLittleEndian(label));
   }
 
+  /**
+   * Computes the JWK thumbprint as specified in RFC 7638: only the required members
+   * of the key type are used, in lexicographic order.
+   */
   public static String jwkSha256(Map<String, String> jwk) {
-    List<String> jwkNames = new ArrayList<>(jwk.keySet());
-    Collections.sort(jwkNames);
+    String kty = jwk.get("kty");
+    List<String> jwkNames;
+    if ("RSA".equals(kty)) {
+      jwkNames = Arrays.asList("e", "kty", "n");
+    } else if ("EC".equals(kty)) {
+      jwkNames = Arrays.asList("crv", "kty", "x", "y");
+    } else if ("OKP".equals(kty)) {
+      jwkNames = Arrays.asList("crv", "kty", "x");
+    } else {
+      jwkNames = new ArrayList<>(jwk.keySet());
+      Collections.sort(jwkNames);
+    }
     StringBuilder canonJwk = new StringBuilder();
     canonJwk.append("{");
     for (String jwkName : jwkNames) {

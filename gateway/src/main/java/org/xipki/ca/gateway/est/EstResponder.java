@@ -364,7 +364,13 @@ public class EstResponder {
         byte[] password = null;
         if (hdrValue.length() > 6) {
           String b64 = hdrValue.substring(6);
-          byte[] userPwd = Base64.decodeFast(b64);
+          byte[] userPwd;
+          try {
+            userPwd = Base64.decodeFast(b64);
+          } catch (IllegalArgumentException ex) {
+            throw new HttpRespAuditException(HttpStatusCode.SC_UNAUTHORIZED,
+                "invalid Authorization information", AuditLevel.INFO, AuditStatus.FAILED);
+          }
           int idx = -1;
           for (int i = 0; i < userPwd.length; i++) {
             if (userPwd[i] == ':') {
@@ -412,8 +418,18 @@ public class EstResponder {
             message, AuditLevel.INFO, AuditStatus.FAILED);
       }
 
-      if (!requestor.isPermitted(Requestor.Permission.ENROLL_CERT)) {
-        throw new OperationException(ErrorCode.NOT_PERMITTED, "ENROLL_CERT is not allowed");
+      boolean reenroll = CMD_simplereenroll.equals(command)
+          || CMD_usimplereenroll.equals(command);
+      Requestor.Permission permission = reenroll
+          ? Requestor.Permission.REENROLL_CERT : Requestor.Permission.ENROLL_CERT;
+      if (!requestor.isPermitted(permission)) {
+        throw new OperationException(ErrorCode.NOT_PERMITTED, permission + " is not allowed");
+      }
+
+      boolean serverKeygen = CMD_serverkeygen.equals(command)
+          || CMD_userverkeygen.equals(command);
+      if (serverKeygen && !requestor.isPermitted(Requestor.Permission.GEN_KEYPAIR)) {
+        throw new OperationException(ErrorCode.NOT_PERMITTED, "GEN_KEYPAIR is not allowed");
       }
 
       if (!requestor.isCertprofilePermitted(caName, profile)) {
@@ -422,14 +438,13 @@ public class EstResponder {
       }
 
       CertificationRequest csr = GatewayUtil.parseCsrInRequest(request);
-      if (!CMD_serverkeygen.equals(command)) {
+      if (!serverKeygen) {
         if (!GatewayUtil.verifyCsr(csr, securityFactory, popControl)) {
           throw new OperationException(ErrorCode.BAD_POP);
         }
       }
 
-      HttpRespContent respContent = CMD_simplereenroll.equals(command)
-          || CMD_usimplereenroll.equals(command)
+      HttpRespContent respContent = reenroll
               ? reenrollCert(command, caName, profile, csr, event)
               :   enrollCert(command, caName, profile, csr, event);
 
