@@ -68,13 +68,6 @@
     <central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
   </properties>
   <modules>
-    <!-- Crypto: codec, crypto API and backends, PKCS#11, emulated HSM (groupId org.xipki.crypto) -->
-    <!-- JDK25+ is required for crypto-be-jdk -->
-    <module>xicrypto</module>
-    <!-- PKIX: ASN.1 structures, utilities, certificates, CMS, CMP, SCEP (groupId org.xipki.pkix) -->
-    <module>xipkix</module>
-    <!-- Shell: picocli/jline shell, third-party dependencies only (groupId org.xipki.shell) -->
-    <module>xishell</module>
     <!-- Base components -->
     <module>util</module>
     <!-- PKI SDK/Client -->
@@ -172,7 +165,7 @@
         <version>${central-publishing-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
-          <publishingServerId>central</publishingServerId>
+          <publishingServerId>sonatype-central</publishingServerId>
         </configuration>
       </plugin>
     </plugins>
