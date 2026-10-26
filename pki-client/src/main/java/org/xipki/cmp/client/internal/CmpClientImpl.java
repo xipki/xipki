@@ -484,9 +484,9 @@ public final class CmpClientImpl implements CmpClient {
 
   @Override
   public KemEncapKey generateKemEncapKey(
-      String caName, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
+      String caName, Requestor requestor, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
-    return agent().generateEncapKey(caName, publicKey, debug);
+    return agent().generateEncapKey(caName, requestor, publicKey, debug);
   }
 
 }

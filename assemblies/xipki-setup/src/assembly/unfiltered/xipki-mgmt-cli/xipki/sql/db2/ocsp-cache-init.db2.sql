@@ -25,7 +25,7 @@ CREATE TABLE OCSP (
 );
 
 COMMENT ON TABLE OCSP IS 'Only OCSP response without nonce is cached here';
-COMMENT ON COLUMN OCSP.IDENT IS 'Identifier consists of hex(SIG_ALG) | hex(CERTHASH_ALG) | hex(serial number)';
+COMMENT ON COLUMN OCSP.IDENT IS 'base64(responder tag (first 8 bytes of SHA-256(responder name)) | SIG_ALG | serial number)';
 COMMENT ON COLUMN OCSP.GENERATED_AT IS 'generatedAt, seconds since January 1, 1970, 00:00:00 GMT';
 COMMENT ON COLUMN OCSP.NEXT_UPDATE IS 'next update, seconds since January 1, 1970, 00:00:00 GMT';
 COMMENT ON COLUMN OCSP.RESP IS 'Base64 DER-encoded OCSP response';

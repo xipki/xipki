@@ -24,8 +24,11 @@ import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -42,6 +45,11 @@ class HttpOcspServlet {
   private static final String CT_REQUEST = "application/ocsp-request";
 
   private static final String CT_RESPONSE = "application/ocsp-response";
+
+  // IMF-fixdate as specified in RFC 9110, e.g. Sun, 06 Nov 1994 08:49:37 GMT
+  private static final DateTimeFormatter HTTP_DATE_FORMATTER =
+      DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'", Locale.US)
+          .withZone(ZoneOffset.UTC);
 
   private final boolean logReqResp;
 
@@ -172,14 +180,15 @@ class HttpOcspServlet {
       Map<String, String> headers = new HashMap<>();
       if (cacheInfo != null) {
         encodedOcspResp = ocspRespWithCacheInfo.response();
-        long now = Clock.systemUTC().millis();
+        // generatedAt and nextUpdate are in seconds since epoch
+        long now = Instant.now().getEpochSecond();
 
         // RFC 5019 6.2: Date: The date and time at which the OCSP server
         // generated he HTTP response.
-        headers.put("Date",Long.toString(now));
+        headers.put("Date", toHttpDate(now));
         // RFC 5019 6.2: Last-Modified: date and time at which the OCSP
         // responder last modified the response.
-        headers.put("Last-Modified", Long.toString(cacheInfo.generatedAt()));
+        headers.put("Last-Modified", toHttpDate(cacheInfo.generatedAt()));
         // RFC 5019 6.2: Expires: This date and time will be the same as the
         // nextUpdate time-stamp in the OCSP response itself.
         // This is overridden by max-age on HTTP/1.1 compatible components
@@ -187,7 +196,7 @@ class HttpOcspServlet {
         Long nextUpdate = cacheInfo.nextUpdate();
 
         if (nextUpdate != null) {
-          headers.put("Expires", Long.toString(nextUpdate));
+          headers.put("Expires", toHttpDate(nextUpdate));
         }
         // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the
         // ASCII HEX representation of the SHA1 hash of the OCSPResponse
@@ -200,7 +209,7 @@ class HttpOcspServlet {
             ? responder.cacheMaxAge() : DFLT_CACHE_MAX_AGE;
 
         if (nextUpdate != null) {
-          maxAge = Math.min(maxAge, (nextUpdate - cacheInfo.generatedAt()) / 1000);
+          maxAge = Math.max(0, Math.min(maxAge, nextUpdate - now));
         }
 
         headers.put("Cache-Control", StringUtil.concat("max-age=",
@@ -213,6 +222,10 @@ class HttpOcspServlet {
       return new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     }
   } // method doGet
+
+  static String toHttpDate(long epochSecond) {
+    return HTTP_DATE_FORMATTER.format(Instant.ofEpochSecond(epochSecond));
+  }
 
   private static byte[] base64Decode(byte[] b64OcspReqBytes) {
     if (Base64.containsOnlyValidChars(b64OcspReqBytes)) {

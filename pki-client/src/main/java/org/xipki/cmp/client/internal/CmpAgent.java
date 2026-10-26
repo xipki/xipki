@@ -528,18 +528,22 @@ class CmpAgent {
     return certs;
   } // method caCerts
 
-  KemEncapKey generateEncapKey(String caName, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
+  KemEncapKey generateEncapKey(
+      String caName, Requestor requestor, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
       throws CmpClientException, PkiErrorException {
     Asn1Oid type = XipkiOIDs.id_xipki_cmp_kem_encapkey;
 
     InfoTypeAndValue itv = new InfoTypeAndValue(Args.notNull(type, "type"),
         Asn1OctetString.wrap(publicKey));
 
-    PKIHeader header = buildPkiHeader(null, null);
+    // the server requires an authenticated requestor
+    Responder responder = getResponder(requestor);
+    PKIHeader header = buildPkiHeader(requestor, responder);
     PKIMessage request = new PKIMessage(header, PKIBody.ofGenm(new GenMsgContent(itv)));
 
-    PKIMessage response = send(caName, request, debug);
-    Asn1Primitive itvValue = parseGenRep(response, type);
+    VerifiedPkiMessage response = signAndSend(caName, requestor, responder, request, debug);
+    checkProtection(response);
+    Asn1Primitive itvValue = parseGenRep(response.pkiMessage(), type);
     return KemEncapKey.decode(((Asn1OctetString) itvValue).getOctets());
   } // method downloadCrl
 

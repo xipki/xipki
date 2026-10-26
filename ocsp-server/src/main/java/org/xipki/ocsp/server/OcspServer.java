@@ -426,8 +426,8 @@ public class OcspServer implements Closeable {
         }
       }
 
-      Responder responder = new Responder(option, requestOptions.get(option.requestOptionName()),
-                              responseOption, signer, statusStores);
+      Responder responder = new Responder(name, option,
+          requestOptions.get(option.requestOptionName()), responseOption, signer, statusStores);
       responders.put(name, responder);
     } // end for
 
@@ -665,7 +665,7 @@ public class OcspServer implements Closeable {
 
         if (cacheDbIssuer != null) {
           OcspRespWithCacheInfo cachedResp = responseCacher.getOcspResponse(
-              cacheDbIssuer.id(), cacheDbSerialNumber, cacheDbSigAlg);
+              cacheDbIssuer.id(), responder.cacheTag(), cacheDbSerialNumber, cacheDbSigAlg);
           if (cachedResp != null) {
             return cachedResp;
           }
@@ -738,8 +738,10 @@ public class OcspServer implements Closeable {
       if (canCacheDb && repControl.canCacheInfo) {
         // Don't cache the response with status UNKNOWN, since this may result
         // in DDoS of storage
-        responseCacher.storeOcspResponse(cacheDbIssuer.id(),
-            cacheDbSerialNumber, producedAtSeconds, repControl.cacheNextUpdate,
+        Long cacheNextUpdate = (repControl.cacheNextUpdate == Long.MAX_VALUE)
+            ? null : repControl.cacheNextUpdate;
+        responseCacher.storeOcspResponse(cacheDbIssuer.id(), responder.cacheTag(),
+            cacheDbSerialNumber, producedAtSeconds, cacheNextUpdate,
             cacheDbSigAlg, encodeOcspResponse);
       }
 

@@ -18,11 +18,10 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.http.HttpRespContent;
-import org.xipki.util.http.XiHttpClient;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
 
+import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSession;
@@ -35,6 +34,7 @@ import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -45,6 +45,8 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -76,6 +78,9 @@ public class ChallengeValidator implements Runnable {
 
   private static final int MAX_DNS_CNAME_DEPTH = 8;
 
+  // RFC 8737, section 6.2
+  private static final String ACME_TLS_1_PROTOCOL = "acme-tls/1";
+
   private final AcmeRepo repo;
 
   private final Resolver dnsResolver;
@@ -84,12 +89,26 @@ public class ChallengeValidator implements Runnable {
 
   private final boolean allowPrivateChallengeTargets;
 
+  private final SSLSocketFactory trustAllSocketFactory;
+
+  private final Http01Client http01Client;
+
   public ChallengeValidator(AcmeRepo repo, AcmeProtocolConf.Acme conf) throws InvalidConfException {
     this.repo = Args.notNull(repo, "repo");
     Args.notNull(conf, "conf");
     this.dnsResolver = buildDnsResolver(conf);
     this.dnssecValidation = conf.dnssecValidation();
     this.allowPrivateChallengeTargets = conf.allowPrivateChallengeTargets();
+
+    try {
+      SSLContext sslContext = SSLContext.getInstance("TLS");
+      sslContext.init(null, new TrustManager[]{trustAll}, null);
+      this.trustAllSocketFactory = sslContext.getSocketFactory();
+    } catch (NoSuchAlgorithmException | KeyManagementException ex) {
+      throw new InvalidConfException("could not initialize SSLContext", ex);
+    }
+
+    this.http01Client = new Http01Client(this::resolveChallengeHost, trustAllSocketFactory);
   }
 
   private boolean stopMe;
@@ -149,12 +168,9 @@ public class ChallengeValidator implements Runnable {
       switch (type) {
         case AcmeConstants.HTTP_01: {
           String host = identifier.value();
-          String url = "http://" + host + "/.well-known/acme-challenge/" + chall.token();
           try {
-            ensureAllowedChallengeHost(host);
-            XiHttpClient client = new XiHttpClient();
-            HttpRespContent authzResp = client.httpGet(url);
-            receivedAuthorization = new String(authzResp.content(), StandardCharsets.UTF_8);
+            byte[] content = http01Client.get(host, "/.well-known/acme-challenge/" + chall.token());
+            receivedAuthorization = new String(content, StandardCharsets.UTF_8);
           } catch (IOException ex) {
             String message =  "error while validating challenge " + challId +
                               " for identifier " + identifier;
@@ -164,21 +180,34 @@ public class ChallengeValidator implements Runnable {
         }
         case AcmeConstants.TLS_ALPN_01: {
           Certificate[] certs = null;
+          String host = identifier.value();
           try {
-            ensureAllowedChallengeHost(identifier.value());
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{trustAll}, null);
-            SSLSocketFactory factory = sslContext.getSocketFactory();
-            try (SSLSocket socket = (SSLSocket) factory.createSocket(identifier.value(), 443)) {
+            InetAddress[] addresses = resolveChallengeHost(host);
+            Socket plainSocket = Http01Client.connect(addresses, 443,
+                Http01Client.CONNECT_TIMEOUT_MS);
+            try (SSLSocket socket = (SSLSocket) trustAllSocketFactory.createSocket(
+                plainSocket, host, 443, true)) {
+              socket.setSoTimeout(Http01Client.CONNECT_TIMEOUT_MS);
               SSLParameters params = socket.getSSLParameters();
-              params.setApplicationProtocols(new String[]{"acme-tls/1.0"});
+              params.setApplicationProtocols(new String[]{ACME_TLS_1_PROTOCOL});
               params.setProtocols(new String[]{"TLSv1.2", "TLSv1.3"});
+              params.setServerNames(Collections.singletonList(new SNIHostName(host)));
               socket.setSSLParameters(params);
+              socket.startHandshake();
 
-              SSLSession session = socket.getSession();
-              certs = session.getPeerCertificates();
+              String negotiatedProtocol = socket.getApplicationProtocol();
+              if (ACME_TLS_1_PROTOCOL.equals(negotiatedProtocol)) {
+                SSLSession session = socket.getSession();
+                certs = session.getPeerCertificates();
+              } else {
+                LOG.warn("tls-alpn-01: negotiated ALPN protocol '{}' instead of '{}' for {}",
+                    negotiatedProtocol, ACME_TLS_1_PROTOCOL, host);
+              }
+            } catch (IOException | RuntimeException ex) {
+              plainSocket.close();
+              throw ex;
             }
-          } catch (NoSuchAlgorithmException | IOException | KeyManagementException ex) {
+          } catch (IOException | IllegalArgumentException ex) {
             String message =  "error while validating challenge " + challId +
                               " for identifier " + identifier;
             LogUtil.error(LOG, ex, message);
@@ -200,7 +229,7 @@ public class ChallengeValidator implements Runnable {
                         && generalNames.get(0).getTagNo() == GeneralName.tag_dNSName;
               if (match) {
                 String sanValue = generalNames.get(0).dNSName();
-                match = identifier.value().equals(sanValue);
+                match = identifier.value().equalsIgnoreCase(sanValue);
               }
             } catch (CodecException ex) {
               String message =  "error while validating challenge " + challId +
@@ -244,7 +273,8 @@ public class ChallengeValidator implements Runnable {
           break;
         }
         case AcmeConstants.DNS_01: {
-          receivedAuthorization = validateDns(identifier, challId);
+          receivedAuthorization = validateDns(identifier, challId,
+              chall.expectedAuthorization());
           break;
         }
         default: {
@@ -306,7 +336,12 @@ public class ChallengeValidator implements Runnable {
     return validatingResolver;
   }
 
-  private String validateDns(AcmeIdentifier identifier, ChallId challId) {
+  /**
+   * Returns the expected authorization if one of the TXT records matches it exactly,
+   * otherwise {@code null}.
+   */
+  private String validateDns(AcmeIdentifier identifier, ChallId challId,
+                             String expectedAuthorization) {
     String host = identifier.value();
     if (host.startsWith("*.")) {
       host = host.substring(2);
@@ -316,7 +351,12 @@ public class ChallengeValidator implements Runnable {
 
     String acmeDomain = "_acme-challenge." + host;
     try {
-      return queryDnsTxt(acmeDomain, 0);
+      List<String> txtValues = queryDnsTxt(acmeDomain, 0);
+      if (txtValues.contains(expectedAuthorization)) {
+        return expectedAuthorization;
+      }
+
+      LOG.debug("dns-01: none of the {} TXT records of '{}' matches", txtValues.size(), acmeDomain);
     } catch (IOException | ExecutionException ex) {
       String message =  "error while validating challenge " + challId +
                         " for identifier " + identifier;
@@ -331,11 +371,15 @@ public class ChallengeValidator implements Runnable {
     return null;
   }
 
-  private String queryDnsTxt(String acmeDomain, int depth)
+  /**
+   * Returns all TXT records of the given domain. Each element is the concatenation of
+   * the character-strings of one TXT record.
+   */
+  private List<String> queryDnsTxt(String acmeDomain, int depth)
       throws IOException, ExecutionException, InterruptedException {
     if (depth > MAX_DNS_CNAME_DEPTH) {
       LOG.warn("dns-01: too many CNAME redirects for '{}'", acmeDomain);
-      return null;
+      return Collections.emptyList();
     }
 
     Name queryName = Name.fromString(acmeDomain, Name.root);
@@ -346,26 +390,31 @@ public class ChallengeValidator implements Runnable {
     if (response.getRcode() != Rcode.NOERROR) {
       LOG.debug("dns-01: query '{}' returned rcode {}", queryName,
           Rcode.string(response.getRcode()));
-      return null;
+      return Collections.emptyList();
     }
 
     if (dnssecValidation && !response.getHeader().getFlag(Flags.AD)) {
       LOG.warn("dns-01 DNSSEC validation failed for '{}' ({})",
           queryName, getDnssecFailureReason(response));
-      return null;
+      return Collections.emptyList();
     }
 
+    List<String> txtValues = new ArrayList<>();
     Name cnameTarget = null;
     for (Record record : response.getSection(Section.ANSWER)) {
       if (record.getType() == Type.TXT && queryName.equals(record.getName())) {
-        TXTRecord txt = (TXTRecord) record;
-        List<String> strings = txt.getStrings();
+        // RFC 7208 section 3.3: multiple character-strings are concatenated
+        List<String> strings = ((TXTRecord) record).getStrings();
         if (strings != null && !strings.isEmpty()) {
-          return strings.get(0);
+          txtValues.add(String.join("", strings));
         }
       } else if (record.getType() == Type.CNAME && queryName.equals(record.getName())) {
         cnameTarget = ((CNAMERecord) record).getTarget();
       }
+    }
+
+    if (!txtValues.isEmpty()) {
+      return txtValues;
     }
 
     if (cnameTarget != null) {
@@ -373,7 +422,7 @@ public class ChallengeValidator implements Runnable {
       return queryDnsTxt(cnameTarget.toString(), depth + 1);
     }
 
-    return null;
+    return Collections.emptyList();
   }
 
   private static String getDnssecFailureReason(Message response) {
@@ -390,22 +439,23 @@ public class ChallengeValidator implements Runnable {
     return "response not DNSSEC-authenticated";
   }
 
-  private void ensureAllowedChallengeHost(String host) throws UnknownHostException {
+  /**
+   * Resolves the challenge host. The caller must connect to the returned addresses
+   * instead of resolving the host again, to prevent DNS rebinding.
+   */
+  private InetAddress[] resolveChallengeHost(String host) throws UnknownHostException {
+    InetAddress[] addresses = InetAddress.getAllByName(host);
     if (allowPrivateChallengeTargets) {
-      return;
+      return addresses;
     }
 
-    ensurePublicAddressableHost(host);
-  }
-
-  private static void ensurePublicAddressableHost(String host) throws UnknownHostException {
-    InetAddress[] addresses = InetAddress.getAllByName(host);
     for (InetAddress address : addresses) {
       if (isForbiddenAddress(address)) {
         throw new UnknownHostException("host resolves to forbidden address " +
             address.getHostAddress());
       }
     }
+    return addresses;
   }
 
   private static boolean isForbiddenAddress(InetAddress address) {

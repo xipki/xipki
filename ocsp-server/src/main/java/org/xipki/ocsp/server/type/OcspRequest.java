@@ -203,7 +203,11 @@ public class OcspRequest {
         Extension extension0 = extensions0.getExtension(oid);
 
         byte[] encoded = extension0.getEncoded();
-        extensions.add(ExtendedExtension.getInstance(encoded, 0, encoded.length));
+        ExtendedExtension extn = ExtendedExtension.getInstance(encoded, 0, encoded.length);
+        // null for unknown non-critical extension
+        if (extn != null) {
+          extensions.add(extn);
+        }
       }
     }
 

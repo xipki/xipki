@@ -15,7 +15,7 @@ CREATE TABLE ISSUER (
 CREATE TABLE OCSP (
     ID BIGINT NOT NULL,
     IID INT NOT NULL,
-    IDENT VARCHAR(48) NOT NULL COMMENT 'Identifier consists of hex(SIG_ALG) | hex(CERTHASH_ALG) | hex(serial number)',
+    IDENT VARCHAR(48) NOT NULL COMMENT 'base64(responder tag (first 8 bytes of SHA-256(responder name)) | SIG_ALG | serial number)',
     GENERATED_AT BIGINT NOT NULL COMMENT 'generatedAt, seconds since January 1, 1970, 00:00:00 GMT',
     NEXT_UPDATE BIGINT NOT NULL COMMENT 'next update, seconds since January 1, 1970, 00:00:00 GMT',
     RESP VARCHAR(8000) CHARACTER SET ascii NOT NULL COMMENT 'Base64 DER-encoded OCSP response',

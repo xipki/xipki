@@ -4,9 +4,12 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.server.OcspServerConf.ResponseOption;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,6 +18,14 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 public class Responder {
+
+  private final String name;
+
+  /**
+   * Distinguishes the cached responses of different responders: the first 8 bytes of
+   * SHA-256(name).
+   */
+  private final byte[] cacheTag;
 
   private final ResponderOption responderOption;
 
@@ -26,13 +37,24 @@ public class Responder {
 
   private final List<OcspStore> stores;
 
-  Responder(ResponderOption responderOption, RequestOption requestOption,
+  Responder(String name, ResponderOption responderOption, RequestOption requestOption,
             ResponseOption responseOption, ResponseSigner signer, List<OcspStore> stores) {
+    this.name = Args.notBlank(name, "name");
+    this.cacheTag = Arrays.copyOf(
+        HashAlgo.SHA256.hash(name.getBytes(StandardCharsets.UTF_8)), 8);
     this.responderOption = Args.notNull(responderOption, "responderOption");
     this.requestOption = Args.notNull(requestOption, "requestOption");
     this.responseOption = Args.notNull(responseOption, "responseOption");
     this.signer = Args.notNull(signer, "signer");
     this.stores = Args.notEmpty(stores, "stores");
+  }
+
+  public String name() {
+    return name;
+  }
+
+  byte[] cacheTag() {
+    return cacheTag;
   }
 
   ResponderOption responderOption() {

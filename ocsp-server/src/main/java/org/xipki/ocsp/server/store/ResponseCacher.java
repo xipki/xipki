@@ -48,9 +48,13 @@ public class ResponseCacher implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(ResponseCacher.class);
 
-  private static final long SEC_DFLT_NEXT_UPDATE_DURATION = 7L * 24 * 60 * 60;
+  // default nextUpdate for responses without nextUpdate: 1 day
+  private static final long SEC_DFLT_NEXT_UPDATE_DURATION = 24L * 60 * 60;
 
   private static final long SEC_NEXT_UPDATE_BUFFER = 600;
+
+  // IDENT is VARCHAR(48), i.e. maximal 36 bytes before the base64 encoding.
+  private static final int MAX_IDENT_BYTES = 36;
 
   private static final String SQL_ADD_ISSUER =
       SqlUtil.buildInsertSql("ISSUER", "ID,S1C,CERT");
@@ -249,10 +253,20 @@ public class ResponseCacher implements Closeable {
     }
   } // method storeIssuer
 
+  /**
+   * Returns the cached response.
+   * @param responderTag
+   *        Distinguishes the responses of different responders.
+   */
   public OcspRespWithCacheInfo getOcspResponse(
-      int issuerId, BigInteger serialNumber, SignAlgo sigAlgo) throws DataAccessException {
+      int issuerId, byte[] responderTag, BigInteger serialNumber, SignAlgo sigAlgo)
+      throws DataAccessException {
     final String sql = sqlSelectOcsp;
-    byte[] identBytes = buildIdent(serialNumber, sigAlgo);
+    byte[] identBytes = buildIdent(responderTag, serialNumber, sigAlgo);
+    if (identBytes.length > MAX_IDENT_BYTES) {
+      return null;
+    }
+
     long id = deriveId(issuerId, identBytes);
     PreparedStatement ps = datasource.prepareStatement(sql);
     ResultSet rs = null;
@@ -275,17 +289,20 @@ public class ResponseCacher implements Closeable {
         return null;
       }
 
+      long nowInSec = Instant.now().getEpochSecond();
       long nextUpdate = rs.getLong("NEXT_UPDATE");
       if (nextUpdate != 0) {
-        // nextUpdate must be at least in 600 seconds
-        long minNextUpdate = Instant.now().getEpochSecond() + 600;
-
-        if (nextUpdate < minNextUpdate) {
+        // nextUpdate must be at least in SEC_NEXT_UPDATE_BUFFER seconds
+        if (nextUpdate < nowInSec + SEC_NEXT_UPDATE_BUFFER) {
           return null;
         }
       }
 
       long generatedAt = rs.getLong("GENERATED_AT");
+      // the response is cached for at most validity, even if not yet removed by the cleaner
+      if (generatedAt + validity < nowInSec) {
+        return null;
+      }
       String b64Resp = rs.getString("RESP");
       byte[] resp = Base64.decodeFast(b64Resp);
       ResponseCacheInfo cacheInfo = new ResponseCacheInfo(generatedAt);
@@ -301,19 +318,27 @@ public class ResponseCacher implements Closeable {
   } // method getOcspResponse
 
   public void storeOcspResponse(
-      int issuerId, BigInteger serialNumber, long generatedAt,
+      int issuerId, byte[] responderTag, BigInteger serialNumber, long generatedAt,
       Long nextUpdate, SignAlgo sigAlgo, byte[] response) {
     long nowInSec = Instant.now().getEpochSecond();
     if (nextUpdate == null) {
       nextUpdate = nowInSec + SEC_DFLT_NEXT_UPDATE_DURATION;
     }
 
-    if (nextUpdate - nowInSec < validity) {
+    // Response which will expire soon cannot be read from the cache, see getOcspResponse().
+    if (nextUpdate < nowInSec + SEC_NEXT_UPDATE_BUFFER) {
       return;
     }
 
-    byte[] identBytes = buildIdent(serialNumber, sigAlgo);
+    byte[] identBytes = buildIdent(responderTag, serialNumber, sigAlgo);
+    if (identBytes.length > MAX_IDENT_BYTES) {
+      // serial number too long, e.g. a garbage serial number in the request.
+      LOG.debug("serial number too long, do not cache the OCSP response");
+      return;
+    }
+
     String ident = Base64.getEncoder().encodeToString(identBytes);
+    String b64Response = Base64.getEncoder().encodeToString(response);
     try {
       long id = deriveId(issuerId, identBytes);
 
@@ -322,7 +347,6 @@ public class ResponseCacher implements Closeable {
         String sql = SQL_ADD_RESP;
         PreparedStatement ps = datasource.prepareStatement(conn, sql);
 
-        String b64Response = Base64.getEncoder().encodeToString(response);
         Boolean dataIntegrityViolationException = null;
         try {
           int idx = 1;
@@ -367,7 +391,12 @@ public class ResponseCacher implements Closeable {
         datasource.returnConnection(conn);
       }
     } catch (DataAccessException ex) {
-      LOG.info("could not cache OCSP response iid={}, ident={}", issuerId, ident);
+      // A common reason is that the base64-encoded response is longer than the column
+      // OCSP.RESP (VARCHAR(4000) in most databases, VARCHAR(8000) in MySQL), e.g. for
+      // responses signed with ML-DSA-65/87 or composite signatures.
+      LOG.warn("could not cache OCSP response iid={}, ident={}, base64 length={}: {}. If the " +
+          "length exceeds the size of column OCSP.RESP, enlarge the column to cache such " +
+          "responses.", issuerId, ident, b64Response.length(), ex.getMessage());
       if (LOG.isDebugEnabled()) {
         LOG.debug("could not cache OCSP response iid={}, ident={}", issuerId, ident, ex);
       }
@@ -472,11 +501,16 @@ public class ResponseCacher implements Closeable {
     return true;
   } // method updateCacheStore0
 
-  private static byte[] buildIdent(BigInteger serialNumber, SignAlgo sigAlgo) {
+  /**
+   * Builds the identifier: responderTag | sigAlgo | serialNumber.
+   */
+  private static byte[] buildIdent(byte[] responderTag, BigInteger serialNumber, SignAlgo sigAlgo) {
     byte[] snBytes = serialNumber.toByteArray();
-    byte[] bytes = new byte[1 + snBytes.length];
-    bytes[0] = sigAlgo.code();
-    System.arraycopy(snBytes, 0, bytes, 1, snBytes.length);
+    int tagLen = responderTag.length;
+    byte[] bytes = new byte[tagLen + 1 + snBytes.length];
+    System.arraycopy(responderTag, 0, bytes, 0, tagLen);
+    bytes[tagLen] = sigAlgo.code();
+    System.arraycopy(snBytes, 0, bytes, tagLen + 1, snBytes.length);
     return bytes;
   }
 

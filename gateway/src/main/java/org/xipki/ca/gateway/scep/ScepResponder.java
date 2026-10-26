@@ -22,6 +22,7 @@ import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
+import org.xipki.ca.sdk.ErrorEntry;
 import org.xipki.ca.sdk.ErrorResponse;
 import org.xipki.ca.sdk.PollCertRequest;
 import org.xipki.ca.sdk.SdkClient;
@@ -65,8 +66,10 @@ import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.xipki.pkix.exception.ErrorCode.BAD_CERT_TEMPLATE;
@@ -623,11 +626,28 @@ public class ScepResponder {
           PollCertRequest.Entry template = new PollCertRequest.Entry(null,
               new X500NameType(is.getSubject()));
 
+          // RFC 8894 section 3.3.3: CertPoll is signed with the same key as the original
+          // request. Accept it if signed by a known requestor, or if the polled certificate
+          // has the same public key as the signature certificate.
+          X509Cert reqSignatureCert = req.signatureCert();
+          Requestor.CertRequestor pollRequestor = getRequestor(reqSignatureCert);
+          if (pollRequestor != null) {
+            checkUserPermission(pollRequestor, caName, certprofileName);
+          }
+
           PollCertRequest sdkReq = new PollCertRequest(null,
               new X500NameType(is.getIssuer()), null,
               req.transactionId().id(), new PollCertRequest.Entry[]{template});
 
-          signedData = buildSignedData(sdk.pollCerts(sdkReq));
+          EnrollOrPollCertsResponse pollResp = sdk.pollCerts(sdkReq);
+          byte[] cert = extractCert(pollResp);
+          if (pollRequestor == null && !samePublicKey(reqSignatureCert, cert)) {
+            LOG.warn("tid={}: CertPoll is neither signed by a known requestor nor with the key " +
+                "of the polled certificate", tid);
+            throw FailInfoException.BAD_REQUEST;
+          }
+
+          signedData = buildSignedData(cert, pollResp.extraCerts());
           break;
         }
         case GetCert: {
@@ -644,7 +664,7 @@ public class ScepResponder {
               "\"" + X509Util.x500NameText(isn.getName()) + "\"");
 
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
-          signedData = getCert(caName, isn.getName(), serial);
+          signedData = getCert(caName, isn.getName(), serial, req.signatureCert(), tid);
           break;
         }
         case GetCRL: {
@@ -678,15 +698,76 @@ public class ScepResponder {
     }
   } // method servicePkiOperation0
 
-  private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
+  /**
+   * GetCert is permitted if signed by a known requestor, or by a certificate issued by this CA
+   * with the same subject as the requested certificate.
+   */
+  private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber,
+                             X509Cert reqSignatureCert, String tid)
       throws FailInfoException, OperationException, SdkErrorResponseException {
+    boolean knownRequestor = getRequestor(reqSignatureCert) != null;
+    if (!knownRequestor && !isIssuedByCa(caName, reqSignatureCert)) {
+      LOG.warn("tid={}: GetCert is neither signed by a known requestor nor by a certificate " +
+          "issued by CA {}", tid, caName);
+      throw FailInfoException.BAD_REQUEST;
+    }
+
     byte[] encodedCert = Optional.ofNullable(sdk.getCert(caName, issuer, serialNumber))
         .orElseThrow(() -> FailInfoException.BAD_CERTID);
+
+    if (!knownRequestor && !reqSignatureCert.subject().equals(parseCert(encodedCert).subject())) {
+      LOG.warn("tid={}: subject of the requested certificate differs from that of the " +
+          "signature certificate", tid);
+      throw FailInfoException.BAD_REQUEST;
+    }
 
     return buildSignedData(encodedCert, null);
   } // method getCert
 
+  private boolean isIssuedByCa(String caName, X509Cert cert)
+      throws OperationException, SdkErrorResponseException {
+    byte[] encodedCaCert = sdk.cacert(caName);
+    if (encodedCaCert == null) {
+      throw new OperationException(PATH_NOT_FOUND, "unknown CA " + caName);
+    }
+
+    X509Cert caCert = parseCert(encodedCaCert);
+    if (!caCert.subject().equals(cert.issuer())) {
+      return false;
+    }
+
+    Instant now = Instant.now();
+    if (now.isBefore(cert.notBefore()) || now.isAfter(cert.notAfter())) {
+      return false;
+    }
+
+    try {
+      cert.verify(caCert.publicKey());
+      return true;
+    } catch (GeneralSecurityException ex) {
+      return false;
+    }
+  } // method isIssuedByCa
+
+  private static boolean samePublicKey(X509Cert cert, byte[] encodedCert)
+      throws OperationException {
+    return Arrays.equals(cert.subjectPublicKeyInfo().getEncoded(),
+        parseCert(encodedCert).subjectPublicKeyInfo().getEncoded());
+  }
+
+  private static X509Cert parseCert(byte[] encodedCert) throws OperationException {
+    try {
+      return new X509Cert(Certificate.fromEncoded(encodedCert));
+    } catch (CodecException ex) {
+      throw new OperationException(SYSTEM_FAILURE, "could not parse certificate");
+    }
+  }
+
   private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp) throws OperationException {
+    return buildSignedData(extractCert(sdkResp), sdkResp.extraCerts());
+  }
+
+  private byte[] extractCert(EnrollOrPollCertsResponse sdkResp) throws OperationException {
     EnrollOrPollCertsResponse.Entry[] entries = sdkResp.entries();
     int n = entries == null ? 0 : entries.length;
     if (n != 1) {
@@ -694,11 +775,26 @@ public class ScepResponder {
     }
 
     EnrollOrPollCertsResponse.Entry entry = entries[0];
-    byte[] cert = Optional.ofNullable(entry.cert()).orElseThrow(() ->
-        new OperationException(ErrorCode.ofCode(entry.error().code()),
-            "expected 1 cert, but received none"));
+    byte[] cert = entry.cert();
+    if (cert == null) {
+      ErrorCode code = SYSTEM_FAILURE;
+      String message = "expected 1 cert, but received none";
+      ErrorEntry error = entry.error();
+      if (error != null) {
+        try {
+          code = ErrorCode.ofCode(error.code());
+        } catch (IllegalArgumentException ex) {
+          LOG.warn("unknown error code {}", error.code());
+        }
 
-    return buildSignedData(cert, sdkResp.extraCerts());
+        if (error.message() != null) {
+          message += ": " + error.message();
+        }
+      }
+      throw new OperationException(code, message);
+    }
+
+    return cert;
   }
 
   private SignedData buildSignedData(byte[] cert, byte[][] extraCerts) throws OperationException {

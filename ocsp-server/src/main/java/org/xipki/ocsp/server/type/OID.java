@@ -46,7 +46,8 @@ public enum OID {
 
   public static OID getInstanceForEncoded(byte[] data, int offset) {
     for (OID m : OID.values()) {
-      if (CompareUtil.areEqual(data, offset, m.encoded, 0, m.encoded.length)) {
+      if (offset + m.encoded.length <= data.length
+          && CompareUtil.areEqual(data, offset, m.encoded, 0, m.encoded.length)) {
         return m;
       }
     }

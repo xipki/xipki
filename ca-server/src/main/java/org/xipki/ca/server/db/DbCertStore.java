@@ -127,8 +127,15 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   private static final String SQL_REVOKE_CERT =
       "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?";
 
+  // The conditions on REV and RR make sure that the status has not been changed
+  // concurrently since it was read.
+  private static final String SQL_COND_UNREVOKED = " AND REV=0";
+
+  private static final String SQL_COND_SUSPENDED =
+      " AND REV=1 AND RR=" + CrlReason.CERTIFICATE_HOLD.code();
+
   private static final String SQL_REVOKE_SUSPENDED_CERT =
-      "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?";
+      "UPDATE CERT SET LUPDATE=?,RR=? WHERE ID=?" + SQL_COND_SUSPENDED;
 
   private static final String SQL_MAX_CRLNO = "SELECT MAX(CRL_NO) FROM CRL WHERE CA_ID=?";
 
@@ -555,13 +562,18 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       invTimeSeconds = revInfo.invalidityTime().getEpochSecond();
     }
 
-    int count = execUpdatePrepStmt0(SQL_REVOKE_CERT,
+    String sql = force ? SQL_REVOKE_CERT
+        : SQL_REVOKE_CERT + (currentRevInfo == null ? SQL_COND_UNREVOKED : SQL_COND_SUSPENDED);
+
+    int count = execUpdatePrepStmt0(sql,
         col2Long(Instant.now().getEpochSecond()), col2Bool(true),
         // revTimeSeconds
         col2Long(revInfo.revocationTime().getEpochSecond()),
         col2Long(invTimeSeconds), col2Int(revInfo.reason().code()),
         col2Long(certWithRevInfo.cert().certId())); // certId
-    if (count != 1) {
+    if (count == 0 && !force) {
+      throw new OperationException(CERT_REVOKED, "certificate status changed concurrently");
+    } else if (count != 1) {
       String message = (count > 1)
           ? count + " rows modified, but exactly one is expected"
           : "no row is modified, but exactly one is expected";
@@ -586,20 +598,24 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       return null;
     }
 
-    CertRevocationInfo currentRevInfo = Optional.ofNullable(certWithRevInfo.revInfo())
-        .orElseThrow(() -> new OperationException(CERT_UNREVOKED, "certificate is not revoked"));
-
-    CrlReason currentReason = currentRevInfo.reason();
-    if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-      throw new OperationException(CERT_REVOKED,
-          "certificate is revoked but not with reason " + CrlReason.CERTIFICATE_HOLD.description());
+    CertRevocationInfo currentRevInfo = certWithRevInfo.revInfo();
+    if (currentRevInfo == null || currentRevInfo.reason() != CrlReason.CERTIFICATE_HOLD) {
+      // the certificate has been unsuspended or revoked concurrently, skip it.
+      LOG.info("certificate with CA={} and serialNumber={} is no longer suspended, skip it",
+          ca.name(), LogUtil.formatCsn(serialNumber.serial()));
+      return null;
     }
 
     int count = execUpdatePrepStmt0(SQL_REVOKE_SUSPENDED_CERT,
         col2Long(Instant.now().getEpochSecond()),
         col2Int(reason.code()), col2Long(serialNumber.id())); // certId
 
-    if (count != 1) {
+    if (count == 0) {
+      // the certificate has been unsuspended or revoked concurrently, skip it.
+      LOG.info("status of certificate with CA={} and serialNumber={} changed concurrently, " +
+          "skip it", ca.name(), LogUtil.formatCsn(serialNumber.serial()));
+      return null;
+    } else if (count != 1) {
       String message = (count > 1) ? count + " rows modified, but exactly one is expected"
           : "no row is modified, but exactly one is expected";
       throw new OperationException(SYSTEM_FAILURE, message);
@@ -638,13 +654,23 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     }
 
     SqlColumn2 nullInt = new SqlColumn2(ColumnType.INT, null);
-    int count = execUpdatePrepStmt0(
-        "UPDATE CERT SET LUPDATE=?,REV=?,RT=?,RIT=?,RR=? WHERE ID=?",
+    String sql = force ? SQL_REVOKE_CERT : SQL_REVOKE_CERT + SQL_COND_SUSPENDED;
+    int count = execUpdatePrepStmt0(sql,
         col2Long(Instant.now().getEpochSecond()), // currentTimeSeconds
         col2Bool(false), nullInt, nullInt, nullInt,
         col2Long(certWithRevInfo.cert().certId())); // certId
 
-    if (count != 1) {
+    if (count == 0 && !force) {
+      CertWithRevocationInfo current = getCertWithRevocationInfo(ca.id(), serialNumber, idNamMap);
+      if (current == null || current.revInfo() == null) {
+        throw new OperationException(CERT_UNREVOKED,
+            "certificate status changed concurrently: not revoked");
+      } else {
+        throw new OperationException(NOT_PERMITTED,
+            "certificate status changed concurrently: revoked with reason "
+            + current.revInfo().reason().description());
+      }
+    } else if (count != 1) {
       String message = (count > 1)
           ? count + " rows modified, but exactly one is expected"
           : "no row is modified, but exactly one is expected";
@@ -688,7 +714,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     if (sql == null) {
       String coreSql = "ID,SN FROM CERT WHERE ID>? AND CA_ID=?";
       if (onlyRevoked) {
-        coreSql += "AND REV=1";
+        coreSql += " AND REV=1";
       }
       sql = datasource.buildSelectFirstSql(numEntries, "ID ASC", coreSql);
       cache.put(numEntries, sql);

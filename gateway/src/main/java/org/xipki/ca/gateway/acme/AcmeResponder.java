@@ -1029,7 +1029,7 @@ public class AcmeResponder {
         if (cn != null && !cn.isEmpty()) {
           boolean match = false;
           for (Identifier identifier : identifiers) {
-            if (identifier.value().equals(cn)) {
+            if (identifier.value().equalsIgnoreCase(cn)) {
               match = true;
               break;
             }
@@ -1062,7 +1062,7 @@ public class AcmeResponder {
 
             Identifier matchedId = null;
             for (Identifier identifier : identifiers) {
-              if ("dns".equalsIgnoreCase(identifier.type()) && value.equals(identifier.value())) {
+              if ("dns".equalsIgnoreCase(identifier.type()) && value.equalsIgnoreCase(identifier.value())) {
                 matchedId = identifier;
                 break;
               }

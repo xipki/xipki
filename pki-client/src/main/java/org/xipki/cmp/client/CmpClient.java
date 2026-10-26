@@ -280,11 +280,14 @@ public interface CmpClient extends Closeable {
   /**
    * Returns the KEM encap key for the given public key, will be used for the
    * POP generation.
+   * @param requestor
+   *          Requestor to protect the request. Must not be {@code null}.
    * @return the KEM encap key.
    * @throws CmpClientException
    *          if client error occurs.
    */
-  KemEncapKey generateKemEncapKey(String caName, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
-    throws CmpClientException, PkiErrorException;
+  KemEncapKey generateKemEncapKey(
+      String caName, Requestor requestor, SubjectPublicKeyInfo publicKey, ReqRespDebug debug)
+      throws CmpClientException, PkiErrorException;
 
 }

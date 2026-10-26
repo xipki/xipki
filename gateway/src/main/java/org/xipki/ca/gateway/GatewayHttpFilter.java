@@ -352,7 +352,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     }
 
     int sepIndex = authenticatorClazzAndConf.indexOf(' ');
-    String clazzName = null;
+    String clazzName;
     String conf = null;
     if (sepIndex == -1) {
       clazzName = authenticatorClazzAndConf;

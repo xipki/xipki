@@ -337,7 +337,7 @@ public abstract class BaseCmpResponder {
         event.addEventType(TYPE_pkiconf);
         respBody = PKIBody.ofPkiconf();
       } else if (type == PKIBody.tag_genm) {
-        respBody = cmpGeneralMsg(caName, reqBody, event);
+        respBody = cmpGeneralMsg(caName, reqBody, requestor, event);
       } else if (type == PKIBody.tag_error) {
         event.addEventType(TYPE_error);
         respBody = revokePendingCertificates(caName, tid);
@@ -359,7 +359,7 @@ public abstract class BaseCmpResponder {
     }
 
     if (respBody.getTagNo() == PKIBody.tag_error) {
-      ErrorMsgContent errorMsgContent = reqBody.getError();
+      ErrorMsgContent errorMsgContent = respBody.getError();
 
       PkiStatusInfo pkiStatus = new PkiStatusInfo(errorMsgContent.getPkiStatusInfo());
 
@@ -1015,7 +1015,14 @@ public abstract class BaseCmpResponder {
     }
   }
 
-  protected PKIBody cmpGeneralMsg(String caName, PKIBody reqBody, AuditEvent event)
+  /**
+   * Processes the general message.
+   * @param requestor
+   *        Authenticated requestor, {@code null} if the message is neither protected
+   *        nor sent via TLS with client certificate.
+   */
+  protected PKIBody cmpGeneralMsg(
+      String caName, PKIBody reqBody, Requestor requestor, AuditEvent event)
       throws SdkErrorResponseException {
     GenMsgContent genMsgBody = reqBody.getGenm();
 
@@ -1079,20 +1086,44 @@ public abstract class BaseCmpResponder {
       }
     } else { // if (OIDs.Xipki.id_xipki_cmp_kem_encapkey.equals(infoType)) {
       event.addEventType(TYPE_genm_kem_keycap);
+      // the KEM encap key is used for the POP in the enrollment, so the same permission
+      // as for the enrollment is required.
+      if (requestor == null) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.notAuthorized, "KEM encap key requires an authenticated requestor");
+      }
+
+      if (!(requestor.isPermitted(Requestor.Permission.ENROLL_CERT)
+          || requestor.isPermitted(Requestor.Permission.REENROLL_CERT))) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.notAuthorized, "requestor is not permitted to enroll certificates");
+      }
+
       SecretKeyWithAlias masterKey = popControl.defaultKemMasterKey();
       if (masterKey == null) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "no master key is available");
       }
 
+      if (!(itv.getInfoValue() instanceof Asn1OctetString)) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.badDataFormat, "infoValue is not an OCTET STRING");
+      }
+
       byte[] bytes = ((Asn1OctetString) itv.getInfoValue()).getOctets();
+
+      SubjectPublicKeyInfo spki;
+      try {
+        spki = SubjectPublicKeyInfo.fromEncoded(bytes);
+      } catch (CodecException e) {
+        return buildErrorMsgPkiBody(PKIStatus.rejection,
+            PKIFailureInfo.badDataFormat, "invalid SubjectPublicKeyInfo");
+      }
 
       KemEncapKey encapKey;
       try {
-        SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.fromEncoded(bytes);
-
         encapKey = KemUtil.generateKemEncapKey(spki, masterKey, random);
-      } catch (XiSecurityException | CodecException e) {
+      } catch (XiSecurityException e) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "error generating KEM encap key");
       }
