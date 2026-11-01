@@ -6,19 +6,19 @@
 
 # XiPKI
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure)
-is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical 
-infrastructure.  Built with minimal dependencies (only SLF4J, HikariCP, jline 
-and Picocli,besides JDBC drivers) and a compact codebase of ~75,000 lines, it 
-offers native support  for post-quantum algorithms (ML-DSA, ML-KEM, 
-composite), HSM integration via PKCS#11, SM2/SM3 for Chinese national 
-standards, and fast OCSP at scale. 
+is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical
+infrastructure. Built with minimal dependencies (only SLF4J, HikariCP, jline
+and Picocli, besides JDBC drivers) and a compact codebase of ~75,000 lines
+(without QA and test code), it offers native support for post-quantum
+algorithms (ML-DSA, ML-KEM, composite), HSM integration via PKCS#11, SM2/SM3
+for Chinese national standards, and fast OCSP at scale.
 
-The complete distribution, including all third-party libraries and the H2 and MariaDB
-JDBC drivers, is under 9 MB.
+The complete distribution, including all third-party libraries and the H2 and
+MariaDB JDBC drivers, is under 9 MiB.
 
-The project author actively contributes to IETF standardization, including co-authoring the 
-C509 specification (CBOR-encoded X.509 certificates) and its test vectors in the COSE Working 
-Group.
+The project author actively contributes to IETF standardization, including
+co-authoring the C509 specification (CBOR-encoded X.509 certificates) and its
+test vectors in the COSE Working Group.
 
 ## License
 * The Apache Software License, Version 2.0
@@ -33,12 +33,12 @@ JRE/JDK, and the steps required to reproduce the bug.
 
 ### Binaries
 XiPKI provides the binary `xipki-setup-<version>.tar.gz` with the following requirements on JDK:
-  - Java 11+ is required for this runtime
+  - Java 11+ is required for the runtime, Java 25+ for building from source
   - The default crypto backend `jdk` requires Java 25+. On Java 11 to 24, replace it in
     `setup/jars/crypto` by the backend `bc` or `bc-fips` (`bc-fips` always runs in the
     approved-only mode of BC-FIPS).
 
-The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the following ways: 
+The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the following ways:
   - Download the binary from https://github.com/xipki/xipki/releases
   - Download the binary from the central maven repository.
     ```
@@ -55,13 +55,13 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
       ```sh
       git clone https://github.com/xipki/xipki
       ```
-      
+
     - Build the project
       * In the `xipki` folder:
         ```sh
         ./install.sh
         ```
- 
+
       The binaries will then be available in `assemblies/xipki-setup/target/`.
 
       If the SNAPSHOT dependencies cannot be retrieved, build and install the
@@ -79,18 +79,18 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
 ### Just Try The Demo
 
 1. Unpack the binary.
-   - Unpack `xipki-setup-<version>.tar.gz` 
+   - Unpack `xipki-setup-<version>.tar.gz`
 2. In the unpacked folder `xipki-setup-<version>`:  
    Run `./demo.sh` to prepare the system and start the XiPKI console.
 
    Once the system has been prepared, you only need to start the XiPKI
    console by running `./xipki-setup-<version>/xipki-mgmt-cli/bin/xipki`.
 3. In the xipki console:  
-   Run `source demo/demo.script` to print the usage information, and 
+   Run `source demo/demo.script` to print the usage information, and
    then follow it, for example:
    `source demo/demo.script DB PKCS12 RSA2048`
 4. (Optional) Point the browser to http://localhost:8282 to open the H2 database
-   console. You can view the database content using username `root` and 
+   console. You can view the database content using username `root` and
    password `123456` with the following JDBC URLs:
    - Database CA configuration: `jdbc:h2:~/.xipki/db/h2/caconf`
    - Database CA data: `jdbc:h2:~/.xipki/db/h2/ca`
@@ -98,7 +98,7 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
 
 The generated keys, certificate requests (CSRs), and certificates are in
 `xipki-mgmt-cli/output`. The CA, OCSP, and gateway instances are in
-the folders `~/xipki_demo/ca-tomcat`, `~/xipki_demo/ocsp-tomcat`, and 
+the folders `~/xipki_demo/ca-tomcat`, `~/xipki_demo/ocsp-tomcat`, and
 `~/xipki_demo/gateway-tomcat` respectively.
 
 ### Install and Setup
@@ -112,12 +112,12 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 * OS
   * Linux, MacOS
 * JRE / JDK
-  * Java 11+
-  * Java 25+ for the crypto backends `jdk` (the default) and `openssl`
+  * Java 25+ for the crypto backend `jdk` (the default), `openssl` and `openssl-fips`
+  * Java 11+ for the crypto backend `bc` and `bc-fips`.
 * Database
   * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
-  * Any available hardware 
+  * Any available hardware
 * Servlet Container
   * Tomcat 10, 11
 * HSM Devices
@@ -338,7 +338,7 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 
 ### Mgmt CLI (Management Client)
   - Configuring CA
-  - Generating key pairs of RSA, EC (including SM2), Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM, 
+  - Generating key pairs of RSA, EC (including SM2), Ed25519, Ed448, X25519, X448, ML-DSA, ML-KEM,
     composite-MLDSA, and composite-MLKEM in the token
   - Deleting key pairs and certificates from the token
   - Updating certificates in the token

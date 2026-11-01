@@ -4,11 +4,12 @@ See also <https://github.com/xipki/xipki/releases>
 
 ## 7.0.0
 - Release date: 202y/mm/dd
-- Make the crypto backend plugable. Three backends have been implemented in https://github.com/xipki/xicrypto:
-  - JDK (requires JDK 25+; the other modules run on JDK 11+, there use one of the BouncyCastle
-    backends)
-  - bouncycastle FIPS (bc-fips and bcpqc-fips required)
-  - bouncycastle LTS (bcprov-lts8on required) and standard (bcprov-jdk8on required)
+- Make the crypto backend plugable. Five backends have been implemented in https://github.com/xipki/xicrypto:
+  - jdk (requires JDK 25+)
+  - bc: bouncycastle LTS (bcprov-lts8on required) or standard (bcprov-jdk8on required)
+  - bc-fips: bouncycastle FIPS (bc-fips and bcpqc-fips required)
+  - openssl (requires JDK 25+ and openssl in non-FIPS mode)
+  - openssl-fips (requires JDK 25+ and openssl in FIPS mode)
 - The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
 - The PKIX modules moved to https://github.com/xipki/xipkix and use the groupId `org.xipki.pkix`.
 - The shell-base module moved to https://github.com/xipki/xishell and use the groupId `org.xipki.shell`.
@@ -18,8 +19,7 @@ See also <https://github.com/xipki/xipki/releases>
     (packages `org.xipki.ca.gateway.dns` and `org.xipki.ca.gateway.dns.dnssec`). The DNSSEC validation runs in the gateway as before, against the configured
     trust anchors, for positive answers only. Answers expanded from DNS wildcards or DNAME are
     rejected; DNSSEC algorithms 8, 10, 13, 14, 15 and 16 are supported.
-  - If `dnsResolvers` is not set, the name servers of `/etc/resolv.conf` are used (required on
-    Windows).
+  - If `dnsResolvers` is not set, the name servers of `/etc/resolv.conf` are used.
   - http-01 and tls-alpn-01: the host is resolved (A and AAAA) with the same DNS resolvers
     instead of the system resolver, so `/etc/hosts` is no longer used.
   - The file `dnssecTrustAnchorsFile` is reloaded when it has been changed (checked every
@@ -35,7 +35,7 @@ See also <https://github.com/xipki/xipki/releases>
   - postgresql: removed
   - jline: 4.4.1   -> 4.4.8
   - h2:    2.4.240 -> 2.5.252
-  - slf4j: 2.0.18  -> 2.0.20 
+  - slf4j: 2.0.18  -> 2.0.20
 
 ## 6.7.1
 - Release date: 2026/09/07
@@ -165,14 +165,14 @@ See also <https://github.com/xipki/xipki/releases>
 - Release date: 2026/03/15
 - All components:
   - Added support of issuing certificate with ML-DSA signature.
-  - Added support of issuing certificate with composite ML-DSA signature 
+  - Added support of issuing certificate with composite ML-DSA signature
     (specified in draft-ietf-lamps-pq-composite-sigs).
   - Added support of issuing certificate with ML-DSA, and ML-KEM public keys
   - Added support of issuing certificate with composite MLDSA public keys
     (specified in draft-ietf-lamps-pq-composite-sigs)
   - Added support of issuing certificate with composite MLKEM public keys
     (specified in draft-ietf-lamps-pq-composite-kem)
-  - Changed (simplified) the format of certificate profiles (v2). The old 
+  - Changed (simplified) the format of certificate profiles (v2). The old
     certificate profiles (v1) can still be used.
   - Use own JSON and CBOR parser and writer
   - Use own PKCS#11 JNI library.
@@ -281,7 +281,7 @@ See also <https://github.com/xipki/xipki/releases>
 ## 6.3.0
 - Release date: 2023/04/29
 - CA
-  - Do not check the uniqueness of serial number in database if it contains 
+  - Do not check the uniqueness of serial number in database if it contains
     at least 95 random bits.
   - Fixed bug "the scheduled generation of CRLs does not work".
   - Split the database of CA to 2 databases: 1 only for the CA's
@@ -418,7 +418,7 @@ See also <https://github.com/xipki/xipki/releases>
 ## 5.3.14
 - Release date: December 24, 2021
 - CA
-  - Feature: Include postgres jdbc driver in the binary. 
+  - Feature: Include postgres jdbc driver in the binary.
   - Feature: Deprecate the use of CertPublisher.isAsyn().
   - Feature: Add support of SM2 in unprofessional HSMs.
   - Feature: Generating self-signed certificate requires now only subject instead of CSR.
@@ -459,7 +459,7 @@ See also <https://github.com/xipki/xipki/releases>
     - Bug fix: Fix file path bug in Windows
     - Bug fix: In CMP, Use NULL Sender if MAC is used to protect the message
     - Bug fix: Fixed incorrect behaviour of extra-control
-    - Feature: Add support of certificates signed with SHAKE128WITHRSAPSS, SHAKE256WITHRSAPSS, ECDSAWITHSHAKE128 and ECDSAWITHSHAKE256. 
+    - Feature: Add support of certificates signed with SHAKE128WITHRSAPSS, SHAKE256WITHRSAPSS, ECDSAWITHSHAKE128 and ECDSAWITHSHAKE256.
     - Feature: Allow the configuration of signature algorithm *withRSAandMGF1 with *withRSAPSS.
     - Feature: Allow the configuration of method to compute SubjectKeyIdentifier
     - Feature: Reduce the minimal size of serial number from 9 to 1
@@ -625,13 +625,13 @@ See also <https://github.com/xipki/xipki/releases>
   - CA
     - Upgrade bcprov-jdk15on and bcpkix-jdk15on to 1.64
     - Fixed bug #128 "CA cannot start with NULL CMP_CONTROL"
-    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+ 
+    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+
     - Securities accepts explicit P11ModuleFactories
   - OCSP
     - Upgrade bcprov-jdk15on and bcpkix-jdk15on to 1.64
-    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+ 
+    - Downgrade liquibase from 3.8.0 to 3.6.3 to support MariaDB 10.3+
     - Securities accepts explicit P11ModuleFactories
-  - CLI 
+  - CLI
     - Optimized the display of benchmark with number over 1,000,000,000
     - Securities accepts explicit P11ModuleFactories
 
@@ -704,7 +704,7 @@ See also <https://github.com/xipki/xipki/releases>
   - CLI
     - Extend the command csr-p11 and csr-p12 to generate CSR with complex subject and extensions
     - Simplify and extend the configuration of custom extension
- 
+
 ## 5.1.0
   - Release date: Mar 17, 2019
   - Relax the limitation of OCSP response in HTTP GET
