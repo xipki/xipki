@@ -49,7 +49,7 @@
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
     <jdbc.h2.version>2.5.252</jdbc.h2.version>
-    <jdbc.mariadb.version>3.5.10</jdbc.mariadb.version>
+    <jdbc.mariadb.version>3.5.11</jdbc.mariadb.version>
     <!--jdbc.postgresql.version>42.7.13</jdbc.postgresql.version-->
 
     <!-- Only for test purpose -->
