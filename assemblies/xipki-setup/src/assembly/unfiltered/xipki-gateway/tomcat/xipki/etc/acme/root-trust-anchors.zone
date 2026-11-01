@@ -10,7 +10,7 @@
 # Page updated: 2024-11-05
 #
 # Format:
-# zone-file DS or DNSKEY records accepted by dnsjava ValidatingResolver.
+# zone-file DS or DNSKEY records, one per line or continued with parentheses.
 # Keep this file current with the active DNS root trust anchors.
 
 . 172800 IN DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D

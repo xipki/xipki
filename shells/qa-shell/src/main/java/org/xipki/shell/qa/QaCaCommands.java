@@ -3,14 +3,11 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -23,35 +20,37 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
 import org.xipki.codec.Base64;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.conf.Validity;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ca.CaEnrollBenchEntry;
 import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
+import org.xipki.qa.ca.CaEnrollBenchEntry;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry;
-import org.xipki.qa.ca.CaEnrollBenchmark;
+import org.xipki.qa.ca.CaEnrollSpeed;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
-import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.ca.mgmt.CaCompleters;
 import org.xipki.shell.ca.mgmt.CaMgmtRuntime;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.xi.Completers;
-import org.xipki.codec.ConfPairs;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -774,7 +773,7 @@ class QaCaCommands {
     }
   }
 
-  abstract static class AbstractBenchmarkEnrollCommand extends XiShellBaseCommand {
+  abstract static class AbstractSpeedEnrollCommand extends XiShellBaseCommand {
 
     @Option(names = "--ca", required = true, description = "CA name")
     @Completion(CaCompleters.CaNameCompleter.class)
@@ -815,42 +814,42 @@ class QaCaCommands {
       return randomDn;
     }
 
-    protected void checkBenchmarkParameters() {
+    protected void checkSpeedParameters() {
       if (numThreads == null || numThreads < 1) {
         throw new IllegalArgumentException("invalid number of threads " + numThreads);
       }
     }
   }
 
-  @Command(name = "benchmark-enroll-serverkeygen",
-      description = "Enroll certificate (CA generates keypairs, benchmark)",
+  @Command(name = "speed-enroll-serverkeygen",
+      description = "Enroll certificate (CA generates keypairs, speed test)",
       mixinStandardHelpOptions = true)
-  static class BenchmarkCaGenEnrollCommand extends AbstractBenchmarkEnrollCommand {
+  static class SpeedCaGenEnrollCommand extends AbstractSpeedEnrollCommand {
 
     @Override
     public void run() {
       try {
-        checkBenchmarkParameters();
+        checkSpeedParameters();
         String description = StringUtil.concatObjectsCap(200,
             "subjectTemplate: ", subjectTemplate,
             "\nprofile: ", certprofile, "\nmaxRequests: ", maxRequests);
 
-        CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(
+        CaEnrollBenchEntry speedEntry = new CaEnrollBenchEntry(
             certprofile, null, subjectTemplate, randomDn());
-        CaEnrollBenchmark benchmark = new CaEnrollBenchmark(
-            caName, benchmarkEntry, maxRequests, num, description);
-        benchmark.setDuration(duration).setThreads(numThreads).execute();
+        CaEnrollSpeed speed = new CaEnrollSpeed(
+            caName, speedEntry, maxRequests, num, description);
+        speed.setDuration(duration).setThreads(numThreads).execute();
       } catch (Exception ex) {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
-            : new RuntimeException("could not run enroll-serverkeygen benchmark: "
+            : new RuntimeException("could not run enroll-serverkeygen speed test: "
                 + ex.getMessage(), ex);
       }
     }
   }
 
-  @Command(name = "benchmark-enroll", description = "Enroll certificate (benchmark)",
+  @Command(name = "speed-enroll", description = "Enroll certificate (speed test)",
       mixinStandardHelpOptions = true)
-  static class BenchmarkEnrollCommand extends AbstractBenchmarkEnrollCommand {
+  static class SpeedEnrollCommand extends AbstractSpeedEnrollCommand {
 
     @Option(names = "--keyspec", required = true, description = "key spec")
     @Completion(SecurityCompleters.KeySpecCompleter.class)
@@ -862,22 +861,21 @@ class QaCaCommands {
     @Override
     public void run() {
       try {
-        checkBenchmarkParameters();
+        checkSpeedParameters();
         String description = StringUtil.concatObjectsCap(200,
             "subjectTemplate: ", subjectTemplate, "\nprofile: ", certprofile,
             "\nkeySpec: ", keyspec, "\nmaxRequests: ", maxRequests);
 
         KeySpec ks = KeySpec.ofKeySpec(keyspec);
-        CaEnrollBenchKeyEntry keyEntry = new CaEnrollBenchKeyEntry(
-            ks, !newKey, new SecureRandom());
-        CaEnrollBenchEntry benchmarkEntry = new CaEnrollBenchEntry(
+        CaEnrollBenchKeyEntry keyEntry = new CaEnrollBenchKeyEntry(ks, !newKey);
+        CaEnrollBenchEntry speedEntry = new CaEnrollBenchEntry(
             certprofile, keyEntry, subjectTemplate, randomDn());
-        CaEnrollBenchmark benchmark = new CaEnrollBenchmark(
-            caName, benchmarkEntry, maxRequests, num, description);
-        benchmark.setDuration(duration).setThreads(numThreads).execute();
+        CaEnrollSpeed speed = new CaEnrollSpeed(
+            caName, speedEntry, maxRequests, num, description);
+        speed.setDuration(duration).setThreads(numThreads).execute();
       } catch (Exception ex) {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
-            : new RuntimeException("could not run enroll benchmark: " + ex.getMessage(), ex);
+            : new RuntimeException("could not run enroll speed test: " + ex.getMessage(), ex);
       }
     }
   }

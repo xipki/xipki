@@ -1,15 +1,15 @@
 
 set crypto $(crypto-info)
 
-set java_version $(java-version)
-
-if "$crypto" neq "CryptoJdk" | "$java_version" ge "25"
+if "$crypto" eq "bc-fips"
+  set list [ tls-rsa tls-ec tls-edwards tls-montgomery tls-mldsa \
+             tls-mlkem tls-compsig tls-compkem ]
+elif "$crypto" eq "openssl-fips"
+  set list [ tls-rsa tls-ec tls-edwards tls-mldsa \
+             tls-mlkem tls-compsig tls-compkem ]
+else
   set list [ tls-rsa tls-ec tls-edwards tls-montgomery tls-sm2 tls-mldsa \
              tls-mlkem tls-compsig tls-compkem ]
-elif "$java_version" ge "15"
-  set list [ tls-rsa tls-ec tls-edwards tls-montgomery tls-sm2 ]
-else
-  set list [ tls-rsa tls-ec tls-montgomery tls-sm2 ]
 fi
 
 set CUR_TIME $(date '+%Y%m%d-%H%M%S')

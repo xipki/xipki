@@ -3,21 +3,8 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.codec.asn1.Asn1Encodable;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.CertPolicyOIDs;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.OIDs;
-import org.xipki.pkix.asn1.util.IETFUtils;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.AccessDescription;
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
-import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.PolicyInformation;
-import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
@@ -30,9 +17,22 @@ import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.pkix.exception.BadCertTemplateException;
+import org.xipki.codec.asn1.Asn1Encodable;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.CertPolicyOIDs;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.AccessDescription;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.PolicyInformation;
+import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
 import org.xipki.pkix.cert.KeyUsage;
-import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.util.List;
@@ -67,7 +67,7 @@ public class CertprofileUtil {
       List<RDN> countryRdns = gs.getRDNs(oid);
       if (countryRdns != null) {
         for (RDN rdn : countryRdns) {
-          String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+          String textValue = X509Util.rdnValueToString(rdn.getFirst().getValue());
           if (!SubjectDnSpec.isValidCountryAreaCode(textValue)) {
             errorOid = oid;
             errorCountry = textValue;

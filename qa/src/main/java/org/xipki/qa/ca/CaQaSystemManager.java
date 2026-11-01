@@ -5,12 +5,12 @@ package org.xipki.qa.ca;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.ca.api.CertprofileException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -4,7 +4,7 @@
 package org.xipki.ca.api;
 
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 /**
  * Hour Minute.

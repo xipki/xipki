@@ -5,26 +5,27 @@ package org.xipki.shell.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Hex;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
-import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.pkcs11.P11CompositeKey;
 import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
 import org.xipki.pkix.pkcs11.P11Module;
 import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.pkix.util.password.PasswordResolverException;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
-import org.xipki.pkix.util.password.PasswordResolverException;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -380,8 +381,7 @@ public class P11Commands {
           }
           LOG.info("{}{}", msgPrefix, ex.getMessage());
 
-          byte[] keyValue = new byte[keysize / 8];
-          securities().securityFactory().random4Key().nextBytes(keyValue);
+          byte[] keyValue = RandomUtil.nextBytes(keysize / 8);
           PKCS11KeyId objId = slot.importSecretKey(keyValue, spec.keyType(p11KeyType));
           Arrays.fill(keyValue, (byte) 0);
           String msg = "generated in memory and imported " + keyType + " key " + objId;

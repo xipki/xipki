@@ -9,19 +9,20 @@ import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.util.audit.AuditEvent;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.conf.Validity;
 import org.xipki.pkix.util.conf.Validity.Unit;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -108,7 +109,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
 
     ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
 
-    Random random = new Random();
+    Random random = RandomUtil.random();
     this.suspendedCertsRevoker = executor.scheduleAtFixedRate(
         new SuspendedCertsRevoker(), random.nextInt(60), 60, TimeUnit.MINUTES);
   } // constructor

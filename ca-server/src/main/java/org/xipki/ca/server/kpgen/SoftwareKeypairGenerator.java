@@ -4,15 +4,14 @@
 package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
+import org.xipki.codec.ConfPairs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.KeyInfoPair;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.codec.ConfPairs;
 
 import java.io.IOException;
 import java.security.KeyPair;
-import java.security.SecureRandom;
 
 /**
  * Software Keypair Generator.
@@ -21,10 +20,7 @@ import java.security.SecureRandom;
  */
 public class SoftwareKeypairGenerator extends KeypairGenerator {
 
-  private final SecureRandom random;
-
-  public SoftwareKeypairGenerator(SecureRandom random) {
-    this.random = random == null ? new SecureRandom() : random;
+  public SoftwareKeypairGenerator() {
   }
 
   @Override
@@ -47,7 +43,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   private KeyInfoPair generateKeypair0(KeySpec keyspec) throws Exception {
-    KeyPair kp = KeyUtil.generateKeyPair(keyspec, random);
+    KeyPair kp = KeyUtil.generateKeyPair(keyspec);
     return new KeyInfoPair(kp);
   }
 

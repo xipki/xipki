@@ -3,10 +3,10 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
+import org.xipki.ca.api.Range;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.Args;
-import org.xipki.ca.api.Range;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 /**
  * Rdn Control settings.

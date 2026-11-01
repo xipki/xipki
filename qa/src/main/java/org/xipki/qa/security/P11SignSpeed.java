@@ -6,21 +6,21 @@ package org.xipki.qa.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
 import org.xipki.pkcs11.wrapper.PKCS11T;
 import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
-import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.SecurityFactory;
-import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.util.benchmark.BenchmarkExecutor;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.misc.RandomUtil;
 
@@ -31,7 +31,7 @@ import java.time.Clock;
  *
  * @author Lijun Liao (xipki)
  */
-public class P11SignSpeed extends BenchmarkExecutor {
+public class P11SignSpeed extends SpeedExecutor {
 
   private class Tester implements Runnable {
 

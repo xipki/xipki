@@ -13,7 +13,6 @@ import org.xipki.pkix.cmp.CmpUtil;
 
 import javax.crypto.Cipher;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 
 /**
@@ -64,12 +63,9 @@ abstract class CrmfKeyWrapper {
 
     private final ECPublicKey publicKey;
 
-    private final SecureRandom rnd;
-
-    public ECIESAsymmetricKeyWrapper(ECPublicKey publicKey, SecureRandom rnd) {
+    public ECIESAsymmetricKeyWrapper(ECPublicKey publicKey) {
       this.publicKey = publicKey;
       this.algorithmIdentifier = CmpUtil.buildCrmfAlgId();
-      this.rnd = rnd == null ? new SecureRandom() : rnd;
     }
 
     @Override
@@ -80,7 +76,7 @@ abstract class CrmfKeyWrapper {
     @Override
     public byte[] generateWrappedKey(byte[] keyToWrap) throws OperatorException {
       try {
-        return CmpUtil.wrapCrmfContentEncryptionKey(keyToWrap, publicKey, rnd);
+        return CmpUtil.wrapCrmfContentEncryptionKey(keyToWrap, publicKey);
       } catch (Exception ex) {
         throw new OperatorException("error while generateWrappedKey", ex);
       }

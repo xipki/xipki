@@ -5,7 +5,6 @@ package org.xipki.ca.api.profile;
 
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.Args;
-import org.xipki.ca.api.CertprofileException;
 
 import java.util.Collections;
 import java.util.HashMap;

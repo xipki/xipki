@@ -3,6 +3,11 @@
 
 package org.xipki.qa.ca;
 
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.profile.ctrl.RdnControl;
+import org.xipki.ca.api.profile.ctrl.StringType;
+import org.xipki.ca.api.profile.ctrl.SubjectControl;
+import org.xipki.ca.api.profile.ctrl.TextValidator;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1IA5String;
 import org.xipki.codec.asn1.Asn1Oid;
@@ -12,18 +17,13 @@ import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
 import org.xipki.codec.asn1.oid.AttributeOIDs;
 import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.codec.util.Args;
 import org.xipki.pkix.asn1.x500.AttributeTypeAndValue;
 import org.xipki.pkix.asn1.x500.RDN;
 import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.ca.api.profile.ctrl.RdnControl;
-import org.xipki.ca.api.profile.ctrl.StringType;
-import org.xipki.ca.api.profile.ctrl.SubjectControl;
-import org.xipki.ca.api.profile.ctrl.TextValidator;
-import org.xipki.codec.util.Args;
-import org.xipki.qa.ValidationIssue;
-import org.xipki.pkix.exception.BadCertTemplateException;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.qa.ValidationIssue;
 
 import java.util.HashSet;
 import java.util.LinkedList;

@@ -3,20 +3,21 @@
 
 package org.xipki.qa.ca;
 
+import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
-import org.xipki.codec.Base64;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.KeyInfoPair;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -30,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.sql.Connection;
@@ -79,7 +81,8 @@ public class FillKeypool implements AutoCloseable {
       throws Exception {
     Args.notNull(password, "password");
 
-    if (keySpecs == null) {
+    boolean withExplicitKeySpecs = keySpecs != null;
+    if (!withExplicitKeySpecs) {
       keySpecs = List.of(KeySpec.values());
     }
 
@@ -102,7 +105,7 @@ public class FillKeypool implements AutoCloseable {
     PreparedStatement ps = null;
     Statement stmt = null;
     String sql = null;
-    SecureRandom rnd = new SecureRandom();
+    SecureRandom rnd = RandomUtil.random();
 
     try {
       // PBE salt and iteration
@@ -174,10 +177,6 @@ public class FillKeypool implements AutoCloseable {
       ps = datasource.prepareStatement(sql);
       int id = 1;
 
-      if (keySpecs == null) {
-        keySpecs = List.of(KeySpec.values());
-      }
-
       // loading the RSA pre-generated keypairs
       Map<KeySpec, List<KeyInfoPair>> preKeysMap = new HashMap<>();
       for (KeySpec keyspec : keySpecs) {
@@ -216,13 +215,18 @@ public class FillKeypool implements AutoCloseable {
 
         long start = Clock.systemUTC().millis();
 
-        for (int i = 0; i < numKeypairs; i++) {
+        int i = 0;
+        for (; i < numKeypairs; i++) {
           KeyInfoPair keyInfoPair;
           if (preKeys != null) {
             keyInfoPair = preKeys.get(i % preKeys.size());
           } else {
-            KeyPair kp = KeyUtil.generateKeyPair(keyspec, rnd);
-            keyInfoPair = new KeyInfoPair(kp);
+            try {
+              KeyPair kp = KeyUtil.generateKeyPair(keyspec);
+              keyInfoPair = new KeyInfoPair(kp);
+            } catch (GeneralSecurityException ex) {
+              continue;
+            }
           }
 
           byte[] nonce = new byte[12];
@@ -250,7 +254,7 @@ public class FillKeypool implements AutoCloseable {
         long duration = Clock.systemUTC().millis() - start;
         System.out.println(keyspec.text() + ": " +
             (preKeys != null ? "loaded " : "generated ") +
-            numKeypairs + " keypairs, took " + duration + " ms");
+            i + " keypairs, took " + duration + " ms");
       } // end for
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

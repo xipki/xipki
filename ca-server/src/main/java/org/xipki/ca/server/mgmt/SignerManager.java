@@ -5,18 +5,18 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.util.Args;
-import org.xipki.pkcs11.wrapper.TokenException;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkix.pkcs11.P11Module;
 import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

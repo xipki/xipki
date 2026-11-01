@@ -13,9 +13,9 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;

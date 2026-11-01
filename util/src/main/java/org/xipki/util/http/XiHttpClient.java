@@ -45,13 +45,9 @@ public class XiHttpClient {
   }
 
   public HttpRespContent httpGet(String url) throws IOException {
-    try {
-      HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
-      httpConn.setRequestMethod("GET");
-      return parseResponse(httpConn);
-    } catch (XiHttpClientException ex) {
-      throw new IOException(ex);
-    }
+    HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
+    httpConn.setRequestMethod("GET");
+    return parseResponse(httpConn);
   } // method httpGet
 
   public HttpRespContent httpPost(
@@ -79,50 +75,41 @@ public class XiHttpClient {
 
   public HttpRespContent httpPost(String url, String requestContentType, byte[] request)
       throws IOException {
-    try {
-      HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
-      httpConn.setRequestMethod("POST");
-      httpConn.setDoOutput(true);
-      httpConn.setUseCaches(false);
+    HttpURLConnection httpConn = openHttpConn(new URL(Args.notNull(url, "url")));
+    httpConn.setRequestMethod("POST");
+    httpConn.setDoOutput(true);
+    httpConn.setUseCaches(false);
 
-      if (request != null) {
-        if (requestContentType != null) {
-          httpConn.setRequestProperty("Content-Type", requestContentType);
-        }
-
-        httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
-        OutputStream outputstream = httpConn.getOutputStream();
-        outputstream.write(request);
-        outputstream.flush();
+    if (request != null) {
+      if (requestContentType != null) {
+        httpConn.setRequestProperty("Content-Type", requestContentType);
       }
 
-      return parseResponse(httpConn);
-    } catch (XiHttpClientException ex) {
-      throw new IOException(ex.getMessage(), ex);
+      httpConn.setRequestProperty("Content-Length", Integer.toString(request.length));
+      OutputStream outputstream = httpConn.getOutputStream();
+      outputstream.write(request);
+      outputstream.flush();
     }
+
+    return parseResponse(httpConn);
   } // method httpPost
 
-  private HttpRespContent parseResponse(HttpURLConnection conn)
-      throws XiHttpClientException {
-    try {
-      int respCode = Args.notNull(conn, "conn").getResponseCode();
-      InputStream inputstream = respCode == HttpURLConnection.HTTP_OK
-          ? conn.getInputStream() : conn.getErrorStream();
-      byte[] content = inputstream == null ? new byte[0]
-          : XipkiIoUtil.readAllBytesAndClose(inputstream);
-      if (content.length > 0) {
-        String encoding = conn.getHeaderField("content-transfer-encoding");
-        if (encoding != null && "base64".equalsIgnoreCase(encoding.trim())) {
-          content = Base64.decode(content);
-        }
+  private HttpRespContent parseResponse(HttpURLConnection conn) throws IOException {
+    int respCode = Args.notNull(conn, "conn").getResponseCode();
+    InputStream inputstream = respCode == HttpURLConnection.HTTP_OK
+        ? conn.getInputStream() : conn.getErrorStream();
+    byte[] content = inputstream == null ? new byte[0]
+        : XipkiIoUtil.readAllBytesAndClose(inputstream);
+    if (content.length > 0) {
+      String encoding = conn.getHeaderField("content-transfer-encoding");
+      if (encoding != null && "base64".equalsIgnoreCase(encoding.trim())) {
+        content = Base64.decode(content);
       }
-
-      return respCode == HttpURLConnection.HTTP_OK
-          ? HttpRespContent.ofOk(conn.getContentType(), content)
-          : HttpRespContent.of(respCode, conn.getContentType(), content);
-    } catch (IOException ex) {
-      throw new XiHttpClientException(ex);
     }
+
+    return respCode == HttpURLConnection.HTTP_OK
+        ? HttpRespContent.ofOk(conn.getContentType(), content)
+        : HttpRespContent.of(respCode, conn.getContentType(), content);
   } // method parseResponse
 
   private HttpURLConnection openHttpConn(URL url) throws IOException {

@@ -3,9 +3,9 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.PermissionConstants;
@@ -14,19 +14,19 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.ConfPairs;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.conf.Validity;
 import org.xipki.pkix.util.conf.FileOrBinary;
 import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceWrapper;
 
 import java.io.IOException;
 import java.io.OutputStream;

@@ -5,9 +5,9 @@ package org.xipki.util.http;
 
 import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.Base64;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.CompareUtil;
 import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.misc.StringUtil;
 import org.xipki.pkix.util.password.Passwords;
 
 import javax.net.ssl.HostnameVerifier;

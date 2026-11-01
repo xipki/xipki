@@ -7,7 +7,6 @@ import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.KeyUtil;
 
-import java.security.SecureRandom;
 
 /**
  * CA Enroll Bench Key entry.
@@ -20,17 +19,13 @@ public class CaEnrollBenchKeyEntry {
 
   private final KeySpec keySpec;
 
-  private final SecureRandom random;
-
-  public CaEnrollBenchKeyEntry(KeySpec keySpec, boolean reuse, SecureRandom random)
-      throws Exception {
+  public CaEnrollBenchKeyEntry(KeySpec keySpec, boolean reuse) throws Exception {
     this.keySpec = keySpec;
-    this.random = (random != null) ? random : new SecureRandom();
     if (!reuse) {
       return;
     }
 
-    this.spki = KeyUtil.generateKeyPair2(keySpec, this.random).subjectPublicKeyInfo();
+    this.spki = KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
@@ -38,7 +33,7 @@ public class CaEnrollBenchKeyEntry {
       return spki;
     }
 
-    return KeyUtil.generateKeyPair2(keySpec, random).subjectPublicKeyInfo();
+    return KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
   }
 
 }

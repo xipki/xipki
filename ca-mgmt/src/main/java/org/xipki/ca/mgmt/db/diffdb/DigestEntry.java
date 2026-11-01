@@ -4,7 +4,7 @@
 package org.xipki.ca.mgmt.db.diffdb;
 
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

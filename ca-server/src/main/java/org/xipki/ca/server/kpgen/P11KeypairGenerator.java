@@ -4,16 +4,16 @@
 package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
+import org.xipki.codec.ConfPairs;
 import org.xipki.codec.util.Args;
-import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkcs11.wrapper.TokenException;
+import org.xipki.pkix.cert.KeyInfoPair;
 import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
 import org.xipki.pkix.pkcs11.P11Module;
 import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
-import org.xipki.pkix.cert.KeyInfoPair;
-import org.xipki.codec.ConfPairs;
 
 import java.io.IOException;
 

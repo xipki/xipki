@@ -5,8 +5,11 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.util.ReflectiveUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.codec.util.Pack;
 import org.xipki.pkix.asn1.x500.X500Name;
@@ -44,7 +47,6 @@ import org.xipki.codec.json.JsonParser;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.exception.ErrorCode;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
@@ -60,9 +62,8 @@ import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.ReflectiveUtil;
 import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -287,7 +288,7 @@ public class AcmeResponder {
       }
     }
 
-    rnd = new SecureRandom();
+    rnd = RandomUtil.random();
 
     if (conf.dbConf() == null) {
       throw new InvalidConfException("dbConf is not specified");
@@ -1062,7 +1063,8 @@ public class AcmeResponder {
 
             Identifier matchedId = null;
             for (Identifier identifier : identifiers) {
-              if ("dns".equalsIgnoreCase(identifier.type()) && value.equalsIgnoreCase(identifier.value())) {
+              if ("dns".equalsIgnoreCase(identifier.type())
+                  && value.equalsIgnoreCase(identifier.value())) {
                 matchedId = identifier;
                 break;
               }

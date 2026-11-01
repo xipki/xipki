@@ -5,7 +5,11 @@ package org.xipki.ca.gateway.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
 import org.xipki.pkix.asn1.x500.X500Name;
@@ -33,8 +37,6 @@ import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
 import org.xipki.crypto.core.KemUtil;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
@@ -54,7 +56,6 @@ import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.misc.PemEncoder;
 import org.xipki.pkix.util.misc.PemEncoder.PemLabel;
 import org.xipki.util.misc.EmbedCertsMode;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -66,7 +67,6 @@ import java.math.BigInteger;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,12 +74,12 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
-import static org.xipki.pkix.exception.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.pkix.exception.ErrorCode.BAD_POP;
-import static org.xipki.pkix.exception.ErrorCode.BAD_REQUEST;
-import static org.xipki.pkix.exception.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.BAD_CERT_TEMPLATE;
+import static org.xipki.ca.sdk.ErrorCode.BAD_POP;
+import static org.xipki.ca.sdk.ErrorCode.BAD_REQUEST;
+import static org.xipki.ca.sdk.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.sdk.ErrorCode.SYSTEM_FAILURE;
 import static org.xipki.util.audit.AuditLevel.ERROR;
 import static org.xipki.util.audit.AuditLevel.INFO;
 import static org.xipki.util.audit.AuditStatus.FAILED;
@@ -335,7 +335,7 @@ public class RestResponder {
           byte[] userPwd;
           try {
             // RFC 7617: standard base64 encoding
-            userPwd = Base64.getDecoder().decode(b64.trim());
+            userPwd = Base64.decode(b64.trim());
           } catch (IllegalArgumentException ex) {
             // malformed, will be rejected as unauthorized below
             userPwd = new byte[0];
@@ -993,7 +993,7 @@ public class RestResponder {
 
     byte[] respBytes;
     try {
-      respBytes = KemUtil.generateKemEncapKey(spki, mk, securityFactory.random4Sign()).getEncoded();
+      respBytes = KemUtil.generateKemEncapKey(spki, mk).getEncoded();
     } catch (Exception e) {
       String message = "error generating KEM encap key";
       LOG.warn(message);

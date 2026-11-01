@@ -4,18 +4,18 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.VariableResolver;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.conf.FileOrBinary;
 import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

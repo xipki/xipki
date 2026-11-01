@@ -3,32 +3,32 @@
 
 package org.xipki.shell.pki.client;
 
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.X509OIDs;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
 import org.xipki.pkix.asn1.ocsp.OCSPResponse;
 import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.pkix.asn1.ocsp.OcspCertStatus;
 import org.xipki.pkix.asn1.ocsp.RevokedInfo;
 import org.xipki.pkix.asn1.ocsp.SingleResponse;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.X509OIDs;
 import org.xipki.pkix.asn1.x509.AccessDescription;
 import org.xipki.pkix.asn1.x509.AuthorityInfoAccessSyntax;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.ocsp.client.RequestOptions;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.shell.xi.XiShellBaseCommand;
 import org.xipki.util.http.ReqRespDebug;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

@@ -11,9 +11,9 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.pkix.exception.OCSPException;
 import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 
@@ -69,7 +69,7 @@ public class OCSPRespBuilder {
 
   public byte[] buildOCSPResponse(
       ConcurrentSigner signer, TaggedCertSequence taggedCertSequence, Instant producedAt)
-      throws OCSPException, NoIdleSignerException {
+      throws PkixException, NoIdleSignerException {
     ResponseData responseData =
         new ResponseData(0, responderId, producedAt, list, responseExtensions);
 
@@ -84,7 +84,7 @@ public class OCSPRespBuilder {
       try {
         signature = signer0.x509Sign(tbs);
       } catch (XiSecurityException ex) {
-        throw new OCSPException("exception signing TBSRequest: " + ex.getMessage(), ex);
+        throw new PkixException("exception signing TBSRequest: " + ex.getMessage(), ex);
       }
       sigAlgId = signer0.getEncodedX509AlgId();
     } finally {

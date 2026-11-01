@@ -5,12 +5,12 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.Permissions;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.CompareUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.Collections;
 import java.util.List;

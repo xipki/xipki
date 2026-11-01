@@ -3,12 +3,12 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.Permissions;
@@ -19,19 +19,19 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.codec.ConfPairs;
-import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

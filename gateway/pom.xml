@@ -17,11 +17,6 @@
       <artifactId>ca-sdk</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- ACME -->
-    <dependency>
-      <groupId>dnsjava</groupId>
-      <artifactId>dnsjava</artifactId>
-    </dependency>
     <!-- For all components -->
     <dependency>
       <groupId>org.xipki.crypto</groupId>

@@ -67,7 +67,7 @@ The gateway handles multiple enrollment protocols (ACME, CMP, EST, SCEP, REST) a
 **Base & Utilities** (foundation layer)
 - `codec` - ASN.1, CBOR and JSON encoding/decoding, and basic utilities
 - `pkix-util` - Utilities used by `pkix` (`org.xipki.pkix.util.*`): misc, password, conf, io
-- `util` - Utilities for the servers (HikariCP): audit, datasource, http, benchmark, misc
+- `util` - Utilities for the servers (HikariCP): audit, datasource, http, speed, misc
 - `pkcs11` - PKCS#11 wrapper for HSM access
 - `xihsm` - XiPKI HSM abstraction layer
 - `pkcs11test` - PKCS#11 integration tests
@@ -96,9 +96,9 @@ The gateway handles multiple enrollment protocols (ACME, CMP, EST, SCEP, REST) a
 
 **Distribution**
 - `assemblies` - Builds distribution packages:
-  - `xipki-setup-<version>-bclts.tar.gz` (~17 MB with BC LTS)
-  - `xipki-setup-<version>-bcfips.tar.gz` (~19 MB with BC FIPS)
-  - `xipki-setup-<version>-thin.tar.gz` (~6 MB without JDBC/BC, user provides)
+  - `xipki-setup-<version>.tar.gz` (~9 MB, with the crypto backend `jdk`); the other backends
+    (`bc`, `bc-fips`, `openssl`, `openssl-fips`) come from `crypto-backends-<version>.tar.gz`
+    of xicrypto
 
 ### Module Dependencies
 
@@ -174,7 +174,6 @@ Key dependency layers (modules lower in list depend on modules above):
 
 ## References
 
-- Technical architecture: `doc/xipki-tech.md`
 - Development environment: `doc/dev-env/README.md`
 - Git workflow: `doc/git/git-commands.md`
 - CI/CD: `.github/workflows/quick-ci.yml` (tests on PR/push to master)

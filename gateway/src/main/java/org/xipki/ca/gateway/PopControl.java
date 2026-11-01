@@ -4,6 +4,7 @@
 package org.xipki.ca.gateway;
 
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.codec.exception.CodecException;
@@ -17,7 +18,6 @@ import org.xipki.crypto.core.SecretKeyWithAlias;
 import org.xipki.pkix.verify.AlgorithmValidator;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.pkix.util.conf.KeystoreConf;
-import org.xipki.pkix.util.misc.StringUtil;
 import org.xipki.pkix.util.password.PasswordResolverException;
 import org.xipki.pkix.util.password.Passwords;
 

@@ -3,6 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1BmpString;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
@@ -39,7 +40,6 @@ import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.exception.BadCertTemplateException;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.ca.api.TripleState;

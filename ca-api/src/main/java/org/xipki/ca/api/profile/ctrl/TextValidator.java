@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
+import org.xipki.codec.util.StringUtil;
 import org.xipki.util.misc.LruCache;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.regex.Pattern;
 

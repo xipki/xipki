@@ -21,7 +21,6 @@
       <outputDirectory>setup/jars/crypto</outputDirectory>
       <includes>
         <include>org.xipki.crypto.crypto-be-jdk-*</include>
-        <include>org.xipki.crypto.crypto-extra-*</include>
       </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -64,7 +63,6 @@
       <excludes>
         <exclude>bin/xipki</exclude>
         <exclude>lib/org.xipki.crypto.crypto-be-jdk-*</exclude>
-        <exclude>lib/org.xipki.crypto.crypto-extra-*</exclude>
         <exclude>lib/h2-*</exclude>
       </excludes>
       <fileMode>0644</fileMode>

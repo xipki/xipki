@@ -3,12 +3,14 @@
 
 package org.xipki.ocsp.client;
 
+import org.xipki.pkix.exception.PkixException;
+
 /**
  * OCSP Requestor Exception type.
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspRequestorException extends Exception {
+public class OcspRequestorException extends PkixException {
 
   public OcspRequestorException(String message) {
     super(message);

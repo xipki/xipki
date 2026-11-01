@@ -1,7 +1,7 @@
 echo ""
 echo "    keyspec:         RSA2048, RSA3072, RSA4096"
 echo "                     RSA2048/PSS, RSA3072/PSS, RSA4096/PSS"
-echo "                     P256, P384, P521, SM2, FRP256V1, ED25519, ED448"
+echo "                     P256, P384, P521, SM2, ED25519, ED448"
 echo "                     BRAINPOOLP256R1,  BRAINPOOLP384R1, BRAINPOOLP512R1"
 echo "                     MLDSA44, MLDSA65, MLDSA87"
 echo "                     MLDSA44-RSA2048,  MLDSA44-ED25519, MLDSA44-P256"

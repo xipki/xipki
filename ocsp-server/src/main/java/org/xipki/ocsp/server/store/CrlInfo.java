@@ -3,13 +3,13 @@
 
 package org.xipki.ocsp.server.store;
 
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.CrlID;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.ConfPairs;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.time.Instant;

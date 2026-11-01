@@ -20,6 +20,7 @@ import org.xipki.pkix.util.X509Util;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
@@ -81,7 +82,7 @@ public class AcmeDataSource {
 
   private final DataSourceWrapper dataSource;
 
-  private final SecureRandom rnd = new SecureRandom();
+  private final SecureRandom rnd = RandomUtil.random();
 
   private IdChecker idChecker;
 

@@ -18,6 +18,7 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.InputStream;
 import java.security.KeyPair;
@@ -33,7 +34,7 @@ import java.security.interfaces.RSAPrivateKey;
  */
 public class CmsTest {
 
-  private static final SecureRandom random = new SecureRandom();
+  private static final SecureRandom random = RandomUtil.random();
 
   @Test
   public void ecdheTest() throws Exception {
@@ -54,7 +55,7 @@ public class CmsTest {
     PrivateKey privateKey = KeyInfoUtil.getPrivateKey(keyStore.getKey("main"));
     X509Cert x509Cert = new X509Cert(keyStore.getCertificate("main"));
 
-    CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder().setSecureRandom(random);
+    CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder();
     if (privateKey instanceof RSAPrivateKey) {
       // Use RSA/OAEP instead RSA/PKCS1
       AlgorithmIdentifier hashAlgId = HashAlgo.SHA256.algorithmIdentifier();
@@ -66,7 +67,7 @@ public class CmsTest {
     } else if (privateKey instanceof ECPrivateKey) {
       // We use ECDHE with AES Key Wrap (standard for EC-based CMS)
       KeySpec keySpec = KeySpec.ofPublicKey(x509Cert.subjectPublicKeyInfo());
-      KeyPair keyPair = KeyUtil.generateKeyPair(keySpec, random);
+      KeyPair keyPair = KeyUtil.generateKeyPair(keySpec);
       builder.addKeyAgreeRecipient(x509Cert.getCert(), CmsAlgorithm.ECDH_SHA256KDF,
           CmsAlgorithm.AES256_WRAP, keyPair);
     } else {

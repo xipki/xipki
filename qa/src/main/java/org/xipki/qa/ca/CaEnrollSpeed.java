@@ -10,9 +10,10 @@ import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.ca.sdk.X500NameType;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Hex;
-import org.xipki.util.benchmark.BenchmarkExecutor;
+import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -20,11 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * CA Enroll Benchmark.
+ * CA enroll speed test.
  *
  * @author Lijun Liao (xipki)
  */
-public class CaEnrollBenchmark extends BenchmarkExecutor {
+public class CaEnrollSpeed extends SpeedExecutor {
 
   class Tester implements Runnable {
 
@@ -59,15 +60,15 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final String CONF_FILE = "xipki/ca-qa/qa-benchmark-conf.json";
+  private static final String CONF_FILE = "xipki/ca-qa/qa-speed-conf.json";
 
-  private static final Logger LOG = LoggerFactory.getLogger(CaEnrollBenchmark.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CaEnrollSpeed.class);
 
-  private final CaEnrollBenchEntry benchmarkEntry;
+  private final CaEnrollBenchEntry speedEntry;
 
   private final AtomicLong index;
 
-  private final SecureRandom random = new SecureRandom();
+  private final SecureRandom random = RandomUtil.random();
 
   private final int num;
 
@@ -81,16 +82,16 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
 
   private final boolean caGenKeyPair;
 
-  public CaEnrollBenchmark(String caName, CaEnrollBenchEntry benchmarkEntry,
+  public CaEnrollSpeed(String caName, CaEnrollBenchEntry speedEntry,
                           int maxRequests, int num, String description)
       throws Exception {
     super(description);
     this.caName = caName;
     this.maxRequests = maxRequests;
     this.num = Args.positive(num, "num");
-    this.benchmarkEntry = Args.notNull(benchmarkEntry, "benchmarkEntry");
+    this.speedEntry = Args.notNull(speedEntry, "speedEntry");
     this.index = new AtomicLong(random.nextLong());
-    this.caGenKeyPair = benchmarkEntry.getSubjectPublicKeyInfo() == null;
+    this.caGenKeyPair = speedEntry.getSubjectPublicKeyInfo() == null;
     this.client = new SdkClient(SdkClientConf.readConfFromFile(CONF_FILE));
   } // constructor
 
@@ -117,11 +118,11 @@ public class CaEnrollBenchmark extends BenchmarkExecutor {
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
       EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
-      entry.setSubject(new X500NameType(benchmarkEntry.getX500Name(thisIndex).getEncoded()));
+      entry.setSubject(new X500NameType(speedEntry.getX500Name(thisIndex).getEncoded()));
       if (!caGenKeyPair) {
-        entry.setSubjectPublicKey(benchmarkEntry.getSubjectPublicKeyInfo().getEncoded());
+        entry.setSubjectPublicKey(speedEntry.getSubjectPublicKeyInfo().getEncoded());
       }
-      entry.setCertprofile(benchmarkEntry.getCertprofile());
+      entry.setCertprofile(speedEntry.getCertprofile());
       entry.setCertReqId(BigInteger.valueOf(i + 1));
       entries[i] = entry;
     }

@@ -3,23 +3,23 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaStatus;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.json.JsonMap;
-import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.codec.ConfPairs;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CompareUtil;
 
 import java.util.List;
 

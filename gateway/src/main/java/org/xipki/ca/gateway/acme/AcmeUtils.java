@@ -133,7 +133,7 @@ final class AcmeUtils {
     }
 
     try {
-      return java.util.Base64.getUrlDecoder().decode(value);
+      return decodeStrictBase64Url(value);
     } catch (IllegalArgumentException ex) {
       throw new InvalidKeySpecException("JWK member " + name + " is not base64url-encoded");
     }
@@ -153,11 +153,26 @@ final class AcmeUtils {
     }
 
     try {
-      return java.util.Base64.getUrlDecoder().decode(text);
+      return decodeStrictBase64Url(text);
     } catch (IllegalArgumentException ex) {
       throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST, AcmeError.malformed,
           name + " is not base64url-encoded");
     }
+  }
+
+  /**
+   * Decodes base64url (RFC 4648, section 5) as required by RFC 7515: only the alphabet of
+   * base64url, no whitespaces. The padding '=' is accepted but not required.
+   * @throws IllegalArgumentException if the text is not base64url-encoded.
+   */
+  private static byte[] decodeStrictBase64Url(String text) {
+    for (int i = 0; i < text.length(); i++) {
+      char c = text.charAt(i);
+      if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+        throw new IllegalArgumentException("whitespace at index " + i);
+      }
+    }
+    return Base64.decodeFast(text, Base64.DecodeOption.BASE64URL_ONLY);
   }
 
   /**
@@ -167,7 +182,7 @@ final class AcmeUtils {
    */
   public static byte[] decodeBase64UrlOrNull(String text) {
     try {
-      return java.util.Base64.getUrlDecoder().decode(text);
+      return decodeStrictBase64Url(text);
     } catch (IllegalArgumentException ex) {
       return null;
     }

@@ -8,7 +8,6 @@ import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.exception.ErrorCode;
 
 /**
  * Error Response payload.

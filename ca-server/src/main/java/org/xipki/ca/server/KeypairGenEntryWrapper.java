@@ -3,16 +3,16 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.codec.asn1.GenerationException;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.mgmt.entry.KeypairGenEntry;
 import org.xipki.ca.server.kpgen.KeypoolKeypairGenerator;
 import org.xipki.ca.server.kpgen.P11KeypairGenerator;
 import org.xipki.ca.server.kpgen.SoftwareKeypairGenerator;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.datasource.DataSourceMap;
 
@@ -48,7 +48,7 @@ public class KeypairGenEntryWrapper {
       ((KeypoolKeypairGenerator) generator).setShardId(shardId);
       ((KeypoolKeypairGenerator) generator).setDatasources(dataSourceMap);
     } else if ("SOFTWARE".equalsIgnoreCase(type)) {
-      generator = new SoftwareKeypairGenerator(securityFactory.random4Key());
+      generator = new SoftwareKeypairGenerator();
     } else if ("PKCS11".equalsIgnoreCase(type)) {
       generator = new P11KeypairGenerator(p11CryptServiceFactory);
     } else {

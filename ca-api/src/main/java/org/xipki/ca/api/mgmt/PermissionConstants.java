@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

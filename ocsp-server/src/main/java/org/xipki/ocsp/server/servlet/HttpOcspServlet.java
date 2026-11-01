@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.Hex;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo;
 import org.xipki.ocsp.server.OcspServer;
 import org.xipki.ocsp.server.Responder;
@@ -20,7 +21,6 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.EOFException;
 import java.io.IOException;

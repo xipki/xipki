@@ -43,8 +43,6 @@ elif $keyspec in BRAINPOOLP384R1
   set sigalg ECDSA-SHA384
 elif $keyspec in BRAINPOOLP512R1
   set sigalg ECDSA-SHA512
-elif $keyspec in FRP256V1
-  set sigalg ECDSA-SHA256
 elif $keyspec in MLDSA44 MLDSA65 MLDSA87
   set sigalg $keyspec
 elif $keyspec in MLDSA44-RSA2048 MLDSA44-ED25519 MLDSA44-P256 MLDSA65-RSA3072 \

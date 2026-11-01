@@ -3,6 +3,7 @@
 
 package org.xipki.ca.api.profile;
 
+import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.oid.AttributeOIDs;
@@ -23,7 +24,6 @@ import org.xipki.ca.api.profile.ctrl.TextValidator;
 import org.xipki.ca.api.profile.id.SubjectDirectoryAttributeType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.exception.BadCertTemplateException;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.ca.api.Range;

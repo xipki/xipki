@@ -3,16 +3,17 @@
 
 package org.xipki.ocsp.client;
 
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.codec.Hex;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.exception.PkixException;
 
 /**
  * OCSP Response Exception type.
  *
  * @author Lijun Liao (xipki)
  */
-public abstract class OcspResponseException extends Exception {
+public abstract class OcspResponseException extends PkixException {
 
   /**
    * Invalid Response payload.

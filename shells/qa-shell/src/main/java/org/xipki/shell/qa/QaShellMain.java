@@ -30,7 +30,7 @@ public class QaShellMain {
 
   @Command(name = "qa", description = "QA commands", subcommands = {
       QaFillKeyPoolCommands.FillKeypoolCommand.class,
-      QaOcspCommands.BenchmarkOcspStatusCommand.class,
+      QaOcspCommands.SpeedOcspStatusCommand.class,
       QaOcspCommands.BatchOcspStatusCommand.class,
       QaOcspCommands.QaOcspStatusCommand.class,
 
@@ -50,8 +50,8 @@ public class QaShellMain {
       QaCaCommands.PublisherCheckCommand.class,
       QaCaCommands.RequestorCheckCommand.class,
       QaCaCommands.SignerCheckCommand.class,
-      QaCaCommands.BenchmarkCaGenEnrollCommand.class,
-      QaCaCommands.BenchmarkEnrollCommand.class,
+      QaCaCommands.SpeedCaGenEnrollCommand.class,
+      QaCaCommands.SpeedEnrollCommand.class,
       QaCaNegCommands.NegCaAliasCheckCommand.class,
       QaCaNegCommands.NegCaCheckCommand.class,
       QaCaNegCommands.NegCaProfileCheckCommand.class,

@@ -64,8 +64,6 @@
     }
   },
   "security":{
-    "keyStrongrandomEnabled":false,
-    "signStrongrandomEnabled":false,
     "defaultSignerParallelism":10,
     // pkcs11Conf if signes.signer.type is pkcs11
     //"pkcs11Conf":{

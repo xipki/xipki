@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.Base64;
 import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -42,7 +43,7 @@ public class NonceManager {
   // default to 10 minutes
   private long validityMs = 10L * 60 * 1000;
 
-  private final SecureRandom rnd = new SecureRandom();
+  private final SecureRandom rnd = RandomUtil.random();
 
   public NonceManager(int nonceNumBytes) {
     this.nonceNumBytes = nonceNumBytes;

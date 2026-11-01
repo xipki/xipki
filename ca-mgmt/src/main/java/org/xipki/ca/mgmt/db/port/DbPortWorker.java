@@ -9,17 +9,18 @@ import org.xipki.ca.mgmt.db.DbWorker;
 import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.ByteArrayCborEncoder;
 import org.xipki.codec.cbor.CborDecoder;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.util.misc.ConfigurableProperties;
-import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 import org.xipki.util.datasource.DataSourceFactory;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.util.misc.ConfigurableProperties;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -66,7 +67,7 @@ public abstract class DbPortWorker extends DbWorker {
 
   private static final int algSuite_pbkdf2_cbc256_hmacsha256 = 1;
 
-  private static final SecureRandom rnd = new SecureRandom();
+  private static final SecureRandom rnd = RandomUtil.random();
 
   protected char[] password;
 

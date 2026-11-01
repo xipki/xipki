@@ -11,14 +11,16 @@
     //"allowPrivateChallengeTargets": false,
     // Enable DNSSEC verification for dns-01 challenge validation.
     //"dnssecValidation": true,
-    // Optional explicit recursive resolvers. If unset, the host system DNS
-    // configuration is used.
+    // Optional explicit recursive resolvers for all challenge types, e.g. "192.0.2.53",
+    // "192.0.2.53:5353", "[2001:db8::53]:5353". If unset, the name servers in
+    // /etc/resolv.conf are used (must be set on Windows). /etc/hosts is not used.
     //"dnsResolvers": [
     //  "1.1.1.1",
     //  "8.8.8.8"
     //],
     // Required if dnssecValidation is enabled. This file contains DNS root
-    // trust anchors in DS or DNSKEY zone-file format.
+    // trust anchors in DS or DNSKEY zone-file format. It is checked every minute
+    // and reloaded if its modification time or size has changed.
     //"dnssecTrustAnchorsFile": "etc/acme/root-trust-anchors.zone",
     //"contactVerifier": "org.example.MyContactVerifier",
     //"termsOfService": "http://example.org/tos",

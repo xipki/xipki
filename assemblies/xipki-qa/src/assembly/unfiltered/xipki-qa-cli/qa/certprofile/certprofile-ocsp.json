@@ -14,7 +14,6 @@
     "BRAINPOOLP512R1",
     "ED25519",
     "ED448",
-    "FRP256V1",
     "MLDSA44",
     "MLDSA44-ED25519",
     "MLDSA44-P256",

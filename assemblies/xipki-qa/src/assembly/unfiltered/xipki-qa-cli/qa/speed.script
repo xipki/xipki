@@ -19,7 +19,7 @@ fi
 if "$printUsage" eq "true"
   echo "Usage: "
   echo ""
-  echo "source qa/benchmark.script <test type> [<duration> [<threads>]]"
+  echo "source qa/speed.script <test type> [<duration> [<threads>]]"
   echo "test type:       enroll, ocsp"
   echo "duration:        duration in seconds, default is 15"
   echo "threads:         number of threads, default is 5"
@@ -48,13 +48,13 @@ if "$action" eq "enroll"
   sleep 1
 
   # Loadtest RSA key
-  echo "Benchmark Enroll"
-  benchmark-enroll --ca subca --duration $duration --thread $threads \
+  echo "Enroll speed test"
+  speed-enroll --ca subca --duration $duration --thread $threads \
     --keyspec rsa2048 --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
     --profile TLS -n 5 --random-dn O
 
-  echo "Benchmark Enroll (server generate keypair)"
-  benchmark-enroll-serverkeygen --ca subca --duration $duration \
+  echo "Enroll speed test (server generates keypair)"
+  speed-enroll-serverkeygen --ca subca --duration $duration \
     --thread $threads --subject "CN=myorg.org,O=myorg PKI company RSA,C=DE" \
     --profile TLS -n 5 --random-dn O
 elif "$action" eq "ocsp"
@@ -62,12 +62,12 @@ elif "$action" eq "ocsp"
   set URL_CRL http://localhost:$[ocsp.http.port]/ocsp/responder2
 
   sleep 1
-  echo "OCSP status benchmark"
-  benchmark-ocsp-status --duration $duration --thread $threads \
+  echo "OCSP status speed test"
+  speed-ocsp-status --duration $duration --thread $threads \
     --issuer output/subca1.crt --cert output/tls-c2.crt --url $URL
 
   echo "Loadtest OCSP status"
-  benchmark-ocsp-status --duration $duration --thread $threads \
+  speed-ocsp-status --duration $duration --thread $threads \
     --issuer output/subcawithcrl1.crt --cert output/ocsp2.crt --url $URL_CRL
 
 fi

@@ -6,12 +6,12 @@ package org.xipki.ca.mgmt.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.util.misc.ConfigurableProperties;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;

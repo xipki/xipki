@@ -11,6 +11,7 @@ import org.xipki.codec.asn1.Asn1IA5String;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1TaggedObject;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.CrlID;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.TBSCertificate;
@@ -30,7 +31,6 @@ import org.xipki.util.misc.DateUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.datasource.SqlUtil;
 import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.File;

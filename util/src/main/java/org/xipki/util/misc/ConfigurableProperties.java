@@ -3,7 +3,7 @@
 package org.xipki.util.misc;
 
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.io.IOException;
 import java.io.InputStream;

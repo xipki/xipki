@@ -3,9 +3,9 @@
 
 package org.xipki.util.http;
 
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;

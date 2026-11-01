@@ -7,7 +7,7 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.File;

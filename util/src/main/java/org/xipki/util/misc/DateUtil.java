@@ -5,7 +5,7 @@ package org.xipki.util.misc;
 
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

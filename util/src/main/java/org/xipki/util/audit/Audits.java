@@ -6,11 +6,11 @@ package org.xipki.util.audit;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ReflectiveUtil;
 import org.xipki.util.audit.services.DatabaseMacAuditService;
 import org.xipki.util.audit.services.EmbedAuditService;
 import org.xipki.util.audit.services.FileMacAuditService;
 import org.xipki.util.audit.services.NoopAuditService;
-import org.xipki.pkix.util.misc.ReflectiveUtil;
 
 /**
  * Audits.
@@ -56,7 +56,7 @@ public class Audits {
 
   private static AuditService auditService;
 
-  private static AuditServiceRuntimeException initializationException;
+  private static RuntimeException initializationException;
 
   private Audits() {
   }
@@ -92,11 +92,10 @@ public class Audits {
 
       service.init(auditConf);
       auditService = service;
-    } catch (AuditServiceRuntimeException ex) {
+    } catch (RuntimeException ex) {
       initializationException = ex;
     } catch (Exception ex) {
-      initializationException =
-          new AuditServiceRuntimeException(ex.getMessage(), ex);
+      initializationException = new IllegalStateException(ex.getMessage(), ex);
     }
   } // method init
 
@@ -104,7 +103,7 @@ public class Audits {
     if (auditType.startsWith("java:")) {
       return auditType.substring("java:".length());
     } else {
-      throw new AuditServiceRuntimeException("invalid Audit.Type '"
+      throw new IllegalArgumentException("invalid Audit.Type '"
           + auditType + "'. Valid values are 'embed' or "
           + "java:<name of class that implements "
           + AuditService.class.getName() + ">");

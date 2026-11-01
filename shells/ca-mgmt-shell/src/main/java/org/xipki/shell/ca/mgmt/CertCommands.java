@@ -3,38 +3,37 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.json.JsonBuilder;
-import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
-import org.xipki.pkix.util.PKCS8Encryptor;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.PKCS8Encryptor;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.PemEncoder;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.pkix.util.misc.PemEncoder;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -427,8 +426,7 @@ public class CertCommands {
         saveVerbose("save unencrypted key to file", ksFilePrefix + "-key.pem",
             PemEncoder.encode(pair.key(), PemEncoder.PemLabel.PRIVATE_KEY));
       } else {
-        EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(
-            privKeyInfo, keyPwd, SecureRandom.getInstanceStrong());
+        EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(privKeyInfo, keyPwd);
         saveVerbose("save key to file", ksFilePrefix + "-key.pem",
             PemEncoder.encode(encKey.getEncoded(), PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
       }

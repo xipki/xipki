@@ -3,14 +3,26 @@
 
 package org.xipki.shell.security;
 
+import org.xipki.codec.ConfPairs;
+import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.pkix.asn1.est.ChangeSubjectName;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.EcCurveEnum;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.crypto.core.SignAlgoMode;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.asn1.est.ChangeSubjectName;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x500.DirectoryString;
 import org.xipki.pkix.asn1.x500.X500Name;
@@ -19,37 +31,25 @@ import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.GeneralNames;
-import org.xipki.crypto.core.KeyInfoUtil;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.Hex;
-import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.crypto.core.KemEncapKey;
-import org.xipki.pkix.exception.NoIdleSignerException;
-import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.NoIdleSignerException;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.CsrControl;
 import org.xipki.pkix.sign.KemHmacSignature;
-import org.xipki.crypto.core.SignAlgoMode;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.codec.ConfPairs;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.PemEncoder;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
-import org.xipki.pkix.util.password.PasswordResolverException;
-import org.xipki.pkix.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -143,8 +143,7 @@ public class CsrCommands {
         throws GenerationException {
       try {
         SecurityFactory securityFactory = securities().securityFactory();
-        return securityFactory.csrControl().generateKemEncapKey(
-            myPublicKey, securityFactory.random4Sign());
+        return securityFactory.csrControl().generateKemEncapKey(myPublicKey);
       } catch (Exception ex) {
         throw new GenerationException("error computing EncapKey: " + ex.getMessage(), ex);
       }

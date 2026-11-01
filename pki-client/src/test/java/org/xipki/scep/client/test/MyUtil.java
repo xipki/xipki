@@ -6,8 +6,9 @@ package org.xipki.scep.client.test;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.util.ContentSigner;
 import org.xipki.pkix.asn1.x500.DirectoryString;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Attribute;
@@ -24,7 +25,6 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.SignatureSigner;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;

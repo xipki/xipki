@@ -5,15 +5,15 @@ package org.xipki.qa.ocsp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.ocsp.client.HttpOcspRequestor;
 import org.xipki.ocsp.client.OcspRequestor;
 import org.xipki.ocsp.client.RequestOptions;
+import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.util.benchmark.BenchmarkExecutor;
 
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -23,11 +23,11 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * OCSP Benchmark.
+ * OCSP speed test.
  *
  * @author Lijun Liao (xipki)
  */
-public class OcspBenchmark extends BenchmarkExecutor {
+public class OcspSpeed extends SpeedExecutor {
 
   final class Tester implements Runnable {
 
@@ -54,7 +54,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   } // class Tester
 
-  private static final Logger LOG = LoggerFactory.getLogger(OcspBenchmark.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OcspSpeed.class);
 
   private final OcspRequestor client;
 
@@ -70,7 +70,7 @@ public class OcspBenchmark extends BenchmarkExecutor {
 
   private final AtomicInteger processedRequests = new AtomicInteger(0);
 
-  public OcspBenchmark(
+  public OcspSpeed(
       X509Cert issuerCert, String responderUrl, RequestOptions requestOptions,
       Iterator<BigInteger> serials, int maxRequests, String description)
       throws MalformedURLException {

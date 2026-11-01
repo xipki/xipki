@@ -44,6 +44,14 @@ public class DemoShellMain {
   }
 
   static void startH2Server(Consumer<String> printer, int webPort, int tcpPort) {
+    // h2 is optional (provided scope): check before using any H2 class.
+    try {
+      Class.forName("org.h2.tools.Server", false, DemoShellMain.class.getClassLoader());
+    } catch (ClassNotFoundException ex) {
+      throw new IllegalStateException("H2 is not available: copy the H2 jar (h2-*.jar) "
+          + "to the lib folder and restart the shell");
+    }
+
     try {
       if (server != null) {
         printer.accept("H2 TCP server and Web console server have been started before with tcpPort="

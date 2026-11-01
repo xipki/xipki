@@ -86,6 +86,16 @@ public class AcmeUtilsTest {
         () -> AcmeUtils.decodeBase64Url(null, "payload"));
     Assert.assertThrows(AcmeProtocolException.class,
         () -> AcmeUtils.decodeBase64Url("a", "payload"));
+
+    // 0xFB 0xFF "xyz": the characters 62 and 63 of base64url, with and without padding
+    byte[] data = {(byte) 0xFB, (byte) 0xFF, 'x', 'y', 'z'};
+    Assert.assertArrayEquals(data, AcmeUtils.decodeBase64UrlOrNull("-_94eXo"));
+    Assert.assertArrayEquals(data, AcmeUtils.decodeBase64UrlOrNull("-_94eXo="));
+    // the alphabet of base64, and whitespaces (also at the ends) are rejected
+    for (String text : new String[]{"+/94eXo", "-_94 eXo", "-_94\neXo", " -_94eXo",
+        "-_94eXo\t", "-_94eXo\r\n"}) {
+      Assert.assertNull(text, AcmeUtils.decodeBase64UrlOrNull(text));
+    }
   }
 
   private static byte[] toBytes(BigInteger bn, int len) {

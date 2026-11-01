@@ -8,11 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.Base64;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditService;
 import org.xipki.util.audit.PciAuditEvent;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -248,7 +249,7 @@ public abstract class MacAuditService implements AuditService {
       throw new IllegalStateException("could not initialize Mac or Cipher", ex);
     }
 
-    this.rnd = new SecureRandom();
+    this.rnd = RandomUtil.random();
     doExtraInit(conf);
   }
 

@@ -3,6 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
@@ -10,12 +11,11 @@ import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.asn1.Asn1Utf8String;
 import org.xipki.codec.asn1.Asn1Util;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 
 /**
  * Constant Extn Value.

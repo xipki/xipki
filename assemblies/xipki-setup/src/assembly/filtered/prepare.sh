@@ -33,13 +33,26 @@ cp "$jars_dir"/jdbc/*.jar \
 echo "Replace Configuration and generate Key & Certificates"
 
 java_exec="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+
+# Native access via the foreign function & memory API (restricted methods).
+# Without --enable-native-access the JDK prints a warning. The option is only known since Java 17.
+java_opts=""
+java_major=$("$java_exec" -version 2>&1 | sed -n 's/.* version "\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\1 \2/p' | head -n 1)
+case "$java_major" in
+  "1 "*) java_major=${java_major#1 } ;;
+  *) java_major=${java_major%% *} ;;
+esac
+if [ -n "$java_major" ] && [ "$java_major" -ge 17 ] 2>/dev/null; then
+  java_opts="--enable-native-access=ALL-UNNAMED"
+fi
+
 classpath="xipki-mgmt-cli/lib/*"
 
 cd "$script_dir"
-"$java_exec" -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
+"$java_exec" $java_opts -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
 
 kc_dir="$script_dir"/setup/keycerts
-"$java_exec" -cp "$classpath" org.xipki.pkix.util.GenerateCerts setup/keycerts.json "$kc_dir"
+"$java_exec" $java_opts -cp "$classpath" org.xipki.pkix.util.GenerateCerts setup/keycerts.json "$kc_dir"
 
 echo "Copy xipki-mgmt-cli's folders lib to xipki-cli"
 cp xipki-mgmt-cli/lib/* xipki-cli/lib

@@ -3,20 +3,18 @@
 
 package org.xipki.ca.api.profile;
 
+import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.CertificatePolicies;
 import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.profile.ctrl.*;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.exception.BadCertTemplateException;
-import org.xipki.ca.api.CertprofileException;
-import org.xipki.ca.api.SubjectKeyIdentifierControl;
 import org.xipki.pkix.util.conf.Validity;
 
 import java.time.Instant;

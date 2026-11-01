@@ -3,23 +3,23 @@
 
 package org.xipki.shell.pki.client;
 
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.password.Passwords;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.StringUtil;
-import org.xipki.pkix.util.password.Passwords;
 import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

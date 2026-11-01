@@ -3,8 +3,11 @@
 
 package org.xipki.shell.xi;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.ShellBaseCommand;
 import org.xipki.shell.ShellUtil;
@@ -14,9 +17,6 @@ import org.xipki.util.http.Curl.CurlResult;
 import org.xipki.util.http.Curl;
 import org.xipki.util.http.DefaultCurl;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

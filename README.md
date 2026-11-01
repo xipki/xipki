@@ -6,13 +6,15 @@
 
 # XiPKI
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure)
-is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical infrastructure.
-Built with minimal dependencies (only SLF4J, dnsjava, HikariCP, jline and Picocli, besides JDBC drivers) and a compact codebase of ~73,000 lines, it offers native support
-for post-quantum algorithms (ML-DSA, ML-KEM, composite), HSM integration via PKCS#11, 
-SM2/SM3 for Chinese national standards, and fast OCSP at scale. 
+is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical 
+infrastructure.  Built with minimal dependencies (only SLF4J, HikariCP, jline 
+and Picocli,besides JDBC drivers) and a compact codebase of ~75,000 lines, it 
+offers native support  for post-quantum algorithms (ML-DSA, ML-KEM, 
+composite), HSM integration via PKCS#11, SM2/SM3 for Chinese national 
+standards, and fast OCSP at scale. 
 
 The complete distribution, including all third-party libraries and the H2 and MariaDB
-JDBC drivers, is under 10 MB.
+JDBC drivers, is under 9 MB.
 
 The project author actively contributes to IETF standardization, including co-authoring the 
 C509 specification (CBOR-encoded X.509 certificates) and its test vectors in the COSE Working 
@@ -32,8 +34,9 @@ JRE/JDK, and the steps required to reproduce the bug.
 ### Binaries
 XiPKI provides the binary `xipki-setup-<version>.tar.gz` with the following requirements on JDK:
   - Java 11+ is required for this runtime
-  - Java 15+ for ED25519 and ED448
-  - Java 25+ for ML-DSA, ML-KEM.
+  - The default crypto backend `jdk` requires Java 25+. On Java 11 to 24, replace it in
+    `setup/jars/crypto` by the backend `bc` or `bc-fips` (`bc-fips` always runs in the
+    approved-only mode of BC-FIPS).
 
 The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the following ways: 
   - Download the binary from https://github.com/xipki/xipki/releases
@@ -109,9 +112,8 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
 * OS
   * Linux, MacOS
 * JRE / JDK
-  * Java 25+ for ML-DSA / ML-KEM
-  * Java 15+ for Ed25519 and Ed448
-  * Java 11+ for the other algorithms
+  * Java 11+
+  * Java 25+ for the crypto backends `jdk` (the default) and `openssl`
 * Database
   * DB2, MariaDB, MySQL, Oracle, PostgreSQL, H2, HSQLDB
 * Hardware
@@ -201,29 +203,29 @@ the instructions in `xipki-setup-<version>/INSTALL.md`.
     - RFC 7633
       - TLSFeature (1.3.6.1.5.5.7.1.24)
     - Car Connectivity Consortium
-      - CCC-K-Vehicle-Cert     (1.3.6.1.4.1.41577.5.1)
-      - CCC-F-External-CA-Cert (1.3.6.1.4.1.41577.5.2)
-      - CCC-E-Instance-CA-Cert (1.3.6.1.4.1.41577.5.3)
-      - CCC-H-Endpoint-Cert    (1.3.6.1.4.1.41577.5.4)
+      - CCC-K-Vehicle-Cert        (1.3.6.1.4.1.41577.5.1)
+      - CCC-F-External-CA-Cert    (1.3.6.1.4.1.41577.5.2)
+      - CCC-E-Instance-CA-Cert    (1.3.6.1.4.1.41577.5.3)
+      - CCC-H-Endpoint-Cert       (1.3.6.1.4.1.41577.5.4)
       - CCC-P-VehicleOEM-Enc-Cert (1.3.6.1.4.1.41577.5.5)
       - CCC-Q-VehicleOEM-Sig-Cert (1.3.6.1.4.1.41577.5.6)
       - CCC-Device-Enc-Cert       (1.3.6.1.4.1.41577.5.7)
       - CCC-Vehicle-Intermediate-Cert (1.3.6.1.4.1.41577.5.8)
-      - CCC-J-VehicleOEM-CA-Cert (1.3.6.1.4.1.41577.5.9)
-      - CCC-M-VehicleOEM-CA-Cert (1.3.6.1.4.1.41577.5.10)
+      - CCC-J-VehicleOEM-CA-Cert      (1.3.6.1.4.1.41577.5.9)
+      - CCC-M-VehicleOEM-CA-Cert      (1.3.6.1.4.1.41577.5.10)
       - CCC-R-Certification-Body-Cert (1.3.6.1.4.1.41577.5.14)
       - CCC-S-SBxD/KIS-Intermediate-CA-Cert (1.3.6.1.4.1.41577.5.15)
-      - CCC-T-SBxD/KIS-Endpoint-Cert (1.3.6.1.4.1.41577.5.16)
-      - CCC-U-SBxD/KIS-RootCA-Cert (1.3.6.1.4.1.41577.5.17)
+      - CCC-T-SBxD/KIS-Endpoint-Cert        (1.3.6.1.4.1.41577.5.16)
+      - CCC-U-SBxD/KIS-RootCA-Cert          (1.3.6.1.4.1.41577.5.17)
     - Microsoft
-      - Certificate Template Name (1.3.6.1.4.1.311.20.2)
+      - Certificate Template Name        (1.3.6.1.4.1.311.20.2)
       - Certificate Template Information (1.3.6.1.4.1.311.21.7)
-      - Security Identifier (SID, 1.3.6.1.4.1.311.25.2)
+      - Security Identifier         (SID, 1.3.6.1.4.1.311.25.2)
     - China GM/T 0015-2023
       - Resident Identity Card Number (1.2.156.10260.4.1.1.1)
-      - Passport Number (1.2.156.10260.4.1.1.2)
-      - Social Insurance Number (1.2.156.10260.4.1.2)
-      - Unified Social Credit Code  (1.2.156.10260.4.4)
+      - Passport Number               (1.2.156.10260.4.1.1.2)
+      - Social Insurance Number       (1.2.156.10260.4.1.2)
+      - Unified Social Credit Code    (1.2.156.10260.4.4)
     - RPKI
       - IPAddrBlocks    (1.3.6.1.5.5.7.1.7)
       - IPAddrBlocksV2  (1.3.6.1.5.5.7.1.28)

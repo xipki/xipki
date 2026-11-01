@@ -5,13 +5,6 @@ package org.xipki.ca.server.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.util.Pack;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.CRLEntry;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -20,34 +13,42 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CaConfStore;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertRevInfoWithSerial;
 import org.xipki.ca.server.CertStore;
 import org.xipki.ca.server.UniqueIdGenerator;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.Pack;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.CRLEntry;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.FpIdCalculator;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.SqlUtil;
-import org.xipki.util.misc.LruCache;
 import org.xipki.pkix.util.password.PasswordResolverException;
 import org.xipki.pkix.util.password.Passwords;
+import org.xipki.util.datasource.DataAccessException;
+import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.datasource.SqlUtil;
+import org.xipki.util.misc.LruCache;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -68,12 +69,12 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.xipki.pkix.exception.ErrorCode.BAD_REQUEST;
-import static org.xipki.pkix.exception.ErrorCode.CERT_REVOKED;
-import static org.xipki.pkix.exception.ErrorCode.CERT_UNREVOKED;
-import static org.xipki.pkix.exception.ErrorCode.DATABASE_FAILURE;
-import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.BAD_REQUEST;
+import static org.xipki.ca.sdk.ErrorCode.CERT_REVOKED;
+import static org.xipki.ca.sdk.ErrorCode.CERT_UNREVOKED;
+import static org.xipki.ca.sdk.ErrorCode.DATABASE_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.sdk.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * DB Cert Store definition.
@@ -218,9 +219,11 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=? AND CRL_NO=?");
 
-    this.sqlSelectUnrevokedSn = buildSelectFirstSql("LUPDATE FROM CERT WHERE REV=0 AND SN=?");
+    // serial numbers are unique only within one CA
+    this.sqlSelectUnrevokedSn = buildSelectFirstSql(
+        "LUPDATE FROM CERT WHERE CA_ID=? AND REV=0 AND SN=?");
 
-    final String prefix = "SN,LUPDATE FROM CERT WHERE REV=0 AND SN";
+    final String prefix = "SN,LUPDATE FROM CERT WHERE CA_ID=? AND REV=0 AND SN";
     this.sqlSelectUnrevokedSn100 = buildArraySql(datasource, prefix, 100);
     this.earliestNotBefore = datasource.getMin(null, "CERT", "NBEFORE");
   } // constructor
@@ -1099,6 +1102,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     }
 
     Set<BigInteger> allSnSet = null;
+    // serial numbers of certificates with reason certificateHold in the base CRL
+    Set<BigInteger> heldSnSet = new HashSet<>();
 
     boolean supportInSql = datasource.databaseType().supportsInArray();
     List<BigInteger> snList = new LinkedList<>();
@@ -1117,6 +1122,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         BigInteger sn = crlEntry.getUserCertificate().getValue();
         snList.add(sn);
         allSnSet.add(sn);
+        if (isOnHold(crlEntry)) {
+          heldSnSet.add(sn);
+        }
 
         if (!supportInSql) {
           continue;
@@ -1131,8 +1139,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
             ps = prepareStatement(sqlSelectUnrevokedSn100);
           }
 
-          for (int i = 1; i < 101; i++) {
-            ps.setString(i, snList.get(i - 1).toString(16));
+          ps.setInt(1, ca.id());
+          for (int i = 0; i < 100; i++) {
+            ps.setString(i + 2, snList.get(i).toString(16));
           }
           snList.clear();
 
@@ -1161,7 +1170,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       ps = prepareStatement(sqlSelectUnrevokedSn);
       try {
         for (BigInteger sn : snList) {
-          ps.setString(1, sn.toString(16));
+          ps.setInt(1, ca.id());
+          ps.setString(2, sn.toString(16));
           ResultSet rs = ps.executeQuery();
           try {
             if (rs.next()) {
@@ -1216,8 +1226,13 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
             BigInteger sn = new BigInteger(rs.getString("SN"), 16);
             if (allSnSet != null && allSnSet.contains(sn)) {
-              // already contained in CRL
-              continue;
+              // already contained in the base CRL, unless it was on hold there and has been
+              // revoked with another reason afterwards.
+              boolean holdChanged = heldSnSet.contains(sn)
+                  && rs.getInt("RR") != CrlReason.CERTIFICATE_HOLD.code();
+              if (!holdChanged) {
+                continue;
+              }
             }
 
             long revInvalidityTime = rs.getLong("RIT");
@@ -1642,6 +1657,14 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       throw new OperationException(ErrorCode.DATABASE_FAILURE, ex);
     }
   } // method borrowPrepStatement
+
+  private static boolean isOnHold(CRLEntry crlEntry) {
+    Extensions extensions = crlEntry.getExtensions();
+    Extension extn = (extensions == null) ? null
+        : extensions.getExtension(ExtensionOIDs.reasonCode);
+    return extn != null
+        && extn.getReasonCode().getValue() == CrlReason.CERTIFICATE_HOLD.code();
+  }
 
   private static String buildArraySql(DataSourceWrapper datasource, String prefix, int num) {
     String sql = prefix + " IN (?" + ",?".repeat(Math.max(0, num - 1)) + ")";

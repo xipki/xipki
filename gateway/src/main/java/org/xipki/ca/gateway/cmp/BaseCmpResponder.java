@@ -5,11 +5,14 @@ package org.xipki.ca.gateway.cmp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cmp.*;
 import org.xipki.pkix.asn1.cms.EnvelopedData;
 import org.xipki.codec.asn1.crypto.GCMParameters;
@@ -29,7 +32,6 @@ import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.CmpOIDs;
 import org.xipki.codec.asn1.oid.PkcsOIDs;
 import org.xipki.codec.asn1.oid.XipkiOIDs;
-import org.xipki.pkix.asn1.util.ContentVerifierProvider;
 import org.xipki.pkix.asn1.x500.RDN;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
@@ -47,7 +49,6 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.cmp.CmpException;
 import org.xipki.pkix.cmp.ProtectedPKIMessage;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsEnvelopedData;
@@ -64,10 +65,10 @@ import org.xipki.pkix.cmp.ProtectionResult;
 import org.xipki.pkix.cmp.ProtectionVerificationResult;
 import org.xipki.crypto.core.KemUtil;
 import org.xipki.crypto.core.KemEncapKey;
-import org.xipki.pkix.exception.ErrorCode;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.KemHmacSignature;
 import org.xipki.crypto.core.EcCurveEnum;
@@ -79,7 +80,7 @@ import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.codec.exception.InsufficientPermissionException;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -157,7 +158,7 @@ public abstract class BaseCmpResponder {
 
   protected final SecurityFactory securityFactory;
 
-  private final SecureRandom random = new SecureRandom();
+  private final SecureRandom random = RandomUtil.random();
 
   protected final SdkClient sdk;
 
@@ -321,7 +322,7 @@ public abstract class BaseCmpResponder {
         if (parameters != null) {
           dfltCertprofileName = parameters.get(HTTP_HEADER_certprofile);
           String str = parameters.get(HTTP_HEADER_groupenroll);
-          groupEnroll = !StringUtil.isBlank(str) && Boolean.parseBoolean(str);
+          groupEnroll = StringUtil.isNotBlank(str) && Boolean.parseBoolean(str);
         }
 
         respBody = cmpEnrollCert(cmpVersion, caName, dfltCertprofileName,
@@ -548,7 +549,7 @@ public abstract class BaseCmpResponder {
   } // method randomBytes
 
   private ProtectionVerificationResult verifyProtection(String tid, PKIMessage pkiMessage)
-      throws CmpException, InvalidKeyException {
+      throws PkixException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
@@ -808,7 +809,7 @@ public abstract class BaseCmpResponder {
       ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
           publicKey, kaKeyAndCert, ownerMasterKey);
       return certRequest.isValidSigningKeyPOP(cvp);
-    } catch (CodecException | InvalidKeyException | IllegalStateException | CmpException ex) {
+    } catch (CodecException | InvalidKeyException | IllegalStateException | PkixException ex) {
       LogUtil.error(LOG, ex);
     }
     return false;
@@ -875,7 +876,7 @@ public abstract class BaseCmpResponder {
         if (reqPub instanceof RSAPublicKey) {
           wrapper = new CrmfKeyWrapper.RSAOAEPAsymmetricKeyWrapper(reqPub);
         } else if (reqPub instanceof ECPublicKey) {
-          wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper((ECPublicKey) reqPub, random);
+          wrapper = new CrmfKeyWrapper.ECIESAsymmetricKeyWrapper((ECPublicKey) reqPub);
         } else {
           String m = "Requestors's private key can not be used for encryption";
           LOG.error(m);
@@ -965,7 +966,7 @@ public abstract class BaseCmpResponder {
       Asn1Integer certReqId, Requestor requestor, CertOrEncCert cec,
       byte[] privateKeyinfo, EphemeralKeyPair ephemeralKeyPair) {
     try {
-      CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder().setSecureRandom(random);
+      CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder();
       if (requestor instanceof Requestor.CertRequestor) {
         Requestor.CertRequestor certRequestor = (Requestor.CertRequestor) requestor;
         X509Cert  recipientX509Cert = certRequestor.cert();
@@ -982,7 +983,7 @@ public abstract class BaseCmpResponder {
           // We use ECDHE with AES Key Wrap (standard for EC-based CMS)
           KeySpec keySpec = KeySpec.ofPublicKey(recipientX509Cert.subjectPublicKeyInfo());
           if (ephemeralKeyPair.keyPair == null) {
-            ephemeralKeyPair.keyPair = KeyUtil.generateKeyPair(keySpec, random);
+            ephemeralKeyPair.keyPair = KeyUtil.generateKeyPair(keySpec);
           }
           builder.addKeyAgreeRecipient(recipientX509Cert.getCert(),
               CmsAlgorithm.ECDH_SHA256KDF, // Key Agreement Algorithm
@@ -1122,7 +1123,7 @@ public abstract class BaseCmpResponder {
 
       KemEncapKey encapKey;
       try {
-        encapKey = KemUtil.generateKemEncapKey(spki, masterKey, random);
+        encapKey = KemUtil.generateKemEncapKey(spki, masterKey);
       } catch (XiSecurityException e) {
         return buildErrorMsgPkiBody(PKIStatus.rejection,
             PKIFailureInfo.systemFailure, "error generating KEM encap key");

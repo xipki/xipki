@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo.ResponseCacheInfo;
@@ -20,7 +21,6 @@ import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.datasource.SqlUtil;
 import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;

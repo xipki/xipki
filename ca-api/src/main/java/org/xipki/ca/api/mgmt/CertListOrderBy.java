@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 /**
  * Cert List Order By enumeration.

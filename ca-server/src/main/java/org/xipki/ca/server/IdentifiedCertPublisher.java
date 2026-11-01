@@ -3,6 +3,7 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -13,7 +14,6 @@ import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.datasource.DataSourceMap;
-import org.xipki.ca.api.CertPublisherException;
 
 import java.io.Closeable;
 

@@ -4,7 +4,7 @@
 package org.xipki.qa;
 
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

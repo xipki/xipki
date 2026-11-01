@@ -4,8 +4,8 @@
 package org.xipki.util.http;
 
 import org.xipki.codec.asn1.GenerationException;
-import org.xipki.pkix.util.misc.ReflectiveUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.ReflectiveUtil;
+import org.xipki.codec.util.StringUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;

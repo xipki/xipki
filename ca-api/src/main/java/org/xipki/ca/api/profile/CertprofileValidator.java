@@ -1,13 +1,13 @@
 // Copyright (c) 2013-2026 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.profile;
 
+import org.xipki.ca.api.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
 import org.xipki.pkix.asn1.x509.CertificatePolicies;
-import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;

@@ -8,11 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.OCSPRequest;
 import org.xipki.pkix.asn1.ocsp.OCSPResponse;
 import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.codec.asn1.oid.OcspOIDs;
-import org.xipki.pkix.asn1.util.ContentVerifierProvider;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
@@ -30,13 +31,13 @@ import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.IssuerEntry;
 import org.xipki.ocsp.server.store.ResponseCacher;
 import org.xipki.ocsp.server.type.*;
-import org.xipki.pkix.exception.OCSPException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataSourceConf;
@@ -46,7 +47,6 @@ import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.conf.FileOrValue;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -728,7 +728,7 @@ public class OcspServer implements Closeable {
         encodeOcspResponse = builder.buildOCSPResponse(concurrentSigner, certsInResp, producedAt);
       } catch (NoIdleSignerException ex) {
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.tryLater);
-      } catch (OCSPException ex) {
+      } catch (PkixException ex) {
         LogUtil.error(LOG, ex, "answer() basicOcspBuilder.build");
         return unsuccesfulOCSPRespMap.get(OcspResponseStatus.internalError);
       }
@@ -946,7 +946,7 @@ public class OcspServer implements Closeable {
   } // method healthCheck
 
   private Object checkSignature(byte[] request, RequestOption requestOption)
-      throws OCSPException {
+      throws PkixException {
     OCSPRequest req;
     try {
       if (!requestOption.isValidateSignature()) {

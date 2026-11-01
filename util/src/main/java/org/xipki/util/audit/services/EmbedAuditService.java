@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditService;
@@ -15,7 +16,6 @@ import org.xipki.util.misc.DateUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;

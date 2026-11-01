@@ -9,7 +9,6 @@ import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.datasource.DataSourceMap;
-import org.xipki.ca.api.CertPublisherException;
 
 import java.io.Closeable;
 

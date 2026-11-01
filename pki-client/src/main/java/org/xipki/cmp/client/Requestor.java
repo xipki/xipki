@@ -10,6 +10,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.security.SecureRandom;
 
@@ -37,7 +38,7 @@ public abstract class Requestor {
    */
   public static class PbmMacCmpRequestor extends Requestor {
 
-    private final SecureRandom random = new SecureRandom();
+    private final SecureRandom random = RandomUtil.random();
 
     private final char[] password;
 

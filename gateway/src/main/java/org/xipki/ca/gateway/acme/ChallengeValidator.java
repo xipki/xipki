@@ -5,9 +5,6 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xbill.DNS.*;
-import org.xbill.DNS.Record;
-import org.xbill.DNS.dnssec.ValidatingResolver;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.MiscOIDs;
@@ -20,6 +17,11 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.ca.gateway.dns.DnsClient;
+import org.xipki.ca.gateway.dns.DnsRecord;
+import org.xipki.ca.gateway.dns.NetDnsTransport;
+import org.xipki.ca.gateway.dns.dnssec.DnssecValidator;
+import org.xipki.ca.gateway.dns.dnssec.TrustAnchorsFile;
 
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
@@ -30,26 +32,25 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Challenge Validator.
@@ -76,16 +77,23 @@ public class ChallengeValidator implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(ChallengeValidator.class);
 
-  private static final int MAX_DNS_CNAME_DEPTH = 8;
+  private static final long TRUST_ANCHORS_CHECK_INTERVAL_MS = 60_000;
 
   // RFC 8737, section 6.2
   private static final String ACME_TLS_1_PROTOCOL = "acme-tls/1";
 
   private final AcmeRepo repo;
 
-  private final Resolver dnsResolver;
+  private final DnsClient dnsClient;
 
-  private final boolean dnssecValidation;
+  // resolves the hosts of http-01 and tls-alpn-01, without DNSSEC validation
+  private final DnsClient addressClient;
+
+  private final DnssecValidator dnssecValidator;
+
+  private final TrustAnchorsFile trustAnchorsFile;
+
+  private long nextTrustAnchorsCheck;
 
   private final boolean allowPrivateChallengeTargets;
 
@@ -96,8 +104,36 @@ public class ChallengeValidator implements Runnable {
   public ChallengeValidator(AcmeRepo repo, AcmeProtocolConf.Acme conf) throws InvalidConfException {
     this.repo = Args.notNull(repo, "repo");
     Args.notNull(conf, "conf");
-    this.dnsResolver = buildDnsResolver(conf);
-    this.dnssecValidation = conf.dnssecValidation();
+    List<InetSocketAddress> dnsServers;
+    try {
+      dnsServers = NetDnsTransport.parseServers(conf.dnsResolvers());
+    } catch (IOException ex) {
+      throw new InvalidConfException("could not initialize DNS resolver", ex);
+    }
+
+    NetDnsTransport transport = new NetDnsTransport(dnsServers, conf.dnssecValidation(),
+        NetDnsTransport.DEFAULT_TIMEOUT_MS);
+
+    if (conf.dnssecValidation()) {
+      this.trustAnchorsFile = new TrustAnchorsFile(
+          Path.of(XipkiIoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true)));
+      try {
+        this.dnssecValidator = new DnssecValidator(transport, trustAnchorsFile.load(),
+            Clock.systemUTC());
+      } catch (IOException | IllegalArgumentException ex) {
+        throw new InvalidConfException(
+            "could not load DNSSEC trust anchors from " + conf.dnssecTrustAnchorsFile(), ex);
+      }
+      this.nextTrustAnchorsCheck = System.currentTimeMillis() + TRUST_ANCHORS_CHECK_INTERVAL_MS;
+    } else {
+      this.trustAnchorsFile = null;
+      this.dnssecValidator = null;
+    }
+    this.dnsClient = new DnsClient(transport, dnssecValidator);
+    // Without DNSSEC (CD=0), a validating resolver still rejects bogus addresses.
+    this.addressClient = dnssecValidator == null ? dnsClient
+        : new DnsClient(new NetDnsTransport(dnsServers, false,
+            NetDnsTransport.DEFAULT_TIMEOUT_MS), null);
     this.allowPrivateChallengeTargets = conf.allowPrivateChallengeTargets();
 
     try {
@@ -116,6 +152,7 @@ public class ChallengeValidator implements Runnable {
   @Override
   public void run() {
     while (!stopMe) {
+      reloadTrustAnchorsIfChanged();
       try {
         singleRun();
       } catch (Throwable t) {
@@ -150,20 +187,6 @@ public class ChallengeValidator implements Runnable {
       String receivedAuthorization = null;
       AcmeIdentifier identifier = chall2.identifier();
       // boolean authorizationValid = false;
-
-      if (LOG.isDebugEnabled()) {
-        String host = identifier.value();
-        if (host.startsWith("*.")) {
-          host = host.substring(2);
-        }
-
-        try {
-          InetAddress inetAddr = InetAddress.getByName(host);
-          LOG.debug("type={}, host={}, InetAddress={}", type, host, inetAddr);
-        } catch (UnknownHostException e) {
-          LOG.debug("type={}, host={}, UnknownHostException", type, host);
-        }
-      }
 
       switch (type) {
         case AcmeConstants.HTTP_01: {
@@ -307,33 +330,32 @@ public class ChallengeValidator implements Runnable {
 
   }
 
-  private static Resolver buildDnsResolver(AcmeProtocolConf.Acme conf) throws InvalidConfException {
-    ExtendedResolver resolver;
+  /**
+   * Reloads the DNSSEC trust anchors if the file has been changed, at most once per
+   * minute. If the new file is invalid, the current trust anchors are kept.
+   */
+  private void reloadTrustAnchorsIfChanged() {
+    if (trustAnchorsFile == null) {
+      return;
+    }
+
+    long now = System.currentTimeMillis();
+    if (now < nextTrustAnchorsCheck) {
+      return;
+    }
+    nextTrustAnchorsCheck = now + TRUST_ANCHORS_CHECK_INTERVAL_MS;
+
     try {
-      List<String> resolverNames = conf.dnsResolvers();
-      if (resolverNames == null || resolverNames.isEmpty()) {
-        resolver = new ExtendedResolver();
-      } else {
-        resolver = new ExtendedResolver(resolverNames.toArray(new String[0]));
+      List<DnsRecord> anchors = trustAnchorsFile.loadIfChanged();
+      if (anchors != null) {
+        dnssecValidator.setTrustAnchors(anchors);
+        LOG.info("reloaded {} DNSSEC trust anchors from {}", anchors.size(),
+            trustAnchorsFile.path());
       }
-    } catch (IOException ex) {
-      throw new InvalidConfException("could not initialize DNS resolver", ex);
+    } catch (IOException | IllegalArgumentException ex) {
+      LogUtil.error(LOG, ex, "could not reload DNSSEC trust anchors from "
+          + trustAnchorsFile.path() + ", keep the current ones");
     }
-
-    if (!conf.dnssecValidation()) {
-      return resolver;
-    }
-
-    ValidatingResolver validatingResolver = new ValidatingResolver(resolver);
-    validatingResolver.setAddReasonToAdditional(true);
-    String anchorFile = XipkiIoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true);
-    try (InputStream in = Files.newInputStream(Path.of(anchorFile))) {
-      validatingResolver.loadTrustAnchors(in);
-    } catch (IOException ex) {
-      throw new InvalidConfException(
-          "could not load DNSSEC trust anchors from " + conf.dnssecTrustAnchorsFile(), ex);
-    }
-    return validatingResolver;
   }
 
   /**
@@ -351,19 +373,14 @@ public class ChallengeValidator implements Runnable {
 
     String acmeDomain = "_acme-challenge." + host;
     try {
-      List<String> txtValues = queryDnsTxt(acmeDomain, 0);
+      List<String> txtValues = dnsClient.queryTxt(acmeDomain);
       if (txtValues.contains(expectedAuthorization)) {
         return expectedAuthorization;
       }
 
       LOG.debug("dns-01: none of the {} TXT records of '{}' matches", txtValues.size(), acmeDomain);
-    } catch (IOException | ExecutionException ex) {
+    } catch (IOException | IllegalArgumentException ex) {
       String message =  "error while validating challenge " + challId +
-                        " for identifier " + identifier;
-      LogUtil.error(LOG, ex, message);
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      String message =  "interrupted while validating challenge " + challId +
                         " for identifier " + identifier;
       LogUtil.error(LOG, ex, message);
     }
@@ -372,79 +389,29 @@ public class ChallengeValidator implements Runnable {
   }
 
   /**
-   * Returns all TXT records of the given domain. Each element is the concatenation of
-   * the character-strings of one TXT record.
+   * Resolves the challenge host with the configured DNS resolvers (A and AAAA records).
+   * The caller must connect to the returned addresses instead of resolving the host
+   * again, to prevent DNS rebinding.
    */
-  private List<String> queryDnsTxt(String acmeDomain, int depth)
-      throws IOException, ExecutionException, InterruptedException {
-    if (depth > MAX_DNS_CNAME_DEPTH) {
-      LOG.warn("dns-01: too many CNAME redirects for '{}'", acmeDomain);
-      return Collections.emptyList();
-    }
-
-    Name queryName = Name.fromString(acmeDomain, Name.root);
-    Record question = Record.newRecord(queryName, Type.TXT, DClass.IN);
-    Message query = Message.newQuery(question);
-    Message response = dnsResolver.sendAsync(query).toCompletableFuture().get();
-
-    if (response.getRcode() != Rcode.NOERROR) {
-      LOG.debug("dns-01: query '{}' returned rcode {}", queryName,
-          Rcode.string(response.getRcode()));
-      return Collections.emptyList();
-    }
-
-    if (dnssecValidation && !response.getHeader().getFlag(Flags.AD)) {
-      LOG.warn("dns-01 DNSSEC validation failed for '{}' ({})",
-          queryName, getDnssecFailureReason(response));
-      return Collections.emptyList();
-    }
-
-    List<String> txtValues = new ArrayList<>();
-    Name cnameTarget = null;
-    for (Record record : response.getSection(Section.ANSWER)) {
-      if (record.getType() == Type.TXT && queryName.equals(record.getName())) {
-        // RFC 7208 section 3.3: multiple character-strings are concatenated
-        List<String> strings = ((TXTRecord) record).getStrings();
-        if (strings != null && !strings.isEmpty()) {
-          txtValues.add(String.join("", strings));
-        }
-      } else if (record.getType() == Type.CNAME && queryName.equals(record.getName())) {
-        cnameTarget = ((CNAMERecord) record).getTarget();
+  private InetAddress[] resolveChallengeHost(String host) throws IOException {
+    InetAddress[] addresses;
+    if (host.indexOf(':') != -1 || host.matches("\\d{1,3}(\\.\\d{1,3}){3}")) {
+      // IP literal, e.g. in the location of a redirect: no DNS lookup
+      addresses = new InetAddress[]{InetAddress.getByName(host)};
+    } else {
+      List<InetAddress> list;
+      try {
+        list = addressClient.queryAddresses(host);
+      } catch (IllegalArgumentException ex) {
+        throw new UnknownHostException("invalid host name " + host);
       }
-    }
 
-    if (!txtValues.isEmpty()) {
-      return txtValues;
-    }
-
-    if (cnameTarget != null) {
-      LOG.debug("dns-01: following CNAME '{}' -> '{}'", queryName, cnameTarget);
-      return queryDnsTxt(cnameTarget.toString(), depth + 1);
-    }
-
-    return Collections.emptyList();
-  }
-
-  private static String getDnssecFailureReason(Message response) {
-    for (Record record : response.getSection(Section.ADDITIONAL)) {
-      if (record.getType() == Type.TXT
-          && record.getDClass() == ValidatingResolver.VALIDATION_REASON_QCLASS
-          && Name.root.equals(record.getName())) {
-        List<String> strings = ((TXTRecord) record).getStrings();
-        return (strings == null || strings.isEmpty()) ? "missing validation reason"
-            : String.join("", strings);
+      if (list.isEmpty()) {
+        throw new UnknownHostException("found no address of host " + host);
       }
+      addresses = list.toArray(new InetAddress[0]);
     }
 
-    return "response not DNSSEC-authenticated";
-  }
-
-  /**
-   * Resolves the challenge host. The caller must connect to the returned addresses
-   * instead of resolving the host again, to prevent DNS rebinding.
-   */
-  private InetAddress[] resolveChallengeHost(String host) throws UnknownHostException {
-    InetAddress[] addresses = InetAddress.getAllByName(host);
     if (allowPrivateChallengeTargets) {
       return addresses;
     }

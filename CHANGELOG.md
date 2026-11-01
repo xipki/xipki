@@ -5,20 +5,37 @@ See also <https://github.com/xipki/xipki/releases>
 ## 7.0.0
 - Release date: 202y/mm/dd
 - Make the crypto backend plugable. Three backends have been implemented in https://github.com/xipki/xicrypto:
-  - JDK (JDK 11+, ML-DSA and ML-KEM require JDK 25+, EdDSA JDK 15+; with crypto-extra, which also
-    provides the SHA3 signatures and HMAC on JDK 11 to 15)
+  - JDK (requires JDK 25+; the other modules run on JDK 11+, there use one of the BouncyCastle
+    backends)
   - bouncycastle FIPS (bc-fips and bcpqc-fips required)
   - bouncycastle LTS (bcprov-lts8on required) and standard (bcprov-jdk8on required)
 - The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
 - The PKIX modules moved to https://github.com/xipki/xipkix and use the groupId `org.xipki.pkix`.
 - The shell-base module moved to https://github.com/xipki/xishell and use the groupId `org.xipki.shell`.
 - The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
-
+- ACME gateway
+  - dns-01 challenge: dnsjava replaced by a built-in stub resolver and DNSSEC validator
+    (packages `org.xipki.ca.gateway.dns` and `org.xipki.ca.gateway.dns.dnssec`). The DNSSEC validation runs in the gateway as before, against the configured
+    trust anchors, for positive answers only. Answers expanded from DNS wildcards or DNAME are
+    rejected; DNSSEC algorithms 8, 10, 13, 14, 15 and 16 are supported.
+  - If `dnsResolvers` is not set, the name servers of `/etc/resolv.conf` are used (required on
+    Windows).
+  - http-01 and tls-alpn-01: the host is resolved (A and AAAA) with the same DNS resolvers
+    instead of the system resolver, so `/etc/hosts` is no longer used.
+  - The file `dnssecTrustAnchorsFile` is reloaded when it has been changed (checked every
+    minute), no restart is required.
+- SCEP: DES3 (DESede) is no longer supported. The gateway no longer offers the capability
+  `DES3` and rejects requests encrypted with DES-EDE3-CBC (`badAlg`); the SCEP client uses AES
+  only and fails if the CA does not support AES.
+- Encrypted private keys exported as PEM (`ENCRYPTED PRIVATE KEY`) use PBES2 with
+  PBKDF2-HMAC-SHA256 and AES-256-CBC instead of pbeWithSHAAnd3-KeyTripleDES-CBC.
 - Dependencies
+  - dnsjava: removed
   - bouncycastle (bcutil, bcpkix, bcprov): removed
   - postgresql: removed
-  - jline: -> 4.4.8
-  - h2: 2.4.240 -> 2.5.252
+  - jline: 4.4.1   -> 4.4.8
+  - h2:    2.4.240 -> 2.5.252
+  - slf4j: 2.0.18  -> 2.0.20 
 
 ## 6.7.1
 - Release date: 2026/09/07

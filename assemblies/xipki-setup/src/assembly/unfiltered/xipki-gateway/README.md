@@ -46,10 +46,20 @@ Deployment in Tomcat (10 and 11)
       - `dnssecValidation`: set to `true`
       - `dnssecTrustAnchorsFile`: set to the trust-anchor file, for example
         `etc/acme/root-trust-anchors.zone`
-      - `dnsResolvers`: optional explicit recursive resolvers such as your internal DNS servers
+      - `dnsResolvers`: optional explicit recursive resolvers such as your internal DNS servers,
+        used for all challenge types (TXT for `dns-01`, A/AAAA for `http-01` and
+        `tls-alpn-01`). If not set, the name servers in `/etc/resolv.conf` are used (must be
+        set on Windows). `/etc/hosts` is not used.
+        The gateway validates the DNSSEC signatures itself (queries with DO=1 and CD=1), so the
+        resolvers need not validate, but they must pass the DNSSEC records (RRSIG, DNSKEY, DS)
+        through. Answers expanded from DNS wildcards or DNAME records are not accepted.
       A sample trust-anchor file is provided in
       `tomcat/xipki/etc/acme/root-trust-anchors.zone`. The example `.zone` file is derived from
       the IANA "Trust Anchors and Rollovers" publication:
       https://www.iana.org/dnssec/files
+      Add the DS of a new root KSK when IANA publishes it (see
+      https://data.iana.org/root-anchors/root-anchors.xml), keeping the current one. The
+      gateway checks the file every minute and reloads it if its modification time or size
+      has changed; if the new file is invalid, the current trust anchors are kept.
 4. Execute the command  
    `./install.sh -t <tomcat dir of proocol gaeway server>`.

@@ -5,6 +5,7 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extensions;
@@ -16,7 +17,6 @@ import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.misc.EmbedCertsMode;
 

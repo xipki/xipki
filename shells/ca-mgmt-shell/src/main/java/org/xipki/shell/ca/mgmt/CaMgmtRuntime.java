@@ -6,9 +6,9 @@ package org.xipki.shell.ca.mgmt;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.shell.ShellUtil;
 import org.xipki.util.http.SslContextConfWrapper;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.util.Set;

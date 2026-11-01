@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.test;
 
-import org.xipki.ca.api.CertprofileValidator;
+import org.xipki.ca.api.profile.CertprofileValidator;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;

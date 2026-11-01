@@ -9,6 +9,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.util.datasource.DataSourceWrapper;
@@ -21,7 +22,6 @@ import org.xipki.pkix.util.conf.Validity;
 import org.xipki.pkix.util.conf.FileOrBinary;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

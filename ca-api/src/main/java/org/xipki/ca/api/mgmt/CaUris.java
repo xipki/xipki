@@ -1,15 +1,15 @@
 // Copyright (c) 2013-2026 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.mgmt;
 
+import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.CompareUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.Collections;
 import java.util.List;

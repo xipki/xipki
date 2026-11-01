@@ -3,17 +3,17 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
-import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.codec.json.JsonBuilder;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.conf.FileOrBinary;
 import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.codec.util.IoUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.CollectionUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

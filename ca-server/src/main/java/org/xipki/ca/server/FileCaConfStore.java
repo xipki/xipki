@@ -5,13 +5,12 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.GenerationException;
-import org.xipki.ca.api.CaUris;
 import org.xipki.ca.api.NameId;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -23,30 +22,31 @@ import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.asn1.GenerationException;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.pkix.exception.OperationException;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.ca.api.CertprofileException;
+import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.pkix.util.conf.FileOrValue;
+import org.xipki.pkix.util.io.XipkiIoUtil;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.CompareUtil;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,9 +74,6 @@ import java.util.Set;
 public class FileCaConfStore implements CaConfStore {
 
   private static final Logger LOG = LoggerFactory.getLogger(FileCaConfStore.class);
-
-  private static final CaMgmtException readOnlyException =
-      new CaMgmtException("File based CaConfStore is read-only");
 
   private static final int REQUESTOR_BY_CA_ID = 1;
 
@@ -862,33 +859,33 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public void addCa(CaEntry caEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addCaAlias(String aliasName, NameId ca) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addCertprofile(CertprofileEntry dbEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addCertprofileToCa(NameId profile, NameId ca, List<String> aliases)
       throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addPublisherToCa(NameId publisher, NameId ca) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addRequestor(RequestorEntry dbEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -897,23 +894,23 @@ public class FileCaConfStore implements CaConfStore {
       return new NameId(REQUESTOR_BY_CA_ID, RequestorInfo.NAME_BY_CA);
     }
 
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addRequestorToCa(CaHasRequestorEntry requestor, NameId ca) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addPublisher(PublisherEntry dbEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void changeCa(ChangeCaEntry changeCaEntry, BaseCaInfo currentCaConf,
                       SecurityFactory securityFactory) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -926,73 +923,73 @@ public class FileCaConfStore implements CaConfStore {
   public IdentifiedCertprofile changeCertprofile(
       NameId nameId, String type, String conf, CaManagerImpl certprofileManager)
       throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public RequestorEntryWrapper changeRequestor(NameId nameId, String type, String conf)
       throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public SignerEntry changeSigner(
       String name, String type, String conf, String base64Cert, CaManagerImpl signerManager)
       throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public KeypairGenEntryWrapper changeKeypairGen(
       String name, String type, String conf, CaManagerImpl manager) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public IdentifiedCertPublisher changePublisher(
       String name, String type, String conf, CaManagerImpl publisherManager)
       throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void removeCaAlias(String aliasName) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void removeCertprofileFromCa(String profileName, String caName) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void removeRequestorFromCa(String requestorName, String caName) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void removePublisherFromCa(String publisherName, String caName) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void removeDbSchema(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void revokeCa(String caName, CertRevocationInfo revocationInfo) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addKeypairGen(KeypairGenEntry dbEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void addSigner(SignerEntry dbEntry) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1001,7 +998,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public void unrevokeCa(String caName) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1011,12 +1008,12 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public void addDbSchema(String name, String value) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
   public void changeDbSchema(String name, String value) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1031,7 +1028,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deleteCa(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1041,7 +1038,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deleteKeyPairGen(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1051,7 +1048,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deleteProfile(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1061,7 +1058,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deletePublisher(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1071,7 +1068,7 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deleteRequestor(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
   }
 
   @Override
@@ -1081,7 +1078,11 @@ public class FileCaConfStore implements CaConfStore {
 
   @Override
   public boolean deleteSigner(String name) throws CaMgmtException {
-    throw readOnlyException;
+    throw readOnlyException();
+  }
+
+  private static CaMgmtException readOnlyException() {
+    return new CaMgmtException("File based CaConfStore is read-only");
   }
 
 }

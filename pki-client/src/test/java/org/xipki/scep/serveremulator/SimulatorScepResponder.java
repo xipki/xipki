@@ -16,13 +16,11 @@ import org.xipki.pkix.asn1.x509.CertificateList;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsAlgorithm;
-import org.xipki.pkix.cms.CmsException;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.DecodedPkiMessage;
 import org.xipki.pkix.scep.message.EnvelopedDataDecryptor;
@@ -96,7 +94,7 @@ public class SimulatorScepResponder {
   }
 
   public ContentInfo servicePkiOperation(CmsSignedData requestContent)
-      throws CodecException, CaException, NoSuchAlgorithmException {
+      throws CodecException, PkixException, NoSuchAlgorithmException {
     Args.notNull(requestContent, "requestContent");
     PrivateKey recipientKey = (raEmulator != null) ? raEmulator.raEncKey() : caEmulator.caKey();
     X509Cert recipientCert = (raEmulator != null) ? raEmulator.raEncCert() : caEmulator.caCert();
@@ -120,22 +118,22 @@ public class SimulatorScepResponder {
       return rep.encode(signingKey(), signatureAlgorithm, jceSignerCert,
           certs, req.signatureCert(), req.contentEncryptionAlgorithm());
     } catch (Exception ex) {
-      throw new CaException(ex);
+      throw new PkixException(ex);
     }
   } // method servicePkiOperation
 
-  public ContentInfo encode(NextCaMessage nextCaMsg) throws CaException {
+  public ContentInfo encode(NextCaMessage nextCaMsg) throws PkixException {
     Args.notNull(nextCaMsg, "nextCaMsg");
     try {
       X509Cert jceSignerCert = signingCert();
       X509Cert[] certs = control.isSendSignerCert() ? new X509Cert[]{jceSignerCert} : null;
       return nextCaMsg.encode(signingKey(), jceSignerCert, certs);
     } catch (Exception ex) {
-      throw new CaException(ex);
+      throw new PkixException(ex);
     }
   }
 
-  private PkiMessage servicePkiOperation0(DecodedPkiMessage req) throws CaException {
+  private PkiMessage servicePkiOperation0(DecodedPkiMessage req) throws PkixException {
     TransactionId tid = req.transactionId();
     PkiMessage rep = new PkiMessage(tid, MessageType.CertRep, Nonce.randomNonce());
     rep.setPkiStatus(PkiStatus.SUCCESS);
@@ -242,7 +240,7 @@ public class SimulatorScepResponder {
         try {
           cert = caEmulator.generateCert(csr);
         } catch (Exception ex) {
-          throw new CaException("system failure: " + ex.getMessage(), ex);
+          throw new PkixException("system failure: " + ex.getMessage(), ex);
         }
 
         if (cert != null && control.isPendingCert()) {
@@ -300,7 +298,7 @@ public class SimulatorScepResponder {
         CertificationRequest csr;
         try {
           csr = parseCsrInRequest(req.messageData());
-        } catch (OperationException e) {
+        } catch (PkixException e) {
           buildPkiMessage(rep, PkiStatus.FAILURE, FailInfo.badRequest);
           return rep;
         }
@@ -309,7 +307,7 @@ public class SimulatorScepResponder {
         try {
           cert = caEmulator.generateCert(csr);
         } catch (Exception ex) {
-          throw new CaException("system failure: " + ex.getMessage(), ex);
+          throw new PkixException("system failure: " + ex.getMessage(), ex);
         }
 
         if (cert != null) {
@@ -327,7 +325,7 @@ public class SimulatorScepResponder {
               req.messageData().asSequence());
           crl = caEmulator.getCrl(isn.getName(), isn.serialNumber());
         } catch (Exception ex) {
-          throw new CaException("system failure: " + ex.getMessage(), ex);
+          throw new PkixException("system failure: " + ex.getMessage(), ex);
         }
 
         if (crl != null) {
@@ -343,36 +341,22 @@ public class SimulatorScepResponder {
     } // end switch
   } // method servicePkiOperation0
 
-  private ContentInfo createSignedData(CertificateList crl) throws CaException {
+  private ContentInfo createSignedData(CertificateList crl) throws PkixException {
     CmsSignedData.Builder cmsSignedDataGen = new CmsSignedData.Builder();
     cmsSignedDataGen.addCRL(crl);
 
-    CmsSignedData cmsSigneddata;
-    try {
-      cmsSigneddata = cmsSignedDataGen.build();
-    } catch (CmsException ex) {
-      throw new CaException(ex.getMessage(), ex);
-    }
-
-    return cmsSigneddata.toASN1Structure();
+    return cmsSignedDataGen.build().toASN1Structure();
   } // method createSignedData
 
-  private ContentInfo createSignedData(X509Cert cert) throws CaException {
+  private ContentInfo createSignedData(X509Cert cert) throws PkixException {
     CmsSignedData.Builder cmsSignedDataGen = new CmsSignedData.Builder();
 
-    CmsSignedData cmsSigneddata;
-    try {
-      cmsSignedDataGen.addCertificate(cert.getCert());
-      if (control.isSendCaCert()) {
-        cmsSignedDataGen.addCertificate(caEmulator.caCert().getCert());
-      }
-
-      cmsSigneddata = cmsSignedDataGen.build();
-    } catch (CmsException ex) {
-      throw new CaException(ex);
+    cmsSignedDataGen.addCertificate(cert.getCert());
+    if (control.isSendCaCert()) {
+      cmsSignedDataGen.addCertificate(caEmulator.caCert().getCert());
     }
 
-    return cmsSigneddata.toASN1Structure();
+    return cmsSignedDataGen.build().toASN1Structure();
   } // method createSignedData
 
   public PrivateKey signingKey() {
@@ -407,11 +391,11 @@ public class SimulatorScepResponder {
   }
 
   private static CertificationRequest parseCsrInRequest(Asn1Primitive p10Asn1)
-      throws OperationException {
+      throws PkixException {
     try {
       return CertificationRequest.fromAsn1(p10Asn1.asSequence());
     } catch (Exception ex) {
-      throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
+      throw new PkixException("invalid CSR: " + ex.getMessage(), ex);
     }
   }
 

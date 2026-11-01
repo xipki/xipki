@@ -3,11 +3,11 @@
 
 package org.xipki.ca.mgmt.db.port;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.List;

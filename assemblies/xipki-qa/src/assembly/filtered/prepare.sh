@@ -10,6 +10,18 @@ script_dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
 
 java_exec="${JAVA_HOME:+$JAVA_HOME/bin/}java"
 
+# Native access via the foreign function & memory API (restricted methods).
+# Without --enable-native-access the JDK prints a warning. The option is only known since Java 17.
+java_opts=""
+java_major=$("$java_exec" -version 2>&1 | sed -n 's/.* version "\([0-9]*\)\.\{0,1\}\([0-9]*\).*/\1 \2/p' | head -n 1)
+case "$java_major" in
+  "1 "*) java_major=${java_major#1 } ;;
+  *) java_major=${java_major%% *} ;;
+esac
+if [ -n "$java_major" ] && [ "$java_major" -ge 17 ] 2>/dev/null; then
+  java_opts="--enable-native-access=ALL-UNNAMED"
+fi
+
 java_debug=""
 #java_debug="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005"
 
@@ -93,12 +105,12 @@ echo "Replace Configuration and generate Key & Certificates"
 
 classpath="xipki-qa-cli/lib/*"
 
-"$java_exec" -cp "$classpath" \
+"$java_exec" $java_opts -cp "$classpath" \
   -Ddatabase.type="$DATABASE_TYPE" -Dtest.basedir="$TBDIR" \
   -Dtomcat.java.home="$tomcat_java_home" \
   org.xipki.util.misc.BatchReplace setup/conf.json
 
-"$java_exec" $java_debug -cp "$classpath" org.xipki.pkix.util.GenerateCerts \
+"$java_exec" $java_opts $java_debug -cp "$classpath" org.xipki.pkix.util.GenerateCerts \
   setup/keycerts.json setup/keycerts
 
 echo "Prepare tomcat instances"

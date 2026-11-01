@@ -3,7 +3,16 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.ca.api.HourMinute;
+import org.xipki.ca.api.mgmt.PublicCaInfo;
+import org.xipki.ca.api.mgmt.CrlControl;
+import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.ca.api.mgmt.entry.SignerEntry;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
 import org.xipki.pkix.asn1.x509.CRLDistributionPoints;
@@ -14,27 +23,19 @@ import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.pkix.asn1.x509.GeneralNames;
 import org.xipki.pkix.asn1.x509.IssuingDistributionPoint;
-import org.xipki.ca.api.PublicCaInfo;
-import org.xipki.ca.api.mgmt.CrlControl;
-import org.xipki.ca.api.mgmt.RequestorInfo;
-import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.exception.NoIdleSignerException;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.audit.AuditEvent;
 import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.util.misc.DateUtil;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.ca.api.HourMinute;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.misc.DateUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -64,11 +65,11 @@ import static org.xipki.ca.sdk.CaAuditConstants.TYPE_cleanup_crl;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_downlaod_crl4number;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_download_crl;
 import static org.xipki.ca.sdk.CaAuditConstants.TYPE_gen_crl;
-import static org.xipki.pkix.exception.ErrorCode.CRL_FAILURE;
-import static org.xipki.pkix.exception.ErrorCode.INVALID_EXTENSION;
-import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
-import static org.xipki.pkix.exception.ErrorCode.SYSTEM_UNAVAILABLE;
+import static org.xipki.ca.sdk.ErrorCode.CRL_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.INVALID_EXTENSION;
+import static org.xipki.ca.sdk.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.sdk.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.SYSTEM_UNAVAILABLE;
 
 /**
  * X509 Crl Module.
@@ -222,7 +223,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       }
     }
 
-    Random random = new Random();
+    Random random = RandomUtil.random();
     ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
     // CRL generation services
     this.crlGenerationService = executor.scheduleAtFixedRate(new CrlGenerationService(),
@@ -586,9 +587,10 @@ public class X509CrlModule extends X509CaModule implements Closeable {
           crlBuilder.addExtension(Extension.ofDeltaCRLIndicator(true, baseCrlNumber));
         }
 
-        // freshestCRL
+        // freshestCRL, MUST NOT appear in delta CRLs (RFC 5280 section 5.2.6)
         List<String> deltaCrlUris = pci.caUris().deltaCrlUris();
-        if (control.deltaCrlIntervals() > 0 && CollectionUtil.isNotEmpty(deltaCrlUris)) {
+        if (!deltaCrl && control.deltaCrlIntervals() > 0
+            && CollectionUtil.isNotEmpty(deltaCrlUris)) {
           CRLDistributionPoints cdp = CaUtil.createCrlDistributionPoints(
               deltaCrlUris, pci.subject(), crlIssuer);
 
@@ -610,7 +612,8 @@ public class X509CrlModule extends X509CaModule implements Closeable {
       try {
         signer0 = concurrentSigner.borrowSigner();
       } catch (NoIdleSignerException ex) {
-        throw new OperationException(SYSTEM_FAILURE, "NoIdleSignerException: " + ex.getMessage());
+        throw new OperationException(SYSTEM_FAILURE,
+            "NoIdleSignerException: " + ex.getMessage(), ex);
       }
 
       X509Crl crl;

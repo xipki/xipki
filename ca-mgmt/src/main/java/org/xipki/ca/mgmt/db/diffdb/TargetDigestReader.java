@@ -3,13 +3,13 @@
 
 package org.xipki.ca.mgmt.db.diffdb;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.speed.ProcessLog;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.util.benchmark.ProcessLog;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;

@@ -6,14 +6,15 @@ package org.xipki.ca.server;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
-import org.xipki.util.audit.AuditEvent;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.audit.AuditEvent;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -95,7 +96,7 @@ public class X509RemoverModule extends X509CaModule implements Closeable {
 
     ScheduledThreadPoolExecutor executor = caManager.scheduledThreadPoolExecutor();
 
-    Random random = new Random();
+    Random random = RandomUtil.random();
     final int minutesOfDay = 24 * 60;
     this.expiredCertsRemover = executor.scheduleAtFixedRate(new ExpiredCertsRemover(),
         minutesOfDay + random.nextInt(60), minutesOfDay, TimeUnit.MINUTES);

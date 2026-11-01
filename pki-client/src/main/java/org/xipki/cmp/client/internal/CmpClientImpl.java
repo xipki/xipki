@@ -304,8 +304,8 @@ public final class CmpClientImpl implements CmpClient {
       return false;
     }
 
-    boolean inBenchmark = Boolean.getBoolean("org.xipki.benchmark");
-    if (inBenchmark) {
+    boolean inSpeed = Boolean.getBoolean("org.xipki.speed");
+    if (inSpeed) {
       return true;
     }
 

@@ -10,9 +10,9 @@ import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.cms.CmsException;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.NextCaMessage;
 import org.xipki.pkix.scep.transaction.Operation;
@@ -121,7 +121,7 @@ public class ScepServlet {
           auditMessage = "could not decrypt and/or verify the request";
           sendError(exchange, SC_BAD_REQUEST);
           return;
-        } catch (CaException ex) {
+        } catch (PkixException ex) {
           auditMessage = "system internal error";
           LOG.error(auditMessage, ex);
           sendError(exchange, SC_INTERNAL_SERVER_ERROR);
@@ -151,7 +151,7 @@ public class ScepServlet {
             }
             CmsSignedData degenerateSignedData = cmsSignedDataGen.build();
             respBytes = degenerateSignedData.getEncoded();
-          } catch (CmsException ex) {
+          } catch (PkixException ex) {
             auditMessage = "system internal error";
             LOG.error(auditMessage, ex);
             sendError(exchange, SC_INTERNAL_SERVER_ERROR);

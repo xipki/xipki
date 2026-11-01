@@ -22,7 +22,7 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.ca.api.CertprofileException;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.ca.api.TripleState;
 

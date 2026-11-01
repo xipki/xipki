@@ -4,6 +4,7 @@
 package org.xipki.scep.client;
 
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.pkix.asn1.cms.SignedData;
@@ -16,9 +17,8 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsAlgorithm;
-import org.xipki.pkix.cms.CmsException;
 import org.xipki.pkix.cms.CmsSignedData;
-import org.xipki.scep.client.ScepClientException.OperationNotSupportedException;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.AuthorityCertStore;
@@ -35,7 +35,6 @@ import org.xipki.pkix.util.X509Util;
 import org.xipki.util.http.Curl;
 import org.xipki.util.http.DefaultCurl;
 import org.xipki.util.http.HttpStatusCode;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -366,7 +365,7 @@ public class ScepClient {
     initIfNotInited();
 
     if (!caCaps.supportsRenewal()) {
-      throw new OperationNotSupportedException(
+      throw new ScepClientException(
           "unsupported messageType '" + MessageType.RenewalReq + "'");
     }
 
@@ -400,7 +399,7 @@ public class ScepClient {
     initIfNotInited();
 
     if (!this.caCaps.supportsGetNextCACert()) {
-      throw new OperationNotSupportedException(
+      throw new ScepClientException(
           "unsupported operation '" + Operation.GetNextCACert.code() + "'");
     }
 
@@ -410,14 +409,12 @@ public class ScepClient {
   private ContentInfo encryptThenSign(
       PkiMessage request, PrivateKey identityKey, X509Cert identityCert)
       throws ScepClientException {
-    Asn1Oid encAlgId;
-    if (caCaps.supportsAES()) {
-      encAlgId = CmsAlgorithm.AES128_CBC;
-    } else if (caCaps.supportsDES3()) {
-      encAlgId = CmsAlgorithm.DES_EDE3_CBC;
-    } else {
-      throw new ScepClientException("DES will not be supported by this client");
+    // AES only: DES3 (DESede) is not used, even if the CA offers it
+    if (!caCaps.supportsAES()) {
+      throw new ScepClientException("the CA does not support AES, DES3 is not supported by "
+          + "this client");
     }
+    Asn1Oid encAlgId = CmsAlgorithm.AES128_CBC;
 
     try {
       SignAlgo signatureAlgorithm = SignAlgo.getInstance(identityKey);
@@ -440,7 +437,7 @@ public class ScepClient {
     CmsSignedData cmsSignedData;
     try {
       cmsSignedData = new CmsSignedData(httpResp.contentBytes());
-    } catch (CmsException | IllegalArgumentException ex) {
+    } catch (PkixException | IllegalArgumentException ex) {
       throw new ScepClientException("invalid SignedData message: " + ex.getMessage(), ex);
     }
 
@@ -532,7 +529,7 @@ public class ScepClient {
   private static CmsSignedData parsePkiMessage(byte[] messageBytes) throws ScepClientException {
     try {
       return new CmsSignedData(messageBytes);
-    } catch (CmsException ex) {
+    } catch (PkixException ex) {
       throw new ScepClientException(ex);
     }
   }

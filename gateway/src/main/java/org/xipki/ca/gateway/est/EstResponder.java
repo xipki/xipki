@@ -5,9 +5,12 @@ package org.xipki.ca.gateway.est;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Set;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cms.CertificateChoice;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.RevocationInfoChoice;
@@ -46,8 +49,6 @@ import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.ca.sdk.TlsHelper;
@@ -63,7 +64,7 @@ import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.pkix.util.misc.PemEncoder;
 import org.xipki.util.misc.EmbedCertsMode;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -179,7 +180,7 @@ public class EstResponder {
 
   private final RequestorAuthenticator authenticator;
 
-  private final Random random = new Random();
+  private final Random random = RandomUtil.random();
 
   private static final Set<String> knownCommands;
 
@@ -337,7 +338,7 @@ public class EstResponder {
           byte[] userPwd;
           try {
             // RFC 7617: standard base64 encoding
-            userPwd = java.util.Base64.getDecoder().decode(b64.trim());
+            userPwd = Base64.decode(b64.trim());
           } catch (IllegalArgumentException ex) {
             // malformed, will be rejected as unauthorized below
             userPwd = new byte[0];

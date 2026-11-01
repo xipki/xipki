@@ -5,17 +5,17 @@ package org.xipki.qa.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.pkcs11.P11Slot;
-import org.xipki.util.benchmark.BenchmarkExecutor;
 
 /**
  * P11 Keypair Gen Speed.
  *
  * @author Lijun Liao (xipki)
  */
-public final class P11KeypairGenSpeed extends BenchmarkExecutor {
+public final class P11KeypairGenSpeed extends SpeedExecutor {
 
   class Tester implements Runnable {
 

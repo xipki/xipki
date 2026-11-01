@@ -3,40 +3,41 @@
 
 package org.xipki.shell.security;
 
+import org.xipki.codec.Base64;
+import org.xipki.codec.Hex;
+import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
+import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.pem.PemObject;
+import org.xipki.crypto.core.pem.PemReader;
+import org.xipki.pkix.Securities;
 import org.xipki.pkix.asn1.cms.CertificateChoice;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.SignedData;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.CertificateList;
 import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.codec.Base64;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.Hex;
-import org.xipki.crypto.api.CryptoApi;
-import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
-import org.xipki.pkix.util.PKCS8Encryptor;
-import org.xipki.crypto.core.pem.PemObject;
-import org.xipki.crypto.core.pem.PemReader;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.Securities;
 import org.xipki.pkix.cert.JceX509Certificate;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.PKCS8Encryptor;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.pkix.util.misc.PemEncoder;
+import org.xipki.pkix.util.password.PasswordResolverException;
+import org.xipki.pkix.util.password.Passwords;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.pkix.util.misc.CompareUtil;
 import org.xipki.shell.xi.XiShellBaseCommand;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.PemEncoder;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
-import org.xipki.pkix.util.password.PasswordResolverException;
-import org.xipki.pkix.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -47,14 +48,19 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -71,16 +77,18 @@ class SecurityCommands {
       mixinStandardHelpOptions = true)
   static class CryptoInfoCommand extends XiShellBaseCommand {
 
-    @Option(names = "--qualified", description = "print only the class name with package name")
-    private boolean qualified;
+    @Option(names = "--class", description = "print the qualified class name instead name")
+    private boolean _class;
 
     @Override
     public void run() {
       try {
         CryptoApi cryptoApi = CryptoApiFactory.get();
-        String clazzName = qualified ? cryptoApi.getClass().getName()
-            : cryptoApi.getClass().getSimpleName();
-        println(clazzName);
+        if (_class) {
+          println(cryptoApi.getClass().getCanonicalName());
+        } else {
+          println(cryptoApi.name());
+        }
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
       }
@@ -215,77 +223,44 @@ class SecurityCommands {
           throw new IllegalArgumentException("in and out cannot be the same");
         }
 
-        KeyStore inKs = KeyStore.getInstance(inType);
-        KeyStore outKs;
-        ByteArrayOutputStream outPemKs;
-
-        if ("PEM".equalsIgnoreCase(outType)) {
-          outPemKs = new ByteArrayOutputStream();
-          outKs = null;
-        } else {
-          outPemKs = null;
-          outKs = KeyUtil.loadKeyStore(outType, null, null);
-          outKs.load(null);
+        char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwdHint);
+        List<KsEntry> entries;
+        try (var inStream = Files.newInputStream(realInFile.toPath())) {
+          entries = readEntries(inType, inStream, inPassword);
         }
 
+        boolean needsPassword = !("PEM".equalsIgnoreCase(outType)
+            && "NONE".equalsIgnoreCase(outPwdHint));
+        char[] outPassword = needsPassword
+            ? readPasswordIfNotSet("password of the destination keystore", outPwdHint)
+            : null;
+
         byte[] outBytes;
-        try {
-          char[] inPassword = readPasswordIfNotSet("password of the source keystore", inPwdHint);
-          try (var inStream = Files.newInputStream(realInFile.toPath())) {
-            inKs.load(inStream, inPassword);
-          }
-
-          boolean needsPassword = !("PEM".equalsIgnoreCase(outType)
-              && "NONE".equalsIgnoreCase(outPwdHint));
-          char[] outPassword = needsPassword
-              ? readPasswordIfNotSet("password of the destination keystore", outPwdHint)
-              : null;
-
-          Enumeration<String> aliases = inKs.aliases();
-          while (aliases.hasMoreElements()) {
-            String alias = aliases.nextElement();
-            if (inKs.isKeyEntry(alias)) {
-              java.security.cert.Certificate[] certs = inKs.getCertificateChain(alias);
-              Key key = inKs.getKey(alias, inPassword);
-              if (outKs != null) {
-                outKs.setKeyEntry(alias, key, outPassword, certs);
+        try (ByteArrayOutputStream bout = new ByteArrayOutputStream(4096)) {
+          if ("PEM".equalsIgnoreCase(outType)) {
+            writePem(entries, bout, outPassword);
+          } else if (isPkcs12(outType)) {
+            Pkcs12KeyStore outKs = new Pkcs12KeyStore();
+            for (KsEntry e : entries) {
+              if (e.isKeyEntry()) {
+                outKs.setKeyEntry(e.alias, e.privateKeyInfo(), e.certs);
               } else {
-                if (outPassword == null) {
-                  outPemKs.write(PemEncoder.encode(key.getEncoded(),
-                                  PemEncoder.PemLabel.PRIVATE_KEY));
-                } else {
-                  EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(
-                      PrivateKeyInfo.fromEncoded(key.getEncoded()), outPassword, null);
-                  outPemKs.write(PemEncoder.encode(encKey.getEncoded(),
-                      PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
-                }
-
-                for (java.security.cert.Certificate cert : certs) {
-                  writePemCert(outPemKs, cert);
-                }
-              }
-            } else {
-              java.security.cert.Certificate cert = inKs.getCertificate(alias);
-              if (outKs != null) {
-                outKs.setCertificateEntry(alias, cert);
-              } else {
-                writePemCert(outPemKs, cert);
+                outKs.setCertificateEntry(e.alias, e.certs.get(0));
               }
             }
-          }
-
-          if (outPemKs == null) {
-            try (ByteArrayOutputStream bout = new ByteArrayOutputStream(4096)) {
-              outKs.store(bout, outPassword);
-              outBytes = bout.toByteArray();
-            }
+            outKs.store(bout, outPassword);
           } else {
-            outBytes = outPemKs.toByteArray();
+            KeyStore outKs = KeyUtil.loadKeyStore(outType, null, null);
+            for (KsEntry e : entries) {
+              if (e.isKeyEntry()) {
+                outKs.setKeyEntry(e.alias, e.jceKey(), outPassword, toJceCerts(e.certs));
+              } else {
+                outKs.setCertificateEntry(e.alias, new JceX509Certificate(e.certs.get(0)));
+              }
+            }
+            outKs.store(bout, outPassword);
           }
-        } finally {
-          if (outPemKs != null) {
-            outPemKs.close();
-          }
+          outBytes = bout.toByteArray();
         }
 
         saveVerbose("saved destination keystore to file", realOutFile.toPath(), outBytes);
@@ -294,9 +269,124 @@ class SecurityCommands {
       }
     }
 
-    private static void writePemCert(OutputStream out, java.security.cert.Certificate cert)
-        throws CertificateEncodingException, IOException {
-      out.write(PemEncoder.encode(cert.getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
+    /**
+     * An entry of a keystore: a key entry with its key and certificate chain, or a certificate
+     * entry with its certificate.
+     */
+    private static final class KsEntry {
+
+      private final String alias;
+
+      /** The key read from a keystore of the JDK, or null. */
+      private final Key jceKey;
+
+      /** The private key read from a PKCS#12 keystore, or null. */
+      private final PrivateKeyInfo privateKey;
+
+      /** The certificate chain of a key entry (may be empty), or the certificate. */
+      private final List<Certificate> certs;
+
+      KsEntry(String alias, Key jceKey, PrivateKeyInfo privateKey, List<Certificate> certs) {
+        this.alias = alias;
+        this.jceKey = jceKey;
+        this.privateKey = privateKey;
+        this.certs = certs;
+      }
+
+      boolean isKeyEntry() {
+        return jceKey != null || privateKey != null;
+      }
+
+      PrivateKeyInfo privateKeyInfo() throws CodecException {
+        if (privateKey != null) {
+          return privateKey;
+        } else if (jceKey instanceof PrivateKey) {
+          return PrivateKeyInfo.fromEncoded(jceKey.getEncoded());
+        } else {
+          throw new IllegalArgumentException("the key " + alias + " is not a private key, "
+              + "it cannot be written to a PKCS#12 or PEM keystore");
+        }
+      }
+
+      Key jceKey() throws InvalidKeySpecException {
+        return (jceKey != null) ? jceKey : CryptoApiFactory.get().getPrivateKey(privateKey);
+      }
+
+    }
+
+    private static boolean isPkcs12(String type) {
+      return StringUtil.orEqualsIgnoreCase(type, "PKCS12", "PKCS#12");
+    }
+
+    private static List<KsEntry> readEntries(String type, InputStream in, char[] password)
+        throws Exception {
+      List<KsEntry> entries = new ArrayList<>();
+      if (isPkcs12(type)) {
+        Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore(in, password);
+        for (String alias : ks.aliases()) {
+          entries.add(ks.isKeyEntry(alias)
+              ? new KsEntry(alias, null, ks.getKey(alias), ks.getCertificateChain(alias))
+              : new KsEntry(alias, null, null, List.of(ks.getCertificate(alias))));
+        }
+      } else {
+        KeyStore ks = KeyUtil.loadKeyStore(type, in, password);
+        Enumeration<String> aliases = ks.aliases();
+        while (aliases.hasMoreElements()) {
+          String alias = aliases.nextElement();
+          if (ks.isKeyEntry(alias)) {
+            entries.add(new KsEntry(alias, ks.getKey(alias, password), null,
+                fromJceCerts(ks.getCertificateChain(alias))));
+          } else {
+            entries.add(new KsEntry(alias, null, null,
+                fromJceCerts(new java.security.cert.Certificate[]{ks.getCertificate(alias)})));
+          }
+        }
+      }
+      return entries;
+    }
+
+    private static void writePem(List<KsEntry> entries, OutputStream out, char[] password)
+        throws Exception {
+      for (KsEntry e : entries) {
+        if (e.isKeyEntry()) {
+          PrivateKeyInfo key = e.privateKeyInfo();
+          if (password == null) {
+            out.write(PemEncoder.encode(key.getEncoded(), PemEncoder.PemLabel.PRIVATE_KEY));
+          } else {
+            EncryptedPrivateKeyInfo encKey = PKCS8Encryptor.encrypt(key, password);
+            out.write(PemEncoder.encode(encKey.getEncoded(),
+                PemEncoder.PemLabel.ENCRYPTED_PRIVATE_KEY));
+          }
+        }
+
+        for (Certificate cert : e.certs) {
+          out.write(PemEncoder.encode(cert.getEncoded(), PemEncoder.PemLabel.CERTIFICATE));
+        }
+      }
+    }
+
+    private static List<Certificate> fromJceCerts(java.security.cert.Certificate[] certs)
+        throws CertificateEncodingException {
+      List<Certificate> list = new ArrayList<>(certs == null ? 0 : certs.length);
+      if (certs != null) {
+        for (java.security.cert.Certificate cert : certs) {
+          list.add(Certificate.fromJceCert((X509Certificate) cert));
+        }
+      }
+      return list;
+    }
+
+    private static java.security.cert.Certificate[] toJceCerts(List<Certificate> certs)
+        throws CertificateEncodingException {
+      if (certs.isEmpty()) {
+        return null;
+      }
+
+      java.security.cert.Certificate[] jceCerts = new java.security.cert.Certificate[certs.size()];
+      for (int i = 0; i < jceCerts.length; i++) {
+        jceCerts[i] = new JceX509Certificate(certs.get(i));
+      }
+      return jceCerts;
     }
   }
 

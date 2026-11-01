@@ -29,7 +29,6 @@ import org.xipki.codec.exception.InvalidConfException;
 import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -42,16 +41,14 @@ import java.util.Map;
  */
 public class ScepSignerTest {
 
-  private static final SecureRandom RND = new SecureRandom();
-
   private static KeyPair signKp;
 
   private static KeyPair encKp;
 
   @BeforeClass
   public static void init() throws Exception {
-    signKp = KeyUtil.generateKeyPair(KeySpec.RSA2048, RND);
-    encKp = KeyUtil.generateKeyPair(KeySpec.RSA2048, RND);
+    signKp = KeyUtil.generateKeyPair(KeySpec.RSA2048);
+    encKp = KeyUtil.generateKeyPair(KeySpec.RSA2048);
   }
 
   @Test
@@ -138,7 +135,7 @@ public class ScepSignerTest {
 
   private static ConcurrentSigner signer(KeyPair kp, X509Cert cert) throws Exception {
     return new P12ContentSignerBuilder(new KeypairWithCert(kp.getPrivate(), new X509Cert[]{cert}))
-        .createSigner(SignAlgo.RSA_SHA256, 1, RND);
+        .createSigner(SignAlgo.RSA_SHA256, 1);
   }
 
   private static X509Cert cert(KeyPair kp, String subject, KeyUsage... usages) throws Exception {

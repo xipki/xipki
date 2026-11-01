@@ -13,6 +13,7 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
+import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.pkix.asn1.cmp.*;
 import org.xipki.pkix.asn1.cms.EnvelopedData;
 import org.xipki.codec.asn1.crypto.GCMParameters;
@@ -32,7 +33,6 @@ import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.CmpOIDs;
 import org.xipki.codec.asn1.oid.NistOIDs;
 import org.xipki.codec.asn1.oid.XipkiOIDs;
-import org.xipki.pkix.asn1.util.ContentVerifierProvider;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
 import org.xipki.pkix.asn1.x509.CRLReason;
@@ -55,7 +55,6 @@ import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.cmp.CmpException;
 import org.xipki.pkix.cmp.CmpUtf8Pairs;
 import org.xipki.pkix.cmp.CmpUtil;
 import org.xipki.pkix.cmp.ProtectedPKIMessage;
@@ -63,13 +62,13 @@ import org.xipki.pkix.cmp.ProtectionResult;
 import org.xipki.pkix.cmp.ProtectionVerificationResult;
 import org.xipki.pkix.cmp.VerifiedPkiMessage;
 import org.xipki.pkix.cms.CmsEnvelopedData;
-import org.xipki.pkix.cms.CmsException;
 import org.xipki.pkix.cms.CmsRecipient;
 import org.xipki.crypto.core.KemEncapKey;
 import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.http.HttpRespContent;
@@ -79,6 +78,7 @@ import org.xipki.util.misc.DateUtil;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -136,7 +136,7 @@ class CmpAgent {
 
   protected final SecurityFactory securityFactory;
 
-  private final Random random = new Random();
+  private final Random random = RandomUtil.random();
 
   private final Responder pbmMacResponder;
 
@@ -194,7 +194,7 @@ class CmpAgent {
       ConcurrentSigner signer = ((Requestor.SignatureCmpRequestor) requestor).signer();
       try {
         return CmpUtil.addProtection(request, signer, requestor.name(), sendRequestorCert);
-      } catch (CmpException | NoIdleSignerException ex) {
+      } catch (PkixException | NoIdleSignerException ex) {
         throw new CmpClientException("could not sign the request", ex);
       }
     } else {
@@ -203,7 +203,7 @@ class CmpAgent {
       try {
         return CmpUtil.addProtection(request, pbmRequestor.password(),
             pbmRequestor.parameter(), requestor.name(), pbmRequestor.senderKID());
-      } catch (CmpException ex) {
+      } catch (PkixException ex) {
         throw new CmpClientException("could not sign the request", ex);
       }
     }
@@ -227,7 +227,7 @@ class CmpAgent {
       try {
         ret.setProtectionVerificationResult(
             verifyProtection(requestor, responder, Hex.encode(tid.getOctets()), response));
-      } catch (InvalidKeyException | CmpException ex) {
+      } catch (InvalidKeyException | PkixException ex) {
         throw new CmpClientException(ex.getMessage(), ex);
       }
     } else {
@@ -378,7 +378,7 @@ class CmpAgent {
 
   private ProtectionVerificationResult verifyProtection(
       Requestor requestor, Responder responder, String tid, PKIMessage pkiMessage)
-      throws CmpException, InvalidKeyException {
+      throws PkixException, InvalidKeyException {
     ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
@@ -1106,7 +1106,7 @@ class CmpAgent {
         }
       }
       throw new GeneralSecurityException("found no password recipient");
-    } catch (CmsException ex) {
+    } catch (PkixException ex) {
       throw new GeneralSecurityException(ex.getMessage(), ex);
     }
   }
@@ -1183,7 +1183,7 @@ class CmpAgent {
       }
 
       return recipient.decrypt(decKey);
-    } catch (CmsException ex) {
+    } catch (PkixException ex) {
       throw new GeneralSecurityException(ex.getMessage(), ex);
     }
   }

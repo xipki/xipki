@@ -8,10 +8,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.util.misc.ConfigurableProperties;
 import org.xipki.util.datasource.DataAccessException.Reason;
 import org.xipki.util.misc.LruCache;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.Closeable;
 import java.io.PrintWriter;
@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.xipki.codec.util.Args.notBlank;
-import static org.xipki.pkix.util.misc.StringUtil.concat;
-import static org.xipki.pkix.util.misc.StringUtil.concatObjectsCap;
-import static org.xipki.pkix.util.misc.StringUtil.isBlank;
-import static org.xipki.pkix.util.misc.StringUtil.startsWithIgnoreCase;
+import static org.xipki.codec.util.StringUtil.concat;
+import static org.xipki.codec.util.StringUtil.concatObjectsCap;
+import static org.xipki.codec.util.StringUtil.isBlank;
+import static org.xipki.codec.util.StringUtil.startsWithIgnoreCase;
 
 /**
  * Data Source Wrapper.

@@ -14,6 +14,7 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
 import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.ca.api.TripleState;
@@ -119,14 +120,14 @@ public class ExtensionConfBuilder {
   }
 
   public static ExtensionValueConf.KeyUsage createKeyUsage(
-      org.xipki.pkix.cert.KeyUsage[] requiredUsages,
-      org.xipki.pkix.cert.KeyUsage[] optionalUsages, List<KeySpec> keySpecs) {
-    List<org.xipki.pkix.cert.KeyUsage> reqSignUsages = new ArrayList<>();
-    List<org.xipki.pkix.cert.KeyUsage> reqEncUsages = new ArrayList<>();
-    List<org.xipki.pkix.cert.KeyUsage> reqKAUsages = new ArrayList<>();
+      KeyUsage[] requiredUsages,
+      KeyUsage[] optionalUsages, List<KeySpec> keySpecs) {
+    List<KeyUsage> reqSignUsages = new ArrayList<>();
+    List<KeyUsage> reqEncUsages = new ArrayList<>();
+    List<KeyUsage> reqKAUsages = new ArrayList<>();
 
     if (requiredUsages != null) {
-      for (org.xipki.pkix.cert.KeyUsage usage : requiredUsages) {
+      for (KeyUsage usage : requiredUsages) {
         if (isSignUsage(usage)) {
           reqSignUsages.add(usage);
         } else if (isEncUsage(usage)){
@@ -137,12 +138,12 @@ public class ExtensionConfBuilder {
       }
     }
 
-    List<org.xipki.pkix.cert.KeyUsage> optSignUsages = new ArrayList<>();
-    List<org.xipki.pkix.cert.KeyUsage> optEncUsages = new ArrayList<>();
-    List<org.xipki.pkix.cert.KeyUsage> optKAUsages = new ArrayList<>();
+    List<KeyUsage> optSignUsages = new ArrayList<>();
+    List<KeyUsage> optEncUsages = new ArrayList<>();
+    List<KeyUsage> optKAUsages = new ArrayList<>();
 
     if (optionalUsages != null) {
-      for (org.xipki.pkix.cert.KeyUsage usage : optionalUsages) {
+      for (KeyUsage usage : optionalUsages) {
         if (isSignUsage(usage)) {
           optSignUsages.add(usage);
         } else if (isEncUsage(usage)){
@@ -189,11 +190,11 @@ public class ExtensionConfBuilder {
     }
 
     if (!signEncKeySpecs.isEmpty()) {
-      List<org.xipki.pkix.cert.KeyUsage> reqUsages = new ArrayList<>();
+      List<KeyUsage> reqUsages = new ArrayList<>();
       reqUsages.addAll(reqEncUsages);
       reqUsages.addAll(reqSignUsages);
 
-      List<org.xipki.pkix.cert.KeyUsage> optUsages = new ArrayList<>();
+      List<KeyUsage> optUsages = new ArrayList<>();
       optUsages.addAll(optEncUsages);
       optUsages.addAll(optSignUsages);
 
@@ -201,11 +202,11 @@ public class ExtensionConfBuilder {
     }
 
     if (!encKaKeySpecs.isEmpty()) {
-      List<org.xipki.pkix.cert.KeyUsage> reqUsages = new ArrayList<>();
+      List<KeyUsage> reqUsages = new ArrayList<>();
       reqUsages.addAll(reqEncUsages);
       reqUsages.addAll(reqKAUsages);
 
-      List<org.xipki.pkix.cert.KeyUsage> optUsages = new ArrayList<>();
+      List<KeyUsage> optUsages = new ArrayList<>();
       optUsages.addAll(optEncUsages);
       optUsages.addAll(optKAUsages);
 
@@ -213,12 +214,12 @@ public class ExtensionConfBuilder {
     }
 
     if (!allKeySpecs.isEmpty()) {
-      List<org.xipki.pkix.cert.KeyUsage> reqUsages = new ArrayList<>();
+      List<KeyUsage> reqUsages = new ArrayList<>();
       reqUsages.addAll(reqEncUsages);
       reqUsages.addAll(reqSignUsages);
       reqUsages.addAll(reqKAUsages);
 
-      List<org.xipki.pkix.cert.KeyUsage> optUsages = new ArrayList<>();
+      List<KeyUsage> optUsages = new ArrayList<>();
       optUsages.addAll(optEncUsages);
       optUsages.addAll(optSignUsages);
       optUsages.addAll(optKAUsages);
@@ -273,7 +274,7 @@ public class ExtensionConfBuilder {
     return new ExtensionValueConf.KeyUsage(list);
   } // method createKeyUsage
 
-  private static boolean isSignUsage(org.xipki.pkix.cert.KeyUsage usage) {
+  private static boolean isSignUsage(KeyUsage usage) {
     switch (usage) {
       case digitalSignature:
       case contentCommitment:
@@ -285,7 +286,7 @@ public class ExtensionConfBuilder {
     }
   }
 
-  private static boolean isEncUsage(org.xipki.pkix.cert.KeyUsage usage) {
+  private static boolean isEncUsage(KeyUsage usage) {
     switch (usage) {
       case dataEncipherment:
       case decipherOnly:
@@ -297,8 +298,8 @@ public class ExtensionConfBuilder {
     }
   }
 
-  private static boolean isKAUsage(org.xipki.pkix.cert.KeyUsage usage) {
-    return usage == org.xipki.pkix.cert.KeyUsage.keyAgreement;
+  private static boolean isKAUsage(KeyUsage usage) {
+    return usage == KeyUsage.keyAgreement;
   }
 
   public static ExtensionValueConf.AuthorityInfoAccess createAuthorityInfoAccess() {

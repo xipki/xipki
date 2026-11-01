@@ -4,23 +4,23 @@
 package org.xipki.shell.qa;
 
 import org.xipki.codec.Hex;
+import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.KeySpec;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.Securities;
+import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
+import org.xipki.pkix.pkcs11.P11Module;
+import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.qa.security.P11KeypairGenSpeed;
 import org.xipki.qa.security.P11SignSpeed;
 import org.xipki.qa.security.P12KeypairGenSpeed;
 import org.xipki.qa.security.P12SignSpeed;
-import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.Securities;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
-import org.xipki.pkix.pkcs11.P11Module;
-import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.shell.Completion;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.security.SecurityRuntime;
 import org.xipki.shell.xi.Completers;
 import org.xipki.shell.xi.XiShellBaseCommand;
-import org.xipki.util.benchmark.BenchmarkExecutor;
-import org.xipki.pkix.util.misc.StringUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -40,7 +40,7 @@ public class QaSecurityCommands {
     @Option(names = "--thread", description = "number of threads")
     private Integer numThreads = 5;
 
-    protected abstract BenchmarkExecutor getTester() throws Exception;
+    protected abstract SpeedExecutor getTester() throws Exception;
 
     protected Securities securities() throws Exception {
       return SecurityRuntime.get();
@@ -95,8 +95,8 @@ public class QaSecurityCommands {
     private String keyspec;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
-      return new P12KeypairGenSpeed(getQaKeySpec(keyspec), securities().securityFactory());
+    protected SpeedExecutor getTester() throws Exception {
+      return new P12KeypairGenSpeed(getQaKeySpec(keyspec));
     }
   }
 
@@ -113,7 +113,7 @@ public class QaSecurityCommands {
     private String signAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected SpeedExecutor getTester() throws Exception {
       SignAlgo jSignAlgo = getQaSignAlgo(signAlgo);
       KeySpec jKeySpec = getQaKeySpec(keyspec, jSignAlgo);
       return new P12SignSpeed(securities().securityFactory(), jSignAlgo, jKeySpec, getNumThreads());
@@ -129,7 +129,7 @@ public class QaSecurityCommands {
     private String keyspec;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected SpeedExecutor getTester() throws Exception {
       return new P11KeypairGenSpeed(getSlot(), getQaKeySpec(keyspec));
     }
 
@@ -152,7 +152,7 @@ public class QaSecurityCommands {
     private String signAlgo;
 
     @Override
-    protected BenchmarkExecutor getTester() throws Exception {
+    protected SpeedExecutor getTester() throws Exception {
       SignAlgo jSignAlgo = getQaSignAlgo(signAlgo);
       KeySpec jKeySpec = getQaKeySpec(keyspec, jSignAlgo);
       return new P11SignSpeed(

@@ -4,13 +4,13 @@
 package org.xipki.shell.security;
 
 import org.xipki.codec.util.Args;
-import org.xipki.shell.Completion;
-import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.password.OBFPasswordService;
 import org.xipki.pkix.util.password.PBEPasswordService;
 import org.xipki.pkix.util.password.Passwords;
+import org.xipki.shell.Completion;
+import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

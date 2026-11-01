@@ -35,17 +35,16 @@
     </developer>
   </developers>
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <skipDeploy>false</skipDeploy>
     <xicrypto.version>7.0.0-SNAPSHOT</xicrypto.version>
     <xipkix.version>7.0.0-SNAPSHOT</xipkix.version>
     <xishell.version>7.0.0-SNAPSHOT</xishell.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <skipDeploy>false</skipDeploy>
-    <dnsjava.version>3.6.5</dnsjava.version>
     <hikaricp.version>7.1.0</hikaricp.version>
     <jakarta.servlet.version>5.0.0</jakarta.servlet.version>
     <jline.version>4.4.8</jline.version>
     <picocli.version>4.7.7</picocli.version>
-    <slf4j.version>2.0.18</slf4j.version>
+    <slf4j.version>2.0.20</slf4j.version>
 
     <!-- only for runtime -->
     <!--log4j.version>2.25.3</log4j.version-->
@@ -285,11 +284,6 @@
         <groupId>jakarta.servlet</groupId>
         <artifactId>jakarta.servlet-api</artifactId>
         <version>${jakarta.servlet.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>dnsjava</groupId>
-        <artifactId>dnsjava</artifactId>
-        <version>${dnsjava.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mariadb.jdbc</groupId>

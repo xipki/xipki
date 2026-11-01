@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
 import org.xipki.pkix.asn1.ocsp.CertID;
 import org.xipki.pkix.asn1.ocsp.OCSPRequest;
@@ -27,12 +28,12 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.pkix.exception.OCSPException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
@@ -45,7 +46,7 @@ import org.xipki.util.http.ReqRespDebug.ReqRespPair;
 import org.xipki.pkix.util.conf.FileOrBinary;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class HttpOcspRequestor implements OcspRequestor {
 
   private String confFile = "xipki/etc/ocsp-client.json";
 
-  private final SecureRandom random = new SecureRandom();
+  private final SecureRandom random = RandomUtil.random();
 
   private final AtomicBoolean initFinished = new AtomicBoolean(false);
 
@@ -500,7 +501,7 @@ public class HttpOcspRequestor implements OcspRequestor {
         try {
           signer0 = signer.borrowSigner();
         } catch (NoIdleSignerException ex) {
-          throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage());
+          throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage(), ex);
         }
 
         try {
@@ -511,7 +512,9 @@ public class HttpOcspRequestor implements OcspRequestor {
       } else {
         return reqBuilder.build();
       } // end if
-    } catch (OCSPException ex) {
+    } catch (OcspRequestorException ex) {
+      throw ex;
+    } catch (PkixException ex) {
       throw new OcspRequestorException(ex.getMessage(), ex);
     }
   } // method buildRequest

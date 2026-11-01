@@ -10,9 +10,6 @@ package org.xipki.ocsp.api;
  */
 public class OcspStoreException extends Exception {
 
-  public OcspStoreException() {
-  }
-
   public OcspStoreException(String message) {
     super(message);
   }

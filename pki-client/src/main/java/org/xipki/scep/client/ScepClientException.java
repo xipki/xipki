@@ -3,12 +3,14 @@
 
 package org.xipki.scep.client;
 
+import org.xipki.pkix.exception.PkixException;
+
 /**
  * SCEP Client Exception type.
  *
  * @author Lijun Liao (xipki)
  */
-public class ScepClientException extends Exception {
+public class ScepClientException extends PkixException {
 
   public ScepClientException(String message, Throwable cause) {
     super(message, cause);
@@ -20,17 +22,6 @@ public class ScepClientException extends Exception {
 
   public ScepClientException(Throwable cause) {
     super(cause.getMessage(), cause);
-  }
-
-  /**
-   * Operation Not Supported Exception type.
-   */
-  public static class OperationNotSupportedException extends ScepClientException {
-
-    public OperationNotSupportedException(String message) {
-      super(message);
-    }
-
   }
 
 }

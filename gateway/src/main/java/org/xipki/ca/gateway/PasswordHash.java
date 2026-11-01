@@ -4,10 +4,10 @@
 package org.xipki.ca.gateway;
 
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.pkix.util.misc.RandomUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

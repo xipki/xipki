@@ -3,7 +3,6 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.NameId;
@@ -12,7 +11,8 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
-import org.xipki.pkix.exception.OperationException;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;

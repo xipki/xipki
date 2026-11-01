@@ -9,15 +9,15 @@ import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.util.datasource.SqlUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.IOException;
 import java.nio.file.Paths;

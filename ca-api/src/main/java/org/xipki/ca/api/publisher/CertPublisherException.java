@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2026 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.publisher;
 
 /**
  * Cert Publisher Exception type.

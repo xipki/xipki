@@ -12,7 +12,6 @@
     "BRAINPOOLP256R1",
     "BRAINPOOLP384R1",
     "BRAINPOOLP512R1",
-    "FRP256V1",
     "P256",
     "P384",
     "P521",

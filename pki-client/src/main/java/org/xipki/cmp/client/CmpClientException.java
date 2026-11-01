@@ -3,12 +3,14 @@
 
 package org.xipki.cmp.client;
 
+import org.xipki.pkix.exception.PkixException;
+
 /**
  * CMP Client Exception type.
  *
  * @author Lijun Liao (xipki)
  */
-public class CmpClientException extends Exception {
+public class CmpClientException extends PkixException {
 
   public CmpClientException(String message) {
     super(message);

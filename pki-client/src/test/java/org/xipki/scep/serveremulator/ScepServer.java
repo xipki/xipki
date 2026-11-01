@@ -16,7 +16,6 @@ import org.xipki.pkix.util.KeyUtil;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -86,14 +85,12 @@ public class ScepServer {
     if (servlet != null) {
       return servlet;
     }
-
-    SecureRandom rnd = KeyUtil.random();
     X500Name rcaSubject;
-    KeyPair keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+    KeyPair keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
     PrivateKey rcaKey = keypair.getPrivate();
     rcaSubject = new X500Name("CN=RCA1, OU=emulator, O=myorg.org, C=DE");
 
-    keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+    keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
 
     SubjectPublicKeyInfo pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
     X500Name subject = new X500Name("CN=CA1, OU=emulator, O=myorg.org, C=DE");
@@ -103,7 +100,7 @@ public class ScepServer {
 
     RaEmulator ra = null;
     if (withRa) {
-      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
       subject = new X500Name("CN=RA1, OU=emulator, O=myorg.org, C=DE");
@@ -112,7 +109,7 @@ public class ScepServer {
         this.raCert = ca.generateCert(pkInfo, subject, notBefore,
             new KeyUsage(KeyUsage.digitalSignature));
 
-        KeyPair encKeypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+        KeyPair encKeypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
         this.raEncCert = ca.generateCert(
             MyUtil.createSubjectPublicKeyInfo(encKeypair.getPublic()),
             new X500Name("CN=RA1-ENC, OU=emulator, O=myorg.org, C=DE"), notBefore,
@@ -128,7 +125,7 @@ public class ScepServer {
 
     NextCaAndRa nextCaAndRa = null;
     if (withNextCa) {
-      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+      keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
 
       pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
       subject = new X500Name("CN=CA2, OU=emulator, O=myorg.org, C=DE");
@@ -139,7 +136,7 @@ public class ScepServer {
       CaEmulator tmpCa = new CaEmulator(keypair.getPrivate(), this.nextCaCert, generateCrl);
 
       if (withRa) {
-        keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048, rnd);
+        keypair = KeyUtil.generateKeyPair(KeySpec.RSA2048);
         pkInfo = MyUtil.createSubjectPublicKeyInfo(keypair.getPublic());
 
         subject = new X500Name("CN=RA2, OU=emulator, O=myorg.org, C=DE");

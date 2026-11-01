@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
@@ -24,7 +25,6 @@ import org.xipki.util.datasource.DataAccessException;
 import org.xipki.util.datasource.DataSourceWrapper;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.io.File;
 import java.io.IOException;

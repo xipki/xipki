@@ -5,39 +5,39 @@ package org.xipki.shell.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.ca.api.TripleState;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ocsp.client.RequestOptions;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.IssuerHash;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.misc.RandomUtil;
 import org.xipki.qa.BigIntegerRange;
 import org.xipki.qa.FileBigIntegerIterator;
 import org.xipki.qa.RangeBigIntegerIterator;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ocsp.OcspBenchmark;
-import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.qa.ocsp.OcspQa;
 import org.xipki.qa.ocsp.OcspResponseOption;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.IssuerHash;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.X509Util;
+import org.xipki.qa.ocsp.OcspSpeed;
+import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.pki.client.PkiClientRuntime;
 import org.xipki.shell.xi.Completers;
-import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.shell.xi.XiShellBaseCommand;
-import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
-import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.pkix.util.misc.StringUtil;
-import org.xipki.ca.api.TripleState;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.util.misc.DateUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -622,9 +622,9 @@ class QaOcspCommands {
     }
   }
 
-  @Command(name = "benchmark-ocsp-status", description = "OCSP benchmark",
+  @Command(name = "speed-ocsp-status", description = "OCSP speed test",
       mixinStandardHelpOptions = true)
-  static class BenchmarkOcspStatusCommand extends XiShellBaseCommand {
+  static class SpeedOcspStatusCommand extends XiShellBaseCommand {
     @Option(names = {"--issuer", "-i"}, required = true, description = "issuer certificate file")
     @Completion(FilePathCompleter.class)
     private String issuerCertFile;
@@ -748,12 +748,12 @@ class QaOcspCommands {
 
         X509Cert issuerCert = X509Util.parseCert(new File(issuerCertFile));
         PkiClientRuntime.getOcspRequestor();
-        OcspBenchmark benchmark = new OcspBenchmark(
+        OcspSpeed speed = new OcspSpeed(
             issuerCert, serverUrl, options, serialNumberIterator, maxRequests, description);
-        benchmark.setDuration(duration).setThreads(numThreads).execute();
+        speed.setDuration(duration).setThreads(numThreads).execute();
       } catch (Exception ex) {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
-            : new RuntimeException("could not run OCSP benchmark: " + ex.getMessage(), ex);
+            : new RuntimeException("could not run OCSP speed test: " + ex.getMessage(), ex);
       } finally {
         if (serialNumberIterator instanceof FileBigIntegerIterator) {
           ((FileBigIntegerIterator) serialNumberIterator).close();

@@ -5,7 +5,10 @@ package org.xipki.ca.gateway.scep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.pkix.asn1.cms.SignedData;
@@ -31,16 +34,14 @@ import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsAlgorithm;
-import org.xipki.pkix.cms.CmsException;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.DecodedPkiMessage;
 import org.xipki.pkix.scep.message.PkiMessage;
@@ -62,20 +63,17 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.pkix.util.misc.LogUtil;
 import org.xipki.util.misc.EmbedCertsMode;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Optional;
 
-import static org.xipki.pkix.exception.ErrorCode.BAD_CERT_TEMPLATE;
-import static org.xipki.pkix.exception.ErrorCode.NOT_PERMITTED;
-import static org.xipki.pkix.exception.ErrorCode.PATH_NOT_FOUND;
-import static org.xipki.pkix.exception.ErrorCode.SYSTEM_FAILURE;
+import static org.xipki.ca.sdk.ErrorCode.BAD_CERT_TEMPLATE;
+import static org.xipki.ca.sdk.ErrorCode.NOT_PERMITTED;
+import static org.xipki.ca.sdk.ErrorCode.PATH_NOT_FOUND;
+import static org.xipki.ca.sdk.ErrorCode.SYSTEM_FAILURE;
 
 /**
  * SCEP Responder.
@@ -108,7 +106,7 @@ public class ScepResponder {
     private final FailInfo failInfo;
 
     private FailInfoException(FailInfo failInfo) {
-      super(Args.notNull(failInfo, "failInfo").name());
+      super(Args.notNull(failInfo, "failInfo").name(), null, false, false);
       this.failInfo = failInfo;
     }
 
@@ -154,8 +152,9 @@ public class ScepResponder {
 
     // CACaps
     CaCaps caps = new CaCaps();
+    // AES only: DES3 (DESede) is not offered
     caps.addCapabilities(CaCapability.SCEPStandard, CaCapability.AES,
-        CaCapability.DES3, CaCapability.POSTPKIOperation, CaCapability.Renewal,
+        CaCapability.POSTPKIOperation, CaCapability.Renewal,
         CaCapability.SHA1, CaCapability.SHA256, CaCapability.SHA512);
     this.caCaps = caps;
     this.signers = signers;
@@ -378,9 +377,9 @@ public class ScepResponder {
         CmsSignedData degenerateSignedData = cmsSignedDataGen.build();
         return degenerateSignedData.getEncoded();
       } catch (CodecException ex) {
-        throw new CmsException("could not build CMS SignedDta");
+        throw new PkixException("could not build CMS SignedDta");
       }
-    } catch (CmsException ex) {
+    } catch (PkixException ex) {
       throw new OperationException(SYSTEM_FAILURE, ex.getMessage());
     }
   }
@@ -474,19 +473,10 @@ public class ScepResponder {
       return fail(rep, FailInfo.badAlg);
     }
 
-    // check the content encryption algorithm
+    // check the content encryption algorithm: AES-128-CBC only (no DES3), the response is
+    // encrypted with the same algorithm
     Asn1Oid encOid = req.contentEncryptionAlgorithm();
-    if (CmsAlgorithm.DES_EDE3_CBC.equals(encOid)) {
-      if (!caCaps.supportsDES3()) {
-        LOG.warn("tid={}: encryption with DES3 algorithm {} is not permitted", tid, encOid);
-        return fail(rep, FailInfo.badAlg);
-      }
-    } else if (CmsAlgorithm.AES128_CBC.equals(encOid)) {
-      if (!caCaps.supportsAES()) {
-        LOG.warn("tid={}: encryption with AES algorithm {} is not permitted", tid, encOid);
-        return fail(rep, FailInfo.badAlg);
-      }
-    } else {
+    if (!CmsAlgorithm.AES128_CBC.equals(encOid)) {
       LOG.warn("tid={}: encryption with algorithm {} is not permitted", tid, encOid);
       return fail(rep, FailInfo.badAlg);
     }
@@ -626,28 +616,11 @@ public class ScepResponder {
           PollCertRequest.Entry template = new PollCertRequest.Entry(null,
               new X500NameType(is.getSubject()));
 
-          // RFC 8894 section 3.3.3: CertPoll is signed with the same key as the original
-          // request. Accept it if signed by a known requestor, or if the polled certificate
-          // has the same public key as the signature certificate.
-          X509Cert reqSignatureCert = req.signatureCert();
-          Requestor.CertRequestor pollRequestor = getRequestor(reqSignatureCert);
-          if (pollRequestor != null) {
-            checkUserPermission(pollRequestor, caName, certprofileName);
-          }
-
           PollCertRequest sdkReq = new PollCertRequest(null,
               new X500NameType(is.getIssuer()), null,
               req.transactionId().id(), new PollCertRequest.Entry[]{template});
 
-          EnrollOrPollCertsResponse pollResp = sdk.pollCerts(sdkReq);
-          byte[] cert = extractCert(pollResp);
-          if (pollRequestor == null && !samePublicKey(reqSignatureCert, cert)) {
-            LOG.warn("tid={}: CertPoll is neither signed by a known requestor nor with the key " +
-                "of the polled certificate", tid);
-            throw FailInfoException.BAD_REQUEST;
-          }
-
-          signedData = buildSignedData(cert, pollResp.extraCerts());
+          signedData = buildSignedData(sdk.pollCerts(sdkReq));
           break;
         }
         case GetCert: {
@@ -664,7 +637,7 @@ public class ScepResponder {
               "\"" + X509Util.x500NameText(isn.getName()) + "\"");
 
           audit(event, CaAuditConstants.NAME_serial, LogUtil.formatCsn(serial));
-          signedData = getCert(caName, isn.getName(), serial, req.signatureCert(), tid);
+          signedData = getCert(caName, isn.getName(), serial);
           break;
         }
         case GetCRL: {
@@ -698,70 +671,13 @@ public class ScepResponder {
     }
   } // method servicePkiOperation0
 
-  /**
-   * GetCert is permitted if signed by a known requestor, or by a certificate issued by this CA
-   * with the same subject as the requested certificate.
-   */
-  private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber,
-                             X509Cert reqSignatureCert, String tid)
+  private SignedData getCert(String caName, X500Name issuer, BigInteger serialNumber)
       throws FailInfoException, OperationException, SdkErrorResponseException {
-    boolean knownRequestor = getRequestor(reqSignatureCert) != null;
-    if (!knownRequestor && !isIssuedByCa(caName, reqSignatureCert)) {
-      LOG.warn("tid={}: GetCert is neither signed by a known requestor nor by a certificate " +
-          "issued by CA {}", tid, caName);
-      throw FailInfoException.BAD_REQUEST;
-    }
-
     byte[] encodedCert = Optional.ofNullable(sdk.getCert(caName, issuer, serialNumber))
         .orElseThrow(() -> FailInfoException.BAD_CERTID);
 
-    if (!knownRequestor && !reqSignatureCert.subject().equals(parseCert(encodedCert).subject())) {
-      LOG.warn("tid={}: subject of the requested certificate differs from that of the " +
-          "signature certificate", tid);
-      throw FailInfoException.BAD_REQUEST;
-    }
-
     return buildSignedData(encodedCert, null);
   } // method getCert
-
-  private boolean isIssuedByCa(String caName, X509Cert cert)
-      throws OperationException, SdkErrorResponseException {
-    byte[] encodedCaCert = sdk.cacert(caName);
-    if (encodedCaCert == null) {
-      throw new OperationException(PATH_NOT_FOUND, "unknown CA " + caName);
-    }
-
-    X509Cert caCert = parseCert(encodedCaCert);
-    if (!caCert.subject().equals(cert.issuer())) {
-      return false;
-    }
-
-    Instant now = Instant.now();
-    if (now.isBefore(cert.notBefore()) || now.isAfter(cert.notAfter())) {
-      return false;
-    }
-
-    try {
-      cert.verify(caCert.publicKey());
-      return true;
-    } catch (GeneralSecurityException ex) {
-      return false;
-    }
-  } // method isIssuedByCa
-
-  private static boolean samePublicKey(X509Cert cert, byte[] encodedCert)
-      throws OperationException {
-    return Arrays.equals(cert.subjectPublicKeyInfo().getEncoded(),
-        parseCert(encodedCert).subjectPublicKeyInfo().getEncoded());
-  }
-
-  private static X509Cert parseCert(byte[] encodedCert) throws OperationException {
-    try {
-      return new X509Cert(Certificate.fromEncoded(encodedCert));
-    } catch (CodecException ex) {
-      throw new OperationException(SYSTEM_FAILURE, "could not parse certificate");
-    }
-  }
 
   private SignedData buildSignedData(EnrollOrPollCertsResponse sdkResp) throws OperationException {
     return buildSignedData(extractCert(sdkResp), sdkResp.extraCerts());
@@ -810,7 +726,7 @@ public class ScepResponder {
 
       CmsSignedData csd = cmsSignedDataGen.build();
       return csd.getSignedData();
-    } catch (CmsException | CodecException ex) {
+    } catch (PkixException | CodecException ex) {
       LogUtil.error(LOG, ex);
       throw new OperationException(SYSTEM_FAILURE, ex);
     }
@@ -833,7 +749,7 @@ public class ScepResponder {
       cmsSignedDataGen.addCRL(CertificateList.fromEncoded(crl));
       CmsSignedData signedData = cmsSignedDataGen.build();
       return signedData.getSignedData();
-    } catch (CmsException | CodecException ex) {
+    } catch (PkixException | CodecException ex) {
       LogUtil.error(LOG, ex, "could not generate CMSSignedData");
       throw new OperationException(SYSTEM_FAILURE, ex);
     }

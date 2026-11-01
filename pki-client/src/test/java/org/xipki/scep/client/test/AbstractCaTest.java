@@ -39,13 +39,13 @@ import java.util.List;
 
 public abstract class AbstractCaTest {
 
-  private final String secret = "preshared-secret";
+  protected final String secret = "preshared-secret";
 
-  private final int port = 8081;
+  protected final int port = 8081;
 
   private ScepServerContainer scepServerContainer;
 
-  private ScepServer scepServer;
+  protected ScepServer scepServer;
 
   protected abstract CaCapability[] getExcludedCaCaps();
 

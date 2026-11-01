@@ -24,11 +24,14 @@ import org.xipki.ca.gateway.scep.ScepHttpServlet;
 import org.xipki.ca.gateway.scep.ScepProtocolConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
+import org.xipki.codec.util.ReflectiveUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.Securities;
 import org.xipki.pkix.auth.RequestorAuthenticator;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.audit.Audits;
@@ -38,10 +41,8 @@ import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.ReflectiveUtil;
 import org.xipki.pkix.util.io.XipkiIoUtil;
 import org.xipki.pkix.util.io.XipkiBaseDir;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -409,7 +410,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     }
 
     return securities.securityFactory().createSigner(signerConf.type(),
-            new org.xipki.pkix.sign.SignerConf(signerConf.conf()),
+            new SignerConf(signerConf.conf()),
             X509Util.parseCerts(signerConf.certs()).toArray(new X509Cert[0]));
   }
 

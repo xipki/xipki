@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -297,7 +296,6 @@ public class P12Commands {
       throws IOException, PasswordResolverException {
     char[] pwd = SecurityCommands.resolveP12Password(passwordHint);
     KeystoreGenerationParameters params = new KeystoreGenerationParameters(pwd);
-    params.setRandom(new SecureRandom());
     if (unsigned != null) {
       params.setUnsigned(unsigned);
     }

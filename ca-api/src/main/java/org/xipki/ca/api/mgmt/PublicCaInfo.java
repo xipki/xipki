@@ -1,7 +1,7 @@
 // Copyright (c) 2013-2026 xipki. All rights reserved.
 // License Apache License 2.0
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.mgmt;
 
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.GeneralNames;

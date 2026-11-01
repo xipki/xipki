@@ -6,7 +6,7 @@ package org.xipki.ca.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.NameId;
-import org.xipki.ca.api.PublicCaInfo;
+import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
@@ -16,22 +16,23 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.codec.util.Args;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.exception.ErrorCode;
-import org.xipki.pkix.exception.OperationException;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.codec.ConfPairs;
+import org.xipki.pkix.util.conf.Validity;
 import org.xipki.pkix.util.misc.CollectionUtil;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.pkix.util.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -336,7 +337,7 @@ public class CaInfo {
     private final SecureRandom random;
 
     private RandomSerialNumberGenerator() {
-      this.random = new SecureRandom();
+      this.random = RandomUtil.random();
     }
 
     /**

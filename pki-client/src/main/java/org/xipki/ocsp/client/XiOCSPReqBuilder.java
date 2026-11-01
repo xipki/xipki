@@ -5,17 +5,17 @@ package org.xipki.ocsp.client;
 
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.pkix.asn1.ocsp.CertID;
 import org.xipki.pkix.asn1.ocsp.OCSPRequest;
 import org.xipki.pkix.asn1.ocsp.Request;
 import org.xipki.pkix.asn1.ocsp.Signature;
 import org.xipki.pkix.asn1.ocsp.TBSRequest;
-import org.xipki.pkix.asn1.util.ContentSigner;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.exception.OCSPException;
+import org.xipki.pkix.exception.PkixException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -93,7 +93,7 @@ public class XiOCSPReqBuilder {
   }
 
   private OCSPRequest generateRequest(ContentSigner contentSigner, Certificate[] chain)
-      throws OCSPException {
+      throws PkixException {
     Iterator<RequestObject> it = list.iterator();
 
     List<Request> requests = new LinkedList<>();
@@ -102,7 +102,7 @@ public class XiOCSPReqBuilder {
       try {
         requests.add(it.next().toRequest());
       } catch (Exception ex) {
-        throw new OCSPException("exception creating Request", ex);
+        throw new PkixException("exception creating Request", ex);
       }
     }
 
@@ -113,14 +113,14 @@ public class XiOCSPReqBuilder {
 
     if (contentSigner != null) {
       if (requestorName == null) {
-        throw new OCSPException("requestorName must be specified if request is signed.");
+        throw new PkixException("requestorName must be specified if request is signed.");
       }
 
       byte[] sigValue;
       try {
         sigValue = contentSigner.atomicSign(tbsReq.getEncoded());
       } catch (Exception ex) {
-        throw new OCSPException("exception processing TBSRequest: " + ex, ex);
+        throw new PkixException("exception processing TBSRequest: " + ex, ex);
       }
 
       Asn1BitString bitSig = new Asn1BitString(sigValue);
@@ -141,14 +141,14 @@ public class XiOCSPReqBuilder {
    * Generate an unsigned request.
    *
    * @return the OCSPRequest
-   * @throws OCSPException
+   * @throws PkixException
    *           If OCSP request cannot be built.
    */
-  public OCSPRequest build() throws OCSPException {
+  public OCSPRequest build() throws PkixException {
     return generateRequest(null, null);
   }
 
-  public OCSPRequest build(ContentSigner signer, Certificate[] chain) throws OCSPException {
+  public OCSPRequest build(ContentSigner signer, Certificate[] chain) throws PkixException {
     if (signer == null) {
       throw new IllegalArgumentException("no signer specified");
     }

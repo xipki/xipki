@@ -3,14 +3,14 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.codec.util.Args;
+import org.xipki.codec.ConfPairs;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.codec.ConfPairs;
-import org.xipki.pkix.util.conf.Validity;
 import org.xipki.pkix.util.conf.Validity.Unit;
-import org.xipki.pkix.util.misc.StringUtil;
+import org.xipki.pkix.util.conf.Validity;
 
 /**
  * Revoke Suspended Control settings.

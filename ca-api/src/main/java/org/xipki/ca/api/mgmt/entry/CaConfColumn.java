@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.CaUris;
+import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.Permissions;

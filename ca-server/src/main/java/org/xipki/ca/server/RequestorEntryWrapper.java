@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.StringUtil;
 
 import java.security.cert.CertificateException;
 
