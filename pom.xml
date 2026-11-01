@@ -55,7 +55,7 @@
     <!-- Only for test purpose -->
     <bcprov.version>2.73.13</bcprov.version>
     <bc-fips.version>2.1.3</bc-fips.version>
-    <bcpqc-fips.version>2.1.0</bcpqc-fips.version>
+    <bcpqc-fips.version>2.1.1</bcpqc-fips.version>
     <junit.version>4.13.2</junit.version>
 
     <!-- plugin versions -->
