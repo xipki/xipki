@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.CborDecoder;

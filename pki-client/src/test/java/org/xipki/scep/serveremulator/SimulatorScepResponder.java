@@ -5,12 +5,12 @@ package org.xipki.scep.serveremulator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cms.ContentInfo;
-import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.scep.IssuerAndSubject;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.asn1.cms.ContentInfo;
+import org.xipki.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.scep.IssuerAndSubject;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.util.Args;

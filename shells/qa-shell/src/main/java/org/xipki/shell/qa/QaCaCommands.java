@@ -3,9 +3,9 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaProfileEntry;

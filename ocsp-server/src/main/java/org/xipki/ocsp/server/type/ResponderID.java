@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 
 /**
  * Responder ID.
@@ -17,12 +17,12 @@ public class ResponderID extends ASN1Type {
   private final int encodedLength;
 
   public ResponderID(byte[] key) {
-    this.encoded = org.xipki.pkix.asn1.ocsp.ResponderID.ofByKey(key).getEncoded();
+    this.encoded = org.xipki.asn1.ocsp.ResponderID.ofByKey(key).getEncoded();
     this.encodedLength = encoded.length;
   }
 
   public ResponderID(X500Name name) {
-    this.encoded = org.xipki.pkix.asn1.ocsp.ResponderID.ofByName(name).getEncoded();
+    this.encoded = org.xipki.asn1.ocsp.ResponderID.ofByName(name).getEncoded();
     this.encodedLength = encoded.length;
   }
 

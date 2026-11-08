@@ -5,8 +5,8 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.TBSCertificate;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.TBSCertificate;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.codec.Base64;

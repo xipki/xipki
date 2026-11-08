@@ -5,11 +5,11 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.pkix.asn1.x509.*;
+import org.xipki.asn1.x509.*;
 import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;

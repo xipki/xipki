@@ -5,10 +5,10 @@ package org.xipki.ocsp.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.ocsp.OCSPRequest;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.ocsp.OCSPRequest;
+import org.xipki.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;

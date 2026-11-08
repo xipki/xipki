@@ -3,11 +3,11 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.xipki.pkix.asn1.ocsp.OCSPRequest;
-import org.xipki.pkix.asn1.ocsp.Request;
-import org.xipki.pkix.asn1.ocsp.TBSRequest;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.ocsp.OCSPRequest;
+import org.xipki.asn1.ocsp.Request;
+import org.xipki.asn1.ocsp.TBSRequest;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.ocsp.api.RequestIssuer;
 
@@ -213,7 +213,7 @@ public class OcspRequest {
     List<CertID> requestList = new ArrayList<>(n);
     for (int i = 0; i < n; i++) {
       Request singleReq0 = requestList0.get(i);
-      org.xipki.pkix.asn1.ocsp.CertID certId0 = singleReq0.getReqCert();
+      org.xipki.asn1.ocsp.CertID certId0 = singleReq0.getReqCert();
       ByteArrayOutputStream out = new ByteArrayOutputStream();
 
       try {

@@ -3,14 +3,14 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.AccessDescription;
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
-import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.PolicyInformation;
-import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
+import org.xipki.asn1.x500.RDN;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.AccessDescription;
+import org.xipki.asn1.x509.CertificatePolicies;
+import org.xipki.asn1.x509.ExtendedKeyUsage;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.PolicyInformation;
+import org.xipki.asn1.x509.SubjectInfoAccessSyntax;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.Certprofile;
@@ -257,7 +257,7 @@ public class CertprofileUtil {
       return;
     }
 
-    org.xipki.pkix.asn1.x509.KeyUsage reqX509 = extension.getKeyUsage();
+    org.xipki.asn1.x509.KeyUsage reqX509 = extension.getKeyUsage();
     for (KeySingleUsage k : usageOccs) {
       if (k.isRequired()) {
         continue;

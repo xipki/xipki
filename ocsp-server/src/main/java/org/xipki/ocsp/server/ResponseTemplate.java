@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.pkix.asn1.ocsp.CertHash;
+import org.xipki.asn1.ocsp.CertHash;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.ExtendedExtension;
@@ -44,8 +44,8 @@ class ResponseTemplate {
 
       AlgorithmIdentifier algId = h.algorithmIdentifier();
       CertHash certHash = new CertHash(algId, new byte[hlen]);
-      org.xipki.pkix.asn1.x509.Extension extn =
-          org.xipki.pkix.asn1.x509.Extension.ofCertHash(false, certHash);
+      org.xipki.asn1.x509.Extension extn =
+          org.xipki.asn1.x509.Extension.ofCertHash(false, certHash);
       byte[] encoded = extn.getEncoded();
       byte[] prefix = Arrays.copyOf(encoded, encoded.length - hlen);
       extnCerthashPrefixMap.put(h, prefix);

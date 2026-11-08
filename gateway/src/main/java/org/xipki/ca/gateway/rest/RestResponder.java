@@ -5,11 +5,11 @@ package org.xipki.ca.gateway.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.Base64;

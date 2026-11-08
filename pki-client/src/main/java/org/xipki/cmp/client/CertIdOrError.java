@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.pkix.asn1.crmf.CertId;
+import org.xipki.asn1.crmf.CertId;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cmp.PkiStatusInfo;
 

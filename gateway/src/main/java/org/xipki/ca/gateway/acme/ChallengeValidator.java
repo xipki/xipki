@@ -5,8 +5,8 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.asn1.x509.GeneralName;
+import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.MiscOIDs;

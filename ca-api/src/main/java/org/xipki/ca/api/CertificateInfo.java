@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.CertRevocationInfo;

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;

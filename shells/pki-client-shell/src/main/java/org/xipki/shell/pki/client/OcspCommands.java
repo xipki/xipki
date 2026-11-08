@@ -3,17 +3,17 @@
 
 package org.xipki.shell.pki.client;
 
-import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
-import org.xipki.pkix.asn1.ocsp.OcspCertStatus;
-import org.xipki.pkix.asn1.ocsp.RevokedInfo;
-import org.xipki.pkix.asn1.ocsp.SingleResponse;
-import org.xipki.pkix.asn1.x509.AccessDescription;
-import org.xipki.pkix.asn1.x509.AuthorityInfoAccessSyntax;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.asn1.ocsp.OcspCertStatus;
+import org.xipki.asn1.ocsp.RevokedInfo;
+import org.xipki.asn1.ocsp.SingleResponse;
+import org.xipki.asn1.x509.AccessDescription;
+import org.xipki.asn1.x509.AuthorityInfoAccessSyntax;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.X509OIDs;
 import org.xipki.codec.util.IoUtil;

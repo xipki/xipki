@@ -3,9 +3,9 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.pkix.asn1.cmp.PBMParameter;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.cmp.PBMParameter;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;

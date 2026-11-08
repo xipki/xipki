@@ -5,11 +5,11 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cert.CtLog.SignedCertificateTimestampList;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.cert.CtLog.SignedCertificateTimestampList;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;

@@ -3,16 +3,16 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
-import org.xipki.pkix.asn1.x509.CRLDistributionPoints;
-import org.xipki.pkix.asn1.x509.CRLReason;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.asn1.x509.GeneralNames;
-import org.xipki.pkix.asn1.x509.IssuingDistributionPoint;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.AuthorityKeyIdentifier;
+import org.xipki.asn1.x509.CRLDistributionPoints;
+import org.xipki.asn1.x509.CRLReason;
+import org.xipki.asn1.x509.CertificateList;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extensions;
+import org.xipki.asn1.x509.GeneralName;
+import org.xipki.asn1.x509.GeneralNames;
+import org.xipki.asn1.x509.IssuingDistributionPoint;
 import org.xipki.util.conf.HourMinute;
 import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;

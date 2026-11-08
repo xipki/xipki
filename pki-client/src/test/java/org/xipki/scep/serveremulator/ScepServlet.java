@@ -6,7 +6,7 @@ package org.xipki.scep.serveremulator;
 import com.sun.net.httpserver.HttpExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.asn1.cms.ContentInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;

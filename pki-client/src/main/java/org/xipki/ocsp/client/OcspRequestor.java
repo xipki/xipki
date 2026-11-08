@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponse;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.http.ReqRespDebug;
 

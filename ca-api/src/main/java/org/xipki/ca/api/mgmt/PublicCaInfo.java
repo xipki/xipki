@@ -3,8 +3,8 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.util.misc.NameId;

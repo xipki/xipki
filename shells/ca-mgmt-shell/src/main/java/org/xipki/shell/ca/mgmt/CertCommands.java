@@ -3,8 +3,8 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;

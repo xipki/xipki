@@ -29,6 +29,11 @@
     <!-- For all components -->
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>pkix-protocol</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ca-sdk</artifactId>
       <version>${project.version}</version>
     </dependency>

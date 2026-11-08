@@ -3,8 +3,8 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KemEncapKey;
 import org.xipki.pkix.cert.X509Cert;

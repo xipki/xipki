@@ -3,10 +3,10 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.pkix.asn1.cert.MicrosoftCertificateTemplate;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.*;
-import org.xipki.pkix.asn1.x509.GeneralSubtree;
+import org.xipki.asn1.cert.MicrosoftCertificateTemplate;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.*;
+import org.xipki.asn1.x509.GeneralSubtree;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1BmpString;
 import org.xipki.codec.asn1.Asn1OctetString;
@@ -1004,7 +1004,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       return mappings;
     }
 
-    public org.xipki.pkix.asn1.x509.PolicyMappings toPolicyMappings() {
+    public org.xipki.asn1.x509.PolicyMappings toPolicyMappings() {
       List<PolicyMapping> tMappings = new ArrayList<>(mappings.size());
 
       for (PolicyIdMappingType mapping : mappings) {
@@ -1012,7 +1012,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
             mapping.issuerDomainPolicy().oid(), mapping.subjectDomainPolicy().oid()));
       }
 
-      return new org.xipki.pkix.asn1.x509.PolicyMappings(tMappings);
+      return new org.xipki.asn1.x509.PolicyMappings(tMappings);
     }
 
     @Override
@@ -1152,11 +1152,11 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       return excludedSubtrees;
     }
 
-    public org.xipki.pkix.asn1.x509.NameConstraints toNameConstraints() {
+    public org.xipki.asn1.x509.NameConstraints toNameConstraints() {
       GeneralSubtrees permitted = buildX509GeneralSubtrees(permittedSubtrees);
       GeneralSubtrees excluded  = buildX509GeneralSubtrees(excludedSubtrees);
       return (permitted == null && excluded == null) ? null
-          : new org.xipki.pkix.asn1.x509.NameConstraints(permitted, excluded);
+          : new org.xipki.asn1.x509.NameConstraints(permitted, excluded);
     }
 
     private static GeneralSubtrees buildX509GeneralSubtrees(List<GeneralSubtreeType> subtrees) {
@@ -1275,7 +1275,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       return certificatePolicyInformations;
     }
 
-    public org.xipki.pkix.asn1.x509.CertificatePolicies toCertificatePolicies()
+    public org.xipki.asn1.x509.CertificatePolicies toCertificatePolicies()
         throws CodecException {
       List<CertificatePolicyInformation> policyInfos = toPolicyInfos();
 
@@ -1294,7 +1294,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
             : new PolicyInformation(policyOid.oid(), policyQualifiers);
       }
 
-      return new org.xipki.pkix.asn1.x509.CertificatePolicies(infos);
+      return new org.xipki.asn1.x509.CertificatePolicies(infos);
     } // method toX509CertificatePolicies
 
     private  static PolicyQualifierInfo.Seq1 createX509PolicyQualifiers(

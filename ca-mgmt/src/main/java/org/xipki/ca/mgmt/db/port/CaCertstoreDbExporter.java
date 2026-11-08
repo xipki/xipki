@@ -5,7 +5,7 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.json.JsonBuilder;

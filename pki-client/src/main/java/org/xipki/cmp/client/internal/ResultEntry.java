@@ -3,11 +3,11 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.xipki.pkix.asn1.cmp.CMPCertificate;
-import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
-import org.xipki.pkix.asn1.cmp.PKIStatus;
-import org.xipki.pkix.asn1.crmf.CertId;
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.cmp.CMPCertificate;
+import org.xipki.asn1.cmp.PKIFailureInfo;
+import org.xipki.asn1.cmp.PKIStatus;
+import org.xipki.asn1.crmf.CertId;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.cmp.client.IdentifiedObject;
 import org.xipki.codec.util.Args;

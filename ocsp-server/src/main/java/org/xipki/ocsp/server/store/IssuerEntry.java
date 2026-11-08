@@ -5,7 +5,7 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;

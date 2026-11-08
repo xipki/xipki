@@ -3,15 +3,15 @@
 
 package org.xipki.scep.client.test;
 
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.x500.DirectoryString;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Attribute;
-import org.xipki.pkix.asn1.x509.BasicConstraints;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.x500.DirectoryString;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Attribute;
+import org.xipki.asn1.x509.BasicConstraints;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extensions;
+import org.xipki.asn1.x509.KeyUsage;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;

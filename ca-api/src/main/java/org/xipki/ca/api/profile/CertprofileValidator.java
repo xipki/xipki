@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.asn1.x509.CertificatePolicies;
 import org.xipki.codec.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;

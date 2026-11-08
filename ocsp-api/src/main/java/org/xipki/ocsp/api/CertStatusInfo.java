@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.api;
 
-import org.xipki.pkix.asn1.ocsp.CrlID;
+import org.xipki.asn1.ocsp.CrlID;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.CertRevocationInfo;

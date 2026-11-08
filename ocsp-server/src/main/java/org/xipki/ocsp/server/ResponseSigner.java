@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.oid.AlgorithmOIDs;

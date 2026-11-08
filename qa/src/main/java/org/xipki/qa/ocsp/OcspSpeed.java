@@ -5,9 +5,9 @@ package org.xipki.qa.ocsp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.ocsp.client.HttpOcspRequestor;

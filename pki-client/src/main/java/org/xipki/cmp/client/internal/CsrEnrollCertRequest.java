@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.cmp.client.IdentifiedObject;
 import org.xipki.codec.util.Args;
 

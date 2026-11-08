@@ -3,9 +3,9 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
-import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.CertificatePolicies;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;

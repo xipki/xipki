@@ -3,9 +3,9 @@
 
 package org.xipki.qa.ca;
 
-import org.xipki.pkix.asn1.x500.AttributeTypeAndValue;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.AttributeTypeAndValue;
+import org.xipki.asn1.x500.RDN;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.StringType;

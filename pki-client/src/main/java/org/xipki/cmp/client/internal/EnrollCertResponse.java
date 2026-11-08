@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client.internal;
 
-import org.xipki.pkix.asn1.cmp.CMPCertificate;
+import org.xipki.asn1.cmp.CMPCertificate;
 import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;

@@ -5,15 +5,15 @@ package org.xipki.qa.ca;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cert.CtLog;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.*;
-import org.xipki.pkix.asn1.x509.qualified.Iso4217CurrencyCode;
-import org.xipki.pkix.asn1.x509.qualified.MonetaryValue;
-import org.xipki.pkix.asn1.x509.qualified.PdsLocation;
-import org.xipki.pkix.asn1.x509.qualified.PdsLocations;
-import org.xipki.pkix.asn1.x509.qualified.QCStatement;
-import org.xipki.pkix.asn1.x509.qualified.QCStatements;
+import org.xipki.asn1.cert.CtLog;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.*;
+import org.xipki.asn1.x509.qualified.Iso4217CurrencyCode;
+import org.xipki.asn1.x509.qualified.MonetaryValue;
+import org.xipki.asn1.x509.qualified.PdsLocation;
+import org.xipki.asn1.x509.qualified.PdsLocations;
+import org.xipki.asn1.x509.qualified.QCStatement;
+import org.xipki.asn1.x509.qualified.QCStatements;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ProfileUtil;
@@ -427,7 +427,7 @@ class X509ExtensionChecker {
         && CollectionUtil.isNotEmpty(optionalKeyusage)) {
       Extension extension = getExtension(requestedExtns, ExtensionOIDs.keyUsage);
       if (extension != null) {
-        org.xipki.pkix.asn1.x509.KeyUsage reqKeyUsage = extension.getKeyUsage();
+        org.xipki.asn1.x509.KeyUsage reqKeyUsage = extension.getKeyUsage();
         for (KeySingleUsage k : optionalKeyusage) {
           if (reqKeyUsage.hasFlag(k.keyUsage().asn1())) {
             expectedUsages.add(k.keyUsage().getName());
@@ -1243,9 +1243,9 @@ class X509ExtensionChecker {
 
   static Set<String> getKeyUsage(byte[] extensionValue) {
     Set<String> usages = new HashSet<>();
-    org.xipki.pkix.asn1.x509.KeyUsage reqKeyUsage;
+    org.xipki.asn1.x509.KeyUsage reqKeyUsage;
     try {
-      reqKeyUsage = org.xipki.pkix.asn1.x509.KeyUsage.fromEncoded(extensionValue);
+      reqKeyUsage = org.xipki.asn1.x509.KeyUsage.fromEncoded(extensionValue);
     } catch (CodecException e) {
       throw new RuntimeException("could not parse key usage");
     }

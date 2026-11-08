@@ -5,9 +5,9 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Extension;
+import org.xipki.asn1.x509.Extensions;
 import org.xipki.codec.asn1.AbstractAsn1Time;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1Integer;

@@ -3,19 +3,19 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
-import org.xipki.pkix.asn1.ocsp.CertHash;
-import org.xipki.pkix.asn1.ocsp.CertID;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
-import org.xipki.pkix.asn1.ocsp.OcspCertStatus;
-import org.xipki.pkix.asn1.ocsp.ResponderID;
-import org.xipki.pkix.asn1.ocsp.RevokedInfo;
-import org.xipki.pkix.asn1.ocsp.SingleResponse;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.CRLReason;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.asn1.ocsp.BasicOCSPResponse;
+import org.xipki.asn1.ocsp.CertHash;
+import org.xipki.asn1.ocsp.CertID;
+import org.xipki.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.asn1.ocsp.OcspCertStatus;
+import org.xipki.asn1.ocsp.ResponderID;
+import org.xipki.asn1.ocsp.RevokedInfo;
+import org.xipki.asn1.ocsp.SingleResponse;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.CRLReason;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.codec.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;

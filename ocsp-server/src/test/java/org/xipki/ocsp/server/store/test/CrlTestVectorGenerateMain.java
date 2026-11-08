@@ -3,10 +3,10 @@
 
 package org.xipki.ocsp.server.store.test;
 
-import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
-import org.xipki.pkix.asn1.x509.CRLReason;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.asn1.x509.AuthorityKeyIdentifier;
+import org.xipki.asn1.x509.CRLReason;
+import org.xipki.asn1.x509.CertificateList;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.pkix.Securities;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;

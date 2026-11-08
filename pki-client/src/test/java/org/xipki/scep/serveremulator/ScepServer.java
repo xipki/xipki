@@ -3,8 +3,8 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.KeyUsage;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.util.KeyUtil;

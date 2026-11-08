@@ -4,9 +4,9 @@
 package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
-import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
-import org.xipki.pkix.asn1.crmf.DhSigStatic;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.asn1.crmf.DhSigStatic;
+import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Oid;

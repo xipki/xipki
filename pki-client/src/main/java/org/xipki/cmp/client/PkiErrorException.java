@@ -3,9 +3,9 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
-import org.xipki.pkix.asn1.cmp.PKIStatus;
-import org.xipki.pkix.asn1.cmp.PKIStatusInfo;
+import org.xipki.asn1.cmp.PKIFailureInfo;
+import org.xipki.asn1.cmp.PKIStatus;
+import org.xipki.asn1.cmp.PKIStatusInfo;
 import org.xipki.pkix.cmp.CmpUtil;
 import org.xipki.pkix.cmp.PkiStatusInfo;
 

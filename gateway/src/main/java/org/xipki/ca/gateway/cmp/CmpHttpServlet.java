@@ -5,7 +5,7 @@ package org.xipki.ca.gateway.cmp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cmp.PKIMessage;
+import org.xipki.asn1.cmp.PKIMessage;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.sdk.CaAuditConstants;

@@ -5,7 +5,7 @@ package org.xipki.ocsp.server.type.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.pkix.asn1.ocsp.OCSPRequest;
+import org.xipki.asn1.ocsp.OCSPRequest;
 import org.xipki.codec.Hex;
 import org.xipki.ocsp.server.type.EncodingException;
 import org.xipki.ocsp.server.type.ExtendedExtension;

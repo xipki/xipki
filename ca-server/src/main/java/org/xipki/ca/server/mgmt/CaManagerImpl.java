@@ -5,7 +5,7 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
 import org.xipki.util.misc.NameId;

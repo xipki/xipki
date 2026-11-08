@@ -3,12 +3,12 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Attribute;
-import org.xipki.pkix.asn1.x509.EDIPartyName;
-import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.asn1.x509.OtherName;
+import org.xipki.asn1.x500.RDN;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Attribute;
+import org.xipki.asn1.x509.EDIPartyName;
+import org.xipki.asn1.x509.GeneralName;
+import org.xipki.asn1.x509.OtherName;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;

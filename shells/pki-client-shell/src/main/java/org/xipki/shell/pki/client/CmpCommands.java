@@ -3,19 +3,19 @@
 
 package org.xipki.shell.pki.client;
 
-import org.xipki.pkix.asn1.cmp.Controls;
-import org.xipki.pkix.asn1.crmf.CertId;
-import org.xipki.pkix.asn1.crmf.CertRequest;
-import org.xipki.pkix.asn1.crmf.CertTemplate;
-import org.xipki.pkix.asn1.crmf.OptionalValidity;
-import org.xipki.pkix.asn1.crmf.POPOSigningKey;
-import org.xipki.pkix.asn1.crmf.ProofOfPossession;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.x500.AttributeTypeAndValue;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.cmp.Controls;
+import org.xipki.asn1.crmf.CertId;
+import org.xipki.asn1.crmf.CertRequest;
+import org.xipki.asn1.crmf.CertTemplate;
+import org.xipki.asn1.crmf.OptionalValidity;
+import org.xipki.asn1.crmf.POPOSigningKey;
+import org.xipki.asn1.crmf.ProofOfPossession;
+import org.xipki.asn1.pkcs10.CertificationRequest;
+import org.xipki.asn1.x500.AttributeTypeAndValue;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.CertificateList;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.cmp.client.CertIdOrError;
 import org.xipki.cmp.client.CmpClient;
 import org.xipki.cmp.client.EnrollCertRequest;

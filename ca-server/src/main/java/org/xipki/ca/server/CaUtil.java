@@ -3,8 +3,8 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.RDN;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -21,7 +21,7 @@ import org.xipki.codec.asn1.oid.X509OIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.asn1.x509.*;
+import org.xipki.asn1.x509.*;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;

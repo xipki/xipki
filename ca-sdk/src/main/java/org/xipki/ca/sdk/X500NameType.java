@@ -3,7 +3,7 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.cbor.CborType;

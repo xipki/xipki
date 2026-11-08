@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.util.Args;
 
 import java.math.BigInteger;

@@ -3,15 +3,15 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.pkix.asn1.ocsp.CertID;
-import org.xipki.pkix.asn1.ocsp.OCSPRequest;
-import org.xipki.pkix.asn1.ocsp.Request;
-import org.xipki.pkix.asn1.ocsp.Signature;
-import org.xipki.pkix.asn1.ocsp.TBSRequest;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.ocsp.CertID;
+import org.xipki.asn1.ocsp.OCSPRequest;
+import org.xipki.asn1.ocsp.Request;
+import org.xipki.asn1.ocsp.Signature;
+import org.xipki.asn1.ocsp.TBSRequest;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extensions;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.crypto.ContentSigner;

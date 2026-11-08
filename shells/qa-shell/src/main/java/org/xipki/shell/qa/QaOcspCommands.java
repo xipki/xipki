@@ -5,7 +5,7 @@ package org.xipki.shell.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.asn1.ocsp.OCSPResponse;
 import org.xipki.codec.TripleState;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;

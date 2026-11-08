@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.pkix.asn1.x509.qualified.Iso4217CurrencyCode;
+import org.xipki.asn1.x509.qualified.Iso4217CurrencyCode;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.codec.util.Args;
 
