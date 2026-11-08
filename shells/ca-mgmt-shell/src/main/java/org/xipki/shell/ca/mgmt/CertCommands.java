@@ -3,6 +3,8 @@
 
 package org.xipki.shell.ca.mgmt;
 
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
@@ -14,20 +16,18 @@ import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
-import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.PKCS8Encryptor;
+import org.xipki.pkix.util.X509KeyUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.PemEncoder;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
+import org.xipki.util.misc.PemEncoder;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -414,7 +414,7 @@ public class CertCommands {
       PrivateKeyInfo privKeyInfo = PrivateKeyInfo.fromEncoded(pair.key());
       if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
         Certificate cert = Certificate.fromEncoded(pair.cert());
-        Pkcs12KeyStore p12Ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, keyPwd);
+        Pkcs12KeyStore p12Ks = X509KeyUtil.loadPKCS12KeyStore((byte[]) null, keyPwd);
         p12Ks.setKeyEntry("main", privKeyInfo, cert);
         byte[] ksBytes;
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {

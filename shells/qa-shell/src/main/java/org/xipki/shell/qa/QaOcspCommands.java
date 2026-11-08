@@ -5,20 +5,20 @@ package org.xipki.shell.qa;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.TripleState;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.codec.TripleState;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ocsp.client.RequestOptions;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.IssuerHash;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.RandomUtil;
 import org.xipki.qa.BigIntegerRange;
 import org.xipki.qa.FileBigIntegerIterator;
 import org.xipki.qa.RangeBigIntegerIterator;
@@ -391,7 +391,7 @@ class QaOcspCommands {
       responseOption.setNonceOccurrence(expectedNonceOccurrence);
       responseOption.setRespIssuer(respIssuer);
       if (StringUtil.isNotBlank(sigAlgo)) {
-        responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+        responseOption.setSignatureAlg(SignAlgo.ofName(sigAlgo));
       }
       if (StringUtil.isNotBlank(certhashAlg)) {
         responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
@@ -547,7 +547,7 @@ class QaOcspCommands {
         if (CollectionUtil.isNotEmpty(prefSigAlgs)) {
           SignAlgo[] algos = new SignAlgo[prefSigAlgs.size()];
           for (int i = 0; i < algos.length; i++) {
-            algos[i] = SignAlgo.getInstance(prefSigAlgs.get(i));
+            algos[i] = SignAlgo.ofName(prefSigAlgs.get(i));
           }
           options.setPreferredSignatureAlgorithms(algos);
         }
@@ -591,7 +591,7 @@ class QaOcspCommands {
           responseOption.setNonceOccurrence(TripleState.valueOf(nonceOccurrenceText));
           responseOption.setRespIssuer(respIssuer);
           if (StringUtil.isNotBlank(sigAlgo)) {
-            responseOption.setSignatureAlg(SignAlgo.getInstance(sigAlgo));
+            responseOption.setSignatureAlg(SignAlgo.ofName(sigAlgo));
           }
           if (StringUtil.isNotBlank(certhashAlg)) {
             responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
@@ -737,7 +737,7 @@ class QaOcspCommands {
         if (CollectionUtil.isNotEmpty(prefSigAlgs)) {
           SignAlgo[] algos = new SignAlgo[prefSigAlgs.size()];
           for (int i = 0; i < algos.length; i++) {
-            algos[i] = SignAlgo.getInstance(prefSigAlgs.get(i));
+            algos[i] = SignAlgo.ofName(prefSigAlgs.get(i));
           }
           options.setPreferredSignatureAlgorithms(algos);
         }

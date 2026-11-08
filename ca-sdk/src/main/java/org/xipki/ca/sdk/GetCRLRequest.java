@@ -52,6 +52,16 @@ public class GetCRLRequest extends SdkRequest {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "crlNumber", crlNumber);
+    appendField(buf, indentLevel, "thisUpdate", thisUpdate);
+    appendField(buf, indentLevel, "crlDp", crlDp);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(3).writeLongObj(crlNumber)
         .writeInstant(thisUpdate).writeTextString(crlDp);

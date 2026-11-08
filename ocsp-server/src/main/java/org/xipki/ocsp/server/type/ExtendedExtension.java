@@ -9,7 +9,7 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CompareUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -79,17 +79,22 @@ public class ExtendedExtension extends Extension {
   public static ExtendedExtension getInstance(byte[] encoded, int from, int len)
       throws EncodingException {
     Header hdrExtn = OcspRequest.readHeader(encoded, from);
-    Header hdrOid = OcspRequest.readHeader(encoded, hdrExtn.readerIndex);
-    Header hdrNext = OcspRequest.readHeader(encoded, hdrOid.readerIndex + hdrOid.len);
+    final int end = hdrExtn.end();
+    Header hdrOid = OcspRequest.readHeader(encoded, hdrExtn.readerIndex, end, (byte) 0x06);
+    Header hdrNext = OcspRequest.readHeader(encoded, hdrOid.end(), end);
     Header hdrExtValue;
 
     boolean critical;
     if (hdrNext.tag == 0x01) { // critical
       critical = encoded[hdrNext.readerIndex] == (byte) 0xFF;
-      hdrExtValue = OcspRequest.readHeader(encoded, hdrNext.readerIndex + hdrNext.len);
+      hdrExtValue = OcspRequest.readHeader(encoded, hdrNext.end(), end);
     } else {
       critical = false;
       hdrExtValue = hdrNext;
+    }
+
+    if (hdrExtValue.tag != 0x04 || hdrExtValue.end() != end) {
+      throw new EncodingException("invalid extnValue");
     }
 
     OID extnType = OID.getInstanceForEncoded(encoded, hdrOid.tagIndex);
@@ -142,6 +147,21 @@ public class ExtendedExtension extends Extension {
 
   public int extnValueLength() {
     return extnValueLength;
+  }
+
+  /**
+   * Returns the length of the content of the OCTET STRING in the extnValue, e.g. of the nonce.
+   *
+   * @return the length of the content of the OCTET STRING.
+   * @throws EncodingException if the extnValue is not exactly one OCTET STRING.
+   */
+  public int octetStringLengthOfExtnValue() throws EncodingException {
+    final int end = extnValueFrom + extnValueLength;
+    Header hdr = OcspRequest.readHeader(encoded, extnValueFrom, end, (byte) 0x04);
+    if (hdr.end() != end) {
+      throw new EncodingException("trailing data after the OCTET STRING in extnValue");
+    }
+    return hdr.len;
   }
 
   public InputStream extnValueStream() {

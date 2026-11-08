@@ -21,7 +21,7 @@ public class RequestOptions {
 
   private boolean useNonce = true;
 
-  private int nonceLen = 8;
+  private int nonceLen = 32;
 
   private boolean allowNoNonceInResponse;
 

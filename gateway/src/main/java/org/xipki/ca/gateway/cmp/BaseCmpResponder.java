@@ -5,6 +5,19 @@ package org.xipki.ca.gateway.cmp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.cmp.*;
+import org.xipki.pkix.asn1.cms.EnvelopedData;
+import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.pkix.asn1.crmf.DhSigStatic;
+import org.xipki.pkix.asn1.crmf.EncryptedKey;
+import org.xipki.pkix.asn1.crmf.EncryptedValue;
+import org.xipki.pkix.asn1.crmf.POPOSigningKey;
+import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
@@ -13,15 +26,7 @@ import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.asn1.cmp.*;
-import org.xipki.pkix.asn1.cms.EnvelopedData;
 import org.xipki.codec.asn1.crypto.GCMParameters;
-import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
-import org.xipki.pkix.asn1.crmf.DhSigStatic;
-import org.xipki.pkix.asn1.crmf.EncryptedKey;
-import org.xipki.pkix.asn1.crmf.EncryptedValue;
-import org.xipki.pkix.asn1.crmf.POPOSigningKey;
-import org.xipki.pkix.asn1.crmf.ProofOfPossession;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.crypto.PBES2Parameters;
 import org.xipki.codec.asn1.crypto.PBKDF2Params;
@@ -32,11 +37,6 @@ import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.CmpOIDs;
 import org.xipki.codec.asn1.oid.PkcsOIDs;
 import org.xipki.codec.asn1.oid.XipkiOIDs;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
@@ -68,19 +68,19 @@ import org.xipki.crypto.core.KemEncapKey;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.KemHmacSignature;
-import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.util.exception.PkixException;
+import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.crypto.core.SecretKeyWithAlias;
 import org.xipki.pkix.verify.AlgorithmValidator;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.codec.exception.InsufficientPermissionException;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -585,7 +585,7 @@ public abstract class BaseCmpResponder {
 
       SignAlgo macAlg;
       try {
-        macAlg = SignAlgo.getInstance(parameter.getMac());
+        macAlg = SignAlgo.ofAlgorithmIdentifier(parameter.getMac());
       } catch (NoSuchAlgorithmException ex) {
         LogUtil.warn(LOG, ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -758,7 +758,7 @@ public abstract class BaseCmpResponder {
     POPOSigningKey popSign = pop.getSignature();
     SignAlgo popAlg;
     try {
-      popAlg = SignAlgo.getInstance(popSign.getAlgorithmIdentifier());
+      popAlg = SignAlgo.ofAlgorithmIdentifier(popSign.getAlgorithmIdentifier());
     } catch (NoSuchAlgorithmException ex) {
       LogUtil.error(LOG, ex, "Cannot parse POP signature algorithm");
       return false;

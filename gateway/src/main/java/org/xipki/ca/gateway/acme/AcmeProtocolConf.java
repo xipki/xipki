@@ -7,15 +7,12 @@ import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.acme.AcmeConf;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * ACME Protocol configuration.
@@ -24,15 +21,15 @@ import java.util.List;
  */
 public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
 
-  private final Acme acme;
+  private final AcmeConf.Acme acme;
 
   public AcmeProtocolConf(Boolean logReqResp, GatewayConf.PopControlConf pop,
-                          SdkClientConf sdkClient, Acme acme) {
+                          SdkClientConf sdkClient, AcmeConf.Acme acme) {
     super(logReqResp, pop, sdkClient);
     this.acme = Args.notNull(acme, "acme");
   }
 
-  public Acme acme() {
+  public AcmeConf.Acme acme() {
     return acme;
   }
 
@@ -44,7 +41,7 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
 
     GatewayConf.ProtocolConf pConf = GatewayConf.ProtocolConf.parse0(confJson);
 
-    Acme acme = Acme.parse(confJson);
+    AcmeConf.Acme acme = AcmeConf.Acme.parse(confJson);
     acme.validate();
 
     return new AcmeProtocolConf(pConf.logReqResp(), pConf.pop(), pConf.sdkClient(), acme);
@@ -58,335 +55,6 @@ public class AcmeProtocolConf extends GatewayConf.ProtocolConf {
     } catch (CodecException e) {
       throw new InvalidConfException("error parsing AcmeProtocolConf: " + e.getMessage(), e);
     }
-  }
-
-  /**
-   * CA profile definition.
-   */
-  public static class CaProfile {
-
-    private final List<String> keyTypes;
-
-    private final String ca;
-
-    private final String tlsProfile;
-
-    public CaProfile(List<String> keyTypes, String ca, String tlsProfile) {
-      this.keyTypes = keyTypes;
-      this.ca = Args.notBlank(ca, "ca");
-      this.tlsProfile = Args.notBlank(tlsProfile, "tlsProfile");
-    }
-
-    public List<String> keyTypes() {
-      return keyTypes;
-    }
-
-    public String ca() {
-      return ca;
-    }
-
-    public String tlsProfile() {
-      return tlsProfile;
-    }
-
-    public static CaProfile parse(JsonMap json) throws CodecException {
-      return new CaProfile(json.getStringList("keyTypes"),
-          json.getNnString("ca"), json.getNnString("tlsProfile"));
-    }
-
-  }
-
-  /**
-   * ACME configuration.
-   */
-  public static class Acme {
-
-    private int cacheSize = 1000;
-
-    private int nonceNumBytes = 16;
-
-    private int tokenNumBytes = 16;
-
-    private int syncDbSeconds = 60;
-
-    private String dbConf;
-
-    // optional. If not set, any valid email address will be accepted.
-    // You can specify to the class name implementing
-    // org.xipki.ca.gateway.acme.ContactVerifier
-    private String contactVerifier;
-
-    private String baseUrl;
-
-    private String termsOfService;
-
-    private String website;
-
-    private List<String> caaIdentities;
-
-    private boolean dnssecValidation;
-
-    private boolean allowPrivateChallengeTargets;
-
-    private List<String> dnsResolvers;
-
-    private String dnssecTrustAnchorsFile;
-
-    private CleanupOrderConf cleanupOrder;
-
-    private List<CaProfile> caProfiles;
-
-    private List<String> challengeTypes;
-
-    public String baseUrl() {
-      if (baseUrl != null) {
-        if (!baseUrl.endsWith("/")) {
-          baseUrl += "/";
-        }
-      }
-
-      return baseUrl;
-    }
-
-    public int syncDbSeconds() {
-      return syncDbSeconds;
-    }
-
-    public void setSyncDbSeconds(int syncDbSeconds) {
-      this.syncDbSeconds = syncDbSeconds;
-    }
-
-    public int cacheSize() {
-      return cacheSize;
-    }
-
-    public void setCacheSize(int cacheSize) {
-      this.cacheSize = cacheSize;
-    }
-
-    public String dbConf() {
-      return dbConf;
-    }
-
-    public void setDbConf(String dbConf) {
-      this.dbConf = dbConf;
-    }
-
-    public List<CaProfile> caProfiles() {
-      return caProfiles;
-    }
-
-    public void setCaProfiles(List<CaProfile> caProfiles) {
-      this.caProfiles = caProfiles;
-    }
-
-    public String contactVerifier() {
-      return contactVerifier;
-    }
-
-    public void setContactVerifier(String contactVerifier) {
-      this.contactVerifier = contactVerifier;
-    }
-
-    public int nonceNumBytes() {
-      return nonceNumBytes;
-    }
-
-    public int tokenNumBytes() {
-      return tokenNumBytes;
-    }
-
-    public CleanupOrderConf cleanupOrder() {
-      return cleanupOrder;
-    }
-
-    public void setCleanupOrder(CleanupOrderConf cleanupOrder) {
-      this.cleanupOrder = cleanupOrder;
-    }
-
-    public void setTokenNumBytes(int tokenNumBytes) {
-      this.tokenNumBytes = tokenNumBytes;
-    }
-
-    public void setNonceNumBytes(int nonceNumBytes) {
-      this.nonceNumBytes = nonceNumBytes;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-      this.baseUrl = baseUrl;
-    }
-
-    public String termsOfService() {
-      return termsOfService;
-    }
-
-    public void setTermsOfService(String termsOfService) {
-      this.termsOfService = termsOfService;
-    }
-
-    public String website() {
-      return website;
-    }
-
-    public void setWebsite(String website) {
-      this.website = website;
-    }
-
-    public List<String> caaIdentities() {
-      return caaIdentities;
-    }
-
-    public void setCaaIdentities(List<String> caaIdentities) {
-      this.caaIdentities = caaIdentities;
-    }
-
-    public boolean dnssecValidation() {
-      return dnssecValidation;
-    }
-
-    public void setDnssecValidation(boolean dnssecValidation) {
-      this.dnssecValidation = dnssecValidation;
-    }
-
-    public boolean allowPrivateChallengeTargets() {
-      return allowPrivateChallengeTargets;
-    }
-
-    public void setAllowPrivateChallengeTargets(boolean allowPrivateChallengeTargets) {
-      this.allowPrivateChallengeTargets = allowPrivateChallengeTargets;
-    }
-
-    public List<String> dnsResolvers() {
-      return dnsResolvers == null ? null : Collections.unmodifiableList(dnsResolvers);
-    }
-
-    public void setDnsResolvers(List<String> dnsResolvers) {
-      this.dnsResolvers = dnsResolvers == null ? null : new ArrayList<>(dnsResolvers);
-    }
-
-    public String dnssecTrustAnchorsFile() {
-      return dnssecTrustAnchorsFile;
-    }
-
-    public void setDnssecTrustAnchorsFile(String dnssecTrustAnchorsFile) {
-      this.dnssecTrustAnchorsFile = dnssecTrustAnchorsFile;
-    }
-
-    public List<String> challengeTypes() {
-      return challengeTypes;
-    }
-
-    public void setChallengeTypes(List<String> challengeTypes) {
-      this.challengeTypes = challengeTypes;
-    }
-
-    private void validate() throws InvalidConfException {
-      if ((syncDbSeconds < 1)) {
-        throw new InvalidConfException("syncDbSeconds must be not less than 1");
-      }
-
-      if (nonceNumBytes < 12) {
-        throw new InvalidConfException("nonceNumBytes must be not less than 12");
-      }
-
-      if (tokenNumBytes < 12) {
-        throw new InvalidConfException("tokenNumBytes must be not less than 12");
-      }
-
-      if (baseUrl == null || baseUrl.isEmpty()) {
-        throw new InvalidConfException("baseUrl must be present and not blank.");
-      }
-
-      if (caProfiles == null || caProfiles.isEmpty()) {
-        throw new InvalidConfException("profiles must be present and not empty.");
-      }
-
-      if (dnssecValidation
-          && (dnssecTrustAnchorsFile == null || dnssecTrustAnchorsFile.isBlank())) {
-        throw new InvalidConfException(
-            "dnssecTrustAnchorsFile must be specified if dnssecValidation is enabled");
-      }
-    }
-
-    public static Acme parse(JsonMap json) throws CodecException {
-      Acme ret = new Acme();
-      ret.setBaseUrl(json.getString("baseUrl"));
-      ret.setCaaIdentities(json.getStringList("caaIdentities"));
-      ret.setDbConf(json.getString("dbConf"));
-      Integer i = json.getInt("cacheSize");
-      if (i != null) {
-        ret.setCacheSize(i);
-      }
-
-      i = json.getInt("nonceNumBytes");
-      if (i != null) {
-        ret.setNonceNumBytes(i);
-      }
-
-      i = json.getInt("tokenNumBytes");
-      if (i != null) {
-        ret.setTokenNumBytes(i);
-      }
-
-      i = json.getInt("syncDbSeconds");
-      if (i != null) {
-        ret.setSyncDbSeconds(i);
-      }
-
-      ret.setContactVerifier(json.getString("contactVerifier"));
-      ret.setTermsOfService(json.getString("termsOfService"));
-      ret.setWebsite(json.getString("website"));
-      ret.setDnssecValidation(json.getBool("dnssecValidation", false));
-      ret.setAllowPrivateChallengeTargets(json.getBool("allowPrivateChallengeTargets", false));
-      ret.setDnsResolvers(json.getStringList("dnsResolvers"));
-      ret.setDnssecTrustAnchorsFile(json.getString("dnssecTrustAnchorsFile"));
-
-      JsonMap map = json.getMap("cleanupOrder");
-      if (map != null) {
-        ret.setCleanupOrder(CleanupOrderConf.parse(map));
-      }
-
-      JsonList list = json.getList("caProfiles");
-      if (list != null) {
-        List<CaProfile> caProfiles = new ArrayList<>(list.size());
-        for (JsonMap v : list.toMapList()) {
-          caProfiles.add(CaProfile.parse(v));
-        }
-        ret.setCaProfiles(caProfiles);
-      }
-
-      ret.setChallengeTypes(json.getStringList("challengeTypes"));
-      return ret;
-    }
-  }
-
-  /**
-   * Cleanup Order configuration.
-   */
-  public static class CleanupOrderConf {
-
-    private final int expiredCertDays;
-
-    private final int expiredOrderDays;
-
-    public CleanupOrderConf(int expiredCertDays, int expiredOrderDays) {
-      this.expiredCertDays = expiredCertDays;
-      this.expiredOrderDays = expiredOrderDays;
-    }
-
-    public int expiredCertDays() {
-      return expiredCertDays;
-    }
-
-    public int expiredOrderDays() {
-      return expiredOrderDays;
-    }
-
-    public static CleanupOrderConf parse(JsonMap json) throws CodecException {
-      return new CleanupOrderConf(json.getNnInt("expiredCertDays"),
-          json.getNnInt("expiredOrderDays"));
-    }
-
   }
 
 }

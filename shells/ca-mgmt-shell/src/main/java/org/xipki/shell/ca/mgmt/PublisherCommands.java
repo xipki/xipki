@@ -3,11 +3,11 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import picocli.CommandLine;

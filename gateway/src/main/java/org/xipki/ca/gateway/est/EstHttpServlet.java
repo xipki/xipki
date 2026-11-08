@@ -18,7 +18,7 @@ import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.IOException;
 

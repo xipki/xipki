@@ -11,9 +11,9 @@ import org.xipki.codec.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 
 import java.io.File;
 import java.io.IOException;

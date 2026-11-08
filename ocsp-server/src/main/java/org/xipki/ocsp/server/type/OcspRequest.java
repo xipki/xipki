@@ -3,12 +3,12 @@
 
 package org.xipki.ocsp.server.type;
 
-import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.pkix.asn1.ocsp.OCSPRequest;
 import org.xipki.pkix.asn1.ocsp.Request;
 import org.xipki.pkix.asn1.ocsp.TBSRequest;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.ocsp.api.RequestIssuer;
 
 import java.io.ByteArrayOutputStream;
@@ -40,12 +40,23 @@ public class OcspRequest {
       this.readerIndex = readerIndex;
     }
 
+    int end() {
+      return readerIndex + len;
+    }
+
     @Override
     public String toString() {
       return "tag=0x" + Integer.toHexString(0xFF & tag) + ", len=" + len
           + ", tagIndex=" + tagIndex + ", readerIndex=" + readerIndex;
     }
   }
+
+  private static final byte TAG_INTEGER = 0x02;
+  private static final byte TAG_OCTET_STRING = 0x04;
+  private static final byte TAG_SEQUENCE = 0x30;
+  private static final byte TAG_CTX_0 = (byte) 0xA0;
+  private static final byte TAG_CTX_1 = (byte) 0xA1;
+  private static final byte TAG_CTX_2 = (byte) 0xA2;
 
   private final int version;
 
@@ -70,102 +81,124 @@ public class OcspRequest {
 
   private static OcspRequest getInstance0(byte[] request) throws EncodingException {
     // OCSPRequest
-    Header hdr = readHeader(request, 0);
+    Header hdrReq = readHeader(request, 0, request.length, TAG_SEQUENCE);
+    if (hdrReq.end() != request.length) {
+      throw new EncodingException("trailing data after OCSPRequest");
+    }
+
     // tbsRequest
-    Header hdrTbs = readHeader(request, hdr.readerIndex);
+    Header hdrTbs = readHeader(request, hdrReq.readerIndex, hdrReq.end(), TAG_SEQUENCE);
+    final int tbsEnd = hdrTbs.end();
+
+    // optionalSignature
+    if (tbsEnd < hdrReq.end()) {
+      Header hdrSig = readHeader(request, tbsEnd, hdrReq.end(), TAG_CTX_0);
+      if (hdrSig.end() != hdrReq.end()) {
+        throw new EncodingException("trailing data after optionalSignature");
+      }
+    }
 
     int version = 0;
 
     // First element of the tbsRequest
-    hdr = readHeader(request, hdrTbs.readerIndex);
-    boolean tagged = (hdr.tag & 0x80) != 0;
-    int tag = hdr.tag & 0x1F;
-
-    if (tagged) {
-      if (tag == 0) {
-        Header hdr0 = readHeader(request, hdr.readerIndex);
-        if (hdr0.len == 1) {
-          version = 0xFF & request[hdr0.readerIndex];
-        } else {
-          throw new EncodingException("version too large");
-        }
+    Header hdr = readHeader(request, hdrTbs.readerIndex, tbsEnd);
+    if (hdr.tag == TAG_CTX_0) {
+      Header hdr0 = readHeader(request, hdr.readerIndex, hdr.end(), TAG_INTEGER);
+      if (hdr0.len != 1 || hdr0.end() != hdr.end()) {
+        throw new EncodingException("version too large");
       }
-
-      // read till requestList
-      while ((hdr.tag & 0x80) != 0) {
-        hdr = readHeader(request, hdr.readerIndex + hdr.len);
-      }
+      version = 0xFF & request[hdr0.readerIndex];
+      hdr = readHeader(request, hdr.end(), tbsEnd);
     }
 
-    List<CertID> requestList = new LinkedList<>();
+    // requestorName
+    if (hdr.tag == TAG_CTX_1) {
+      hdr = readHeader(request, hdr.end(), tbsEnd);
+    }
+
     Header hdrRequestList = hdr;
+    if (hdrRequestList.tag != TAG_SEQUENCE) {
+      throw new EncodingException("requestList is not a SEQUENCE");
+    }
     if (hdrRequestList.len == 0) {
       throw new EncodingException("requestList is empty");
     }
 
-    Header hdrSingleReq = readHeader(request, hdr.readerIndex);
     // requestList
-    while (true) {
-      Header hdrCertId   = readHeader(request, hdrSingleReq.readerIndex);
-      Header hdrHashAlgo = readHeader(request, hdrCertId.readerIndex);
-      Header hdrNameHash = readHeader(request, hdrHashAlgo.readerIndex + hdrHashAlgo.len);
-      Header hdrKeyHash  = readHeader(request, hdrNameHash.readerIndex + hdrNameHash.len);
-      Header hdrSerial   = readHeader(request, hdrKeyHash.readerIndex + hdrKeyHash.len);
-      RequestIssuer issuer;
-      try {
-        issuer = new RequestIssuer(request, hdrCertId.readerIndex,
-            hdrKeyHash.readerIndex + hdrKeyHash.len - hdrCertId.readerIndex);
-      } catch (NoSuchAlgorithmException ex) {
-        throw new EncodingException(ex);
-      }
-
-      if (hdrSerial.len == 0) {
-        throw new EncodingException("serialNumber is empty");
-      }
-      BigInteger serialNumber = new BigInteger(readContent(request, hdrSerial));
-      CertID certId = new CertID(issuer, serialNumber);
-      requestList.add(certId);
-
-      int nextIndex = hdrSingleReq.readerIndex + hdrSingleReq.len;
-      if (nextIndex < hdrRequestList.readerIndex + hdrRequestList.len) {
-        hdrSingleReq = readHeader(request, nextIndex);
-      } else {
-        break;
-      }
+    List<CertID> requestList = new LinkedList<>();
+    int offset = hdrRequestList.readerIndex;
+    while (offset < hdrRequestList.end()) {
+      Header hdrSingleReq = readHeader(request, offset, hdrRequestList.end(), TAG_SEQUENCE);
+      requestList.add(readCertId(request, hdrSingleReq));
+      offset = hdrSingleReq.end();
     }
 
     // extensions
     List<ExtendedExtension> extensions = new LinkedList<>();
-    int extensionsOffset = hdrRequestList.readerIndex + hdrRequestList.len;
-
-    if (extensionsOffset < hdrTbs.readerIndex + hdrTbs.len) {
-      hdr = readHeader(request, extensionsOffset);
-      tag = hdr.tag;
-      if ((tag & 0x80) == 0 || (tag & 0x1F) != 2) {
-        throw new EncodingException("invalid element after requestList");
+    if (hdrRequestList.end() < tbsEnd) {
+      hdr = readHeader(request, hdrRequestList.end(), tbsEnd, TAG_CTX_2);
+      if (hdr.end() != tbsEnd) {
+        throw new EncodingException("trailing data in tbsRequest");
       }
-      Header hdrExtensions = readHeader(request, hdr.readerIndex);
 
-      Header hdrExtension = readHeader(request, hdrExtensions.readerIndex);
-      while (true) {
-        int extensionLen = hdrExtension.readerIndex - hdrExtension.tagIndex + hdrExtension.len;
-        ExtendedExtension extn =
-            ExtendedExtension.getInstance(request, hdrExtension.tagIndex, extensionLen);
+      Header hdrExtensions = readHeader(request, hdr.readerIndex, hdr.end(), TAG_SEQUENCE);
+      if (hdrExtensions.end() != hdr.end()) {
+        throw new EncodingException("trailing data after requestExtensions");
+      }
+
+      offset = hdrExtensions.readerIndex;
+      while (offset < hdrExtensions.end()) {
+        Header hdrExtension = readHeader(request, offset, hdrExtensions.end(), TAG_SEQUENCE);
+        ExtendedExtension extn = ExtendedExtension.getInstance(request, hdrExtension.tagIndex,
+            hdrExtension.end() - hdrExtension.tagIndex);
         if (extn != null) {
           extensions.add(extn);
         }
-
-        int nextIndex = hdrExtension.readerIndex + hdrExtension.len;
-        if (nextIndex < hdrExtensions.readerIndex + hdrExtensions.len) {
-          hdrExtension = readHeader(request, nextIndex);
-        } else {
-          break;
-        }
+        offset = hdrExtension.end();
       }
     }
 
     return new OcspRequest(version, requestList, extensions);
   } // method getInstance
+
+  private static CertID readCertId(byte[] request, Header hdrSingleReq) throws EncodingException {
+    final int reqEnd = hdrSingleReq.end();
+    Header hdrCertId = readHeader(request, hdrSingleReq.readerIndex, reqEnd, TAG_SEQUENCE);
+    final int end = hdrCertId.end();
+
+    // singleRequestExtensions
+    if (end < reqEnd) {
+      Header hdrExtns = readHeader(request, end, reqEnd, TAG_CTX_0);
+      if (hdrExtns.end() != reqEnd) {
+        throw new EncodingException("trailing data in Request");
+      }
+    }
+
+    Header hdrHashAlgo = readHeader(request, hdrCertId.readerIndex, end, TAG_SEQUENCE);
+    Header hdrNameHash = readHeader(request, hdrHashAlgo.end(), end, TAG_OCTET_STRING);
+    Header hdrKeyHash  = readHeader(request, hdrNameHash.end(), end, TAG_OCTET_STRING);
+    Header hdrSerial   = readHeader(request, hdrKeyHash.end(), end, TAG_INTEGER);
+    if (hdrSerial.end() != end) {
+      throw new EncodingException("trailing data in CertID");
+    }
+
+    if (hdrSerial.len == 0) {
+      throw new EncodingException("serialNumber is empty");
+    }
+    if (request[hdrSerial.readerIndex] < 0) {
+      throw new EncodingException("serialNumber is negative");
+    }
+
+    RequestIssuer issuer;
+    try {
+      issuer = new RequestIssuer(request, hdrCertId.readerIndex,
+          hdrKeyHash.end() - hdrCertId.readerIndex);
+    } catch (NoSuchAlgorithmException ex) {
+      throw new EncodingException(ex);
+    }
+
+    return new CertID(issuer, new BigInteger(readContent(request, hdrSerial)));
+  }
 
   public static OcspRequest getInstance(OCSPRequest req) throws EncodingException {
     TBSRequest tbsReq = req.getTbsRequest();
@@ -247,12 +280,25 @@ public class OcspRequest {
     Header hdr = readHeader(request, 0);
     // tbsRequest
     Header hdrTbs = readHeader(request, hdr.readerIndex);
-    int signatureIndex = hdrTbs.readerIndex + hdrTbs.len;
-    return signatureIndex < request.length;
+    return hdrTbs.end() < hdr.end();
   }
 
   static Header readHeader(byte[] encoded, int readerIndex) throws EncodingException {
-    if (readerIndex < 0 || readerIndex + 2 > encoded.length) {
+    return readHeader(encoded, readerIndex, encoded.length);
+  }
+
+  static Header readHeader(byte[] encoded, int readerIndex, int limit, byte expectedTag)
+      throws EncodingException {
+    Header hdr = readHeader(encoded, readerIndex, limit);
+    if (hdr.tag != expectedTag) {
+      throw new EncodingException("unexpected tag at " + readerIndex);
+    }
+    return hdr;
+  }
+
+  static Header readHeader(byte[] encoded, int readerIndex, int limit)
+      throws EncodingException {
+    if (readerIndex < 0 || readerIndex + 2 > limit) {
       throw new EncodingException("truncated data at " + readerIndex);
     }
 
@@ -261,7 +307,7 @@ public class OcspRequest {
     int len = 0xFF & encoded[off++];
     if (len >= 0x80) {
       int lenSize = len & 0x7F;
-      if (off + lenSize > encoded.length) {
+      if (off + lenSize > limit) {
         throw new EncodingException("truncated length field at " + readerIndex);
       }
 
@@ -281,7 +327,7 @@ public class OcspRequest {
     }
 
     // len < 0: 4-byte length field larger than Integer.MAX_VALUE
-    if (len < 0 || len > encoded.length - off) {
+    if (len < 0 || len > limit - off) {
       throw new EncodingException("content exceeds the data at " + readerIndex);
     }
     return new Header(readerIndex, tag, len, off);

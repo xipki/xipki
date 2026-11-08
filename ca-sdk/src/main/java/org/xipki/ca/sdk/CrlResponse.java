@@ -26,6 +26,14 @@ public class CrlResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendLongBytes(buf, indentLevel, "crl", crl);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(1).writeByteString(crl);
   }

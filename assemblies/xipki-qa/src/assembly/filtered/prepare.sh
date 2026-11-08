@@ -108,7 +108,7 @@ classpath="xipki-qa-cli/lib/*"
 "$java_exec" $java_opts -cp "$classpath" \
   -Ddatabase.type="$DATABASE_TYPE" -Dtest.basedir="$TBDIR" \
   -Dtomcat.java.home="$tomcat_java_home" \
-  org.xipki.util.misc.BatchReplace setup/conf.json
+  org.xipki.util.io.BatchReplace setup/conf.json
 
 "$java_exec" $java_opts $java_debug -cp "$classpath" org.xipki.pkix.util.GenerateCerts \
   setup/keycerts.json setup/keycerts
@@ -132,9 +132,12 @@ cp $jars_dir/crypto/*.jar \
    "$script_dir"/xipki-qa-cli/lib/com.zaxxer.HikariCP-*.jar \
    "$script_dir"/xipki-qa-cli/lib/org.slf4j.*.jar \
    "$script_dir"/xipki-qa-cli/lib/org.xipki.crypto.*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.pkix.*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.util-*.jar \
-   "$jars_dir"/misc/org.xipki.pki.servlet.servlet-common-*.jar \
+   "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.asn1-*.jar \
+   "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.pkix-*.jar \
+   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.util-*.jar \
+   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.datasource-*.jar \
+   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.pkix-util-*.jar \
+   "$jars_dir"/misc/org.xipki.util.servlet-common-*.jar \
    "$script_dir"/war-common/WEB-INF/lib
 
 # bouncycastle already in the tomcat's lib dir

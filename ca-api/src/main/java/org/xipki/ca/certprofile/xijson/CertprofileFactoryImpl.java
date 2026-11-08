@@ -3,7 +3,7 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileFactory;
 

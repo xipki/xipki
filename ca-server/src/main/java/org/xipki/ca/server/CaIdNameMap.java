@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 
 import java.util.HashMap;
 import java.util.Map;

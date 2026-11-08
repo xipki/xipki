@@ -33,6 +33,15 @@ public class CaNameResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "name", name);
+    appendFields(buf, indentLevel, "aliases", aliases);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2).writeTextString(name).writeTextStrings(aliases);
   }

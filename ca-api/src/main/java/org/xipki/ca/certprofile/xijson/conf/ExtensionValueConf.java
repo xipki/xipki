@@ -3,6 +3,10 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import org.xipki.pkix.asn1.cert.MicrosoftCertificateTemplate;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.*;
+import org.xipki.pkix.asn1.x509.GeneralSubtree;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1BmpString;
 import org.xipki.codec.asn1.Asn1OctetString;
@@ -10,19 +14,8 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
-import org.xipki.pkix.asn1.cert.MicrosoftCertificateTemplate;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.PolicyQualifierOIDs;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.asn1.x509.GeneralNames;
-import org.xipki.pkix.asn1.x509.GeneralSubtree;
-import org.xipki.pkix.asn1.x509.GeneralSubtrees;
-import org.xipki.pkix.asn1.x509.OtherName;
-import org.xipki.pkix.asn1.x509.PolicyInformation;
-import org.xipki.pkix.asn1.x509.PolicyMapping;
-import org.xipki.pkix.asn1.x509.PolicyQualifierInfo;
-import org.xipki.pkix.asn1.x509.UserNotice;
 import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.api.profile.id.AbstractID;
@@ -41,8 +34,8 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.ca.api.TripleState;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.codec.TripleState;
 
 import java.net.URI;
 import java.net.URISyntaxException;

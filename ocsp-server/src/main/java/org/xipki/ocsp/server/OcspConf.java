@@ -9,7 +9,7 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.pkix.Securities.SecurityConf;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.util.io.XipkiIoUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

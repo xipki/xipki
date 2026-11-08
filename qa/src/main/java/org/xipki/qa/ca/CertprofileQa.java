@@ -5,6 +5,10 @@ package org.xipki.qa.ca;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.TBSCertificate;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ctrl.PublicKeyControl;
 import org.xipki.ca.certprofile.xijson.XijsonCertprofile;
@@ -20,15 +24,11 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.pkix.asn1.x509.TBSCertificate;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 
@@ -167,7 +167,7 @@ public class CertprofileQa {
 
       if (!issue.isFailed()) {
         try {
-          SignAlgo signAlgo = SignAlgo.getInstance(sigAlgId);
+          SignAlgo signAlgo = SignAlgo.ofAlgorithmIdentifier(sigAlgId);
 
           if (!signatureAlgorithms.contains(signAlgo)) {
             issue.setFailureMessage("signatureAlgorithm '" + signAlgo + "' is not allowed");

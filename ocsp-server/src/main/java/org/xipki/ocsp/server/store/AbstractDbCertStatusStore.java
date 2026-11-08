@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.server.IssuerFilter;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

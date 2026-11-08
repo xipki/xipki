@@ -37,6 +37,16 @@ public class PollCertRequest extends CaIdentifierRequest {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    toStringCaIdentifier(buf, indentLevel);
+    appendField(buf, indentLevel, "transactionId", transactionId);
+    appendObjects(buf, indentLevel, "entries", entries);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     super.encode0(encoder, 2);
     encoder.writeTextString(transactionId);
@@ -76,6 +86,15 @@ public class PollCertRequest extends CaIdentifierRequest {
 
     public X500NameType subject() {
       return subject;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendBigInt(buf, indentLevel, "id", id);
+      appendName(buf, indentLevel, "subject", subject);
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

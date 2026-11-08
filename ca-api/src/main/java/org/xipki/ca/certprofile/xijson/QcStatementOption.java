@@ -3,8 +3,8 @@
 
 package org.xipki.ca.certprofile.xijson;
 
-import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.pkix.asn1.x509.qualified.QCStatement;
+import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.Args;
 
 /**

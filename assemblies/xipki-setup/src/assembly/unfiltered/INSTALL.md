@@ -83,11 +83,11 @@ In all XiPKI components, you may configure the password using the following meth
     - `PBE-GUI quorum=<number>,tries=<number>`, e.g. `PBE-GUI quorum=1,tries=3`
     - `GUI quorum=<number>,tries=<number>`, e.g. `GUI quorum=1,tries=3`
     - `OBF OBF:<obfuscated master password>`, e.g. `OBF OBF:1yf01z7o1t331z7e1yf6`.
-    - `java:<class name implements org.xipki.pkix.util.password.PasswordCallback> [<corresponding configuration>]`
-      e.g. `java:org.xipki.pkix.util.password.demo.PassThroughPasswordCallback qwert`.
+    - `java:<class name implements org.xipki.util.password.PasswordCallback> [<corresponding configuration>]`
+      e.g. `java:org.xipki.util.password.demo.PassThroughPasswordCallback qwert`.
 
 - Use you own password resolver, assumed the password protocol is `ABC`, then the password is
-  `ABC:<data>`. You need to write a Java class implements `org.xipki.pkix.util.password.PasswordResolver` which
+  `ABC:<data>`. You need to write a Java class implements `org.xipki.util.password.PasswordResolver` which
   can resolve password starting with `ABC:`.
   You need to add the password resolvers in the file `xipki/secuity/password.cfg`:
    ```

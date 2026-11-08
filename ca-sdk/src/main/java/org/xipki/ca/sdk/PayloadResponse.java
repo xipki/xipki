@@ -29,6 +29,14 @@ public class PayloadResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendLongBytes(buf, indentLevel, "payload", payload);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(1).writeByteString(payload);
   }

@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.util.Args;
@@ -14,7 +14,7 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CompareUtil;
 
 import java.security.cert.CertificateEncodingException;
 

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;

@@ -6,6 +6,7 @@ package org.xipki.ca.sdk;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.ToStringUtil;
 
 /**
  * Error entry.
@@ -49,6 +50,14 @@ public class ErrorEntry extends SdkEncodable {
       sb.append(", message: ").append(message);
     }
     return sb.toString();
+  }
+
+  @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    ToStringUtil.appendIndent(buf, indentLevel, toString() + "\n");
+
+    return endToString(buf, indentLevel, start);
   }
 
   @Override

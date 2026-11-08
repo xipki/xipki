@@ -5,16 +5,16 @@ package org.xipki.ca.sdk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.GenerationException;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.cert.EmbedCertsMode;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.SslContextConf;
 import org.xipki.util.http.XiHttpClient;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.util.misc.LogUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;

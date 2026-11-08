@@ -5,23 +5,32 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.pkix.asn1.x509.GeneralNames;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.MiscOIDs;
-import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.asn1.x509.GeneralNames;
-import org.xipki.ca.gateway.acme.type.ChallengeStatus;
+import org.xipki.acme.type.ChallengeStatus;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.ca.gateway.dns.DnsClient;
-import org.xipki.ca.gateway.dns.DnsRecord;
-import org.xipki.ca.gateway.dns.NetDnsTransport;
-import org.xipki.ca.gateway.dns.dnssec.DnssecValidator;
-import org.xipki.ca.gateway.dns.dnssec.TrustAnchorsFile;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.dns.DnsClient;
+import org.xipki.dns.DnsRecord;
+import org.xipki.dns.NetDnsTransport;
+import org.xipki.dns.dnssec.DnssecValidator;
+import org.xipki.dns.dnssec.TrustAnchorsFile;
+import org.xipki.acme.AcmeChallenge;
+import org.xipki.acme.AcmeChallenge2;
+import org.xipki.acme.AcmeConf;
+import org.xipki.acme.AcmeConstants;
+import org.xipki.acme.AcmeIdentifier;
+import org.xipki.acme.AcmeRepo;
+import org.xipki.acme.AcmeSystemException;
+import org.xipki.acme.ChallId;
+import org.xipki.acme.Http01Client;
 
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLContext;
@@ -47,7 +56,6 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -101,7 +109,7 @@ public class ChallengeValidator implements Runnable {
 
   private final Http01Client http01Client;
 
-  public ChallengeValidator(AcmeRepo repo, AcmeProtocolConf.Acme conf) throws InvalidConfException {
+  public ChallengeValidator(AcmeRepo repo, AcmeConf.Acme conf) throws InvalidConfException {
     this.repo = Args.notNull(repo, "repo");
     Args.notNull(conf, "conf");
     List<InetSocketAddress> dnsServers;

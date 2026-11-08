@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.mgmt.db.port.DbPorter;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.IoUtil;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.conf.ConfigurableProperties;
 
 import java.io.IOException;
 import java.nio.file.Paths;

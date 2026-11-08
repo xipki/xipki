@@ -5,27 +5,27 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.codec.asn1.AbstractAsn1Time;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Tags;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.crypto.core.KeyInfoUtil;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.asn1.Asn1StreamParser;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.BufferedInputStream;
 import java.io.Closeable;
@@ -478,7 +478,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   public boolean verifySignature(PublicKey publicKey) throws IOException {
     try {
-      ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(publicKey);
+      ContentVerifierProvider cvp = X509KeyUtil.getContentVerifierProvider(publicKey);
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
       OutputStream sigOut = verifier.getOutputStream();
       try (InputStream crlStream = Files.newInputStream(crlFile.toPath())) {

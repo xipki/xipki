@@ -15,12 +15,12 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataAccessException.Reason;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.SqlUtil;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataAccessException.Reason;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.datasource.SqlUtil;
+import org.xipki.util.conf.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.BufferedWriter;
 import java.io.Closeable;

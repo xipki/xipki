@@ -10,7 +10,7 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.Closeable;
 import java.io.IOException;

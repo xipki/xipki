@@ -5,20 +5,25 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.sdk.OperationException;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.acme.type.CertReqMeta;
-import org.xipki.ca.gateway.acme.type.OrderStatus;
+import org.xipki.acme.type.CertReqMeta;
+import org.xipki.acme.type.OrderStatus;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.acme.AcmeOrder;
+import org.xipki.acme.AcmeRepo;
+import org.xipki.acme.AcmeSystemException;
+import org.xipki.acme.AcmeUtils;
+import org.xipki.pkix.util.X509Util;
 
 import java.util.Iterator;
 
@@ -122,10 +127,12 @@ public class CertEnroller implements Runnable {
         EnrollOrPollCertsResponse.Entry sdkRespEntry = sdkResp.entries()[0];
         byte[] certBytes = sdkRespEntry.cert();
         boolean valid = certBytes != null;
+        long certNotAfter = 0;
         if (valid) {
           // check the certificate
           try {
             Certificate.fromEncoded(certBytes);
+            certNotAfter = X509Util.extractCertNotAfter(certBytes);
           } catch (Exception ex) {
             LogUtil.error(LOG, ex, "Error parsing enrolled certificate for order " + orderIdStr);
             valid = false;
@@ -136,7 +143,7 @@ public class CertEnroller implements Runnable {
 
         if (valid) {
           LOG.info("enrolled certificate for order {}", orderIdStr);
-          order.setCert(certBytes);
+          order.setCert(certBytes, certNotAfter);
           order.setStatus(OrderStatus.valid);
         } else {
           order.setStatus(OrderStatus.invalid);

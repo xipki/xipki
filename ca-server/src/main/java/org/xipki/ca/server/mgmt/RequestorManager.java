@@ -5,14 +5,14 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.server.RequestorEntryWrapper;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.util.HashSet;
 import java.util.List;

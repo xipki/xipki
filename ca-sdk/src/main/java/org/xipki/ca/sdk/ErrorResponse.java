@@ -54,6 +54,16 @@ public class ErrorResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "transactionId", transactionId);
+    appendField(buf, indentLevel, "code", code);
+    appendField(buf, indentLevel, "message", message);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(3).writeTextString(transactionId)
         .writeInt(code.code()).writeTextString(message);

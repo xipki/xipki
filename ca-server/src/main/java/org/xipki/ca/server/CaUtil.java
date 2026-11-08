@@ -3,6 +3,8 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -13,21 +15,19 @@ import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.codec.Base64;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.X509OIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.*;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -234,7 +234,7 @@ public class CaUtil {
     String algo = pairs.value("algo");
     if (algo != null) {
       try {
-        algo = SignAlgo.getInstance(algo).jceName();
+        algo = SignAlgo.ofName(algo).jceName();
       } catch (NoSuchAlgorithmException ex) {
         throw new CaMgmtException(ex);
       }

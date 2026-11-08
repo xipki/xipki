@@ -3,10 +3,10 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.pkix.asn1.cms.CertificateChoice;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.SignedData;
+import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cert.X509Cert;

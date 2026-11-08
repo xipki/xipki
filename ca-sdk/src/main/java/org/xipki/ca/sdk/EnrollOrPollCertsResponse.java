@@ -7,6 +7,7 @@ import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.ToStringUtil;
 
 import java.math.BigInteger;
 
@@ -55,6 +56,17 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
   public void setExtraCerts(byte[][] extraCerts) {
     this.extraCerts = extraCerts;
+  }
+
+  @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "transactionId", transactionId);
+    appendField(buf, indentLevel, "confirmWaitTime", confirmWaitTime);
+    appendObjects(buf, indentLevel, "entries", entries);
+    appendLongBytesArray(buf, indentLevel, "extraCerts", extraCerts);
+
+    return endToString(buf, indentLevel, start);
   }
 
   @Override
@@ -111,6 +123,19 @@ public class EnrollOrPollCertsResponse extends SdkResponse {
 
     public byte[] privateKey() {
       return privateKey;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendBigInt(buf, indentLevel, "id", id);
+      appendObject(buf, indentLevel, "error", error);
+      appendLongBytes(buf, indentLevel, "cert", cert);
+      if (privateKey != null) {
+        ToStringUtil.appendSecret(buf, indentLevel, "privateKey", privateKey.length);
+      }
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

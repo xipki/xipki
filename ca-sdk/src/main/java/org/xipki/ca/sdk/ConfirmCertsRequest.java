@@ -35,6 +35,15 @@ public class ConfirmCertsRequest extends SdkRequest {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "transactionId", transactionId);
+    appendObjects(buf, indentLevel, "entries", entries);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2).writeTextString(transactionId).writeObjects(entries);
   }
@@ -78,6 +87,16 @@ public class ConfirmCertsRequest extends SdkRequest {
 
     public boolean isAccept() {
       return accept;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendField(buf, indentLevel, "accept", accept);
+      appendBigInt(buf, indentLevel, "certReqId", certReqId);
+      appendBytes(buf, indentLevel, "certhash", certhash);
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

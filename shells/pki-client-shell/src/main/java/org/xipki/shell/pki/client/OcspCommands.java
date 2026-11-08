@@ -3,13 +3,6 @@
 
 package org.xipki.shell.pki.client;
 
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.X509OIDs;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.codec.util.StringUtil;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
 import org.xipki.pkix.asn1.ocsp.OCSPResponse;
 import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
@@ -21,9 +14,16 @@ import org.xipki.pkix.asn1.x509.AuthorityInfoAccessSyntax;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.X509OIDs;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
@@ -165,7 +165,7 @@ public class OcspCommands {
         if (CollectionUtil.isNotEmpty(prefSigAlgs)) {
           SignAlgo[] algos = new SignAlgo[prefSigAlgs.size()];
           for (int i = 0; i < algos.length; i++) {
-            algos[i] = SignAlgo.getInstance(prefSigAlgs.get(i));
+            algos[i] = SignAlgo.ofName(prefSigAlgs.get(i));
           }
           options.setPreferredSignatureAlgorithms(algos);
         }
@@ -213,7 +213,7 @@ public class OcspCommands {
           println("producedAt=" + basicResp.producedAt());
           if (basicResp.getSignatureAlgorithm() != null) {
             try {
-              println("signatureAlg=" + SignAlgo.getInstance(
+              println("signatureAlg=" + SignAlgo.ofAlgorithmIdentifier(
                   basicResp.getSignatureAlgorithm()).jceName());
             } catch (Exception ex) {
               println("signatureAlg=" + basicResp.getSignatureAlgorithm().getAlgorithm().getId());

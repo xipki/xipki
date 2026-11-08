@@ -5,9 +5,9 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
@@ -24,11 +24,11 @@ import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.CompareUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.CompareUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.File;
 import java.io.IOException;

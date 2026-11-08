@@ -5,7 +5,7 @@ package org.xipki.qa.ca;
 
 import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509KeyUtil;
 
 
 /**
@@ -25,7 +25,7 @@ public class CaEnrollBenchKeyEntry {
       return;
     }
 
-    this.spki = KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
+    this.spki = X509KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
   }
 
   public SubjectPublicKeyInfo getSubjectPublicKeyInfo() throws Exception {
@@ -33,7 +33,7 @@ public class CaEnrollBenchKeyEntry {
       return spki;
     }
 
-    return KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
+    return X509KeyUtil.generateKeyPair2(keySpec).subjectPublicKeyInfo();
   }
 
 }

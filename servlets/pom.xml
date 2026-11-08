@@ -17,7 +17,6 @@
     <log4j.dir>../shared/filtered</log4j.dir>
   </properties>
   <modules>
-    <module>servlet-common</module>
     <!-- CA -->
     <module>ca-servlet</module>
     <!-- OCSP -->

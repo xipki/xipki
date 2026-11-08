@@ -49,7 +49,7 @@ abstract class Responder {
 
       this.macAlgos = new ArrayList<>(macs.size());
       for (String mac : macs) {
-        macAlgos.add(SignAlgo.getInstance(mac));
+        macAlgos.add(SignAlgo.ofName(mac));
       }
 
     }

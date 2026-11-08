@@ -3,11 +3,11 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.ca.api.TripleState;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.codec.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
 import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
@@ -20,9 +20,9 @@ import org.xipki.ca.api.profile.ctrl.SubjectControl;
 import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.conf.Validity.Unit;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.conf.Validity.Unit;
 
 import java.util.Arrays;
 import java.util.Collection;

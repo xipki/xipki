@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.InsufficientPermissionException;

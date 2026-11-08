@@ -5,8 +5,8 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.datasource.SqlUtil;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.SqlUtil;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

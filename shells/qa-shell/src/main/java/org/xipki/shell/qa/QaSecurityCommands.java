@@ -161,7 +161,7 @@ public class QaSecurityCommands {
   }
 
   private static SignAlgo getQaSignAlgo(String str) throws Exception {
-    return SignAlgo.getInstance(str);
+    return SignAlgo.ofName(str);
   }
 
   private static KeySpec getQaKeySpec(String str) throws Exception {

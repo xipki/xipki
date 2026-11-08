@@ -73,6 +73,26 @@ public class CaIdentifierRequest extends SdkRequest{
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    toStringCaIdentifier(buf, indentLevel);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  /**
+   * Appends the fields defined in this class, each followed by a new line.
+   * @param buf the buffer.
+   * @param indentLevel the indent level.
+   * @return the buffer.
+   */
+  protected StringBuilder toStringCaIdentifier(StringBuilder buf, int indentLevel) {
+    appendBytes(buf, indentLevel, "issuerCertSha1Fp", issuerCertSha1Fp);
+    appendName(buf, indentLevel, "issuer", issuer);
+    return appendBytes(buf, indentLevel, "authorityKeyIdentifier", authorityKeyIdentifier);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encode0(encoder, 0);
   }

@@ -3,13 +3,13 @@
 
 package org.xipki.ca.sdk;
 
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.pkix.cert.EmbedCertsMode;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -93,6 +93,19 @@ public class EnrollCertsRequest extends SdkRequest {
 
   public void setEntries(Entry[] entries) {
     this.entries = entries;
+  }
+
+  @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "transactionId", transactionId);
+    appendField(buf, indentLevel, "groupEnroll", groupEnroll);
+    appendField(buf, indentLevel, "explicitConfirm", explicitConfirm);
+    appendField(buf, indentLevel, "confirmWaitTimeMs", confirmWaitTimeMs);
+    appendField(buf, indentLevel, "caCertMode", caCertMode);
+    appendObjects(buf, indentLevel, "entries", entries);
+
+    return endToString(buf, indentLevel, start);
   }
 
   @Override
@@ -250,6 +263,22 @@ public class EnrollCertsRequest extends SdkRequest {
 
     public void setOldCertInfo(OldCertInfo oldCertInfo) {
       this.oldCertInfo = oldCertInfo;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendBigInt(buf, indentLevel, "certReqId", certReqId);
+      appendField(buf, indentLevel, "certprofile", certprofile);
+      appendLongBytes(buf, indentLevel, "p10req", p10req);
+      appendName(buf, indentLevel, "subject", subject);
+      appendLongBytes(buf, indentLevel, "subjectPublicKey", subjectPublicKey);
+      appendLongBytes(buf, indentLevel, "extensions", extensions);
+      appendField(buf, indentLevel, "notBefore", notBefore);
+      appendField(buf, indentLevel, "notAfter", notAfter);
+      appendObject(buf, indentLevel, "oldCertInfo", oldCertInfo);
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

@@ -3,10 +3,10 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.Hex;
-import org.xipki.pkix.exception.PkixException;
+import org.xipki.util.exception.PkixException;
 
 /**
  * OCSP Response Exception type.

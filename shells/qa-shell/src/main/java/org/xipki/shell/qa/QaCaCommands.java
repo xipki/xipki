@@ -3,7 +3,10 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
+import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -24,12 +27,9 @@ import org.xipki.codec.ConfPairs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
-import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.util.conf.Validity;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
 import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;

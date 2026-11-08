@@ -7,7 +7,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.util.http.SslConf;
-import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrBinary;
 
 import java.util.List;
 

@@ -38,6 +38,15 @@ public class GetCertRequest extends SdkRequest {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendBigInt(buf, indentLevel, "serialNumber", serialNumber);
+    appendName(buf, indentLevel, "issuer", issuer);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2).writeBigInt(serialNumber).writeObject(issuer);
   }

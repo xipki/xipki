@@ -6,7 +6,7 @@ package org.xipki.ca.gateway;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.Collections;
 import java.util.HashMap;

@@ -17,8 +17,8 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.io.XipkiBaseDir;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.io.XipkiBaseDir;
 
 import java.io.IOException;
 import java.util.HashMap;

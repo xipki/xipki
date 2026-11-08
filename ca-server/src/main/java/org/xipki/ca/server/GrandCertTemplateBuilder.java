@@ -5,8 +5,10 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.NameId;
+import org.xipki.pkix.cert.KeyInfoPair;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
@@ -22,12 +24,10 @@ import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.cert.KeyInfoPair;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.misc.LogUtil;
 
 import java.math.BigInteger;
 import java.time.Instant;

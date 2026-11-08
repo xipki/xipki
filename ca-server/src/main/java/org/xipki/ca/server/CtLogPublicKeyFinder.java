@@ -11,8 +11,8 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.File;
 import java.io.IOException;

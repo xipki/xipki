@@ -5,7 +5,7 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CrlControl;
@@ -29,10 +29,10 @@ import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

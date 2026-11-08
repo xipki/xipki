@@ -9,6 +9,8 @@ import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.cbor.CborType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.codec.util.ToStringUtil;
 import org.xipki.codec.Hex;
 
 /**
@@ -70,6 +72,21 @@ public class X500NameType extends SdkEncodable {
       throw new CodecException("error parsing X500Name " + (encoded == null
           ? text : "0x" + Hex.encode(encoded)));
     }
+  }
+
+  @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    String str;
+    if (text != null) {
+      str = text;
+    } else {
+      try {
+        str = X509Util.x500NameText(toX500Name());
+      } catch (CodecException ex) {
+        str = "<ERROR> 0x" + Hex.encode(encoded);
+      }
+    }
+    return ToStringUtil.appendIndent(buf, indentLevel, str);
   }
 
   @Override

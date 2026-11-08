@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;

@@ -9,7 +9,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;

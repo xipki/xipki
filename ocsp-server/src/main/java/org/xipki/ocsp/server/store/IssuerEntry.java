@@ -5,8 +5,8 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.api.RequestIssuer;
@@ -14,7 +14,7 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CompareUtil;
 
 import java.security.cert.CertificateEncodingException;
 import java.time.Instant;

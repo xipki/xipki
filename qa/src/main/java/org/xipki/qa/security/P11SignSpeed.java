@@ -5,7 +5,7 @@ package org.xipki.qa.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
@@ -21,8 +21,8 @@ import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import java.time.Clock;
 

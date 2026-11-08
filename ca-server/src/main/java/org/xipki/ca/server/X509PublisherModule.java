@@ -5,7 +5,7 @@ package org.xipki.ca.server;
 
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
@@ -14,8 +14,8 @@ import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;

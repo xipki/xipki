@@ -5,30 +5,30 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.codec.asn1.GenerationException;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.util.ReflectiveUtil;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
-import org.xipki.codec.util.Pack;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.pkix.asn1.x509.GeneralNames;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.util.ReflectiveUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.util.Pack;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.HttpRespAuditException;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.gateway.acme.msg.*;
-import org.xipki.ca.gateway.acme.type.AccountStatus;
-import org.xipki.ca.gateway.acme.type.AcmeError;
-import org.xipki.ca.gateway.acme.type.AuthzStatus;
-import org.xipki.ca.gateway.acme.type.CertReqMeta;
-import org.xipki.ca.gateway.acme.type.ChallengeStatus;
-import org.xipki.ca.gateway.acme.type.Identifier;
-import org.xipki.ca.gateway.acme.type.OrderStatus;
+import org.xipki.acme.msg.*;
+import org.xipki.acme.type.AccountStatus;
+import org.xipki.acme.type.AcmeError;
+import org.xipki.acme.type.AuthzStatus;
+import org.xipki.acme.type.CertReqMeta;
+import org.xipki.acme.type.ChallengeStatus;
+import org.xipki.acme.type.Identifier;
+import org.xipki.acme.type.OrderStatus;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorEntry;
 import org.xipki.ca.sdk.RevokeCertsRequest;
@@ -50,9 +50,9 @@ import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
@@ -60,10 +60,25 @@ import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.misc.RandomUtil;
+import org.xipki.acme.AcmeAccount;
+import org.xipki.acme.AcmeAuthz;
+import org.xipki.acme.AcmeChallenge;
+import org.xipki.acme.AcmeChallenge2;
+import org.xipki.acme.AcmeConf;
+import org.xipki.acme.AcmeDataSource;
+import org.xipki.acme.AcmeOrder;
+import org.xipki.acme.AcmeProtocolException;
+import org.xipki.acme.AcmeRepo;
+import org.xipki.acme.AcmeSystemException;
+import org.xipki.acme.AcmeUtils;
+import org.xipki.acme.AuthzId;
+import org.xipki.acme.ChallId;
+import org.xipki.acme.ContactVerifier;
+import org.xipki.acme.NonceManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -90,8 +105,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.xipki.ca.gateway.acme.AcmeConstants.*;
-import static org.xipki.ca.gateway.acme.AcmeUtils.decodeBase64Url;
+import static org.xipki.acme.AcmeConstants.*;
+import static org.xipki.acme.AcmeUtils.decodeBase64Url;
 
 /**
  * ACME Responder.
@@ -136,7 +151,7 @@ public class AcmeResponder {
 
   private final String accountPrefix;
 
-  private final List<AcmeProtocolConf.CaProfile> caProfiles;
+  private final List<AcmeConf.CaProfile> caProfiles;
 
   private final Set<String> challengeTypes;
 
@@ -148,7 +163,7 @@ public class AcmeResponder {
 
   private final int tokenNumBytes;
 
-  private final AcmeProtocolConf.CleanupOrderConf cleanOrderConf;
+  private final AcmeConf.CleanupOrderConf cleanOrderConf;
 
   private final ChallengeValidator challengeValidator;
 
@@ -189,7 +204,7 @@ public class AcmeResponder {
   }
 
   public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory,
-                      PopControl popControl, AcmeProtocolConf.Acme conf)
+                      PopControl popControl, AcmeConf.Acme conf)
       throws InvalidConfException {
     this.sdk = Args.notNull(sdk, "sdk");
     this.popControl = Args.notNull(popControl, "popControl");
@@ -198,10 +213,10 @@ public class AcmeResponder {
     this.baseUrl = Args.notBlank(conf.baseUrl(), "baseUrl");
     this.accountPrefix = this.baseUrl + "acct/";
 
-    AcmeProtocolConf.CleanupOrderConf cleanOrder = conf.cleanupOrder();
+    AcmeConf.CleanupOrderConf cleanOrder = conf.cleanupOrder();
     int expiredOrderDays = (cleanOrder == null) ? 365 : Math.max(10, cleanOrder.expiredOrderDays());
     int expiredCertDays  = (cleanOrder == null) ? 365 : Math.max(10, cleanOrder.expiredCertDays());
-    this.cleanOrderConf = new AcmeProtocolConf.CleanupOrderConf(expiredCertDays, expiredOrderDays);
+    this.cleanOrderConf = new AcmeConf.CleanupOrderConf(expiredCertDays, expiredOrderDays);
 
     try {
       URL url = new URL(baseUrl);
@@ -1014,7 +1029,7 @@ public class AcmeResponder {
 
         String keyAlgOid = csr.getSubjectPKInfo().getAlgorithm().getAlgorithm().getId();
 
-        AcmeProtocolConf.CaProfile caProfile = Optional.ofNullable(
+        AcmeConf.CaProfile caProfile = Optional.ofNullable(
             getCaProfile(keyAlgOid)).orElseThrow(
                 () -> new AcmeProtocolException(SC_BAD_REQUEST,
                     AcmeError.badCSR, "unsupported key type " + keyAlgOid));
@@ -1349,8 +1364,8 @@ public class AcmeResponder {
     return (bytes == null || bytes.length != 12) ? null : new ChallId(bytes);
   }
 
-  private AcmeProtocolConf.CaProfile getCaProfile(String keyAlgId) {
-    for (AcmeProtocolConf.CaProfile caProfile : caProfiles) {
+  private AcmeConf.CaProfile getCaProfile(String keyAlgId) {
+    for (AcmeConf.CaProfile caProfile : caProfiles) {
       if (caProfile.keyTypes().contains(keyAlgId)) {
         return caProfile;
       }

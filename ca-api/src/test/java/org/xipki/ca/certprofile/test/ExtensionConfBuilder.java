@@ -16,8 +16,8 @@ import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.ca.api.TripleState;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.codec.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;

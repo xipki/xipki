@@ -7,8 +7,8 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.conf.Validity;
 
 import java.io.Closeable;
 import java.math.BigInteger;

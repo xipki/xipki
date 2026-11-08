@@ -12,12 +12,12 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.NextCaMessage;
 import org.xipki.pkix.scep.transaction.Operation;
 import org.xipki.pkix.scep.util.ScepUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.util.exception.PkixException;
+import org.xipki.util.io.XipkiIoUtil;
 
 import java.io.EOFException;
 import java.io.IOException;

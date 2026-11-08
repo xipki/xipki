@@ -8,7 +8,7 @@
 XiPKI (e**X**tensible s**I**mple **P**ublic **K**ey **I**nfrastructure)
 is a high-performance, open-source PKI (CA, RA, OCSP) designed for critical
 infrastructure. Built with minimal dependencies (only SLF4J, HikariCP, jline
-and Picocli, besides JDBC drivers) and a compact codebase of ~75,000 lines
+and Picocli, besides JDBC drivers) and a compact codebase of ~100,000 lines
 (without QA and test code), it offers native support for post-quantum
 algorithms (ML-DSA, ML-KEM, composite), HSM integration via PKCS#11, SM2/SM3
 for Chinese national standards, and fast OCSP at scale.
@@ -66,10 +66,9 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
 
       If the SNAPSHOT dependencies cannot be retrieved, build and install the
       corresponding repositories locally first, then rerun `./install.sh`:
-      - [xipki/xishell](https://github.com/xipki/xishell) (groupId `org.xipki.shell`)
       - [xipki/xicrypto](https://github.com/xipki/xicrypto) (groupId `org.xipki.crypto`)
-      - [xipki/xipkix](https://github.com/xipki/xipkix) (groupId `org.xipki.pkix`),
-        which depends on `xicrypto`, so build it after `xicrypto`.
+      - [xipki/xiutil](https://github.com/xipki/xiutil) (groupId `org.xipki.util`),
+        which depends on `xicrypto`, so build it after that.
 
       In each of these repositories:
       ```sh

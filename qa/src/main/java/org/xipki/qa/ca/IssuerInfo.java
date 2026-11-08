@@ -6,7 +6,7 @@ package org.xipki.qa.ca;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.security.cert.CertificateException;
 import java.time.Instant;

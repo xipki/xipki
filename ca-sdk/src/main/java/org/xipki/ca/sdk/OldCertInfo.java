@@ -66,6 +66,17 @@ public class OldCertInfo extends SdkEncodable {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendField(buf, indentLevel, "reusePublicKey", reusePublicKey);
+    appendObject(buf, indentLevel, "isn", isn);
+    appendObject(buf, indentLevel, "subject", subject);
+    appendObject(buf, indentLevel, "fsn", fsn);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2);
     encoder.writeBoolean(isReusePublicKey());
@@ -130,6 +141,15 @@ public class OldCertInfo extends SdkEncodable {
     }
 
     @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendName(buf, indentLevel, "issuer", issuer);
+      appendBigInt(buf, indentLevel, "serialNumber", serialNumber);
+
+      return endToString(buf, indentLevel, start);
+    }
+
+    @Override
     protected void encode0(CborEncoder encoder) throws CodecException {
       encoder.writeArrayStart(2).writeObject(issuer).writeBigInt(serialNumber);
     }
@@ -173,6 +193,15 @@ public class OldCertInfo extends SdkEncodable {
     }
 
     @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendBytes(buf, indentLevel, "caCertSha1", caCertSha1);
+      appendBigInt(buf, indentLevel, "serialNumber", serialNumber);
+
+      return endToString(buf, indentLevel, start);
+    }
+
+    @Override
     protected void encode0(CborEncoder encoder) throws CodecException {
       encoder.writeArrayStart(2).writeByteString(caCertSha1).writeBigInt(serialNumber);
     }
@@ -210,6 +239,15 @@ public class OldCertInfo extends SdkEncodable {
 
     public byte[] san() {
       return san;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendLongBytes(buf, indentLevel, "subject", subject);
+      appendLongBytes(buf, indentLevel, "san", san);
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

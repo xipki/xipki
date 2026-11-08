@@ -3,9 +3,9 @@
 
 package org.xipki.ca.gateway;
 
+import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
@@ -14,12 +14,13 @@ import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509KeyUtil;
 import org.xipki.crypto.core.SecretKeyWithAlias;
 import org.xipki.pkix.verify.AlgorithmValidator;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.conf.KeystoreConf;
-import org.xipki.pkix.util.password.PasswordResolverException;
-import org.xipki.pkix.util.password.Passwords;
+import org.xipki.util.conf.KeystoreConf;
+import org.xipki.util.password.PasswordResolverException;
+import org.xipki.util.password.Passwords;
 
 import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
@@ -174,7 +175,7 @@ public class PopControl {
       ret.password = password;
 
       if ("PKCS12".equalsIgnoreCase(confType) || "PKCS#12".equalsIgnoreCase(confType)) {
-        ret.pkcs12KeyStore = KeyUtil.loadPKCS12KeyStore(is, password);
+        ret.pkcs12KeyStore = X509KeyUtil.loadPKCS12KeyStore(is, password);
       } else {
         ret.keyStore = KeyUtil.loadKeyStore(conf.type(), is, password);
       }

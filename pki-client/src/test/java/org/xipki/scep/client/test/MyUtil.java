@@ -3,11 +3,6 @@
 
 package org.xipki.scep.client.test;
 
-import org.xipki.codec.asn1.Asn1PrintableString;
-import org.xipki.codec.asn1.GenerationException;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x500.DirectoryString;
 import org.xipki.pkix.asn1.x500.X500Name;
@@ -17,6 +12,11 @@ import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.asn1.Asn1PrintableString;
+import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.SignAlgo;
@@ -24,7 +24,7 @@ import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.SignatureSigner;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -57,7 +57,7 @@ public class MyUtil {
       BasicConstraints bc = new BasicConstraints(0);
       certGenerator.addExtension(Extension.ofBasicConstraints(true, bc));
       ContentSigner contentSigner = SignatureSigner.newContentSigner(
-          SignAlgo.getInstance(rcaKey), rcaKey);
+          SignAlgo.ofKey(rcaKey), rcaKey);
       return new X509Cert(certGenerator.build(contentSigner));
     } catch (CodecException | NoSuchAlgorithmException | XiSecurityException ex) {
       throw new GenerationException(ex.getMessage(), ex);
@@ -86,8 +86,7 @@ public class MyUtil {
 
     ContentSigner contentSigner;
     try {
-      contentSigner = SignatureSigner.newContentSigner(
-          SignAlgo.getInstance(privateKey), privateKey);
+      contentSigner = SignatureSigner.newContentSigner(SignAlgo.ofKey(privateKey), privateKey);
     } catch (NoSuchAlgorithmException | XiSecurityException ex) {
       throw new GenerationException(ex.getMessage(), ex);
     }
@@ -131,8 +130,7 @@ public class MyUtil {
 
     ContentSigner contentSigner;
     try {
-      contentSigner = SignatureSigner.newContentSigner(
-          SignAlgo.getInstance(identityKey), identityKey);
+      contentSigner = SignatureSigner.newContentSigner(SignAlgo.ofKey(identityKey), identityKey);
     } catch (XiSecurityException | NoSuchAlgorithmException ex) {
       throw new CertificateException("error while creating signer", ex);
     }

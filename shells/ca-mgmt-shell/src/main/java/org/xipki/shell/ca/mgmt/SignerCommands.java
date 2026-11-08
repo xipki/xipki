@@ -9,7 +9,7 @@ import org.xipki.codec.Base64;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.util.io.XipkiIoUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

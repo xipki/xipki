@@ -3,15 +3,15 @@
 
 package org.xipki.ca.api.mgmt;
 
-import org.xipki.ca.api.HourMinute;
-import org.xipki.ca.api.TripleState;
+import org.xipki.util.conf.HourMinute;
+import org.xipki.codec.TripleState;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.util.conf.Validity;
 
 import java.util.List;
 

@@ -5,6 +5,7 @@ package org.xipki.ca.mgmt.db.port;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.json.JsonBuilder;
@@ -16,13 +17,12 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 
 import java.io.File;
 import java.io.IOException;

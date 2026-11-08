@@ -3,7 +3,7 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
@@ -12,7 +12,7 @@ import org.xipki.codec.Base64;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.codec.util.IoUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

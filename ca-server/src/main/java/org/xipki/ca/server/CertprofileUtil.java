@@ -3,6 +3,14 @@
 
 package org.xipki.ca.server;
 
+import org.xipki.pkix.asn1.x500.RDN;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.AccessDescription;
+import org.xipki.pkix.asn1.x509.CertificatePolicies;
+import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.PolicyInformation;
+import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.Certprofile;
@@ -23,17 +31,9 @@ import org.xipki.codec.asn1.oid.AttributeOIDs;
 import org.xipki.codec.asn1.oid.CertPolicyOIDs;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.OIDs;
-import org.xipki.pkix.asn1.x500.RDN;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.AccessDescription;
-import org.xipki.pkix.asn1.x509.CertificatePolicies;
-import org.xipki.pkix.asn1.x509.ExtendedKeyUsage;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.PolicyInformation;
-import org.xipki.pkix.asn1.x509.SubjectInfoAccessSyntax;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.List;
 import java.util.Map;

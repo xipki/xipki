@@ -6,7 +6,7 @@ package org.xipki.ca.server;
 import org.xipki.ca.api.CertificateInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.math.BigInteger;
 import java.time.Clock;

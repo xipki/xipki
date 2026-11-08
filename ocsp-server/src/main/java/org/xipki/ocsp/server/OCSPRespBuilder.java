@@ -11,11 +11,11 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
+import org.xipki.util.exception.NoIdleSignerException;
+import org.xipki.util.exception.PkixException;
 
 import java.time.Instant;
 import java.util.LinkedList;

@@ -37,6 +37,15 @@ public class SingleCertSerialEntry extends SdkEncodable {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendBigInt(buf, indentLevel, "serialNumber", serialNumber);
+    appendObject(buf, indentLevel, "error", error);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(2).writeBigInt(serialNumber).writeObject(error);
   }

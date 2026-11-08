@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
-import org.xipki.ca.api.Range;
+import org.xipki.util.conf.Range;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;

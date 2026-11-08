@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.xipki.pkix.asn1.cmp.CMPCertificate;
 import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
 import org.xipki.pkix.asn1.cmp.PKIStatus;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.cmp.client.*;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
@@ -26,7 +26,7 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.pkix.verify.AlgorithmValidator;
 import org.xipki.util.http.SslContextConf;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.codec.util.IoUtil;
 
@@ -132,7 +132,7 @@ public final class CmpClientImpl implements CmpClient {
 
       Set<SignAlgo> algos = new HashSet<>();
       for (String algoName : algoNames) {
-        SignAlgo sa = SignAlgo.getInstance(algoName);
+        SignAlgo sa = SignAlgo.ofName(algoName);
         algos.add(sa);
       }
 

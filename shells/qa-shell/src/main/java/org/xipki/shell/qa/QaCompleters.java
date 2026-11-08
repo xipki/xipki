@@ -7,7 +7,7 @@ import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.qa.ocsp.OcspError;
 import org.xipki.shell.CompletionProvider;
 import org.xipki.shell.completer.AbstractSetCompleter;
-import org.xipki.ca.api.TripleState;
+import org.xipki.codec.TripleState;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 

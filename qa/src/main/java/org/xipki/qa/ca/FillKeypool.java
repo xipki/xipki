@@ -13,11 +13,11 @@ import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.pkix.cert.KeyInfoPair;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

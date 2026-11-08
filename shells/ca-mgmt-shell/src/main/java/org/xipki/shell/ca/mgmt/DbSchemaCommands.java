@@ -3,7 +3,7 @@
 
 package org.xipki.shell.ca.mgmt;
 
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

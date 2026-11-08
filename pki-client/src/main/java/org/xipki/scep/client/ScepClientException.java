@@ -3,7 +3,7 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.pkix.exception.PkixException;
+import org.xipki.util.exception.PkixException;
 
 /**
  * SCEP Client Exception type.

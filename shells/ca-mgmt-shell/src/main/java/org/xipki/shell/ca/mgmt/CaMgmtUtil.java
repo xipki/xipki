@@ -11,10 +11,10 @@ import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.shell.xi.XiShellBaseCommand;
-import org.xipki.util.datasource.DatabaseType;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.datasource.DatabaseType;
+import org.xipki.util.conf.ConfigurableProperties;
 import org.xipki.util.misc.DateUtil;
 
 import java.nio.file.Files;

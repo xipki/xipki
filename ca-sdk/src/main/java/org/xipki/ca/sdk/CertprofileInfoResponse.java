@@ -47,6 +47,20 @@ public class CertprofileInfoResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendFields(buf, indentLevel, "requiredExtensionTypes", requiredExtensionTypes);
+    appendFields(buf, indentLevel, "optionalExtensionTypes", optionalExtensionTypes);
+    String[] keyTypeNames = new String[keyTypes.length];
+    for (int i = 0; i < keyTypes.length; i++) {
+      keyTypeNames[i] = keyTypes[i].name();
+    }
+    appendFields(buf, indentLevel, "keyTypes", keyTypeNames);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(3).writeTextStrings(requiredExtensionTypes)
         .writeTextStrings(optionalExtensionTypes);

@@ -3,17 +3,17 @@
 
 package org.xipki.ca.api.profile;
 
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.Asn1Primitive;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.OIDs;
 import org.xipki.pkix.asn1.x500.RDN;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Attribute;
 import org.xipki.pkix.asn1.x509.EDIPartyName;
 import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.pkix.asn1.x509.OtherName;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.asn1.oid.AttributeOIDs;
+import org.xipki.codec.asn1.oid.OIDs;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.StringType;
@@ -25,8 +25,8 @@ import org.xipki.ca.api.profile.id.SubjectDirectoryAttributeType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.ca.api.Range;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.conf.Range;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

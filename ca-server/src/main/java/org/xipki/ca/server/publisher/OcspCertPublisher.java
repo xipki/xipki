@@ -18,9 +18,9 @@ import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.util.audit.Audits;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceMap;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceMap;
+import org.xipki.datasource.DataSourceWrapper;
 
 import java.security.NoSuchAlgorithmException;
 

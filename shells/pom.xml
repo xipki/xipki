@@ -13,9 +13,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>xi-shell</module>
-    <module>demo-shell</module>
-    <module>security-shell</module>
     <module>pki-client-shell</module>
     <module>ca-mgmt-shell</module>
     <module>qa-shell</module>

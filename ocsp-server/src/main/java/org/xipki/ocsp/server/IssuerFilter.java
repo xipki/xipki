@@ -6,7 +6,7 @@ package org.xipki.ocsp.server;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.HashSet;
 import java.util.Set;

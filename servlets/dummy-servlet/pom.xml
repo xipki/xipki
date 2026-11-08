@@ -16,9 +16,9 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.pki.servlet</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>servlet-common</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -27,9 +27,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pkix</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xipkix.version}</version>
+      <version>${xiutil.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -39,9 +39,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>util</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.util</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${xiutil.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

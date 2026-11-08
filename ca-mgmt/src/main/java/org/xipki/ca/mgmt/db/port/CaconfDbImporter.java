@@ -15,9 +15,9 @@ import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.datasource.SqlUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.SqlUtil;
 
 import java.io.IOException;
 import java.nio.file.Paths;

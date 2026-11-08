@@ -49,7 +49,7 @@ fi
 classpath="xipki-mgmt-cli/lib/*"
 
 cd "$script_dir"
-"$java_exec" $java_opts -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
+"$java_exec" $java_opts -cp "$classpath" org.xipki.util.io.BatchReplace setup/conf.json
 
 kc_dir="$script_dir"/setup/keycerts
 "$java_exec" $java_opts -cp "$classpath" org.xipki.pkix.util.GenerateCerts setup/keycerts.json "$kc_dir"
@@ -58,9 +58,9 @@ echo "Copy xipki-mgmt-cli's folders lib to xipki-cli"
 cp xipki-mgmt-cli/lib/* xipki-cli/lib
 
 rm -f xipki-cli/lib/org.xipki.pki.ca-*-*.jar \
-      xipki-cli/lib/org.xipki.pki.xipki-mgmt-cli-*.jar \
+      xipki-cli/lib/org.xipki.pki.shell.xipki-mgmt-cli-*.jar \
       xipki-cli/lib/org.xipki.pki.shell.ca-mgmt-shell-*.jar \
-      xipki-cli/lib/org.xipki.pki.shell.demo-shell-*.jar
+      xipki-cli/lib/org.xipki.util.demo-shell-*.jar
 
 echo "Prepare tomcat"
 
@@ -83,9 +83,12 @@ cp $jars_dir/crypto/*.jar \
    "$script_dir"/xipki-mgmt-cli/lib/com.zaxxer.HikariCP-*.jar \
    "$script_dir"/xipki-mgmt-cli/lib/org.slf4j.*.jar \
    "$script_dir"/xipki-mgmt-cli/lib/org.xipki.crypto.*.jar \
-   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pkix.*.jar \
-   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pki.util-*.jar \
-   "$jars_dir"/misc/org.xipki.pki.servlet.servlet-common-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pki.asn1-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.pki.pkix-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.util.util-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.util.datasource-*.jar \
+   "$script_dir"/xipki-mgmt-cli/lib/org.xipki.util.pkix-util-*.jar \
+   "$jars_dir"/misc/org.xipki.util.servlet-common-*.jar \
    "$script_dir"/war-common/WEB-INF/lib
 
 # bouncycastle already in the tomcat's lib dir

@@ -3,15 +3,15 @@
 
 package org.xipki.scep.serveremulator;
 
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
 import org.xipki.codec.util.Args;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.scep.client.test.MyUtil;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.CaCaps;
-import org.xipki.pkix.util.KeyUtil;
 
 import java.math.BigInteger;
 import java.security.KeyPair;

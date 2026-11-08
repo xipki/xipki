@@ -5,11 +5,6 @@ package org.xipki.scep.serveremulator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
-import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.BasicConstraints;
@@ -18,12 +13,17 @@ import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.CertificateList;
 import org.xipki.pkix.asn1.x509.Extension;
 import org.xipki.pkix.asn1.x509.KeyUsage;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.SignatureSigner;
-import org.xipki.pkix.util.KeyUtil;
+import org.xipki.pkix.util.X509KeyUtil;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -131,7 +131,7 @@ public class CaEmulator {
     certGenerator.addExtension(Extension.ofBasicConstraints(true, bc));
 
     ContentSigner contentSigner = SignatureSigner.newContentSigner(
-        SignAlgo.getInstance(caKey), caKey);
+        SignAlgo.ofKey(caKey), caKey);
     X509Cert cert = new X509Cert(certGenerator.build(contentSigner));
 
     serialCertMap.put(tmpSerialNumber, cert);
@@ -170,8 +170,7 @@ public class CaEmulator {
     crlBuilder.addCRLEntry(BigInteger.valueOf(2), revocationTime, CRLReason.keyCompromise);
     crlBuilder.addExtension(Extension.ofCRLNumber(false, crlNumber.getAndAdd(1)));
 
-    ContentSigner contentSigner = SignatureSigner.newContentSigner(
-        SignAlgo.getInstance(caKey), caKey);
+    ContentSigner contentSigner = SignatureSigner.newContentSigner(SignAlgo.ofKey(caKey), caKey);
     return crlBuilder.build(contentSigner);
   } // method getCrl
 
@@ -191,7 +190,7 @@ public class CaEmulator {
 
   public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
       throws InvalidKeyException {
-    return KeyUtil.getContentVerifierProvider(publicKey);
+    return X509KeyUtil.getContentVerifierProvider(publicKey);
   } // method getContentVerifierProvider
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)

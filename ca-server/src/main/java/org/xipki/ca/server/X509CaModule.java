@@ -5,7 +5,7 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.codec.util.Args;

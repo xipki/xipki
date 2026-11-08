@@ -5,20 +5,20 @@ package org.xipki.ca.gateway.scep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.pkix.asn1.cms.SignedData;
-import org.xipki.codec.asn1.oid.CmsOIDs;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.scep.IssuerAndSubject;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.CertificateList;
 import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.asn1.oid.CmsOIDs;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
@@ -33,6 +33,7 @@ import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.pkix.cert.EmbedCertsMode;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.HashAlgo;
@@ -41,7 +42,6 @@ import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.DecodedPkiMessage;
 import org.xipki.pkix.scep.message.PkiMessage;
@@ -58,11 +58,11 @@ import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditService;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.util.audit.Audits;
+import org.xipki.util.exception.PkixException;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.util.misc.LogUtil;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -770,7 +770,7 @@ public class ScepResponder {
     HashAlgo hashAlgo = request.digestAlgorithm();
 
     try {
-      SignAlgo signatureAlgorithm = SignAlgo.getInstance(hashAlgo.jceName() + "withRSA");
+      SignAlgo signatureAlgorithm = SignAlgo.ofName(hashAlgo.jceName() + "withRSA");
       X509Cert[] cmsCertSet = control.isIncludeSignerCert() ? new X509Cert[]{signer.cert()} : null;
 
       return response.encode(signer.key(), signatureAlgorithm, signer.cert(), cmsCertSet,

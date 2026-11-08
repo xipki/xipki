@@ -3,7 +3,7 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.pkix.exception.PkixException;
+import org.xipki.util.exception.PkixException;
 
 /**
  * OCSP Requestor Exception type.

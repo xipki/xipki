@@ -19,7 +19,7 @@ import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.ca.api.TripleState;
+import org.xipki.codec.TripleState;
 
 import java.util.Arrays;
 import java.util.List;

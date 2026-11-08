@@ -13,7 +13,7 @@ import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.Hex;
 import org.xipki.codec.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

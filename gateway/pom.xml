@@ -11,6 +11,21 @@
   <artifactId>gateway</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
+    <dependency>
+      <groupId>org.xipki.util</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${xiutil.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.util</groupId>
+      <artifactId>dns</artifactId>
+      <version>${xiutil.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.util</groupId>
+      <artifactId>acme</artifactId>
+      <version>${xiutil.version}</version>
+    </dependency>
     <!-- For all components -->
     <dependency>
       <groupId>${project.groupId}</groupId>

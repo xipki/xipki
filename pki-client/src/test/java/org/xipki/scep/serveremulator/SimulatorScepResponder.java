@@ -5,14 +5,14 @@ package org.xipki.scep.serveremulator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.scep.IssuerAndSubject;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsAlgorithm;
@@ -20,7 +20,6 @@ import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.DecodedPkiMessage;
 import org.xipki.pkix.scep.message.EnvelopedDataDecryptor;
@@ -34,7 +33,7 @@ import org.xipki.pkix.scep.transaction.Nonce;
 import org.xipki.pkix.scep.transaction.PkiStatus;
 import org.xipki.pkix.scep.transaction.TransactionId;
 import org.xipki.pkix.sign.SignAlgos;
-import org.xipki.pkix.sign.SignerConf;
+import org.xipki.util.exception.PkixException;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -107,9 +106,8 @@ public class SimulatorScepResponder {
 
     PkiMessage rep = servicePkiOperation0(req);
 
-    SignerConf conf = new SignerConf();
-    conf.setHash(req.digestAlgorithm());
-    SignAlgo signatureAlgorithm = SignAlgos.getInstance(signingKey(), conf);
+    SignAlgo signatureAlgorithm =
+        SignAlgo.getInstance(signingKey(), null, null, req.digestAlgorithm());
 
     try {
       X509Cert jceSignerCert = signingCert();

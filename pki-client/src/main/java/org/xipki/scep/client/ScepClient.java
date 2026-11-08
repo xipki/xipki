@@ -3,8 +3,6 @@
 
 package org.xipki.scep.client;
 
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.cms.ContentInfo;
 import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.pkix.asn1.cms.SignedData;
@@ -13,12 +11,13 @@ import org.xipki.pkix.asn1.scep.IssuerAndSubject;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsSignedData;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.AuthorityCertStore;
@@ -32,6 +31,7 @@ import org.xipki.pkix.scep.transaction.PkiStatus;
 import org.xipki.pkix.scep.transaction.TransactionId;
 import org.xipki.pkix.scep.util.ScepUtil;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.util.exception.PkixException;
 import org.xipki.util.http.Curl;
 import org.xipki.util.http.DefaultCurl;
 import org.xipki.util.http.HttpStatusCode;
@@ -417,7 +417,7 @@ public class ScepClient {
     Asn1Oid encAlgId = CmsAlgorithm.AES128_CBC;
 
     try {
-      SignAlgo signatureAlgorithm = SignAlgo.getInstance(identityKey);
+      SignAlgo signatureAlgorithm = SignAlgo.ofKey(identityKey);
 
       return request.encode(identityKey, signatureAlgorithm, identityCert,
           new X509Cert[]{identityCert}, authorityCertStore.encryptionCert(), encAlgId);

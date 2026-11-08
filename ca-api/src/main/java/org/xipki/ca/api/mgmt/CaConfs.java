@@ -10,10 +10,10 @@ import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

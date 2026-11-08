@@ -6,7 +6,7 @@ package org.xipki.ocsp.server.type;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.ExtensionOIDs;
 import org.xipki.codec.asn1.oid.OcspOIDs;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CompareUtil;
 
 /**
  * OID enumeration.

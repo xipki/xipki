@@ -6,13 +6,13 @@ package org.xipki.ca.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
 import org.xipki.codec.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.util.ArrayList;
 import java.util.List;

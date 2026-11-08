@@ -22,11 +22,11 @@ import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.conf.Validity;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 
 import java.io.IOException;
 import java.io.OutputStream;

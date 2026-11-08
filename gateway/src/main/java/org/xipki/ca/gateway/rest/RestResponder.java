@@ -5,19 +5,20 @@ package org.xipki.ca.gateway.rest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.Base64;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequest;
 import org.xipki.pkix.asn1.pkcs10.CertificationRequestInfo;
 import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.OperationException;
+import org.xipki.codec.Base64;
+import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.HttpRespAuditException;
+import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
@@ -50,12 +51,10 @@ import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.misc.PemEncoder;
-import org.xipki.pkix.util.misc.PemEncoder.PemLabel;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.PemEncoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -699,15 +698,15 @@ public class RestResponder {
 
     try (ByteArrayOutputStream bo = new ByteArrayOutputStream()) {
       if (caGenKeyPair) {
-        bo.write(PemEncoder.encode(entry.privateKey(), PemLabel.PRIVATE_KEY));
+        bo.write(PemEncoder.encode(entry.privateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
       }
 
-      bo.write(PemEncoder.encode(entry.cert(), PemLabel.CERTIFICATE));
+      bo.write(PemEncoder.encode(entry.cert(), PemEncoder.PemLabel.CERTIFICATE));
 
       if (twin) {
         entry = getEntry(sdkResp.entries(), certIdEnc);
-        bo.write(PemEncoder.encode(entry.privateKey(), PemLabel.PRIVATE_KEY));
-        bo.write(PemEncoder.encode(entry.cert(), PemLabel.CERTIFICATE));
+        bo.write(PemEncoder.encode(entry.privateKey(), PemEncoder.PemLabel.PRIVATE_KEY));
+        bo.write(PemEncoder.encode(entry.cert(), PemEncoder.PemLabel.CERTIFICATE));
       }
       bo.flush();
 
@@ -761,13 +760,13 @@ public class RestResponder {
         }
 
         String type = pemObject.getType();
-        if (PemLabel.CERTIFICATE_REQUEST.type().equals(type)) {
+        if (PemEncoder.PemLabel.CERTIFICATE_REQUEST.type().equals(type)) {
           if (csrBytes != null) {
             throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
                 "duplicated PEM CSRs", INFO, FAILED);
           }
           csrBytes = pemObject.getContent();
-        } else if (PemLabel.CERTIFICATE.type().equals(type)) {
+        } else if (PemEncoder.PemLabel.CERTIFICATE.type().equals(type)) {
           if (targetCertBytes != null) {
             throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
                 "duplicated PEM certificates", INFO, FAILED);

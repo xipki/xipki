@@ -9,9 +9,9 @@ import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.conf.ConfigurableProperties;
 
 import java.io.File;
 import java.io.IOException;

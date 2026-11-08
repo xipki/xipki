@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.kpgen;
 
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.pkix.SecurityFactory;
 
 import java.util.Set;

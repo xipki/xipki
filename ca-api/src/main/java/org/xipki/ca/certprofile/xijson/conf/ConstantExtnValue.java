@@ -6,6 +6,7 @@ package org.xipki.ca.certprofile.xijson.conf;
 import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1PrintableString;
@@ -64,6 +65,8 @@ public class ConstantExtnValue implements JsonEncodable {
       return new Asn1Utf8String(value);
     } else if (type == Type.PRINTABLE) {
       return new Asn1PrintableString(value);
+    } else if (type == Type.NULL) {
+      return Asn1Null.INSTANCE;
     } else { // if (type == null || type == Type.ASN1) {
       return Asn1Util.readAsn1Object(Base64.decode(value));
     }
@@ -88,7 +91,8 @@ public class ConstantExtnValue implements JsonEncodable {
     BITSTRING,
     UTF8,
     PRINTABLE,
-    INTEGER
+    INTEGER,
+    NULL
   }
 
 }

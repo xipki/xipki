@@ -6,14 +6,14 @@ package org.xipki.ca.server;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.CertificateInfo;
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
-import org.xipki.util.datasource.DataSourceMap;
+import org.xipki.datasource.DataSourceMap;
 
 import java.io.Closeable;
 

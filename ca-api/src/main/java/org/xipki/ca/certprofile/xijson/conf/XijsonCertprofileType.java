@@ -23,8 +23,8 @@ import org.xipki.codec.json.JsonParser;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.ca.api.TripleState;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.codec.TripleState;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;

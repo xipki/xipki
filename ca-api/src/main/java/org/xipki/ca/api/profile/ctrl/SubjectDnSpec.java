@@ -5,7 +5,7 @@ package org.xipki.ca.api.profile.ctrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.Range;
+import org.xipki.util.conf.Range;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.AttributeOIDs;
 import org.xipki.codec.asn1.oid.MatterOIDs;

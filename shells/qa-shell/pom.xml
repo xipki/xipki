@@ -12,9 +12,9 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>xi-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.pki</groupId>
@@ -22,9 +22,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pkix</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xipkix.version}</version>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.pki.shell</groupId>

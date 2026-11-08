@@ -57,9 +57,9 @@
                     <version>${project.version}</version>
                   </artifactItem>
                   <artifactItem>
-                    <groupId>org.xipki.pki.servlet</groupId>
+                    <groupId>org.xipki.util</groupId>
                     <artifactId>servlet-common</artifactId>
-                    <version>${project.version}</version>
+                    <version>${xiutil.version}</version>
                   </artifactItem>
                 </artifactItems>
               </configuration>

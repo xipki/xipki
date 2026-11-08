@@ -5,7 +5,7 @@ package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.ca.gateway.acme.AcmeHttpServlet;
 import org.xipki.ca.gateway.acme.AcmeProtocolConf;
 import org.xipki.ca.gateway.acme.AcmeResponder;
@@ -40,9 +40,9 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.io.XipkiBaseDir;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.io.XipkiBaseDir;
 
 import java.util.HashMap;
 import java.util.List;

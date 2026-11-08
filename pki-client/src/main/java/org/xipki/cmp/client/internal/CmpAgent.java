@@ -5,6 +5,22 @@ package org.xipki.cmp.client.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.cmp.*;
+import org.xipki.pkix.asn1.cms.EnvelopedData;
+import org.xipki.pkix.asn1.crmf.CertId;
+import org.xipki.pkix.asn1.crmf.CertReqMessages;
+import org.xipki.pkix.asn1.crmf.CertReqMsg;
+import org.xipki.pkix.asn1.crmf.CertTemplate;
+import org.xipki.pkix.asn1.crmf.EncryptedKey;
+import org.xipki.pkix.asn1.crmf.EncryptedValue;
+import org.xipki.pkix.asn1.x500.X500Name;
+import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
+import org.xipki.pkix.asn1.x509.CRLReason;
+import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.pkix.asn1.x509.Extensions;
+import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1Encodable;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Integer;
@@ -14,15 +30,7 @@ import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
 import org.xipki.codec.crypto.ContentVerifierProvider;
-import org.xipki.pkix.asn1.cmp.*;
-import org.xipki.pkix.asn1.cms.EnvelopedData;
 import org.xipki.codec.asn1.crypto.GCMParameters;
-import org.xipki.pkix.asn1.crmf.CertId;
-import org.xipki.pkix.asn1.crmf.CertReqMessages;
-import org.xipki.pkix.asn1.crmf.CertReqMsg;
-import org.xipki.pkix.asn1.crmf.CertTemplate;
-import org.xipki.pkix.asn1.crmf.EncryptedKey;
-import org.xipki.pkix.asn1.crmf.EncryptedValue;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.crypto.PBES2Parameters;
 import org.xipki.codec.asn1.crypto.PBKDF2Params;
@@ -33,14 +41,6 @@ import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.CmpOIDs;
 import org.xipki.codec.asn1.oid.NistOIDs;
 import org.xipki.codec.asn1.oid.XipkiOIDs;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.AuthorityKeyIdentifier;
-import org.xipki.pkix.asn1.x509.CRLReason;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.CertificateList;
-import org.xipki.pkix.asn1.x509.Extension;
-import org.xipki.pkix.asn1.x509.Extensions;
-import org.xipki.pkix.asn1.x509.GeneralName;
 import org.xipki.cmp.client.CmpClientException;
 import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.PkiErrorException;
@@ -64,21 +64,21 @@ import org.xipki.pkix.cmp.VerifiedPkiMessage;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cms.CmsRecipient;
 import org.xipki.crypto.core.KemEncapKey;
-import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.util.exception.NoIdleSignerException;
+import org.xipki.util.exception.PkixException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.XiHttpClient;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -410,7 +410,7 @@ class CmpAgent {
 
       SignAlgo mac;
       try {
-        mac = SignAlgo.getInstance(parameter.getMac());
+        mac = SignAlgo.ofAlgorithmIdentifier(parameter.getMac());
       } catch (NoSuchAlgorithmException ex) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.mac)", ex);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
@@ -449,7 +449,8 @@ class CmpAgent {
 
       SignAlgo protectionAlgo;
       try {
-        protectionAlgo = SignAlgo.getInstance(protectedMsg.getHeader().getProtectionAlg());
+        protectionAlgo = SignAlgo.ofAlgorithmIdentifier(
+            protectedMsg.getHeader().getProtectionAlg());
       } catch (NoSuchAlgorithmException ex) {
         LOG.warn("tid={}: unknown response protection algorithm: {}", tid, ex.getMessage());
         return new ProtectionVerificationResult(null, ProtectionResult.SIGNATURE_INVALID);

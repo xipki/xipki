@@ -32,6 +32,15 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    toStringCaIdentifier(buf, indentLevel);
+    appendObjects(buf, indentLevel, "entries", entries);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     super.encode0(encoder, 1);
     encoder.writeObjects(entries);
@@ -81,6 +90,16 @@ public class RevokeCertsRequest extends CaIdentifierRequest {
 
     public Instant invalidityTime() {
       return invalidityTime;
+    }
+
+    @Override
+    public StringBuilder toString(StringBuilder buf, int indentLevel) {
+      int start = buf.length();
+      appendBigInt(buf, indentLevel, "serialNumber", serialNumber);
+      appendField(buf, indentLevel, "reason", reason);
+      appendField(buf, indentLevel, "invalidityTime", invalidityTime);
+
+      return endToString(buf, indentLevel, start);
     }
 
     @Override

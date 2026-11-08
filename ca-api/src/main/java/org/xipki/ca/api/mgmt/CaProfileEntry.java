@@ -5,7 +5,7 @@ package org.xipki.ca.api.mgmt;
 
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;

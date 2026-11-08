@@ -4,7 +4,7 @@
 package org.xipki.scep.client;
 
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.util.io.XipkiIoUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

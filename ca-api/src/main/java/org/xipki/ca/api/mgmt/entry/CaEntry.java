@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.CodecException;
@@ -17,8 +17,8 @@ import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.CompareUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -117,7 +117,7 @@ public class CaEntry extends MgmtEntry {
     for (String n : list) {
       SignAlgo signAlgo;
       try {
-        signAlgo = SignAlgo.getInstance(n);
+        signAlgo = SignAlgo.ofName(n);
       } catch (NoSuchAlgorithmException ex) {
         throw new XiSecurityException(ex.getMessage(), ex);
       }

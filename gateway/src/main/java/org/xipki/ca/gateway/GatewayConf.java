@@ -12,8 +12,8 @@ import org.xipki.codec.json.JsonParser;
 import org.xipki.pkix.Securities;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.audit.Audits;
-import org.xipki.pkix.util.conf.KeystoreConf;
-import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.util.conf.KeystoreConf;
+import org.xipki.util.conf.FileOrBinary;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

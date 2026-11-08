@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.mgmt.entry;
 
-import org.xipki.ca.api.NameId;
+import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CaUris;
@@ -12,7 +12,7 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.util.conf.Validity;
 
 import java.util.List;
 

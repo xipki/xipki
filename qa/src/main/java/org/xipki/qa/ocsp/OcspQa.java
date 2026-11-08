@@ -3,19 +3,6 @@
 
 package org.xipki.qa.ocsp;
 
-import org.xipki.ca.api.TripleState;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.OcspOIDs;
-import org.xipki.codec.crypto.ContentVerifierProvider;
-import org.xipki.codec.util.Args;
-import org.xipki.crypto.api.CryptoApi;
-import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.crypto.core.KeyInfoUtil;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.asn1.ocsp.BasicOCSPResponse;
 import org.xipki.pkix.asn1.ocsp.CertHash;
 import org.xipki.pkix.asn1.ocsp.CertID;
@@ -29,6 +16,19 @@ import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.CRLReason;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.codec.TripleState;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.api.CryptoApi;
+import org.xipki.crypto.api.CryptoApiFactory;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.IssuerHash;
 import org.xipki.pkix.cert.X509Cert;
@@ -184,7 +184,7 @@ public class OcspQa {
       SignAlgo expectedSigalgo = responseOption.getSignatureAlg();
       if (expectedSigalgo != null) {
         try {
-          SignAlgo signAlgo = SignAlgo.getInstance(basicResp.getSignatureAlgorithm());
+          SignAlgo signAlgo = SignAlgo.ofAlgorithmIdentifier(basicResp.getSignatureAlgorithm());
 
           if (signAlgo != expectedSigalgo) {
             issue.setFailureMessage("is '" + signAlgo.jceName() +

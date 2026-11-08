@@ -16,11 +16,11 @@ import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.misc.RandomUtil;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.conf.ConfigurableProperties;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;

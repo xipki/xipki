@@ -10,11 +10,11 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.conf.FileOrBinary;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 
 import java.io.BufferedReader;
 import java.io.Closeable;

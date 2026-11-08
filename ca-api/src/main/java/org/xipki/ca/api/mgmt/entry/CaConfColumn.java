@@ -16,7 +16,7 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.conf.Validity;
+import org.xipki.util.conf.Validity;
 
 import java.util.List;
 

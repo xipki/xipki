@@ -5,7 +5,7 @@ package org.xipki.ca.api.profile.ctrl;
 
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.Args;
-import org.xipki.ca.api.TripleState;
+import org.xipki.codec.TripleState;
 
 /**
  * Extension Control settings.

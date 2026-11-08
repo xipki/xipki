@@ -11,12 +11,45 @@ See also <https://github.com/xipki/xipki/releases>
   - openssl (requires JDK 25+ and openssl in non-FIPS mode)
   - openssl-fips (requires JDK 25+ and openssl in FIPS mode)
 - The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
-- The PKIX modules moved to https://github.com/xipki/xipkix and use the groupId `org.xipki.pkix`.
-- The shell-base module moved to https://github.com/xipki/xishell and use the groupId `org.xipki.shell`.
+- The ASN.1 structures are in the new module `asn1` (package `org.xipki.asn1`), built on the `codec` module of
+  xicrypto instead of BouncyCastle. The PKIX API is in the module `pkix`. Both use the groupId `org.xipki.pki`.
+- The modules `org.xipki.pkix:pkix-util` and `util` moved to https://github.com/xipki/xiutil and use the groupId
+  `org.xipki.util`, as the modules `util` and `datasource`:
+  - `org.xipki.pkix.util.password`, `.conf`, `.io` and `.misc` are renamed to `org.xipki.util.*`.
+    Custom `PasswordCallback` and `PasswordResolver` classes, and class names in `password.cfg`,
+    need the new package.
+  - `org.xipki.datasource` is in the module `datasource`, the only one that needs HikariCP.
+    `QueryExecutor` and `ResultRow` moved there from `org.xipki.ca.server.db`.
+  - `UniqueIdGenerator` (from `org.xipki.ca.server`) and `NameId` (from `org.xipki.ca.api`) moved to
+    `org.xipki.util.misc`.
+  - `QuadrupleState` (from `org.xipki.ocsp.server`) and `HourMinute`, `Range` and `TripleState` (from
+    `org.xipki.ca.api`) moved to `org.xipki.util.conf`.
+  - The modules `servlet-common`, `xi-shell` and `demo-shell` moved there too, with their packages
+    unchanged.
+  - `KeyCertBytesPair` and `CertPathValidationModel` moved from `org.xipki.pkix.cert` and `.verify` to
+    `org.xipki.util.cert`, together with `EmbedCertsMode`, `PemEncoder` and `KeyInfoPair`.
+  - `HttpRespAuditException` and `PasswordHash` moved from `org.xipki.ca.gateway` to
+    `org.xipki.util.audit` and `org.xipki.util.password`.
+  - The new module `acme` holds the X.509-independent part of the ACME gateway (`org.xipki.acme`). A custom
+    `ContactVerifier` needs the new package.
+  - The new module `pkix-util` holds the PKCS#11 modules, slots, keys and their configuration, moved from
+    `org.xipki.pkix.pkcs11` to `org.xipki.util.pkcs11`. `P11Signer` and `P11SignerFactory` are now abstract there;
+    `X509P11Signer` and `X509P11SignerFactory` in `org.xipki.pkix.pkcs11` implement them for X.509.
+  - `PkixException` and `NoIdleSignerException` moved from `org.xipki.pkix.exception` to
+    `org.xipki.util.exception` in `pkix-util`.
+  - `org.xipki.pkix.util.KeyUtil` is split: `org.xipki.util.key.KeyUtil` (key generation, loading JDK keystores) and
+    `org.xipki.pkix.util.X509KeyUtil` (PKCS#12 keystores, signers and verifiers). `FpIdCalculator`,
+    `PKCS8Encryptor`, `KeyStoreWrapper` and `KeystoreGenerationParameters` moved to `org.xipki.util.key`,
+    `KemHmacSignature` and `SignAlgos` to `org.xipki.util.sign`. `SignAlgos` no longer takes a `SignerConf`.
+  - The new module `dns` holds the DNS resolver and DNSSEC validator (`org.xipki.dns`).
+  - `DatabaseMacAuditService` moved to `org.xipki.datasource`. The audit types `db-mac` and
+    `database-mac` are unchanged, but need the module `datasource`.
+- The shell-base module moved to https://github.com/xipki/xiutil and use the groupId `org.xipki.util`. The
+  package `org.xipki.shell` is unchanged.
 - The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
 - ACME gateway
   - dns-01 challenge: dnsjava replaced by a built-in stub resolver and DNSSEC validator
-    (packages `org.xipki.ca.gateway.dns` and `org.xipki.ca.gateway.dns.dnssec`). The DNSSEC validation runs in the gateway as before, against the configured
+    (packages `org.xipki.dns` and `org.xipki.dns.dnssec`). The DNSSEC validation runs in the gateway as before, against the configured
     trust anchors, for positive answers only. Answers expanded from DNS wildcards or DNAME are
     rejected; DNSSEC algorithms 8, 10, 13, 14, 15 and 16 are supported.
   - If `dnsResolvers` is not set, the name servers of `/etc/resolv.conf` are used.
@@ -24,6 +57,17 @@ See also <https://github.com/xipki/xipki/releases>
     instead of the system resolver, so `/etc/hosts` is no longer used.
   - The file `dnssecTrustAnchorsFile` is reloaded when it has been changed (checked every
     minute), no restart is required.
+- PKCS#11: fixed the check of HMAC signers, which rejected the mechanisms supported by the token and accepted
+  the unsupported ones.
+- OCSP client: the default length of the nonce is changed from 8 to 32 bytes. Use `--nonce-len`
+  for a responder that does not accept this length, e.g. an older XiPKI responder with `maxLen` 32.
+- OCSP responder
+  - The configured `nonce.minLen` and `nonce.maxLen` now limit the length of the nonce itself.
+    Previously the 2-byte header of its OCTET STRING was counted, so that e.g. with `maxLen` 32
+    a nonce of 32 bytes was rejected. A value that is not one OCTET STRING is rejected as
+    `malformedRequest`.
+  - Malformed unsigned requests are rejected as `malformedRequest`: negative serial numbers,
+    wrong tags, unexpected fields, children exceeding their parent and trailing data.
 - SCEP: DES3 (DESede) is no longer supported. The gateway no longer offers the capability
   `DES3` and rejects requests encrypted with DES-EDE3-CBC (`badAlg`); the SCEP client uses AES
   only and fails if the CA does not support AES.

@@ -5,7 +5,7 @@ package org.xipki.ca.server.publisher;
 
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherFactory;
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 
 import java.util.Collections;
 import java.util.Set;

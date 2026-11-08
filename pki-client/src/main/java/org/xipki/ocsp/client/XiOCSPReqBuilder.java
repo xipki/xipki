@@ -3,9 +3,6 @@
 
 package org.xipki.ocsp.client;
 
-import org.xipki.codec.asn1.Asn1BitString;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.pkix.asn1.ocsp.CertID;
 import org.xipki.pkix.asn1.ocsp.OCSPRequest;
 import org.xipki.pkix.asn1.ocsp.Request;
@@ -15,7 +12,10 @@ import org.xipki.pkix.asn1.x500.X500Name;
 import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.pkix.asn1.x509.Extensions;
 import org.xipki.pkix.asn1.x509.GeneralName;
-import org.xipki.pkix.exception.PkixException;
+import org.xipki.codec.asn1.Asn1BitString;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.util.exception.PkixException;
 
 import java.util.ArrayList;
 import java.util.Iterator;

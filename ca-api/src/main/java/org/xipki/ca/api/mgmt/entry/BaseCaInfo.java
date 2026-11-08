@@ -18,8 +18,8 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.misc.CompareUtil;
 
 import java.util.List;
 

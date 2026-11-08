@@ -3,8 +3,8 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.pkix.asn1.ocsp.CertHash;
+import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.Extension;

@@ -18,10 +18,10 @@ import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.KeyInfoPair;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceMap;
-import org.xipki.util.datasource.DataSourceWrapper;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceMap;
+import org.xipki.datasource.DataSourceWrapper;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;

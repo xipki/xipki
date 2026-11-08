@@ -10,7 +10,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.util.misc.RandomUtil;
 
 import java.security.SecureRandom;
 

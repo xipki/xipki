@@ -11,12 +11,13 @@ import org.xipki.codec.json.JsonParser;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.pkix.verify.CertPathValidationModel;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.datasource.DataSourceConf;
-import org.xipki.pkix.util.conf.Validity;
-import org.xipki.pkix.util.conf.Validity.Unit;
-import org.xipki.pkix.util.conf.FileOrBinary;
+import org.xipki.datasource.DataSourceConf;
+import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.conf.Validity.Unit;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.QuadrupleState;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

@@ -15,9 +15,9 @@ import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.io.XipkiIoUtil;
-import org.xipki.pkix.util.password.PasswordResolverException;
-import org.xipki.pkix.util.password.Passwords;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.password.PasswordResolverException;
+import org.xipki.util.password.Passwords;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.api.publisher;
 
-import org.xipki.codec.asn1.GenerationException;
+import org.xipki.codec.exception.GenerationException;
 
 import java.util.Set;
 

@@ -12,19 +12,19 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>xi-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.shell</groupId>
-      <artifactId>xishell</artifactId>
-      <version>${xishell.version}</version>
+      <groupId>org.xipki.util</groupId>
+      <artifactId>shell-base</artifactId>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>security-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.pki.shell</groupId>
@@ -37,9 +37,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>org.xipki.util</groupId>
       <artifactId>demo-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xiutil.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

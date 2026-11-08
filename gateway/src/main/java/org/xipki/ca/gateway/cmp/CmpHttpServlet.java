@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.pkix.asn1.cmp.PKIMessage;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.ca.gateway.HttpRespAuditException;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
@@ -23,7 +23,7 @@ import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
-import org.xipki.pkix.util.misc.LogUtil;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.EOFException;
 import java.io.IOException;

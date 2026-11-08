@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.util.datasource.DataAccessException;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.util.misc.ConfigurableProperties;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.conf.ConfigurableProperties;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;

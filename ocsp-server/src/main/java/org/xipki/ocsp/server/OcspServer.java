@@ -5,16 +5,16 @@ package org.xipki.ocsp.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.pkix.asn1.ocsp.OCSPRequest;
+import org.xipki.pkix.asn1.ocsp.OCSPResponse;
+import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
+import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.asn1.ocsp.OCSPRequest;
-import org.xipki.pkix.asn1.ocsp.OCSPResponse;
-import org.xipki.pkix.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.codec.asn1.oid.OcspOIDs;
-import org.xipki.pkix.asn1.x509.Certificate;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
@@ -34,19 +34,20 @@ import org.xipki.ocsp.server.type.*;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.exception.NoIdleSignerException;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.exception.PkixException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.datasource.DataSourceConf;
-import org.xipki.util.datasource.DataSourceFactory;
-import org.xipki.util.datasource.DataSourceWrapper;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.LogUtil;
-import org.xipki.pkix.util.conf.FileOrValue;
-import org.xipki.pkix.util.io.XipkiIoUtil;
+import org.xipki.datasource.DataSourceConf;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.util.exception.NoIdleSignerException;
+import org.xipki.util.exception.PkixException;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.util.conf.QuadrupleState;
 
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
@@ -577,7 +578,14 @@ public class OcspServer implements Closeable {
         if (reqOpt.nonceOccurrence() == QuadrupleState.ignore) {
           nonceExtn = null;
         } else {
-          int len = nonceExtn.extnValueLength();
+          int len;
+          try {
+            len = nonceExtn.octetStringLengthOfExtnValue();
+          } catch (EncodingException ex) {
+            LOG.warn("nonce is not a valid OCTET STRING");
+            return unsuccesfulOCSPRespMap.get(OcspResponseStatus.malformedRequest);
+          }
+
           int min = reqOpt.nonceMinLen();
           int max = reqOpt.nonceMaxLen();
 
@@ -964,7 +972,8 @@ public class OcspServer implements Closeable {
 
       try {
         req = OCSPRequest.fromEncoded(request);
-      } catch (IllegalArgumentException | CodecException ex) {
+      } catch (RuntimeException | CodecException ex) {
+        // RuntimeException: e.g. caused by a malformed request.
         throw new EncodingException("could not parse OCSP request", ex);
       }
     } catch (EncodingException ex) {

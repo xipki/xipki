@@ -26,6 +26,14 @@ public class UnSuspendOrRemoveCertsResponse extends SdkResponse {
   }
 
   @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    appendObjects(buf, indentLevel, "entries", entries);
+
+    return endToString(buf, indentLevel, start);
+  }
+
+  @Override
   protected void encode0(CborEncoder encoder) throws CodecException {
     encoder.writeArrayStart(1).writeObjects(entries);
   }

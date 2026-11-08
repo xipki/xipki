@@ -22,7 +22,7 @@ import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.codec.Base64;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
-import org.xipki.ca.api.TripleState;
+import org.xipki.codec.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;

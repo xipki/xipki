@@ -8,8 +8,8 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.pkix.util.misc.CompareUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.CompareUtil;
 
 import java.util.Collections;
 import java.util.List;

@@ -5,11 +5,11 @@ package org.xipki.ca.gateway.cmp;
 
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.EmbedCertsMode;
 import org.xipki.pkix.cmp.ProtectedPKIMessage;
 import org.xipki.pkix.verify.AlgorithmValidator;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.util.misc.CollectionUtil;
-import org.xipki.util.misc.EmbedCertsMode;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -85,7 +85,7 @@ public class CmpControl {
     // PBM
     try {
       if (conf.responsePbmMac() != null) {
-        this.responsePbmMac = SignAlgo.getInstance(conf.responsePbmMac());
+        this.responsePbmMac = SignAlgo.ofName(conf.responsePbmMac());
       }
 
       if (conf.responsePbmOwf() != null) {
@@ -155,7 +155,7 @@ public class CmpControl {
       String algo = pbmMacs.get(i);
       SignAlgo signAlgo;
       try {
-        signAlgo = SignAlgo.getInstance(algo);
+        signAlgo = SignAlgo.ofName(algo);
       } catch (NoSuchAlgorithmException ex) {
         throw new InvalidConfException("invalid pbmMac " + algo, ex);
       }

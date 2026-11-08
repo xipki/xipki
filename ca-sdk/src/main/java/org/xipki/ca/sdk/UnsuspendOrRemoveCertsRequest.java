@@ -7,6 +7,7 @@ import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.ToStringUtil;
 
 import java.math.BigInteger;
 
@@ -27,6 +28,20 @@ public class UnsuspendOrRemoveCertsRequest extends CaIdentifierRequest {
 
   public BigInteger[] entries() {
     return entries;
+  }
+
+  @Override
+  public StringBuilder toString(StringBuilder buf, int indentLevel) {
+    int start = buf.length();
+    toStringCaIdentifier(buf, indentLevel);
+    if (entries != null) {
+      ToStringUtil.appendIndent(buf, indentLevel, "entries:\n");
+      for (BigInteger entry : entries) {
+        appendBigInt(buf, indentLevel + 1, "-", entry);
+      }
+    }
+
+    return endToString(buf, indentLevel, start);
   }
 
   @Override

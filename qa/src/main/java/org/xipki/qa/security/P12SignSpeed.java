@@ -18,7 +18,8 @@ import org.xipki.pkix.pkcs12.Pkcs12KeyStoreWrapper;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.misc.RandomUtil;
+import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.util.misc.RandomUtil;
 
 
 /**
@@ -117,7 +118,7 @@ public final class P12SignSpeed extends SpeedExecutor {
       }
     }
 
-    Pkcs12KeyStoreWrapper identity = KeyUtil.generateKeyPair3(keySpec, params);
+    Pkcs12KeyStoreWrapper identity = X509KeyUtil.generateKeyPair3(keySpec, params);
     return identity.keystore();
   }
 

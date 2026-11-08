@@ -52,12 +52,12 @@ public class AttributeType extends AbstractID {
 
   public static final AttributeType L = locality;
 
-  public static final AttributeType state = initOf(AttributeOIDs.state);
+  public static final AttributeType state = initOf(AttributeOIDs.state, "state", "S");
 
   public static final AttributeType ST = state;
 
   public static final AttributeType street =
-      initOf(AttributeOIDs.street, "state", "S");
+      initOf(AttributeOIDs.street, "street", "S");
 
   public static final AttributeType organization =
       initOf(AttributeOIDs.organization, "organization", "O");

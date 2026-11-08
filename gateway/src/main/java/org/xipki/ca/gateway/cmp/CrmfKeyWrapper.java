@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway.cmp;
 
-import org.xipki.codec.asn1.OperatorException;
+import org.xipki.codec.exception.OperatorException;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
 import org.xipki.codec.asn1.oid.AlgorithmOIDs;
