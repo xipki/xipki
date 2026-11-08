@@ -5,11 +5,11 @@ package org.xipki.pkix.scep.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.pkix.asn1.cms.Attributes;
-import org.xipki.pkix.asn1.cms.ContentInfo;
-import org.xipki.pkix.asn1.cms.SignedData;
-import org.xipki.pkix.asn1.x509.Attribute;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.cms.Attributes;
+import org.xipki.asn1.cms.ContentInfo;
+import org.xipki.asn1.cms.SignedData;
+import org.xipki.asn1.x509.Attribute;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.AttributeOIDs;

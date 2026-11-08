@@ -3,7 +3,7 @@
 
 package org.xipki.pkix.cms;
 
-import org.xipki.pkix.asn1.cms.ecc.EccCmsSharedInfo;
+import org.xipki.asn1.cms.ecc.EccCmsSharedInfo;
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;

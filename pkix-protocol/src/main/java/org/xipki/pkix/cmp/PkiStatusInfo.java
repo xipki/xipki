@@ -3,10 +3,10 @@
 
 package org.xipki.pkix.cmp;
 
-import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
-import org.xipki.pkix.asn1.cmp.PKIFreeText;
-import org.xipki.pkix.asn1.cmp.PKIStatus;
-import org.xipki.pkix.asn1.cmp.PKIStatusInfo;
+import org.xipki.asn1.cmp.PKIFailureInfo;
+import org.xipki.asn1.cmp.PKIFreeText;
+import org.xipki.asn1.cmp.PKIStatus;
+import org.xipki.asn1.cmp.PKIStatusInfo;
 import org.xipki.codec.util.Args;
 
 /**

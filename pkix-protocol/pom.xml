@@ -69,28 +69,7 @@
           <!-- crypto-be-jdk: ML-DSA with context string, and the expanded ML-DSA / ML-KEM private keys
                from the seed, use the internals of the JDK -->
           <argLine>--add-exports java.base/sun.security.provider=ALL-UNNAMED --add-exports java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
-          <excludes>
-            <exclude>**/SmDisabledTest.java</exclude>
-          </excludes>
         </configuration>
-        <executions>
-          <!-- runs in its own JVM: the SM algorithms must be disabled before first use -->
-          <execution>
-            <id>sm-disabled</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <excludes combine.self="override"/>
-              <includes>
-                <include>**/SmDisabledTest.java</include>
-              </includes>
-              <systemPropertyVariables>
-                <xipki.crypto.disableSm>true</xipki.crypto.disableSm>
-              </systemPropertyVariables>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

@@ -3,11 +3,11 @@
 
 package org.xipki.pkix.scep.util;
 
-import org.xipki.pkix.asn1.cms.CertificateChoice;
-import org.xipki.pkix.asn1.cms.RevocationInfoChoice;
-import org.xipki.pkix.asn1.cms.SignedData;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.asn1.cms.CertificateChoice;
+import org.xipki.asn1.cms.RevocationInfoChoice;
+import org.xipki.asn1.cms.SignedData;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.asn1.AbstractAsn1Time;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.util.Args;

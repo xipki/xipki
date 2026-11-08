@@ -3,17 +3,17 @@
 
 package org.xipki.pkix.cmp;
 
-import org.xipki.pkix.asn1.cmp.InfoTypeAndValue;
-import org.xipki.pkix.asn1.cmp.PBMParameter;
-import org.xipki.pkix.asn1.cmp.PKIFailureInfo;
-import org.xipki.pkix.asn1.cmp.PKIFreeText;
-import org.xipki.pkix.asn1.cmp.PKIHeader;
-import org.xipki.pkix.asn1.cmp.PKIMessage;
-import org.xipki.pkix.asn1.cmp.PKIStatus;
-import org.xipki.pkix.asn1.crmf.EncryptedValue;
-import org.xipki.pkix.asn1.x500.X500Name;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.cmp.InfoTypeAndValue;
+import org.xipki.asn1.cmp.PBMParameter;
+import org.xipki.asn1.cmp.PKIFailureInfo;
+import org.xipki.asn1.cmp.PKIFreeText;
+import org.xipki.asn1.cmp.PKIHeader;
+import org.xipki.asn1.cmp.PKIMessage;
+import org.xipki.asn1.cmp.PKIStatus;
+import org.xipki.asn1.crmf.EncryptedValue;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;

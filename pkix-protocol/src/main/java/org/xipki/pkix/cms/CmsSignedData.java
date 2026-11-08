@@ -3,10 +3,10 @@
 
 package org.xipki.pkix.cms;
 
-import org.xipki.pkix.asn1.cms.*;
-import org.xipki.pkix.asn1.x509.Attribute;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.CertificateList;
+import org.xipki.asn1.cms.*;
+import org.xipki.asn1.x509.Attribute;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;

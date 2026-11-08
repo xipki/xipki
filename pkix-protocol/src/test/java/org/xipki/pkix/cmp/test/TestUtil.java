@@ -19,7 +19,7 @@ import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierProvider;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Certificate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

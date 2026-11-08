@@ -17,13 +17,13 @@ import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.pkix.asn1.cmp.PBMParameter;
-import org.xipki.pkix.asn1.cmp.PKIMessage;
-import org.xipki.pkix.asn1.crmf.CertReqMsg;
-import org.xipki.pkix.asn1.crmf.CertRequest;
-import org.xipki.pkix.asn1.crmf.CertTemplate;
-import org.xipki.pkix.asn1.crmf.POPOSigningKey;
-import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.asn1.cmp.PBMParameter;
+import org.xipki.asn1.cmp.PKIMessage;
+import org.xipki.asn1.crmf.CertReqMsg;
+import org.xipki.asn1.crmf.CertRequest;
+import org.xipki.asn1.crmf.CertTemplate;
+import org.xipki.asn1.crmf.POPOSigningKey;
+import org.xipki.asn1.crmf.ProofOfPossession;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.oid.AlgorithmOIDs;
 import org.xipki.codec.asn1.oid.PkcsOIDs;
@@ -181,13 +181,13 @@ public class CmpInteropTest {
   // ---------------- helpers ----------------
 
   private static ProtectedPKIMessage.Builder newXipkiBuilder() throws Exception {
-    org.xipki.pkix.asn1.x500.X500Name sender = TestUtil.rsa().cert.getSubject();
+    org.xipki.asn1.x500.X500Name sender = TestUtil.rsa().cert.getSubject();
     return new ProtectedPKIMessage.Builder(
-        org.xipki.pkix.asn1.x509.GeneralName.ofDirectoryName(sender),
-        org.xipki.pkix.asn1.x509.GeneralName.ofDirectoryName(sender))
+        org.xipki.asn1.x509.GeneralName.ofDirectoryName(sender),
+        org.xipki.asn1.x509.GeneralName.ofDirectoryName(sender))
         .setTransactionID(TID)
         .setSenderNonce(new byte[16])
-        .setBody(org.xipki.pkix.asn1.cmp.PKIBody.ofPkiconf());
+        .setBody(org.xipki.asn1.cmp.PKIBody.ofPkiconf());
   }
 
   private static ProtectedPKIMessageBuilder newBcBuilder() {

@@ -3,15 +3,15 @@
 
 package org.xipki.pkix.cmp;
 
-import org.xipki.pkix.asn1.cmp.CMPCertificate;
-import org.xipki.pkix.asn1.cmp.InfoTypeAndValue;
-import org.xipki.pkix.asn1.cmp.PBMParameter;
-import org.xipki.pkix.asn1.cmp.PKIBody;
-import org.xipki.pkix.asn1.cmp.PKIFreeText;
-import org.xipki.pkix.asn1.cmp.PKIHeader;
-import org.xipki.pkix.asn1.cmp.PKIMessage;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.GeneralName;
+import org.xipki.asn1.cmp.CMPCertificate;
+import org.xipki.asn1.cmp.InfoTypeAndValue;
+import org.xipki.asn1.cmp.PBMParameter;
+import org.xipki.asn1.cmp.PKIBody;
+import org.xipki.asn1.cmp.PKIFreeText;
+import org.xipki.asn1.cmp.PKIHeader;
+import org.xipki.asn1.cmp.PKIMessage;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;

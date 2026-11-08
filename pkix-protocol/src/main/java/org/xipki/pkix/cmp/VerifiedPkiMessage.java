@@ -3,7 +3,7 @@
 
 package org.xipki.pkix.cmp;
 
-import org.xipki.pkix.asn1.cmp.PKIMessage;
+import org.xipki.asn1.cmp.PKIMessage;
 import org.xipki.codec.util.Args;
 
 /**

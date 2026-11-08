@@ -3,11 +3,11 @@
 
 package org.xipki.pkix.cmp;
 
-import org.xipki.pkix.asn1.crmf.CertReqMsg;
-import org.xipki.pkix.asn1.crmf.CertRequest;
-import org.xipki.pkix.asn1.crmf.CertTemplate;
-import org.xipki.pkix.asn1.crmf.POPOSigningKey;
-import org.xipki.pkix.asn1.crmf.ProofOfPossession;
+import org.xipki.asn1.crmf.CertReqMsg;
+import org.xipki.asn1.crmf.CertRequest;
+import org.xipki.asn1.crmf.CertTemplate;
+import org.xipki.asn1.crmf.POPOSigningKey;
+import org.xipki.asn1.crmf.ProofOfPossession;
 import org.xipki.codec.asn1.Asn1Encodable;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;

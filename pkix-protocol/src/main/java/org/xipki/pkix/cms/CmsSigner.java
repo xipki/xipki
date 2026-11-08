@@ -3,13 +3,13 @@
 
 package org.xipki.pkix.cms;
 
-import org.xipki.pkix.asn1.cms.Attributes;
-import org.xipki.pkix.asn1.cms.CMSAlgorithmProtection;
-import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
-import org.xipki.pkix.asn1.cms.SignerInfo;
-import org.xipki.pkix.asn1.x509.Attribute;
-import org.xipki.pkix.asn1.x509.Certificate;
-import org.xipki.pkix.asn1.x509.Extension;
+import org.xipki.asn1.cms.Attributes;
+import org.xipki.asn1.cms.CMSAlgorithmProtection;
+import org.xipki.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.asn1.cms.SignerInfo;
+import org.xipki.asn1.x509.Attribute;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierProvider;

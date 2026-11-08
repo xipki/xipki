@@ -3,9 +3,9 @@
 
 package org.xipki.pkix.scep.message;
 
-import org.xipki.pkix.asn1.cms.Attributes;
-import org.xipki.pkix.asn1.cms.ContentInfo;
-import org.xipki.pkix.asn1.x509.Attribute;
+import org.xipki.asn1.cms.Attributes;
+import org.xipki.asn1.cms.ContentInfo;
+import org.xipki.asn1.x509.Attribute;
 import org.xipki.codec.asn1.Asn1Encodable;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;

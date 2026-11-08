@@ -3,7 +3,7 @@
 
 package org.xipki.pkix.scep.message;
 
-import org.xipki.pkix.asn1.cms.ContentInfo;
+import org.xipki.asn1.cms.ContentInfo;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.asn1.oid.CmsOIDs;
 import org.xipki.codec.util.Args;

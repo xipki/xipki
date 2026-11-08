@@ -3,15 +3,15 @@
 
 package org.xipki.pkix.cms;
 
-import org.xipki.pkix.asn1.cms.IssuerAndSerialNumber;
-import org.xipki.pkix.asn1.cms.KeyAgreeRecipientIdentifier;
-import org.xipki.pkix.asn1.cms.KeyAgreeRecipientInfo;
-import org.xipki.pkix.asn1.cms.KeyTransRecipientInfo;
-import org.xipki.pkix.asn1.cms.OriginatorPublicKey;
-import org.xipki.pkix.asn1.cms.PasswordRecipientInfo;
-import org.xipki.pkix.asn1.cms.RecipientEncryptedKey;
-import org.xipki.pkix.asn1.cms.RecipientIdentifier;
-import org.xipki.pkix.asn1.x509.Certificate;
+import org.xipki.asn1.cms.IssuerAndSerialNumber;
+import org.xipki.asn1.cms.KeyAgreeRecipientIdentifier;
+import org.xipki.asn1.cms.KeyAgreeRecipientInfo;
+import org.xipki.asn1.cms.KeyTransRecipientInfo;
+import org.xipki.asn1.cms.OriginatorPublicKey;
+import org.xipki.asn1.cms.PasswordRecipientInfo;
+import org.xipki.asn1.cms.RecipientEncryptedKey;
+import org.xipki.asn1.cms.RecipientIdentifier;
+import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.asn1.crypto.PBKDF2Params;
 import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
