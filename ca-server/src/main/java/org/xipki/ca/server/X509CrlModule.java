@@ -618,7 +618,7 @@ public class X509CrlModule extends X509CaModule implements Closeable {
 
       X509Crl crl;
       try {
-        crl = new X509Crl(crlBuilder.build(signer0.x509Signer()));
+        crl = new X509Crl(crlBuilder.build(signer0.contentSigner()));
       } finally {
         concurrentSigner.requiteSigner(signer0);
       }

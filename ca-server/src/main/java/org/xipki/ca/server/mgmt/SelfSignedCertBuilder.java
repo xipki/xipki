@@ -183,7 +183,7 @@ public class SelfSignedCertBuilder {
       CaUtil.addExtensions(extensionTuples, certBuilder, certprofile.extensionControls());
       Certificate cert;
       try {
-        cert = certBuilder.build(signer0.x509Signer());
+        cert = certBuilder.build(signer0.contentSigner());
       } finally {
         signer.requiteSigner(signer0);
       }

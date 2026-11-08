@@ -14,12 +14,13 @@ import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierProvider;
-import org.xipki.codec.exception.GenerationException;
-import org.xipki.asn1.x509.Certificate;
+import org.xipki.crypto.core.SignAlgo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -117,12 +119,20 @@ public class TestUtil {
    * A {@link ContentSigner} with JCA {@link Signature}.
    */
   public static ContentSigner signer(PrivateKey key, String jceAlg, AlgorithmIdentifier algId) {
+
+    final Integer c509AlgId = x509ToC509AlgId(algId);
+
     return new ContentSigner() {
       private final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
       @Override
       public AlgorithmIdentifier getAlgorithmIdentifier() {
         return algId;
+      }
+
+      @Override
+      public Integer getC509AlgorithmIdentifier() {
+        return c509AlgId;
       }
 
       @Override
@@ -161,15 +171,18 @@ public class TestUtil {
         return cert != null && cert.isValidOn(time);
       }
 
-      @Override
-      public ContentVerifier get(AlgorithmIdentifier algId) throws GenerationException {
-        String name = new DefaultAlgorithmNameFinder().getAlgorithmName(
-            org.bouncycastle.asn1.x509.AlgorithmIdentifier.getInstance(algId.getEncoded()));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+      private ContentVerifier get(
+          ByteArrayOutputStream out, String name, AlgorithmIdentifier algId, Integer c509AlgId)
+          throws GenerationException {
         return new ContentVerifier() {
           @Override
           public AlgorithmIdentifier getAlgorithmIdentifier() {
             return algId;
+          }
+
+          @Override
+          public Integer getC509AlgorithmIdentifier() {
+            return c509AlgId;
           }
 
           @Override
@@ -191,7 +204,40 @@ public class TestUtil {
           }
         };
       }
+
+      @Override
+      public ContentVerifier get(AlgorithmIdentifier algId) throws GenerationException {
+        String name = new DefaultAlgorithmNameFinder().getAlgorithmName(
+            org.bouncycastle.asn1.x509.AlgorithmIdentifier.getInstance(algId.getEncoded()));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final Integer c509AlgId = x509ToC509AlgId(algId);
+        return get(out, name, algId, c509AlgId);
+      }
+
+      @Override
+      public ContentVerifier getForC509(int c509AlgId) throws GenerationException {
+        SignAlgo signAlgo;
+        try {
+          signAlgo = SignAlgo.ofC509AlgorithmIdentifier(c509AlgId);
+        } catch (NoSuchAlgorithmException e) {
+          throw new GenerationException(e);
+        }
+
+        AlgorithmIdentifier algId = signAlgo.algorithmIdentifier();
+        String name = new DefaultAlgorithmNameFinder().getAlgorithmName(
+            org.bouncycastle.asn1.x509.AlgorithmIdentifier.getInstance(algId.getEncoded()));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        return get(out, name, algId, c509AlgId);
+      }
     };
+  }
+
+  private static Integer x509ToC509AlgId(AlgorithmIdentifier x509AlgId) {
+    try {
+      return SignAlgo.ofAlgorithmIdentifier(x509AlgId).c509AlgorithmIdentifier();
+    } catch (NoSuchAlgorithmException e) {
+      return null;
+    }
   }
 
 }

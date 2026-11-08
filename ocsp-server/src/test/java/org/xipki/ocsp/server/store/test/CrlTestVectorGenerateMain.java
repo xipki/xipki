@@ -83,7 +83,7 @@ public class CrlTestVectorGenerateMain {
 
   private static void buildCrl(CertificateList.V2CRLBuilder builder, Signer signer, String fn)
       throws Exception {
-    byte[] encoded = builder.build(signer.x509Signer()).getEncoded();
+    byte[] encoded = builder.build(signer.contentSigner()).getEncoded();
     IoUtil.save("output/" + fn, encoded);
   }
 

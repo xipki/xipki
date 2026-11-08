@@ -575,7 +575,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
         Certificate precert;
         try {
-          precert = certBuilder.build(signer0.x509Signer());
+          precert = certBuilder.build(signer0.contentSigner());
         } finally {
           // returns the signer after the signing so that it can be used by
           // others
@@ -608,7 +608,7 @@ public class X509Ca extends X509CaModule implements Closeable {
 
       Certificate bcCert;
       try {
-        bcCert = certBuilder.build(signer0.x509Signer());
+        bcCert = certBuilder.build(signer0.contentSigner());
       } finally {
         gct.signer.requiteSigner(signer0);
       }

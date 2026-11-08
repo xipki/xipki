@@ -124,7 +124,7 @@ public class CmpUtil {
     Signer signer0 = signer.borrowSigner();
     ProtectedPKIMessage signedMessage;
     try {
-      signedMessage = builder.build(signer0.x509Signer());
+      signedMessage = builder.build(signer0.contentSigner());
     } finally {
       signer.requiteSigner(signer0);
     }

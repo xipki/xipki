@@ -505,7 +505,7 @@ public class HttpOcspRequestor implements OcspRequestor {
         }
 
         try {
-          return reqBuilder.build(signer0.x509Signer(), certChain);
+          return reqBuilder.build(signer0.contentSigner(), certChain);
         } finally {
           signer.requiteSigner(signer0);
         }

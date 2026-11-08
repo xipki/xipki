@@ -789,7 +789,7 @@ public class CmpCommands {
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = CertificateRequestMessage.buildSigningKeyPop(certRequest, signer0.x509Signer());
+        popSk = CertificateRequestMessage.buildSigningKeyPop(certRequest, signer0.contentSigner());
       } finally {
         signer.requiteSigner(signer0);
       }
@@ -1010,7 +1010,8 @@ public class CmpCommands {
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
-        popSk = CertificateRequestMessage.buildSigningKeyPop(certRequest, signer0.x509Signer());
+        popSk = CertificateRequestMessage.buildSigningKeyPop(
+            certRequest, signer0.contentSigner());
       } finally {
         signer.requiteSigner(signer0);
       }
