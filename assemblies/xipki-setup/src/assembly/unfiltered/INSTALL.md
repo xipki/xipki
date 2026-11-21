@@ -3,6 +3,22 @@ The XiPKI components `xipki-ca`, `xipki-gateway`, and `xipki-ocsp` shall be
 installed in different tomcat instances. Do NOT install more than 1 XiPKI component above
 to one tomcat instance.
 
+## XiPKI Base Directory
+
+Relative paths in the configuration files (keystores, certificates, `etc/*.json`, the path of an
+embedded H2 or HSQLDB database in a JDBC URL, etc.) are resolved against the base directory, not
+against the working directory.
+
+- Default: `${catalina.base}/xipki`, set by the context parameter `xipki.basedir` in the
+  `web.xml` of each web application.
+- To use another directory, set the parameter in Tomcat's `conf/context.xml`:
+  `<Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>`.
+  The value must be the absolute path of an existing directory, otherwise the web application
+  does not start. It cannot be set by a system property or an environment variable.
+- The keystore paths in `conf/server.xml` (`xipki/keycerts/...`) are relative to
+  `CATALINA_BASE`. With a separate `CATALINA_BASE`, the folder `xipki` must be under
+  `CATALINA_BASE`, or the paths in `server.xml` must be adapted.
+
 ## JAVA_HOME
 Set the environment variable `JAVA_HOME` to the root directory of JRE/JDK installation.
 

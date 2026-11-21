@@ -1,3 +1,5 @@
+# set SCRIPT_TRACE true
+
 set printUsage "false"
 set argsValid "false"
 set errMsg ""
