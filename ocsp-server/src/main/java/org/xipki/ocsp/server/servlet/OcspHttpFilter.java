@@ -18,7 +18,6 @@ import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.io.XipkiBaseDir;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,12 +42,10 @@ public class OcspHttpFilter implements XiHttpFilter {
 
   private final HttpOcspServlet ocspServlet;
 
-  public OcspHttpFilter() throws Exception {
-    XipkiBaseDir.init();
-
+  public OcspHttpFilter(String basedir) throws Exception {
     OcspConf conf;
     try {
-      conf = OcspConf.readConfFromFile(DFLT_CFG);
+      conf = OcspConf.readConfFromFile(DFLT_CFG, basedir);
     } catch (InvalidConfException ex) {
       throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
@@ -57,9 +54,9 @@ public class OcspHttpFilter implements XiHttpFilter {
     LOG.info("logReqResp: {}", logReqResp);
 
     securities = new Securities();
-    securities.init(conf.security());
+    securities.init(conf.security(), basedir);
 
-    OcspServer ocspServer = new OcspServer();
+    OcspServer ocspServer = new OcspServer(basedir);
     ocspServer.setSecurityFactory(securities.securityFactory());
     ocspServer.setConfFile(conf.serverConf());
 

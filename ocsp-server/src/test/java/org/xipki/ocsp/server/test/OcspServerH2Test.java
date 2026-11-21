@@ -36,6 +36,7 @@ import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.audit.Audits;
+import org.xipki.util.password.Passwords;
 import org.xipki.util.conf.ConfigurableProperties;
 
 import java.io.ByteArrayInputStream;
@@ -106,8 +107,8 @@ public class OcspServerH2Test {
   @BeforeClass
   public static void init() throws Exception {
     workDir = Files.createTempDirectory("xipki-ocsp-h2-test");
-    System.setProperty("XIPKI_BASE", workDir.toString());
-    Audits.init("noop", new ConfPairs());
+    Passwords.init(workDir.toString());
+    Audits.init("noop", new ConfPairs(), workDir.toString());
 
     Path dbConf = writeDbConf("ca_" + UUID.randomUUID().toString().replace("-", ""));
     datasource = createDatasource(dbConf);
@@ -138,9 +139,9 @@ public class OcspServerH2Test {
     }
 
     securities = new Securities();
-    securities.init();
+    securities.init(null, workDir.toString());
 
-    server = new OcspServer();
+    server = new OcspServer(workDir.toString());
     server.setSecurityFactory(securities.securityFactory());
     server.setConfFile(writeResponderConf(dbConf, ca1Keystore).toString());
     server.init(true);

@@ -15,8 +15,9 @@ import org.xipki.util.http.XiHttpFilter;
 public class CrlServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
-    return new CrlHttpFilter();
+  protected XiHttpFilter initFilter(FilterConfig filterConfig, String basedir)
+      throws Exception {
+    return new CrlHttpFilter(basedir);
   }
 
 }

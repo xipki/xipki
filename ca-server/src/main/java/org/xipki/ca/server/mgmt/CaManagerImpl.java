@@ -41,7 +41,6 @@ import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.audit.AuditLevel;
@@ -211,6 +210,8 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   private final DataSourceFactory datasourceFactory;
 
+  private final String basedir;
+
   private CtLogPublicKeyFinder ctLogPublicKeyFinder;
 
   private boolean caSystemSetuped;
@@ -239,9 +240,15 @@ public class CaManagerImpl implements CaManager, Closeable {
     LOG.info("XiPKI CA version {}", StringUtil.getBundleVersion(CaManagerImpl.class));
   }
 
-  public CaManagerImpl() {
+  /**
+   * Constructor.
+   * @param basedir the base directory, against which relative paths in the configuration are
+   *                resolved. May be {@code null}.
+   */
+  public CaManagerImpl(String basedir) {
+    this.basedir = basedir;
     this.datasourceFactory = new DataSourceFactory();
-    this.calockFilePath = XipkiIoUtil.expandFilepath("calock", true);
+    this.calockFilePath = IoUtil.resolvePath(basedir, "calock");
     String calockId = null;
 
     File calockFile = new File(calockFilePath);
@@ -402,11 +409,11 @@ public class CaManagerImpl implements CaManager, Closeable {
     shardId = caServerConf.shardId();
     LOG.info("ca.shardId: {}", shardId);
 
-    caServerConf.initSsl();
+    caServerConf.initSsl(basedir);
 
     if (caServerConf.ctLog() != null) {
       try {
-        ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.ctLog());
+        ctLogPublicKeyFinder = new CtLogPublicKeyFinder(caServerConf.ctLog(), basedir);
       } catch (Exception ex) {
         throw new CaMgmtException("could not load CtLogPublicKeyFinder: " + ex.getMessage(), ex);
       }
@@ -431,12 +438,12 @@ public class CaManagerImpl implements CaManager, Closeable {
       if (caServerConf.caConfFiles() == null) {
         LOG.info("loading CAConf from database");
         DataSourceWrapper caconfDatasource = allDataSources.get("caconf");
-        caConfStore = new DbCaConfStore(caconfDatasource);
+        caConfStore = new DbCaConfStore(caconfDatasource, basedir);
       } else {
         LOG.info("loading CAConf from files {}", caServerConf.caConfFiles());
         try {
           caConfStore = new FileCaConfStore(securityFactory,
-              certprofileFactoryRegister, caServerConf.caConfFiles());
+              certprofileFactoryRegister, caServerConf.caConfFiles(), basedir);
         } catch (IOException ex) {
           throw new CaMgmtException("IO error: " + ex.getMessage(), ex);
         } catch (InvalidConfException ex) {
@@ -568,10 +575,18 @@ public class CaManagerImpl implements CaManager, Closeable {
     }
   } // method init
 
+  /**
+   * Returns the base directory, against which relative paths in the configuration are resolved.
+   * @return the base directory, may be {@code null}.
+   */
+  String basedir() {
+    return basedir;
+  }
+
   private void addDataSource(String name, FileOrValue conf) throws CaMgmtException {
     DataSourceWrapper datasource;
     try {
-      datasource = datasourceFactory.createDataSource(name, conf);
+      datasource = datasourceFactory.createDataSource(name, conf, basedir);
 
       // test the datasource
       Connection conn = datasource.getConnection();

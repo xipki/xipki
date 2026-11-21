@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app>
   <display-name>XiPKI CA Web Application</display-name>
+  <!-- Base directory, against which relative paths in the configuration are resolved.
+       Override it only in Tomcat's conf/context.xml:
+       <Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/> -->
+  <context-param>
+    <param-name>xipki.basedir</param-name>
+    <param-value>${catalina.base}/xipki</param-value>
+  </context-param>
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>

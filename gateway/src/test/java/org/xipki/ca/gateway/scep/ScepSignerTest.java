@@ -109,14 +109,15 @@ public class ScepSignerTest {
 
     // signer as default, decryptor for subca only
     CaNameScepSigners signers = new CaNameScepSigners(
-        new CaNameSigners(raSigner, null), decryptorsConf);
+        new CaNameSigners(raSigner, null), decryptorsConf, null);
     Assert.assertEquals(encCert, signers.getSigner("subca").encryptionCert());
     ScepSigner other = signers.getSigner("other");
     Assert.assertSame(other.cert(), other.encryptionCert());
 
     // decryptor for a CA without signer
     try {
-      new CaNameScepSigners(new CaNameSigners(null, Map.of("other", raSigner)), decryptorsConf);
+      new CaNameScepSigners(
+          new CaNameSigners(null, Map.of("other", raSigner)), decryptorsConf, null);
       Assert.fail("InvalidConfException expected");
     } catch (InvalidConfException ex) {
       Assert.assertTrue(ex.getMessage(), ex.getMessage().contains("no signer"));

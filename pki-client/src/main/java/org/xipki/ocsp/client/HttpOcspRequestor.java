@@ -45,7 +45,6 @@ import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.codec.util.IoUtil;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.File;
@@ -161,7 +160,7 @@ public class HttpOcspRequestor implements OcspRequestor {
       throw new IOException("bad response: mime type " + responseContentType + " not supported!");
     }
 
-    return XipkiIoUtil.readAllBytesAndClose(inputstream);
+    return IoUtil.readAllBytesAndClose(inputstream);
   } // method send
 
   public String confFile() {

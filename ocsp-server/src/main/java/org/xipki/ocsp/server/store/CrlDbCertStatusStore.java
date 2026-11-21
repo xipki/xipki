@@ -21,7 +21,6 @@ import org.xipki.util.misc.LogUtil;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.codec.util.IoUtil;
-import org.xipki.util.io.XipkiIoUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -177,7 +176,7 @@ public class CrlDbCertStatusStore extends DbCertStatusStore {
     this.sourceConf = Args.notNull(sourceConf, "sourceConf");
 
     // check the dir
-    this.dir = XipkiIoUtil.expandFilepath(sourceConf.getNnString("dir"), true);
+    this.dir = IoUtil.resolvePath(basedir, sourceConf.getNnString("dir"));
     File dirObj = new File(this.dir);
     if (!dirObj.exists()) {
       throw new OcspStoreException("the dir " + this.dir + " does not exist");

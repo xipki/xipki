@@ -25,7 +25,7 @@ set CA_TOMCAT_DIR $[demo.dir]/ca-tomcat
 set OCSP_TOMCAT_DIR $[demo.dir]/ocsp-tomcat
 set GW_TOMCAT_DIR $[demo.dir]/gateway-tomcat
 
-set XIPKI_BASE ${CA_TOMCAT_DIR}/xipki
+set XIPKI_DIR ${CA_TOMCAT_DIR}/xipki
 
 set SLOT 0
 set LABEL $[ca.name]
@@ -53,11 +53,11 @@ rm --force --recursive $CA_KEYCERTS_DIR
 
 if "$storetype" eq "file"
   rm --force --recursive output/ca-setup/ca-conf
-  rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
+  rm --force --recursive ${XIPKI_DIR}/etc/ca/ca-conf
 fi
 
 source xipki/ca-setup/cacert-none-${storetype}based/setup-${tokenfile}.script \
-  $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_BASE
+  $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_DIR
 
 echo "+---------------------------------------------------------------+"
 echo "|  - CA key-spec:       $CA_KEYSPEC"
@@ -68,12 +68,12 @@ echo "+---------------------------------------------------------------+"
 
 if "$storetype" eq "file"
   rm --force --recursive output/ca-setup/ca-conf
-  rm --force --recursive ${XIPKI_BASE}/etc/ca/ca-conf
+  rm --force --recursive ${XIPKI_DIR}/etc/ca/ca-conf
 fi
 
 source \
   xipki/ca-setup/cacert-present-${storetype}based/setup-${tokenfile}.script \
-  $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_BASE
+  $CA_KEYSPEC $CA_TOMCAT_DIR $XIPKI_DIR
 
 gen-crl --ca $[ca.name]
 

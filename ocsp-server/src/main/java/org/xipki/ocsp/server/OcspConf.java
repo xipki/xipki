@@ -9,7 +9,7 @@ import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.pkix.Securities.SecurityConf;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,10 +35,11 @@ public class OcspConf {
     this.security = security;
   }
 
-  public static OcspConf readConfFromFile(String fileName) throws InvalidConfException {
+  public static OcspConf readConfFromFile(String fileName, String basedir)
+      throws InvalidConfException {
     Args.notBlank(fileName, "fileName");
     try {
-      Path path = Paths.get(XipkiIoUtil.expandFilepath(fileName, true));
+      Path path = Paths.get(IoUtil.resolvePath(basedir, fileName));
       return parse(JsonParser.parseMap(path, true));
     } catch (RuntimeException | CodecException e) {
       throw new InvalidConfException("error parsing " + fileName + ": " + e.getMessage(), e);

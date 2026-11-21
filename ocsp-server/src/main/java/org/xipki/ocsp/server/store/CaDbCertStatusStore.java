@@ -376,11 +376,11 @@ public class CaDbCertStatusStore extends AbstractDbCertStatusStore {
 
     if (caCerts != null) {
       if (CollectionUtil.isNotEmpty(caCerts.includes())) {
-        includeIssuers = DbCertStatusStore.parseCerts(caCerts.includes());
+        includeIssuers = DbCertStatusStore.parseCerts(caCerts.includes(), basedir);
       }
 
       if (CollectionUtil.isNotEmpty(caCerts.excludes())) {
-        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.excludes());
+        excludeIssuers = DbCertStatusStore.parseCerts(caCerts.excludes(), basedir);
       }
     }
 

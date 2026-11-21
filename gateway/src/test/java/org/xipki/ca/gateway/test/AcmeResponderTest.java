@@ -113,7 +113,7 @@ public class AcmeResponderTest {
         + "}\n";
     AcmeConf.Acme acmeConf = AcmeConf.Acme.parse(JsonParser.parseMap(conf, false));
     responder = new AcmeResponder(env.sdk(), env.ca().securities().securityFactory(),
-        env.popControl(), acmeConf);
+        env.popControl(), acmeConf, workDir.toString());
     responder.start();
   }
 

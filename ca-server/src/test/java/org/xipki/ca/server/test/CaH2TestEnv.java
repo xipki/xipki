@@ -28,6 +28,7 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.audit.Audits;
+import org.xipki.util.password.Passwords;
 import org.xipki.util.conf.ConfigurableProperties;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.NameId;
@@ -76,8 +77,8 @@ public final class CaH2TestEnv implements AutoCloseable {
 
   public CaH2TestEnv() throws Exception {
     workDir = Files.createTempDirectory("xipki-ca-h2-test");
-    System.setProperty("XIPKI_BASE", workDir.toString());
-    Audits.init("noop", new ConfPairs());
+    Passwords.init(workDir.toString());
+    Audits.init("noop", new ConfPairs(), workDir.toString());
 
     // the databases are kept until the JVM exits (DB_CLOSE_DELAY=-1), so that the CA system,
     // which opens its own connection pools, sees the same databases.
@@ -90,9 +91,9 @@ public final class CaH2TestEnv implements AutoCloseable {
     runScript(caconfDatasource, "caconf-init.h2.sql");
 
     securities = new Securities();
-    securities.init();
+    securities.init(null, workDir.toString());
 
-    caManager = new CaManagerImpl();
+    caManager = new CaManagerImpl(workDir.toString());
     caManager.setSecurityFactory(securities.securityFactory());
     CertprofileFactoryRegister profileRegister = new CertprofileFactoryRegister();
     profileRegister.registFactory(new CertprofileFactoryImpl());

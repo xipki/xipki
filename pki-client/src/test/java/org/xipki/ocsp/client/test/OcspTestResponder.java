@@ -22,6 +22,7 @@ import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.audit.Audits;
+import org.xipki.util.password.Passwords;
 import org.xipki.util.conf.ConfigurableProperties;
 
 import java.io.ByteArrayInputStream;
@@ -91,8 +92,8 @@ final class OcspTestResponder implements AutoCloseable {
 
   OcspTestResponder() throws Exception {
     workDir = Files.createTempDirectory("xipki-ocsp-client-test");
-    System.setProperty("XIPKI_BASE", workDir.toString());
-    Audits.init("noop", new ConfPairs());
+    Passwords.init(workDir.toString());
+    Audits.init("noop", new ConfPairs(), workDir.toString());
 
     Path dbConf = writeDbConf("ca_" + UUID.randomUUID().toString().replace("-", ""));
     datasource = createDatasource(dbConf);
@@ -120,9 +121,9 @@ final class OcspTestResponder implements AutoCloseable {
     }
 
     securities = new Securities();
-    securities.init();
+    securities.init(null, workDir.toString());
 
-    ocspServer = new OcspServer();
+    ocspServer = new OcspServer(workDir.toString());
     ocspServer.setSecurityFactory(securities.securityFactory());
     ocspServer.setConfFile(writeResponderConf(dbConf, caKeystore).toString());
     ocspServer.init(true);

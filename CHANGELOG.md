@@ -47,6 +47,25 @@ See also <https://github.com/xipki/xipki/releases>
 - The shell-base module moved to https://github.com/xipki/xiutil and use the groupId `org.xipki.util`. The
   package `org.xipki.shell` is unchanged.
 - The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
+- Base directory
+  - `XipkiBaseDir` is removed, and the system property `XIPKI_BASE` is no longer used. No global base
+    directory is put in front of relative paths any more.
+  - The servlets take their base directory from the context parameter `xipki.basedir`. The default,
+    `${catalina.base}/xipki`, is set in the `web.xml` of each web application. It can be changed only
+    in Tomcat's `conf/context.xml`:
+    `<Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>`.
+  - `setenv.sh` no longer sets `-DXIPKI_BASE`, and `server.xml` uses the relative keystore paths
+    `xipki/keycerts/...`. With a separate `CATALINA_BASE`, the folder `xipki` must be under
+    `CATALINA_BASE`.
+  - A relative path in a configuration is resolved against the base directory only; the working
+    directory is no longer tried first. This applies also to the file `.nonces` of the ACME gateway,
+    to `etc/csr.json`, and to the path of an embedded H2 or HSQLDB database in a JDBC URL.
+  - API: `FileOrBinary.readContent(String basedir)`, `FileOrValue.readContent(String basedir)`;
+    `IoUtil.resolvePath(String basedir, String path)` (in `org.xipki.codec.util`) replaces
+    `expandFilepath(String, boolean)` and `detectPath(String)`. `XipkiIoUtil` is removed, its methods
+    are in `IoUtil`. `BatchReplace` moved from `org.xipki.util.io` to `org.xipki.util.misc`. `AuditService.init(ConfPairs, String basedir)` and
+    `RequestorAuthenticator.init(String, String basedir)` take the base directory, so custom
+    implementations must be adapted. `ServletFilter.initFilter(FilterConfig, String basedir)`.
 - ACME gateway
   - dns-01 challenge: dnsjava replaced by a built-in stub resolver and DNSSEC validator
     (packages `org.xipki.dns` and `org.xipki.dns.dnssec`). The DNSSEC validation runs in the gateway as before, against the configured

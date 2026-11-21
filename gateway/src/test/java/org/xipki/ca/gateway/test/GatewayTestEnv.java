@@ -107,9 +107,9 @@ public final class GatewayTestEnv implements AutoCloseable {
         "http://127.0.0.1:" + raServer.getAddress().getPort() + "/ra/", null, null);
 
     SimpleRequestorAuthenticator authenticator = new SimpleRequestorAuthenticator();
-    authenticator.init(writeRequestorsConf().toString());
+    authenticator.init(writeRequestorsConf().toString(), null);
 
-    popControl = new PopControl(new GatewayConf.PopControlConf(null, null, null));
+    popControl = new PopControl(new GatewayConf.PopControlConf(null, null, null), null);
     GatewayConf.CaProfilesControl caProfiles = new GatewayConf.CaProfilesControl(List.of(
         new GatewayConf.CaProfileConf("default", CA, PROFILE),
         new GatewayConf.CaProfileConf("tls", CA, PROFILE)));

@@ -291,14 +291,14 @@ public class CaServerConf {
     return ctLog;
   }
 
-  public void initSsl() {
+  public void initSsl(String basedir) {
     if (sslContexts == null || sslContexts.isEmpty()) {
       return;
     }
 
     if (sslContextConfMap.isEmpty()) {
       for (SslContext m : sslContexts) {
-        SslContextConf conf = new SslContextConf(m.trustanchors, m.hostverifier);
+        SslContextConf conf = new SslContextConf(m.trustanchors, m.hostverifier, basedir);
         try {
           conf.init();
         } catch (GenerationException e) {

@@ -19,7 +19,6 @@ import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -218,7 +217,7 @@ class CaCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      XipkiIoUtil.closeQuietly(entriesFileOs);
+      IoUtil.closeQuietly(entriesFileOs);
     }
   } // method exportEntries
 

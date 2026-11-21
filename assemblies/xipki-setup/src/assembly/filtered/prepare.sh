@@ -49,7 +49,7 @@ fi
 classpath="xipki-mgmt-cli/lib/*"
 
 cd "$script_dir"
-"$java_exec" $java_opts -cp "$classpath" org.xipki.util.io.BatchReplace setup/conf.json
+"$java_exec" $java_opts -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
 
 kc_dir="$script_dir"/setup/keycerts
 "$java_exec" $java_opts -cp "$classpath" org.xipki.pkix.util.GenerateCerts setup/keycerts.json "$kc_dir"

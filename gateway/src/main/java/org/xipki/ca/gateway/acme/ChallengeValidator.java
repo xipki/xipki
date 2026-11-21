@@ -17,7 +17,7 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.dns.DnsClient;
 import org.xipki.dns.DnsRecord;
 import org.xipki.dns.NetDnsTransport;
@@ -111,7 +111,8 @@ public class ChallengeValidator implements Runnable {
 
   private final Http01Client http01Client;
 
-  public ChallengeValidator(AcmeRepo repo, AcmeConf.Acme conf) throws InvalidConfException {
+  public ChallengeValidator(AcmeRepo repo, AcmeConf.Acme conf, String basedir)
+      throws InvalidConfException {
     this.repo = Args.notNull(repo, "repo");
     Args.notNull(conf, "conf");
     List<InetSocketAddress> dnsServers;
@@ -126,7 +127,7 @@ public class ChallengeValidator implements Runnable {
 
     if (conf.dnssecValidation()) {
       this.trustAnchorsFile = new TrustAnchorsFile(
-          Path.of(XipkiIoUtil.expandFilepath(conf.dnssecTrustAnchorsFile(), true)));
+          Path.of(IoUtil.resolvePath(basedir, conf.dnssecTrustAnchorsFile())));
       try {
         this.dnssecValidator = new DnssecValidator(transport, trustAnchorsFile.load(),
             Clock.systemUTC());

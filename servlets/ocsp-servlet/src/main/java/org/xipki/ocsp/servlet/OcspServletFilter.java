@@ -16,8 +16,9 @@ import org.xipki.util.http.XiHttpFilter;
 public class OcspServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
-    return new OcspHttpFilter();
+  protected XiHttpFilter initFilter(FilterConfig filterConfig, String basedir)
+      throws Exception {
+    return new OcspHttpFilter(basedir);
   }
 
 }

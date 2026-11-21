@@ -12,7 +12,6 @@ import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.CollectionUtil;
 
 import java.io.ByteArrayInputStream;
@@ -69,7 +68,7 @@ public class CaConfs {
       zipStream.setLevel(Deflater.BEST_SPEED);
 
       File confFile = new File(confFilename);
-      confFile = XipkiIoUtil.expandFilepath(confFile, false);
+      confFile = IoUtil.resolvePath(null, confFile);
 
       CaConfType.CaSystem root = CaConfType.CaSystem.parse(confFile.toPath());
 

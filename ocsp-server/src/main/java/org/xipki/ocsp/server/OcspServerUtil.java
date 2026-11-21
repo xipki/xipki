@@ -30,7 +30,7 @@ import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -62,13 +62,14 @@ public class OcspServerUtil {
   private static final String STORE_TYPE_EJBCA_DB = "ejbca-db";
 
   static ResponseSigner initSigner(
-      OcspServerConf.Signer signerType, SecurityFactory securityFactory)
+      OcspServerConf.Signer signerType, SecurityFactory securityFactory,
+      String basedir)
       throws InvalidConfException {
     X509Cert[] explicitCertificateChain = null;
 
     X509Cert explicitResponderCert = null;
     if (signerType.cert() != null) {
-      explicitResponderCert = parseCert(signerType.cert());
+      explicitResponderCert = parseCert(signerType.cert(), basedir);
     }
 
     if (explicitResponderCert != null) {
@@ -77,7 +78,7 @@ public class OcspServerUtil {
         caCerts = new HashSet<>();
 
         for (FileOrBinary certConf : signerType.caCerts()) {
-          caCerts.add(parseCert(certConf));
+          caCerts.add(parseCert(certConf, basedir));
         }
       }
 
@@ -143,7 +144,8 @@ public class OcspServerUtil {
     }
   } // method initSigner
 
-  static OcspStore newStore(OcspServerConf.Store conf, Map<String, DataSourceWrapper> datasources)
+  static OcspStore newStore(
+      OcspServerConf.Store conf, Map<String, DataSourceWrapper> datasources, String basedir)
       throws InvalidConfException {
     OcspStore store;
     try {
@@ -175,6 +177,7 @@ public class OcspServerUtil {
     }
 
     store.setName(conf.name());
+    store.setBasedir(basedir);
     Integer interval = conf.retentionInterval();
     int retentionInterval = (interval == null) ? -1 : interval;
     store.setRetentionInterval(retentionInterval);
@@ -260,9 +263,10 @@ public class OcspServerUtil {
     return (bo == null) ? defaultValue : bo;
   }
 
-  private static X509Cert parseCert(FileOrBinary certConf) throws InvalidConfException {
+  private static X509Cert parseCert(FileOrBinary certConf, String basedir)
+      throws InvalidConfException {
     try {
-      return X509Util.parseCert(certConf.readContent());
+      return X509Util.parseCert(certConf.readContent(basedir));
     } catch (IOException | CertificateException ex) {
       String msg = "could not parse certificate";
       if (certConf.file() != null) {
@@ -272,8 +276,9 @@ public class OcspServerUtil {
     }
   } // method parseCert
 
-  static OcspServerConf parseConf(String confFilename) throws InvalidConfException {
-    return OcspServerConf.readConfFromFile(XipkiIoUtil.expandFilepath(confFilename, true));
+  static OcspServerConf parseConf(String confFilename, String basedir)
+      throws InvalidConfException {
+    return OcspServerConf.readConfFromFile(IoUtil.resolvePath(basedir, confFilename));
   }
 
   static ExtendedExtension removeExtension(List<ExtendedExtension> extensions, OID extnType) {

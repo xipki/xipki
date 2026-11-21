@@ -41,8 +41,7 @@ import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.io.XipkiIoUtil;
-import org.xipki.util.io.XipkiBaseDir;
+import org.xipki.codec.util.IoUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +73,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
   private ScepHttpServlet scepServlet;
 
+  private final String basedir;
+
   private Securities securities;
 
   static {
@@ -81,28 +82,28 @@ public class GatewayHttpFilter implements XiHttpFilter {
         StringUtil.getBundleVersion(AcmeResponder.class));
   }
 
-  public GatewayHttpFilter() throws Exception {
-    XipkiBaseDir.init();
+  public GatewayHttpFilter(String basedir) throws Exception {
+    this.basedir = basedir;
 
     GatewayConf gatewayConf;
     try {
-      gatewayConf = GatewayConf.readConfFromFile(XipkiIoUtil.expandFilepath(DFLT_CFG, true));
+      gatewayConf = GatewayConf.readConfFromFile(IoUtil.resolvePath(basedir, DFLT_CFG));
     } catch (InvalidConfException ex) {
       throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
 
     securities = new Securities();
-    securities.init(gatewayConf.security());
+    securities.init(gatewayConf.security(), basedir);
 
-    Audits.init(gatewayConf.audit().type(), gatewayConf.audit().conf());
+    Audits.init(gatewayConf.audit().type(), gatewayConf.audit().conf(), basedir);
     if (Audits.getAuditService() == null) {
       throw new InvalidConfException("could not init AuditService");
     }
 
-    SdkClient gSdkClient = new SdkClient(gatewayConf.sdkClient());
+    SdkClient gSdkClient = new SdkClient(gatewayConf.sdkClient(), basedir);
     boolean gLogReqResp = gatewayConf.isLogReqResp();
     String reverseProxyMode = gatewayConf.reverseProxyMode();
-    PopControl gPopControl = new PopControl(gatewayConf.pop());
+    PopControl gPopControl = new PopControl(gatewayConf.pop(), basedir);
 
     GatewayConf.SupportedProtocols protocols = gatewayConf.protocols();
     boolean enabled = protocols.isAcme();
@@ -140,20 +141,20 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private void initAcme(boolean gLogReqResp, SdkClient gSdkClient, PopControl gPopControl) {
     try {
       AcmeProtocolConf pconf = AcmeProtocolConf.readConfFromFile(
-          XipkiIoUtil.expandFilepath(ACME_CFG, true));
+          IoUtil.resolvePath(basedir, ACME_CFG));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
       SdkClient sdkClient = gSdkClient;
       if (pconf.sdkClient() != null) {
-        sdkClient = new SdkClient(pconf.sdkClient());
+        sdkClient = new SdkClient(pconf.sdkClient(), basedir);
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop());
+      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       AcmeResponder responder = new AcmeResponder(sdkClient,
-          securities.securityFactory(), popControl, pconf.acme());
+          securities.securityFactory(), popControl, pconf.acme(), basedir);
 
       responder.start();
       acmeServlet = new AcmeHttpServlet(logReqResp, responder);
@@ -167,17 +168,17 @@ public class GatewayHttpFilter implements XiHttpFilter {
                       PopControl gPopControl, String reverseProxyMode) {
     try {
       CmpProtocolConf pconf = CmpProtocolConf.readConfFromFile(
-          XipkiIoUtil.expandFilepath(CMP_CFG, true));
+          IoUtil.resolvePath(basedir, CMP_CFG));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
       SdkClient sdkClient = gSdkClient;
       if (pconf.sdkClient() != null) {
-        sdkClient = new SdkClient(pconf.sdkClient());
+        sdkClient = new SdkClient(pconf.sdkClient(), basedir);
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop());
+      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       CaNameSigners signers = newCaSigners(securities, pconf.signers());
@@ -197,17 +198,17 @@ public class GatewayHttpFilter implements XiHttpFilter {
                       PopControl gPopControl, String reverseProxyMode) {
     try {
       EstProtocolConf pconf = EstProtocolConf.readConfFromFile(
-          XipkiIoUtil.expandFilepath(EST_CFG, true));
+          IoUtil.resolvePath(basedir, EST_CFG));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
       SdkClient sdkClient = gSdkClient;
       if (pconf.sdkClient() != null) {
-        sdkClient = new SdkClient(pconf.sdkClient());
+        sdkClient = new SdkClient(pconf.sdkClient(), basedir);
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop());
+      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
@@ -227,17 +228,17 @@ public class GatewayHttpFilter implements XiHttpFilter {
                         PopControl gPopControl, String reverseProxyMode) {
     try {
       RestProtocolConf pconf = RestProtocolConf.readConfFromFile(
-          XipkiIoUtil.expandFilepath(REST_CFG, true));
+          IoUtil.resolvePath(basedir, REST_CFG));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp :  pconf.logReqResp();
 
       SdkClient sdkClient = gSdkClient;
       if (pconf.sdkClient() != null) {
-        sdkClient = new SdkClient(pconf.sdkClient());
+        sdkClient = new SdkClient(pconf.sdkClient(), basedir);
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop());
+      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
@@ -256,23 +257,23 @@ public class GatewayHttpFilter implements XiHttpFilter {
   private void initScep(boolean gLogReqResp, SdkClient gSdkClient, PopControl gPopControl) {
     try {
       ScepProtocolConf pconf = ScepProtocolConf.readConfFromFile(
-          XipkiIoUtil.expandFilepath(SCEP_CFG, true));
+          IoUtil.resolvePath(basedir, SCEP_CFG));
 
       boolean logReqResp = (pconf.logReqResp() == null) ? gLogReqResp : pconf.logReqResp();
 
       SdkClient sdkClient = gSdkClient;
       if (pconf.sdkClient() != null) {
-        sdkClient = new SdkClient(pconf.sdkClient());
+        sdkClient = new SdkClient(pconf.sdkClient(), basedir);
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop());
+      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
           new GatewayConf.CaProfilesControl(pconf.caProfiles());
       CaNameScepSigners signers = new CaNameScepSigners(
-          newCaSigners(securities, pconf.signers()), pconf.decryptors());
+          newCaSigners(securities, pconf.signers()), pconf.decryptors(), basedir);
 
       ScepResponder responder = new ScepResponder(pconf.scep(), sdkClient,
           securities.securityFactory(), signers, authenticator, popControl, caProfilesControl);
@@ -346,7 +347,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     }
   }
 
-  private static RequestorAuthenticator newAuthenticator(String authenticatorClazzAndConf)
+  private RequestorAuthenticator newAuthenticator(String authenticatorClazzAndConf)
       throws InvalidConfException {
     if (authenticatorClazzAndConf == null) {
       return null;
@@ -372,14 +373,14 @@ public class GatewayHttpFilter implements XiHttpFilter {
     }
 
     try {
-      authenticator.init(conf);
+      authenticator.init(conf, basedir);
     } catch (XiSecurityException e) {
       throw new InvalidConfException(e);
     }
     return authenticator;
   }
 
-  private static CaNameSigners newCaSigners(
+  private CaNameSigners newCaSigners(
       Securities securities, GatewayConf.CaNameSignersConf signersConf)
       throws InvalidConfException, GenerationException {
     if (signersConf == null) {
@@ -402,7 +403,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
     return new CaNameSigners(defaultSigner, signerMap);
   }
 
-  private static ConcurrentSigner buildSigner(
+  private ConcurrentSigner buildSigner(
       Securities securities, GatewayConf.SignerConf signerConf)
       throws InvalidConfException, GenerationException {
     if (signerConf == null) {
@@ -411,7 +412,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
     return securities.securityFactory().createSigner(signerConf.type(),
             new SignerConf(signerConf.conf()),
-            X509Util.parseCerts(signerConf.certs()).toArray(new X509Cert[0]));
+            X509Util.parseCerts(signerConf.certs(), basedir).toArray(new X509Cert[0]));
   }
 
 }

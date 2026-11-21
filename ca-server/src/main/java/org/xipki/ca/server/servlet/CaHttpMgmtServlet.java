@@ -23,7 +23,7 @@ import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -113,7 +113,7 @@ class CaHttpMgmtServlet {
           .orElseThrow(() -> new MyException(HttpStatusCode.SC_NOT_FOUND,
               "unknown action '" + actionStr + "'"));
 
-      reqBody = XipkiIoUtil.readAllBytesAndClose(request.getInputStream());
+      reqBody = IoUtil.readAllBytesAndClose(request.getInputStream());
 
       JsonMap json;
       try {
@@ -201,7 +201,7 @@ class CaHttpMgmtServlet {
         case exportConf: {
           MgmtRequest.ExportConf req = MgmtRequest.ExportConf.parse(nonNullReq(json));
           InputStream confStream = caManager.exportConf(req.caNames());
-          resp = new MgmtResponse.ByteArray(XipkiIoUtil.readAllBytesAndClose(confStream));
+          resp = new MgmtResponse.ByteArray(IoUtil.readAllBytesAndClose(confStream));
           break;
         }
         case generateCertificate: {

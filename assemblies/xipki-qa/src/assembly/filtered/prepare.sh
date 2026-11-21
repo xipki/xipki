@@ -108,7 +108,7 @@ classpath="xipki-qa-cli/lib/*"
 "$java_exec" $java_opts -cp "$classpath" \
   -Ddatabase.type="$DATABASE_TYPE" -Dtest.basedir="$TBDIR" \
   -Dtomcat.java.home="$tomcat_java_home" \
-  org.xipki.util.io.BatchReplace setup/conf.json
+  org.xipki.util.misc.BatchReplace setup/conf.json
 
 "$java_exec" $java_opts $java_debug -cp "$classpath" org.xipki.pkix.util.GenerateCerts \
   setup/keycerts.json setup/keycerts

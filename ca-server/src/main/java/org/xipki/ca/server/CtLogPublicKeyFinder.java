@@ -11,7 +11,7 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.LogUtil;
 
 import java.io.File;
@@ -37,11 +37,11 @@ public class CtLogPublicKeyFinder {
 
   private final boolean withPublicKeys;
 
-  public CtLogPublicKeyFinder(CtLogConf conf) throws IOException {
+  public CtLogPublicKeyFinder(CtLogConf conf, String basedir) throws IOException {
     String keydirName = conf.keydir();
     File[] keyFiles = null;
     if (keydirName != null && !keydirName.isEmpty()) {
-      keydirName = XipkiIoUtil.expandFilepath(keydirName, true);
+      keydirName = IoUtil.resolvePath(basedir, keydirName);
       keyFiles = new File(keydirName).listFiles(pathname -> {
         String name = pathname.getName();
         return pathname.isFile() &&
@@ -62,7 +62,7 @@ public class CtLogPublicKeyFinder {
     List<PublicKey> publicKeyList = new ArrayList<>(size);
 
     for (File m : keyFiles) {
-      byte[] keyBytes = XipkiIoUtil.read(m, true);
+      byte[] keyBytes = IoUtil.read(null, m); // m is already under keydir
       keyBytes = X509Util.toDerEncoded(keyBytes);
       try {
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.fromEncoded(keyBytes);

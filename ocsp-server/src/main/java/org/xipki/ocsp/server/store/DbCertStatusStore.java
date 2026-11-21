@@ -24,6 +24,7 @@ import org.xipki.pkix.util.X509Util;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.LogUtil;
 
 import java.io.File;
@@ -467,11 +468,11 @@ public class DbCertStatusStore extends AbstractDbCertStatusStore {
 
     if (caCerts != null) {
       if (CollectionUtil.isNotEmpty(caCerts.includes())) {
-        includeIssuers = parseCerts(caCerts.includes());
+        includeIssuers = parseCerts(caCerts.includes(), basedir);
       }
 
       if (CollectionUtil.isNotEmpty(caCerts.excludes())) {
-        excludeIssuers = parseCerts(caCerts.excludes());
+        excludeIssuers = parseCerts(caCerts.excludes(), basedir);
       }
     }
 
@@ -493,11 +494,12 @@ public class DbCertStatusStore extends AbstractDbCertStatusStore {
     return (issuer == null) ? null : issuer.cert();
   }
 
-  static Set<X509Cert> parseCerts(Collection<String> certFiles) throws OcspStoreException {
+  static Set<X509Cert> parseCerts(Collection<String> certFiles, String basedir)
+      throws OcspStoreException {
     Set<X509Cert> certs = new HashSet<>(certFiles.size());
     for (String certFile : certFiles) {
       try {
-        certs.add(X509Util.parseCert(new File(certFile)));
+        certs.add(X509Util.parseCert(new File(IoUtil.resolvePath(basedir, certFile))));
       } catch (CertificateException | IOException ex) {
         throw new OcspStoreException("could not parse X.509 certificate from file " +
             certFile + ": " + ex.getMessage(), ex);

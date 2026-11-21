@@ -43,8 +43,19 @@ public class SdkClient {
   private boolean logReqResp = false;
 
   public SdkClient(SdkClientConf conf) throws GenerationException {
+    this(conf, null);
+  }
+
+  /**
+   * Constructor.
+   * @param conf the configuration.
+   * @param basedir the base directory, against which relative files in the SSL configuration
+   *                are resolved. May be {@code null}.
+   * @throws GenerationException if error occurs while creating the HTTP client.
+   */
+  public SdkClient(SdkClientConf conf, String basedir) throws GenerationException {
     this.serverUrl = conf.serverUrl();
-    this.client = new XiHttpClient(SslContextConf.ofSslConf(conf.ssl()));
+    this.client = new XiHttpClient(SslContextConf.ofSslConf(conf.ssl(), basedir));
   }
 
   public SdkClient(String serverUrl, SSLSocketFactory sslSocketFactory,

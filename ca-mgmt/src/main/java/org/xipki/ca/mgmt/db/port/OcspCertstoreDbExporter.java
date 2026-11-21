@@ -11,7 +11,6 @@ import org.xipki.codec.util.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 
@@ -195,7 +194,7 @@ class OcspCertstoreDbExporter extends DbPorter {
       LOG.error("Exception", ex);
       return ex;
     } finally {
-      XipkiIoUtil.closeQuietly(certsFileOs);
+      IoUtil.closeQuietly(certsFileOs);
     }
   } // method exportCert
 

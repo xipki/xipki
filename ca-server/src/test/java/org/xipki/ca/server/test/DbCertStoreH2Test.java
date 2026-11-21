@@ -59,7 +59,7 @@ public class DbCertStoreH2Test {
     caIdent = idNameMap.getCa(CA);
     // shard id 1: must differ from the one of the CA system (0) on the same database
     certstore = new DbCertStore(env.caDatasource(),
-        new DbCaConfStore(env.caconfDatasource()), new UniqueIdGenerator(0, 1));
+        new DbCaConfStore(env.caconfDatasource(), null), new UniqueIdGenerator(0, 1));
   }
 
   @AfterClass

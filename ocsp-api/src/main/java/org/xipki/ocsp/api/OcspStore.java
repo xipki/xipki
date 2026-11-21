@@ -23,6 +23,12 @@ public abstract class OcspStore implements Closeable {
 
   protected String name;
 
+  /**
+   * The base directory, against which relative paths in the configuration are resolved.
+   * May be {@code null}.
+   */
+  protected String basedir;
+
   protected UnknownCertBehaviour unknownCertBehaviour = UnknownCertBehaviour.unknown;
 
   protected int retentionInterval;
@@ -156,6 +162,10 @@ public abstract class OcspStore implements Closeable {
       throws OcspStoreException;
 
   public abstract boolean isHealthy();
+
+  public void setBasedir(String basedir) {
+    this.basedir = basedir;
+  }
 
   public void setName(String name) {
     this.name = Args.notBlank(name, "name");

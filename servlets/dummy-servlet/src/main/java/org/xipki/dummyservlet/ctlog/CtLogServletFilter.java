@@ -15,7 +15,8 @@ import org.xipki.util.http.XiHttpFilter;
 public class CtLogServletFilter extends ServletFilter {
 
   @Override
-  protected XiHttpFilter initFilter(FilterConfig filterConfig) throws Exception {
+  protected XiHttpFilter initFilter(FilterConfig filterConfig, String basedir)
+      throws Exception {
     return new CtlogHttpFilter();
   }
 

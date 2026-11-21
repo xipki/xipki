@@ -104,8 +104,11 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   private final int maxX500nameLen;
 
-  public DbCaConfStore(DataSourceWrapper datasource) throws CaMgmtException {
+  private final String basedir;
+
+  public DbCaConfStore(DataSourceWrapper datasource, String basedir) throws CaMgmtException {
     super(datasource);
+    this.basedir = basedir;
 
     try {
       Map<String, String> dbSchema = datasource.getDbSchema(null);
@@ -636,7 +639,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
         }
 
         signerConf = (signerConf == null)
-            ? rs.getString("SIGNER_CONF") : CaUtil.canonicalizeSignerConf(signerConf);
+            ? rs.getString("SIGNER_CONF") : CaUtil.canonicalizeSignerConf(signerConf, basedir);
 
         try {
           List<CaSignerConf> signerConfs = CaEntry.splitCaSignerConfs(signerConf);
@@ -864,7 +867,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     SignerEntry dbEntry = createSigner(Args.notBlank(name, "name"));
     String tmpType = (type == null ? dbEntry.type() : type);
     if (conf != null) {
-      conf = CaUtil.canonicalizeSignerConf(conf);
+      conf = CaUtil.canonicalizeSignerConf(conf, basedir);
     }
 
     SignerEntry signer = new SignerEntry(name, tmpType, (conf == null ? dbEntry.conf() : conf),

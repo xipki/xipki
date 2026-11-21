@@ -22,7 +22,6 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.FpIdCalculator;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.SqlUtil;
@@ -369,7 +368,7 @@ class CaCertstoreDbImporter extends DbPorter {
 
         String filename = cert.file();
         // rawcert
-        byte[] encodedCert = XipkiIoUtil.readAllBytesAndClose(
+        byte[] encodedCert = IoUtil.readAllBytesAndClose(
             zipFile.getInputStream(zipFile.getEntry(filename)));
 
         TBSCertificate tbsCert;
@@ -391,7 +390,7 @@ class CaCertstoreDbImporter extends DbPorter {
         if (cert.privateKeyFile() != null) {
           ZipEntry keyZipEntry = zipFile.getEntry(cert.privateKeyFile());
           if (keyZipEntry != null) {
-            privateKey = new String(XipkiIoUtil.readAllBytesAndClose(
+            privateKey = new String(IoUtil.readAllBytesAndClose(
                           zipFile.getInputStream(keyZipEntry)));
           }
         }
@@ -537,7 +536,7 @@ class CaCertstoreDbImporter extends DbPorter {
         ZipEntry zipEntry = zipFile.getEntry(filename);
 
         // rawcert
-        byte[] encodedCrl = XipkiIoUtil.readAllBytesAndClose(zipFile.getInputStream(zipEntry));
+        byte[] encodedCrl = IoUtil.readAllBytesAndClose(zipFile.getInputStream(zipEntry));
         String b64Sha1 = HashAlgo.SHA1.base64Hash(encodedCrl);
 
         X509Crl x509crl;

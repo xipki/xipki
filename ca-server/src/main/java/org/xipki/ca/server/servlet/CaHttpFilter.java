@@ -30,8 +30,7 @@ import org.xipki.pkix.Securities;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.io.XipkiBaseDir;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.audit.Audits.AuditConf;
@@ -69,12 +68,10 @@ public class CaHttpFilter implements XiHttpFilter {
 
   private CaHttpMgmtServlet mgmtServlet;
 
-  public CaHttpFilter() throws Exception {
-    XipkiBaseDir.init();
-
+  public CaHttpFilter(String basedir) throws Exception {
     CaServerConf conf;
     try {
-      conf = CaServerConf.readConfFromFile(XipkiIoUtil.expandFilepath(DFLT_CFG, true));
+      conf = CaServerConf.readConfFromFile(IoUtil.resolvePath(basedir, DFLT_CFG));
     } catch (InvalidConfException ex) {
       throw new InvalidConfException("could not parse configuration file " + DFLT_CFG, ex);
     }
@@ -89,7 +86,7 @@ public class CaHttpFilter implements XiHttpFilter {
     }
 
     securities = new Securities();
-    securities.init(conf.security());
+    securities.init(conf.security(), basedir);
 
     int shardId = conf.shardId();
     ConfPairs auditConf = audit.conf();
@@ -97,12 +94,12 @@ public class CaHttpFilter implements XiHttpFilter {
       auditConf.putPair("shard-id", Integer.toString(shardId));
     }
 
-    Audits.init(auditType, auditConf);
+    Audits.init(auditType, auditConf, basedir);
     if (Audits.getAuditService() == null) {
       throw new IllegalStateException("could not init AuditService");
     }
 
-    caManager = new CaManagerImpl();
+    caManager = new CaManagerImpl(basedir);
     caManager.setSecurityFactory(securities.securityFactory());
     caManager.setP11CryptServiceFactory(securities.p11CryptServiceFactory());
 
@@ -151,7 +148,7 @@ public class CaHttpFilter implements XiHttpFilter {
       } else {
         List<X509Cert> certs = null;
         try {
-          certs = X509Util.parseCerts(certFiles);
+          certs = X509Util.parseCerts(certFiles, basedir);
         } catch (InvalidConfException ex) {
           LOG.error("error parsing remote management's client certificates", ex);
         }
@@ -266,7 +263,7 @@ public class CaHttpFilter implements XiHttpFilter {
       byte[] respBody = null;
       try {
         String path = (String) req.getAttribute(HttpConstants.ATTR_XIPKI_PATH);
-        reqBody = post ? XipkiIoUtil.readAllBytesAndClose(req.getInputStream()) : null;
+        reqBody = post ? IoUtil.readAllBytesAndClose(req.getInputStream()) : null;
 
         SdkResponse response = responder.service(path, reqBody, req);
         respBody = response == null ? null : response.encode();

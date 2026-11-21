@@ -20,7 +20,6 @@ import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
@@ -372,7 +371,7 @@ class OcspCertStoreFromCaDbImporter extends AbstractOcspCertstoreDbImporter {
             String filename = cert.file();
 
             // rawcert
-            byte[] encodedCert = XipkiIoUtil.readAllBytesAndClose(
+            byte[] encodedCert = IoUtil.readAllBytesAndClose(
                 zipFile.getInputStream(zipFile.getEntry(filename)));
             String certhash = certhashAlgo.base64Hash(encodedCert);
 

@@ -17,7 +17,7 @@ import org.xipki.pkix.scep.message.NextCaMessage;
 import org.xipki.pkix.scep.transaction.Operation;
 import org.xipki.pkix.scep.util.ScepUtil;
 import org.xipki.util.exception.PkixException;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -104,7 +104,7 @@ public class ScepServlet {
         // parse the request
         try {
           byte[] content = post
-              ? XipkiIoUtil.readAllBytesAndClose(exchange.getRequestBody())
+              ? IoUtil.readAllBytesAndClose(exchange.getRequestBody())
               : Base64.decode(params.get("message"));
 
           reqMessage = new CmsSignedData(content);

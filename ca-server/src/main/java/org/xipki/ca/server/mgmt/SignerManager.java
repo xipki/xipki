@@ -76,7 +76,7 @@ class SignerManager {
 
     String conf = signerEntry.conf();
     if (conf != null) {
-      String newConf = CaUtil.canonicalizeSignerConf(conf);
+      String newConf = CaUtil.canonicalizeSignerConf(conf, manager.basedir());
       if (!conf.equals(newConf)) {
         signerEntry.setConf(newConf);
       }

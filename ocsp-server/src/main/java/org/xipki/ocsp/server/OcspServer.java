@@ -46,7 +46,7 @@ import org.xipki.util.exception.PkixException;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.conf.QuadrupleState;
 
 import java.io.ByteArrayInputStream;
@@ -164,7 +164,15 @@ public class OcspServer implements Closeable {
     encodedAcceptableResponses_Basic = Hex.decode("300B06092B0601050507300101");
   } // method static
 
-  public OcspServer() {
+  private final String basedir;
+
+  /**
+   * Constructor.
+   * @param basedir the base directory, against which relative paths in the configuration are
+   *                resolved. May be {@code null}.
+   */
+  public OcspServer(String basedir) {
+    this.basedir = basedir;
     this.datasourceFactory = new DataSourceFactory();
   }
 
@@ -237,7 +245,7 @@ public class OcspServer implements Closeable {
     servletPaths.clear();
     path2responderMap.clear();
 
-    OcspServerConf conf = parseConf(confFile);
+    OcspServerConf conf = parseConf(confFile, basedir);
 
     //-- check the duplication names
     Set<String> set = new HashSet<>();
@@ -354,7 +362,8 @@ public class OcspServer implements Closeable {
       DataSourceConf cacheSourceConf = cacheType.datasource();
       DataSourceWrapper datasource;
       try (InputStream dsStream = getInputStream(cacheSourceConf.conf())) {
-        datasource = datasourceFactory.createDataSource(cacheSourceConf.name(), dsStream);
+        datasource = datasourceFactory.createDataSource(
+            cacheSourceConf.name(), dsStream, basedir);
       } catch (IOException ex) {
         throw new InvalidConfException(ex.getMessage(), ex);
       }
@@ -365,12 +374,12 @@ public class OcspServer implements Closeable {
     //-- initializes the responders
     // signers
     for (OcspServerConf.Signer m : conf.signers()) {
-      signers.put(m.name(), initSigner(m, securityFactory));
+      signers.put(m.name(), initSigner(m, securityFactory, basedir));
     }
 
     // requests
     for (OcspServerConf.RequestOption m : conf.requestOptions()) {
-      requestOptions.put(m.name(), new RequestOption(m));
+      requestOptions.put(m.name(), new RequestOption(m, basedir));
     }
 
     // responses
@@ -385,7 +394,7 @@ public class OcspServer implements Closeable {
         String name = m.name();
         DataSourceWrapper datasource;
         try (InputStream dsStream = getInputStream(m.conf())) {
-          datasource = datasourceFactory.createDataSource(name, dsStream);
+          datasource = datasourceFactory.createDataSource(name, dsStream, basedir);
         } catch (IOException ex) {
           throw new InvalidConfException(ex.getMessage(), ex);
         }
@@ -398,7 +407,7 @@ public class OcspServer implements Closeable {
 
     // stores
     for (OcspServerConf.Store m : conf.stores()) {
-      OcspStore store = newStore(m, datasources);
+      OcspStore store = newStore(m, datasources, basedir);
       stores.put(m.name(), store);
     }
 
@@ -1032,10 +1041,10 @@ public class OcspServer implements Closeable {
     return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
   } // method checkSignature
 
-  private static InputStream getInputStream(FileOrValue conf)
+  private InputStream getInputStream(FileOrValue conf)
       throws IOException {
     return (conf.file() != null)
-        ? Files.newInputStream(Paths.get(XipkiIoUtil.expandFilepath(conf.file(), true)))
+        ? Files.newInputStream(Paths.get(IoUtil.resolvePath(basedir, conf.file())))
         : new ByteArrayInputStream(StringUtil.toUtf8Bytes(conf.value()));
   }
 

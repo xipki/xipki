@@ -104,11 +104,11 @@
               certificateVerification="optional"
               protocols="TLSv1.2+TLSv1.3"
               ciphers="TLS_AES_256_GCM_SHA384,TLS_CHACHA20_POLY1305_SHA256,TLS_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256"
-              truststoreFile="${XIPKI_BASE}/keycerts/gateway-client-ca-certstore.p12"
+              truststoreFile="xipki/keycerts/gateway-client-ca-certstore.p12"
               truststorePassword="$[gateway.https.certstorePassword]"
               truststoreType="PKCS12">
         <Certificate
-                certificateKeystoreFile="${XIPKI_BASE}/keycerts/gateway-server.p12"
+                certificateKeystoreFile="xipki/keycerts/gateway-server.p12"
                 certificateKeystorePassword="$[gateway.https.keyPassword]"
                 certificateKeystoreType="PKCS12"/>
       </SSLHostConfig>

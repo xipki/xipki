@@ -61,7 +61,17 @@ public class PopControl {
 
   private SecretKeyWithAlias defaultKemMasterSecretKeys;
 
-  public PopControl(GatewayConf.PopControlConf conf) throws InvalidConfException {
+  private final String basedir;
+
+  /**
+   * Constructor.
+   * @param conf the configuration.
+   * @param basedir the base directory, against which relative files are resolved. May be
+   *                {@code null}.
+   * @throws InvalidConfException if the configuration is invalid.
+   */
+  public PopControl(GatewayConf.PopControlConf conf, String basedir) throws InvalidConfException {
+    this.basedir = basedir;
     // pop signature algorithms
     if (conf.sigAlgos() == null) {
       this.popAlgoValidator = AlgorithmValidator.INSTANCE;
@@ -175,7 +185,7 @@ public class PopControl {
       throw new InvalidConfException("error resolving password");
     }
 
-    try (InputStream is = new ByteArrayInputStream(conf.keystore().readContent())) {
+    try (InputStream is = new ByteArrayInputStream(conf.keystore().readContent(basedir))) {
       String confType = conf.type();
       LoadedKeyStore ret = new LoadedKeyStore();
       ret.password = password;

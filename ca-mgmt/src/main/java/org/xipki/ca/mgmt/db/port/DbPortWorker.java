@@ -16,7 +16,6 @@ import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.RandomUtil;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -150,7 +149,7 @@ public abstract class DbPortWorker extends DbWorker {
       file.write(macValue);
     }
 
-    XipkiIoUtil.deleteDir(dir);
+    IoUtil.deleteDir(dir);
     IoUtil.deleteFile(zipFile);
   }
 
@@ -437,7 +436,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("certStoreDataSource.close()", th);
         }
-        XipkiIoUtil.deleteDir(new File(srcFolder));
+        IoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     } // method run0
@@ -502,7 +501,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
 
-        XipkiIoUtil.deleteDir(new File(srcFolder));
+        IoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     } // method run0
@@ -778,7 +777,7 @@ public abstract class DbPortWorker extends DbWorker {
         } catch (Throwable th) {
           LOG.error("datasource.close()", th);
         }
-        XipkiIoUtil.deleteDir(new File(srcFolder));
+        IoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     }
@@ -833,7 +832,7 @@ public abstract class DbPortWorker extends DbWorker {
           LOG.error("datasource.close()", th);
         }
 
-        XipkiIoUtil.deleteDir(new File(srcFolder));
+        IoUtil.deleteDir(new File(srcFolder));
         printFinishedIn(start);
       }
     }

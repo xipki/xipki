@@ -26,7 +26,7 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.CollectionUtil;
 
 import java.io.IOException;
@@ -224,7 +224,8 @@ public class CaUtil {
     return CollectionUtil.isEmpty(ret) ? null : ret.toArray(new RDN[0]);
   } // method getRdns
 
-  public static String canonicalizeSignerConf(String signerConf) throws CaMgmtException {
+  public static String canonicalizeSignerConf(String signerConf, String basedir)
+      throws CaMgmtException {
     if (!signerConf.contains("file:") && !signerConf.contains("base64:")) {
       return signerConf;
     }
@@ -247,7 +248,7 @@ public class CaUtil {
     if (StringUtil.startsWithIgnoreCase(keystoreConf, "file:")) {
       String keystoreFile = keystoreConf.substring("file:".length());
       try {
-        ksBytes = XipkiIoUtil.read(keystoreFile, true);
+        ksBytes = IoUtil.read(basedir, keystoreFile);
       } catch (IOException ex) {
         throw new CaMgmtException("IOException: " + ex.getMessage(), ex);
       }

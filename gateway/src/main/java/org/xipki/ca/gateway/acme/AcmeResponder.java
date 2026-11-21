@@ -204,7 +204,7 @@ public class AcmeResponder {
   }
 
   public AcmeResponder(SdkClient sdk, SecurityFactory securityFactory,
-                      PopControl popControl, AcmeConf.Acme conf)
+                      PopControl popControl, AcmeConf.Acme conf, String basedir)
       throws InvalidConfException {
     this.sdk = Args.notNull(sdk, "sdk");
     this.popControl = Args.notNull(popControl, "popControl");
@@ -235,7 +235,7 @@ public class AcmeResponder {
       throw new InvalidConfException("invalid baseUrl '" + baseUrl + "'");
     }
 
-    this.nonceManager = new NonceManager(conf.nonceNumBytes());
+    this.nonceManager = new NonceManager(conf.nonceNumBytes(), basedir);
     this.tokenNumBytes = conf.tokenNumBytes();
     this.directoryHeader = "<" + baseUrl + "directory>;rel=\"index\"";
     this.caProfiles = conf.caProfiles();
@@ -312,13 +312,13 @@ public class AcmeResponder {
     try {
       FileOrValue fileOrValue = FileOrValue.ofFile(conf.dbConf());
       DataSourceWrapper dataSource0 =
-          new DataSourceFactory().createDataSource("acme-db", fileOrValue);
+          new DataSourceFactory().createDataSource("acme-db", fileOrValue, basedir);
       repo = new AcmeRepo(new AcmeDataSource(dataSource0), conf.cacheSize(), conf.syncDbSeconds());
     } catch (Exception ex) {
       throw new InvalidConfException("could not initialize database", ex);
     }
 
-    this.challengeValidator = new ChallengeValidator(repo, conf);
+    this.challengeValidator = new ChallengeValidator(repo, conf, basedir);
     this.certEnroller = new CertEnroller(repo, sdk);
   }
 

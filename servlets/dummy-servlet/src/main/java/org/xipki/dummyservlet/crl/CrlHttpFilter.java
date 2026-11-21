@@ -9,7 +9,6 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.util.io.XipkiBaseDir;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
@@ -37,18 +36,16 @@ public class CrlHttpFilter implements XiHttpFilter {
 
   private static final String RESP_CONTENT_TYPE = "application/pkix-crl";
 
-  private static final String DFLT_CA_DB_CFG =
-      "${sys:catalina.home}/xipki/etc/ca/database/ca-db.properties";
+  private static final String DFLT_CA_DB_CFG = "etc/ca/database/ca-db.properties";
 
   private final DataSourceWrapper dataSource;
 
   private final boolean hasSha1Column;
 
-  public CrlHttpFilter() throws Exception {
-    XipkiBaseDir.init();
+  public CrlHttpFilter(String basedir) throws Exception {
     try {
-      this.dataSource = new DataSourceFactory().createDataSourceForFile("ca",
-          StringUtil.resolveVariables(DFLT_CA_DB_CFG));
+      this.dataSource = new DataSourceFactory().createDataSourceForFile(
+          "ca", DFLT_CA_DB_CFG, basedir);
       this.hasSha1Column = dataSource.tableHasColumn(null, "CRL", "SHA1");
     } catch (InvalidConfException | IOException | DataAccessException ex) {
       LOG.error("error initializing datasource", ex);

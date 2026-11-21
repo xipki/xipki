@@ -28,7 +28,6 @@ import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.SslContextConf;
 import org.xipki.util.http.SslContextConfWrapper;
@@ -879,7 +878,7 @@ public class CaMgmtClient implements CaManager {
             return null;
           } else {
             inClosed = true;
-            return XipkiIoUtil.readAllBytesAndClose(httpUrlConnection.getInputStream());
+            return IoUtil.readAllBytesAndClose(httpUrlConnection.getInputStream());
           }
         } finally {
           if (in != null & !inClosed) {

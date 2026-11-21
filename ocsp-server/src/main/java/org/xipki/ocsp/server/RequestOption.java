@@ -10,6 +10,7 @@ import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.pkix.sign.CertPathValidationModel;
 import org.xipki.util.misc.CollectionUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.QuadrupleState;
 
@@ -63,7 +64,8 @@ public class RequestOption {
 
   private final CertPathValidationModel certpathValidationModel;
 
-  RequestOption(OcspServerConf.RequestOption conf) throws InvalidConfException {
+  RequestOption(OcspServerConf.RequestOption conf, String basedir)
+      throws InvalidConfException {
     supportsHttpGet = Args.notNull(conf, "conf").isSupportsHttpGet();
     signatureRequired = conf.isSignatureRequired();
     validateSignature = conf.isValidateSignature();
@@ -141,7 +143,7 @@ public class RequestOption {
     certpathValidationModel = certpathConf.validationModel();
 
     try {
-      Set<X509Cert> tmpCerts = getCerts(certpathConf.trustanchors());
+      Set<X509Cert> tmpCerts = getCerts(certpathConf.trustanchors(), basedir);
       trustanchors = new HashSet<>(tmpCerts.size());
       trustanchors.addAll(tmpCerts);
     } catch (Exception ex) {
@@ -151,7 +153,7 @@ public class RequestOption {
 
     OcspServerConf.CertCollection certsType = certpathConf.certs();
     try {
-      certs = (certsType == null) ? null : getCerts(certsType);
+      certs = (certsType == null) ? null : getCerts(certsType, basedir);
     } catch (Exception ex) {
       throw new InvalidConfException("could not initialize the certs: " + ex.getMessage(), ex);
     }
@@ -213,17 +215,17 @@ public class RequestOption {
     return certs;
   }
 
-  private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf)
+  private static Set<X509Cert> getCerts(OcspServerConf.CertCollection conf, String basedir)
       throws CertificateException, IOException {
     Args.notNull(conf, "conf");
     Set<X509Cert> tmpCerts = new HashSet<>();
 
     if (conf.certs() != null) {
       for (FileOrBinary fn : conf.certs()) {
-        tmpCerts.add(X509Util.parseCert(fn.readContent()));
+        tmpCerts.add(X509Util.parseCert(fn.readContent(basedir)));
       }
     } else if (conf.dir() != null) {
-      File dir = new File(conf.dir());
+      File dir = new File(IoUtil.resolvePath(basedir, conf.dir()));
       File[] files = dir.listFiles();
       if (files != null) {
         for (File file : files) {

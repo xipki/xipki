@@ -43,7 +43,6 @@ import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.io.XipkiIoUtil;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.CompareUtil;
 import org.xipki.util.misc.DateUtil;
@@ -121,13 +120,13 @@ public class FileCaConfStore implements CaConfStore {
 
   public FileCaConfStore(SecurityFactory securityFactory,
                         CertprofileFactoryRegister certprofileFactoryRegister,
-                        List<String> confFiles)
+                        List<String> confFiles, String basedir)
       throws IOException, CaMgmtException, InvalidConfException {
     Args.notEmpty(confFiles, "confFiles");
 
     String baseDir = null;
     for (String confFile : confFiles) {
-      File fileobj = new File(XipkiIoUtil.expandFilepath(confFile, true));
+      File fileobj = new File(IoUtil.resolvePath(basedir, confFile));
       if (baseDir == null) {
         baseDir = fileobj.getParent();
       } else {
@@ -141,7 +140,7 @@ public class FileCaConfStore implements CaConfStore {
       baseDir = ".";
     }
 
-    CaConfType.CaSystem root = mergeConfs(confFiles);
+    CaConfType.CaSystem root = mergeConfs(confFiles, basedir);
 
     //-- make sure all names, IDs are unique
     Map<String, Integer> profileNameIdMap = assertNameIdUnique(root.profiles(), "profile");
@@ -584,19 +583,15 @@ public class FileCaConfStore implements CaConfStore {
       return value;
     }
 
-    String expandedPath = IoUtil.expandFilepath(fv.file());
-    Path path = Paths.get(expandedPath);
-    if (!path.isAbsolute()) {
-      path = Paths.get(baseDir, expandedPath);
-    }
+    Path path = Paths.get(IoUtil.resolvePath(baseDir, fv.file()));
 
     return StringUtil.toUtf8String(Files.readAllBytes(path));
   }
 
-  private static CaConfType.CaSystem mergeConfs(List<String> confFiles)
+  private static CaConfType.CaSystem mergeConfs(List<String> confFiles, String basedir)
       throws InvalidConfException {
     CaConfType.CaSystem conf0 = CaConfType.CaSystem.parse(
-        Paths.get(XipkiIoUtil.expandFilepath(confFiles.get(0), true)));
+        Paths.get(IoUtil.resolvePath(basedir, confFiles.get(0))));
 
     Map<String, String> dbSchemas = conf0.dbSchemas();
     if (dbSchemas == null) {
@@ -642,7 +637,7 @@ public class FileCaConfStore implements CaConfStore {
 
     for (int i = 1; i < confFiles.size(); i++) {
       CaConfType.CaSystem root = CaConfType.CaSystem.parse(
-          Paths.get(XipkiIoUtil.expandFilepath(confFiles.get(i), true)));
+          Paths.get(IoUtil.resolvePath(basedir, confFiles.get(i))));
 
       // Db Schemas
       if (root.dbSchemas() != null) {
@@ -764,11 +759,7 @@ public class FileCaConfStore implements CaConfStore {
       return fb.binary();
     }
 
-    String expandedPath = IoUtil.expandFilepath(fb.file());
-    Path path = Paths.get(expandedPath);
-    if (!path.isAbsolute()) {
-      path = Paths.get(baseDir, expandedPath);
-    }
+    Path path = Paths.get(IoUtil.resolvePath(baseDir, fb.file()));
 
     return Files.readAllBytes(path);
   }

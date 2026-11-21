@@ -15,7 +15,7 @@ import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.util.io.XipkiIoUtil;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.util.password.PasswordResolverException;
 import org.xipki.util.password.Passwords;
 
@@ -43,7 +43,7 @@ public class CaNameScepSigners {
   private final Map<String, ScepSigner> signers;
 
   public CaNameScepSigners(CaNameSigners signers) throws InvalidConfException {
-    this(signers, null);
+    this(signers, null, null);
   }
 
   /**
@@ -51,22 +51,24 @@ public class CaNameScepSigners {
    * @param signers the signers.
    * @param decryptorsConf the decryptors. If null, or if not configured for a CA, the signing
    *                       key decrypts the requests.
+   * @param basedir the base directory, against which relative files are resolved. May be
+   *                {@code null}.
    * @throws InvalidConfException if the configuration is invalid.
    */
   public CaNameScepSigners(
-      CaNameSigners signers, ScepProtocolConf.CaNameDecryptorsConf decryptorsConf)
-      throws InvalidConfException {
+      CaNameSigners signers, ScepProtocolConf.CaNameDecryptorsConf decryptorsConf,
+      String basedir) throws InvalidConfException {
     X509KeypairWithCert defaultDecryptor = null;
     Map<String, X509KeypairWithCert> decryptors = new HashMap<>();
     if (decryptorsConf != null) {
       if (decryptorsConf.getDefault() != null) {
-        defaultDecryptor = loadDecryptor(decryptorsConf.getDefault());
+        defaultDecryptor = loadDecryptor(decryptorsConf.getDefault(), basedir);
       }
 
       List<ScepProtocolConf.CaNameDecryptorConf> confs = decryptorsConf.decryptors();
       if (confs != null) {
         for (ScepProtocolConf.CaNameDecryptorConf m : confs) {
-          X509KeypairWithCert decryptor = loadDecryptor(m.decryptor());
+          X509KeypairWithCert decryptor = loadDecryptor(m.decryptor(), basedir);
           for (String name : m.names()) {
             if (decryptors.put(name.toLowerCase(Locale.ROOT), decryptor) != null) {
               throw new InvalidConfException(
@@ -117,8 +119,8 @@ public class CaNameScepSigners {
    * Loads the key and certificate from the PKCS#12 keystore. The key is not used for signing
    * (e.g. no test signature as by the signer factory).
    */
-  private static X509KeypairWithCert loadDecryptor(GatewayConf.SignerConf decryptorConf)
-      throws InvalidConfException {
+  private static X509KeypairWithCert loadDecryptor(
+      GatewayConf.SignerConf decryptorConf, String basedir) throws InvalidConfException {
     if (!"pkcs12".equalsIgnoreCase(decryptorConf.type())) {
       throw new InvalidConfException(
           "unsupported decryptor type " + decryptorConf.type() + ", only pkcs12 is supported");
@@ -135,10 +137,10 @@ public class CaNameScepSigners {
       throw new InvalidConfException("keystore of the decryptor is not specified");
     }
 
-    List<X509Cert> certs = X509Util.parseCerts(decryptorConf.certs());
+    List<X509Cert> certs = X509Util.parseCerts(decryptorConf.certs(), basedir);
     X509Cert[] certchain = certs.isEmpty() ? null : certs.toArray(new X509Cert[0]);
 
-    try (InputStream is = getInputStream(keystore)) {
+    try (InputStream is = getInputStream(keystore, basedir)) {
       return X509KeypairWithCert.fromPKCS12Keystore(
           is, password, conf.keyLabel(), password, certchain);
     } catch (IOException | XiSecurityException ex) {
@@ -160,11 +162,12 @@ public class CaNameScepSigners {
     }
   }
 
-  private static InputStream getInputStream(String str) throws IOException, InvalidConfException {
+  private static InputStream getInputStream(String str, String basedir)
+      throws IOException, InvalidConfException {
     if (StringUtil.startsWithIgnoreCase(str, "base64:")) {
       return new ByteArrayInputStream(Base64.decode(str.substring(7))); // "base64:".length() = 7
     } else if (StringUtil.startsWithIgnoreCase(str, "file:")) {
-      return Files.newInputStream(Paths.get(XipkiIoUtil.detectPath(str.substring(5))));
+      return Files.newInputStream(Paths.get(IoUtil.resolvePath(basedir, str.substring(5))));
     } else {
       throw new InvalidConfException("unknown content format of the keystore");
     }
