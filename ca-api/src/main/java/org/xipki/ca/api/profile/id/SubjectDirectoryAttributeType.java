@@ -4,8 +4,8 @@
 package org.xipki.ca.api.profile.id;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.TcgOIDs;
+import org.xipki.codec.x509.id.AttributeOIDs;
+import org.xipki.codec.x509.id.TcgOIDs;
 import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;

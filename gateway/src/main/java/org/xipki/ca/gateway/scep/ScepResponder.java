@@ -18,7 +18,7 @@ import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.oid.CmsOIDs;
+import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
@@ -33,7 +33,7 @@ import org.xipki.ca.sdk.SdkErrorResponseException;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.HashAlgo;
@@ -170,7 +170,7 @@ public class ScepResponder {
     return authenticator.getPasswordRequestorByUser(Requestor.Protocol.SCEP, user);
   }
 
-  private Requestor.CertRequestor getRequestor(X509Cert cert) {
+  private Requestor.X509CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(Requestor.Protocol.SCEP, cert);
   }
 

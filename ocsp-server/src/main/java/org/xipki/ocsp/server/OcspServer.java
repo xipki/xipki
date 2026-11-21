@@ -11,10 +11,11 @@ import org.xipki.asn1.ocsp.OCSPResponseStatus;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.crypto.EmbedCertsMode;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.codec.x509.id.OcspOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
@@ -25,7 +26,6 @@ import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo.ResponseCacheInfo;
-import org.xipki.ocsp.server.OcspServerConf.EmbedCertsMode;
 import org.xipki.ocsp.server.OcspServerConf.Source;
 import org.xipki.ocsp.server.ResponderOption.OcspMode;
 import org.xipki.ocsp.server.store.IssuerEntry;
@@ -698,7 +698,7 @@ public class OcspServer implements Closeable {
       }
 
       ResponderID responderId = signer.getResponderId(repOpt.isResponderIdByName());
-      OCSPRespBuilder builder = new OCSPRespBuilder(responderId);
+      OcspRespBuilder builder = new OcspRespBuilder(responderId);
 
       boolean unknownAsRevoked = false;
       AtomicBoolean unknownAsRevoked0 = new AtomicBoolean(false);
@@ -725,7 +725,7 @@ public class OcspServer implements Closeable {
 
       EmbedCertsMode certsMode = repOpt.embedCertsMode();
       TaggedCertSequence certsInResp =
-            (certsMode == EmbedCertsMode.SIGNER) ? signer.sequenceOfCert()
+            (certsMode == EmbedCertsMode.CERT) ? signer.sequenceOfCert()
           : (certsMode == EmbedCertsMode.NONE)   ? null
           // certsMode == EmbedCertsMode.SIGNER_AND_CA
           : signer.sequenceOfCertChain();
@@ -769,7 +769,7 @@ public class OcspServer implements Closeable {
   } // method ask
 
   private OcspRespWithCacheInfo processCertReq(
-      AtomicBoolean unknownAsRevoked, CertID certId, OCSPRespBuilder builder,
+      AtomicBoolean unknownAsRevoked, CertID certId, OcspRespBuilder builder,
       Responder responder, RequestOption reqOpt,
       OcspServerConf.ResponseOption repOpt, OcspRespControl repControl) {
     HashAlgo reqHashAlgo = certId.issuer().hashAlgorithm();
@@ -997,12 +997,12 @@ public class OcspServer implements Closeable {
       }
     }
 
-    ContentVerifierProvider cvp;
+    ContentVerifierFactory cvp;
     try {
-      cvp = securityFactory.getContentVerifierProvider(certs[0]);
+      cvp = securityFactory.getContentVerifierFactory(certs[0]);
     } catch (InvalidKeyException ex) {
       String message = ex.getMessage();
-      LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", message);
+      LOG.warn("securityFactory.getContentVerifierFactory, InvalidKeyException: {}", message);
       return unsuccesfulOCSPRespMap.get(OcspResponseStatus.unauthorized);
     }
 

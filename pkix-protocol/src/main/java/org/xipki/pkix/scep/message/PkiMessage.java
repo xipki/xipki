@@ -10,8 +10,8 @@ import org.xipki.codec.asn1.Asn1Encodable;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.CmsOIDs;
+import org.xipki.codec.x509.id.AttributeOIDs;
+import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.SignAlgo;
@@ -25,6 +25,7 @@ import org.xipki.pkix.scep.transaction.Nonce;
 import org.xipki.pkix.scep.transaction.PkiStatus;
 import org.xipki.pkix.scep.transaction.TransactionId;
 import org.xipki.pkix.scep.util.ScepUtil;
+import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignatureSigner;
 import org.xipki.util.exception.PkixException;
 import org.xipki.util.misc.CollectionUtil;
@@ -234,7 +235,7 @@ public class PkiMessage {
       }
 
       builder.addSigner(signer, signerCert.getCert(),
-          ScepUtil.getDigestAlgorithm(signer.getAlgorithmIdentifier()),
+          ScepUtil.getDigestAlgorithm(signer.x509Algorithm()),
           signedAttributes(), unsignedAttributes());
 
       // certificateSet

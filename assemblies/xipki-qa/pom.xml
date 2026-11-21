@@ -42,7 +42,7 @@
         <executions>
           <execution>
             <id>filter</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>resources</goal>
             </goals>
@@ -56,7 +56,7 @@
         <executions>
           <execution>
             <id>unpack-qa-cli-lib</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -75,7 +75,7 @@
           </execution>
           <execution>
             <id>unpack</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -93,7 +93,7 @@
           </execution>
           <execution>
             <id>copy-dummy-servlet-war</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy</goal>
             </goals>

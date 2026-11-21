@@ -11,7 +11,7 @@ import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonMap;

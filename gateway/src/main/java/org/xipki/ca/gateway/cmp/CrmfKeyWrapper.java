@@ -4,9 +4,9 @@
 package org.xipki.ca.gateway.cmp;
 
 import org.xipki.codec.exception.OperatorException;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.RSAESOAEPParams;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.pkix.cmp.CmpUtil;

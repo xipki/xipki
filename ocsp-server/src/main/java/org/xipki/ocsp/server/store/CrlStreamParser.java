@@ -14,17 +14,17 @@ import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Tags;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.crypto.ContentVerifier;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.asn1.Asn1StreamParser;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.misc.LogUtil;
 
 import java.io.BufferedInputStream;
@@ -478,7 +478,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
   public boolean verifySignature(PublicKey publicKey) throws IOException {
     try {
-      ContentVerifierProvider cvp = X509KeyUtil.getContentVerifierProvider(publicKey);
+      ContentVerifierFactory cvp = KeyUtil.getContentVerifierFactory(publicKey);
       ContentVerifier verifier = cvp.get(algorithmIdentifier);
       OutputStream sigOut = verifier.getOutputStream();
       try (InputStream crlStream = Files.newInputStream(crlFile.toPath())) {
@@ -513,7 +513,7 @@ public class CrlStreamParser extends Asn1StreamParser {
 
       sigOut.close();
 
-      return verifier.verify(this.signature());
+      return verifier.x509Verify(this.signature());
     } catch (InvalidKeyException | GenerationException | SignatureException ex) {
       LogUtil.error(LOG, ex, "could not validate POP of CSR");
       return false;

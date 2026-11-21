@@ -9,10 +9,11 @@ import org.xipki.asn1.crmf.CertTemplate;
 import org.xipki.asn1.crmf.POPOSigningKey;
 import org.xipki.asn1.crmf.ProofOfPossession;
 import org.xipki.codec.asn1.Asn1Encodable;
-import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.codec.crypto.AtomicContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.Args;
+import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.util.exception.PkixException;
 
 import java.security.SignatureException;
@@ -53,11 +54,11 @@ public class CertificateRequestMessage {
   /**
    * Verifies the signing-key proof of possession whose POPOSigningKeyInput, if present,
    * contains the sender (RFC 4211, section 4.1).
-   * @param verifierProvider the provider of the signature verifier.
+   * @param verifierFactory the provider of the signature verifier.
    * @return true if the signature is valid, false otherwise.
    * @throws PkixException if the signature cannot be verified.
    */
-  public boolean isValidSigningKeyPOP(ContentVerifierProvider verifierProvider)
+  public boolean isValidSigningKeyPOP(ContentVerifierFactory verifierFactory)
       throws PkixException {
     ProofOfPossession pop = certReqMsg.getPop();
     if (pop.getTagNo() != tag_popSigningKey) {
@@ -76,8 +77,8 @@ public class CertificateRequestMessage {
     }
 
     try {
-      ContentVerifier verifier = verifierProvider.get(popoSign.getAlgorithmIdentifier());
-      return verifier.atomicVerify(signed.getEncoded(), popoSign.signature());
+      ContentVerifier verifier = verifierFactory.get(popoSign.getAlgorithmIdentifier());
+      return verifier.atomicX509Verify(signed.getEncoded(), popoSign.signature());
     } catch (Exception e) {
       throw new PkixException("error verifying the signature: " + e.getMessage(), e);
     }
@@ -91,13 +92,14 @@ public class CertificateRequestMessage {
    * @return the proof of possession.
    * @throws PkixException if the signature cannot be calculated.
    */
-  public static POPOSigningKey buildSigningKeyPop(CertRequest certRequest, ContentSigner signer)
+  public static POPOSigningKey buildSigningKeyPop(
+      CertRequest certRequest, AtomicContentSigner signer)
       throws PkixException {
     Args.notNull(certRequest, "certRequest");
     Args.notNull(signer, "signer");
     try {
-      byte[] signature = signer.atomicSign(certRequest.getEncoded());
-      return new POPOSigningKey(null, signer.getAlgorithmIdentifier(), signature);
+      byte[] signature = signer.atomicX509Sign(certRequest.getEncoded());
+      return new POPOSigningKey(null, signer.x509Algorithm(), signature);
     } catch (SignatureException e) {
       throw new PkixException("error signing: " + e.getMessage(), e);
     }

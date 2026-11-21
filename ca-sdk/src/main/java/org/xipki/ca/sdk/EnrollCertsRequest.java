@@ -4,12 +4,12 @@
 package org.xipki.ca.sdk;
 
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.cbor.ByteArrayCborDecoder;
 import org.xipki.codec.cbor.CborDecoder;
 import org.xipki.codec.cbor.CborEncoder;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 
 import java.math.BigInteger;
 import java.time.Instant;

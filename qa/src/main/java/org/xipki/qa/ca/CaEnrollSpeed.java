@@ -11,7 +11,7 @@ import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkClientConf;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.Hex;
-import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.util.misc.RandomUtil;
 

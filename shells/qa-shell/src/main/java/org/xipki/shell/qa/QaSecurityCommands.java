@@ -4,7 +4,7 @@
 package org.xipki.shell.qa;
 
 import org.xipki.codec.Hex;
-import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
@@ -20,7 +20,7 @@ import org.xipki.shell.Completion;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.security.SecurityRuntime;
 import org.xipki.shell.xi.Completers;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

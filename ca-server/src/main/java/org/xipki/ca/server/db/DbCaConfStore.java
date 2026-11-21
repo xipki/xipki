@@ -30,7 +30,7 @@ import org.xipki.ca.server.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.codec.Base64;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
@@ -1137,7 +1137,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     }
 
     try {
-      List<X509Cert> certs = X509Util.listCertificates(encodedCertchain);
+      List<X509Cert> certs = X509Util.listPemCertificates(encodedCertchain);
       return CollectionUtil.isEmpty(certs) ? null : certs;
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);

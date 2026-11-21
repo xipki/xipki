@@ -171,7 +171,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
   final Map<String, Integer> caAliases = new ConcurrentHashMap<>();
 
-  final Map<String, X509Ca> x509cas = new ConcurrentHashMap<>();
+  final Map<String, Ca> cas = new ConcurrentHashMap<>();
 
   RequestorInfo byCaRequestor;
 
@@ -771,7 +771,7 @@ public class CaManagerImpl implements CaManager, Closeable {
 
       this.lastStartTime = Instant.now();
 
-      x509cas.clear();
+      cas.clear();
 
       scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
       scheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true);
@@ -1306,8 +1306,8 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ca2Manager.generateKeyCert(caName, profileName, subject, notBefore, notAfter);
   }
 
-  public X509Ca getX509Ca(String name) throws CaMgmtException {
-    return ca2Manager.getX509Ca(name);
+  public Ca getCaInstance(String name) throws CaMgmtException {
+    return ca2Manager.getCaInstance(name);
   }
 
   public KeypairGenerator getKeypairGenerator(String keypairGenName) {
@@ -1424,7 +1424,7 @@ public class CaManagerImpl implements CaManager, Closeable {
     return ctLogPublicKeyFinder;
   }
 
-  public X509Ca getCa(CaIdentifierRequest req) {
+  public Ca getCa(CaIdentifierRequest req) {
     X500NameType issuer = req.issuer();
     X500Name x500Issuer = null;
     if (issuer != null) {
@@ -1442,8 +1442,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       return null;
     }
 
-    for (Map.Entry<String, X509Ca> entry : x509cas.entrySet()) {
-      X509Ca ca = entry.getValue();
+    for (Map.Entry<String, Ca> entry : cas.entrySet()) {
+      Ca ca = entry.getValue();
       if (x500Issuer != null) {
         if (!x500Issuer.equals(ca.caCert().subject())) {
           continue;

@@ -33,6 +33,18 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- the OCSP responder for the integration tests of the OCSP client -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ocsp-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <scope>test</scope>

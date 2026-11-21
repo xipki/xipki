@@ -5,8 +5,8 @@ package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.OIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OIDs;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
@@ -24,7 +24,7 @@ import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;

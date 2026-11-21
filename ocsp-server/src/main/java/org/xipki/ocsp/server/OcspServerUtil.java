@@ -25,7 +25,7 @@ import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.pkix.sign.CertPathValidationModel;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.conf.Validity;

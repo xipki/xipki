@@ -3,7 +3,7 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cmp.PkiStatusInfo;
 import org.xipki.pkix.cert.X509Cert;

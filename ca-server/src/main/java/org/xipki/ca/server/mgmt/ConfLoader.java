@@ -351,13 +351,13 @@ class ConfLoader {
       List<String> tmpCaNames = new ArrayList<>(caNames.size());
       for (String name : caNames) {
         name = name.toLowerCase();
-        if (manager.x509cas.containsKey(name)) {
+        if (manager.cas.containsKey(name)) {
           tmpCaNames.add(name);
         }
       }
       caNames = tmpCaNames;
     } else {
-      caNames = new ArrayList<>(manager.x509cas.keySet());
+      caNames = new ArrayList<>(manager.cas.keySet());
     }
 
     // initial 1M
@@ -374,7 +374,7 @@ class ConfLoader {
       if (CollectionUtil.isNotEmpty(caNames)) {
         List<CaConfType.Ca> list = new LinkedList<>();
 
-        for (String name : manager.x509cas.keySet()) {
+        for (String name : manager.cas.keySet()) {
           if (!caNames.contains(name)) {
             continue;
           }
@@ -416,7 +416,7 @@ class ConfLoader {
             publishers = new ArrayList<>(strs);
           }
 
-          CaEntry entry = manager.x509cas.get(name).caInfo().caEntry();
+          CaEntry entry = manager.cas.get(name).caInfo().caEntry();
 
           // Certificate
           byte[] certBytes = entry.cert().getEncoded();

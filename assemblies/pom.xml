@@ -21,7 +21,7 @@
           <executions>
             <execution>
               <id>jdbc-jars</id>
-              <phase>generate-resources</phase>
+              <phase>prepare-package</phase>
               <goals>
                 <goal>copy</goal>
               </goals>
@@ -42,7 +42,7 @@
             </execution>
             <execution>
               <id>misc-jars</id>
-              <phase>generate-resources</phase>
+              <phase>prepare-package</phase>
               <goals>
                 <goal>copy</goal>
               </goals>
@@ -76,6 +76,33 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- rebuild the staging dir from scratch: avoids "Overwriting" warnings and stale files -->
+            <id>clean-staging</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}/t2</directory>
+                </fileset>
+                <fileset>
+                  <directory>${project.build.directory}/dependency-maven-plugin-markers</directory>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <modules>
     <module>xipki-setup</module>

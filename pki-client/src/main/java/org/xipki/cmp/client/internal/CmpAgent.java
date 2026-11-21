@@ -29,24 +29,24 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
-import org.xipki.codec.crypto.ContentVerifierProvider;
-import org.xipki.codec.asn1.crypto.GCMParameters;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.PBES2Parameters;
-import org.xipki.codec.asn1.crypto.PBKDF2Params;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
-import org.xipki.codec.asn1.oid.CmpOIDs;
-import org.xipki.codec.asn1.oid.NistOIDs;
-import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.codec.x509.GCMParameters;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.PBES2Parameters;
+import org.xipki.codec.x509.PBKDF2Params;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.RSAESOAEPParams;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
+import org.xipki.codec.x509.id.CmpOIDs;
+import org.xipki.codec.x509.id.NistOIDs;
+import org.xipki.codec.x509.id.XipkiOIDs;
 import org.xipki.cmp.client.CmpClientException;
 import org.xipki.cmp.client.EnrollCertRequest;
 import org.xipki.cmp.client.PkiErrorException;
 import org.xipki.cmp.client.Requestor;
 import org.xipki.cmp.client.RevokeCertRequest;
 import org.xipki.cmp.client.UnsuspendCertRequest;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
@@ -57,7 +57,7 @@ import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cmp.CmpUtf8Pairs;
 import org.xipki.pkix.cmp.CmpUtil;
-import org.xipki.pkix.cmp.ProtectedPKIMessage;
+import org.xipki.pkix.cmp.ProtectedPkiMessage;
 import org.xipki.pkix.cmp.ProtectionResult;
 import org.xipki.pkix.cmp.ProtectionVerificationResult;
 import org.xipki.pkix.cmp.VerifiedPkiMessage;
@@ -379,7 +379,7 @@ class CmpAgent {
   private ProtectionVerificationResult verifyProtection(
       Requestor requestor, Responder responder, String tid, PKIMessage pkiMessage)
       throws PkixException, InvalidKeyException {
-    ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
+    ProtectedPkiMessage protectedMsg = new ProtectedPkiMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
 
@@ -469,14 +469,14 @@ class CmpAgent {
       }
 
       X509Cert cert = sigResponder.getCert();
-      ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(cert);
+      ContentVerifierFactory verifierFactory = securityFactory.getContentVerifierFactory(cert);
 
-      if (verifierProvider == null) {
+      if (verifierFactory == null) {
         LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
         return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      boolean signatureValid = protectedMsg.verify(verifierProvider);
+      boolean signatureValid = protectedMsg.verify(verifierFactory);
       return new ProtectionVerificationResult(cert,
           signatureValid ? ProtectionResult.SIGNATURE_VALID : ProtectionResult.SIGNATURE_INVALID);
     }

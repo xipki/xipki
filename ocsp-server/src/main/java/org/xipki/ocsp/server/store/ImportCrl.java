@@ -8,12 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.asn1.ocsp.CrlID;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.TBSCertificate;
-import org.xipki.codec.asn1.Asn1Encodable;
-import org.xipki.codec.asn1.Asn1GeneralizedTime;
-import org.xipki.codec.asn1.Asn1IA5String;
-import org.xipki.codec.asn1.Asn1Integer;
-import org.xipki.codec.asn1.Asn1Sequence;
-import org.xipki.codec.asn1.Asn1TaggedObject;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
@@ -48,8 +42,6 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -504,31 +496,22 @@ class ImportCrl {
         LOG.info("The CRL is a {}", crl.isDeltaCrl() ? "DeltaCRL" : "FullCRL");
         File urlFile = new File(basedir, "crl.url");
         // Construct CrlID
-        List<Asn1Encodable> vec = new LinkedList<>();
+        String crlDp = null;
         if (crlDirInfo.crlDownloded) {
           File crlDownloadFile = new File(basedir, "crl.download");
           Properties props = CrlDbCertStatusStore.loadProperties(crlDownloadFile);
-          String crldp = props.getProperty("crldp");
-          if (StringUtil.isNotBlank(crldp)) {
-            vec.add(new Asn1TaggedObject(true, 0, new Asn1IA5String(crldp)));
-          }
+          crlDp = props.getProperty("crldp");
 
           if (urlFile.exists()) {
             LOG.warn("use {} only, ignore {}", crlDownloadFile.getPath(), urlFile.getPath());
           }
         } else {
           if (urlFile.exists()) {
-            String crlUrl = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
-            if (StringUtil.isNotBlank(crlUrl)) {
-              vec.add(new Asn1TaggedObject(true, 0, new Asn1IA5String(crlUrl)));
-            }
+            crlDp = StringUtil.toUtf8String(IoUtil.read(urlFile)).trim();
           }
         }
 
-        vec.add(new Asn1TaggedObject(true, 1, new Asn1Integer(crl.crlNumber())));
-        vec.add(new Asn1TaggedObject(true, 2, new Asn1GeneralizedTime(crl.thisUpdate())));
-        CrlID crlId = CrlID.fromAsn1(new Asn1Sequence(vec));
-
+        CrlID crlId = new CrlID(crlDp, crl.crlNumber(), crl.thisUpdate());
         BigInteger crlNumber = crl.crlNumber();
         BigInteger baseCrlNumber = crl.baseCrlNumber();
 
@@ -1038,14 +1021,7 @@ class ImportCrl {
     String b64CertHash = certhashAlgo.base64Hash(encodedCert);
 
     if (caCert.subjectKeyIdentifier != null) {
-      byte[] aki;
-      try {
-        aki = cert.authorityKeyId();
-      } catch (CodecException ex) {
-        LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
-        return;
-      }
-
+      byte[] aki = cert.authorityKeyId();
       if (aki == null || !Arrays.equals(caCert.subjectKeyIdentifier, aki)) {
         LOG.warn("certificate {} is not issued by the given CA, ignore it", certLogId);
         return;

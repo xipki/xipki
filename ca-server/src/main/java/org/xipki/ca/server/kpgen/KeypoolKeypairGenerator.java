@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.codec.Base64;
-import org.xipki.codec.ConfPairs;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.util.ConfPairs;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
@@ -265,7 +265,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException {
+  public KeyInfoPair.X509 generateKeypair(KeySpec keyspec) throws XiSecurityException {
     Integer keyspecId = keyspecToId.get(keyspec);
     if (keyspecId == null) {
       return null;
@@ -311,7 +311,7 @@ public class KeypoolKeypairGenerator extends KeypairGenerator {
       if (cd.pukData != null) {
         publicKeyInfo = SubjectPublicKeyInfo.fromEncoded(cd.pukData);
       }
-      return new KeyInfoPair(publicKeyInfo, privateKeyInfo);
+      return new KeyInfoPair.X509(publicKeyInfo, privateKeyInfo);
     } catch (CodecException e) {
       throw new XiSecurityException(e);
     }

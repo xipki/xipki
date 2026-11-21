@@ -5,7 +5,7 @@ package org.xipki.pkix.scep.message;
 
 import org.xipki.asn1.cms.ContentInfo;
 import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.asn1.oid.CmsOIDs;
+import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.HashAlgo;

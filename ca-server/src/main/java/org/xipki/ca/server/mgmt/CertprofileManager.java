@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.CertprofileValidator;
 import org.xipki.util.misc.NameId;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;

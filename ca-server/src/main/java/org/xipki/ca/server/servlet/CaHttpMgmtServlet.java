@@ -260,7 +260,7 @@ class CaHttpMgmtServlet {
               caManager.getCaCerts(name)).orElseThrow(
                   () -> new CaMgmtException("Unknown CA " + name));
           resp = new MgmtResponse.StringResponse(
-              X509Util.encodeCertificates(caCerts.toArray(new X509Cert[0])));
+              X509Util.encodePemCertificates(caCerts.toArray(new X509Cert[0])));
           break;
         }
         case getCaAliasNames: {

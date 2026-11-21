@@ -14,8 +14,8 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.PolicyQualifierOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.PolicyQualifierOIDs;
 import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ctrl.KeySingleUsage;
 import org.xipki.ca.api.profile.id.AbstractID;
@@ -35,7 +35,7 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -1153,13 +1153,13 @@ public abstract class ExtensionValueConf implements JsonEncodable {
     }
 
     public org.xipki.asn1.x509.NameConstraints toNameConstraints() {
-      GeneralSubtrees permitted = buildX509GeneralSubtrees(permittedSubtrees);
-      GeneralSubtrees excluded  = buildX509GeneralSubtrees(excludedSubtrees);
+      GeneralSubtrees permitted = buildGeneralSubtrees(permittedSubtrees);
+      GeneralSubtrees excluded  = buildGeneralSubtrees(excludedSubtrees);
       return (permitted == null && excluded == null) ? null
           : new org.xipki.asn1.x509.NameConstraints(permitted, excluded);
     }
 
-    private static GeneralSubtrees buildX509GeneralSubtrees(List<GeneralSubtreeType> subtrees) {
+    private static GeneralSubtrees buildGeneralSubtrees(List<GeneralSubtreeType> subtrees) {
       if (CollectionUtil.isEmpty(subtrees)) {
         return null;
       }
@@ -1167,18 +1167,17 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       final int n = subtrees.size();
       GeneralSubtree[] ret = new GeneralSubtree[n];
       for (int i = 0; i < n; i++) {
-        ret[i] = buildX509GeneralSubtree(subtrees.get(i));
+        ret[i] = buildGeneralSubtree(subtrees.get(i));
       }
 
       return new GeneralSubtrees(ret);
     }
 
-    private static GeneralSubtree buildX509GeneralSubtree(GeneralSubtreeType type) {
+    private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeType type) {
       GeneralSubtreeType baseType = Args.notNull(type, "type");
       GeneralName base;
       if (baseType.directoryName() != null) {
-        base = GeneralName.ofDirectoryName(
-                X509Util.reverse(new X500Name(baseType.directoryName())));
+        base = GeneralName.ofDirectoryName(new X500Name(baseType.directoryName()));
       } else if (baseType.dnsName() != null) {
         base = GeneralName.ofDnsName(baseType.dnsName());
       } else if (baseType.ipAddress() != null) {
@@ -1286,7 +1285,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       for (CertificatePolicyInformation policyInfo : policyInfos) {
         List<CertificatePolicyQualifier> qualifiers = policyInfo.qualifiers();
         PolicyQualifierInfo.Seq1 policyQualifiers = CollectionUtil.isEmpty(qualifiers)
-            ? null : createX509PolicyQualifiers(qualifiers);
+            ? null : createPolicyQualifiers(qualifiers);
         CertificatePolicyID policyOid = policyInfo.certPolicyId();
 
         infos[idx++] = (policyQualifiers == null)
@@ -1297,7 +1296,7 @@ public abstract class ExtensionValueConf implements JsonEncodable {
       return new org.xipki.asn1.x509.CertificatePolicies(infos);
     } // method toX509CertificatePolicies
 
-    private  static PolicyQualifierInfo.Seq1 createX509PolicyQualifiers(
+    private  static PolicyQualifierInfo.Seq1 createPolicyQualifiers(
         List<CertificatePolicyQualifier> qualifiers) throws CodecException {
       List<PolicyQualifierInfo> qualifierInfos = new LinkedList<>();
       for (CertificatePolicyQualifier qualifier : qualifiers) {

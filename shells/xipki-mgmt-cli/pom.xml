@@ -22,17 +22,17 @@
       <version>${xiutil.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>security-shell</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>pki-client-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.pki.shell</groupId>
+      <groupId>${project.groupId}</groupId>
       <artifactId>ca-mgmt-shell</artifactId>
       <version>${project.version}</version>
     </dependency>

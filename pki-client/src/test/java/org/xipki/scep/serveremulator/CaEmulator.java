@@ -14,16 +14,16 @@ import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.KeyUsage;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.SignatureSigner;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
@@ -180,7 +180,7 @@ public class CaEmulator {
       SubjectPublicKeyInfo pkInfo = csr.getSubjectPKInfo();
       PublicKey pk = generatePublicKey(pkInfo);
 
-      ContentVerifierProvider cvp = getContentVerifierProvider(pk);
+      ContentVerifierFactory cvp = getContentVerifierFactory(pk);
       return csr.isSignatureValid(cvp);
     } catch (InvalidKeyException | SignatureException | InvalidKeySpecException ex) {
       LOG.error("could not validate POP of CSR", ex);
@@ -188,9 +188,9 @@ public class CaEmulator {
     }
   } // method verifyPop
 
-  public ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+  public ContentVerifierFactory getContentVerifierFactory(PublicKey publicKey)
       throws InvalidKeyException {
-    return X509KeyUtil.getContentVerifierProvider(publicKey);
+    return KeyUtil.getContentVerifierFactory(publicKey);
   } // method getContentVerifierProvider
 
   private static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)

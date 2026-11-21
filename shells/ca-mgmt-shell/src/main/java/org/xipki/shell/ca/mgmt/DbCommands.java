@@ -10,7 +10,7 @@ import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import org.xipki.util.conf.ConfigurableProperties;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;

@@ -14,7 +14,7 @@ import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.KeyUsage;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.util.Args;
@@ -140,7 +140,7 @@ public class MyUtil {
 
   public static SubjectPublicKeyInfo createSubjectPublicKeyInfo(PublicKey publicKey)
       throws InvalidKeyException {
-    return KeyUtil.createSubjectPublicKeyInfo(publicKey);
+    return KeyUtil.createX509SubjectPublicKeyInfo(publicKey);
   } // method createSubjectPublicKeyInfo
 
 }

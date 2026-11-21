@@ -4,8 +4,8 @@
 package org.xipki.ocsp.server.type;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OcspOIDs;
 import org.xipki.util.misc.CompareUtil;
 
 /**

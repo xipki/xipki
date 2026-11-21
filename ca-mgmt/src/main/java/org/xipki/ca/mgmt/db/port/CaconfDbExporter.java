@@ -14,7 +14,7 @@ import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaConfColumn;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonBuilder;
@@ -320,7 +320,7 @@ class CaconfDbExporter extends DbPorter {
         if (StringUtil.isNotBlank(encodedCertchain)) {
           List<X509Cert> certchain;
           try {
-            certchain = X509Util.listCertificates(encodedCertchain);
+            certchain = X509Util.listPemCertificates(encodedCertchain);
           } catch (CertificateException e) {
             throw new InvalidConfException("error parsing CERTCHAIN of CA " + name);
           }

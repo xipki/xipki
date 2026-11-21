@@ -5,9 +5,9 @@ package org.xipki.ca.gateway.cmp;
 
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.cert.EmbedCertsMode;
-import org.xipki.pkix.cmp.ProtectedPKIMessage;
-import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.codec.crypto.EmbedCertsMode;
+import org.xipki.pkix.cmp.ProtectedPkiMessage;
+import org.xipki.pkix.sign.AlgorithmValidator;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.misc.CollectionUtil;
 
@@ -104,11 +104,11 @@ public class CmpControl {
       pbmIterationCount = DFLT_PBM_ITERATIONCOUNT;
     }
 
-    if (pbmIterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
-        || pbmIterationCount > ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
+    if (pbmIterationCount < ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT
+        || pbmIterationCount > ProtectedPkiMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
       throw new InvalidConfException("invalid responsePbmIterationCount " + pbmIterationCount
-          + ", shall be between " + ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
-          + " and " + ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT);
+          + ", shall be between " + ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT
+          + " and " + ProtectedPkiMessage.DFLT_MAX_PBM_ITERATION_COUNT);
     }
     this.responsePbmIterationCount = pbmIterationCount;
 
@@ -117,11 +117,11 @@ public class CmpControl {
       maxIterationCount = DFLT_REQUEST_PBM_MAX_ITERATIONCOUNT;
     }
 
-    if (maxIterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
-        || maxIterationCount > ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
+    if (maxIterationCount < ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT
+        || maxIterationCount > ProtectedPkiMessage.DFLT_MAX_PBM_ITERATION_COUNT) {
       throw new InvalidConfException("invalid requestPbmMaxIterationCount " + maxIterationCount
-          + ", shall be between " + ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT
-          + " and " + ProtectedPKIMessage.DFLT_MAX_PBM_ITERATION_COUNT);
+          + ", shall be between " + ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT
+          + " and " + ProtectedPkiMessage.DFLT_MAX_PBM_ITERATION_COUNT);
     }
     this.requestPbmMaxIterationCount = maxIterationCount;
 

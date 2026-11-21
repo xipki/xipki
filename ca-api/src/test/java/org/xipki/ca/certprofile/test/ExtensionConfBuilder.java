@@ -5,7 +5,7 @@ package org.xipki.ca.certprofile.test;
 
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.ca.api.profile.id.CertificatePolicyID;
 import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
 import org.xipki.ca.api.profile.id.ExtensionID;
@@ -17,7 +17,7 @@ import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,6 +63,11 @@ public class ExtensionConfBuilder {
         case INTEGER: {
           extnId = ExtensionID.inhibitAnyPolicy;
           constValue = new ConstantExtnValue(type, "1");
+          break;
+        }
+        case NULL: {
+          extnId = ExtensionID.ofOid(new Asn1Oid("1.2.3.4.5.1"));
+          constValue = new ConstantExtnValue(type, (String) null);
           break;
         }
         case PRINTABLE: {
@@ -355,10 +360,10 @@ public class ExtensionConfBuilder {
 
   public static ExtensionValueConf.NameConstraints createNameConstraints() {
     List<GeneralSubtreeType> permitted = new LinkedList<>();
-    permitted.add(GeneralSubtreeType.ofDirectoryName( "O=myorg organization, C=DE"));
+    permitted.add(GeneralSubtreeType.ofDirectoryName( "C=DE,O=myorg organization"));
 
     List<GeneralSubtreeType> excluded = new LinkedList<>();
-    excluded.add(GeneralSubtreeType.ofDirectoryName( "OU=bad OU, O=myorg organization, C=DE"));
+    excluded.add(GeneralSubtreeType.ofDirectoryName( "C=DE, O=myorg organization, OU=bad OU"));
 
     return new ExtensionValueConf.NameConstraints(permitted, excluded);
   } // method createNameConstraints

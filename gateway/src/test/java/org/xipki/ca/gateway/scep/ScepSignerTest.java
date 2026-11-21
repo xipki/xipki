@@ -10,14 +10,14 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.KeyUsage;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.codec.Base64;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.pkcs12.KeypairWithCert;
+import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.pkcs12.P12ContentSignerBuilder;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.cert.X509Cert;
@@ -63,7 +63,7 @@ public class ScepSignerTest {
     X509Cert encCert = cert(encKp, "CN=RA-ENC", KeyUsage.keyEncipherment);
     ScepSigner signer = new ScepSigner(
         signer(signKp, cert(signKp, "CN=RA", KeyUsage.digitalSignature)),
-        new KeypairWithCert(encKp.getPrivate(), new X509Cert[]{encCert}));
+        new X509KeypairWithCert(encKp.getPrivate(), new X509Cert[]{encCert}));
     Assert.assertEquals(encCert, signer.encryptionCert());
     Assert.assertNotEquals(signer.cert(), signer.encryptionCert());
   }
@@ -77,15 +77,15 @@ public class ScepSignerTest {
     X509Cert badEncCert = cert(encKp, "CN=RA-ENC",
         KeyUsage.keyEncipherment, KeyUsage.digitalSignature);
 
-    assertInvalid(badSigner, new KeypairWithCert(encKp.getPrivate(),
+    assertInvalid(badSigner, new X509KeypairWithCert(encKp.getPrivate(),
         new X509Cert[]{goodEncCert}), "signer certificate");
-    assertInvalid(goodSigner, new KeypairWithCert(encKp.getPrivate(),
+    assertInvalid(goodSigner, new X509KeypairWithCert(encKp.getPrivate(),
         new X509Cert[]{badEncCert}), "decryptor certificate");
     // decryption key does not match the certificate
-    assertInvalid(goodSigner, new KeypairWithCert(signKp.getPrivate(),
+    assertInvalid(goodSigner, new X509KeypairWithCert(signKp.getPrivate(),
         new X509Cert[]{goodEncCert}), "does not match");
     // same key
-    assertInvalid(goodSigner, new KeypairWithCert(signKp.getPrivate(),
+    assertInvalid(goodSigner, new X509KeypairWithCert(signKp.getPrivate(),
         new X509Cert[]{cert(signKp, "CN=RA-ENC", KeyUsage.keyEncipherment)}), "signing key");
   }
 
@@ -124,7 +124,7 @@ public class ScepSignerTest {
   }
 
   private static void assertInvalid(
-      ConcurrentSigner signer, KeypairWithCert decryptor, String expMessage) {
+      ConcurrentSigner signer, X509KeypairWithCert decryptor, String expMessage) {
     try {
       new ScepSigner(signer, decryptor);
       Assert.fail("IllegalArgumentException expected");
@@ -134,7 +134,8 @@ public class ScepSignerTest {
   }
 
   private static ConcurrentSigner signer(KeyPair kp, X509Cert cert) throws Exception {
-    return new P12ContentSignerBuilder(new KeypairWithCert(kp.getPrivate(), new X509Cert[]{cert}))
+    return new P12ContentSignerBuilder(
+        new X509KeypairWithCert(kp.getPrivate(), new X509Cert[]{cert}))
         .createSigner(SignAlgo.RSA_SHA256, 1);
   }
 

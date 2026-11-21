@@ -348,7 +348,7 @@ class CaconfDbImporter extends DbPorter {
             for (int i = 0; i < certchainBytes.length; i++) {
               certchainBytes[i] = readContent(caInfo.getCertchain().get(i));
             }
-            certchainStr = X509Util.encodeCertificates(certchainBytes);
+            certchainStr = X509Util.encodePemCertificates(certchainBytes);
           }
 
           BaseCaInfo base = caInfo.base();

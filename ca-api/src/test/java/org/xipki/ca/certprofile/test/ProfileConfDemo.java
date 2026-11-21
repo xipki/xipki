@@ -19,7 +19,7 @@ import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +34,7 @@ public class ProfileConfDemo extends ProfileConfBuilder {
 
   public static void main(String[] args) {
     try {
+/*
       certprofileCross(qa_dir + "/certprofile-cross.json");
       certprofileRootCa(mgmt_dir + "/certprofile-rootca.json",
           qa_dir + "/certprofile-rootca.json");
@@ -103,10 +104,14 @@ public class ProfileConfDemo extends ProfileConfBuilder {
       certprofileMicrosoft(qa_dir + "certprofile-microsoft.json");
       certprofileGMT0015(qa_dir + "certprofile-gmt0015.json");
       certprofileRfc3739(qa_dir + "certprofile-rfc3739.json");
+*/
+      certprofileRfc9608(qa_dir + "certprofile-rfc9608.json");
+/*
       certprofileSpdm(qa_dir + "certprofile-spdm.json");
       certprofileTcg(qa_dir + "certprofile-tcg.json");
       certprofileCaliptra(qa_dir + "certprofile-caliptra.json");
       certprofileOthernames(qa_dir + "certprofile-othernames.json");
+ */
     } catch (Exception ex) {
       ex.printStackTrace();
     }
@@ -692,6 +697,41 @@ public class ProfileConfDemo extends ProfileConfBuilder {
                 SubjectDirectoryAttributeType.countryOfCitizenship.mainAlias()
         ));
     last(list).setSubjectDirectoryAttributes(sdAttrs);
+
+    for (String destFilename : destFilenames) {
+      marshall(profile, destFilename, true);
+    }
+  } // method certprofileRfc3739
+
+
+  private static void certprofileRfc9608(String... destFilenames) {
+    XijsonCertprofileType profile = getBaseProfile(
+        "certprofile RFC 9608", CertLevel.EndEntity, "5y",
+        KeypairGenMode.FIRST_ALLOWED_KEY, AllowKeyMode.ALL);
+
+    // Subject
+    addRdns(profile, rdn01(AttributeType.C), rdn01(AttributeType.O), rdn01(AttributeType.OU),
+        rdn01(AttributeType.SN), rdn(AttributeType.CN));
+
+    // Extensions
+    List<ExtensionType> list = profile.extensions();
+
+    list.add(createExtension(ExtensionID.subjectKeyIdentifier, true, false));
+
+    // Extensions - basicConstraints
+    list.add(createExtension(ExtensionID.basicConstraints, true, true));
+
+    // Extensions - AuthorityKeyIdentifier
+    list.add(createExtension(ExtensionID.authorityKeyIdentifier, true, false));
+
+    // Extensions - keyUsage
+    list.add(createExtension(ExtensionID.keyUsage, true, true));
+    last(list).setKeyUsage(createKeyUsage(
+        new KeyUsage[]{KeyUsage.digitalSignature, KeyUsage.dataEncipherment,
+            KeyUsage.keyEncipherment, KeyUsage.keyAgreement}, null, profile.keyAlgorithms()));
+
+    // Extensions - noRevAvail
+    list.add(createExtension(ExtensionID.noRevAvail, true, false));
 
     for (String destFilename : destFilenames) {
       marshall(profile, destFilename, true);

@@ -38,7 +38,11 @@ public class ConstantExtnValue implements JsonEncodable {
 
   public ConstantExtnValue(Type type, String value) {
     this.type = (type == null) ? Type.ASN1 : type;
-    this.value = Args.notNull(value, "value");
+    if (type == Type.NULL) {
+      this.value = null;
+    } else {
+      this.value = Args.notNull(value, "value");
+    }
   }
 
   public ConstantExtnValue(Type type, byte[] value) {
@@ -78,8 +82,9 @@ public class ConstantExtnValue implements JsonEncodable {
   }
 
   public static ConstantExtnValue parse(JsonMap json) throws CodecException {
-    return new ConstantExtnValue(Type.valueOf(json.getNnString("type")),
-        json.getNnString("value"));
+    Type type = Type.valueOf(json.getNnString("type"));
+    String value = (type == Type.NULL) ? null : json.getNnString("value");
+    return new ConstantExtnValue(type, value);
   }
 
   /**

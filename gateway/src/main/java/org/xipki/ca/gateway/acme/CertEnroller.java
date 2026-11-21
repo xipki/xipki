@@ -17,7 +17,7 @@ import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.acme.AcmeOrder;
 import org.xipki.acme.AcmeRepo;

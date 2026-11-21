@@ -5,10 +5,10 @@ package org.xipki.ca.gateway.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
-import org.xipki.codec.asn1.oid.PkcsOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.RSAESOAEPParams;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
+import org.xipki.codec.x509.id.PkcsOIDs;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cms.CmsRecipient;
@@ -18,7 +18,6 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.X509KeyUtil;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.InputStream;
@@ -50,7 +49,7 @@ public class CmsTest {
   private void doTest(String p12File) throws Exception {
     Pkcs12KeyStore keyStore;
     try (InputStream is = CmsTest.class.getClassLoader().getResourceAsStream(p12File)) {
-      keyStore = X509KeyUtil.loadPKCS12KeyStore(is, "CHANGEIT".toCharArray());
+      keyStore = KeyUtil.loadPKCS12KeyStore(is, "CHANGEIT".toCharArray());
     }
 
     PrivateKey privateKey = KeyInfoUtil.getPrivateKey(keyStore.getKey("main"));

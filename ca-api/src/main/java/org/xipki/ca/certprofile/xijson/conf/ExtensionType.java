@@ -9,7 +9,7 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 /**
  * Extension Type definition.

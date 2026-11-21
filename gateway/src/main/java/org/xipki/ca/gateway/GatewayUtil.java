@@ -11,8 +11,8 @@ import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.id.XipkiOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.pkix.SecurityFactory;
@@ -71,7 +71,7 @@ public class GatewayUtil {
                                   PopControl popControl) {
     Args.notNull(popControl, "popControl");
 
-    DHSigStaticKeyCertPair kaKeyAndCert = null;
+    DHSigStaticKeyCertPair.X509 kaKeyAndCert = null;
     SecretKeyWithAlias kemMasterKey = null;
 
     AlgorithmIdentifier algId = Args.notNull(csr, "csr").getSignatureAlgorithm();

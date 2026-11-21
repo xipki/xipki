@@ -24,19 +24,19 @@ import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.crypto.GCMParameters;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.PBES2Parameters;
-import org.xipki.codec.asn1.crypto.PBKDF2Params;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.RSAESOAEPParams;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
-import org.xipki.codec.asn1.oid.CmpOIDs;
-import org.xipki.codec.asn1.oid.PkcsOIDs;
-import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.codec.x509.GCMParameters;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.PBES2Parameters;
+import org.xipki.codec.x509.PBKDF2Params;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.RSAESOAEPParams;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
+import org.xipki.codec.x509.id.CmpOIDs;
+import org.xipki.codec.x509.id.PkcsOIDs;
+import org.xipki.codec.x509.id.XipkiOIDs;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
@@ -49,7 +49,7 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.cmp.ProtectedPKIMessage;
+import org.xipki.pkix.cmp.ProtectedPkiMessage;
 import org.xipki.pkix.cms.CmsAlgorithm;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cmp.CertificateRequestMessage;
@@ -74,7 +74,7 @@ import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.exception.PkixException;
 import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.crypto.core.SecretKeyWithAlias;
-import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.pkix.sign.AlgorithmValidator;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
@@ -217,7 +217,7 @@ public abstract class BaseCmpResponder {
   protected abstract PKIBody revokePendingCertificates(
       String caName, Asn1OctetString transactionId) throws SdkErrorResponseException;
 
-  private Requestor.CertRequestor getCertRequestor(
+  private Requestor.X509CertRequestor getCertRequestor(
       X500Name requestorSender, byte[] senderKID, CMPCertificate.Seq1 extraCerts) {
     if (extraCerts == null) {
       return null;
@@ -253,7 +253,7 @@ public abstract class BaseCmpResponder {
     return authenticator.getSimplePasswordRequestorByKeyId(Requestor.Protocol.CMP, senderKID);
   }
 
-  private Requestor.CertRequestor getCertRequestor(X509Cert senderCert) {
+  private Requestor.X509CertRequestor getCertRequestor(X509Cert senderCert) {
     return authenticator.getCertRequestor(Requestor.Protocol.CMP, senderCert);
   }
 
@@ -550,7 +550,7 @@ public abstract class BaseCmpResponder {
 
   private ProtectionVerificationResult verifyProtection(String tid, PKIMessage pkiMessage)
       throws PkixException, InvalidKeyException {
-    ProtectedPKIMessage protectedMsg = new ProtectedPKIMessage(pkiMessage);
+    ProtectedPkiMessage protectedMsg = new ProtectedPkiMessage(pkiMessage);
 
     PKIHeader header = protectedMsg.getHeader();
     byte[] senderKID = header.senderKID();
@@ -602,9 +602,9 @@ public abstract class BaseCmpResponder {
       }
 
       int iterationCount = parameter.iterationCount();
-      if (iterationCount < ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT) {
+      if (iterationCount < ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT) {
         LOG.warn("MAC_ALGO_FORBIDDEN (PBMParameter.iterationCount: {} < {})", iterationCount,
-            ProtectedPKIMessage.MIN_PBM_ITERATION_COUNT);
+            ProtectedPkiMessage.MIN_PBM_ITERATION_COUNT);
         return new ProtectionVerificationResult(null, ProtectionResult.MAC_ALGO_FORBIDDEN);
       }
 
@@ -634,17 +634,17 @@ public abstract class BaseCmpResponder {
       }
 
       X500Name x500Sender = getX500Name(header.getSender());
-      Requestor.CertRequestor requestor = (x500Sender == null) ? null
+      Requestor.X509CertRequestor requestor = (x500Sender == null) ? null
           : getCertRequestor(x500Sender, senderKID, pkiMessage.getExtraCerts());
 
-      ContentVerifierProvider verifierProvider = requestor == null ? null
-          : securityFactory.getContentVerifierProvider(requestor.cert());
-      if (verifierProvider == null) {
+      ContentVerifierFactory verifierFactory = requestor == null ? null
+          : securityFactory.getContentVerifierFactory(requestor.cert());
+      if (verifierFactory == null) {
         LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
         return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
       }
 
-      boolean signatureValid = protectedMsg.verify(verifierProvider);
+      boolean signatureValid = protectedMsg.verify(verifierFactory);
       return new ProtectionVerificationResult(requestor,
           signatureValid ? ProtectionResult.SIGNATURE_VALID : ProtectionResult.SIGNATURE_INVALID);
     }
@@ -654,7 +654,7 @@ public abstract class BaseCmpResponder {
       ConcurrentSigner signer, PKIMessage pkiMessage, AuditEvent event, Requestor requestor) {
     GeneralName respSender = pkiMessage.getHeader().getSender();
     try {
-      if (requestor instanceof Requestor.CertRequestor) {
+      if (requestor instanceof Requestor.X509CertRequestor) {
         return CmpUtil.addProtection(pkiMessage, signer, respSender,
                 cmpControl.isSendResponderCert());
       } else {
@@ -778,7 +778,7 @@ public abstract class BaseCmpResponder {
     try {
       PublicKey publicKey = securityFactory.generatePublicKey(spki);
 
-      DHSigStaticKeyCertPair kaKeyAndCert = null;
+      DHSigStaticKeyCertPair.X509 kaKeyAndCert = null;
       if (SignAlgo.DHPOP_X25519 == popAlg || SignAlgo.DHPOP_X448 == popAlg) {
         DhSigStatic dhSigStatic = DhSigStatic.fromEncoded(popSign.signature());
         IssuerAndSerialNumber isn = dhSigStatic.getIssuerAndSerial();
@@ -806,7 +806,7 @@ public abstract class BaseCmpResponder {
         }
       }
 
-      ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(
+      ContentVerifierFactory cvp = securityFactory.getContentVerifierFactory(
           publicKey, kaKeyAndCert, ownerMasterKey);
       return certRequest.isValidSigningKeyPOP(cvp);
     } catch (CodecException | InvalidKeyException | IllegalStateException | PkixException ex) {
@@ -867,8 +867,8 @@ public abstract class BaseCmpResponder {
     EncryptedValue encKey;
 
     try {
-      if (requestor instanceof Requestor.CertRequestor) {
-        Requestor.CertRequestor certRequestor = (Requestor.CertRequestor) requestor;
+      if (requestor instanceof Requestor.X509CertRequestor) {
+        Requestor.X509CertRequestor certRequestor = (Requestor.X509CertRequestor) requestor;
 
         // use private key of the requestor to encrypt the private key
         PublicKey reqPub = certRequestor.cert().publicKey();
@@ -967,8 +967,8 @@ public abstract class BaseCmpResponder {
       byte[] privateKeyinfo, EphemeralKeyPair ephemeralKeyPair) {
     try {
       CmsEnvelopedData.Builder builder = new CmsEnvelopedData.Builder();
-      if (requestor instanceof Requestor.CertRequestor) {
-        Requestor.CertRequestor certRequestor = (Requestor.CertRequestor) requestor;
+      if (requestor instanceof Requestor.X509CertRequestor) {
+        Requestor.X509CertRequestor certRequestor = (Requestor.X509CertRequestor) requestor;
         X509Cert  recipientX509Cert = certRequestor.cert();
         PublicKey publicKey = recipientX509Cert.publicKey();
         if (publicKey instanceof RSAPublicKey) {

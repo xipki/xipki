@@ -5,11 +5,12 @@ package org.xipki.ca.gateway.acme;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.codec.asn1.Asn1OctetString;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.MiscOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.MiscOIDs;
 import org.xipki.acme.type.ChallengeStatus;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
@@ -52,6 +53,7 @@ import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Instant;
@@ -271,34 +273,25 @@ public class ChallengeValidator implements Runnable {
           }
 
           if (match) {
-            X509Certificate cert = (X509Certificate) certs[0];
+            org.xipki.asn1.x509.Certificate cert = null;
+            try {
+              byte[] encodedCert0 = certs[0].getEncoded();
+              cert = org.xipki.asn1.x509.Certificate.fromEncoded(encodedCert0);
+            } catch (CertificateEncodingException | CodecException ex) {
+              String message =  "error while validating challenge " + challId +
+                  " for identifier " + identifier + ": could not parse the certificate";
+              LogUtil.error(LOG, ex, message);
+              match = false;
+            }
+
             // check the critical extension id_pe_acmeIdentifier
-            var criticalExtensionOids = cert.getCriticalExtensionOIDs();
-            match = criticalExtensionOids != null
-                && criticalExtensionOids.contains(MiscOIDs.id_pe_acmeIdentifier.getId());
+            Extension extension = cert == null ? null
+                : cert.getExtension(ExtensionOIDs.id_pe_acmeIdentifier);
+            match = extension != null && extension.isCritical();
+
             if (match) {
-              byte[] extnValue = cert.getExtensionValue(MiscOIDs.id_pe_acmeIdentifier.getId());
-              if (extnValue != null) {
-                byte[] octets = null;
-                try {
-                  octets = Asn1OctetString.fromEncoded(extnValue).getOctets();
-                } catch (CodecException ex) {
-                  // do nothing
-                }
-
-                if (octets != null) {
-                  byte[] value = null;
-                  try {
-                    value  = Asn1OctetString.fromEncoded(octets).getOctets();
-                  } catch (CodecException ex) {
-                    // do nothing
-                  }
-
-                  if (value != null) {
-                    receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(value);
-                  }
-                }
-              }
+              byte[] authorization = extension.getAcmeAuthorization().getOctets();
+              receivedAuthorization = Base64.getUrlNoPaddingEncoder().encodeToString(authorization);
             }
           }
           break;

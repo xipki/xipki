@@ -13,11 +13,11 @@ import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.codec.Base64;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.X509OIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.X509OIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.SignAlgo;
@@ -186,13 +186,13 @@ public class CaUtil {
     return new CRLDistributionPoints(points);
   } // method createCrlDistributionPoints
 
-  public static X500Name sortX509Name(X500Name name) {
+  public static X500Name sortName(X500Name name) {
     List<RDN> requestedRdns = name.getRDNs();
     List<RDN> rdns = new LinkedList<>();
 
     List<Asn1Oid> sortedDNs = SubjectDnSpec.getForwardDNs();
     for (Asn1Oid type : sortedDNs) {
-      RDN[] thisRdns = getX509Rdns(requestedRdns, type);
+      RDN[] thisRdns = getRdns(requestedRdns, type);
       if (thisRdns == null || thisRdns.length == 0) {
         continue;
       }
@@ -211,7 +211,7 @@ public class CaUtil {
     return new X500Name(rdns.toArray(new RDN[0]));
   }
 
-  private static RDN[] getX509Rdns(List<RDN> rdns, Asn1Oid type) {
+  private static RDN[] getRdns(List<RDN> rdns, Asn1Oid type) {
     Args.notNull(rdns, "rdns");
     Args.notNull(type, "type");
     List<RDN> ret = new ArrayList<>(1);
@@ -382,7 +382,7 @@ public class CaUtil {
   } // method getPermissions
 
   public static String encodeCertchain(List<X509Cert> certs) {
-    return X509Util.encodeCertificates(certs.toArray(new X509Cert[0]));
+    return X509Util.encodePemCertificates(certs.toArray(new X509Cert[0]));
   }
 
   public static List<X509Cert> buildCertChain(X509Cert targetCert, List<X509Cert> certs)

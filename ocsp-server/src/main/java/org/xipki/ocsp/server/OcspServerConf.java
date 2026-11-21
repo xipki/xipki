@@ -3,6 +3,7 @@
 
 package org.xipki.ocsp.server;
 
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonList;
@@ -13,7 +14,7 @@ import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.datasource.DataSourceConf;
-import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.pkix.sign.CertPathValidationModel;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.conf.Validity.Unit;
 import org.xipki.util.conf.FileOrBinary;
@@ -31,15 +32,6 @@ import java.util.List;
  * @author Lijun Liao (xipki)
  */
 public class OcspServerConf {
-
-  /**
-   * Embed Certs Mode enumeration.
-   */
-  public enum EmbedCertsMode {
-    NONE,
-    SIGNER,
-    SIGNER_AND_CA
-  } // class EmbedCertsMode
 
   /**
    * Cert Collection.
@@ -440,7 +432,7 @@ public class OcspServerConf {
 
     private boolean includeRevReason = false;
 
-    private EmbedCertsMode embedCertsMode = EmbedCertsMode.SIGNER;
+    private EmbedCertsMode embedCertsMode = EmbedCertsMode.CERT;
 
     private boolean includeCerthash = false;
 
@@ -527,7 +519,21 @@ public class OcspServerConf {
 
       ret.setCacheMaxAge(json.getLong("cacheMaxAge"));
 
-      EmbedCertsMode certsMode = json.getEnum("embedCertsMode", EmbedCertsMode.class);
+      EmbedCertsMode certsMode;
+      try {
+        certsMode = json.getEnum("embedCertsMode", EmbedCertsMode.class);
+      } catch (IllegalArgumentException ex) {
+        // we have changed SIGNER -> CERT, and SIGNER_AND_CA -> CHAIN in version 7.0.0
+        String str = json.getNnString("embedCertsMode");
+        if ("SIGNER".equalsIgnoreCase(str)) {
+          certsMode = EmbedCertsMode.CERT;
+        } else if ("SIGNER_AND_CA".equalsIgnoreCase(str)) {
+          certsMode = EmbedCertsMode.CHAIN;
+        } else {
+          throw ex;
+        }
+      }
+
       if (certsMode != null) {
         ret.setEmbedCertsMode(certsMode);
       }

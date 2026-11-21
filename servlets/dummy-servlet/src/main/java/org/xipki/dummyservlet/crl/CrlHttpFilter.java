@@ -23,6 +23,7 @@ import org.xipki.util.http.XiHttpResponse;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
@@ -88,11 +89,14 @@ public class CrlHttpFilter implements XiHttpFilter {
     Connection conn = null;
     try {
       conn = dataSource.getConnection();
-      String sql = dataSource.buildSelectFirstSql(1, "ID FROM CA WHERE NAME='" + caName + "'");
-      ResultSet rs = dataSource.createStatement(conn).executeQuery(sql);
+      String sql = dataSource.buildSelectFirstSql(1, "ID FROM CA WHERE NAME=?");
 
       int id;
+      PreparedStatement ps = dataSource.prepareStatement(conn, sql);
+      ResultSet rs = null;
       try {
+        ps.setString(1, caName);
+        rs = ps.executeQuery();
         if (!rs.next()) {
           LOG.warn("Unknown CA {}", caName);
           resp.sendError(HttpStatusCode.SC_NOT_FOUND);
@@ -100,7 +104,8 @@ public class CrlHttpFilter implements XiHttpFilter {
         }
         id = rs.getInt("ID");
       } finally {
-        dataSource.releaseResources(null, rs);
+        // close ps and rs, but keep conn; it is returned in the outer finally block
+        dataSource.releaseResources(ps, rs, false);
       }
 
       long crlNo = dataSource.getMax(conn, "CRL", "CRL_NO", "CA_ID=" + id + " AND DELTACRL=" +
@@ -117,16 +122,25 @@ public class CrlHttpFilter implements XiHttpFilter {
         columnName = "SHA1";
       }
       sql = dataSource.buildSelectFirstSql(1, columnName +
-          " FROM CRL WHERE CA_ID=" + id + " AND CRL_NO=" + crlNo);
-      rs = dataSource.prepareStatement(sql).executeQuery();
+          " FROM CRL WHERE CA_ID=? AND CRL_NO=?");
 
       byte[] dbContent;
+      // use the same connection, do not borrow a second one from the pool
+      ps = dataSource.prepareStatement(conn, sql);
+      rs = null;
       try {
-        rs.next();
+        ps.setInt(1, id);
+        ps.setLong(2, crlNo);
+        rs = ps.executeQuery();
+        if (!rs.next()) {
+          LOG.warn("CRL {} of CA {} not found", crlNo, caName);
+          resp.sendError(HttpStatusCode.SC_NOT_FOUND);
+          return;
+        }
         String b64 = rs.getString(columnName);
         dbContent = Base64.decodeFast(b64);
       } finally {
-        dataSource.releaseResources(null, rs);
+        dataSource.releaseResources(ps, rs, false);
       }
 
       byte[] respContent;
@@ -143,9 +157,7 @@ public class CrlHttpFilter implements XiHttpFilter {
       LogUtil.error(LOG, th);
       resp.sendError(HttpStatusCode.SC_INTERNAL_SERVER_ERROR);
     } finally {
-      if (conn != null) {
-        dataSource.returnConnection(conn);
-      }
+      dataSource.returnConnection(conn);
     }
   } // method doFilter
 

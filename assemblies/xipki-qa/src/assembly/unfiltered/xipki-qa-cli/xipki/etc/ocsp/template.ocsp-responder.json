@@ -79,14 +79,14 @@
   }],
   "responseOptions":[{
     "name":"response1",
-    "embedCertsMode":"SIGNER",
+    "embedCertsMode":"CERT",
     "includeCerthash":true,
     "includeInvalidityDate":false,
     "includeRevReason":true,
     "responderIdByName":true
   },{
     "name":"response2",
-    "embedCertsMode":"SIGNER_AND_CA",
+    "embedCertsMode":"CHAIN",
     "includeCerthash":false,
     "includeInvalidityDate":false,
     "includeRevReason":true,

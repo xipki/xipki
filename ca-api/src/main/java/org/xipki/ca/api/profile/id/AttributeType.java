@@ -4,8 +4,9 @@
 package org.xipki.ca.api.profile.id;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.MatterOIDs;
+import org.xipki.c509.registry.ConstRDNAttributeType;
+import org.xipki.codec.x509.id.AttributeOIDs;
+import org.xipki.codec.x509.id.MatterOIDs;
 import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class AttributeType extends AbstractID {
   public static final AttributeType ST = state;
 
   public static final AttributeType street =
-      initOf(AttributeOIDs.street, "street", "S");
+      initOf(AttributeOIDs.street, "street");
 
   public static final AttributeType organization =
       initOf(AttributeOIDs.organization, "organization", "O");
@@ -74,6 +75,9 @@ public class AttributeType extends AbstractID {
 
   public static final AttributeType businessCategory =
       initOf(AttributeOIDs.businessCategory, "businessCategory");
+
+  public static final AttributeType postalCode =
+      initOf(AttributeOIDs.postalCode, "postalCode");
 
   public static final AttributeType givenName =
       initOf(AttributeOIDs.givenName, "givenName", "GN");

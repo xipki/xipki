@@ -111,9 +111,6 @@
       "certificatePolicies": {
         "certificatePolicyInformations": [
           {
-            "policyIdentifier": "2.4.3.2.1"
-          },
-          {
             "policyIdentifier": "1.2.3.4.5",
             "policyQualifiers": [
               {
@@ -121,6 +118,9 @@
                 "value": "http://myorg.org/ca1-cps"
               }
             ]
+          },
+          {
+            "policyIdentifier": "2.4.3.2.1"
           }
         ]
       }
@@ -158,12 +158,12 @@
       "nameConstraints": {
         "permittedSubtrees": [
           {
-            "directoryName": "O=myorg organization, C=DE"
+            "directoryName": "C=DE, O=myorg organization"
           }
         ],
         "excludedSubtrees": [
           {
-            "directoryName": "OU=bad OU, O=myorg organization, C=DE"
+            "directoryName": "C=DE, O=myorg organization, OU=bad OU"
           }
         ]
       }

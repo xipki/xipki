@@ -113,78 +113,64 @@ classpath="xipki-qa-cli/lib/*"
 "$java_exec" $java_opts $java_debug -cp "$classpath" org.xipki.pkix.util.GenerateCerts \
   setup/keycerts.json setup/keycerts
 
-echo "Prepare tomcat instances"
+echo "Prepare tomcat"
 
-rm -rf "$script_dir"/war-common
-mkdir -p "$script_dir"/war-common/WEB-INF/lib
-cd "$script_dir"/war-common
-
-echo "1. Prepare xipki-dummy"
-
-mkdir -p "$script_dir"/xipki-dummy/tomcat/lib
-
-cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-dummy/tomcat/lib/
-
-cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
-   "$script_dir"/xipki-dummy/tomcat/lib/ 2>/dev/null || true
-
-cp $jars_dir/crypto/*.jar \
-   "$script_dir"/xipki-qa-cli/lib/com.zaxxer.HikariCP-*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.slf4j.*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.crypto.*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.asn1-*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.pkix-*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.util-*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.datasource-*.jar \
-   "$script_dir"/xipki-qa-cli/lib/org.xipki.util.pkix-util-*.jar \
-   "$jars_dir"/misc/org.xipki.util.servlet-common-*.jar \
-   "$script_dir"/war-common/WEB-INF/lib
-
-# bouncycastle already in the tomcat's lib dir
-rm -f "$script_dir"/war-common/WEB-INF/lib/org.bouncycastle.*.jar
-
-zip -r "$script_dir"/xipki-dummy/tomcat/webapps/dummy.war .
-
-echo "2. Prepare xipki-ocsp"
+echo "1. Copy JDBC and bouncycastle jars to the tomcat's lib folder"
 
 mkdir -p "$script_dir"/xipki-ocsp/tomcat/lib
+mkdir -p "$script_dir"/xipki-ca/tomcat/lib
+mkdir -p "$script_dir"/xipki-gateway/tomcat/lib
+mkdir -p "$script_dir"/xipki-dummy/tomcat/lib
 
-cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-ocsp/tomcat/lib/
+cp "$jars_dir"/jdbc/*.jar \
+   "$script_dir"/xipki-ocsp/tomcat/lib/
+
+cp "$jars_dir"/jdbc/*.jar \
+   "$script_dir"/xipki-ca/tomcat/lib/
+
+cp "$jars_dir"/jdbc/*.jar \
+   "$script_dir"/xipki-gateway/tomcat/lib/
+
+cp "$jars_dir"/jdbc/*.jar \
+   "$script_dir"/xipki-dummy/tomcat/lib/
 
 cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
    "$script_dir"/xipki-ocsp/tomcat/lib/ 2>/dev/null || true
 
-zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
-
-echo "3. Prepare xipki-gateway"
-
-mkdir -p "$script_dir"/xipki-gateway/tomcat/lib
-
-cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-gateway/tomcat/lib/
+cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
+   "$script_dir"/xipki-ca/tomcat/lib/ 2>/dev/null || true
 
 cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
    "$script_dir"/xipki-gateway/tomcat/lib/ 2>/dev/null || true
 
-cp "$jars_dir"/misc/org.xipki.pki.ca-sdk-*.jar \
-   "$script_dir"/war-common/WEB-INF/lib
-
-zip -r "$script_dir/xipki-gateway/tomcat/webapps/gw.war" .
-
-echo "4. Prepare xipki-ca"
-
-mkdir -p "$script_dir"/xipki-ca/tomcat/lib
-
-cp "$jars_dir"/jdbc/*.jar "$script_dir"/xipki-ca/tomcat/lib/
-
 cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
-   "$script_dir"/xipki-ca/tomcat/lib/ 2>/dev/null || true
+   "$script_dir"/xipki-dummy/tomcat/lib/ 2>/dev/null || true
 
-cp "$script_dir"/xipki-qa-cli/lib/org.xipki.pki.ca-api-*.jar \
+echo "2. Add the crypto backend jars to war files"
+
+rm -rf "$script_dir"/war-common
+
+mkdir -p "$script_dir"/war-common/WEB-INF/lib
+
+cp $jars_dir/crypto/*.jar \
    "$script_dir"/war-common/WEB-INF/lib
+
+rm -rf "$script_dir"/war-common/WEB-INF/lib/org.bouncycastle.*.jar
+
+cd "$script_dir"/war-common
+
+zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
 
 zip -r "$script_dir"/xipki-ca/tomcat/webapps/ca.war .
 
+zip -r "$script_dir"/xipki-gateway/tomcat/webapps/gw.war .
+
+zip -r "$script_dir"/xipki-dummy/tomcat/webapps/dummy.war .
+
+cd "$script_dir"
 rm -rf "$script_dir"/war-common
+
+echo "Prepare key and certificates for internal communication"
 
 kc_dir="$script_dir"/setup/keycerts
 ks_dir="$kc_dir"/certstore
@@ -227,13 +213,6 @@ cp "$kc_dir"/ca-mgmt-client/* \
    "$kc_dir"/ra-sdk-client/ra-sdk-client-cert.pem \
    "$kc_dir"/secretkeys/kem-pop.jceks \
    "$script_dir"/xipki-qa-cli/xipki/keycerts
-
-pki_ui_dir="$TBDIR/pki-ui"
-
-mkdir -p "$pki_ui_dir/keycerts"
-cp "$kc_dir"/ca-server/ca-server-cert.pem \
-   "$kc_dir"/ca-mgmt-client/ca-mgmt-client.p12 \
-   "$pki_ui_dir"/keycerts
 
 tomcat_dir_ca="$TBDIR"/ca-tomcat
 tomcat_dir_ocsp="$TBDIR"/ocsp-tomcat

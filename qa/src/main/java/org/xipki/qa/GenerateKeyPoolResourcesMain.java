@@ -3,11 +3,11 @@
 package org.xipki.qa;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.pkcs12.KeyPairWithSubjectPublicKeyInfo;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.pkcs12.X509KeyPairWithSubjectPublicKeyInfo;
+import org.xipki.pkix.util.KeyUtil;
 
 import java.nio.charset.StandardCharsets;
 
@@ -29,7 +29,7 @@ public class GenerateKeyPoolResourcesMain {
       try {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
-          KeyPairWithSubjectPublicKeyInfo kp2 = X509KeyUtil.generateKeyPair2(keySpec);
+          X509KeyPairWithSubjectPublicKeyInfo kp2 = KeyUtil.generateX509KeyPair2(keySpec);
           byte[] encodedSk = kp2.keypair().getPrivate().getEncoded();
           byte[] encodedPk = kp2.subjectPublicKeyInfo().getEncoded();
           PrivateKeyInfo.fromEncoded(encodedSk);

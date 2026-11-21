@@ -13,7 +13,7 @@ import org.xipki.codec.util.StringUtil;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;

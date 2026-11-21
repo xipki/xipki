@@ -14,7 +14,7 @@ import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.conf.Validity;
 

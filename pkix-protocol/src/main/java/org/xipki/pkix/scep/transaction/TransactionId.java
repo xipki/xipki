@@ -3,7 +3,7 @@
 
 package org.xipki.pkix.scep.transaction;
 
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Hex;
 import org.xipki.crypto.core.HashAlgo;

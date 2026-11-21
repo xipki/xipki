@@ -45,7 +45,7 @@
   }],
   "responseOptions":[{
     "name":"response1",
-    "embedCertsMode":"SIGNER",
+    "embedCertsMode":"CERT",
     "includeCerthash":false,
     "includeInvalidityDate":false,
     "includeRevReason":true,

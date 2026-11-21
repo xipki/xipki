@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.CaCaps;

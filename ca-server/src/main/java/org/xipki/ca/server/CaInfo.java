@@ -18,7 +18,7 @@ import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;

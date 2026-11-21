@@ -15,12 +15,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.asn1.x509.Certificate;
+import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
-import org.xipki.codec.crypto.ContentVerifierProvider;
-import org.xipki.crypto.core.SignAlgo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -28,7 +27,6 @@ import java.math.BigInteger;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
@@ -120,19 +118,17 @@ public class TestUtil {
    */
   public static ContentSigner signer(PrivateKey key, String jceAlg, AlgorithmIdentifier algId) {
 
-    final Integer c509AlgId = x509ToC509AlgId(algId);
-
     return new ContentSigner() {
       private final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
       @Override
-      public AlgorithmIdentifier getAlgorithmIdentifier() {
+      public AlgorithmIdentifier x509Algorithm() {
         return algId;
       }
 
       @Override
-      public Integer getC509AlgorithmIdentifier() {
-        return c509AlgId;
+      public int c509Algorithm() {
+        throw new UnsupportedOperationException("c509Algorithm unsupported");
       }
 
       @Override
@@ -142,7 +138,7 @@ public class TestUtil {
       }
 
       @Override
-      public byte[] getSignature() throws SignatureException {
+      public byte[] getX509Signature() throws SignatureException {
         try {
           Signature sig = Signature.getInstance(jceAlg, BC);
           sig.initSign(key);
@@ -156,11 +152,11 @@ public class TestUtil {
   }
 
   /**
-   * A {@link ContentVerifierProvider} with JCA {@link Signature}, the algorithm name is
+   * A {@link ContentVerifierFactory} with JCA {@link Signature}, the algorithm name is
    * resolved by BouncyCastle.
    */
-  public static ContentVerifierProvider verifierProvider(PublicKey key, Certificate cert) {
-    return new ContentVerifierProvider() {
+  public static ContentVerifierFactory verifierProvider(PublicKey key, Certificate cert) {
+    return new ContentVerifierFactory() {
       @Override
       public boolean hasAssociatedCertificate() {
         return cert != null;
@@ -172,17 +168,17 @@ public class TestUtil {
       }
 
       private ContentVerifier get(
-          ByteArrayOutputStream out, String name, AlgorithmIdentifier algId, Integer c509AlgId)
+          ByteArrayOutputStream out, String name, AlgorithmIdentifier algId)
           throws GenerationException {
         return new ContentVerifier() {
           @Override
-          public AlgorithmIdentifier getAlgorithmIdentifier() {
+          public AlgorithmIdentifier x509Algorithm() {
             return algId;
           }
 
           @Override
-          public Integer getC509AlgorithmIdentifier() {
-            return c509AlgId;
+          public int c509Algorithm() {
+            throw new UnsupportedOperationException("c509Algorithm unsupported");
           }
 
           @Override
@@ -192,7 +188,7 @@ public class TestUtil {
           }
 
           @Override
-          public boolean verify(byte[] signature) throws SignatureException {
+          public boolean x509Verify(byte[] signature) throws SignatureException {
             try {
               Signature sig = Signature.getInstance(name, BC);
               sig.initVerify(key);
@@ -210,34 +206,14 @@ public class TestUtil {
         String name = new DefaultAlgorithmNameFinder().getAlgorithmName(
             org.bouncycastle.asn1.x509.AlgorithmIdentifier.getInstance(algId.getEncoded()));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final Integer c509AlgId = x509ToC509AlgId(algId);
-        return get(out, name, algId, c509AlgId);
+        return get(out, name, algId);
       }
 
       @Override
       public ContentVerifier getForC509(int c509AlgId) throws GenerationException {
-        SignAlgo signAlgo;
-        try {
-          signAlgo = SignAlgo.ofC509AlgorithmIdentifier(c509AlgId);
-        } catch (NoSuchAlgorithmException e) {
-          throw new GenerationException(e);
-        }
-
-        AlgorithmIdentifier algId = signAlgo.algorithmIdentifier();
-        String name = new DefaultAlgorithmNameFinder().getAlgorithmName(
-            org.bouncycastle.asn1.x509.AlgorithmIdentifier.getInstance(algId.getEncoded()));
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        return get(out, name, algId, c509AlgId);
+        throw new UnsupportedOperationException("getForC509(int) unsupported");
       }
     };
-  }
-
-  private static Integer x509ToC509AlgId(AlgorithmIdentifier x509AlgId) {
-    try {
-      return SignAlgo.ofAlgorithmIdentifier(x509AlgId).c509AlgorithmIdentifier();
-    } catch (NoSuchAlgorithmException e) {
-      return null;
-    }
   }
 
 }

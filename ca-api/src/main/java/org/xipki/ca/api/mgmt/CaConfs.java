@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.util.Args;

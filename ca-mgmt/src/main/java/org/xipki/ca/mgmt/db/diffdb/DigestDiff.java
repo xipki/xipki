@@ -6,7 +6,7 @@ package org.xipki.ca.mgmt.db.diffdb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.Base64;
-import org.xipki.codec.speed.ProcessLog;
+import org.xipki.codec.util.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;

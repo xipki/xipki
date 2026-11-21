@@ -4,8 +4,8 @@
 package org.xipki.qa.ca;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
@@ -178,7 +178,7 @@ public class FillKeypool implements AutoCloseable {
       int id = 1;
 
       // loading the RSA pre-generated keypairs
-      Map<KeySpec, List<KeyInfoPair>> preKeysMap = new HashMap<>();
+      Map<KeySpec, List<KeyInfoPair.X509>> preKeysMap = new HashMap<>();
       for (KeySpec keyspec : keySpecs) {
         String fn = "/keypool/" + keyspec.name() + ".txt";
 
@@ -188,7 +188,7 @@ public class FillKeypool implements AutoCloseable {
           }
 
           BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-          List<KeyInfoPair> keys = new ArrayList<>(10);
+          List<KeyInfoPair.X509> keys = new ArrayList<>(10);
           preKeysMap.put(keyspec, keys);
           String line;
           while ((line = reader.readLine()) != null) {
@@ -204,26 +204,26 @@ public class FillKeypool implements AutoCloseable {
             byte[] pkBytes = Base64.decodeFast(b64Pk);
             PrivateKeyInfo skInfo = PrivateKeyInfo.fromEncoded(skBytes);
             SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.fromEncoded(pkBytes);
-            keys.add(new KeyInfoPair(pkInfo, skInfo));
+            keys.add(new KeyInfoPair.X509(pkInfo, skInfo));
           }
         }
       }
 
       for (KeySpec keyspec : keySpecs) {
         int kid = keyspecToIdMap.get(keyspec);
-        List<KeyInfoPair> preKeys = preKeysMap.get(keyspec);
+        List<KeyInfoPair.X509> preKeys = preKeysMap.get(keyspec);
 
         long start = Clock.systemUTC().millis();
 
         int i = 0;
         for (; i < numKeypairs; i++) {
-          KeyInfoPair keyInfoPair;
+          KeyInfoPair.X509 keyInfoPair;
           if (preKeys != null) {
             keyInfoPair = preKeys.get(i % preKeys.size());
           } else {
             try {
               KeyPair kp = KeyUtil.generateKeyPair(keyspec);
-              keyInfoPair = new KeyInfoPair(kp);
+              keyInfoPair = new KeyInfoPair.X509(kp);
             } catch (GeneralSecurityException ex) {
               continue;
             }

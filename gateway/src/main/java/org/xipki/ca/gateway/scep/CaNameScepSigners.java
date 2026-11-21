@@ -9,7 +9,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.pkcs12.KeypairWithCert;
+import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
@@ -56,8 +56,8 @@ public class CaNameScepSigners {
   public CaNameScepSigners(
       CaNameSigners signers, ScepProtocolConf.CaNameDecryptorsConf decryptorsConf)
       throws InvalidConfException {
-    KeypairWithCert defaultDecryptor = null;
-    Map<String, KeypairWithCert> decryptors = new HashMap<>();
+    X509KeypairWithCert defaultDecryptor = null;
+    Map<String, X509KeypairWithCert> decryptors = new HashMap<>();
     if (decryptorsConf != null) {
       if (decryptorsConf.getDefault() != null) {
         defaultDecryptor = loadDecryptor(decryptorsConf.getDefault());
@@ -66,7 +66,7 @@ public class CaNameScepSigners {
       List<ScepProtocolConf.CaNameDecryptorConf> confs = decryptorsConf.decryptors();
       if (confs != null) {
         for (ScepProtocolConf.CaNameDecryptorConf m : confs) {
-          KeypairWithCert decryptor = loadDecryptor(m.decryptor());
+          X509KeypairWithCert decryptor = loadDecryptor(m.decryptor());
           for (String name : m.names()) {
             if (decryptors.put(name.toLowerCase(Locale.ROOT), decryptor) != null) {
               throw new InvalidConfException(
@@ -94,7 +94,7 @@ public class CaNameScepSigners {
         throw new InvalidConfException("no signer is configured for the CA " + name);
       }
 
-      KeypairWithCert decryptor = decryptors.get(name);
+      X509KeypairWithCert decryptor = decryptors.get(name);
       if (decryptor == null) {
         decryptor = defaultDecryptor;
       }
@@ -117,7 +117,7 @@ public class CaNameScepSigners {
    * Loads the key and certificate from the PKCS#12 keystore. The key is not used for signing
    * (e.g. no test signature as by the signer factory).
    */
-  private static KeypairWithCert loadDecryptor(GatewayConf.SignerConf decryptorConf)
+  private static X509KeypairWithCert loadDecryptor(GatewayConf.SignerConf decryptorConf)
       throws InvalidConfException {
     if (!"pkcs12".equalsIgnoreCase(decryptorConf.type())) {
       throw new InvalidConfException(
@@ -139,7 +139,7 @@ public class CaNameScepSigners {
     X509Cert[] certchain = certs.isEmpty() ? null : certs.toArray(new X509Cert[0]);
 
     try (InputStream is = getInputStream(keystore)) {
-      return KeypairWithCert.fromPKCS12Keystore(
+      return X509KeypairWithCert.fromPKCS12Keystore(
           is, password, conf.keyLabel(), password, certchain);
     } catch (IOException | XiSecurityException ex) {
       throw new InvalidConfException("could not load the decryptor: " + ex.getMessage(), ex);

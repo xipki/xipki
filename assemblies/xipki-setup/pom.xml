@@ -41,7 +41,7 @@
         <executions>
           <execution>
             <id>filter</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>resources</goal>
             </goals>
@@ -54,7 +54,7 @@
         <executions>
           <execution>
             <id>unpack-mgmt-cli-lib</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -73,7 +73,7 @@
           </execution>
           <execution>
             <id>unpack-cli-lib</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -92,7 +92,7 @@
           </execution>
           <execution>
             <id>copy-wars</id>
-            <phase>generate-resources</phase>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy</goal>
             </goals>

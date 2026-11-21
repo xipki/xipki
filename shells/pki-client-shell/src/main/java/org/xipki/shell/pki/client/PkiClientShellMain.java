@@ -4,7 +4,7 @@
 package org.xipki.shell.pki.client;
 
 import org.xipki.shell.PicocliShell;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 
 /**

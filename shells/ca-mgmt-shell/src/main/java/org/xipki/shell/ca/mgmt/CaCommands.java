@@ -19,7 +19,7 @@ import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
@@ -391,7 +391,7 @@ public class CaCommands {
       try {
         List<X509Cert> certs = client().getCaCerts(name);
         IoUtil.save(outFile,
-            X509Util.encodeCertificates(certs.toArray(new X509Cert[0])).getBytes());
+            X509Util.encodePemCertificates(certs.toArray(new X509Cert[0])).getBytes());
         println("saved CA certificate chain to " + outFile);
       } catch (Exception ex) {
         throw new RuntimeException("could not export CA certificate chain: " + ex.getMessage(), ex);

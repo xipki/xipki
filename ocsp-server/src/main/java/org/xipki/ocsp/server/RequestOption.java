@@ -8,7 +8,7 @@ import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.pkix.verify.CertPathValidationModel;
+import org.xipki.pkix.sign.CertPathValidationModel;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.QuadrupleState;

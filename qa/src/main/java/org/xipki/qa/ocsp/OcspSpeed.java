@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.asn1.ocsp.BasicOCSPResponse;
 import org.xipki.asn1.ocsp.OCSPResponse;
 import org.xipki.asn1.ocsp.OCSPResponseStatus;
-import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.ocsp.client.HttpOcspRequestor;
 import org.xipki.ocsp.client.OcspRequestor;
@@ -113,7 +113,7 @@ public class OcspSpeed extends SpeedExecutor {
       return false;
     }
 
-    if (OCSPResponseStatus.SUCCESSFUL.equals(ocspResp.getResponseStatus())) {
+    if (!OCSPResponseStatus.SUCCESSFUL.equals(ocspResp.getResponseStatus())) {
       LOG.warn("bad response: response status is other than SUCCESSFUL: {}",
           ocspResp.getResponseStatus());
       return false;

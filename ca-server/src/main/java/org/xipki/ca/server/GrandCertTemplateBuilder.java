@@ -16,11 +16,11 @@ import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1BitString;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.RSAPublicKey;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.RSAPublicKey;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
@@ -58,7 +58,7 @@ class GrandCertTemplateBuilder {
     this.keyspecByImplicitCA = caInfo.caKeySpec();
   }
 
-  X509Ca.GrantedCertTemplate create(
+  Ca.GrantedCertTemplate create(
       boolean batch, IdentifiedCertprofile certprofile,
       CertTemplateData certTemplate, List<KeypairGenerator> keypairGenerators)
       throws OperationException {
@@ -170,7 +170,7 @@ class GrandCertTemplateBuilder {
       String name = keypairGenerator.name();
 
       try {
-        KeyInfoPair keyInfoPair = keypairGenerator.generateKeypair(keyspec);
+        KeyInfoPair.X509 keyInfoPair = keypairGenerator.generateKeypair(keyspec);
         privateKey = keyInfoPair.getPrivate();
         grantedPublicKeyInfo = keyInfoPair.getPublic();
 
@@ -300,7 +300,7 @@ class GrandCertTemplateBuilder {
     if (msgBuilder.length() > 2) {
       warning = msgBuilder.substring(2);
     }
-    X509Ca.GrantedCertTemplate gct = new X509Ca.GrantedCertTemplate(batch,
+    Ca.GrantedCertTemplate gct = new Ca.GrantedCertTemplate(batch,
         certTemplate.certReqId(), certTemplate.extensions(), certprofile,
         grantedNotBefore, grantedNotAfter, requestedSubject,
         grantedPublicKeyInfo, privateKey, signer, warning);

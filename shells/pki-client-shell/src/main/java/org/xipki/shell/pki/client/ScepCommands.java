@@ -10,7 +10,7 @@ import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.password.Passwords;
@@ -20,7 +20,7 @@ import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.xi.Completers;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -87,7 +87,7 @@ public class ScepCommands {
           : Passwords.resolvePassword(passwordHint);
       Pkcs12KeyStore ks;
       try (InputStream is = Files.newInputStream(Paths.get(p12File))) {
-        ks = X509KeyUtil.loadPKCS12KeyStore(is, pwd);
+        ks = KeyUtil.loadPKCS12KeyStore(is, pwd);
       }
 
       String keyname = null;

@@ -26,19 +26,20 @@ import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Set;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.AttributeOIDs;
-import org.xipki.codec.asn1.oid.CmsOIDs;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.id.AttributeOIDs;
+import org.xipki.codec.x509.id.CmsOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
+import org.xipki.ca.sdk.ErrorEntry;
 import org.xipki.ca.sdk.OldCertInfo;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
@@ -216,7 +217,7 @@ public class EstResponder {
     return authenticator.getPasswordRequestorByUser(Requestor.Protocol.EST, user);
   }
 
-  private Requestor.CertRequestor getRequestor(X509Cert cert) {
+  private Requestor.X509CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(Requestor.Protocol.EST, cert);
   }
 
@@ -299,7 +300,7 @@ public class EstResponder {
         case CMD_ucacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
           return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
-              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+              StringUtil.toUtf8Bytes(X509Util.encodePemCertificates(certsBytes))));
         }
         case CMD_ucacert:
           return toHttpResponse(HttpRespContent.ofOk(CT_pkix_cert, true, sdk.cacert(caName)));
@@ -507,7 +508,7 @@ public class EstResponder {
 
   private HttpRespContent enrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-          throws HttpRespAuditException, IOException, SdkErrorResponseException, CodecException {
+          throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException, CodecException {
     boolean caGenKeyPair = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
     X500Name subject = csr.getSubject();
@@ -595,7 +596,7 @@ public class EstResponder {
 
   private HttpRespContent reenrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-      throws HttpRespAuditException, CodecException, SdkErrorResponseException {
+      throws OperationException, HttpRespAuditException, CodecException, SdkErrorResponseException {
     event.addEventData(CaAuditConstants.NAME_certprofile, profile);
     X500Name oldSubject = csr.getSubject();
 
@@ -715,13 +716,15 @@ public class EstResponder {
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
-      throws HttpRespAuditException {
+      throws HttpRespAuditException, OperationException {
     EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
     if (entries != null) {
       for (EnrollOrPollCertsResponse.Entry entry : entries) {
-        if (entry.error() != null) {
-          throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-              entry.error().toString(), AuditLevel.INFO, AuditStatus.FAILED);
+        ErrorEntry error = entry.error();
+        if (error != null) {
+          // keep the error code of the CA, so that e.g. BAD_CERT_TEMPLATE is answered as
+          // client error, not as server error
+          throw new OperationException(toErrorCode(error.code()), error.message());
         }
       }
     }
@@ -733,6 +736,14 @@ public class EstResponder {
           AuditLevel.INFO, AuditStatus.FAILED);
     }
   }
+  private static ErrorCode toErrorCode(int code) {
+    try {
+      return ErrorCode.ofCode(code);
+    } catch (IllegalArgumentException ex) {
+      return ErrorCode.SYSTEM_FAILURE;
+    }
+  }
+
 
   private static EnrollOrPollCertsResponse.Entry getEntry(
       EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)

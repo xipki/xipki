@@ -30,7 +30,7 @@ import org.xipki.ca.server.CertStore;
 import org.xipki.util.misc.UniqueIdGenerator;
 import org.xipki.codec.Base64;
 import org.xipki.codec.Hex;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.Pack;
@@ -215,7 +215,9 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
     this.sqlCertStatusForSubjectFp = buildSelectFirstSql("REV FROM CERT WHERE FP_S=? AND CA_ID=?");
 
-    this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC",
+    // THISUPDATE has the precision of seconds: of CRLs generated in the same second, the
+    // one with the highest CRL number is the latest.
+    this.sqlCrl = buildSelectFirstSql("THISUPDATE DESC,CRL_NO DESC",
         "THISUPDATE,CRL FROM CRL WHERE CA_ID=?");
 
     this.sqlCrlWithNo = buildSelectFirstSql("THISUPDATE DESC",
@@ -422,7 +424,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         if (fpSubject == fpReqSubject) {
           fpReqSubject = null;
         } else {
-          reqSubjectText = X509Util.cutX500Name(CaUtil.sortX509Name(reqSubject), maxX500nameLen);
+          reqSubjectText = X509Util.cutX500Name(CaUtil.sortName(reqSubject), maxX500nameLen);
         }
       }
 
@@ -1277,7 +1279,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   @Override
   public boolean isHealthy() {
     try {
-      execUpdateStmt("SELECT ID FROM CA");
+      execQueryStmt(buildSelectFirstSql("ID FROM CA"));
       return true;
     } catch (Exception ex) {
       LOG.error("isHealthy(). {}: {}", ex.getClass().getName(), ex.getMessage());

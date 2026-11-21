@@ -5,8 +5,8 @@ package org.xipki.ocsp.server;
 
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Primitive;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.server.type.ResponderID;

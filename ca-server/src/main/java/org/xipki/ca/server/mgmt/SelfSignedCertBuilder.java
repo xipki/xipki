@@ -17,9 +17,9 @@ import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
@@ -123,7 +123,7 @@ public class SelfSignedCertBuilder {
     SubjectPublicKeyInfo publicKeyInfo;
 
     try {
-      SubjectPublicKeyInfo x509PkInfo = KeyUtil.createSubjectPublicKeyInfo(signer.publicKey());
+      SubjectPublicKeyInfo x509PkInfo = KeyUtil.createX509SubjectPublicKeyInfo(signer.publicKey());
       publicKeyInfo = X509Util.toRfc3279Style(x509PkInfo);
     } catch (InvalidKeyException ex) {
       LOG.warn("building SubjectPublicKeyInfo from JCE public key", ex);
@@ -171,8 +171,6 @@ public class SelfSignedCertBuilder {
       PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject,
           grantedSubject, serialNumber, null, ski, null, null);
 
-      Signer signer0 = signer.borrowSigner();
-
       ExtensionValues extensionTuples = certprofile.getExtensions(
           requestedSubject, grantedSubject, null, publicKeyInfo,
           publicCaInfo, null, notBefore, notAfter);
@@ -181,12 +179,7 @@ public class SelfSignedCertBuilder {
             grantedSubject, serialNumber, notBefore, notAfter, grantedSubject, publicKeyInfo);
 
       CaUtil.addExtensions(extensionTuples, certBuilder, certprofile.extensionControls());
-      Certificate cert;
-      try {
-        cert = certBuilder.build(signer0.contentSigner());
-      } finally {
-        signer.requiteSigner(signer0);
-      }
+      Certificate cert = certBuilder.build(signer);
       return new X509Cert(cert);
     } catch (BadCertTemplateException ex) {
       throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, ex);

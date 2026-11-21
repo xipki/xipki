@@ -4,7 +4,7 @@
 package org.xipki.ca.certprofile.test;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.id.AccessMethodID;
@@ -22,7 +22,7 @@ import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
 import org.xipki.codec.Base64;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;

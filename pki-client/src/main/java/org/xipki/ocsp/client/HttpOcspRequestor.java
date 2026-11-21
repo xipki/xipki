@@ -22,7 +22,7 @@ import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.oid.OcspOIDs;
+import org.xipki.codec.x509.id.OcspOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
@@ -451,7 +451,7 @@ public class HttpOcspRequestor implements OcspRequestor {
     HashAlgo hashAlgo = requestOptions.hashAlgorithm();
     List<SignAlgo> prefSigAlgs = requestOptions.preferredSignatureAlgorithms();
 
-    XiOCSPReqBuilder reqBuilder = new XiOCSPReqBuilder();
+    OcspRequestBuilder reqBuilder = new OcspRequestBuilder();
     List<Extension> extensions = new LinkedList<>();
     if (nonce != null) {
       extensions.add(Extension.ofOcspNonce(false, nonce));
@@ -497,18 +497,7 @@ public class HttpOcspRequestor implements OcspRequestor {
           certChain[i] = certChain0[i].getCert();
         }
 
-        Signer signer0;
-        try {
-          signer0 = signer.borrowSigner();
-        } catch (NoIdleSignerException ex) {
-          throw new OcspRequestorException("NoIdleSignerException: " + ex.getMessage(), ex);
-        }
-
-        try {
-          return reqBuilder.build(signer0.contentSigner(), certChain);
-        } finally {
-          signer.requiteSigner(signer0);
-        }
+        return reqBuilder.build(signer, certChain);
       } else {
         return reqBuilder.build();
       } // end if

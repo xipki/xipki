@@ -23,7 +23,7 @@ import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
 import org.xipki.codec.Base64;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
@@ -45,7 +45,7 @@ import org.xipki.shell.ca.mgmt.CaMgmtRuntime;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.xi.Completers;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

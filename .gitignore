@@ -94,3 +94,6 @@ nb-configuration.xml
 
 *~
 hs_err*.log
+
+# ACME nonces saved by NonceManager
+.nonces

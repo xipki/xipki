@@ -4,7 +4,7 @@
 package org.xipki.ca.api;
 
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;

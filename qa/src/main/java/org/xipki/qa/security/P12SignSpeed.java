@@ -6,7 +6,7 @@ package org.xipki.qa.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.Base64;
-import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
@@ -14,11 +14,11 @@ import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.KeyStoreWrapper;
 import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
-import org.xipki.pkix.pkcs12.Pkcs12KeyStoreWrapper;
+import org.xipki.pkix.pkcs12.X509Pkcs12KeyStoreWrapper;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.misc.RandomUtil;
 
 
@@ -31,25 +31,20 @@ public final class P12SignSpeed extends SpeedExecutor {
 
   private class Tester implements Runnable {
 
-    private static final int batch = 16;
-
-    private final byte[][] data = new byte[batch][16];
+    private final byte[] data = RandomUtil.nextBytes(16);
 
     public Tester() {
-      for (int i = 0; i < data.length; i++) {
-        data[i] = RandomUtil.nextBytes(data[i].length);
-      }
     }
 
     @Override
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.x509Sign(data);
-          account(batch, 0);
+          signer.atomicX509Sign(data);
+          account(1, 0);
         } catch (Exception ex) {
           LOG.error("P12SignSpeed.Tester.run()", ex);
-          account(batch, batch);
+          account(1, 1);
         }
       }
     }
@@ -118,7 +113,7 @@ public final class P12SignSpeed extends SpeedExecutor {
       }
     }
 
-    Pkcs12KeyStoreWrapper identity = X509KeyUtil.generateKeyPair3(keySpec, params);
+    X509Pkcs12KeyStoreWrapper identity = KeyUtil.generateX509KeyPair3(keySpec, params);
     return identity.keystore();
   }
 

@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway.scep;
 
-import org.xipki.pkix.pkcs12.KeypairWithCert;
+import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.EnvelopedDataDecryptor;
@@ -44,7 +44,7 @@ public class ScepSigner {
    * @param decryptor the key and certificate to decrypt the requests. If null, the signing key
    *                  is used.
    */
-  public ScepSigner(ConcurrentSigner signer, KeypairWithCert decryptor) {
+  public ScepSigner(ConcurrentSigner signer, X509KeypairWithCert decryptor) {
     Key signingKey = signer.signingKey();
     if (!(signingKey instanceof PrivateKey)) {
       throw new IllegalArgumentException(
@@ -63,7 +63,7 @@ public class ScepSigner {
       this.encryptionCert = cert;
       decryptionKey = key;
     } else {
-      this.encryptionCert = decryptor.x509CertChain()[0];
+      this.encryptionCert = decryptor.certChain()[0];
       decryptionKey = decryptor.getKey();
       checkDecryptor(cert, encryptionCert, decryptionKey);
     }

@@ -6,7 +6,7 @@ package org.xipki.qa.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.speed.SpeedExecutor;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
@@ -35,25 +35,20 @@ public class P11SignSpeed extends SpeedExecutor {
 
   private class Tester implements Runnable {
 
-    private static final int batch = 10;
-
-    private final byte[][] data = new byte[batch][16];
+    private final byte[] data = RandomUtil.nextBytes(16);
 
     public Tester() {
-      for (int i = 0; i < data.length; i++) {
-        data[i] = RandomUtil.nextBytes(data[i].length);
-      }
     }
 
     @Override
     public void run() {
       while (!stop() && getErrorAccount() < 1) {
         try {
-          signer.x509Sign(data);
-          account(batch, 0);
+          signer.atomicX509Sign(data);
+          account(1, 0);
         } catch (Exception ex) {
           LOG.error("P11SignSpeed.Tester.run()", ex);
-          account(batch, batch);
+          account(1, 1);
         }
       }
     }

@@ -1,0 +1,159 @@
+// Copyright (c) 2013-2026 xipki. All rights reserved.
+// License Apache License 2.0
+
+package org.xipki.ocsp.client;
+
+import org.xipki.asn1.ocsp.CertID;
+import org.xipki.asn1.ocsp.OCSPRequest;
+import org.xipki.asn1.ocsp.Request;
+import org.xipki.asn1.ocsp.Signature;
+import org.xipki.asn1.ocsp.TBSRequest;
+import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.asn1.x509.Extensions;
+import org.xipki.asn1.x509.GeneralName;
+import org.xipki.codec.asn1.Asn1BitString;
+import org.xipki.codec.crypto.AtomicContentSigner;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.util.exception.PkixException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * XiPKI OCSPReq Builder.
+ *
+ * @author Lijun Liao (xipki)
+ */
+public class OcspRequestBuilder {
+  private final List<RequestObject> list = new ArrayList<>();
+  private GeneralName requestorName = null;
+  private Extensions requestExtensions = null;
+
+  private static class RequestObject {
+    private final CertID certId;
+    private final Extensions extensions;
+
+    public RequestObject(CertID certId, Extensions  extensions) {
+      this.certId = certId;
+      this.extensions = extensions;
+    }
+
+    public Request toRequest() {
+      return new Request(certId, extensions);
+    }
+  }
+
+  /**
+   * Add a request for the given CertificateID.
+   *
+   * @param certId certificate ID of interest
+   * @return a reference to this object.
+   */
+  public OcspRequestBuilder addRequest(CertID certId) {
+    list.add(new RequestObject(certId, null));
+
+    return this;
+  }
+
+  /**
+   * Add a request with extensions.
+   *
+   * @param certId certificate ID of interest
+   * @param singleRequestExtensions the extensions to attach to the request
+   * @return a reference to this object.
+   */
+  public OcspRequestBuilder addRequest(CertID certId, Extensions singleRequestExtensions) {
+    list.add(new RequestObject(certId, singleRequestExtensions));
+
+    return this;
+  }
+
+  /**
+   * Set the requestor name to the passed in X500Name.
+   *
+   * @param requestorName an X500Name representing the requestor name.
+   * @return a reference to this object.
+   */
+  public OcspRequestBuilder setRequestorName(X500Name requestorName) {
+    this.requestorName = GeneralName.ofDirectoryName(requestorName);
+    return this;
+  }
+
+  public OcspRequestBuilder setRequestorName(GeneralName requestorName) {
+    this.requestorName = requestorName;
+    return this;
+  }
+
+  public OcspRequestBuilder setRequestExtensions(Extensions requestExtensions) {
+    this.requestExtensions = requestExtensions;
+    return this;
+  }
+
+  private OCSPRequest generateRequest(AtomicContentSigner contentSigner, Certificate[] chain)
+      throws PkixException {
+    Iterator<RequestObject> it = list.iterator();
+
+    List<Request> requests = new LinkedList<>();
+
+    while (it.hasNext()) {
+      try {
+        requests.add(it.next().toRequest());
+      } catch (Exception ex) {
+        throw new PkixException("exception creating Request", ex);
+      }
+    }
+
+    TBSRequest tbsReq = new TBSRequest(requestorName,
+                          new Request.Seq0(requests), requestExtensions);
+
+    Signature signature = null;
+
+    if (contentSigner != null) {
+      if (requestorName == null) {
+        throw new PkixException("requestorName must be specified if request is signed.");
+      }
+
+      byte[] sigValue;
+      try {
+        sigValue = contentSigner.atomicX509Sign(tbsReq.getEncoded());
+      } catch (Exception ex) {
+        throw new PkixException("exception processing TBSRequest: " + ex, ex);
+      }
+
+      Asn1BitString bitSig = new Asn1BitString(sigValue);
+      AlgorithmIdentifier sigAlgId = contentSigner.x509Algorithm();
+
+      if (chain != null && chain.length > 0) {
+        Certificate.Seq0 asn1Chain = new Certificate.Seq0(chain);
+        signature = new Signature(sigAlgId, bitSig, asn1Chain);
+      } else {
+        signature = new Signature(sigAlgId, bitSig);
+      }
+    }
+
+    return new OCSPRequest(tbsReq, signature);
+  } // method generateRequest
+
+  /**
+   * Generate an unsigned request.
+   *
+   * @return the OCSPRequest
+   * @throws PkixException
+   *           If OCSP request cannot be built.
+   */
+  public OCSPRequest build() throws PkixException {
+    return generateRequest(null, null);
+  }
+
+  public OCSPRequest build(AtomicContentSigner signer, Certificate[] chain) throws PkixException {
+    if (signer == null) {
+      throw new IllegalArgumentException("no signer specified");
+    }
+
+    return generateRequest(signer, chain);
+  }
+}

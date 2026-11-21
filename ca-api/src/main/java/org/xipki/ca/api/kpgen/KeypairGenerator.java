@@ -5,7 +5,7 @@ package org.xipki.ca.api.kpgen;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
@@ -80,7 +80,7 @@ public abstract class KeypairGenerator implements Closeable {
     return keyspec != null && keyspecs.contains(keyspec);
   }
 
-  public abstract KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException;
+  public abstract KeyInfoPair.X509 generateKeypair(KeySpec keyspec) throws XiSecurityException;
 
   public abstract boolean isHealthy();
 

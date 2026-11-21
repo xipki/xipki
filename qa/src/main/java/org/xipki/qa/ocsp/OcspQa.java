@@ -16,12 +16,12 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.CRLReason;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.crypto.ContentVerifierFactory;
+import org.xipki.codec.util.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.OcspOIDs;
-import org.xipki.codec.crypto.ContentVerifierProvider;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OcspOIDs;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
@@ -30,7 +30,7 @@ import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.IssuerHash;
+import org.xipki.pkix.cert.X509IssuerHash;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.qa.ValidationIssue;
@@ -66,7 +66,7 @@ public class OcspQa {
   }
 
   public ValidationResult checkOcsp(
-      OCSPResponse response, IssuerHash issuerHash, BigInteger serialNumber,
+      OCSPResponse response, X509IssuerHash issuerHash, BigInteger serialNumber,
       byte[] encodedCert, QaOcspCertStatus expectedOcspStatus,
       OcspResponseOption responseOption, Instant exptectedRevTime, boolean noSigVerify) {
     List<BigInteger> serialNumbers = new ArrayList<>(1);
@@ -114,7 +114,7 @@ public class OcspQa {
   } // method checkOcsp
 
   public ValidationResult checkOcsp(
-      OCSPResponse response, IssuerHash issuerHash, List<BigInteger> serialNumbers,
+      OCSPResponse response, X509IssuerHash issuerHash, List<BigInteger> serialNumbers,
       Map<BigInteger, byte[]> encodedCerts,
       Map<BigInteger, QaOcspCertStatus> expectedOcspStatuses,
       Map<BigInteger, Instant> expectedRevTimes,
@@ -273,7 +273,7 @@ public class OcspQa {
           PublicKey responderPubKey =
               KeyInfoUtil.getPublicKey(respSigner.getSubjectPublicKeyInfo());
 
-          ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(responderPubKey);
+          ContentVerifierFactory cvp = securityFactory.getContentVerifierFactory(responderPubKey);
           if (!basicResp.isSignatureValid(cvp)) {
             sigValIssue.setFailureMessage("signature is invalid");
           }
@@ -316,7 +316,7 @@ public class OcspQa {
   } // method checkOcsp
 
   private List<ValidationIssue> checkSingleCert(
-      int index, SingleResponse singleResp, IssuerHash issuerHash,
+      int index, SingleResponse singleResp, X509IssuerHash issuerHash,
       QaOcspCertStatus expectedStatus, byte[] encodedCert,
       Instant expectedRevTime, boolean extendedRevoke,
       TripleState nextupdateOccurrence, TripleState certhashOccurrence, HashAlgo certhashAlg) {

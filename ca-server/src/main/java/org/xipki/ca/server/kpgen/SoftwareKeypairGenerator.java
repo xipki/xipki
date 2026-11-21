@@ -4,7 +4,7 @@
 package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.KeyInfoPair;
@@ -28,7 +28,7 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
   }
 
   @Override
-  public KeyInfoPair generateKeypair(KeySpec keyspec) throws XiSecurityException {
+  public KeyInfoPair.X509 generateKeypair(KeySpec keyspec) throws XiSecurityException {
     if (!supports(keyspec)) {
       throw new XiSecurityException(name + " cannot generate keypair of keyspec " + keyspec);
     }
@@ -42,9 +42,9 @@ public class SoftwareKeypairGenerator extends KeypairGenerator {
     }
   }
 
-  private KeyInfoPair generateKeypair0(KeySpec keyspec) throws Exception {
+  private KeyInfoPair.X509 generateKeypair0(KeySpec keyspec) throws Exception {
     KeyPair kp = KeyUtil.generateKeyPair(keyspec);
-    return new KeyInfoPair(kp);
+    return new KeyInfoPair.X509(kp);
   }
 
   @Override

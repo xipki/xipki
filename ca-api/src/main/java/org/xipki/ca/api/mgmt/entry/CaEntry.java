@@ -5,7 +5,7 @@ package org.xipki.ca.api.mgmt.entry;
 
 import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;

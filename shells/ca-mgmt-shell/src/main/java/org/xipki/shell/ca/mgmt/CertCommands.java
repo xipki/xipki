@@ -11,8 +11,8 @@ import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.codec.asn1.crypto.EncryptedPrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.codec.x509.EncryptedPrivateKeyInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
@@ -22,7 +22,7 @@ import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.util.PKCS8Encryptor;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
@@ -414,7 +414,7 @@ public class CertCommands {
       PrivateKeyInfo privKeyInfo = PrivateKeyInfo.fromEncoded(pair.key());
       if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
         Certificate cert = Certificate.fromEncoded(pair.cert());
-        Pkcs12KeyStore p12Ks = X509KeyUtil.loadPKCS12KeyStore((byte[]) null, keyPwd);
+        Pkcs12KeyStore p12Ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, keyPwd);
         p12Ks.setKeyEntry("main", privKeyInfo, cert);
         byte[] ksBytes;
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {

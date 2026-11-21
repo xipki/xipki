@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile RFC9608"
+    "details": "certprofile RFC 9608"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,
@@ -84,23 +84,9 @@
       "required": true
     },
     {
-      "type": "CRLDistributionPoints"
-    },
-    {
-      "type": "FreshestCRL"
-    },
-    {
       "type": "BasicConstraints",
       "required": true,
       "critical": true
-    },
-    {
-      "type": "AuthorityInfoAccess",
-      "required": true,
-      "authorityInfoAccess": {
-        "includeCaIssuers": true,
-        "includeOcsp": true
-      }
     },
     {
       "type": "AuthorityKeyIdentifier",
@@ -205,6 +191,10 @@
           }
         ]
       }
+    },
+    {
+      "type": "noRevAvail",
+      "required": true
     }
   ]
 }

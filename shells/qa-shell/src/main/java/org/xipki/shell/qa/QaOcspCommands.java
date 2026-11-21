@@ -6,14 +6,14 @@ package org.xipki.shell.qa;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.asn1.ocsp.OCSPResponse;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.IssuerHash;
+import org.xipki.pkix.cert.X509IssuerHash;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.misc.CollectionUtil;
@@ -34,7 +34,7 @@ import org.xipki.shell.completer.DirPathCompleter;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.pki.client.PkiClientRuntime;
 import org.xipki.shell.xi.Completers;
-import org.xipki.shell.xi.XiShellBaseCommand;
+import org.xipki.shell.security.XiShellBaseCommand;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.misc.DateUtil;
@@ -181,7 +181,7 @@ class QaOcspCommands {
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.setHashAlgorithm(HashAlgo.SHA256);
-        IssuerHash issuerHash = new IssuerHash(requestOptions.hashAlgorithm(), issuerCert);
+        X509IssuerHash issuerHash = new X509IssuerHash(requestOptions.hashAlgorithm(), issuerCert);
         OcspQa ocspQa = new OcspQa(PkiClientRuntime.getSecurities().securityFactory());
 
         int numSucc = 0;
@@ -283,7 +283,7 @@ class QaOcspCommands {
 
     private ValidationResult processOcspLine(OcspQa ocspQa, String line, File messageDir,
         File detailsDir, URL serverUrl, X509Cert respIssuer, X509Cert issuerCert,
-        IssuerHash issuerHash, RequestOptions requestOptions,
+        X509IssuerHash issuerHash, RequestOptions requestOptions,
         TripleState expectedCerthashOccurrence, TripleState expectedNextUpdateOccurrence,
         TripleState expectedNonceOccurrence) throws Exception {
       StringTokenizer tokens = new StringTokenizer(line, ",;:");
@@ -353,7 +353,7 @@ class QaOcspCommands {
     private ValidationResult processOcspQuery(
         OcspQa ocspQa, BigInteger serialNumber,
         QaOcspCertStatus status, Instant revTime, File messageDir, File detailsDir, URL serverUrl,
-        X509Cert respIssuer, X509Cert issuerCert, IssuerHash issuerHash,
+        X509Cert respIssuer, X509Cert issuerCert, X509IssuerHash issuerHash,
         RequestOptions requestOptions, TripleState expectedCerthashOccurrence,
         TripleState expectedNextUpdateOccurrence, TripleState expectedNonceOccurrence)
         throws Exception {
@@ -597,7 +597,7 @@ class QaOcspCommands {
             responseOption.setCerthashAlg(HashAlgo.getInstance(certhashAlg));
           }
 
-          IssuerHash issuerHash = new IssuerHash(options.hashAlgorithm(), issuerCert);
+          X509IssuerHash issuerHash = new X509IssuerHash(options.hashAlgorithm(), issuerCert);
           result = ocspQa.checkOcsp(response, issuerHash, serialNumbers,
               encodedCerts.isEmpty() ? null : encodedCerts, expectedStatuses,
               expectedRevTimes, responseOption, noSigVerify);

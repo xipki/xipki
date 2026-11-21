@@ -1,7 +1,7 @@
 {
   "metadata": {
     "category": "A",
-    "details": "certprofile STIR"
+    "details": "certprofile RPKI"
   },
   "certLevel": "EndEntity",
   "maxSize": 8400,

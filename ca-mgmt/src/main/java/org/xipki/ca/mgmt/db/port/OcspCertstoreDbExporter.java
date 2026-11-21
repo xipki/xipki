@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.codec.speed.ProcessLog;
+import org.xipki.codec.util.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;

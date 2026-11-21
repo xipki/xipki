@@ -24,11 +24,11 @@ import org.xipki.asn1.crmf.CertRequest;
 import org.xipki.asn1.crmf.CertTemplate;
 import org.xipki.asn1.crmf.POPOSigningKey;
 import org.xipki.asn1.crmf.ProofOfPossession;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.oid.AlgorithmOIDs;
-import org.xipki.codec.asn1.oid.PkcsOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
+import org.xipki.codec.x509.id.PkcsOIDs;
 import org.xipki.pkix.cmp.CertificateRequestMessage;
-import org.xipki.pkix.cmp.ProtectedPKIMessage;
+import org.xipki.pkix.cmp.ProtectedPkiMessage;
 
 import java.math.BigInteger;
 
@@ -58,7 +58,7 @@ public class CmpInteropTest {
           sha256 ? AlgorithmOIDs.id_hmacWithSHA256 : PkcsOIDs.id_hmacWithSHA1);
       PBMParameter params = new PBMParameter(new byte[16], owf, 1000, mac);
 
-      ProtectedPKIMessage msg = newXipkiBuilder().build(params, PASSWORD);
+      ProtectedPkiMessage msg = newXipkiBuilder().build(params, PASSWORD);
       Assert.assertTrue(msg.hasPasswordBasedMacProtection());
 
       org.bouncycastle.cert.cmp.ProtectedPKIMessage bcMsg = toBc(msg.toASN1Structure());
@@ -67,7 +67,7 @@ public class CmpInteropTest {
           bcMsg.verify(bcPkMacBuilder(), "wrong".toCharArray()));
 
       // xipki verifies its own message
-      ProtectedPKIMessage parsed = new ProtectedPKIMessage(
+      ProtectedPkiMessage parsed = new ProtectedPkiMessage(
           PKIMessage.fromEncoded(msg.toASN1Structure().getEncoded()));
       Assert.assertTrue(parsed.verify(PASSWORD));
     }
@@ -78,7 +78,7 @@ public class CmpInteropTest {
     org.bouncycastle.cert.cmp.ProtectedPKIMessage bcMsg = newBcBuilder()
         .build(bcPkMacBuilder().build(PASSWORD));
 
-    ProtectedPKIMessage msg = new ProtectedPKIMessage(
+    ProtectedPkiMessage msg = new ProtectedPkiMessage(
         PKIMessage.fromEncoded(bcMsg.toASN1Structure().getEncoded()));
     Assert.assertTrue(msg.hasPasswordBasedMacProtection());
     Assert.assertTrue("verify", msg.verify(PASSWORD));
@@ -90,7 +90,7 @@ public class CmpInteropTest {
   @Test
   public void testSignatureToBc() throws Exception {
     TestUtil.KeyAndCert kc = TestUtil.rsa();
-    ProtectedPKIMessage msg = newXipkiBuilder()
+    ProtectedPkiMessage msg = newXipkiBuilder()
         .addCMPCertificate(kc.cert)
         .build(TestUtil.signer(kc.keyPair.getPrivate(), "SHA256withRSA", SHA256_WITH_RSA));
 
@@ -110,7 +110,7 @@ public class CmpInteropTest {
           .build(new JcaContentSignerBuilder(alg).setProvider(TestUtil.BC)
               .build(kc.keyPair.getPrivate()));
 
-      ProtectedPKIMessage msg = new ProtectedPKIMessage(
+      ProtectedPkiMessage msg = new ProtectedPkiMessage(
           PKIMessage.fromEncoded(bcMsg.toASN1Structure().getEncoded()));
       Assert.assertFalse(msg.hasPasswordBasedMacProtection());
       Assert.assertEquals(1, msg.toASN1Structure().getExtraCerts().size());
@@ -180,9 +180,9 @@ public class CmpInteropTest {
 
   // ---------------- helpers ----------------
 
-  private static ProtectedPKIMessage.Builder newXipkiBuilder() throws Exception {
+  private static ProtectedPkiMessage.Builder newXipkiBuilder() throws Exception {
     org.xipki.asn1.x500.X500Name sender = TestUtil.rsa().cert.getSubject();
-    return new ProtectedPKIMessage.Builder(
+    return new ProtectedPkiMessage.Builder(
         org.xipki.asn1.x509.GeneralName.ofDirectoryName(sender),
         org.xipki.asn1.x509.GeneralName.ofDirectoryName(sender))
         .setTransactionID(TID)

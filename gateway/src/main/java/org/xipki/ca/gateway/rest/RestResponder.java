@@ -13,20 +13,22 @@ import org.xipki.asn1.x509.Extensions;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.Base64;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
+import org.xipki.ca.sdk.ErrorEntry;
 import org.xipki.ca.sdk.OldCertInfo;
 import org.xipki.ca.sdk.RevokeCertsRequest;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkErrorResponseException;
+import org.xipki.ca.sdk.SingleCertSerialEntry;
 import org.xipki.ca.sdk.UnsuspendOrRemoveCertsRequest;
 import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.util.Args;
@@ -213,7 +215,7 @@ public class RestResponder {
     return authenticator.getPasswordRequestorByUser(Requestor.Protocol.REST, user);
   }
 
-  private Requestor.CertRequestor getRequestor(X509Cert cert) {
+  private Requestor.X509CertRequestor getRequestor(X509Cert cert) {
     return authenticator.getCertRequestor(Requestor.Protocol.REST, cert);
   }
 
@@ -312,14 +314,14 @@ public class RestResponder {
         case CMD_cacerts: {
           byte[][] certsBytes = sdk.cacerts(caName);
           return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
-              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certsBytes))));
+              StringUtil.toUtf8Bytes(X509Util.encodePemCertificates(certsBytes))));
         }
         case CMD_crl:
           return toHttpResponse(getCrl(caName, httpRetriever));
         case CMD_dh_pop_certs: {
           X509Cert[] certs = popControl.dhCertificates();
           return toHttpResponse(HttpRespContent.ofOk(CT_pem_file,
-              StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certs))));
+              StringUtil.toUtf8Bytes(X509Util.encodePemCertificates(certs))));
         }
       }
 
@@ -843,13 +845,15 @@ public class RestResponder {
   }
 
   private static void checkResponse(int expectedSize, EnrollOrPollCertsResponse resp)
-      throws HttpRespAuditException {
+      throws HttpRespAuditException, OperationException {
     EnrollOrPollCertsResponse.Entry[] entries = resp.entries();
     if (entries != null) {
       for (EnrollOrPollCertsResponse.Entry entry : entries) {
-        if (entry.error() != null) {
-          throw new HttpRespAuditException(HttpStatusCode.SC_INTERNAL_SERVER_ERROR,
-              entry.error().toString(), INFO, FAILED);
+        ErrorEntry error = entry.error();
+        if (error != null) {
+          // keep the error code of the CA, so that e.g. BAD_CERT_TEMPLATE is answered as
+          // client error, not as server error
+          throw new OperationException(toErrorCode(error.code()), error.message());
         }
       }
     }
@@ -860,6 +864,30 @@ public class RestResponder {
           "expected " + expectedSize + " cert, but received " + n, INFO, FAILED);
     }
   }
+  private static ErrorCode toErrorCode(int code) {
+    try {
+      return ErrorCode.ofCode(code);
+    } catch (IllegalArgumentException ex) {
+      return ErrorCode.SYSTEM_FAILURE;
+    }
+  }
+
+  /**
+   * Checks the result of the CA for the single certificate of a revoke or unsuspend request.
+   */
+  private static void checkSingleEntryResponse(String command, SingleCertSerialEntry[] entries)
+      throws OperationException {
+    if (entries == null || entries.length != 1) {
+      throw new OperationException(SYSTEM_FAILURE, command + ": expected exactly one entry "
+          + "in CA response, but received " + (entries == null ? 0 : entries.length));
+    }
+
+    ErrorEntry error = entries[0].error();
+    if (error != null) {
+      throw new OperationException(toErrorCode(error.code()), error.message());
+    }
+  }
+
 
   private static void checkProfile(Requestor requestor, String caName, String profile)
       throws HttpRespAuditException, OperationException {
@@ -923,7 +951,7 @@ public class RestResponder {
     if (!revoke) {
       UnsuspendOrRemoveCertsRequest sdkReq = new UnsuspendOrRemoveCertsRequest(
           caSha1, null, null, new BigInteger[]{serialNumber});
-      sdk.unsuspendCerts(sdkReq);
+      checkSingleEntryResponse(command, sdk.unsuspendCerts(sdkReq).entries());
     } else {
       String strReason = httpRetriever.getParameter(PARAM_reason);
       CrlReason reason = (strReason == null) ? CrlReason.UNSPECIFIED
@@ -942,7 +970,7 @@ public class RestResponder {
 
       RevokeCertsRequest sdkReq = new RevokeCertsRequest(caSha1,
           null, null, new RevokeCertsRequest.Entry[]{entry});
-      sdk.revokeCerts(sdkReq);
+      checkSingleEntryResponse(command, sdk.revokeCerts(sdkReq).entries());
     }
   }
 

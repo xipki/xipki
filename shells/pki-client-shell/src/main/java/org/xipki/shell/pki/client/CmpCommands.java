@@ -24,9 +24,9 @@ import org.xipki.cmp.client.Requestor;
 import org.xipki.cmp.client.RevokeCertRequest;
 import org.xipki.cmp.client.UnsuspendCertRequest;
 import org.xipki.codec.Hex;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.CmpOIDs;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.CmpOIDs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
@@ -40,14 +40,14 @@ import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.pkix.util.X509KeyUtil;
+import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.password.Passwords;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
+import org.xipki.shell.security.XiShellBaseCommand;
 import org.xipki.shell.xi.Completers;
-import org.xipki.shell.xi.XiShellBaseCommand;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.misc.DateUtil;
 import picocli.CommandLine.Command;
@@ -185,7 +185,7 @@ public class CmpCommands {
           throw new IOException("received no CA certificate chain");
         }
 
-        String encoded = X509Util.encodeCertificates(caCertChain.toArray(new X509Cert[0]));
+        String encoded = X509Util.encodePemCertificates(caCertChain.toArray(new X509Cert[0]));
         saveVerbose("saved CA certificate to file", outFile,
             StringUtil.toUtf8Bytes(encoded));
       } catch (Exception ex) {
@@ -441,7 +441,7 @@ public class CmpCommands {
         }
 
         char[] pwd = getPassword();
-        Pkcs12KeyStore ks = X509KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
+        Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
         ks.setKeyEntry("main", privateKeyInfo, certchain);
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
           ks.store(bout, pwd);
@@ -564,7 +564,7 @@ public class CmpCommands {
         }
 
         char[] pwd = getPassword();
-        Pkcs12KeyStore ks = X509KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
+        Pkcs12KeyStore ks = KeyUtil.loadPKCS12KeyStore((byte[]) null, pwd);
         ks.setKeyEntry("main", privateKeyInfo, cert.getCert());
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream()) {
           ks.store(bout, pwd);

@@ -11,7 +11,7 @@ See also <https://github.com/xipki/xipki/releases>
   - openssl (requires JDK 25+ and openssl in non-FIPS mode)
   - openssl-fips (requires JDK 25+ and openssl in FIPS mode)
 - The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
-- The ASN.1 structures are in the new module `asn1` (package `org.xipki.asn1`), built on the `codec` module of
+- The ASN.1 structures are in the new module `asn1` (package `org.xipki.asn1`), built on the `crypto-codec` module of
   xicrypto instead of BouncyCastle. The PKIX API is in the module `pkix`. Both use the groupId `org.xipki.pki`.
 - The modules `org.xipki.pkix:pkix-util` and `util` moved to https://github.com/xipki/xiutil and use the groupId
   `org.xipki.util`, as the modules `util` and `datasource`:

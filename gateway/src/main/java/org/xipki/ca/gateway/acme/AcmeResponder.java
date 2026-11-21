@@ -14,7 +14,7 @@ import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.util.ReflectiveUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.util.Pack;
@@ -1167,7 +1167,7 @@ public class AcmeResponder {
         certchain[0] = certBytes;
         System.arraycopy(cacerts, 0, certchain, 1, cacerts.length);
 
-        byte[] respBytes = StringUtil.toUtf8Bytes(X509Util.encodeCertificates(certchain));
+        byte[] respBytes = StringUtil.toUtf8Bytes(X509Util.encodePemCertificates(certchain));
 
         LOG.info("downloaded certificate of order {}", order.idText());
         return toHttpResponse(HttpRespContent.ofOk(CT_PEM_CERTIFICATE_CHAIN, respBytes));

@@ -4,7 +4,9 @@
 package org.xipki.ca.gateway;
 
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.codec.asn1.crypto.PrivateKeyInfo;
+import org.xipki.asn1.x509.Certificate;
+import org.xipki.c509.cert.C509Certificate;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.codec.exception.CodecException;
@@ -14,9 +16,8 @@ import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.pkix.util.X509KeyUtil;
 import org.xipki.crypto.core.SecretKeyWithAlias;
-import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.pkix.sign.AlgorithmValidator;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.conf.KeystoreConf;
 import org.xipki.util.password.PasswordResolverException;
@@ -52,7 +53,7 @@ public class PopControl {
 
   private final AlgorithmValidator popAlgoValidator;
 
-  private final List<DHSigStaticKeyCertPair> dhKeyAndCerts = new ArrayList<>(1);
+  private final List<DHSigStaticKeyCertPair.X509> dhKeyAndCerts = new ArrayList<>(1);
 
   private final X509Cert[] dhCerts;
 
@@ -101,8 +102,13 @@ public class PopControl {
             continue;
           }
 
-          X509Cert cert = new X509Cert(ks.getCertificate(alias));
-          dhKeyAndCerts.add(new DHSigStaticKeyCertPair(key, cert));
+          Certificate rawCert = ks.getCertificate(alias);
+          if (rawCert == null) {
+            continue;
+          }
+
+          X509Cert cert = new X509Cert(rawCert);
+          dhKeyAndCerts.add(new DHSigStaticKeyCertPair.X509(key, cert));
           certs.add(cert);
         }
 
@@ -175,7 +181,7 @@ public class PopControl {
       ret.password = password;
 
       if ("PKCS12".equalsIgnoreCase(confType) || "PKCS#12".equalsIgnoreCase(confType)) {
-        ret.pkcs12KeyStore = X509KeyUtil.loadPKCS12KeyStore(is, password);
+        ret.pkcs12KeyStore = KeyUtil.loadPKCS12KeyStore(is, password);
       } else {
         ret.keyStore = KeyUtil.loadKeyStore(conf.type(), is, password);
       }
@@ -189,13 +195,13 @@ public class PopControl {
     return (dhCerts == null || dhCerts.length == 0) ? null : Arrays.copyOf(dhCerts, dhCerts.length);
   }
 
-  public DHSigStaticKeyCertPair getDhKeyCertPair(
+  public DHSigStaticKeyCertPair.X509 getDhKeyCertPair(
       X500Name issuer, BigInteger serial, String keyAlgorithm) {
     if (dhKeyAndCerts.isEmpty()) {
       return null;
     }
 
-    for (DHSigStaticKeyCertPair m : dhKeyAndCerts) {
+    for (DHSigStaticKeyCertPair.X509 m : dhKeyAndCerts) {
       if (m.issuer().equals(issuer) && m.serialNumber().equals(serial)
           && KeyInfoUtil.getCurve(m.privateKey()) == EcCurveEnum.ofAlias(keyAlgorithm)) {
         return m;

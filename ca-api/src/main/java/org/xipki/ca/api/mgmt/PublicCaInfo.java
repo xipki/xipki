@@ -8,7 +8,7 @@ import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.ConfPairs;
+import org.xipki.codec.util.ConfPairs;
 
 import java.math.BigInteger;
 import java.util.Arrays;

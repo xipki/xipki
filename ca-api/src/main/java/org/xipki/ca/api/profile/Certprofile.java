@@ -8,7 +8,7 @@ import org.xipki.asn1.x509.CertificatePolicies;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.profile.ctrl.*;
 import org.xipki.codec.util.Args;

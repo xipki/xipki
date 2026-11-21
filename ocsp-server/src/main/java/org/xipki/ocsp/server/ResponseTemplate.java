@@ -4,7 +4,7 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.asn1.ocsp.CertHash;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
+import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.Extension;

@@ -9,7 +9,7 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.cert.EmbedCertsMode;
+import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.SslContextConf;
@@ -189,7 +189,7 @@ public class SdkClient {
   }
 
   public byte[] generateCrl(String ca, String crldp) throws SdkErrorResponseException {
-    GenCRLRequest req = new GenCRLRequest(crldp);
+    GenCrlRequest req = new GenCrlRequest(crldp);
     byte[] respBytes = send(ca, CMD_gen_crl, req);
     CrlResponse resp;
     try {
@@ -207,7 +207,7 @@ public class SdkClient {
 
   public byte[] currentCrlInfo(String ca, Long crlNumber, Instant thisUpdate, String crlDp)
       throws SdkErrorResponseException {
-    GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
+    GetCrlRequest req = new GetCrlRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crlinfo, req);
     CrlInfoResponse resp;
     try {
@@ -224,7 +224,7 @@ public class SdkClient {
 
   public byte[] currentCrl(String ca, Long crlNumber, Instant thisUpdate, String crlDp)
       throws SdkErrorResponseException {
-    GetCRLRequest req = new GetCRLRequest(crlNumber, thisUpdate, crlDp);
+    GetCrlRequest req = new GetCrlRequest(crlNumber, thisUpdate, crlDp);
     byte[] respBytes = send(ca, CMD_crl, req);
     CrlResponse resp;
     try {

@@ -22,10 +22,10 @@ import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
 import org.xipki.codec.exception.OperatorException;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.CmpOIDs;
-import org.xipki.codec.asn1.oid.XipkiOIDs;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.CmpOIDs;
+import org.xipki.codec.x509.id.XipkiOIDs;
 import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
@@ -113,7 +113,7 @@ public class CmpUtil {
       tmpSignerName = GeneralName.ofDirectoryName(x500Name);
     }
 
-    ProtectedPKIMessage.Builder builder = newProtectedPKIMessageBuilder(
+    ProtectedPkiMessage.Builder builder = newProtectedPKIMessageBuilder(
         pkiMessage, tmpSignerName, null);
 
     if (addSignerCert) {
@@ -121,29 +121,23 @@ public class CmpUtil {
       builder.addCMPCertificate(signerCert);
     }
 
-    Signer signer0 = signer.borrowSigner();
-    ProtectedPKIMessage signedMessage;
-    try {
-      signedMessage = builder.build(signer0.contentSigner());
-    } finally {
-      signer.requiteSigner(signer0);
-    }
+    ProtectedPkiMessage signedMessage = builder.build(signer);
     return signedMessage.toASN1Structure();
   }
 
   public static PKIMessage addProtection(
       PKIMessage pkiMessage, char[] password, PBMParameter pbmParameter,
       GeneralName signerName, byte[] senderKid) throws PkixException {
-    ProtectedPKIMessage.Builder builder =
+    ProtectedPkiMessage.Builder builder =
         newProtectedPKIMessageBuilder(pkiMessage, signerName, senderKid);
 
     return builder.build(pbmParameter, password).toASN1Structure();
   }
 
-  private static ProtectedPKIMessage.Builder newProtectedPKIMessageBuilder(
+  private static ProtectedPkiMessage.Builder newProtectedPKIMessageBuilder(
       PKIMessage pkiMessage, GeneralName sender, byte[] senderKid) {
     PKIHeader header = pkiMessage.getHeader();
-    ProtectedPKIMessage.Builder builder = new ProtectedPKIMessage.Builder(
+    ProtectedPkiMessage.Builder builder = new ProtectedPkiMessage.Builder(
         header.getPvno().intValueExact(), sender, header.getRecipient());
     PKIFreeText freeText = header.getFreeText();
     if (freeText != null) {

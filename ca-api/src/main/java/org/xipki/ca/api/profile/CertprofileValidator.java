@@ -4,10 +4,10 @@
 package org.xipki.ca.api.profile;
 
 import org.xipki.asn1.x509.CertificatePolicies;
-import org.xipki.codec.TripleState;
+import org.xipki.codec.util.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.KeyPurposeOIDs;
 import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
 import org.xipki.ca.api.profile.ctrl.CertDomain;
 import org.xipki.ca.api.profile.ctrl.CertLevel;

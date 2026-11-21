@@ -9,7 +9,7 @@ import org.xipki.ca.api.CertificateInfo;
 import org.xipki.util.misc.NameId;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
-import org.xipki.codec.speed.ProcessLog;
+import org.xipki.codec.util.speed.ProcessLog;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.misc.LogUtil;

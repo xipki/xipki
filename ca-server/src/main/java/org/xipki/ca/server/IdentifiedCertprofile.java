@@ -21,9 +21,9 @@ import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Util;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.KeyPurposeOIDs;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.KeyPurposeOIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
@@ -226,6 +226,9 @@ public class IdentifiedCertprofile {
 
     // ocsp-nocheck
     addExtnPkixOcspNoCheck(values, types, controls);
+
+    // noRevAvail
+    addExtnNoRevAvail(values, types, controls);
 
     // SubjectInfoAccess
     addExtnSubjectInfoAccess(values, types, controls, requestedExtns);
@@ -606,6 +609,20 @@ public class IdentifiedCertprofile {
 
     types.remove(extType);
     // the extension ocsp-nocheck will only be set if requested explicitly
+    CertprofileUtil.addExtension(values, extType, extControl, Asn1Null.INSTANCE);
+  }
+
+  private void addExtnNoRevAvail(
+      ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls)
+      throws CertprofileException {
+    Asn1Oid extType = ExtensionOIDs.noRevAvail;
+    ExtensionControl extControl = controls.getControl(extType);
+    if (extControl == null) {
+      return;
+    }
+
+    types.remove(extType);
+    // the extension noRevAvail will only be set if requested explicitly
     CertprofileUtil.addExtension(values, extType, extControl, Asn1Null.INSTANCE);
   }
 

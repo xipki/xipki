@@ -4,7 +4,7 @@
     "details": "certprofile ee-complex"
   },
   "certLevel": "EndEntity",
-  "maxSize": 12000,
+  "maxSize": 8400,
   "validity": "5y",
   "notBeforeTime": "midnight",
   "keypairGeneration": "InheritCA",

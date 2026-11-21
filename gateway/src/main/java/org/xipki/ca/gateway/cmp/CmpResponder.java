@@ -26,9 +26,9 @@ import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
-import org.xipki.codec.asn1.oid.CmpOIDs;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.CmpOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
@@ -511,13 +511,13 @@ public class CmpResponder extends BaseCmpResponder {
         Extension ext = exts.getExtension(ExtensionOIDs.authorityKeyIdentifier);
         if (ext != null) {
           AuthorityKeyIdentifier tAki = ext.getAuthorityKeyIdentifier();
-          if (tAki.getKeyIdentifierOctets() == null) {
+          if (tAki.keyIdentifier() == null) {
             return buildErrorMsgPkiBody(rejection, badCertTemplate, "issuer's AKI not present");
           }
 
           if (aki == null) {
-            aki = tAki.getKeyIdentifierOctets();
-          } else if (!Arrays.equals(aki, tAki.getKeyIdentifierOctets())) {
+            aki = tAki.keyIdentifier();
+          } else if (!Arrays.equals(aki, tAki.keyIdentifier())) {
             return buildErrorMsgPkiBody(rejection, badCertTemplate,
                 "not all AKIs are of the same");
           }

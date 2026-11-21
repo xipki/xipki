@@ -246,14 +246,6 @@
         "capabilities": [
           {
             "capabilityId": "1.2.840.113549.3.7"
-          },
-          {
-            "capabilityId": "1.2.840.113549.3.2",
-            "parameter": 128
-          },
-          {
-            "capabilityId": "1.2.840.113549.3.2",
-            "parameter": 64
           }
         ]
       }

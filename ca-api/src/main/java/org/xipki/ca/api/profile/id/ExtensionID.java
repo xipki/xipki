@@ -4,9 +4,9 @@
 package org.xipki.ca.api.profile.id;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.oid.DiceOIDs;
-import org.xipki.codec.asn1.oid.ExtensionOIDs;
-import org.xipki.codec.asn1.oid.MrtdOIDs;
+import org.xipki.codec.x509.id.DiceOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.MrtdOIDs;
 import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
@@ -94,6 +94,9 @@ public class ExtensionID extends AbstractID {
 
   public static final ExtensionID ocspNoCheck =
       initOf(ExtensionOIDs.id_pkix_ocsp_nocheck, "OCSPNoCheck");
+
+  public static final ExtensionID noRevAvail =
+      initOf(ExtensionOIDs.noRevAvail, "noRevAvail");
 
   public static final ExtensionID smimeCapabilities =
       initOf(ExtensionOIDs.id_smimeCapabilities, "SMIMECapabilities");

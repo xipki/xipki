@@ -4,7 +4,7 @@
 package org.xipki.ca.api.mgmt;
 
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.codec.VariableResolver;
+import org.xipki.codec.util.VariableResolver;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonEncodable;

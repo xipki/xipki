@@ -17,8 +17,8 @@ import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1UtcTime;
 import org.xipki.codec.asn1.Time;
-import org.xipki.codec.asn1.crypto.AlgorithmIdentifier;
-import org.xipki.codec.asn1.crypto.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
@@ -59,9 +59,9 @@ public class CertprofileQa {
       2050, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant();
   //2050-01-01T00:00:00.000;
 
-  private final X509SubjectChecker subjectChecker;
+  private final SubjectChecker subjectChecker;
 
-  private final X509ExtensionsChecker extensionsChecker;
+  private final ExtensionsChecker extensionsChecker;
 
   private final XijsonCertprofile certprofile;
 
@@ -79,8 +79,8 @@ public class CertprofileQa {
       certprofile.initialize(conf);
 
       this.publicKeyControl = certprofile.publicKeyControl();
-      this.subjectChecker = new X509SubjectChecker( certprofile.subjectControl());
-      this.extensionsChecker = new X509ExtensionsChecker(conf, certprofile);
+      this.subjectChecker = new SubjectChecker( certprofile.subjectControl());
+      this.extensionsChecker = new ExtensionsChecker(conf, certprofile);
     } catch (RuntimeException ex) {
       LogUtil.error(LOG, ex);
       throw new CertprofileException("RuntimeException thrown while " +

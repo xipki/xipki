@@ -9,7 +9,7 @@ import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.verify.AlgorithmValidator;
+import org.xipki.pkix.sign.AlgorithmValidator;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;

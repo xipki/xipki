@@ -12,7 +12,7 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.ca.server.X509Ca;
+import org.xipki.ca.server.Ca;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
@@ -218,7 +218,7 @@ class PublisherManager {
     caName = Args.toNonBlankLower(caName, "caName");
     Args.positive(numThreads, "numThreads");
 
-    X509Ca ca = manager.x509cas.get(caName);
+    Ca ca = manager.cas.get(caName);
     if (ca == null) {
       throw new CaMgmtException(StringUtil.concat("could not find CA named ", caName));
     }
