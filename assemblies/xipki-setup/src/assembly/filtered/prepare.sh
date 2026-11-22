@@ -2,24 +2,16 @@
 
 set -e
 
-error() {
-  echo "ERROR: $*" >&2
-  exit 1
-}
-
+# copy_key_material <target dir> <file>...
 copy_key_material() {
-  local source_dir="$1"
-  local target_dir="$2"
-  shift 2
+  local target_dir="$1"
+  shift
   mkdir -p "$target_dir"
   cp "$@" "$target_dir"
 }
 
 script_dir="$(cd -- "$(dirname "$0")" >/dev/null 2>&1 && pwd -P)"
 jars_dir="$script_dir"/setup/jars
-
-cd "$script_dir"
-echo "change to folder: $(pwd)"
 
 cd "$script_dir"
 echo "change to folder: $(pwd)"
@@ -48,7 +40,6 @@ fi
 
 classpath="xipki-mgmt-cli/lib/*"
 
-cd "$script_dir"
 "$java_exec" $java_opts -cp "$classpath" org.xipki.util.misc.BatchReplace setup/conf.json
 
 kc_dir="$script_dir"/setup/keycerts
@@ -66,27 +57,12 @@ echo "Prepare tomcat"
 
 echo "1. Copy JDBC and bouncycastle jars to the tomcat's lib folder"
 
-mkdir -p "$script_dir"/xipki-ocsp/tomcat/lib
-mkdir -p "$script_dir"/xipki-ca/tomcat/lib
-mkdir -p "$script_dir"/xipki-gateway/tomcat/lib
-
-cp "$jars_dir"/jdbc/*.jar \
-   "$script_dir"/xipki-ocsp/tomcat/lib/
-
-cp "$jars_dir"/jdbc/*.jar \
-   "$script_dir"/xipki-ca/tomcat/lib/
-
-cp "$jars_dir"/jdbc/*.jar \
-   "$script_dir"/xipki-gateway/tomcat/lib/
-
-cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
-   "$script_dir"/xipki-ocsp/tomcat/lib/ 2>/dev/null || true
-
-cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
-   "$script_dir"/xipki-ca/tomcat/lib/ 2>/dev/null || true
-
-cp "$jars_dir"/crypto/org.bouncycastle.*.jar \
-   "$script_dir"/xipki-gateway/tomcat/lib/ 2>/dev/null || true
+for component in xipki-ca xipki-ocsp xipki-gateway; do
+  mkdir -p "$script_dir/$component/tomcat/lib"
+  cp "$jars_dir"/jdbc/*.jar "$script_dir/$component/tomcat/lib/"
+  cp "$jars_dir"/crypto/org.bouncycastle.*.jar "$script_dir/$component/tomcat/lib/" 2>/dev/null \
+    || true
+done
 
 echo "2. Add the crypto backend jars to war files"
 
@@ -94,18 +70,18 @@ rm -rf "$script_dir"/war-common
 
 mkdir -p "$script_dir"/war-common/WEB-INF/lib
 
-cp $jars_dir/crypto/*.jar \
+cp "$jars_dir"/crypto/*.jar \
    "$script_dir"/war-common/WEB-INF/lib
 
-rm -rf "$script_dir"/war-common/WEB-INF/lib/org.bouncycastle.*.jar
+# the bouncycastle jars are in the tomcat's lib folder
+rm -f "$script_dir"/war-common/WEB-INF/lib/org.bouncycastle.*.jar
 
 cd "$script_dir"/war-common
 
-zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
-
-zip -r "$script_dir"/xipki-ca/tomcat/webapps/ca.war .
-
-zip -r "$script_dir"/xipki-gateway/tomcat/webapps/ROOT.war .
+for war in xipki-ca/tomcat/webapps/ca.war xipki-ocsp/tomcat/webapps/ocsp.war \
+    xipki-gateway/tomcat/webapps/ROOT.war; do
+  zip -r "$script_dir/$war" .
+done
 
 cd "$script_dir"
 rm -rf "$script_dir"/war-common
@@ -115,13 +91,13 @@ echo "Prepare key and certificates for internal communication"
 ks_dir="$kc_dir/certstore"
 
 echo "1. Copying generated keys to the XiPKI component xipki-ca"
-copy_key_material "$kc_dir" "$script_dir/xipki-ca/tomcat/xipki/keycerts" \
+copy_key_material "$script_dir/xipki-ca/tomcat/xipki/keycerts" \
   "$kc_dir"/ca-server/* \
   "$kc_dir"/ca-mgmt-client/*-cert.pem \
   "$ks_dir"/ca-client-certstore.p12
 
 echo "2. Copying generated keys to the XiPKI component xipki-gateway"
-copy_key_material "$kc_dir" "$script_dir/xipki-gateway/tomcat/xipki/keycerts" \
+copy_key_material "$script_dir/xipki-gateway/tomcat/xipki/keycerts" \
   "$kc_dir"/gateway-server/* \
   "$kc_dir"/ra-sdk-client/* \
   "$kc_dir"/cmp-client/*-cert.pem \
@@ -133,7 +109,7 @@ copy_key_material "$kc_dir" "$script_dir/xipki-gateway/tomcat/xipki/keycerts" \
   "$kc_dir"/secretkeys/kem-pop.jceks
 
 echo "3. Copying generated keys to the XiPKI component xipki-cli"
-copy_key_material "$kc_dir" "$script_dir/xipki-cli/xipki/keycerts" \
+copy_key_material "$script_dir/xipki-cli/xipki/keycerts" \
   "$kc_dir"/cmp-client/* \
   "$kc_dir"/est-client/* \
   "$kc_dir"/rest-client/* \
@@ -142,7 +118,7 @@ copy_key_material "$kc_dir" "$script_dir/xipki-cli/xipki/keycerts" \
   "$kc_dir"/secretkeys/kem-pop.jceks
 
 echo "4. Copying generated keys to the XiPKI component xipki-mgmt-cli"
-copy_key_material "$kc_dir" "$script_dir/xipki-mgmt-cli/xipki/keycerts" \
+copy_key_material "$script_dir/xipki-mgmt-cli/xipki/keycerts" \
   "$kc_dir"/cmp-client/* \
   "$kc_dir"/est-client/* \
   "$kc_dir"/rest-client/* \

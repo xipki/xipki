@@ -22,8 +22,6 @@ fi
 
 create_backup_layout
 backup_common_tomcat_files
-copy_tomcat_tree
-cp -r "$SCRIPT_DIR/tomcat/conf" "$TOMCAT_DIR/"
 
 # WAR files of former versions
 for war_name in gw acme cmp est rest scep; do
@@ -35,11 +33,18 @@ done
 
 # The gateway is the root web application. Back up the current one, e.g. Tomcat's default
 # web application in webapps/ROOT.
-[ -f "$TOMCAT_DIR/webapps/ROOT.war" ] && mv "$TOMCAT_DIR/webapps/ROOT.war" "$BACKUP_DIR/webapps"
-[ -d "$TOMCAT_DIR/webapps/ROOT" ] && mv "$TOMCAT_DIR/webapps/ROOT" "$BACKUP_DIR/webapps"
+if [ -f "$TOMCAT_DIR/webapps/ROOT.war" ]; then
+  mv "$TOMCAT_DIR/webapps/ROOT.war" "$BACKUP_DIR/webapps"
+fi
+if [ -d "$TOMCAT_DIR/webapps/ROOT" ]; then
+  mv "$TOMCAT_DIR/webapps/ROOT" "$BACKUP_DIR/webapps"
+fi
 
 # The rewrite rules of former versions (RewriteValve), no longer needed.
 rewrite_config="$TOMCAT_DIR/conf/Catalina/localhost/rewrite.config"
-[ -f "$rewrite_config" ] && mv "$rewrite_config" "$BACKUP_DIR/conf"
+if [ -f "$rewrite_config" ]; then
+  mv "$rewrite_config" "$BACKUP_DIR/conf"
+fi
 
-cp "$SCRIPT_DIR/tomcat/webapps/ROOT.war" "$TOMCAT_DIR/webapps"
+# copies also webapps/ROOT.war
+copy_tomcat_tree

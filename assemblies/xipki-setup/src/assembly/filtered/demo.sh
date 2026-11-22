@@ -11,6 +11,11 @@ lib_dir="$script_dir/xipki-mgmt-cli/lib"
 classpath="$lib_dir/*"
 java_exec="${JAVA_HOME:+$JAVA_HOME/bin/}java"
 
+error() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
 find_tomcat_version() {
   local search_dir="$1"
   local major="$2"
@@ -20,16 +25,34 @@ find_tomcat_version() {
     local_tar="$(ls "$search_dir"/apache-tomcat-"$major".*.tar.gz | tail -n 1)"
     basename "$local_tar" | cut -d '-' -f 3 | cut -d '.' -f 1-3
   else
-    curl --silent "http://dlcdn.apache.org/tomcat/tomcat-${major}/" \
+    curl --silent "https://dlcdn.apache.org/tomcat/tomcat-${major}/" \
       | grep "v${major}" \
       | tail -n 1 \
       | awk '{split($5,c,">v"); split(c[2],d,"/"); print d[1]}'
   fi
 }
 
-shutdown_tomcat() {
-  local name="$1"
-  sh "$DEMO_DIR/$name/bin/shutdown.sh" >/dev/null 2>&1 || true
+# Sends shutdown to all given tomcats, then waits until all of them are stopped, since
+# shutdown.sh returns before tomcat is stopped and its folder will be removed afterwards.
+shutdown_tomcats() {
+  local name tomcat_dir running=()
+  for name in "$@"; do
+    tomcat_dir="$DEMO_DIR/$name"
+    pgrep -f -- "-Dcatalina.base=$tomcat_dir " >/dev/null 2>&1 || continue
+    echo "Stop $name"
+    sh "$tomcat_dir/bin/shutdown.sh" >/dev/null 2>&1 || true
+    running+=("$tomcat_dir")
+  done
+
+  local seconds=0
+  for tomcat_dir in "${running[@]}"; do
+    while pgrep -f -- "-Dcatalina.base=$tomcat_dir " >/dev/null 2>&1; do
+      seconds=$((seconds + 1))
+      [ "$seconds" -le 60 ] || error "tomcat $tomcat_dir is not stopped after 60 seconds"
+      sleep 1
+    done
+  done
+  [ "${#running[@]}" -eq 0 ] || echo "Stopped ${#running[@]} tomcat(s) in ${seconds}s"
 }
 
 install_component() {
@@ -38,10 +61,11 @@ install_component() {
   "$script_dir/$installer" -t "$target"
 }
 
+cd "$script_dir"
 "$java_exec" -cp "$classpath" -Ddemo.dir="$DEMO_DIR" \
   org.xipki.util.misc.BatchReplace setup/demo-conf.json
 
-sh "$script_dir/prepare.sh"
+bash "$script_dir/prepare.sh"
 
 mkdir -p "$DEMO_DIR"
 
@@ -59,12 +83,11 @@ if [ -f "$tomcat_binary" ]; then
   echo "Use local ${tomcat_binary}"
 else
   echo "Download ${tomcat_binary}"
-  wget --no-check-certificate "https://dlcdn.apache.org/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${tomcat_version}/bin/${tomcat_binary}"
+  tomcat_url="https://dlcdn.apache.org/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}"
+  curl --fail --location --remote-name "${tomcat_url}/v${tomcat_version}/bin/${tomcat_binary}"
 fi
 
-shutdown_tomcat ca-tomcat
-shutdown_tomcat ocsp-tomcat
-shutdown_tomcat gateway-tomcat
+shutdown_tomcats ca-tomcat ocsp-tomcat gateway-tomcat
 
 rm -rf ca-tomcat ocsp-tomcat gateway-tomcat "$tomcat_dir"
 tar xf "$tomcat_binary"
