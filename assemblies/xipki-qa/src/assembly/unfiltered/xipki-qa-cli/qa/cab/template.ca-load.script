@@ -1,9 +1,6 @@
 source qa/cab/initdb.script
 
-echo "Restart CA (tomcat) server!"
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
-sleep 1
+source qa/qa.d/restart-tomcat.script ca $[ca.https.port] https
 
 echo "#################################################################"
 echo "#                        Load rootca.json                       #"

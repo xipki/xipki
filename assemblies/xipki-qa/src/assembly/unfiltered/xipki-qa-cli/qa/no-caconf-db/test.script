@@ -4,6 +4,7 @@ set CA_DIR $[test.basedir]/ca-tomcat/xipki/etc/ca
 echo "Shutdown tomcat for CA server"
 
 exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
+wait-server --stopped --timeout 60 $[ca.https.port]
 
 // initialize database
 sql --force --db-conf "$CA_DIR/database/ca-db.properties" xipki/sql/ca-init.sql
@@ -25,7 +26,7 @@ copy-file -f $SRC_DIR/ca-rootca.json $CA_DIR/ca.json
 
 echo "Start tomcat for CA server"
 exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
-sleep 5
+wait-server --tls --timeout 120 $[ca.https.port]
 
 enroll-cert --ca rootca1 --csr $SRC_DIR/csr/subca1.csr --outform PEM \
   --out output/subca1.pem --profile subca
@@ -35,11 +36,7 @@ copy-file -f output/subca1.pem $CA_DIR/caconf/keycerts
 copy-file -f $SRC_DIR/ca.json $CA_DIR/ca.json
 
 echo "Re-start tomcat for CA server"
-
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
-sleep 2
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
-sleep 3
+source qa/qa.d/restart-tomcat.script ca $[ca.https.port] https
 
 echo "Test CA"
 

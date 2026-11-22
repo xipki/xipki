@@ -138,7 +138,7 @@
         "dir":"crls/example-crls",
         "sqlBatchCommit":1000,
         "ignoreExpiredCrls":true,
-        "startupDelay":5
+        "startupDelay":1
       }
     },
     "unknownCertBehaviour":"good"

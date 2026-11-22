@@ -146,7 +146,8 @@ qa-ocsp-status --issuer output/subca1.crt --serial 99999 --sign \
 echo "=====QA : OCSP responder====="
 echo "URL: $URL_CRL"
 
-sleep 7
+# The OCSP responder imports the CRLs 1 second (startupDelay) after its start.
+sleep 2
 
 echo "QA: Good (POST, CRL)"
 qa-ocsp-status --issuer output/subcawithcrl1.crt --serial 99999 \

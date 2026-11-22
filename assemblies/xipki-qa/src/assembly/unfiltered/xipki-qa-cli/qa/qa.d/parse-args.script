@@ -1,0 +1,73 @@
+# Parses the arguments [-l] <token type> <CA keyspec> [<EE keyspec>] of the scripts
+# qa/lifecycle.script and qa/camgmt.script.
+#
+# Sets printUsage, argsValid, errMsg, LOAD_CONF, TOKEN_TYPE, CA_KEYSPEC, CA_SIGALG, CA_RSAPSS,
+# CA_P11_LABEL_PREFIX, KEYSPEC, RSAPSS and EE_P11_LABEL_PREFIX.
+
+set printUsage "false"
+set argsValid "false"
+set errMsg ""
+set LOAD_CONF "false"
+
+if "$1" eq "" or "$1" eq "help"
+  set printUsage "true"
+  set argsValid "true"
+else
+  if "$1" eq "-l"
+    set LOAD_CONF "true"
+    set TOKEN_TYPE $2
+    set CA_KEYSPEC $3
+    set KEYSPEC $4
+  else
+    set TOKEN_TYPE $1
+    set CA_KEYSPEC $2
+    set KEYSPEC $3
+  fi
+
+  set TOKEN_TYPE $(uppercase "$TOKEN_TYPE")
+  set CA_KEYSPEC $(uppercase "$CA_KEYSPEC")
+  set KEYSPEC $(uppercase "$KEYSPEC")
+
+  set argsValid $($TOKEN_TYPE in PKCS11 PKCS12)
+
+  if "$argsValid" eq "false"
+    set errMsg "invalid token type $TOKEN_TYPE"
+  else
+    set keyspec $CA_KEYSPEC
+    source xipki/ca-setup/c14n-keyspec.script
+
+    if "$sigalg" eq ""
+      set argsValid "false"
+      set errMsg "invalid CA keyspec $CA_KEYSPEC, a signature keyspec is required"
+    else
+      set CA_KEYSPEC $keyspec
+      set CA_SIGALG $sigalg
+      set CA_RSAPSS $rsapss
+      set CA_P11_LABEL_PREFIX $p11composite
+
+      if "$KEYSPEC" eq ""
+        set keyspec $CA_KEYSPEC
+      else
+        set keyspec $KEYSPEC
+      fi
+
+      source xipki/ca-setup/c14n-keyspec.script
+
+      if "$keyspec" eq ""
+        set argsValid "false"
+        set errMsg "invalid EE keyspec $KEYSPEC"
+      else
+        set KEYSPEC $keyspec
+        set RSAPSS $rsapss
+        set EE_P11_LABEL_PREFIX $p11composite
+
+        # the keys of the end entities are pregenerated
+        set p12DirExists $(file-exists qa/p12/${KEYSPEC})
+        if "$p12DirExists" eq "false"
+          set argsValid "false"
+          set errMsg "no pregenerated keys for the EE keyspec $KEYSPEC in qa/p12/${KEYSPEC}"
+        fi
+      fi
+    fi
+  fi
+fi

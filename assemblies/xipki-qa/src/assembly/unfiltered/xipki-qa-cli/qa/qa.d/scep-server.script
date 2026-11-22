@@ -51,8 +51,5 @@ update-cert-p12 --p12 ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12 \
 copy-file -f ${KEYCERTS_DIR}/scep-enc-subcawithcrl.p12 \
   ${GATEWAY_XIPKI_DIR}/keycerts/scep-enc-subcawithcrl.p12
 
-echo "restart gateway tomcat!"
-exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/shutdown.sh'
-exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/startup.sh'
-sleep 1
+source qa/qa.d/restart-tomcat.script gateway $[gateway.https.port] https
 

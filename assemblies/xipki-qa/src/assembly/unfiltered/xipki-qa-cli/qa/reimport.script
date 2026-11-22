@@ -2,14 +2,9 @@ echo "#################################################################"
 echo "#               Export-then-import CA and OCSP                  #"
 echo "#################################################################"
 ## Restart the CA
-exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
-  '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
-exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
-  '$[test.basedir]/ca-tomcat/bin/startup.sh'
+source qa/qa.d/restart-tomcat.script ca $[ca.https.port] https
 
 source qa/setenv.script
-
-sleep 1
 
 rm -r -f output/dbexport
 
@@ -115,11 +110,6 @@ import-ca-certstore --in-dir output/dbexport-certstore/ca --password CHANGEIT \
   --db-conf ${CA_XIPKI_DIR}/etc/ca/database/ca-db.properties
 
 ## Restart the CA
-exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
-  '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
-exec --env JAVA_HOME=$[test.basedir]/jdk-tomcat \
-  '$[test.basedir]/ca-tomcat/bin/startup.sh'
-
-sleep 2
+source qa/qa.d/restart-tomcat.script ca $[ca.https.port] https
 
 ca-info

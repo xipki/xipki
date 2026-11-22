@@ -1,0 +1,19 @@
+# Restarts a tomcat instance and waits until it answers.
+#
+# Usage: source qa/qa.d/restart-tomcat.script <name> <port> <protocol>
+#   name:     ca, ocsp, gateway or dummy, the tomcat in $[test.basedir]/<name>-tomcat
+#   port:     the port of a connector of this tomcat
+#   protocol: http or https, the protocol of this connector
+
+echo "Restart $1 (tomcat) server!"
+exec $[tomcat.java.home] '$[test.basedir]/$1-tomcat/bin/shutdown.sh'
+# shutdown.sh returns before the tomcat is stopped
+wait-server --stopped --timeout 60 $2
+
+exec $[tomcat.java.home] '$[test.basedir]/$1-tomcat/bin/startup.sh'
+# startup.sh returns before the web applications are deployed
+if "$3" eq "https"
+  wait-server --tls --timeout 120 $2
+else
+  wait-server --timeout 120 $2
+fi

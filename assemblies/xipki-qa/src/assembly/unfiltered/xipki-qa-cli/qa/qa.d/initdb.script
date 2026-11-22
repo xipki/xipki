@@ -2,8 +2,6 @@ echo "#################################################################"
 echo "#                      Initialize the database                  #"
 echo "#################################################################"
 
-sleep 1
-
 source qa/setenv.script
 
 set OS_NAME $(osinfo --name)

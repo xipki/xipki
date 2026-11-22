@@ -1,0 +1,42 @@
+# Prepares the configuration, keys, certificates and CRLs of the OCSP responder.
+# Requires the OCSP signer key output/ocsp99*, the certificates output/rootca1.crt and
+# output/subcawithcrl1.crt and the CRL output/subcawithcrl1.crl.
+
+copy-file -f xipki/etc/ocsp/template.ocsp-responder.json \
+  xipki/etc/ocsp/ocsp-responder.json
+
+replace --old "REPLACEME-TOKENTYPE" --new "$TOKEN_TYPE" \
+  --old "REPLACEME-TOKENKEY" --new "$OCSP_KEYCONF" --old "REPLACEME-SIGALG" \
+  --new "$CA_SIGALG" xipki/etc/ocsp/ocsp-responder.json
+
+copy-file -f xipki/etc/ocsp/ocsp-responder.json \
+  ${OCSP_XIPKI_DIR}/etc/ocsp/ocsp-responder.json
+
+copy-file -f output/ocsp99.crt ${OCSP_XIPKI_DIR}/keycerts/ocsp.crt
+
+if "$TOKEN_TYPE" eq "PKCS12"
+  copy-file -f output/ocsp99.p12 ${OCSP_XIPKI_DIR}/keycerts/ocsp99.p12
+fi
+
+rm -r -f ${OCSP_XIPKI_DIR}/crls/example-crls
+
+copy-dir ${OCSP_XIPKI_DIR}/crls/template ${OCSP_XIPKI_DIR}/crls/example-crls
+
+# CRL will be provided via out-of-band mechanism
+
+rm -f ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/REVOCATION
+
+copy-file -f output/subcawithcrl1.crt \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crt
+
+copy-file -f output/subcawithcrl1.crl \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-provided-mycrl1/ca.crl
+
+# CRL will be downloaded by the OCSP responder
+rm -f ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/REVOCATION
+
+copy-file -f output/rootca1.crt \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/ca.crt
+
+copy-file -f qa/qa.d/rootca.crl.download \
+  ${OCSP_XIPKI_DIR}/crls/example-crls/crl-download-mycrl2/crl.download

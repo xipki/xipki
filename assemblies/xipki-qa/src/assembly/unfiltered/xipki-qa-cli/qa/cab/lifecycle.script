@@ -88,10 +88,7 @@ fi
 
 source qa/qa.d/prepare-keys.script
 
-echo "Restart Gateway (tomcat) server!"
-exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/shutdown.sh'
-exec $[tomcat.java.home] '$[test.basedir]/gateway-tomcat/bin/startup.sh'
-sleep 5
+source qa/qa.d/restart-tomcat.script gateway $[gateway.https.port] https
 
 copy-file -f qa/cab/template.ca-load.script qa/cab/ca-load.script
 
@@ -101,12 +98,7 @@ replace --old "REPLACEME-RSAPSS" --new "${CA_RSAPSS}" qa/cab/ca-load.script
 
 replace --old "REPLACEME-RSAPSS" --new "${RSAPSS}" qa/cab/ra.script
 
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/shutdown.sh'
-sleep 2
-
-exec $[tomcat.java.home] '$[test.basedir]/ca-tomcat/bin/startup.sh'
-sleep 5
-
+# restarts the CA
 source qa/cab/ca-load.script
 
 echo "#################################################################"
@@ -119,8 +111,6 @@ list-cert --ca rootca1 --subject "CN=*ca*,O=myorg" --order subject -n 100
 
 source qa/cab/ra.script
 
-sleep 1
-
 echo "#################################################################"
 echo "#                     CAQA:Check certificate                    #"
 echo "#################################################################"
@@ -130,7 +120,7 @@ init-caqa
 check-cert --issuer rootca --profile cab-subca --csr output/subca1.csr \
   --cert output/subca1.crt
 
-set list [ cab-domain-validated cab-domain-validated cab-org-validated ]
+set list [ cab-domain-validated cab-individual-validated cab-org-validated ]
 
 for it in $list
   set name $it
