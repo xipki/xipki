@@ -1,4 +1,4 @@
-# set SCRIPT_TRACE true
+# set SCRIPT_TRACE false
 
 ## DER or PEM
 set OUTFORM DER

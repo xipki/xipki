@@ -1,4 +1,4 @@
-# set SCRIPT_TRACE true
+# set SCRIPT_TRACE false
 
 set printUsage "false"
 set argsValid "false"
