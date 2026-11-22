@@ -101,6 +101,14 @@ See also <https://github.com/xipki/xipki/releases>
   only and fails if the CA does not support AES.
 - Encrypted private keys exported as PEM (`ENCRYPTED PRIVATE KEY`) use PBES2 with
   PBKDF2-HMAC-SHA256 and AES-256-CBC instead of pbeWithSHAAnd3-KeyTripleDES-CBC.
+- CA revocation
+  - The audit event types of a CA are `revoke_ca`, `suspend_ca` (revocation with reason
+    `certificateHold`) and `unsuspend_ca` (unrevocation). Previously a suspension was audited as
+    `revoke_ca` and an unrevocation as `unrevoke_ca`.
+  - The revocation of a CA is audited for every CA, not only for self-signed ones, with the
+    status of the publication. Previously the revocation of a self-signed CA was audited as
+    `FAILED` and logged the warning that the certificate does not exist, since the CA
+    certificate is not in the table `CERT`.
 - Dependencies
   - dnsjava: removed
   - bouncycastle (bcutil, bcpkix, bcprov): removed

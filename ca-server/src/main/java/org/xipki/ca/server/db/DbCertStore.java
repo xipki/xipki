@@ -536,7 +536,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   @Override
   public CertWithRevocationInfo revokeCert(
       NameId ca, BigInteger serialNumber, CertRevocationInfo revInfo,
-      boolean force, CaIdNameMap idNameMap) throws OperationException {
+      CaIdNameMap idNameMap) throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber", revInfo, "revInfo");
 
     CertWithRevocationInfo certWithRevInfo =
@@ -558,7 +558,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
           revInfo.setRevocationTime(currentRevInfo.revocationTime());
           revInfo.setInvalidityTime(currentRevInfo.invalidityTime());
         }
-      } else if (!force) {
+      } else {
         throw new OperationException(CERT_REVOKED,
             "certificate already revoked with reason " + currentReason.description());
       }
@@ -569,8 +569,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
       invTimeSeconds = revInfo.invalidityTime().getEpochSecond();
     }
 
-    String sql = force ? SQL_REVOKE_CERT
-        : SQL_REVOKE_CERT + (currentRevInfo == null ? SQL_COND_UNREVOKED : SQL_COND_SUSPENDED);
+    String sql = SQL_REVOKE_CERT
+        + (currentRevInfo == null ? SQL_COND_UNREVOKED : SQL_COND_SUSPENDED);
 
     int count = execUpdatePrepStmt0(sql,
         col2Long(Instant.now().getEpochSecond()), col2Bool(true),
@@ -578,7 +578,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         col2Long(revInfo.revocationTime().getEpochSecond()),
         col2Long(invTimeSeconds), col2Int(revInfo.reason().code()),
         col2Long(certWithRevInfo.cert().certId())); // certId
-    if (count == 0 && !force) {
+    if (count == 0) {
       throw new OperationException(CERT_REVOKED, "certificate status changed concurrently");
     } else if (count != 1) {
       String message = (count > 1)
@@ -634,7 +634,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
   @Override
   public CertWithDbId unsuspendCert(
-      NameId ca, BigInteger serialNumber, boolean force, CaIdNameMap idNamMap)
+      NameId ca, BigInteger serialNumber, CaIdNameMap idNamMap)
       throws OperationException {
     notNulls(ca, "ca", serialNumber, "serialNumber");
 
@@ -652,22 +652,19 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         .orElseThrow(() -> new OperationException(CERT_UNREVOKED, "certificate is not revoked"));
 
     CrlReason currentReason = currentRevInfo.reason();
-    if (!force) {
-      if (currentReason != CrlReason.CERTIFICATE_HOLD) {
-        throw new OperationException(NOT_PERMITTED,
-            "could not unsuspend certificate revoked with reason "
-            + currentReason.description());
-      }
+    if (currentReason != CrlReason.CERTIFICATE_HOLD) {
+      throw new OperationException(NOT_PERMITTED,
+          "could not unsuspend certificate revoked with reason " + currentReason.description());
     }
 
     SqlColumn2 nullInt = new SqlColumn2(ColumnType.INT, null);
-    String sql = force ? SQL_REVOKE_CERT : SQL_REVOKE_CERT + SQL_COND_SUSPENDED;
+    String sql = SQL_REVOKE_CERT + SQL_COND_SUSPENDED;
     int count = execUpdatePrepStmt0(sql,
         col2Long(Instant.now().getEpochSecond()), // currentTimeSeconds
         col2Bool(false), nullInt, nullInt, nullInt,
         col2Long(certWithRevInfo.cert().certId())); // certId
 
-    if (count == 0 && !force) {
+    if (count == 0) {
       CertWithRevocationInfo current = getCertWithRevocationInfo(ca.id(), serialNumber, idNamMap);
       if (current == null || current.revInfo() == null) {
         throw new OperationException(CERT_UNREVOKED,

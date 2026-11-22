@@ -87,14 +87,14 @@ public interface CertStore {
 
   CertWithRevocationInfo revokeCert(
       NameId ca, BigInteger serialNumber, CertRevocationInfo revInfo,
-      boolean force, CaIdNameMap idNameMap) throws OperationException;
+      CaIdNameMap idNameMap) throws OperationException;
 
   CertWithRevocationInfo revokeSuspendedCert(
       NameId ca, SerialWithId serialNumber, CrlReason reason, CaIdNameMap idNameMap)
       throws OperationException;
 
-  CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber,
-                            boolean force, CaIdNameMap idNamMap) throws OperationException;
+  CertWithDbId unsuspendCert(NameId ca, BigInteger serialNumber, CaIdNameMap idNamMap)
+      throws OperationException;
 
   void removeCert(long id) throws OperationException;
 
