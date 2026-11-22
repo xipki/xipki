@@ -2,11 +2,14 @@
 <web-app>
   <display-name>XiPKI OCSP Web Application</display-name>
   <!-- Base directory, against which relative paths in the configuration are resolved.
-       Override it only in Tomcat's conf/context.xml:
+       A relative value is resolved against the base directory of the servlet container:
+       CATALINA_BASE (Tomcat), JETTY_BASE (Jetty), jboss.server.base.dir (WildFly) or the
+       domain directory (GlassFish, Payara). Override it in the container, e.g. in Tomcat's
+       conf/context.xml:
        <Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/> -->
   <context-param>
     <param-name>xipki.basedir</param-name>
-    <param-value>${catalina.base}/xipki</param-value>
+    <param-value>xipki</param-value>
   </context-param>
   <session-config>
     <session-timeout>60</session-timeout>

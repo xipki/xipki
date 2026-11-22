@@ -18,7 +18,7 @@
 <!-- The contents of this file will be loaded for each web application -->
 <Context>
     <!-- Base directory of XiPKI, against which relative paths in the configuration are resolved.
-         Default (set in the web application's web.xml): ${catalina.base}/xipki.
+         Default (set in the web application's web.xml): xipki, i.e. ${catalina.base}/xipki.
          To use another directory, uncomment and adapt the following line.
     <Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>
     -->

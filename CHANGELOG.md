@@ -50,9 +50,12 @@ See also <https://github.com/xipki/xipki/releases>
 - Base directory
   - `XipkiBaseDir` is removed, and the system property `XIPKI_BASE` is no longer used. No global base
     directory is put in front of relative paths any more.
-  - The servlets take their base directory from the context parameter `xipki.basedir`. The default,
-    `${catalina.base}/xipki`, is set in the `web.xml` of each web application. It can be changed only
-    in Tomcat's `conf/context.xml`:
+  - The servlets take their base directory from the context parameter `xipki.basedir`. The
+    default, `xipki`, is set in the `web.xml` of each web application. A relative value is
+    resolved against the base directory of the servlet container: Tomcat, TomEE
+    (`CATALINA_BASE`), Jetty (`JETTY_BASE`), WildFly, JBoss EAP (`jboss.server.base.dir`),
+    GlassFish, Payara (`com.sun.aas.instanceRoot`); in other containers it must be absolute.
+    It can be overridden in the container, e.g. in Tomcat's `conf/context.xml`:
     `<Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>`.
   - `setenv.sh` no longer sets `-DXIPKI_BASE`, and `server.xml` uses the relative keystore paths
     `xipki/keycerts/...`. With a separate `CATALINA_BASE`, the folder `xipki` must be under

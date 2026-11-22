@@ -9,12 +9,25 @@ Relative paths in the configuration files (keystores, certificates, `etc/*.json`
 embedded H2 or HSQLDB database in a JDBC URL, etc.) are resolved against the base directory, not
 against the working directory.
 
-- Default: `${catalina.base}/xipki`, set by the context parameter `xipki.basedir` in the
-  `web.xml` of each web application.
-- To use another directory, set the parameter in Tomcat's `conf/context.xml`:
-  `<Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>`.
-  The value must be the absolute path of an existing directory, otherwise the web application
-  does not start. It cannot be set by a system property or an environment variable.
+- Default: `xipki`, set by the context parameter `xipki.basedir` in the `web.xml` of each web
+  application. A relative value is resolved against the base directory of the servlet
+  container, never against the working directory:
+
+  | Servlet container  | Base directory (system property)                   |
+  |--------------------|----------------------------------------------------|
+  | Tomcat, TomEE      | `CATALINA_BASE` (`catalina.base`)                  |
+  | Jetty              | `JETTY_BASE` (`jetty.base`)                        |
+  | WildFly, JBoss EAP | server base directory (`jboss.server.base.dir`)    |
+  | GlassFish, Payara  | domain directory (`com.sun.aas.instanceRoot`)      |
+
+  In any other servlet container the value must be an absolute path.
+- To use another directory, override the parameter with a relative or absolute path:
+  in Tomcat's `conf/context.xml`:
+  `<Parameter name="xipki.basedir" value="/path/to/xipki" override="false"/>`;
+  in other servlet containers with their means of overriding context parameters, or in the
+  `web.xml` of the web application.
+- The directory must exist, otherwise the web application does not start. The base directory
+  cannot be set by a system property or an environment variable.
 - The keystore paths in `conf/server.xml` (`xipki/keycerts/...`) are relative to
   `CATALINA_BASE`. With a separate `CATALINA_BASE`, the folder `xipki` must be under
   `CATALINA_BASE`, or the paths in `server.xml` must be adapted.
