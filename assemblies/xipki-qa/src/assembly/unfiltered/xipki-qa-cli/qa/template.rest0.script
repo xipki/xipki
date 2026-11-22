@@ -78,7 +78,7 @@ echo "REST crl (crl-number)"
 set CRLNUMBER $(crl-info --crlnumber --in $OUT_DIR/crl.crl)
 
 curl --out $OUT_DIR/crl-number-${CRLNUMBER}.crl \
-  "$BASE_URL/crl?crl-nubmer=${CRLNUMBER}"
+  "$BASE_URL/crl?crl-number=${CRLNUMBER}"
 
 echo "=====REST: Enroll Twin TLS Certificates (CA generates all keypairs)====="
 
