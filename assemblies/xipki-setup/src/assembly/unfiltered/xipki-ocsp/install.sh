@@ -10,6 +10,9 @@ parse_tomcat_target "$@"
 require_no_conflicting_wars \
   ca "CA is running in $TOMCAT_DIR, please use other tomcat instance." \
   gw "Protocol gateway is running in $TOMCAT_DIR, please use other tomcat instance."
+require_no_conflicting_paths \
+  xipki/etc/ca "CA is running in $TOMCAT_DIR, please use other tomcat instance." \
+  xipki/etc/gateway.json "Protocol gateway is running in $TOMCAT_DIR, please use other tomcat instance."
 
 TOMCAT_MAJOR="$(resolve_tomcat_major)"
 if [ "$TOMCAT_MAJOR" -lt 10 ]; then

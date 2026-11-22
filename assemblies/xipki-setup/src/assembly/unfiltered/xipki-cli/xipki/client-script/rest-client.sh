@@ -16,16 +16,16 @@ elif [[ "$1" == "ocsp" ]] ; then
 fi
 
 # Please adapt the URL
-## URL pattern: https://<host>:<port>/gw/rest/<CA-name>. To enroll certificate, the
+## URL pattern: https://<host>:<port>/rest/<CA-name>. To enroll certificate, the
 ## profile parameter shall be specified. e.g.
-## https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]/enroll-cert?profile=smime
+## https://$[gateway.host]:$[gateway.https.port]/rest/$[ca.alias]/enroll-cert?profile=smime
 #
-CA_URL="https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]"
+CA_URL="https://$[gateway.host]:$[gateway.https.port]/rest/$[ca.alias]"
 echo "CA URL: ${CA_URL}"
 
 ## Short URL is possible (without the "profile" parameter)
-##   For all aliases:     https://<host>:<port>/gw/rest/<alias>
-##   For alias "default": https://<host>:<port>/gw/rest/
+##   For all aliases:     https://<host>:<port>/rest/<alias>
+##   For alias "default": https://<host>:<port>/rest/
 ##
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the REST proxy (rest-proxy.conf) with given alias.

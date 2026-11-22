@@ -105,7 +105,7 @@ zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
 
 zip -r "$script_dir"/xipki-ca/tomcat/webapps/ca.war .
 
-zip -r "$script_dir"/xipki-gateway/tomcat/webapps/gw.war .
+zip -r "$script_dir"/xipki-gateway/tomcat/webapps/ROOT.war .
 
 cd "$script_dir"
 rm -rf "$script_dir"/war-common

@@ -1,6 +1,6 @@
 {
   "acme": {
-    "baseUrl": "https://$[gateway.host]:$[gateway.https.port]/gw/acme/",
+    "baseUrl": "https://$[gateway.host]:$[gateway.https.port]/acme/",
     "nonceNumBytes": 16,
     "tokenNumBytes": 16,
     "cacheSize": 1000,

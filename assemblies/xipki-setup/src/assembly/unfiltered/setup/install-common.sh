@@ -30,6 +30,21 @@ require_no_conflicting_wars() {
   done
 }
 
+# Exits with the message if the file or directory (relative to the tomcat directory) exists.
+# Detects a component by its configuration, also if its WAR file is renamed, e.g. to ROOT.war.
+require_no_conflicting_paths() {
+  local path message
+  while [ "$#" -gt 0 ]; do
+    path="$1"
+    message="$2"
+    shift 2
+    if [ -e "$TOMCAT_DIR/$path" ]; then
+      echo "$message"
+      exit 1
+    fi
+  done
+}
+
 resolve_tomcat_major() {
   local version_line
   version_line="$($TOMCAT_DIR/bin/version.sh | grep 'Server number')"

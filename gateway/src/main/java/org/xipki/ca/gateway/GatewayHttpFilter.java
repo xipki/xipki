@@ -307,6 +307,13 @@ public class GatewayHttpFilter implements XiHttpFilter {
   @Override
   public void doFilter(XiHttpRequest req, XiHttpResponse resp) throws Exception {
     String path = req.getServletPath();
+    // /.well-known/est/ (RFC 7030) and /.well-known/cmp/ (CMP over HTTP) are aliases of
+    // /est/ and /cmp/.
+    if (path.startsWith("/.well-known/est/") || path.startsWith("/.well-known/cmp/")) {
+      // 12 = "/.well-known".length()
+      path = path.substring(12);
+    }
+
     if (path.startsWith("/acme/")) {
       if (acmeServlet != null) {
         // 5 = "/acme".length()

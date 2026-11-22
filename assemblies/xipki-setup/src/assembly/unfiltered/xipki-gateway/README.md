@@ -1,5 +1,9 @@
 Deployment in Tomcat (10 and 11)
 ----
+The gateway is deployed as the root web application `webapps/ROOT.war`. It serves the URLs
+`/acme/`, `/cmp/`, `/est/`, `/rest/` and `/scep/`; `/.well-known/est/` and `/.well-known/cmp/` are aliases of `/est/` and `/cmp/`.
+The installation backs up an existing root web application, e.g. Tomcat's default `webapps/ROOT`.
+
 1. (Optional) Replace
   `org.xipki.pkix.auth.SimpleRequestorAuthenticator` with your own
    implementation in the following files:

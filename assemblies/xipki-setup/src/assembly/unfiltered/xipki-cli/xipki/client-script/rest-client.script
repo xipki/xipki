@@ -33,15 +33,15 @@ if $printUsage eq "true"
   return
 fi
 
-## URL pattern: https://<host>:<port>/gw/rest/<CA-name>. To enroll
+## URL pattern: https://<host>:<port>/rest/<CA-name>. To enroll
 ## certificate, the profile parameter shall be specified. e.g.
-## https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]/enroll-cert?profile=smime
+## https://$[gateway.host]:$[gateway.https.port]/rest/$[ca.alias]/enroll-cert?profile=smime
 #
-set BASE_URL https://$[gateway.host]:$[gateway.https.port]/gw/rest/$[ca.alias]
+set BASE_URL https://$[gateway.host]:$[gateway.https.port]/rest/$[ca.alias]
 
 ## Short URL is possible (without the "profile" parameter)
-##   For all aliases:     https://<host>:<port>/gw/rest/<alias>
-##   For alias "default": https://<host>:<port>/gw/rest/
+##   For all aliases:     https://<host>:<port>/rest/<alias>
+##   For alias "default": https://<host>:<port>/rest/
 ##
 ## To use the short URL, you need to configure the "CaProfiles" field
 ## in the REST proxy (rest-proxy.conf) with given alias.

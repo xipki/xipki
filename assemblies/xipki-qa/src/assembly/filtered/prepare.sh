@@ -163,7 +163,7 @@ zip -r "$script_dir"/xipki-ocsp/tomcat/webapps/ocsp.war .
 
 zip -r "$script_dir"/xipki-ca/tomcat/webapps/ca.war .
 
-zip -r "$script_dir"/xipki-gateway/tomcat/webapps/gw.war .
+zip -r "$script_dir"/xipki-gateway/tomcat/webapps/ROOT.war .
 
 zip -r "$script_dir"/xipki-dummy/tomcat/webapps/dummy.war .
 

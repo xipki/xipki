@@ -47,6 +47,12 @@ See also <https://github.com/xipki/xipki/releases>
 - The shell-base module moved to https://github.com/xipki/xiutil and use the groupId `org.xipki.util`. The
   package `org.xipki.shell` is unchanged.
 - The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
+- Protocol gateway
+  - The gateway is deployed as `ROOT.war` (formerly `gw.war`) and serves the URLs
+    `/acme/`, `/cmp/`, `/est/`, `/rest/` and `/scep/` directly; `/.well-known/est/` and `/.well-known/cmp/` are aliases of `/est/` and `/cmp/`.
+    The URLs with the prefix `/gw/` are no longer available.
+  - The `RewriteValve` and `rewrite.config` of Tomcat are removed, so no configuration of the
+    servlet container is needed.
 - Base directory
   - `XipkiBaseDir` is removed, and the system property `XIPKI_BASE` is no longer used. No global base
     directory is put in front of relative paths any more.

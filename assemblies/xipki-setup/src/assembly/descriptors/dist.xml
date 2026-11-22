@@ -216,7 +216,7 @@
     <file>
       <source>${project.build.directory}/t2/webapps/gateway-servlet.war</source>
       <outputDirectory>xipki-gateway/tomcat/webapps/</outputDirectory>
-      <destName>gw.war</destName>
+      <destName>ROOT.war</destName>
       <fileMode>0644</fileMode>
     </file>
   </files>
