@@ -508,7 +508,8 @@ public class EstResponder {
 
   private HttpRespContent enrollCert(
       String command, String caName, String profile, CertificationRequest csr, AuditEvent event)
-          throws OperationException, HttpRespAuditException, IOException, SdkErrorResponseException, CodecException {
+      throws OperationException, HttpRespAuditException, IOException,
+          SdkErrorResponseException, CodecException {
     boolean caGenKeyPair = CMD_serverkeygen.equals(command) || CMD_userverkeygen.equals(command);
 
     X500Name subject = csr.getSubject();
@@ -743,7 +744,6 @@ public class EstResponder {
       return ErrorCode.SYSTEM_FAILURE;
     }
   }
-
 
   private static EnrollOrPollCertsResponse.Entry getEntry(
       EnrollOrPollCertsResponse.Entry[] entries, BigInteger certReqId)

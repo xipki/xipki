@@ -703,7 +703,6 @@ public class ProfileConfDemo extends ProfileConfBuilder {
     }
   } // method certprofileRfc3739
 
-
   private static void certprofileRfc9608(String... destFilenames) {
     XijsonCertprofileType profile = getBaseProfile(
         "certprofile RFC 9608", CertLevel.EndEntity, "5y",

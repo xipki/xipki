@@ -68,7 +68,8 @@ final class OcspTestResponder implements AutoCloseable {
   static final BigInteger SN_REVOKED = BigInteger.valueOf(0x1002);
 
   private static final String SQL_SCRIPT =
-      "../assemblies/xipki-setup/src/assembly/unfiltered/xipki-mgmt-cli/xipki/sql/h2/ca-init.h2.sql";
+      "../assemblies/xipki-setup/src/assembly/unfiltered/" +
+      "xipki-mgmt-cli/xipki/sql/h2/ca-init.h2.sql";
 
   private final Path workDir;
 

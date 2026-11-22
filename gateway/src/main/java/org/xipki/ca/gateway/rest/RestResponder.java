@@ -888,7 +888,6 @@ public class RestResponder {
     }
   }
 
-
   private static void checkProfile(Requestor requestor, String caName, String profile)
       throws HttpRespAuditException, OperationException {
     if (StringUtil.isBlank(profile)) {

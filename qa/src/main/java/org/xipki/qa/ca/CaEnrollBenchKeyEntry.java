@@ -7,7 +7,6 @@ import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.KeyUtil;
 
-
 /**
  * CA Enroll Bench Key entry.
  *

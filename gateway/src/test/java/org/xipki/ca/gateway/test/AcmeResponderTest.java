@@ -58,7 +58,8 @@ public class AcmeResponderTest {
   private static final String BASE_URL = "https://" + HOST + "/acme/";
 
   private static final String SQL_SCRIPT =
-      "../assemblies/xipki-setup/src/assembly/unfiltered/xipki-mgmt-cli/xipki/sql/h2/acme-init.h2.sql";
+      "../assemblies/xipki-setup/src/assembly/unfiltered/" +
+      "xipki-mgmt-cli/xipki/sql/h2/acme-init.h2.sql";
 
   private static final String ERR_PREFIX = "urn:ietf:params:acme:error:";
 

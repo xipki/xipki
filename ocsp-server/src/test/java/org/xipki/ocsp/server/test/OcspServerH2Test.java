@@ -64,7 +64,8 @@ import java.util.UUID;
 public class OcspServerH2Test {
 
   private static final String SQL_SCRIPT =
-      "../assemblies/xipki-setup/src/assembly/unfiltered/xipki-mgmt-cli/xipki/sql/h2/ca-init.h2.sql";
+      "../assemblies/xipki-setup/src/assembly/unfiltered/" +
+          "xipki-mgmt-cli/xipki/sql/h2/ca-init.h2.sql";
 
   private static final String PASSWORD = "CHANGEIT";
 

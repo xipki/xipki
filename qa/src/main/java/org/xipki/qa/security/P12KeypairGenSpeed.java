@@ -10,7 +10,6 @@ import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.KeyUtil;
 
-
 /**
  * P12 Keypair Gen Speed.
  *

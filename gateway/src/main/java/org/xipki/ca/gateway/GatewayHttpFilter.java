@@ -151,7 +151,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
+      PopControl popControl = (pconf.pop() == null)
+          ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       AcmeResponder responder = new AcmeResponder(sdkClient,
           securities.securityFactory(), popControl, pconf.acme(), basedir);
@@ -178,7 +179,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
+      PopControl popControl = (pconf.pop() == null)
+          ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       CaNameSigners signers = newCaSigners(securities, pconf.signers());
@@ -208,7 +210,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
+      PopControl popControl = (pconf.pop() == null)
+          ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
@@ -238,7 +241,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
+      PopControl popControl = (pconf.pop() == null)
+          ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =
@@ -267,7 +271,8 @@ public class GatewayHttpFilter implements XiHttpFilter {
         sdkClient.setLogReqResp(logReqResp);
       }
 
-      PopControl popControl = (pconf.pop() == null) ? gPopControl : new PopControl(pconf.pop(), basedir);
+      PopControl popControl = (pconf.pop() == null)
+          ? gPopControl : new PopControl(pconf.pop(), basedir);
 
       RequestorAuthenticator authenticator = newAuthenticator(pconf.authenticator());
       GatewayConf.CaProfilesControl caProfilesControl =

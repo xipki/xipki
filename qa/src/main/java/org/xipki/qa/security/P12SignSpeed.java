@@ -21,7 +21,6 @@ import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.misc.RandomUtil;
 
-
 /**
  * P12 Sign Speed.
  *
