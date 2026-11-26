@@ -1,0 +1,116 @@
+/* License Apache License 2.0 */
+
+.cert-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.cert-list-header .ant-typography {
+  margin: 0;
+}
+
+.cert-list-filters {
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.cert-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 0.8fr);
+  gap: 12px 14px;
+}
+
+.cert-filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
+}
+
+.cert-filter-label {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.cert-filter-field .ant-select,
+.cert-filter-field .ant-picker,
+.cert-filter-field .ant-input-number {
+  width: 100%;
+}
+
+.cert-filter-limit .ant-input-number {
+  max-width: 160px;
+}
+
+.cert-filter-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.cert-filter-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.cert-list-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.cert-detail-descriptions .ant-descriptions-item-label {
+  white-space: nowrap;
+}
+
+.cert-detail-descriptions .ant-descriptions-item-content {
+  overflow-wrap: anywhere;
+}
+
+.cert-subject {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cert-serial {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .cert-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .cert-filter-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cert-list-pagination {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .cert-list-pagination .ant-pagination-total-text {
+    flex-basis: 100%;
+    margin-right: 0;
+  }
+}

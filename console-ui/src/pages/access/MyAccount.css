@@ -1,0 +1,46 @@
+/* License Apache License 2.0 */
+
+.my-account {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.my-account-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 24px;
+  align-items: start;
+}
+.my-account-grid .ant-card {
+  min-width: 0;
+}
+.my-account-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  overflow-wrap: anywhere;
+}
+.my-account-identity .ant-avatar {
+  flex-shrink: 0;
+  background: #eaf2ff;
+  color: #1677ff;
+}
+.my-account-identity h4.ant-typography {
+  margin: 0 0 4px;
+}
+.my-account .ant-descriptions-item-content {
+  overflow-wrap: anywhere;
+}
+.my-account .ant-tag {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  margin-inline-end: 0;
+}
+.my-account-grid h5.ant-typography {
+  margin-top: 0;
+}
+@media (max-width: 1000px) {
+  .my-account-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

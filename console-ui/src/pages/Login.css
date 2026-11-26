@@ -1,0 +1,130 @@
+/* License Apache License 2.0 */
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #fff;
+}
+
+.login-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - 64px);
+  min-height: calc(100dvh - 64px);
+}
+
+.login-introduction,
+.login-form-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 48px;
+}
+
+.login-introduction {
+  background: linear-gradient(140deg, #eff6ff 0%, #f5f8ff 55%, #eef2ff 100%);
+  border-right: 1px solid #edf1f7;
+}
+
+.login-introduction-content {
+  max-width: 460px;
+}
+
+.login-product-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  margin-bottom: 32px;
+  border: 1px solid #d6e6ff;
+  border-radius: 24px;
+  color: #1677ff;
+  background: #ffffffc9;
+  font-size: 44px;
+  box-shadow: 0 12px 32px #1d4ed80a;
+}
+
+.login-introduction h1.ant-typography {
+  margin: 0 0 20px;
+  color: #172b4d;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.3;
+  letter-spacing: -0.5px;
+}
+
+.login-introduction .ant-typography {
+  color: #536581;
+  font-size: 17px;
+  line-height: 1.8;
+}
+.login-form-content {
+  width: 100%;
+  max-width: 420px;
+}
+.login-form-content h2.ant-typography {
+  margin: 0 0 12px;
+  color: #172b4d;
+}
+.login-form-description.ant-typography {
+  margin-bottom: 36px;
+  color: #64748b;
+}
+.login-form-content .ant-input-prefix {
+  margin-inline-end: 10px;
+  color: #94a3b8;
+}
+.login-form-content .ant-input-affix-wrapper {
+  min-height: 48px;
+  border-radius: 8px;
+}
+.login-form-content .ant-btn-primary {
+  height: 48px;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+.login-form-content .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+.login-form-content .certificate-login {
+  height: 48px;
+  margin-top: 16px;
+  border-radius: 8px;
+}
+
+@media (max-width: 760px) {
+  .login-main {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+  .login-introduction {
+    padding: 32px 24px;
+    border-right: 0;
+    border-bottom: 1px solid #edf1f7;
+  }
+  .login-introduction-content {
+    width: 100%;
+    max-width: 420px;
+  }
+  .login-product-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+    font-size: 26px;
+  }
+  .login-introduction h1.ant-typography {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
+  .login-introduction .ant-typography {
+    font-size: 15px;
+    margin-bottom: 0;
+  }
+  .login-form-section {
+    padding: 36px 24px 48px;
+  }
+  .login-form-description.ant-typography {
+    margin-bottom: 24px;
+  }
+}

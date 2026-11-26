@@ -1,0 +1,89 @@
+/* License Apache License 2.0 */
+
+.ca-hierarchy-viewport {
+  overflow-x: auto;
+  padding: 4px 4px 16px;
+}
+
+.ca-hierarchy-tree {
+  min-width: max-content;
+}
+
+.ca-hierarchy-tree .ant-tree-treenode {
+  padding-bottom: 12px;
+}
+
+.ca-hierarchy-tree .ant-tree-switcher {
+  margin-top: 17px;
+}
+
+.ca-hierarchy-tree .ant-tree-node-content-wrapper {
+  height: auto;
+  padding: 0 4px;
+}
+
+.ca-hierarchy-tree .ant-tree-node-content-wrapper:hover,
+.ca-hierarchy-tree .ant-tree-node-selected {
+  background: transparent !important;
+}
+
+.ca-hierarchy-node {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: clamp(220px, calc(100vw - 150px), 460px);
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid #d9e2eb;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.ca-hierarchy-tree .ant-tree-node-content-wrapper:hover .ca-hierarchy-node,
+.ca-hierarchy-tree .ant-tree-node-selected .ca-hierarchy-node {
+  border-color: #1677ff;
+  background: #f7fbff;
+}
+
+.ca-hierarchy-node-icon {
+  flex: none;
+  color: #1677ff;
+  font-size: 20px;
+}
+
+.ca-hierarchy-node-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.ca-hierarchy-node-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+
+.ca-hierarchy-node-heading strong {
+  margin-right: 4px;
+  overflow-wrap: anywhere;
+}
+
+.ca-hierarchy-node-heading .ant-tag {
+  margin: 0;
+}
+
+.ca-hierarchy-node-subject {
+  overflow: hidden;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ca-hierarchy-node-arrow {
+  flex: none;
+  color: #8c8c8c;
+  font-size: 12px;
+}

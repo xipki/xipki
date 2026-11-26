@@ -1,0 +1,67 @@
+/* License Apache License 2.0 */
+
+.account-menu-trigger.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  max-width: 240px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: #334155;
+}
+
+.account-menu-trigger .ant-avatar {
+  flex-shrink: 0;
+  color: #1677ff;
+  background: #eaf2ff;
+}
+.account-menu-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-menu-chevron {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: #64748b;
+}
+.account-menu-trigger.ant-btn:hover,
+.account-menu-trigger.ant-btn[aria-expanded='true'] {
+  background: #f0f5fb;
+}
+.account-menu-trigger.ant-btn:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 3px;
+}
+
+.account-menu.ant-dropdown-menu {
+  min-width: 200px;
+  padding: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+.account-menu .ant-dropdown-menu-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+@media (max-width: 600px) {
+  .account-menu-trigger.ant-btn {
+    max-width: 140px;
+    gap: 6px;
+    padding: 0 6px;
+  }
+}
+
+@media (max-width: 359px) {
+  .account-menu-trigger.ant-btn {
+    width: 40px;
+    min-width: 40px;
+    justify-content: center;
+  }
+  .account-menu-name,
+  .account-menu-chevron {
+    display: none;
+  }
+}

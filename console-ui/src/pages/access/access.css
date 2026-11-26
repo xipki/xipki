@@ -1,0 +1,186 @@
+/* License Apache License 2.0 */
+
+.access-modal .ant-modal-content {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 48px);
+}
+.access-modal .ant-modal-body {
+  min-height: 0;
+  overflow: auto;
+}
+.access-modal .ant-modal-footer {
+  flex-shrink: 0;
+}
+.role-editor .ant-modal-body {
+  height: min(650px, calc(100dvh - 210px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.role-editor .ant-tabs {
+  min-height: 0;
+  flex: 1;
+}
+.role-editor .ant-tabs-content-holder {
+  min-height: 0;
+  overflow: auto;
+}
+.role-editor .ant-tabs-content,
+.role-editor .ant-tabs-tabpane-active {
+  height: 100%;
+}
+.role-editor-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 180px;
+  gap: 16px;
+}
+.role-editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+.permission-explorer {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.permission-explorer > .permission-explorer {
+  flex: 1;
+  height: auto;
+}
+.permission-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+}
+.permission-toolbar .ant-input-search {
+  width: 320px;
+  max-width: 100%;
+}
+.permission-browser {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #e8edf2;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.permission-navigation {
+  width: 220px;
+  flex-shrink: 0;
+  overflow: auto;
+  background: #fafbfd;
+  padding: 8px;
+  border-right: 1px solid #e8edf2;
+}
+.permission-navigation button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #434343;
+  font: inherit;
+  padding: 11px 12px;
+  cursor: pointer;
+}
+.permission-navigation button:hover {
+  background: #eef3f9;
+}
+.permission-navigation button[aria-current='true'] {
+  background: #e6f4ff;
+  color: #0958d9;
+  font-weight: 600;
+}
+.permission-navigation button:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: -2px;
+}
+.permission-group-count {
+  font-size: 12px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.permission-content {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 16px 20px;
+}
+.permission-group-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.permission-group-heading h5 {
+  margin: 0;
+}
+.permission-row {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.permission-row:last-child {
+  border-bottom: none;
+}
+.permission-conditions {
+  margin-left: 24px;
+  font-size: 12px;
+}
+.permission-conditions:empty {
+  display: none;
+}
+.permission-details-modal .ant-modal-body {
+  height: min(600px, calc(100dvh - 190px));
+  overflow: hidden;
+}
+.access-grants {
+  width: 100%;
+}
+.access-grants .ant-collapse-header-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.access-grants .ant-collapse-header {
+  align-items: center !important;
+}
+@media (max-width: 700px) {
+  .role-editor-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .permission-browser {
+    flex-direction: column;
+  }
+  .permission-navigation {
+    width: auto;
+    max-height: 140px;
+    flex-shrink: 0;
+    border-right: none;
+    border-bottom: 1px solid #e8edf2;
+  }
+  .permission-content {
+    padding: 12px;
+  }
+  .permission-toolbar {
+    gap: 8px;
+  }
+  .permission-toolbar .ant-input-search {
+    width: 100%;
+  }
+  .permission-group-heading {
+    flex-wrap: wrap;
+  }
+}

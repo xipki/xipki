@@ -1,0 +1,73 @@
+/* License Apache License 2.0 */
+
+.console-layout {
+  min-height: 100vh;
+}
+
+.console-desktop-nav.ant-layout-sider {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.console-nav-brand {
+  padding: 20px 16px 12px;
+}
+
+.console-nav-brand .ant-typography {
+  color: #fff;
+  margin: 0;
+  font-size: 17px;
+}
+
+.console-desktop-nav .ant-menu-item-group-title,
+.console-mobile-drawer .ant-menu-item-group-title {
+  padding-top: 22px;
+  padding-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  text-transform: uppercase;
+  cursor: default;
+  user-select: none;
+}
+
+.console-content.ant-layout-content {
+  margin: 20px;
+  padding: 24px;
+  min-width: 0;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.console-menu-trigger.ant-btn {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .console-desktop-nav.ant-layout-sider {
+    display: none;
+  }
+
+  .console-menu-trigger.ant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
+
+  .console-content.ant-layout-content {
+    margin: 16px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .console-content.ant-layout-content {
+    margin: 12px;
+    padding: 14px;
+  }
+}

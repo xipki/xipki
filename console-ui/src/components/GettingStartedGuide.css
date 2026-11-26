@@ -1,0 +1,77 @@
+/* License Apache License 2.0 */
+
+.getting-started-guide {
+  margin-top: 24px;
+}
+
+.getting-started-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+}
+
+.getting-started-heading .ant-typography {
+  margin: 0;
+}
+
+.getting-started-heading .ant-btn {
+  flex: none;
+}
+
+.getting-started-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 4px 20px 16px;
+}
+
+.getting-started-intro .ant-typography {
+  max-width: 720px;
+  margin-bottom: 8px;
+}
+
+.getting-started-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.getting-started-step {
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 3px solid;
+}
+
+.getting-started-step .ant-btn-link {
+  height: auto;
+  white-space: normal;
+  text-align: left;
+}
+
+@media (max-width: 1100px) {
+  .getting-started-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .getting-started-heading {
+    padding: 12px 14px;
+  }
+
+  .getting-started-intro,
+  .getting-started-steps {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .getting-started-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

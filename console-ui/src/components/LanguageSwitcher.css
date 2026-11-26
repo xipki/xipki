@@ -1,0 +1,61 @@
+/* License Apache License 2.0 */
+
+.language-switcher.ant-btn {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #334155;
+  background: #fff;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.language-switcher.ant-btn:hover,
+.language-switcher.ant-btn[aria-expanded='true'] {
+  color: #1677ff;
+  border-color: #91caff;
+  background: #f0f7ff;
+}
+
+.language-switcher.ant-btn:focus-visible {
+  outline: 2px solid #1677ff;
+  outline-offset: 3px;
+}
+
+.language-switcher .language-switcher-chevron {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.language-switcher-menu.ant-dropdown-menu {
+  min-width: 180px;
+  padding: 6px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.language-switcher-menu .ant-dropdown-menu-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+@media (max-width: 359px) {
+  .language-switcher.ant-btn {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+  .language-switcher span[lang],
+  .language-switcher-chevron {
+    display: none;
+  }
+}
