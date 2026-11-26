@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "${1:-}" == "compose" && "${2:-}" == "version" ]]; then
+  exit 0
+fi
+
+printf '%s\n' "$*" >> "${XIPKI_TEST_DOCKER_LOG:?}"
+
+# Makes node setup and doctor tests observe one healthy role without starting real containers.
+if [[ " $* " == *" ps -q "* ]]; then
+  echo xipki-fixture-role
+  exit 0
+fi
+if [[ "${1:-}" == "inspect" && "$*" == *'.State.Health'* ]]; then
+  echo healthy
+  exit 0
+fi
+if [[ "${1:-}" == "inspect" && "$*" == *'.State.Status'* ]]; then
+  echo running
+  exit 0
+fi
+if [[ "${1:-}" == "image" && "${2:-}" == "inspect" ]]; then
+  exit 0
+fi
+
+# Simulates Bootstrap's prepare export for launcher packaging tests. The fake materializes the
+# minimum role contract and a small certificate hierarchy used by the launcher's contract checks.
+if [[ "${1:-}" == "run" ]]; then
+  export_dir=""
+  ca_host=ca
+  gateway_host=gateway
+  for argument in "$@"; do
+    if [[ "${argument}" == type=bind,source=*,target=/export ]]; then
+      export_dir="${argument#type=bind,source=}"
+      export_dir="${export_dir%,target=/export}"
+    fi
+    case "${argument}" in
+      XIPKI_CA_HOST=*) ca_host="${argument#XIPKI_CA_HOST=}" ;;
+      XIPKI_GATEWAY_HOST=*) gateway_host="${argument#XIPKI_GATEWAY_HOST=}" ;;
+    esac
+  done
+  [[ -n "${export_dir}" ]] || exit 0
+  mkdir -p \
+    "${export_dir}/roles/admin/xipki/etc" "${export_dir}/roles/admin/xipki/keycerts" \
+    "${export_dir}/roles/admin/deployment-ca" "${export_dir}/roles/admin/verification" \
+    "${export_dir}/roles/ca/conf" "${export_dir}/roles/ca/xipki/keycerts" \
+    "${export_dir}/roles/ca/xipki/etc/ca/database/mariadb" \
+    "${export_dir}/roles/gateway/conf" "${export_dir}/roles/gateway/xipki/keycerts" \
+    "${export_dir}/roles/gateway/xipki/etc/acme/database/mariadb" \
+    "${export_dir}/roles/ocsp/conf" "${export_dir}/roles/ocsp/xipki/keycerts" \
+    "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/mariadb" \
+    "${export_dir}/roles/console/client" "${export_dir}/roles/console/enrollment"
+
+  # The launcher validates the identity contract after Bootstrap returns. Generate a small test
+  # hierarchy so this fake covers the same EKU, SAN, and trust boundaries as the real image.
+  fake_pki="${export_dir}/.fake-pki"
+  mkdir -p "${fake_pki}"
+  openssl req -x509 -newkey rsa:2048 -nodes -days 30 -sha256 \
+    -subj '/CN=XiPKI fixture deployment CA' \
+    -addext 'basicConstraints=critical,CA:TRUE,pathlen:0' \
+    -addext 'keyUsage=critical,keyCertSign,cRLSign' \
+    -keyout "${fake_pki}/root.key" -out "${fake_pki}/root.crt" >/dev/null 2>&1
+
+  make_fixture_leaf() {
+    local name="$1"
+    local purpose="$2"
+    local host="${3:-}"
+    local extension_file="${fake_pki}/${name}.ext"
+    {
+      echo 'basicConstraints=critical,CA:FALSE'
+      echo 'keyUsage=critical,digitalSignature,keyEncipherment'
+      printf 'extendedKeyUsage=%s\n' "${purpose}"
+      if [[ -n "${host}" ]]; then
+        if [[ "${host}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          printf 'subjectAltName=IP:%s\n' "${host}"
+        else
+          printf 'subjectAltName=DNS:%s\n' "${host}"
+        fi
+      fi
+    } > "${extension_file}"
+    openssl req -new -newkey rsa:2048 -nodes -sha256 \
+      -subj "/CN=${host:-${name}}" \
+      -keyout "${fake_pki}/${name}.key" -out "${fake_pki}/${name}.csr" >/dev/null 2>&1
+    openssl x509 -req -days 30 -sha256 -in "${fake_pki}/${name}.csr" \
+      -CA "${fake_pki}/root.crt" -CAkey "${fake_pki}/root.key" -CAcreateserial \
+      -extfile "${extension_file}" -out "${fake_pki}/${name}.crt" >/dev/null 2>&1
+  }
+
+  make_fixture_leaf ca-server serverAuth "${ca_host}"
+  if [[ "${XIPKI_TEST_BAD_GATEWAY_CERT:-false}" == "true" ]]; then
+    make_fixture_leaf gateway-server clientAuth "${gateway_host}"
+  else
+    make_fixture_leaf gateway-server serverAuth "${gateway_host}"
+  fi
+  make_fixture_leaf ca-mgmt-client clientAuth
+  make_fixture_leaf ra-sdk-client clientAuth
+  cp "${fake_pki}/root.crt" \
+    "${export_dir}/roles/admin/deployment-ca/deployment-internal-ca-cert.pem"
+  cp "${fake_pki}/ca-server.crt" \
+    "${export_dir}/roles/ca/xipki/keycerts/ca-server-cert.pem"
+  cp "${fake_pki}/ca-mgmt-client.crt" \
+    "${export_dir}/roles/ca/xipki/keycerts/ca-mgmt-client-cert.pem"
+  cp "${fake_pki}/gateway-server.crt" \
+    "${export_dir}/roles/gateway/xipki/keycerts/gateway-server-cert.pem"
+  cp "${fake_pki}/ra-sdk-client.crt" \
+    "${export_dir}/roles/gateway/xipki/keycerts/ra-sdk-client-cert.pem"
+  cp "${fake_pki}/ra-sdk-client.crt" \
+    "${export_dir}/roles/console/client/gateway-ra-cert.pem"
+  cp "${fake_pki}/root.crt" \
+    "${export_dir}/roles/gateway/xipki/keycerts/ca-server-cert.pem"
+  rm -rf "${fake_pki}"
+
+  for role in admin ca console gateway ocsp; do
+    printf 'format=1\nrole=%s\ndeployment=test\n' "${role}" \
+      > "${export_dir}/roles/${role}/.initialized"
+  done
+  printf '<Certificate certificateKeystorePassword="fixture-ca-tls"/>\n' \
+    > "${export_dir}/roles/ca/conf/server.xml"
+  printf '<Certificate certificateKeystorePassword="fixture-gateway-tls"/>\n' \
+    > "${export_dir}/roles/gateway/conf/server.xml"
+  printf '<Server/>\n' > "${export_dir}/roles/ocsp/conf/server.xml"
+  for placeholder in \
+    "${export_dir}/roles/admin/xipki/etc/ca-mgmt-client.json" \
+    "${export_dir}/roles/console/client/client.p12" \
+    "${export_dir}/roles/console/client/trustanchors.pem" \
+    "${export_dir}/roles/console/client/password" \
+    "${export_dir}/roles/ca/xipki/keycerts/ca-server.p12" \
+    "${export_dir}/roles/ca/xipki/keycerts/ca-client-certstore.p12" \
+    "${export_dir}/roles/gateway/xipki/keycerts/gateway-server.p12" \
+    "${export_dir}/roles/gateway/xipki/keycerts/ra-sdk-client.p12" \
+    "${export_dir}/roles/gateway/xipki/keycerts/gateway-client-ca-certstore.p12" \
+    "${export_dir}/roles/ocsp/xipki/keycerts/ocsp1.p12"; do
+    printf 'fixture\n' > "${placeholder}"
+  done
+  printf 'fixture-rest-client\n' \
+    > "${export_dir}/roles/admin/verification/rest-client.p12"
+  printf 'fixture-rest-password' \
+    > "${export_dir}/roles/admin/verification/rest-client.p12.password"
+  printf '{"ssl":{"keystorePassword":"fixture-gateway-ra"}}\n' \
+    > "${export_dir}/roles/gateway/xipki/etc/gateway.json"
+  for domain in caconf ca ocsp keypool; do
+    uppercase_domain="$(printf '%s' "${domain}" | tr '[:lower:]' '[:upper:]')"
+    printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_%s_DB_NAME__\ndataSource.user = __XIPKI_DB_USER__\ndataSource.password = __XIPKI_CA_DB_PASSWORD__\n' \
+      "${uppercase_domain}" \
+      > "${export_dir}/roles/ca/xipki/etc/ca/database/${domain}-db.properties"
+  done
+  printf 'unused backend template\n' \
+    > "${export_dir}/roles/ca/xipki/etc/ca/database/mariadb/ca-db.properties"
+  printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_ACME_DB_NAME__\ndataSource.user = __XIPKI_DB_USER__\ndataSource.password = __XIPKI_GATEWAY_DB_PASSWORD__\n' \
+    > "${export_dir}/roles/gateway/xipki/etc/acme/database/acme-db.properties"
+  printf 'unused backend template\n' \
+    > "${export_dir}/roles/gateway/xipki/etc/acme/database/mariadb/acme-db.properties"
+  printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_OCSP_DB_NAME__\ndataSource.user = __XIPKI_DB_USER__\ndataSource.password = __XIPKI_OCSP_DB_PASSWORD__\n' \
+    > "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/ocsp-db.properties"
+  printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_CA_DB_NAME__\ndataSource.user = __XIPKI_DB_USER__\ndataSource.password = __XIPKI_OCSP_DB_PASSWORD__\n' \
+    > "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/ca-db.properties"
+  # Real setup archives also contain optional cache/CRL templates and backend-specific source
+  # directories. Distributed node bundles must keep only the role's supported runtime files.
+  printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_OCSP-CACHE_DB_NAME__\n' \
+    > "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/ocsp-cache-db.properties"
+  printf 'dataSource.url = jdbc:mariadb://__XIPKI_DB_HOST__:__XIPKI_DB_PORT__/__XIPKI_OCSP-CRL_DB_NAME__\n' \
+    > "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/ocsp-crl-db.properties"
+  printf 'unused backend template\n' \
+    > "${export_dir}/roles/ocsp/xipki/etc/ocsp/database/mariadb/ca-db.properties"
+  printf 'format=4\ndeployment-mode=distributed\n' \
+    > "${export_dir}/roles/deployment.properties"
+fi
