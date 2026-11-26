@@ -1,0 +1,72 @@
+name: ${XIPKI_COMPOSE_PROJECT:-xipki-console}
+
+services:
+  role-init:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    user: "0:0"
+    entrypoint: ["xipki-role-init"]
+    environment:
+      XIPKI_ROLE: console
+      XIPKI_DEPLOYMENT_NAME: ${XIPKI_DEPLOYMENT_NAME}
+    volumes:
+      - ./.state/seed:/seed:ro
+      - role-state:/var/lib/xipki
+    restart: "no"
+
+  console:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    environment:
+      XIPKI_ROLE: console
+      SERVER_PORT: 8443
+      SERVER_TLS_ENABLED: "true"
+      SERVER_TLS_CERT_FILE: /run/secrets/console_tls_cert
+      SERVER_TLS_KEY_FILE: /run/secrets/console_tls_key
+      SERVER_TLS_CLIENT_CA_FILE: /run/secrets/console_client_ca_cert
+      SESSION_COOKIE_SECURE: "true"
+      WEB_AUTH_MODE: ${XIPKI_CONSOLE_AUTH_MODE:-both}
+      WEB_ADMIN_CLIENT_CERT_FILE: /run/secrets/console_admin_client_cert
+      WEB_DB_URL: ${XIPKI_CONSOLE_DB_URL}
+      WEB_DB_USER: ${XIPKI_DB_USER}
+      WEB_DB_PASSWORD_FILE: /run/secrets/console_db_password
+      WEB_ADMIN_USERNAME: admin
+      WEB_ADMIN_PASSWORD_FILE: /run/secrets/console_admin_password
+      WEB_ENROLLMENT_KEY_FILE: /run/secrets/console_enrollment_key
+      WEB_ENROLLMENT_KEY_DIR: /var/lib/xipki/enrollment
+      XIPKI_CA_URL: ${XIPKI_CA_URL}
+      XIPKI_CLIENT_DIR: /var/lib/xipki/client
+      XIPKI_GATEWAY_RA_CERT_FILE: /var/lib/xipki/client/gateway-ra-cert.pem
+    secrets:
+      - console_db_password
+      - console_admin_password
+      - console_enrollment_key
+      - console_tls_cert
+      - console_tls_key
+      - console_client_ca_cert
+      - console_admin_client_cert
+    volumes:
+      - role-state:/var/lib/xipki
+    ports:
+      - "${XIPKI_BIND_ADDRESS:-0.0.0.0}:${XIPKI_CONSOLE_HTTPS_PORT:-18081}:8443"
+    depends_on:
+      role-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+secrets:
+  console_db_password:
+    file: ./.state/secrets/console_db_password
+  console_admin_password:
+    file: ./.state/secrets/console_admin_password
+  console_enrollment_key:
+    file: ./.state/secrets/console_enrollment_key
+  console_tls_cert:
+    file: ./.state/secrets/console_tls_cert.pem
+  console_tls_key:
+    file: ./.state/secrets/console_tls_key.pem
+  console_client_ca_cert:
+    file: ./.state/client/console-client-ca.crt
+  console_admin_client_cert:
+    file: ./.state/client/admin.crt
+
+volumes:
+  role-state:

@@ -108,7 +108,11 @@ copy_key_material "$script_dir/xipki-gateway/tomcat/xipki/keycerts" \
   "$kc_dir"/dh-pop/dh-pop.p12 \
   "$kc_dir"/secretkeys/kem-pop.jceks
 
-echo "3. Copying generated keys to the XiPKI component xipki-cli"
+echo "3. Copying generated keys to the XiPKI component xipki-ocsp"
+copy_key_material "$script_dir/xipki-ocsp/tomcat/xipki/keycerts" \
+  "$kc_dir"/ocsp1/*
+
+echo "4. Copying generated keys to the XiPKI component xipki-cli"
 copy_key_material "$script_dir/xipki-cli/xipki/keycerts" \
   "$kc_dir"/cmp-client/* \
   "$kc_dir"/est-client/* \
@@ -117,7 +121,7 @@ copy_key_material "$script_dir/xipki-cli/xipki/keycerts" \
   "$kc_dir"/dh-pop/dh-pop-certs.pem \
   "$kc_dir"/secretkeys/kem-pop.jceks
 
-echo "4. Copying generated keys to the XiPKI component xipki-mgmt-cli"
+echo "5. Copying generated keys to the XiPKI component xipki-mgmt-cli"
 copy_key_material "$script_dir/xipki-mgmt-cli/xipki/keycerts" \
   "$kc_dir"/cmp-client/* \
   "$kc_dir"/est-client/* \

@@ -1,0 +1,4 @@
+services:
+  console:
+    environment:
+      WEB_DB_URL: ${XIPKI_CONSOLE_DB_URL:?XIPKI_CONSOLE_DB_URL is required for an external database}

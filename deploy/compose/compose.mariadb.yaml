@@ -1,0 +1,33 @@
+services:
+  bootstrap:
+    environment:
+      XIPKI_DB_HOST: database
+      XIPKI_DB_PORT: 3306
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/mariadb:${XIPKI_VERSION:-7.0.0}
+    environment:
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/mariadb_admin_password
+    secrets:
+      - mariadb_admin_password
+      - ca_db_password
+      - console_db_password
+      - gateway_db_password
+      - ocsp_db_password
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - backend
+    restart: unless-stopped
+
+  console:
+    environment:
+      WEB_DB_URL: jdbc:mariadb://database:3306/xipki_console

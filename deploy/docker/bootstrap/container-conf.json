@@ -1,0 +1,188 @@
+{
+  "prefix": "$[",
+  "suffix": "]",
+  "basedir": "..",
+  "sections": [
+    {
+      "description": "Container service configuration",
+      "includes": {
+        "dirs": [
+          "setup/",
+          "xipki-ca/",
+          "xipki-gateway/",
+          "xipki-ocsp/",
+          "xipki-cli/",
+          "xipki-mgmt-cli/"
+        ],
+        "suffixes": [".json", ".xml", ".cfg", ".script", ".properties", ".sh", ".bat"]
+      },
+      "replacements": {
+        "organization": "${env:XIPKI_ORGANIZATION}",
+        "deployment.internal.ca.keyPassword": "${env:XIPKI_DEPLOYMENT_INTERNAL_CA_KEY_PASSWORD}",
+        "dummy.host": "localhost",
+        "dummy.https.keyPassword": "${env:XIPKI_DUMMY_KEY_PASSWORD}",
+        "ocsp.keyPassword": "${env:XIPKI_OCSP_KEY_PASSWORD}",
+        "ocsp.shutdown.port": "8005",
+        "ocsp.http.port": "8080",
+        "ocsp.host": "${env:XIPKI_OCSP_HOST}",
+        "ca.https.keyPassword": "${env:XIPKI_CA_KEY_PASSWORD}",
+        "ca.https.certstorePassword": "${env:XIPKI_CA_TRUSTSTORE_PASSWORD}",
+        "ca.shutdown.port": "8006",
+        "ca.https.port": "${env:XIPKI_CA_HTTPS_PORT}",
+        "ca.host": "${env:XIPKI_CA_HOST}",
+        "ca.name": "myca1",
+        "ca.alias": "myca",
+        "gateway.https.keyPassword": "${env:XIPKI_GATEWAY_KEY_PASSWORD}",
+        "gateway.https.certstorePassword": "${env:XIPKI_GATEWAY_TRUSTSTORE_PASSWORD}",
+        "gateway.shutdown.port": "8007",
+        "gateway.http.port": "8082",
+        "gateway.https.port": "8445",
+        "gateway.host": "${env:XIPKI_GATEWAY_HOST}",
+        "gateway.acme.enabled": "false",
+        "gateway.cmp.enabled": "true",
+        "gateway.est.enabled": "true",
+        "gateway.rest.enabled": "true",
+        "gateway.scep.enabled": "false",
+        "gateway.requestor.user1": "bootstrap-disabled",
+        "gateway.requestor.password1": "${env:XIPKI_GATEWAY_REQUESTOR_PASSWORD}",
+        "ra.sdk.keyPassword": "${env:XIPKI_RA_SDK_KEY_PASSWORD}",
+        "dh-pop.keyPassword": "${env:XIPKI_DH_POP_KEY_PASSWORD}",
+        "kem-pop.keyPassword": "${env:XIPKI_KEM_POP_KEY_PASSWORD}",
+        "scep.keyPassword": "${env:XIPKI_SCEP_KEY_PASSWORD}",
+        "cmp.client.ca.keyPassword": "${env:XIPKI_CMP_CLIENT_CA_KEY_PASSWORD}",
+        "cmp.client.keyPassword": "${env:XIPKI_CMP_CLIENT_KEY_PASSWORD}",
+        "est.client.ca.keyPassword": "${env:XIPKI_EST_CLIENT_CA_KEY_PASSWORD}",
+        "est.client.keyPassword": "${env:XIPKI_EST_CLIENT_KEY_PASSWORD}",
+        "rest.client.ca.keyPassword": "${env:XIPKI_REST_CLIENT_CA_KEY_PASSWORD}",
+        "rest.client.keyPassword": "${env:XIPKI_REST_CLIENT_KEY_PASSWORD}",
+        "ca.mgmt.client.keyPassword": "${env:XIPKI_CA_MGMT_KEY_PASSWORD}"
+      }
+    },
+    {
+      "description": "CA PostgreSQL configuration",
+      "includes": {
+        "dirs": ["xipki-ca/tomcat/xipki/etc/ca/database/pgsql/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "pgsql:ca.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ca.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ca.user": "xipki_ca",
+        "pgsql:ca.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "pgsql:caconf.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:caconf.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:caconf.user": "xipki_ca",
+        "pgsql:caconf.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "pgsql:keypool.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:keypool.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:keypool.user": "xipki_ca",
+        "pgsql:keypool.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "pgsql:ocsp.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ocsp.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ocsp.user": "xipki_ca",
+        "pgsql:ocsp.password": "${env:XIPKI_CA_DB_PASSWORD}"
+      }
+    },
+    {
+      "description": "OCSP PostgreSQL configuration",
+      "includes": {
+        "dirs": ["xipki-ocsp/tomcat/xipki/etc/ocsp/database/pgsql/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "pgsql:ca.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ca.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ca.user": "xipki_ocsp",
+        "pgsql:ca.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "pgsql:ocsp.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ocsp.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ocsp.user": "xipki_ocsp",
+        "pgsql:ocsp.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "pgsql:ocspcache.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ocspcache.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ocspcache.user": "xipki_ocsp",
+        "pgsql:ocspcache.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "pgsql:ocspcrl.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:ocspcrl.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:ocspcrl.user": "xipki_ocsp",
+        "pgsql:ocspcrl.password": "${env:XIPKI_OCSP_DB_PASSWORD}"
+      }
+    },
+    {
+      "description": "Gateway PostgreSQL configuration",
+      "includes": {
+        "dirs": ["xipki-gateway/tomcat/xipki/etc/acme/database/pgsql/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "pgsql:acme.host": "${env:XIPKI_DB_HOST}",
+        "pgsql:acme.port": "${env:XIPKI_DB_PORT}",
+        "pgsql:acme.user": "xipki_gateway",
+        "pgsql:acme.password": "${env:XIPKI_GATEWAY_DB_PASSWORD}"
+      }
+    },
+    {
+      "description": "CA MariaDB configuration",
+      "includes": {
+        "dirs": ["xipki-ca/tomcat/xipki/etc/ca/database/mariadb/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "mysql:ca.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ca.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ca.user": "xipki_ca",
+        "mysql:ca.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "mysql:caconf.host": "${env:XIPKI_DB_HOST}",
+        "mysql:caconf.port": "${env:XIPKI_DB_PORT}",
+        "mysql:caconf.user": "xipki_ca",
+        "mysql:caconf.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "mysql:keypool.host": "${env:XIPKI_DB_HOST}",
+        "mysql:keypool.port": "${env:XIPKI_DB_PORT}",
+        "mysql:keypool.user": "xipki_ca",
+        "mysql:keypool.password": "${env:XIPKI_CA_DB_PASSWORD}",
+        "mysql:ocsp.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ocsp.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ocsp.user": "xipki_ca",
+        "mysql:ocsp.password": "${env:XIPKI_CA_DB_PASSWORD}"
+      }
+    },
+    {
+      "description": "OCSP MariaDB configuration",
+      "includes": {
+        "dirs": ["xipki-ocsp/tomcat/xipki/etc/ocsp/database/mariadb/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "mysql:ca.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ca.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ca.user": "xipki_ocsp",
+        "mysql:ca.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "mysql:ocsp.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ocsp.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ocsp.user": "xipki_ocsp",
+        "mysql:ocsp.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "mysql:ocspcache.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ocspcache.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ocspcache.user": "xipki_ocsp",
+        "mysql:ocspcache.password": "${env:XIPKI_OCSP_DB_PASSWORD}",
+        "mysql:ocspcrl.host": "${env:XIPKI_DB_HOST}",
+        "mysql:ocspcrl.port": "${env:XIPKI_DB_PORT}",
+        "mysql:ocspcrl.user": "xipki_ocsp",
+        "mysql:ocspcrl.password": "${env:XIPKI_OCSP_DB_PASSWORD}"
+      }
+    },
+    {
+      "description": "Gateway MariaDB configuration",
+      "includes": {
+        "dirs": ["xipki-gateway/tomcat/xipki/etc/acme/database/mariadb/"],
+        "suffixes": ["-db.properties"]
+      },
+      "replacements": {
+        "mysql:acme.host": "${env:XIPKI_DB_HOST}",
+        "mysql:acme.port": "${env:XIPKI_DB_PORT}",
+        "mysql:acme.user": "xipki_gateway",
+        "mysql:acme.password": "${env:XIPKI_GATEWAY_DB_PASSWORD}"
+      }
+    }
+  ]
+}

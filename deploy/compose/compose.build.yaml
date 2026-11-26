@@ -1,0 +1,34 @@
+services:
+  database:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/${XIPKI_DATABASE:-mariadb}:${XIPKI_DEV_VERSION:-7.0.0-dev}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/${XIPKI_DATABASE:-mariadb}/Dockerfile
+
+  bootstrap:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/bootstrap:${XIPKI_DEV_VERSION:-7.0.0-dev}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+      target: bootstrap
+      args:
+        XIPKI_SETUP_ARCHIVE: ${XIPKI_SETUP_ARCHIVE:-assemblies/xipki-setup/target/xipki-setup-7.0.0.tar.gz}
+
+  ca:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/xipki:${XIPKI_DEV_VERSION:-7.0.0-dev}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+      target: xipki
+      args:
+        XIPKI_SETUP_ARCHIVE: ${XIPKI_SETUP_ARCHIVE:-assemblies/xipki-setup/target/xipki-setup-7.0.0.tar.gz}
+        XIPKI_CONSOLE_JAR: ${XIPKI_CONSOLE_JAR:-console-server/target/xipki-console-server-7.0.0.jar}
+
+  gateway:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/xipki:${XIPKI_DEV_VERSION:-7.0.0-dev}
+
+  ocsp:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/xipki:${XIPKI_DEV_VERSION:-7.0.0-dev}
+
+  console:
+    image: ${XIPKI_DEV_IMAGE_PREFIX:-xipki}/xipki:${XIPKI_DEV_VERSION:-7.0.0-dev}

@@ -1,0 +1,14 @@
+**
+!.dockerignore
+!deploy/
+!deploy/docker/
+!deploy/docker/**
+!assemblies/
+!assemblies/xipki-setup/
+!assemblies/xipki-setup/target/
+!assemblies/xipki-setup/target/xipki-setup-*.tar.gz
+!console-server/
+!console-server/target/
+!console-server/target/xipki-console-server-*.jar
+!console-server/target/lib/
+!console-server/target/lib/**

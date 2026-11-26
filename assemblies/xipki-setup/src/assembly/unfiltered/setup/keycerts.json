@@ -13,6 +13,14 @@
   ],
   "keycerts": [
     {
+      "name": "deployment-internal-ca",
+      "certType": "CA",
+      "keyType": "P256",
+      "subject": "O=$[organization], CN=XiPKI deployment internal CA",
+      "validity": "20y",
+      "p12Password": "$[deployment.internal.ca.keyPassword]"
+    },
+    {
       "name": "dummy-server",
       "certType": "TLS-Server",
       "keyType": "P256",
@@ -26,28 +34,41 @@
       "keyType": "P256",
       "subject": "O=$[organization], OU=CA server, CN=$[ca.host]",
       "validity": "20y",
-      "p12Password": "$[ca.https.keyPassword]"
+      "p12Password": "$[ca.https.keyPassword]",
+      "issuerName": "deployment-internal-ca"
     },{
       "name": "ca-mgmt-client",
       "certType": "TLS-Client",
       "keyType": "P256",
       "subject": "O=$[organization], CN=CA management client",
       "validity": "20y",
-      "p12Password": "$[ca.mgmt.client.keyPassword]"
+      "p12Password": "$[ca.mgmt.client.keyPassword]",
+      "issuerName": "deployment-internal-ca"
+    },{
+      // This bootstrap signer only lets OCSP start before a Business CA exists.
+      // First-run initialization must replace it with a CA-issued OCSP signer.
+      "name": "ocsp1",
+      "certType": "EE",
+      "keyType": "P256",
+      "subject": "O=$[organization], OU=OCSP responder, CN=$[ocsp.host]",
+      "validity": "20y",
+      "p12Password": "$[ocsp.keyPassword]"
     },{
       "name": "ra-sdk-client",
       "certType": "TLS-Client",
       "keyType": "P256",
       "subject": "O=$[organization], CN=RA SDK client",
       "validity": "20y",
-      "p12Password": "$[ra.sdk.keyPassword]"
+      "p12Password": "$[ra.sdk.keyPassword]",
+      "issuerName": "deployment-internal-ca"
     },{
       "name": "gateway-server",
       "certType": "TLS-Server",
       "keyType": "P256",
       "subject": "O=$[organization], OU=Gateway server,CN=$[gateway.host]",
       "validity": "20y",
-      "p12Password": "$[gateway.https.keyPassword]"
+      "p12Password": "$[gateway.https.keyPassword]",
+      "issuerName": "deployment-internal-ca"
     },{
       "name": "cmp-client-ca",
       "certType": "CA",
@@ -122,7 +143,7 @@
     },{
       "name": "ca-client",
       "p12Password":"$[ca.https.certstorePassword]",
-      "keyCertNames": ["ca-mgmt-client", "ra-sdk-client"]
+      "keyCertNames": ["deployment-internal-ca"]
     }
   ]
 }

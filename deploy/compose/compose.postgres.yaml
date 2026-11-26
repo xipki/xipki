@@ -1,0 +1,35 @@
+services:
+  bootstrap:
+    environment:
+      XIPKI_DB_HOST: database
+      XIPKI_DB_PORT: 5432
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/postgres:${XIPKI_VERSION:-7.0.0}
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: xipki_admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_admin_password
+    secrets:
+      - postgres_admin_password
+      - ca_db_password
+      - console_db_password
+      - gateway_db_password
+      - ocsp_db_password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xipki_admin -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks:
+      - backend
+    restart: unless-stopped
+
+  console:
+    environment:
+      WEB_DB_URL: jdbc:postgresql://database:5432/xipki_console

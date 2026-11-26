@@ -1,0 +1,49 @@
+name: ${XIPKI_COMPOSE_PROJECT:-xipki-gateway}
+
+services:
+  role-init:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    user: "0:0"
+    entrypoint: ["xipki-role-init"]
+    environment:
+      XIPKI_ROLE: gateway
+      XIPKI_DEPLOYMENT_NAME: ${XIPKI_DEPLOYMENT_NAME}
+      XIPKI_DB_HOST: ${XIPKI_DB_HOST}
+      XIPKI_DB_PORT: ${XIPKI_DB_PORT}
+      XIPKI_DB_USER: ${XIPKI_DB_USER}
+      XIPKI_ACME_DB_NAME: ${XIPKI_ACME_DB_NAME}
+    volumes:
+      - ./.state/seed:/seed:ro
+      - role-state:/var/lib/xipki
+    secrets:
+      - gateway_db_password
+      - gateway_tls_keystore_password
+      - gateway_ra_client_keystore_password
+    restart: "no"
+
+  gateway:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    environment:
+      XIPKI_ROLE: gateway
+    volumes:
+      - role-state:/var/lib/xipki
+    ports:
+      # Gateway terminates public TLS itself. Keep its plaintext listener host-local so a node
+      # operator cannot expose it accidentally through the role-wide bind address.
+      - "127.0.0.1:${XIPKI_GATEWAY_HTTP_PORT:-18082}:8082"
+      - "${XIPKI_BIND_ADDRESS:-0.0.0.0}:${XIPKI_GATEWAY_HTTPS_PORT:-18445}:8445"
+    depends_on:
+      role-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  role-state:
+
+secrets:
+  gateway_db_password:
+    file: ./.state/secrets/gateway_db_password
+  gateway_tls_keystore_password:
+    file: ./.state/secrets/gateway_tls_keystore_password
+  gateway_ra_client_keystore_password:
+    file: ./.state/secrets/gateway_ra_client_keystore_password

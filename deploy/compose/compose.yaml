@@ -1,0 +1,167 @@
+name: xipki
+
+services:
+  bootstrap:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/bootstrap:${XIPKI_VERSION:-7.0.0}
+    environment:
+      XIPKI_ORGANIZATION: ${XIPKI_ORGANIZATION:-XiPKI Evaluation}
+      XIPKI_DATABASE: ${XIPKI_DATABASE:-mariadb}
+      XIPKI_DATABASE_MODE: ${XIPKI_DATABASE_MODE:-managed}
+      XIPKI_DEPLOYMENT_MODE: ${XIPKI_DEPLOYMENT_MODE:-standalone}
+      XIPKI_DEPLOYMENT_NAME: ${XIPKI_DEPLOYMENT_NAME:-xipki}
+      XIPKI_DB_HOST: ${XIPKI_DB_HOST:-database}
+      XIPKI_DB_PORT: ${XIPKI_DB_PORT:-3306}
+      XIPKI_CA_HOST: ${XIPKI_CA_HOST:-ca}
+      XIPKI_CA_HTTPS_PORT: ${XIPKI_CA_HTTPS_PORT:-8444}
+      XIPKI_GATEWAY_HOST: ${XIPKI_GATEWAY_HOST:-gateway}
+      XIPKI_OCSP_HOST: ${XIPKI_OCSP_HOST:-ocsp}
+    secrets:
+      - ca_db_password
+      - console_db_password
+      - gateway_db_password
+      - ocsp_db_password
+    volumes:
+      - bootstrap-state:/var/lib/xipki-bootstrap
+      - admin-state:/state/admin
+      - ca-state:/state/ca
+      - console-state:/state/console
+      - gateway-state:/state/gateway
+      - ocsp-state:/state/ocsp
+    networks:
+      - backend
+    restart: "no"
+
+  ca:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/xipki:${XIPKI_VERSION:-7.0.0}
+    environment:
+      XIPKI_ROLE: ca
+      XIPKI_HEALTH_PORT: ${XIPKI_CA_HTTPS_PORT:-8444}
+    volumes:
+      - ca-state:/var/lib/xipki
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    networks:
+      - backend
+    restart: unless-stopped
+
+  console:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/xipki:${XIPKI_VERSION:-7.0.0}
+    environment:
+      XIPKI_ROLE: console
+      SERVER_PORT: 8443
+      SERVER_TLS_ENABLED: "true"
+      SERVER_TLS_CERT_FILE: /run/secrets/console_tls_cert
+      SERVER_TLS_KEY_FILE: /run/secrets/console_tls_key
+      SERVER_TLS_CLIENT_CA_FILE: /run/secrets/console_client_ca_cert
+      SESSION_COOKIE_SECURE: "true"
+      WEB_AUTH_MODE: ${XIPKI_CONSOLE_AUTH_MODE:-both}
+      WEB_ADMIN_CLIENT_CERT_FILE: /run/secrets/console_admin_client_cert
+      WEB_DB_USER: xipki_console
+      WEB_DB_PASSWORD_FILE: /run/secrets/console_db_password
+      WEB_ADMIN_USERNAME: admin
+      WEB_ADMIN_PASSWORD_FILE: /run/secrets/console_admin_password
+      WEB_ENROLLMENT_KEY_FILE: /run/secrets/console_enrollment_key
+      WEB_ENROLLMENT_KEY_DIR: /var/lib/xipki/enrollment
+      XIPKI_CA_URL: https://${XIPKI_CA_HOST:-ca}:${XIPKI_CA_HTTPS_PORT:-8444}/ca/mgmt
+      XIPKI_CLIENT_DIR: /var/lib/xipki/client
+      XIPKI_GATEWAY_RA_CERT_FILE: /var/lib/xipki/client/gateway-ra-cert.pem
+    secrets:
+      - console_db_password
+      - console_admin_password
+      - console_enrollment_key
+      - console_tls_cert
+      - console_tls_key
+      - console_client_ca_cert
+      - console_admin_client_cert
+    volumes:
+      - console-state:/var/lib/xipki
+    ports:
+      - "${XIPKI_BIND_ADDRESS:-127.0.0.1}:${XIPKI_CONSOLE_HTTPS_PORT:-18081}:8443"
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+      ca:
+        condition: service_healthy
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  gateway:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/xipki:${XIPKI_VERSION:-7.0.0}
+    environment:
+      XIPKI_ROLE: gateway
+    volumes:
+      - gateway-state:/var/lib/xipki
+    ports:
+      # Plain HTTP is retained for local diagnostics only. Remote protocol clients must use the
+      # Gateway-owned TLS listener so changing the public bind address cannot expose port 8082.
+      - "127.0.0.1:${XIPKI_GATEWAY_HTTP_PORT:-18082}:8082"
+      - "${XIPKI_BIND_ADDRESS:-127.0.0.1}:${XIPKI_GATEWAY_HTTPS_PORT:-18445}:8445"
+    depends_on:
+      ca:
+        condition: service_healthy
+      bootstrap:
+        condition: service_completed_successfully
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  ocsp:
+    image: ${XIPKI_IMAGE_PREFIX:-docker.io/xipki}/xipki:${XIPKI_VERSION:-7.0.0}
+    environment:
+      XIPKI_ROLE: ocsp
+    volumes:
+      - ocsp-state:/var/lib/xipki
+    ports:
+      - "${XIPKI_BIND_ADDRESS:-127.0.0.1}:${XIPKI_OCSP_HTTP_PORT:-18080}:8080"
+    depends_on:
+      bootstrap:
+        condition: service_completed_successfully
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+secrets:
+  mariadb_admin_password:
+    file: ./.state/secrets/mariadb_admin_password
+  postgres_admin_password:
+    file: ./.state/secrets/postgres_admin_password
+  ca_db_password:
+    file: ./.state/secrets/ca_db_password
+  console_db_password:
+    file: ./.state/secrets/console_db_password
+  console_admin_password:
+    file: ./.state/secrets/console_admin_password
+  console_enrollment_key:
+    file: ./.state/secrets/console_enrollment_key
+  console_tls_cert:
+    file: ./.state/secrets/console_tls_cert.pem
+  console_tls_key:
+    file: ./.state/secrets/console_tls_key.pem
+  console_client_ca_cert:
+    file: ./.state/client/console-client-ca.crt
+  console_admin_client_cert:
+    file: ./.state/client/admin.crt
+  gateway_db_password:
+    file: ./.state/secrets/gateway_db_password
+  ocsp_db_password:
+    file: ./.state/secrets/ocsp_db_password
+
+volumes:
+  mariadb-data:
+  postgres-data:
+  bootstrap-state:
+  admin-state:
+  ca-state:
+  console-state:
+  gateway-state:
+  ocsp-state:
+
+networks:
+  backend:
+    internal: true
+  frontend:

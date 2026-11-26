@@ -1,0 +1,47 @@
+name: ${XIPKI_COMPOSE_PROJECT:-xipki-ca}
+
+services:
+  role-init:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    user: "0:0"
+    entrypoint: ["xipki-role-init"]
+    environment:
+      XIPKI_ROLE: ca
+      XIPKI_DEPLOYMENT_NAME: ${XIPKI_DEPLOYMENT_NAME}
+      XIPKI_DB_HOST: ${XIPKI_DB_HOST}
+      XIPKI_DB_PORT: ${XIPKI_DB_PORT}
+      XIPKI_DB_USER: ${XIPKI_DB_USER}
+      XIPKI_CACONF_DB_NAME: ${XIPKI_CACONF_DB_NAME}
+      XIPKI_CA_DB_NAME: ${XIPKI_CA_DB_NAME}
+      XIPKI_OCSP_DB_NAME: ${XIPKI_OCSP_DB_NAME}
+      XIPKI_KEYPOOL_DB_NAME: ${XIPKI_KEYPOOL_DB_NAME}
+    volumes:
+      - ./.state/seed:/seed:ro
+      - role-state:/var/lib/xipki
+    secrets:
+      - ca_db_password
+      - ca_tls_keystore_password
+    restart: "no"
+
+  ca:
+    image: ${XIPKI_IMAGE_PREFIX}/xipki:${XIPKI_VERSION}
+    environment:
+      XIPKI_ROLE: ca
+      XIPKI_HEALTH_PORT: ${XIPKI_CA_HTTPS_PORT:-8444}
+    volumes:
+      - role-state:/var/lib/xipki
+    ports:
+      - "${XIPKI_BIND_ADDRESS:-0.0.0.0}:${XIPKI_CA_HTTPS_PORT:-8444}:${XIPKI_CA_HTTPS_PORT:-8444}"
+    depends_on:
+      role-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  role-state:
+
+secrets:
+  ca_db_password:
+    file: ./.state/secrets/ca_db_password
+  ca_tls_keystore_password:
+    file: ./.state/secrets/ca_tls_keystore_password

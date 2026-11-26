@@ -37,6 +37,10 @@
                     <groupId>com.h2database</groupId>
                     <artifactId>h2</artifactId>
                   </artifactItem>
+                  <artifactItem>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                  </artifactItem>
                 </artifactItems>
               </configuration>
             </execution>

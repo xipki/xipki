@@ -66,6 +66,13 @@ temp/**/*
 *.swp
 *~.nib
 local.properties
+/deploy/compose/.state/
+/deploy/compose/dist/
+/deploy/compose/xipki.env
+/deploy/release/target/
+/console-ui/dist/
+/console-ui/node_modules/
+/console-server/target/
 .classpath
 .settings/
 .loadpath
