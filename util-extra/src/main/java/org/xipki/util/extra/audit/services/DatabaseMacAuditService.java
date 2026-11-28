@@ -104,10 +104,7 @@ public class DatabaseMacAuditService extends MacAuditService {
         int idx = 1;
         ps.setInt   (idx++, shardId);
         ps.setLong  (idx++, thisId);
-        // stored without the ending 'Z' to fit into the column TIME CHAR(23), it is always UTC.
-        // The MAC covers the time with 'Z', see formatDate().
-        String time = formatDate(date);
-        ps.setString(idx++, time.substring(0, time.length() - 1));
+        ps.setString(idx++, formatDate(date));
         ps.setString(idx++, levelText);
         ps.setInt   (idx++, eventType);
         ps.setLong  (idx++, previousId);

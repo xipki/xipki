@@ -38,8 +38,8 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" primaryKeyName="PK_AUDIT" nullable="false"/>
       </column>
-      <column name="TIME" type="CHAR(23)"
-          remarks="Logging time e.g. 2022.03.06-10:18:35.483">
+      <column name="TIME" type="CHAR(24)"
+          remarks="Logging time e.g. 2022.03.06-10:18:35.483Z">
         <constraints nullable="false"/>
       </column>
       <column name="LEVEL" type="VARCHAR(5)"
