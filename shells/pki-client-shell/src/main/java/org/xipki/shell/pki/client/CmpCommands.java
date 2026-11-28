@@ -781,12 +781,24 @@ public class CmpCommands {
 
     protected abstract ConcurrentSigner getSigner() throws Exception;
 
-    /** The signer, created once per command (the keystore password is read once). */
+    /** The signer, created once per execution (the keystore password is read once). */
     private ConcurrentSigner signer() throws Exception {
       if (signer == null) {
         signer = getSigner();
       }
       return signer;
+    }
+
+    @Override
+    protected EnrollCertResult enroll() throws Exception {
+      // the shell reuses the command object: the signer must not be reused by the next
+      // execution, which may use another keystore.
+      signer = null;
+      try {
+        return super.enroll();
+      } finally {
+        signer = null;
+      }
     }
 
     @Override
@@ -1003,12 +1015,24 @@ public class CmpCommands {
 
     private ConcurrentSigner signer;
 
-    /** The signer, created once per command (the keystore password is read once). */
+    /** The signer, created once per execution (the keystore password is read once). */
     private ConcurrentSigner signer() throws Exception {
       if (signer == null) {
         signer = getSigner();
       }
       return signer;
+    }
+
+    @Override
+    protected EnrollCertResult enroll() throws Exception {
+      // the shell reuses the command object: the signer must not be reused by the next
+      // execution, which may use another keystore.
+      signer = null;
+      try {
+        return super.enroll();
+      } finally {
+        signer = null;
+      }
     }
 
     @Override

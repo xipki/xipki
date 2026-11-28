@@ -82,7 +82,21 @@ public class ScepCommands {
 
     private Identity identity;
 
-    /** The identity, read once per command (the keystore password is read once). */
+    @Override
+    public final void run() {
+      // the shell reuses the command object: the identity must not be reused by the next
+      // execution, which may use another keystore.
+      identity = null;
+      try {
+        doRun();
+      } finally {
+        identity = null;
+      }
+    }
+
+    protected abstract void doRun();
+
+    /** The identity, read once per execution (the keystore password is read once). */
     private Identity readIdentity() throws Exception {
       if (identity == null) {
         identity = readIdentity0();
@@ -136,7 +150,7 @@ public class ScepCommands {
     private String outputFile;
 
     @Override
-    public void run() {
+    protected void doRun() {
       try {
         CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
         ScepClient client = getScepClient();
@@ -185,7 +199,7 @@ public class ScepCommands {
     private String method;
 
     @Override
-    public void run() {
+    protected void doRun() {
       try {
         ScepClient client = getScepClient();
         CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
@@ -272,7 +286,7 @@ public class ScepCommands {
     private String outputFile;
 
     @Override
-    public void run() {
+    protected void doRun() {
       try {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
@@ -308,7 +322,7 @@ public class ScepCommands {
     private String outputFile;
 
     @Override
-    public void run() {
+    protected void doRun() {
       try {
         X509Cert cert = X509Util.parseCert(new File(certFile));
         X509CRLHolder crl = getScepClient().scepGetCrl(
