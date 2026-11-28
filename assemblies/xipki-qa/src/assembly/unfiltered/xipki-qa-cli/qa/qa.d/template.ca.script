@@ -187,7 +187,7 @@ ca-add --name subca1 --permission all --sn-len 20 --next-crl-no 2 \
   --revoke-suspended-control \
   enabled=true,targetReason=cessationOfOperation,unchangedSince=15d \
   --ctlog-control \
-  "enabled=true,sslcontext.name=ctlog1,servers=https://localhost:$[dummy.https.port]/dummy/ctlog/"
+  "enabled=true,sslcontext.name=ctlog1,servers=https://localhost:$[dummy.https.port]/dummy/ctlog/ctlogrsa;https://localhost:$[dummy.https.port]/dummy/ctlog/ctlogec"
 
 caalias-add --ca subca1 --alias subca
 

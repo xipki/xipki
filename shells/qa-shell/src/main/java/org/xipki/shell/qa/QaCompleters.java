@@ -3,11 +3,11 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.qa.ocsp.QaOcspCertStatus;
+import org.xipki.codec.util.TripleState;
 import org.xipki.qa.ocsp.OcspError;
+import org.xipki.qa.ocsp.QaOcspCertStatus;
 import org.xipki.shell.CompletionProvider;
 import org.xipki.shell.completer.AbstractSetCompleter;
-import org.xipki.codec.util.TripleState;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
 

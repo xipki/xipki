@@ -8,19 +8,22 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.pkix.cert.C509Crl;
+import org.xipki.pkix.cert.CrlVariant;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.password.Passwords;
 import org.xipki.scep.client.CaIdentifier;
 import org.xipki.scep.client.EnrolmentResponse;
 import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.shell.xi.Completers;
 import org.xipki.shell.security.XiShellBaseCommand;
+import org.xipki.shell.xi.Completers;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -81,7 +84,21 @@ public class ScepCommands {
       return readIdentity().certificate;
     }
 
+    private Identity identity;
+
+    protected void resetIdentity() {
+      identity = null;
+    }
+
+    /** The identity, read once per run (the keystore password is read once); reset in run(). */
     private Identity readIdentity() throws Exception {
+      if (identity == null) {
+        identity = readIdentity0();
+      }
+      return identity;
+    }
+
+    private Identity readIdentity0() throws Exception {
       char[] pwd = passwordHint == null
           ? readPassword("Enter the keystore password")
           : Passwords.resolvePassword(passwordHint);
@@ -127,6 +144,7 @@ public class ScepCommands {
 
     @Override
     public void run() {
+      resetIdentity(); // the shell reuses command objects
       try {
         CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
         ScepClient client = getScepClient();
@@ -176,6 +194,7 @@ public class ScepCommands {
 
     @Override
     public void run() {
+      resetIdentity(); // the shell reuses command objects
       try {
         ScepClient client = getScepClient();
         CertificationRequest csr = X509Util.parseCsr(new File(csrFile));
@@ -263,6 +282,7 @@ public class ScepCommands {
 
     @Override
     public void run() {
+      resetIdentity(); // the shell reuses command objects
       try {
         ScepClient client = getScepClient();
         BigInteger serial = toBigInt(serialNumber);
@@ -299,6 +319,7 @@ public class ScepCommands {
 
     @Override
     public void run() {
+      resetIdentity(); // the shell reuses command objects
       try {
         X509Cert cert = X509Util.parseCert(new File(certFile));
         CertificateList crl = getScepClient().scepGetCrl(
@@ -307,7 +328,8 @@ public class ScepCommands {
           throw new IOException("received no CRL from server");
         }
 
-        saveVerbose("saved CRL to file", outputFile, encodeCrl(crl.getEncoded(), outform));
+        saveVerbose("saved CRL to file", outputFile,
+            encodeCrl(CrlVariant.ofX509(new X509Crl(crl)), outform));
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
       }

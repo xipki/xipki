@@ -6,12 +6,13 @@ package org.xipki.ca.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.CaServerConf.CtLogConf;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeyInfoUtil;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.LogUtil;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class CtLogPublicKeyFinder {
 
     for (File m : keyFiles) {
       byte[] keyBytes = IoUtil.read(null, m); // m is already under keydir
-      keyBytes = X509Util.toDerEncoded(keyBytes);
+      keyBytes = CertUtil.toRawEncoded(keyBytes);
       try {
         SubjectPublicKeyInfo spki = SubjectPublicKeyInfo.fromEncoded(keyBytes);
         byte[] logId = HashAlgo.SHA256.hash(spki.getEncoded());
@@ -80,6 +81,11 @@ public class CtLogPublicKeyFinder {
     this.logIds = logIdList.toArray(new byte[0][0]);
     this.publicKeys = publicKeyList.toArray(new PublicKey[0]);
     this.withPublicKeys = logIds.length > 0;
+  }
+
+  /** Whether at least one public key of a CT log is configured. */
+  public boolean hasPublicKeys() {
+    return withPublicKeys;
   }
 
   public PublicKey getPublicKey(byte[] logId) {

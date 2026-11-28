@@ -3,13 +3,13 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.shell.ca.mgmt.CaCommands;
-import org.xipki.shell.ca.mgmt.CertCommands;
-import org.xipki.shell.ca.mgmt.MiscCommands;
-import org.xipki.shell.ca.mgmt.ProfileCommands;
-import org.xipki.shell.ca.mgmt.PublisherCommands;
-import org.xipki.shell.ca.mgmt.RequestorCommands;
-import org.xipki.shell.ca.mgmt.SignerCommands;
+import org.xipki.ca.mgmt.shell.CaCommands;
+import org.xipki.ca.mgmt.shell.CertCommands;
+import org.xipki.ca.mgmt.shell.MiscCommands;
+import org.xipki.ca.mgmt.shell.ProfileCommands;
+import org.xipki.ca.mgmt.shell.PublisherCommands;
+import org.xipki.ca.mgmt.shell.RequestorCommands;
+import org.xipki.ca.mgmt.shell.SignerCommands;
 import picocli.CommandLine.Command;
 
 /**

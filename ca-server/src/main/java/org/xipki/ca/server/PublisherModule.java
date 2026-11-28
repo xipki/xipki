@@ -3,19 +3,18 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.Base64;
 import org.xipki.codec.util.Args;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +52,7 @@ class PublisherModule extends CaModule {
    *         certstore and any publishers, 2: if could be published to CA
    *         certstore but not to all publishers.
    */
-  int publishCert(CertificateInfo certInfo, boolean saveKeypair) {
+  int publishCert(X509CertificateInfo certInfo, boolean saveKeypair) {
     if (Args.notNull(certInfo, "certInfo").isAlreadyIssued()) {
       return 0;
     }
@@ -86,7 +85,7 @@ class PublisherModule extends CaModule {
 
     if (LOG.isWarnEnabled()) {
       LOG.warn("could not publish to publishers {}: {}", failedPublishers,
-          Base64.encodeToString(certInfo.cert().cert().getEncoded(), true));
+          Base64.encodeToString(certInfo.cert().getEncodedCert(), true));
     }
     return 2;
   } // method publishCert0
@@ -197,11 +196,11 @@ class PublisherModule extends CaModule {
       }
 
       successful = false;
-      X509Cert cert = certToRemove.cert();
       if (LOG.isErrorEnabled()) {
         LOG.error(
             "removing certificate issuer='{}', serial={}, subject='{}' from publisher {} failed.",
-            cert.issuerText(), cert.serialNumberHex(), cert.subjectText(), publisher.ident());
+            certToRemove.issuerText(), certToRemove.serialNumberHex(),
+            certToRemove.subjectText(), publisher.ident());
       }
     } // end for
 

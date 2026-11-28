@@ -4,10 +4,9 @@
 package org.xipki.ca.api.profile.id;
 
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.c509.registry.ConstRDNAttributeType;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.MatterOIDs;
-import org.xipki.codec.util.Args;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -4,8 +4,8 @@
 package org.xipki.ca.server.kpgen;
 
 import org.xipki.ca.api.kpgen.KeypairGenerator;
-import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkcs11.wrapper.TokenException;

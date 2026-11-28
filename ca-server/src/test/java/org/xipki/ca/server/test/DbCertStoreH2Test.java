@@ -79,12 +79,12 @@ public class DbCertStoreH2Test {
 
     CertWithRevocationInfo bySerial =
         certstore.getCertWithRevocationInfo(caIdent.id(), serial, idNameMap);
-    Assert.assertEquals(cert, bySerial.cert().cert());
+    Assert.assertEquals(cert, bySerial.cert().x509Cert());
     Assert.assertEquals(id, (long) bySerial.cert().certId());
     Assert.assertEquals(CaH2TestEnv.PROFILE_TLS, bySerial.certprofile());
 
     CertWithRevocationInfo byId = certstore.getCertWithRevocationInfo(id, idNameMap);
-    Assert.assertEquals(cert, byId.cert().cert());
+    Assert.assertEquals(cert, byId.cert().x509Cert());
 
     Assert.assertEquals(0, certstore.getCertId(caIdent, BigInteger.valueOf(Long.MAX_VALUE)));
   }
@@ -170,8 +170,8 @@ public class DbCertStoreH2Test {
 
   @Test
   public void crlsAreStoredAndCleanedUp() throws Exception {
-    X509Crl crl1 = caManager.generateCrlOnDemand(CA);
-    X509Crl crl2 = caManager.generateCrlOnDemand(CA);
+    X509Crl crl1 = caManager.generateCrlOnDemand(CA).x509Crl();
+    X509Crl crl2 = caManager.generateCrlOnDemand(CA).x509Crl();
     long crlNo2 = crl2.crlNumber().longValueExact();
 
     Assert.assertEquals(crlNo2, certstore.getMaxCrlNumber(caIdent));

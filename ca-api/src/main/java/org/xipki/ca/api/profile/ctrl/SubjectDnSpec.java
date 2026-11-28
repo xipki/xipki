@@ -5,13 +5,13 @@ package org.xipki.ca.api.profile.ctrl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.conf.Range;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.MatterOIDs;
 import org.xipki.codec.x509.id.OIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.util.StringUtil;
+import org.xipki.util.conf.Range;
 
 import java.io.BufferedReader;
 import java.io.IOException;

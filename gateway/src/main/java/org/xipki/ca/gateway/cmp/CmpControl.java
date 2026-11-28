@@ -3,12 +3,12 @@
 
 package org.xipki.ca.gateway.cmp;
 
+import org.xipki.codec.crypto.EmbedCertsMode;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.codec.crypto.EmbedCertsMode;
 import org.xipki.pkix.cmp.ProtectedPkiMessage;
 import org.xipki.pkix.sign.AlgorithmValidator;
-import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.misc.CollectionUtil;
 
 import java.security.NoSuchAlgorithmException;

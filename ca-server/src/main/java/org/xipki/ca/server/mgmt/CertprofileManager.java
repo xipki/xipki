@@ -5,14 +5,12 @@ package org.xipki.ca.server.mgmt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.CertprofileException;
-import org.xipki.ca.api.profile.CertprofileValidator;
-import org.xipki.util.misc.NameId;
-import org.xipki.codec.util.TripleState;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.ca.api.profile.CertprofileValidator;
 import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.PublicKeyControl;
@@ -23,8 +21,10 @@ import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.TripleState;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 
 import java.util.HashSet;
 import java.util.LinkedList;

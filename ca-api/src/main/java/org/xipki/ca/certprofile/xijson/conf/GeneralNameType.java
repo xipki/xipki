@@ -4,10 +4,10 @@
 package org.xipki.ca.certprofile.xijson.conf;
 
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
 
 import java.util.Collection;
 import java.util.HashSet;

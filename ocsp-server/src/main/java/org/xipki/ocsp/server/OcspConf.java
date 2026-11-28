@@ -3,13 +3,13 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.pkix.Securities.SecurityConf;
-import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.Securities.SecurityConf;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -18,33 +18,33 @@ import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.TBSCertificate;
+import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.x509.id.OcspOIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.id.OcspOIDs;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.exception.NoIdleSignerException;
+import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.exception.PkixException;
 import org.xipki.util.http.Curl;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.misc.LogUtil;
 import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.ReqRespDebug.ReqRespPair;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.codec.util.IoUtil;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.File;
@@ -218,10 +218,10 @@ public class HttpOcspRequestor implements OcspRequestor {
       throw new OcspRequestorException("signerConf is not configured");
     }
 
-    X509Cert cert = null;
+    CertVariant cert = null;
     if (signerCert != null) {
       try {
-        cert = X509Util.parseCert(signerCert.readContent());
+        cert = CertUtil.parseCert(signerCert.readContent());
       } catch (CertificateException ex) {
         throw new OcspRequestorException("could not parse certificate: " + ex.getMessage());
       }
@@ -489,11 +489,11 @@ public class HttpOcspRequestor implements OcspRequestor {
       if (requestOptions.isSignRequest()) {
         ConcurrentSigner signer = signer();
 
-        reqBuilder.setRequestorName(signer.x509Cert().subject());
-        X509Cert[] certChain0 = signer.x509CertChain();
+        reqBuilder.setRequestorName(signer.cert().x509Cert().subject());
+        CertVariant[] certChain0 = signer.certChain();
         Certificate[] certChain = new Certificate[certChain0.length];
         for (int i = 0; i < certChain.length; i++) {
-          certChain[i] = certChain0[i].getCert();
+          certChain[i] = certChain0[i].x509Cert().getCert();
         }
 
         return reqBuilder.build(signer, certChain);

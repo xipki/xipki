@@ -3,8 +3,8 @@
 package org.xipki.qa;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.pkcs12.X509KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.pkix.util.KeyUtil;

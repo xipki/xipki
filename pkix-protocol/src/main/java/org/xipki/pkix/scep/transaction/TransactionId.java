@@ -3,9 +3,9 @@
 
 package org.xipki.pkix.scep.transaction;
 
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Hex;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.util.misc.RandomUtil;
 

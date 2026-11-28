@@ -5,17 +5,17 @@ package org.xipki.ca.gateway.scep;
 
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.GatewayConf;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.codec.util.IoUtil;
 import org.xipki.util.password.PasswordResolverException;
 import org.xipki.util.password.Passwords;
 

@@ -4,11 +4,11 @@
 package org.xipki.qa.ca;
 
 import org.xipki.codec.Base64;
-import org.xipki.codec.x509.PrivateKeyInfo;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.x509.PrivateKeyInfo;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.KeySpec;
@@ -101,7 +101,7 @@ public class FillKeypool implements AutoCloseable {
       throw new IllegalArgumentException("invalid encAlg " + encAlg);
     }
 
-    Connection conn = datasource.getConnection();
+    Connection conn = null;
     PreparedStatement ps = null;
     Statement stmt = null;
     String sql = null;
@@ -243,7 +243,8 @@ public class FillKeypool implements AutoCloseable {
           ps.setInt(idx++, encAlgCode); // AES128/GCM
           ps.setString(idx++, Base64.encodeToString(nonce));
           ps.setString(idx++, Base64.encodeToString(encryptedData));
-          ps.setString(idx,   Base64.encodeToString(keyInfoPair.getPrivate().getEncoded()));
+          // the public key; the private key is stored only encrypted
+          ps.setString(idx,   Base64.encodeToString(keyInfoPair.getPublic().getEncoded()));
           ps.addBatch();
 
           if ((i == numKeypairs - 1) || (i % 100 == 0)) {

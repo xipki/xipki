@@ -33,9 +33,30 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- the CA with the OCSP publisher for the tests of the OCSP stores -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <!-- in-memory database for the integration tests -->
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- in-memory PKCS#11 module (xihsm:mem) for the PKCS#11 tests -->
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>xihsm</artifactId>
+      <version>${xicrypto.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

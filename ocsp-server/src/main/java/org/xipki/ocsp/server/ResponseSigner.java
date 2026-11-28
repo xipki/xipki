@@ -5,16 +5,18 @@ package org.xipki.ocsp.server;
 
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.id.AlgorithmOIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.ocsp.server.type.ResponderID;
-import org.xipki.ocsp.server.type.TaggedCertSequence;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.ocsp.server.type.ResponderID;
+import org.xipki.ocsp.server.type.TaggedCertSequence;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.util.X509Util;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -63,7 +65,8 @@ class ResponseSigner {
       byte[] keySha1 = firstSigner.sha1OfMacKey();
       this.responderIdByKey = new ResponderID(keySha1);
     } else {
-      X509Cert[] tmpCertChain = firstSigner.x509CertChain();
+      X509Cert[] tmpCertChain = X509Util.extractCerts(firstSigner.certChain(),
+          "firstSigner.certChain()");
       if (tmpCertChain == null || tmpCertChain.length == 0) {
         throw new CertificateException("no certificate is bound with the signer");
       }

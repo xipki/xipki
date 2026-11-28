@@ -4,11 +4,11 @@
 package org.xipki.ca.api.profile.id;
 
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.id.DiceOIDs;
 import org.xipki.codec.x509.id.SpdmOIDs;
 import org.xipki.codec.x509.id.TcgOIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

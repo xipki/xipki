@@ -5,9 +5,12 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusInfo.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
@@ -15,13 +18,10 @@ import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.api.RequestIssuer;
 import org.xipki.ocsp.server.IssuerFilter;
 import org.xipki.ocsp.server.OcspServerConf;
-import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
 

@@ -3,12 +3,12 @@
 
 package org.xipki.ca.api.publisher;
 
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
+import org.xipki.datasource.DataSourceMap;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
-import org.xipki.datasource.DataSourceMap;
 
 import java.io.Closeable;
 
@@ -56,7 +56,7 @@ public abstract class CertPublisher implements Closeable {
    *          Certificate to be published.
    * @return whether the certificate is published.
    */
-  public abstract boolean certificateAdded(CertificateInfo certInfo);
+  public abstract boolean certificateAdded(X509CertificateInfo certInfo);
 
   /**
    * Publishes the revocation of a certificate.

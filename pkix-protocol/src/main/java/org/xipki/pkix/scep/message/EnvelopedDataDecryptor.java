@@ -3,11 +3,11 @@
 
 package org.xipki.pkix.scep.message;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cms.CmsRecipient;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.exception.PkixException;
 
 import java.security.PrivateKey;

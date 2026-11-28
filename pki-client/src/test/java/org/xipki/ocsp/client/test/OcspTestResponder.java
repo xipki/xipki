@@ -22,8 +22,8 @@ import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.audit.Audits;
-import org.xipki.util.password.Passwords;
 import org.xipki.util.conf.ConfigurableProperties;
+import org.xipki.util.password.Passwords;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

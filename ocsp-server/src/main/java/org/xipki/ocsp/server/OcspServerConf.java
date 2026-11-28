@@ -4,21 +4,21 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.codec.crypto.EmbedCertsMode;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.Args;
+import org.xipki.datasource.DataSourceConf;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownIssuerBehaviour;
 import org.xipki.ocsp.api.OcspStoreException;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.datasource.DataSourceConf;
 import org.xipki.pkix.sign.CertPathValidationModel;
-import org.xipki.util.conf.Validity;
-import org.xipki.util.conf.Validity.Unit;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.QuadrupleState;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.conf.Validity.Unit;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;

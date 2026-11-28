@@ -97,11 +97,11 @@ public abstract class Requestor {
     }
 
     private static X500Name getSignerSubject(ConcurrentSigner signer) {
-      if (Args.notNull(signer, "signer").x509Cert() == null) {
+      if (Args.notNull(signer, "signer").cert() == null) {
         throw new IllegalArgumentException("requestor without certificate is not allowed");
       }
 
-      return signer.x509Cert().subject();
+      return signer.cert().x509Cert().subject();
     }
 
   } // class SignatureCmpRequestor

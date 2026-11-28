@@ -10,17 +10,14 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.util.exception.NoIdleSignerException;
-import org.xipki.util.misc.NameId;
+import org.xipki.pkix.ca.BadCertTemplateException;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
@@ -29,24 +26,24 @@ import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.codec.asn1.Asn1OctetString;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.x509.id.OIDs;
-import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.misc.LogUtil;
 import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 
 import java.io.Closeable;
 import java.math.BigInteger;
@@ -228,8 +225,8 @@ public class Ca extends CaModule implements Closeable {
   }
 
   public X509Cert getCert(BigInteger serialNumber) throws OperationException {
-    CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
-    return (certInfo == null) ? null : certInfo.cert().cert();
+    X509CertificateInfo certInfo = certstore.getCertInfo(caIdent, caCert, serialNumber, caIdNameMap);
+    return (certInfo == null) ? null : certInfo.cert().x509Cert();
   }
 
   /**
@@ -343,12 +340,12 @@ public class Ca extends CaModule implements Closeable {
     revokerModule.unrevokeCa(requestor);
   }
 
-  public List<CertificateInfo> generateCerts(
+  public List<X509CertificateInfo> generateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates, String transactionId)
       throws OperationException {
     AuditEvent event = newAuditEvent(TYPE_gen_cert, requestor);
     try {
-      List<CertificateInfo> ret = generateCerts(requestor, certTemplates, transactionId, event);
+      List<X509CertificateInfo> ret = generateCerts(requestor, certTemplates, transactionId, event);
       finish(event, true);
       return ret;
     } catch (OperationExceptionWithIndex ex) {
@@ -357,7 +354,7 @@ public class Ca extends CaModule implements Closeable {
     }
   }
 
-  private List<CertificateInfo> generateCerts(
+  private List<X509CertificateInfo> generateCerts(
       RequestorInfo requestor, List<CertTemplateData> certTemplates,
       String transactionId, AuditEvent event) throws OperationExceptionWithIndex {
     Args.notEmpty(certTemplates, "certTemplates");
@@ -410,7 +407,7 @@ public class Ca extends CaModule implements Closeable {
       }
     }
 
-    List<CertificateInfo> certInfos = new ArrayList<>(n);
+    List<X509CertificateInfo> certInfos = new ArrayList<>(n);
     OperationExceptionWithIndex exception = null;
 
     for (int i = 0; i < n; i++) {
@@ -425,7 +422,7 @@ public class Ca extends CaModule implements Closeable {
 
       boolean successful = false;
       try {
-        CertificateInfo certInfo = generateCert(requestor, i, gct, transactionId, event);
+        X509CertificateInfo certInfo = generateCert(requestor, i, gct, transactionId, event);
         successful = true;
         certInfos.add(certInfo);
 
@@ -434,7 +431,7 @@ public class Ca extends CaModule implements Closeable {
           CertWithDbId cert = certInfo.cert();
           LOG.info("{} generateCertificate: CA={}, profile={}, subject='{}', serialNumber={}",
               prefix, caIdent.name(), certprofilIdent.name(),
-              cert.cert().subjectText(), cert.cert().serialNumberHex());
+              cert.subjectText(), cert.serialNumberHex());
         }
       } catch (OperationException ex) {
         exception = new OperationExceptionWithIndex(i, ex);
@@ -452,8 +449,8 @@ public class Ca extends CaModule implements Closeable {
       LOG.error("could not generate certificate for request[{}], " +
               "reverted all generated certificates", exception.getIndex());
       // delete generated certificates
-      for (CertificateInfo m : certInfos) {
-        BigInteger serial = m.cert().cert().serialNumber();
+      for (X509CertificateInfo m : certInfos) {
+        BigInteger serial = m.cert().serialNumber();
         try {
           removeCert(requestor, serial);
         } catch (Throwable thr) {
@@ -468,13 +465,13 @@ public class Ca extends CaModule implements Closeable {
     return certInfos;
   }
 
-  public CertificateInfo generateCert(
+  public X509CertificateInfo generateCert(
       RequestorInfo requestor, CertTemplateData certTemplate, String transactionId)
       throws OperationException {
     Args.notNull(certTemplate, "certTemplate");
     AuditEvent event = newAuditEvent(CaAuditConstants.TYPE_gen_cert, requestor);
     try {
-      CertificateInfo ret = generateCerts(requestor,
+      X509CertificateInfo ret = generateCerts(requestor,
           Collections.singletonList(certTemplate), transactionId, event).get(0);
       finish(event, true);
       return ret;
@@ -487,11 +484,11 @@ public class Ca extends CaModule implements Closeable {
     }
   }
 
-  private CertificateInfo generateCert(
+  private X509CertificateInfo generateCert(
       RequestorInfo requestor, int index, GrantedCertTemplate gct,
       String transactionId, AuditEvent event) throws OperationExceptionWithIndex {
     try {
-      CertificateInfo ret = generateCert0(requestor, gct, transactionId, event);
+      X509CertificateInfo ret = generateCert0(requestor, gct, transactionId, event);
       setEventStatus(event, ret != null);
       return ret;
     } catch (OperationException ex) {
@@ -505,7 +502,7 @@ public class Ca extends CaModule implements Closeable {
     }
   }
 
-  private CertificateInfo generateCert0(
+  private X509CertificateInfo generateCert0(
       RequestorInfo requestor, GrantedCertTemplate gct, String transactionId, AuditEvent event)
       throws OperationException {
     Args.notNull(gct, "gct");
@@ -549,11 +546,11 @@ public class Ca extends CaModule implements Closeable {
         gct.grantedNotBefore, gct.grantedNotAfter,
         gct.grantedSubject, gct.grantedPublicKey);
 
-    CertificateInfo ret;
+    X509CertificateInfo ret;
 
     try {
       SignerEntry crlSigner = crlModule.getCrlSigner();
-      X509Cert crlSignerCert = (crlSigner == null) ? null : crlSigner.certificate();
+      X509Cert crlSignerCert = (crlSigner == null) ? null : crlSigner.certificate().x509Cert();
 
       ExtensionValues extensionTuples = certprofile.getExtensions(
           gct.requestedSubject, gct.grantedSubject, gct.extensions,
@@ -579,10 +576,10 @@ public class Ca extends CaModule implements Closeable {
         // remove the precertificate extension
         certBuilder.removeExtension(ExtensionOIDs.id_precertificate);
 
-        // add the SCTs extension
-        byte[] extnValue = new Asn1OctetString(scts.getEncoded()).getEncoded();
+        // add the SCTs extension: ofSignedCertificateTimestampList wraps the TLS-encoded list
+        // in the OCTET STRING SignedCertificateTimestampList (RFC 6962 3.3)
         certBuilder.addExtension(Extension.ofSignedCertificateTimestampList(
-            extnSctCtrl.isCritical(), extnValue));
+            extnSctCtrl.isCritical(), scts.getEncoded()));
       }
 
       Certificate rawCert = certBuilder.build(gct.signer);
@@ -605,7 +602,7 @@ public class Ca extends CaModule implements Closeable {
       }
 
       CertWithDbId certWithMeta = new CertWithDbId(cert);
-      ret = new CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
+      ret = new X509CertificateInfo(certWithMeta, gct.privateKey, caIdent, caCert,
               gct.certprofile.ident(), requestor.ident());
       ret.setTransactionId(transactionId);
       ret.setRequestedSubject(gct.requestedSubject);
@@ -663,7 +660,7 @@ public class Ca extends CaModule implements Closeable {
         continue;
       }
 
-      if (entry.cert().cert().equals(requestorCert)) {
+      if (entry.cert().x509Cert().equals(requestorCert)) {
         return new RequestorInfo.CertRequestorInfo(m, entry.cert());
       }
     }

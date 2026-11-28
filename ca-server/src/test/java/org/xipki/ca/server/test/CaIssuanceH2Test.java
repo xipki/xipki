@@ -9,8 +9,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.ca.api.CertificateInfo;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.sdk.CaAuditConstants;
@@ -19,7 +17,9 @@ import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.Ca;
 import org.xipki.ca.server.CertTemplateData;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
@@ -80,7 +80,7 @@ public class CaIssuanceH2Test {
   public void issueFromCsr() throws Exception {
     X509KeyPairWithSubjectPublicKeyInfo kp = KeyUtil.generateX509KeyPair2(KeySpec.P256);
     X509Cert cert = caManager.generateCertificate(CA, CaH2TestEnv.PROFILE_TLS,
-        csr("csr.example.org", kp), null, null);
+        csr("csr.example.org", kp), null, null).x509Cert();
 
     cert.verify(env.caCert().publicKey());
     Assert.assertEquals(kp.subjectPublicKeyInfo(), cert.subjectPublicKeyInfo());
@@ -237,8 +237,8 @@ public class CaIssuanceH2Test {
     CertTemplateData template = new CertTemplateData(
         new X500Name("CN=" + commonName + ",O=myorg,C=DE"), publicKey, notBefore, notAfter,
         null, CaH2TestEnv.PROFILE_TLS);
-    CertificateInfo certInfo = ca.generateCert(requestor, template, null);
-    return certInfo.cert().cert();
+    X509CertificateInfo certInfo = ca.generateCert(requestor, template, null);
+    return certInfo.cert().x509Cert();
   }
 
   private static SubjectPublicKeyInfo newP256Key() {

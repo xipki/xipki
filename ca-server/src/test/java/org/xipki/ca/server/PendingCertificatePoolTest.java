@@ -6,10 +6,10 @@ package org.xipki.ca.server;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509KeypairWithCert;
@@ -41,7 +41,7 @@ public class PendingCertificatePoolTest {
   @Test
   public void confirmWithMatchingHash() {
     PendingCertificatePool pool = new PendingCertificatePool();
-    CertificateInfo info = certInfo(cert1);
+    X509CertificateInfo info = certInfo(cert1);
     pool.addCertificate("tid1", BigInteger.ONE, info, future());
 
     Assert.assertSame(info, pool.removeCertificate("tid1", BigInteger.ONE, sha1(cert1)));
@@ -53,7 +53,7 @@ public class PendingCertificatePoolTest {
   @Test
   public void hashMismatchDoesNotRemove() {
     PendingCertificatePool pool = new PendingCertificatePool();
-    CertificateInfo info = certInfo(cert1);
+    X509CertificateInfo info = certInfo(cert1);
     pool.addCertificate("tid1", BigInteger.ONE, info, future());
 
     // the entry is returned, but stays in the pool since the hash does not match
@@ -74,14 +74,14 @@ public class PendingCertificatePoolTest {
   @Test
   public void removeAllOfATransaction() {
     PendingCertificatePool pool = new PendingCertificatePool();
-    CertificateInfo info1 = certInfo(cert1);
-    CertificateInfo info2 = certInfo(cert2);
-    CertificateInfo other = certInfo(cert1);
+    X509CertificateInfo info1 = certInfo(cert1);
+    X509CertificateInfo info2 = certInfo(cert2);
+    X509CertificateInfo other = certInfo(cert1);
     pool.addCertificate("tid1", BigInteger.ONE, info1, future());
     pool.addCertificate("tid1", BigInteger.TWO, info2, future());
     pool.addCertificate("tid2", BigInteger.ONE, other, future());
 
-    Set<CertificateInfo> removed = pool.removeCertificates("tid1");
+    Set<X509CertificateInfo> removed = pool.removeCertificates("tid1");
     Assert.assertEquals(Set.of(info1, info2), removed);
     Assert.assertNull(pool.removeCertificates("tid1"));
     Assert.assertSame(other, pool.removeCertificate("tid2", BigInteger.ONE, sha1(cert1)));
@@ -90,7 +90,7 @@ public class PendingCertificatePoolTest {
   @Test
   public void alreadyIssuedCertificatesAreNotPooled() {
     PendingCertificatePool pool = new PendingCertificatePool();
-    CertificateInfo info = certInfo(cert1);
+    X509CertificateInfo info = certInfo(cert1);
     info.setAlreadyIssued(true);
     pool.addCertificate("tid1", BigInteger.ONE, info, future());
     Assert.assertNull(pool.removeCertificates("tid1"));
@@ -101,9 +101,9 @@ public class PendingCertificatePoolTest {
     PendingCertificatePool pool = new PendingCertificatePool();
     Assert.assertNull("empty pool", pool.removeConfirmTimeoutedCertificates());
 
-    CertificateInfo expired1 = certInfo(cert1);
-    CertificateInfo expired2 = certInfo(cert2);
-    CertificateInfo pending = certInfo(cert2);
+    X509CertificateInfo expired1 = certInfo(cert1);
+    X509CertificateInfo expired2 = certInfo(cert2);
+    X509CertificateInfo pending = certInfo(cert2);
     long past = System.currentTimeMillis() - 1000;
     pool.addCertificate("tid1", BigInteger.ONE, expired1, past);
     pool.addCertificate("tid1", BigInteger.TWO, pending, future());
@@ -135,8 +135,8 @@ public class PendingCertificatePoolTest {
     return HashAlgo.SHA1.hash(cert.getEncoded());
   }
 
-  private static CertificateInfo certInfo(X509Cert cert) {
-    return new CertificateInfo(new CertWithDbId(cert), null, new NameId(1, "ca"), cert,
+  private static X509CertificateInfo certInfo(X509Cert cert) {
+    return new X509CertificateInfo(new CertWithDbId(cert), null, new NameId(1, "ca"), cert,
         new NameId(2, "profile"), new NameId(3, "requestor"));
   }
 

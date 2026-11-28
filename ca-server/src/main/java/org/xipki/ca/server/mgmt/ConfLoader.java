@@ -23,9 +23,11 @@ import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
 import org.xipki.util.misc.CollectionUtil;
@@ -36,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -224,8 +227,8 @@ class ConfLoader {
             ConcurrentSigner signer = null;
             try {
               signer = securityFactory.createSigner(
-                  caEntry.base().signerType(), signerConf, (X509Cert) null);
-              caEntry.setCert(signer.x509Cert());
+                  caEntry.base().signerType(), signerConf, (CertVariant) null);
+              caEntry.setCert(signer.cert());
             } catch (GenerationException ex) {
               throw new CaMgmtException("could not create signer for CA " + caName, ex);
             } finally {
@@ -424,7 +427,13 @@ class ConfLoader {
               "files/ca-" + name + "-cert.der");
 
           // certchain
-          List<X509Cert> certchain = entry.certchain();
+          List<X509Cert> certchain;
+          try {
+            certchain = X509Util.extractCerts(entry.certchain(), "entry.certchain()");
+          } catch (CertificateEncodingException e) {
+            throw new CaMgmtException(e);
+          }
+
           List<FileOrBinary> ccList = null;
           if (CollectionUtil.isNotEmpty(certchain)) {
             ccList = new ArrayList<>(certchain.size());

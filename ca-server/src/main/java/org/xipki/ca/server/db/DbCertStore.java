@@ -11,15 +11,12 @@ import org.xipki.asn1.x509.CRLEntry;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.pkix.util.FpIdCalculator;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CaConfStore;
@@ -27,30 +24,33 @@ import org.xipki.ca.server.CaIdNameMap;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertRevInfoWithSerial;
 import org.xipki.ca.server.CertStore;
-import org.xipki.util.misc.UniqueIdGenerator;
 import org.xipki.codec.Base64;
 import org.xipki.codec.Hex;
-import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.Pack;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.cert.CertRevocationInfo;
-import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.cert.X509Crl;
-import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.LogUtil;
-import org.xipki.util.password.PasswordResolverException;
-import org.xipki.util.password.Passwords;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.QueryExecutor;
 import org.xipki.datasource.ResultRow;
 import org.xipki.datasource.SqlUtil;
+import org.xipki.pkix.ca.X509CertificateInfo;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.util.FpIdCalculator;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.util.misc.LruCache;
+import org.xipki.util.misc.NameId;
+import org.xipki.util.misc.UniqueIdGenerator;
+import org.xipki.util.password.PasswordResolverException;
+import org.xipki.util.password.Passwords;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -174,6 +174,12 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     super(datasource);
 
     this.caConfStore = Args.notNull(caConfStore, "caConfStore");
+
+    String error = CaUtil.checkCertFormat(datasource.getDbSchema(null),
+        "CA database " + datasource.name());
+    if (error != null) {
+      throw new CaMgmtException(error);
+    }
 
     Map<String, String> caConfDbSchemaInfo = caConfStore.getDbSchemas();
     String vendor = caConfStore.getDbSchemas().get("VENDOR");
@@ -375,7 +381,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   }
 
   @Override
-  public boolean addCert(CertificateInfo certInfo, boolean saveKeypair) {
+  public boolean addCert(X509CertificateInfo certInfo, boolean saveKeypair) {
     if (saveKeypair && certInfo.privateKey() != null) {
       if (keypairEncKey == null) {
         LOG.error("no keypair encryption key is configured");
@@ -411,10 +417,10 @@ public class DbCertStore extends QueryExecutor implements CertStore {
             Base64.encodeToString(nonce) + ":" + Base64.encodeToString(encrypted);
       }
 
-      String subjectText = X509Util.cutText(cert.cert().subjectText(), maxX500nameLen);
-      long fpSubject = X509Util.fpCanonicalizedName(cert.cert().subject());
+      String subjectText = X509Util.cutText(cert.x509Cert().subjectText(), maxX500nameLen);
+      long fpSubject = X509Util.fpCanonicalizedName(cert.x509Cert().subject());
 
-      Extension extn = cert.cert().getCert().getExtension(ExtensionOIDs.subjectAlternativeName);
+      Extension extn = cert.x509Cert().getCert().getExtension(ExtensionOIDs.subjectAlternativeName);
       Long fpSan = extn == null ? null : FpIdCalculator.hash(extn.extnValue());
 
       String reqSubjectText = null;
@@ -428,10 +434,10 @@ public class DbCertStore extends QueryExecutor implements CertStore {
         }
       }
 
-      encodedCert = cert.cert().getEncoded();
+      encodedCert = cert.getEncodedCert();
       String b64FpCert = HashAlgo.SHA1.base64Hash(encodedCert);
 
-      X509Cert cert0 = cert.cert();
+      X509Cert cert0 = cert.x509Cert();
       boolean isEeCert = cert0.basicConstraints() == -1;
 
       List<SqlColumn2> columns = new ArrayList<>(20);
@@ -467,7 +473,8 @@ public class DbCertStore extends QueryExecutor implements CertStore {
 
       cert.setCertId(certId);
     } catch (Exception ex) {
-      LOG.error("could not save certificate {}: {}. Message: {}", certInfo.cert().cert().subject(),
+      LOG.error("could not save certificate {}: {}. Message: {}",
+          certInfo.cert().x509Cert().subject(),
           encodedCert == null ? "null" : Base64.encodeToString(encodedCert, true), ex.getMessage());
       LOG.debug("error", ex);
       return false;
@@ -848,7 +855,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   } // method cleanupCrls
 
   @Override
-  public CertificateInfo getCertForId(
+  public X509CertificateInfo getCertForId(
       NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap) throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap");
 
@@ -860,7 +867,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     X509Cert cert = parseCert(Base64.decodeFast(rs.getString("CERT")));
     CertWithDbId certWithMeta = new CertWithDbId(cert);
     certWithMeta.setCertId(certId);
-    CertificateInfo certInfo = new CertificateInfo(certWithMeta, null,
+    X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, null,
         ca, caCert, idNameMap.getCertprofile(rs.getInt("PID")),
         idNameMap.getRequestor(rs.getInt("RID")));
     certInfo.setRevocationInfo(buildCertRevInfo(rs));
@@ -931,7 +938,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
   }
 
   @Override
-  public CertificateInfo getCertInfo(
+  public X509CertificateInfo getCertInfo(
       NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException {
     notNulls(ca, "ca", caCert, "caCert", idNameMap, "idNameMap", serial, "serial");
@@ -945,7 +952,7 @@ public class DbCertStore extends QueryExecutor implements CertStore {
     byte[] encodedCert = Base64.decodeFast(rs.getString("CERT"));
     CertWithDbId certWithMeta = new CertWithDbId(parseCert(encodedCert));
 
-    CertificateInfo certInfo = new CertificateInfo(certWithMeta, null,
+    X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta, null,
         ca, caCert, idNameMap.getCertprofile(rs.getInt("PID")),
         idNameMap.getRequestor(rs.getInt("RID")));
 

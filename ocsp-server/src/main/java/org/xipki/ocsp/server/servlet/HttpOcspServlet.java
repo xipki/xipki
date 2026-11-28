@@ -5,16 +5,15 @@ package org.xipki.ocsp.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
-import org.xipki.codec.Hex;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.HashAlgo;
 import org.xipki.ocsp.server.OcspRespWithCacheInfo;
 import org.xipki.ocsp.server.OcspServer;
 import org.xipki.ocsp.server.Responder;
 import org.xipki.ocsp.server.ResponderAndPath;
-import org.xipki.crypto.core.HashAlgo;
-import org.xipki.codec.util.IoUtil;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -251,7 +250,16 @@ class HttpOcspServlet {
       byte[] realB64Bytes = new byte[len - cnt * 2];
       for (int i = 0, j = 0; j < realB64Bytes.length; i++, j++) {
         if (b64OcspReqBytes[i] == '%') {
-          realB64Bytes[j] = Hex.decodeSingle(b64OcspReqBytes, i + 1);
+          // an invalid or truncated escape is a bad request
+          if (i + 2 >= len) {
+            return null;
+          }
+          int hi = Character.digit(b64OcspReqBytes[i + 1], 16);
+          int lo = Character.digit(b64OcspReqBytes[i + 2], 16);
+          if (hi < 0 || lo < 0) {
+            return null;
+          }
+          realB64Bytes[j] = (byte) ((hi << 4) | lo);
           i += 2;
         } else {
           realB64Bytes[j] = b64OcspReqBytes[i];

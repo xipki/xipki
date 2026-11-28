@@ -5,8 +5,8 @@ package org.xipki.ca.gateway.scep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;

@@ -5,22 +5,22 @@ package org.xipki.ocsp.server.store;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.ocsp.api.OcspStoreException;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.Validity;
 import org.xipki.util.http.Curl;
 import org.xipki.util.http.DefaultCurl;
 import org.xipki.util.http.SslContextConf;
 import org.xipki.util.misc.DateUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.conf.Validity;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.codec.util.IoUtil;
 
 import java.io.File;
 import java.io.IOException;

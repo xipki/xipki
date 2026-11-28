@@ -17,20 +17,21 @@ import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1UtcTime;
 import org.xipki.codec.asn1.Time;
-import org.xipki.codec.x509.AlgorithmIdentifier;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.qa.ValidationIssue;
+import org.xipki.qa.ValidationResult;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.qa.ValidationIssue;
-import org.xipki.qa.ValidationResult;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -102,7 +103,7 @@ public class CertprofileQa {
     ValidationIssue issue = new ValidationIssue("X509.SIZE", "certificate size");
     resultIssues.add(issue);
 
-    certBytes = X509Util.toDerEncoded(certBytes);
+    certBytes = CertUtil.toRawEncoded(certBytes);
 
     Integer maxSize = certprofile.maxSize();
     if (maxSize != 0) {

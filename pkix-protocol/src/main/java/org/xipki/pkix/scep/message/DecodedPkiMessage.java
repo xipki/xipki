@@ -13,18 +13,18 @@ import org.xipki.asn1.scep.IssuerAndSubject;
 import org.xipki.asn1.x509.Attribute;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.CmsOIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.cms.CmsSigner;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.EnvelopedDataDecryptor.EnvelopedDataDecryptorInstance;
 import org.xipki.pkix.scep.transaction.FailInfo;
 import org.xipki.pkix.scep.transaction.MessageType;
@@ -32,6 +32,7 @@ import org.xipki.pkix.scep.transaction.Nonce;
 import org.xipki.pkix.scep.transaction.PkiStatus;
 import org.xipki.pkix.scep.transaction.TransactionId;
 import org.xipki.pkix.scep.util.ScepUtil;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.exception.PkixException;
 import org.xipki.util.misc.CollectionUtil;
@@ -355,7 +356,7 @@ public class DecodedPkiMessage extends PkiMessage {
         case PKCSReq:
         case RenewalReq:
           ret.setMessageData(CertificationRequest.fromEncoded(
-                X509Util.toDerEncoded(encodedMessageData)));
+                CertUtil.toRawEncoded(encodedMessageData)));
           break;
         case CertPoll:
           ret.setMessageData(IssuerAndSubject.fromEncoded(encodedMessageData));

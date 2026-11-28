@@ -3,8 +3,8 @@
 
 package org.xipki.ca.certprofile.test;
 
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.id.AttributeType;
 import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
@@ -16,10 +16,10 @@ import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.GeneralNameType;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.TripleState;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.KeyUsage;
-import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
-import org.xipki.codec.util.TripleState;
 
 import java.util.Arrays;
 import java.util.List;

@@ -30,15 +30,15 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1PrintableString;
 import org.xipki.codec.asn1.Asn1Utf8String;
-import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.codec.x509.id.OIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OIDs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.util.misc.CollectionUtil;
 import org.xipki.qa.CheckerUtil;
 import org.xipki.qa.ValidationIssue;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

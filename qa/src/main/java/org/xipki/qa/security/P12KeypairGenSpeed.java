@@ -5,8 +5,8 @@ package org.xipki.qa.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.KeyUtil;
 

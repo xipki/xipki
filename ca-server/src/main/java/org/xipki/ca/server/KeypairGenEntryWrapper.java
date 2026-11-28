@@ -12,8 +12,8 @@ import org.xipki.ca.server.kpgen.SoftwareKeypairGenerator;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.datasource.DataSourceMap;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
 
 import java.util.Set;

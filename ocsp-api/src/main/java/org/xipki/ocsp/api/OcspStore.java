@@ -3,11 +3,11 @@
 
 package org.xipki.ocsp.api;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo.UnknownCertBehaviour;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.conf.Validity;
 
 import java.io.Closeable;

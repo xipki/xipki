@@ -13,7 +13,6 @@ import org.xipki.codec.crypto.AtomicContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.util.exception.PkixException;
 
 import java.security.SignatureException;

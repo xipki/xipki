@@ -4,17 +4,17 @@
 package org.xipki.ca.server;
 
 import org.xipki.ca.sdk.TlsHelper;
-import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.Securities.SecurityConf;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.util.audit.Audits.AuditConf;
 import org.xipki.datasource.DataSourceConf;
+import org.xipki.pkix.Securities.SecurityConf;
+import org.xipki.util.audit.Audits.AuditConf;
+import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.http.SslContextConf;
 
 import java.nio.file.Paths;

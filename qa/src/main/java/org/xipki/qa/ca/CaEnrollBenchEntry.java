@@ -7,10 +7,10 @@ import org.xipki.asn1.x500.RDN;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Utf8String;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.OIDs;
-import org.xipki.codec.util.Args;
 import org.xipki.pkix.util.X509Util;
 
 import java.util.List;

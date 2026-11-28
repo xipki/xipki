@@ -14,34 +14,24 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.ca.sdk.EnrollCertsRequest;
-import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
-import org.xipki.ca.sdk.ErrorEntry;
-import org.xipki.ca.sdk.ErrorResponse;
-import org.xipki.ca.sdk.PollCertRequest;
-import org.xipki.ca.sdk.SdkClient;
-import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.ca.sdk.X500NameType;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
+import org.xipki.ca.sdk.*;
+import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.crypto.EmbedCertsMode;
-import org.xipki.pkix.cms.CmsAlgorithm;
-import org.xipki.pkix.cms.CmsSignedData;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.SecurityFactory;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cms.CmsAlgorithm;
+import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.scep.message.CaCaps;
 import org.xipki.pkix.scep.message.DecodedPkiMessage;
 import org.xipki.pkix.scep.message.PkiMessage;
@@ -372,8 +362,11 @@ public class ScepResponder {
       try {
         cmsSignedDataGen.addCertificate(Certificate.fromEncoded(cacert));
         cmsSignedDataGen.addCertificate(signer.cert().getCert());
-        // separate RA certificate for the encryption, selected by the client via keyUsage
-        cmsSignedDataGen.addCertificate(signer.encryptionCert().getCert());
+        // separate RA certificate for the encryption, selected by the client via keyUsage;
+        // without decryptor the signer certificate is also used for the encryption
+        if (!signer.encryptionCert().equals(signer.cert())) {
+          cmsSignedDataGen.addCertificate(signer.encryptionCert().getCert());
+        }
         CmsSignedData degenerateSignedData = cmsSignedDataGen.build();
         return degenerateSignedData.getEncoded();
       } catch (CodecException ex) {
@@ -583,7 +576,7 @@ public class ScepResponder {
           // need to remove the password
           EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
           template.setCertprofile(certprofileName);
-          template.setSubject(new X500NameType(csr.getSubject()));
+          template.setSubject(new NameType(csr.getSubject()));
 
           template.extensions(extensions);
           template.subjectPublicKey(csr.getSubjectPKInfo());
@@ -614,10 +607,10 @@ public class ScepResponder {
           audit(event, CaAuditConstants.NAME_subject,
               "\"" + X509Util.x500NameText(is.getSubject()) + "\"");
           PollCertRequest.Entry template = new PollCertRequest.Entry(null,
-              new X500NameType(is.getSubject()));
+              new NameType(is.getSubject()));
 
           PollCertRequest sdkReq = new PollCertRequest(null,
-              new X500NameType(is.getIssuer()), null,
+              new NameType(is.getIssuer()), null,
               req.transactionId().id(), new PollCertRequest.Entry[]{template});
 
           signedData = buildSignedData(sdk.pollCerts(sdkReq));

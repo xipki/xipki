@@ -6,8 +6,8 @@ package org.xipki.qa.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkcs11.wrapper.PKCS11KeyId;
@@ -16,6 +16,7 @@ import org.xipki.pkcs11.wrapper.TokenException;
 import org.xipki.pkcs11.wrapper.spec.PKCS11KeyPairSpec;
 import org.xipki.pkcs11.wrapper.spec.PKCS11SecretKeySpec;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs11.P11Slot;
 import org.xipki.pkix.pkcs11.P11SlotId;
@@ -77,7 +78,7 @@ public class P11SignSpeed extends SpeedExecutor {
         slotId.id(), keyId.getId(), Args.notNull(signAlgo, "signAlgo"),
         threads + Math.max(2, threads * 5 / 4));
     try {
-      this.signer = securityFactory.createSigner("PKCS11", signerConf, (X509Cert) null);
+      this.signer = securityFactory.createSigner("PKCS11", signerConf, (CertVariant) null);
     } catch (GenerationException ex) {
       close();
       throw ex;

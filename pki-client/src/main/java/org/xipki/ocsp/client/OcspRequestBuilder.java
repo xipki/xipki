@@ -15,7 +15,6 @@ import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.crypto.AtomicContentSigner;
 import org.xipki.codec.x509.AlgorithmIdentifier;
-import org.xipki.codec.crypto.ContentSigner;
 import org.xipki.util.exception.PkixException;
 
 import java.util.ArrayList;

@@ -12,19 +12,14 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>datasource</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>dns</artifactId>
-      <version>${xiutil.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xipki.util</groupId>
-      <artifactId>acme</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <!-- For all components -->
     <dependency>
@@ -33,9 +28,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>ca-sdk</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki-common.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>acme</artifactId>
+      <version>${xipki-common.version}</version>
     </dependency>
     <!-- For all components -->
     <dependency>
@@ -69,6 +69,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <!-- the CMP and SCEP clients for the tests of the CMP and SCEP responders -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>pki-client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -76,6 +83,18 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <!-- the test harness GatewayTestEnv / ServletTestServer is also used by the tests of
+             pki-client-shell -->
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>

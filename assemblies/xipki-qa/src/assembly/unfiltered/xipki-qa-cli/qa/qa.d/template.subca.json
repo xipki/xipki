@@ -36,7 +36,7 @@
       "ctlogControl":{
         "enabled":true,
         "sslcontext.name":"ctlog1",
-        "servers":"https://localhost:$[dummy.https.port]/dummy/ctlog/"
+        "servers":"https://localhost:$[dummy.https.port]/dummy/ctlog/ctlogrsa;https://localhost:$[dummy.https.port]/dummy/ctlog/ctlogec"
       },
       "keypairGenNames":["software"],
       "expirationPeriod":365,

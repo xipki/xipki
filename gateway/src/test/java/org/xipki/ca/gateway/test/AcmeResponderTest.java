@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.xipki.acme.AcmeConf;
+import org.xipki.acme.AcmeHttpServlet;
+import org.xipki.acme.AcmeResponder;
 import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Attribute;
@@ -15,8 +17,9 @@ import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.GeneralNames;
-import org.xipki.ca.gateway.acme.AcmeResponder;
+import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
@@ -24,20 +27,28 @@ import org.xipki.crypto.core.KeySpec;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.ScriptRunner;
+import org.xipki.pkix.cert.CertFormat;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.X509KeyPairWithSubjectPublicKeyInfo;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.ConfigurableProperties;
+import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
+import org.xipki.util.http.XiHttpResponse;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.xipki.ca.gateway.test.AcmeTestClient.b64;
@@ -113,8 +124,9 @@ public class AcmeResponderTest {
         + "\"}]\n"
         + "}\n";
     AcmeConf.Acme acmeConf = AcmeConf.Acme.parse(JsonParser.parseMap(conf, false));
-    responder = new AcmeResponder(env.sdk(), env.ca().securities().securityFactory(),
-        env.popControl(), acmeConf, workDir.toString());
+    responder = new AcmeResponder(env.sdk(), CertFormat.X509,
+          GatewayUtil.csrVerifier(env.ca().securities().securityFactory(), env.popControl()),
+          acmeConf, workDir.toString());
     responder.start();
   }
 
@@ -132,6 +144,74 @@ public class AcmeResponderTest {
     if (env != null) {
       env.close();
     }
+  }
+
+  /** The HTTP methods through the servlet ({@code AcmeHttpServlet}). */
+  @Test
+  public void httpMethodsViaServlet() throws Exception {
+    AcmeHttpServlet servlet = new AcmeHttpServlet(false, responder);
+    // RFC 8555 7.2: HEAD and GET for newNonce
+    ServletResp resp = callServlet(servlet, "HEAD", "/new-nonce");
+    Assert.assertEquals(200, resp.status);
+    Assert.assertNotNull("Replay-Nonce", resp.headers.get("replay-nonce"));
+    Assert.assertEquals(204, callServlet(servlet, "GET", "/new-nonce").status);
+    Assert.assertEquals(405, callServlet(servlet, "PUT", "/new-nonce").status);
+
+    Assert.assertEquals(200, callServlet(servlet, "GET", "/directory").status);
+    Assert.assertEquals(405, callServlet(servlet, "HEAD", "/directory").status);
+    Assert.assertEquals(405, callServlet(servlet, "DELETE", "/directory").status);
+    // the other commands only via POST
+    Assert.assertEquals(405, callServlet(servlet, "GET", "/new-account").status);
+  }
+
+  private static ServletResp callServlet(AcmeHttpServlet servlet, String method, String path)
+      throws Exception {
+    TestHttpRequest req = new TestHttpRequest(method).header("Host", HOST);
+    req.setAttribute(HttpConstants.ATTR_XIPKI_PATH, path);
+    ServletResp resp = new ServletResp();
+    servlet.service(req, resp);
+    return resp;
+  }
+
+  private static final class ServletResp implements XiHttpResponse {
+
+    private int status = 200;
+
+    private final Map<String, String> headers = new HashMap<>();
+
+    @Override
+    public void setStatus(int sc) {
+      this.status = sc;
+    }
+
+    @Override
+    public void sendError(int sc) {
+      this.status = sc;
+    }
+
+    @Override
+    public void setContentType(String type) {
+    }
+
+    @Override
+    public void addHeader(String name, String value) {
+      headers.put(name.toLowerCase(Locale.ROOT), value);
+    }
+
+    @Override
+    public void setHeader(String name, String value) {
+      headers.put(name.toLowerCase(Locale.ROOT), value);
+    }
+
+    @Override
+    public void setContentLength(int len) {
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+      return new ByteArrayOutputStream();
+    }
+
   }
 
   @Test
@@ -277,6 +357,49 @@ public class AcmeResponderTest {
     resp = client.post(order.getString("finalize"),
         new JsonMap().put("csr", b64(csr("other.example.org"))));
     assertProblem(resp, 400, "badCSR");
+  }
+
+  /**
+   * The ACME database must have the certificate format of the gateway (DBSCHEMA entry
+   * CERTFORMAT).
+   */
+  @Test
+  public void acmeDatabaseWithOtherCertFormatIsRejected() throws Exception {
+    Path workDir = Files.createTempDirectory("xipki-acme-format-test");
+    Path dbConf = workDir.resolve("acme-db.properties");
+    Files.writeString(dbConf, "dataSourceClassName = org.h2.jdbcx.JdbcDataSource\n"
+        + "dataSource.url = jdbc:h2:mem:acme_" + UUID.randomUUID().toString().replace("-", "")
+        + ";DB_CLOSE_DELAY=-1\n"
+        + "dataSource.user = sa\n"
+        + "dataSource.password = \n"
+        + "autoCommit = true\n"
+        + "maximumPoolSize = 5\n"
+        + "minimumIdle = 1\n");
+    ConfigurableProperties props = new ConfigurableProperties();
+    try (InputStream in = Files.newInputStream(dbConf)) {
+      props.load(in);
+    }
+    try (DataSourceWrapper ds = new DataSourceFactory().createDataSource("acme-format", props)) {
+      ScriptRunner.runScript(ds, Paths.get(SQL_SCRIPT).toString(),
+          workDir.resolve("acme-init.log"), workDir.resolve("acme-init.error.log"));
+      try (java.sql.Connection conn = ds.getConnection();
+           java.sql.Statement stmt = conn.createStatement()) {
+        stmt.executeUpdate("DELETE FROM DBSCHEMA WHERE NAME='CERTFORMAT'");
+        stmt.executeUpdate("INSERT INTO DBSCHEMA (NAME, VALUE2) VALUES ('CERTFORMAT', 'C509')");
+      }
+
+      String conf = "{\"baseUrl\": \"" + BASE_URL + "\","
+          + " \"dbConf\": \"" + dbConf.toAbsolutePath().toString().replace("\\", "/") + "\","
+          + " \"caProfiles\": [{\"keyTypes\": [\"1.2.840.10045.2.1\"],"
+          + " \"ca\": \"ca1\", \"tlsProfile\": \"tls\"}]}";
+      AcmeConf.Acme acmeConf = AcmeConf.Acme.parse(JsonParser.parseMap(conf, false));
+      InvalidConfException ex = Assert.assertThrows(InvalidConfException.class,
+          () -> new AcmeResponder(env.sdk(), CertFormat.X509,
+              GatewayUtil.csrVerifier(env.ca().securities().securityFactory(),
+                  env.popControl()), acmeConf, workDir.toString()));
+      Assert.assertTrue(ex.getMessage(),
+          ex.getMessage().contains("has the certificate format C509"));
+    }
   }
 
   // ----- helpers -----

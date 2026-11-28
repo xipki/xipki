@@ -5,7 +5,7 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertWithDbId;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;

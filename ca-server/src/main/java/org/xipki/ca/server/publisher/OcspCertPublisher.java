@@ -5,12 +5,15 @@ package org.xipki.ca.server.publisher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.codec.util.ConfPairs;
+import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceMap;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
@@ -18,9 +21,6 @@ import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.util.audit.Audits;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceMap;
-import org.xipki.datasource.DataSourceWrapper;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -79,7 +79,7 @@ public class OcspCertPublisher extends CertPublisher {
   } // method caAdded
 
   @Override
-  public boolean certificateAdded(CertificateInfo certInfo) {
+  public boolean certificateAdded(X509CertificateInfo certInfo) {
     X509Cert caCert = certInfo.issuerCert();
     CertWithDbId cert = certInfo.cert();
 
@@ -87,7 +87,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.addCert(caCert, cert, certInfo.revocationInfo());
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(), ex,
+      logAndAudit(caCert.subjectText(), cert.x509Cert(), cert.certId(), ex,
           "could not save certificate");
       return false;
     }
@@ -100,7 +100,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.revokeCert(caCert, cert, revInfo);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(), ex,
+      logAndAudit(caCert.subjectText(), cert.x509Cert(), cert.certId(), ex,
           "could not publish revoked certificate");
       return false;
     }
@@ -112,7 +112,7 @@ public class OcspCertPublisher extends CertPublisher {
       queryExecutor.unrevokeCert(caCert, cert);
       return true;
     } catch (Exception ex) {
-      logAndAudit(caCert.subjectText(), cert.cert(), cert.certId(), ex,
+      logAndAudit(caCert.subjectText(), cert.x509Cert(), cert.certId(), ex,
           "could not publish unrevocation of certificate");
       return false;
     }

@@ -5,9 +5,9 @@ package org.xipki.ocsp.server.type;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.Hex;
 import org.xipki.ocsp.server.type.OcspRequest.Header;
 import org.xipki.util.misc.CompareUtil;
 

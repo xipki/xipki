@@ -17,7 +17,6 @@ import org.xipki.asn1.stir.JWTClaimPermittedValuesList;
 import org.xipki.asn1.x500.RDN;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.CertificatePolicies;
-import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.asn1.x509.PolicyConstraints;
@@ -27,8 +26,7 @@ import org.xipki.asn1.x509.qualified.PdsLocation;
 import org.xipki.asn1.x509.qualified.PdsLocations;
 import org.xipki.asn1.x509.qualified.QCStatement;
 import org.xipki.asn1.x509.qualified.QCStatements;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.codec.util.TripleState;
+import org.xipki.pkix.ca.BadCertTemplateException;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ProfileUtil;
@@ -53,13 +51,14 @@ import org.xipki.codec.asn1.Asn1IA5String;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.util.TripleState;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.x509.id.OIDs;
 import org.xipki.codec.x509.id.SpdmOIDs;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.Validity;
@@ -141,8 +140,8 @@ public class XijsonExtensions {
 
   private ExtensionValue mrtdDocumentTypes;
 
-  XijsonExtensions(XijsonCertprofileType conf, SubjectControl subjectControl)
-      throws CertprofileException {
+  XijsonExtensions(XijsonCertprofile certprofile, XijsonCertprofileType conf,
+                   SubjectControl subjectControl) throws CertprofileException {
     Args.notNull(subjectControl, "subjectControl");
 
     List<ExtensionType> extensionsConf = conf.extensions();
@@ -313,10 +312,17 @@ public class XijsonExtensions {
       }
     }
 
+    // extensions processed by a subclass of XijsonCertprofile
+    for (Asn1Oid extnId : new ArrayList<>(extnIds)) {
+      if (certprofile.initExtraExtension(extensions.get(extnId.getId()))) {
+        extnIds.remove(extnId);
+      }
+    }
+
     if (!extnIds.isEmpty()) {
       throw new CertprofileException("Cannot process the extensions: " + extnIds);
     }
-  } // method initialize0
+  } // constructor
 
   private void initAuthorityInfoAccess(Set<Asn1Oid> extnIds,
                                       Map<String, ExtensionType> extensions) {
@@ -720,7 +726,13 @@ public class XijsonExtensions {
         continue;
       }
 
-      if (!subjectAltNameModes.contains(targetTag)) {
+      if (!extensionsControl.containsID(ExtensionID.subjectAlternativeName.oid())) {
+        throw new CertprofileException("toSAN " + targetTag
+            + " cannot be configured if extension subjectAltName is not permitted");
+      }
+
+      // no configured modes: all modes are allowed
+      if (subjectAltNameModes != null && !subjectAltNameModes.contains(targetTag)) {
         throw new CertprofileException("target tag " + targetTag + " not allowed in SAN");
       }
 

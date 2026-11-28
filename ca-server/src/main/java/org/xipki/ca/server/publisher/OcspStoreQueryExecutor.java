@@ -5,19 +5,20 @@ package org.xipki.ca.server.publisher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertWithDbId;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
+import org.xipki.ca.server.CaUtil;
 import org.xipki.codec.Base64;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.SqlUtil;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.datasource.SqlUtil;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -127,6 +128,13 @@ class OcspStoreQueryExecutor {
   OcspStoreQueryExecutor(DataSourceWrapper datasource, boolean publishGoodCerts)
       throws DataAccessException, NoSuchAlgorithmException {
     this.datasource = Args.notNull(datasource, "datasource");
+
+    String error = CaUtil.checkCertFormat(datasource.getDbSchema(null),
+        "OCSP database " + datasource.name());
+    if (error != null) {
+      throw new DataAccessException(error);
+    }
+
     this.issuerStore = initIssuerStore();
     this.publishGoodCerts = publishGoodCerts;
 
@@ -137,7 +145,7 @@ class OcspStoreQueryExecutor {
     String str = variables.get("VERSION");
     this.dbSchemaVersion = Integer.parseInt(str);
     str = variables.get("X500NAME_MAXLEN");
-    this.maxX500nameLen = Integer.parseInt(str);
+    this.maxX500nameLen = str == null ? 350 : Integer.parseInt(str);
 
     str = variables.get("CERTHASH_ALGO");
     this.certhashAlgo = HashAlgo.getInstance(str);
@@ -176,7 +184,7 @@ class OcspStoreQueryExecutor {
     boolean revoked = (revInfo != null);
     int issuerId = getIssuerId(issuer);
 
-    BigInteger serialNumber = certificate.cert().serialNumber();
+    BigInteger serialNumber = certificate.serialNumber();
     Long certRegisteredId = getCertId(issuerId, serialNumber);
 
     if (!publishGoodCerts && !revoked && certRegisteredId != null) {
@@ -191,11 +199,11 @@ class OcspStoreQueryExecutor {
     final String sql = revoked ? SQL_ADD_REVOKED_CERT : SQL_ADD_CERT;
 
     long certId = certificate.certId();
-    byte[] encodedCert = certificate.cert().getEncoded();
+    byte[] encodedCert = certificate.getEncodedCert();
     String certHash = certhashAlgo.base64Hash(encodedCert);
 
-    X509Cert cert = certificate.cert();
-    String cuttedSubject = X509Util.cutText(certificate.cert().subjectText(), maxX500nameLen);
+    X509Cert cert = certificate.x509Cert();
+    String cuttedSubject = X509Util.cutText(certificate.subjectText(), maxX500nameLen);
 
     PreparedStatement ps = datasource.prepareStatement(sql);
 
@@ -295,7 +303,7 @@ class OcspStoreQueryExecutor {
       return;
     }
 
-    BigInteger serialNumber = cert.cert().serialNumber();
+    BigInteger serialNumber = cert.serialNumber();
     Long certRegisteredId = getCertId(issuerId, serialNumber);
 
     if (certRegisteredId == null) {
@@ -350,7 +358,7 @@ class OcspStoreQueryExecutor {
 
     try {
       ps.setInt(1, issuerId);
-      ps.setString(2, cert.cert().serialNumber().toString(16));
+      ps.setString(2, cert.serialNumber().toString(16));
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw datasource.translate(sql, ex);

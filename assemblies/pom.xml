@@ -40,30 +40,6 @@
                 </artifactItems>
               </configuration>
             </execution>
-            <execution>
-              <id>misc-jars</id>
-              <phase>prepare-package</phase>
-              <goals>
-                <goal>copy</goal>
-              </goals>
-              <configuration>
-                <stripVersion>false</stripVersion>
-                <prependGroupId>true</prependGroupId>
-                <outputDirectory>${project.build.directory}/t2/setup/jars/misc</outputDirectory>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>org.xipki.pki</groupId>
-                    <artifactId>ca-sdk</artifactId>
-                    <version>${project.version}</version>
-                  </artifactItem>
-                  <artifactItem>
-                    <groupId>org.xipki.util</groupId>
-                    <artifactId>servlet-common</artifactId>
-                    <version>${xiutil.version}</version>
-                  </artifactItem>
-                </artifactItems>
-              </configuration>
-            </execution>
           </executions>
         </plugin>
         <plugin>

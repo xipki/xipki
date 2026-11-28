@@ -3,11 +3,11 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
-import org.xipki.util.http.SslConf;
+import org.xipki.codec.util.Args;
 import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.http.SslConf;
 
 import java.util.List;
 
@@ -161,7 +161,7 @@ public class CmpClientConf {
 
   public static CmpClientConf parse(JsonMap json) throws CodecException {
     CmpClientConf ret = new CmpClientConf();
-    ret.setSendRequestorCert(json.getBool("sendRequestorCert", false));
+    ret.setSendRequestorCert(json.getBool("sendRequestorCert", true));
     JsonMap map = json.getMap("responder");
     if (map != null) {
       ret.setResponder(Responder.parse(map));

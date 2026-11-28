@@ -5,14 +5,14 @@ package org.xipki.pkix.scep.message;
 
 import org.xipki.asn1.cms.ContentInfo;
 import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.x509.id.CmsOIDs;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.scep.util.ScepUtil;
 import org.xipki.pkix.sign.SignatureSigner;
 import org.xipki.util.exception.PkixException;

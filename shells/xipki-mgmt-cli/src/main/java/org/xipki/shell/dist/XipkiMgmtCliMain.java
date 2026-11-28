@@ -5,9 +5,10 @@ package org.xipki.shell.dist;
 
 import org.xipki.shell.PicocliShell;
 import org.xipki.shell.ShellBaseCommand;
-import org.xipki.shell.ca.mgmt.CaMgmtShellMain;
+import org.xipki.ca.mgmt.shell.CaMgmtShellMain;
 import org.xipki.shell.demo.DemoShellMain;
 import org.xipki.shell.pki.client.PkiClientShellMain;
+import org.xipki.shell.security.SecurityRuntime;
 import org.xipki.shell.security.SecurityShellMain;
 import org.xipki.shell.xi.XiShellMain;
 import picocli.CommandLine;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class XipkiMgmtCliMain {
 
   public static void main(String[] args) throws Exception {
+    SecurityRuntime.initPasswords();
     PicocliShell shell = new PicocliShell("xipki> ", new RootCommand(),
         new PrintWriter(System.out, true));
     CommandLine commandLine = shell.commandLine();

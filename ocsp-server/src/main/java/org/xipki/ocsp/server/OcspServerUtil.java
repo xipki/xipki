@@ -5,11 +5,14 @@ package org.xipki.ocsp.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.ReflectiveUtil;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.ocsp.api.OcspStore;
 import org.xipki.ocsp.api.OcspStoreException;
 import org.xipki.ocsp.server.store.CaDbCertStatusStore;
@@ -20,17 +23,14 @@ import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.CertPathValidationModel;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.InvalidConfException;
-import org.xipki.datasource.DataSourceWrapper;
-import org.xipki.pkix.sign.CertPathValidationModel;
+import org.xipki.util.conf.FileOrBinary;
+import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.conf.Validity;
-import org.xipki.util.conf.FileOrBinary;
-import org.xipki.codec.util.IoUtil;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -105,7 +105,8 @@ public class OcspServerUtil {
 
       try {
         ConcurrentSigner requestorSigner = securityFactory.createSigner(
-            responderSignerType, new SignerConf(signerConf), explicitCertificateChain);
+            responderSignerType, new SignerConf(signerConf),
+            X509Util.toCertVariants(explicitCertificateChain));
         singleSigners.add(requestorSigner);
         succSigAlgos.add(sigAlgo);
       } catch (Exception ex) {

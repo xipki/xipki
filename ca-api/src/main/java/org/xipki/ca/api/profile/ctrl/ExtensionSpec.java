@@ -3,11 +3,12 @@
 
 package org.xipki.ca.api.profile.ctrl;
 
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.ca.api.profile.id.ExtensionID;
 
-import java.security.cert.Extension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;

@@ -5,11 +5,10 @@ package org.xipki.ca.server.db;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.misc.NameId;
+import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.PermissionConstants;
@@ -30,24 +29,28 @@ import org.xipki.ca.server.SystemEvent;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.codec.Base64;
-import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.pkix.cert.CertRevocationInfo;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.SignerConf;
-import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.datasource.QueryExecutor;
 import org.xipki.datasource.ResultRow;
 import org.xipki.datasource.SqlUtil;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.ca.CaUris;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CertVariant;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.sign.ConcurrentSigner;
+import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.CertUtil;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.NameId;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -117,6 +120,12 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
       str = dbSchema.get("X500NAME_MAXLEN");
       this.maxX500nameLen = str == null ? 350 : Integer.parseInt(str);
+
+      String error = CaUtil.checkCertFormat(dbSchema,
+          "CA configuration database " + datasource.name());
+      if (error != null) {
+        throw new CaMgmtException(error);
+      }
     } catch (DataAccessException ex) {
       throw new CaMgmtException(ex);
     }
@@ -298,7 +307,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     entry.setCert(generateCert(rs.getString("CERT")));
 
-    List<X509Cert> certchain = generateCertchain(rs.getString("CERTCHAIN"));
+    List<CertVariant> certchain = generateCertchain(rs.getString("CERTCHAIN"));
     // validate certchain
     if (CollectionUtil.isNotEmpty(certchain)) {
       buildCertChain(entry.cert(), certchain);
@@ -390,7 +399,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     String sql = SqlUtil.buildInsertSql("CA", colNames);
 
     byte[] encodedCert = caEntry.cert().getEncoded();
-    List<X509Cert> certchain = caEntry.certchain();
+    List<CertVariant> certchain = caEntry.certchain();
     String certchainStr = CollectionUtil.isEmpty(certchain) ? null
         : encodeCertchain(buildCertChain(caEntry.cert(), certchain));
 
@@ -609,7 +618,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     String signerType = changeCaEntry.signerType();
     String signerConf = changeCaEntry.signerConf();
 
-    X509Cert caCert = null;
+    CertVariant caCert = null;
 
     if (signerType != null || signerConf != null || encodedCert != null
         || CollectionUtil.isNotEmpty(changeCaEntry.encodedCertchain())) {
@@ -673,7 +682,7 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       if (encodedCertchain.isEmpty()) {
         certchainStr = CaManager.NULL;
       } else {
-        List<X509Cert> certs = new LinkedList<>();
+        List<CertVariant> certs = new LinkedList<>();
         for (byte[] m : changeCaEntry.encodedCertchain()) {
           certs.add(parseCert(m));
         }
@@ -729,25 +738,25 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       // CAcert URIs
       List<String> uris = changeUris.cacertUris();
       if (uris != null) {
-        newCC.setCacertUris(uris.isEmpty() ? null : uris);
+        newCC.setCacertUris(isRemoveUris(uris) ? null : uris);
       }
 
       // CRL URIs
       uris = changeUris.crlUris();
       if (uris != null) {
-        newCC.setCrlUris(uris.isEmpty() ? null : uris);
+        newCC.setCrlUris(isRemoveUris(uris) ? null : uris);
       }
 
       // DeltaCRL URIs
       uris = changeUris.deltaCrlUris();
       if (uris != null) {
-        newCC.setDeltaCrlUris(uris.isEmpty() ? null : uris);
+        newCC.setDeltaCrlUris(isRemoveUris(uris) ? null : uris);
       }
 
       // OCSP URIs
       uris = changeUris.ocspUris();
       if (uris != null) {
-        newCC.setOcspUris(uris.isEmpty() ? null : uris);
+        newCC.setOcspUris(isRemoveUris(uris) ? null : uris);
       }
     }
 
@@ -1130,17 +1139,17 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return deleteRowWithName(name, "SIGNER");
   }
 
-  private static X509Cert generateCert(String b64Cert) throws CaMgmtException {
+  private static CertVariant generateCert(String b64Cert) throws CaMgmtException {
     return (b64Cert == null) ? null : parseCert(Base64.decode(b64Cert));
   } // method generateCert
 
-  private static List<X509Cert> generateCertchain(String encodedCertchain) throws CaMgmtException {
+  private static List<CertVariant> generateCertchain(String encodedCertchain) throws CaMgmtException {
     if (StringUtil.isBlank(encodedCertchain)) {
       return null;
     }
 
     try {
-      List<X509Cert> certs = X509Util.listPemCertificates(encodedCertchain);
+      List<CertVariant> certs = CertUtil.listPemCertificates(encodedCertchain);
       return CollectionUtil.isEmpty(certs) ? null : certs;
     } catch (CertificateException | IOException ex) {
       throw new CaMgmtException(ex);
@@ -1157,6 +1166,15 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
   public int getMaxX500nameLen() {
     return maxX500nameLen;
+  }
+
+  /**
+   * Whether the URIs of a CA change mean "remove": empty, or only {@link CaManager#NULL} (an
+   * empty list cannot be transported, {@code CaUris} turns it into null = unchanged).
+   */
+  private static boolean isRemoveUris(List<String> uris) {
+    return uris.isEmpty()
+        || (uris.size() == 1 && CaManager.NULL.equalsIgnoreCase(uris.get(0)));
   }
 
   private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
@@ -1252,7 +1270,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     final String sql = buf.toString();
 
-    try (PreparedStatement ps = prepareStatement(sql)){
+    PreparedStatement ps = prepareStatement(sql);
+    try {
       Map<String, String> changedColumns = new HashMap<>();
 
       int index = 1;
@@ -1272,6 +1291,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
           tableName, whereColumn.name(), whereColumn.value(), changedColumns);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      // closes the statement and returns the connection to the pool
+      datasource.releaseResources(ps, null);
     }
   } // method changeIfNotNull
 

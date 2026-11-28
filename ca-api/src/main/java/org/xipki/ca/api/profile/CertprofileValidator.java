@@ -4,13 +4,9 @@
 package org.xipki.ca.api.profile;
 
 import org.xipki.asn1.x509.CertificatePolicies;
-import org.xipki.codec.util.TripleState;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.codec.x509.id.KeyPurposeOIDs;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.profile.ctrl.AuthorityInfoAccessControl;
-import org.xipki.ca.api.profile.ctrl.CertDomain;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.api.profile.ctrl.ExtensionSpec;
@@ -18,11 +14,15 @@ import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.SubjectControl;
 import org.xipki.ca.api.profile.id.ExtensionID;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.TripleState;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.KeyPurposeOIDs;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.conf.Validity.Unit;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.Arrays;
 import java.util.Collection;

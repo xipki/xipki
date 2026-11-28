@@ -30,14 +30,15 @@ import org.xipki.ocsp.server.OcspServer;
 import org.xipki.ocsp.server.Responder;
 import org.xipki.pkix.Securities;
 import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509KeypairWithCert;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.audit.Audits;
-import org.xipki.util.password.Passwords;
 import org.xipki.util.conf.ConfigurableProperties;
+import org.xipki.util.password.Passwords;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -225,7 +226,7 @@ public class OcspServerH2Test {
   public void responseIsSignedByTheResponder() throws Exception {
     BasicOCSPResponse basic = basicResponse(request(certId(ca1Cert, SN_GOOD)));
     Assert.assertTrue("response signature", basic.isSignatureValid(
-        securities.securityFactory().getContentVerifierFactory(ca1Cert)));
+        securities.securityFactory().getContentVerifierFactory(CertVariant.ofX509(ca1Cert))));
   }
 
   @Test

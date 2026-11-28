@@ -15,14 +15,13 @@ import org.xipki.asn1.x509.GeneralName;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.crypto.AtomicContentSigner;
 import org.xipki.codec.crypto.ContentVerifier;
+import org.xipki.codec.crypto.ContentVerifierFactory;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.id.CmpOIDs;
-import org.xipki.codec.crypto.ContentVerifierFactory;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.util.exception.PkixException;
 
 import javax.crypto.Mac;

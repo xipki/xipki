@@ -3,17 +3,17 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.util.Args;
+import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.Closeable;

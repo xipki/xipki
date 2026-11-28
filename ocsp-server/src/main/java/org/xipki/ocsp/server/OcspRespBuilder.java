@@ -4,6 +4,7 @@
 package org.xipki.ocsp.server;
 
 import org.xipki.codec.Hex;
+import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.CertID;
 import org.xipki.ocsp.server.type.Extensions;
@@ -11,7 +12,6 @@ import org.xipki.ocsp.server.type.ResponderID;
 import org.xipki.ocsp.server.type.ResponseData;
 import org.xipki.ocsp.server.type.SingleResponse;
 import org.xipki.ocsp.server.type.TaggedCertSequence;
-import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.util.exception.NoIdleSignerException;

@@ -17,9 +17,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>ca-mgmt-api</artifactId>
+      <version>${xipki-common.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
       <artifactId>ca-sdk</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.crypto</groupId>
@@ -41,6 +46,13 @@
       <!-- in-memory database for the integration tests -->
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- in-memory PKCS#11 module (xihsm:mem) for the PKCS#11 tests -->
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>xihsm</artifactId>
+      <version>${xicrypto.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

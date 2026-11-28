@@ -3,28 +3,28 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.Asn1Primitive;
-import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.codec.x509.id.OIDs;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.ca.api.profile.ctrl.CertDomain;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
-import org.xipki.ca.api.profile.ctrl.ValidityMode;
-import org.xipki.codec.util.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonList;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.TripleState;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OIDs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.codec.util.TripleState;
 
 import java.io.File;
 import java.security.NoSuchAlgorithmException;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -200,9 +201,9 @@ public class XijsonCertprofileType implements JsonEncodable {
   }
 
   public void setSignatureAlgorithms(List<SignAlgo> signatureAlgorithms) {
-    // remove duplicated algorithms
+    // remove duplicated algorithms, keep the order: the first one supported by the CA is used
     this.signatureAlgorithms = (signatureAlgorithms == null) ? null
-        : new ArrayList<>(new HashSet<>(signatureAlgorithms));
+        : new ArrayList<>(new LinkedHashSet<>(signatureAlgorithms));
   }
 
   public List<KeySpec> keyAlgorithms() {

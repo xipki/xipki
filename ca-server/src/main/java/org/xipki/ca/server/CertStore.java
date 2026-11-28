@@ -4,20 +4,20 @@
 package org.xipki.ca.server;
 
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertStatistics;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.sdk.OperationException;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
-import org.xipki.datasource.DataAccessException;
+import org.xipki.util.misc.NameId;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -75,7 +75,7 @@ public interface CertStore {
 
   void unrevokeCa(String caName) throws CaMgmtException;
 
-  boolean addCert(CertificateInfo certInfo, boolean saveKeypair);
+  boolean addCert(X509CertificateInfo certInfo, boolean saveKeypair);
 
   long getMaxFullCrlNumber(NameId ca) throws OperationException;
 
@@ -115,7 +115,7 @@ public interface CertStore {
 
   int cleanupCrls(NameId ca, int numCrls) throws OperationException;
 
-  CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap)
+  X509CertificateInfo getCertForId(NameId ca, X509Cert caCert, long certId, CaIdNameMap idNameMap)
       throws OperationException;
 
   CertWithRevocationInfo getCertWithRevocationInfo(long certId, CaIdNameMap idNameMap)
@@ -129,7 +129,7 @@ public interface CertStore {
 
   long getCertId(NameId ca, BigInteger serial) throws OperationException;
 
-  CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
+  X509CertificateInfo getCertInfo(NameId ca, X509Cert caCert, BigInteger serial, CaIdNameMap idNameMap)
       throws OperationException;
 
   /**

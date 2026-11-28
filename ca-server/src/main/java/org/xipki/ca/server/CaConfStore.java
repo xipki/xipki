@@ -3,7 +3,6 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -18,6 +17,7 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.util.misc.NameId;
 
 import java.util.List;
 import java.util.Map;

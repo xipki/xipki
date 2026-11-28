@@ -15,11 +15,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.DefaultAlgorithmNameFinder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.xipki.asn1.x509.Certificate;
+import org.xipki.codec.crypto.ContentSigner;
+import org.xipki.codec.crypto.ContentVerifier;
 import org.xipki.codec.crypto.ContentVerifierFactory;
 import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.x509.AlgorithmIdentifier;
-import org.xipki.codec.crypto.ContentSigner;
-import org.xipki.codec.crypto.ContentVerifier;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;

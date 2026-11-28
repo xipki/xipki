@@ -11,6 +11,7 @@ import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaSystemStatus;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
@@ -55,7 +56,8 @@ public class CaManagerH2Test {
     X509Cert caCert = env.caCert();
     Assert.assertEquals(caCert.subject(), caCert.issuer());
     caCert.verify(caCert.publicKey());
-    Assert.assertEquals(caCert, caManager.getCaCerts(CaH2TestEnv.CA_NAME).get(0));
+    Assert.assertEquals(CertVariant.ofX509(caCert),
+        caManager.getCaCerts(CaH2TestEnv.CA_NAME).get(0));
   }
 
   @Test
@@ -67,7 +69,7 @@ public class CaManagerH2Test {
     CertWithRevocationInfo stored = caManager.getCert(CaH2TestEnv.CA_NAME, cert.serialNumber());
     Assert.assertNotNull(stored);
     Assert.assertFalse(stored.isRevoked());
-    Assert.assertEquals(cert, stored.cert().cert());
+    Assert.assertEquals(cert, stored.cert().x509Cert());
     Assert.assertEquals(CaH2TestEnv.PROFILE_TLS, stored.certprofile());
   }
 

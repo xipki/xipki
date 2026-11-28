@@ -3,10 +3,10 @@
 
 package org.xipki.cmp.client;
 
-import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cmp.PkiStatusInfo;
 
 import java.util.Map;
 import java.util.Set;

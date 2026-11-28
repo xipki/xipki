@@ -3,7 +3,7 @@
 
 package org.xipki.ca.gateway.test;
 
-import org.xipki.ca.gateway.acme.AcmeResponder;
+import org.xipki.acme.AcmeResponder;
 import org.xipki.codec.json.JsonBuilder;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;

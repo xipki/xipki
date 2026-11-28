@@ -50,8 +50,8 @@ cp xipki-mgmt-cli/lib/* xipki-cli/lib
 
 rm -f xipki-cli/lib/org.xipki.pki.ca-*-*.jar \
       xipki-cli/lib/org.xipki.pki.shell.xipki-mgmt-cli-*.jar \
-      xipki-cli/lib/org.xipki.pki.shell.ca-mgmt-shell-*.jar \
-      xipki-cli/lib/org.xipki.util.demo-shell-*.jar
+      xipki-cli/lib/org.xipki.common.ca-mgmt-shell-*.jar \
+      xipki-cli/lib/org.xipki.common.demo-shell-*.jar
 
 echo "Prepare tomcat"
 

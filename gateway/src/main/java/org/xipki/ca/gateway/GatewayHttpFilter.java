@@ -5,10 +5,9 @@ package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.codec.exception.GenerationException;
-import org.xipki.ca.gateway.acme.AcmeHttpServlet;
+import org.xipki.acme.AcmeHttpServlet;
+import org.xipki.acme.AcmeResponder;
 import org.xipki.ca.gateway.acme.AcmeProtocolConf;
-import org.xipki.ca.gateway.acme.AcmeResponder;
 import org.xipki.ca.gateway.cmp.CmpControl;
 import org.xipki.ca.gateway.cmp.CmpHttpServlet;
 import org.xipki.ca.gateway.cmp.CmpProtocolConf;
@@ -24,16 +23,21 @@ import org.xipki.ca.gateway.scep.ScepHttpServlet;
 import org.xipki.ca.gateway.scep.ScepProtocolConf;
 import org.xipki.ca.gateway.scep.ScepResponder;
 import org.xipki.ca.sdk.SdkClient;
+import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.ReflectiveUtil;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.Securities;
 import org.xipki.pkix.auth.RequestorAuthenticator;
-import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.cert.CertFormat;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.audit.Audits;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpStatusCode;
@@ -41,7 +45,6 @@ import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.codec.util.IoUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -154,8 +157,9 @@ public class GatewayHttpFilter implements XiHttpFilter {
       PopControl popControl = (pconf.pop() == null)
           ? gPopControl : new PopControl(pconf.pop(), basedir);
 
-      AcmeResponder responder = new AcmeResponder(sdkClient,
-          securities.securityFactory(), popControl, pconf.acme(), basedir);
+      AcmeResponder responder = new AcmeResponder(sdkClient, CertFormat.X509,
+          GatewayUtil.csrVerifier(securities.securityFactory(), popControl),
+          pconf.acme(), basedir);
 
       responder.start();
       acmeServlet = new AcmeHttpServlet(logReqResp, responder);
@@ -424,7 +428,7 @@ public class GatewayHttpFilter implements XiHttpFilter {
 
     return securities.securityFactory().createSigner(signerConf.type(),
             new SignerConf(signerConf.conf()),
-            X509Util.parseCerts(signerConf.certs(), basedir).toArray(new X509Cert[0]));
+            CertUtil.parseCerts(signerConf.certs(), basedir).toArray(new CertVariant[0]));
   }
 
 }

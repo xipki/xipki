@@ -6,18 +6,18 @@ package org.xipki.qa.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.codec.Base64;
-import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.pkcs12.KeyStoreWrapper;
 import org.xipki.pkix.pkcs12.KeystoreGenerationParameters;
 import org.xipki.pkix.pkcs12.X509Pkcs12KeyStoreWrapper;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.util.misc.RandomUtil;
 
@@ -72,7 +72,7 @@ public final class P12SignSpeed extends SpeedExecutor {
     SignerConf signerConf = getKeystoreSignerConf(
         Args.notNull(keystore, "keystore"), PASSWORD,
         Args.notNull(signAlgo, "signAlgo"), threads + Math.max(2, threads * 5 / 4));
-    this.signer = securityFactory.createSigner(tokenType, signerConf, (X509Cert) null);
+    this.signer = securityFactory.createSigner(tokenType, signerConf, (CertVariant) null);
   }
 
   @Override

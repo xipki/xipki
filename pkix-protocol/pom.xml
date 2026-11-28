@@ -22,9 +22,9 @@
       <version>${xicrypto.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.crypto</groupId>

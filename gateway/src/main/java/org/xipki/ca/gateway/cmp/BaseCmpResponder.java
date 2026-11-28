@@ -18,16 +18,27 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.GeneralName;
+import org.xipki.ca.gateway.CaNameSigners;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorCode;
+import org.xipki.ca.sdk.ErrorResponse;
+import org.xipki.ca.sdk.SdkClient;
+import org.xipki.ca.sdk.SdkErrorResponseException;
+import org.xipki.codec.Base64;
+import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1BitString;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Integer;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.crypto.ContentVerifierFactory;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InsufficientPermissionException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.x509.GCMParameters;
 import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.GCMParameters;
 import org.xipki.codec.x509.PBES2Parameters;
 import org.xipki.codec.x509.PBKDF2Params;
 import org.xipki.codec.x509.PrivateKeyInfo;
@@ -37,48 +48,39 @@ import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.x509.id.CmpOIDs;
 import org.xipki.codec.x509.id.PkcsOIDs;
 import org.xipki.codec.x509.id.XipkiOIDs;
-import org.xipki.ca.gateway.CaNameSigners;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.ca.sdk.ErrorResponse;
-import org.xipki.ca.sdk.SdkClient;
-import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.Base64;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.Hex;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.pkix.cmp.ProtectedPkiMessage;
-import org.xipki.pkix.cms.CmsAlgorithm;
-import org.xipki.pkix.cms.CmsEnvelopedData;
-import org.xipki.pkix.cmp.CertificateRequestMessage;
+import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.crypto.core.HashAlgo;
+import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.crypto.core.KemUtil;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.SecretKeyWithAlias;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.pkix.cert.CertVariant;
+import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
+import org.xipki.pkix.cert.SubjectPublicKeyInfoVariant;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cmp.CertificateRequestMessage;
 import org.xipki.pkix.cmp.CmpUtil;
 import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.pkix.cmp.ProtectedPkiMessage;
 import org.xipki.pkix.cmp.ProtectionResult;
 import org.xipki.pkix.cmp.ProtectionVerificationResult;
-import org.xipki.crypto.core.KemUtil;
-import org.xipki.crypto.core.KemEncapKey;
-import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
-import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cms.CmsAlgorithm;
+import org.xipki.pkix.cms.CmsEnvelopedData;
+import org.xipki.pkix.sign.AlgorithmValidator;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.KemHmacSignature;
 import org.xipki.pkix.util.KeyUtil;
-import org.xipki.util.exception.PkixException;
-import org.xipki.crypto.core.EcCurveEnum;
-import org.xipki.crypto.core.SecretKeyWithAlias;
-import org.xipki.pkix.sign.AlgorithmValidator;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
-import org.xipki.codec.exception.InsufficientPermissionException;
+import org.xipki.util.exception.PkixException;
 import org.xipki.util.misc.LogUtil;
 import org.xipki.util.misc.RandomUtil;
 
@@ -421,7 +423,7 @@ public abstract class BaseCmpResponder {
       List<RDN> rdns = x500Name.getRDNs();
       // consider the empty DN
       if ((rdns != null && !rdns.isEmpty()) // Not an empty DN
-          && !signer.x509Cert().subject().equals(x500Name)) {
+          && !signer.cert().x509Cert().subject().equals(x500Name)) {
         LOG.warn("tid={}: I am not the intended recipient, but '{}'",
             tid, reqHeader.getRecipient());
         failureCode = PKIFailureInfo.badRequest;
@@ -638,7 +640,7 @@ public abstract class BaseCmpResponder {
           : getCertRequestor(x500Sender, senderKID, pkiMessage.getExtraCerts());
 
       ContentVerifierFactory verifierFactory = requestor == null ? null
-          : securityFactory.getContentVerifierFactory(requestor.cert());
+          : securityFactory.getContentVerifierFactory(CertVariant.ofX509(requestor.cert()));
       if (verifierFactory == null) {
         LOG.warn("tid={}: not authorized requestor '{}'", tid, header.getSender());
         return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
@@ -776,7 +778,8 @@ public abstract class BaseCmpResponder {
     }
 
     try {
-      PublicKey publicKey = securityFactory.generatePublicKey(spki);
+      PublicKey publicKey = securityFactory.generatePublicKey(
+          SubjectPublicKeyInfoVariant.ofX509(spki));
 
       DHSigStaticKeyCertPair.X509 kaKeyAndCert = null;
       if (SignAlgo.DHPOP_X25519 == popAlg || SignAlgo.DHPOP_X448 == popAlg) {

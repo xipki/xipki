@@ -5,28 +5,30 @@ package org.xipki.ca.server;
 
 import org.xipki.asn1.x500.RDN;
 import org.xipki.asn1.x500.X500Name;
+import org.xipki.asn1.x509.*;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtensionsControl;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.codec.Base64;
-import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.GenerationException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.x509.id.X509OIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.SignAlgo;
-import org.xipki.asn1.x509.*;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
-import org.xipki.codec.util.IoUtil;
 import org.xipki.util.misc.CollectionUtil;
 
 import java.io.IOException;
@@ -37,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -46,6 +49,34 @@ import java.util.zip.ZipOutputStream;
  * @author Lijun Liao (xipki)
  */
 public class CaUtil {
+
+  /**
+   * The certificate format of this CA, the expected value of the DBSCHEMA entry CERTFORMAT of
+   * its databases.
+   */
+  public static final String CERT_FORMAT = "X509";
+
+  /**
+   * Checks the DBSCHEMA entry CERTFORMAT of a database: absent or X509 for X.509, C509 for
+   * C509. It must be the certificate format of this CA.
+   *
+   * @param dbSchema the entries of the table DBSCHEMA.
+   * @param dbDescription description of the database, used in the error message.
+   * @return the error message, or {@code null} if the format is correct.
+   */
+  public static String checkCertFormat(Map<String, String> dbSchema, String dbDescription) {
+    String value = dbSchema == null ? null : dbSchema.get("CERTFORMAT");
+    String format = value == null ? "X509" : value;
+    if (!"X509".equals(format) && !"C509".equals(format)) {
+      return "invalid CERTFORMAT '" + value + "' in table DBSCHEMA of " + dbDescription
+          + ", expected X509 or C509";
+    }
+    if (!CERT_FORMAT.equals(format)) {
+      return dbDescription + " has the certificate format " + format
+          + ", but this CA uses " + CERT_FORMAT;
+    }
+    return null;
+  }
 
   private static final String id_ce_prefix = "2.5.29.";
 
@@ -382,22 +413,22 @@ public class CaUtil {
     return list;
   } // method getPermissions
 
-  public static String encodeCertchain(List<X509Cert> certs) {
-    return X509Util.encodePemCertificates(certs.toArray(new X509Cert[0]));
+  public static String encodeCertchain(List<CertVariant> certs) {
+    return CertUtil.encodePemCertificates(certs.toArray(new CertVariant[0]));
   }
 
-  public static List<X509Cert> buildCertChain(X509Cert targetCert, List<X509Cert> certs)
+  public static List<CertVariant> buildCertChain(CertVariant targetCert, List<CertVariant> certs)
       throws CaMgmtException {
-    X509Cert[] certchain = X509Util.buildCertPath(targetCert, certs, false);
+    CertVariant[] certchain = CertUtil.buildCertPath(targetCert, certs, false);
     if (certchain == null || certs.size() != certchain.length) {
       throw new CaMgmtException("could not build certchain containing all specified certs");
     }
     return Arrays.asList(certchain);
   } // method buildCertChain
 
-  public static X509Cert parseCert(byte[] encodedCert) throws CaMgmtException {
+  public static CertVariant parseCert(byte[] encodedCert) throws CaMgmtException {
     try {
-      return X509Util.parseCert(encodedCert);
+      return CertUtil.parseCert(encodedCert);
     } catch (CertificateException ex) {
       throw new CaMgmtException("could not parse certificate", ex);
     }

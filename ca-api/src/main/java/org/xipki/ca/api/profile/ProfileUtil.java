@@ -9,11 +9,7 @@ import org.xipki.asn1.x509.Attribute;
 import org.xipki.asn1.x509.EDIPartyName;
 import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.OtherName;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.asn1.Asn1Primitive;
-import org.xipki.codec.x509.id.AttributeOIDs;
-import org.xipki.codec.x509.id.OIDs;
+import org.xipki.pkix.ca.BadCertTemplateException;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
 import org.xipki.ca.api.profile.ctrl.RdnControl;
 import org.xipki.ca.api.profile.ctrl.StringType;
@@ -22,11 +18,15 @@ import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.api.profile.ctrl.TextValidator;
 import org.xipki.ca.api.profile.id.SubjectDirectoryAttributeType;
-import org.xipki.codec.util.Args;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.id.AttributeOIDs;
+import org.xipki.codec.x509.id.OIDs;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.conf.Range;
+import org.xipki.util.misc.CollectionUtil;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -286,7 +286,7 @@ public class ProfileUtil {
       if (maxLen != null && len > maxLen) {
         throw new BadCertTemplateException(String.format(
             "subject %s '%s' is too long (length (%d) > maxLen (%d))",
-            tmpText, tmpText, len, maxLen));
+            typeDesc, tmpText, len, maxLen));
       }
     }
 

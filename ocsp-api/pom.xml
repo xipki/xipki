@@ -12,14 +12,14 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>datasource</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
   </dependencies>
 </project>

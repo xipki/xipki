@@ -5,37 +5,39 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.misc.NameId;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CaStatus;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.CtlogControl;
 import org.xipki.ca.api.mgmt.PermissionConstants;
 import org.xipki.ca.api.mgmt.Permissions;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
-import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.ca.X509PublicCaInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 import org.xipki.util.misc.RandomUtil;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.security.cert.CertificateEncodingException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -64,7 +66,7 @@ public class CaInfo {
 
   private final boolean selfSigned;
 
-  private final PublicCaInfo publicCaInfo;
+  private final X509PublicCaInfo publicCaInfo;
 
   private final List<X509Cert> certchain;
 
@@ -84,7 +86,7 @@ public class CaInfo {
     this.caEntry = Args.notNull(caEntry, "caEntry");
     this.certStore = certStore;
 
-    X509Cert cert = caEntry.cert();
+    X509Cert cert = caEntry.cert().x509Cert();
     this.notBefore = cert.notBefore();
     this.notAfter = cert.notAfter();
     this.serialNumber = cert.serialNumber();
@@ -92,17 +94,17 @@ public class CaInfo {
 
     BaseCaInfo base = caEntry.base();
 
-    List<X509Cert> certs = caEntry.certchain();
-    this.certchain = certs == null ? Collections.emptyList() : certs;
     this.noNewCertificateAfter = notAfter.minus(base.expirationPeriod(), ChronoUnit.DAYS);
     this.randomSnGenerator = RandomSerialNumberGenerator.getInstance();
     this.extraControl = base.extraControl();
 
     try {
-      this.publicCaInfo = new PublicCaInfo(cert, base.caUris(), base.extraControl());
+      List<X509Cert> certs = X509Util.extractCerts(caEntry.certchain(), "caEntry.certchain()");
+      this.certchain = certs == null ? Collections.emptyList() : certs;
+      this.publicCaInfo = new X509PublicCaInfo(cert, base.caUris(), base.extraControl());
       // keyspec
-      caKeySpec = KeySpec.ofPublicKey(caEntry.cert().subjectPublicKeyInfo());
-    } catch (CodecException e) {
+      caKeySpec = KeySpec.ofPublicKey(caEntry.cert().x509Cert().subjectPublicKeyInfo());
+    } catch (CertificateEncodingException | CodecException e) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, e);
     }
   } // constructor
@@ -119,7 +121,7 @@ public class CaInfo {
     caEntry.base().setNextCrlNo(crlNumber);
   }
 
-  public PublicCaInfo publicCaInfo() {
+  public X509PublicCaInfo publicCaInfo() {
     return publicCaInfo;
   }
 

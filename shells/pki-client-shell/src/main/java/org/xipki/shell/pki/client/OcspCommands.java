@@ -14,21 +14,21 @@ import org.xipki.asn1.x509.AuthorityInfoAccessSyntax;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.GeneralName;
-import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.codec.x509.id.X509OIDs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.X509OIDs;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
-import org.xipki.shell.xi.Completers;
 import org.xipki.shell.security.XiShellBaseCommand;
+import org.xipki.shell.xi.Completers;
 import org.xipki.util.http.ReqRespDebug;
+import org.xipki.util.misc.CollectionUtil;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -226,13 +226,14 @@ public class OcspCommands {
           SingleResponse singleResp = singleResponses.get(i);
           OcspCertStatus status = singleResp.getCertStatus();
           String statusText;
-          if (status == null) {
+          if (status == null || OcspCertStatus.GOOD.equals(status)) {
             statusText = "good";
           } else if (status.getRevoked() != null) {
             RevokedInfo revokedInfo = status.getRevoked();
             statusText = "revoked";
             if (revokedInfo.getRevocationReason() != null) {
-              statusText += " reason=" + revokedInfo.getRevocationReason();
+              statusText += " reason="
+                  + revokedInfo.getRevocationReason().getEnumeratedName();
             }
             if (revokedInfo.getRevocationTime() != null) {
               statusText += " revocationTime=" + revokedInfo.getRevocationTime();

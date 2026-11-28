@@ -23,9 +23,10 @@ import org.xipki.asn1.x509.qualified.MonetaryValue;
 import org.xipki.asn1.x509.qualified.QCStatement;
 import org.xipki.asn1.x509.qualified.QCStatements;
 import org.xipki.asn1.x509.qualified.TypeOfBiometricData;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.codec.util.TripleState;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
+import org.xipki.pkix.ca.BadCertTemplateException;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -35,6 +36,7 @@ import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.api.profile.ctrl.*;
 import org.xipki.ca.api.profile.id.ExtensionID;
 import org.xipki.ca.api.profile.id.QCStatementID;
+import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.RdnType;
 import org.xipki.ca.certprofile.xijson.conf.XijsonCertprofileType;
@@ -43,16 +45,18 @@ import org.xipki.codec.asn1.Asn1IA5String;
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1OctetString;
 import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.codec.x509.id.OIDs;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.util.TripleState;
+import org.xipki.codec.x509.id.ExtensionOIDs;
+import org.xipki.codec.x509.id.OIDs;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.ca.X509PublicCaInfo;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.LogUtil;
@@ -61,6 +65,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -264,7 +269,7 @@ public class XijsonCertprofile extends Certprofile {
     this.subjectControl = new SubjectControl(subjectDnControls, b != null && b);
 
     // Extensions
-    this.extensions = new XijsonExtensions(conf, subjectControl);
+    this.extensions = new XijsonExtensions(this, conf, subjectControl);
   } // method initialize0
 
   @Override
@@ -349,7 +354,7 @@ public class XijsonCertprofile extends Certprofile {
       List<Asn1Oid> extensionsToProcess,
       X500Name requestedSubject, X500Name grantedSubject,
       Map<Asn1Oid, Extension> requestedExtensions,
-      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
+      Instant notBefore, Instant notAfter, X509PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException {
     ExtensionValues values = new ExtensionValues();
     if (CollectionUtil.isEmpty(extensionsToProcess)) {
@@ -889,8 +894,55 @@ public class XijsonCertprofile extends Certprofile {
       }
     }
 
+    // extensions processed by a subclass
+    if (!tmpExtnTypes.isEmpty()) {
+      ExtensionValues extraValues = getExtraExtensions(Collections.unmodifiableList(tmpExtnTypes),
+          requestedSubject, grantedSubject, requestedExtensions, notBefore, notAfter, caInfo);
+      if (extraValues != null) {
+        for (Asn1Oid m : extraValues.getExtensionTypes()) {
+          if (tmpExtnTypes.contains(m)) {
+            values.addExtension(m, extraValues.getExtensionValue(m));
+          }
+        }
+      }
+    }
+
     return values;
   } // method getExtensions
+
+  /**
+   * Initializes an extension which this profile cannot process itself. Subclasses override this
+   * method to support their own extensions, and return the values in
+   * {@link #getExtraExtensions}.
+   *
+   * @param extn the configuration of the extension.
+   * @return whether the extension is processed by this profile.
+   * @throws CertprofileException if the configuration is invalid.
+   */
+  protected boolean initExtraExtension(ExtensionType extn) throws CertprofileException {
+    return false;
+  }
+
+  /**
+   * Returns the values of the extensions initialized by {@link #initExtraExtension}.
+   *
+   * @param extensionsToProcess types of the extensions not processed yet, not modifiable.
+   * @param requestedSubject requested subject.
+   * @param grantedSubject granted subject.
+   * @param requestedExtensions requested extensions, may be {@code null}.
+   * @param notBefore notBefore of the certificate.
+   * @param notAfter notAfter of the certificate.
+   * @param caInfo information of the CA.
+   * @return the extension values, may be {@code null}.
+   * @throws CertprofileException if error occurs.
+   * @throws BadCertTemplateException if the request is not permitted.
+   */
+  protected ExtensionValues getExtraExtensions(
+      List<Asn1Oid> extensionsToProcess, X500Name requestedSubject, X500Name grantedSubject,
+      Map<Asn1Oid, Extension> requestedExtensions, Instant notBefore, Instant notAfter,
+      X509PublicCaInfo caInfo) throws CertprofileException, BadCertTemplateException {
+    return null;
+  }
 
   public Map<Asn1Oid, ExtensionValue> constantExtensions() {
     return extensions.constantExtensions();

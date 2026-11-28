@@ -7,12 +7,13 @@ import org.xipki.asn1.x509.AuthorityKeyIdentifier;
 import org.xipki.asn1.x509.CRLReason;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.Extension;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.pkix.Securities;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
-import org.xipki.codec.util.IoUtil;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -43,8 +44,8 @@ public class CrlTestVectorGenerateMain {
           .setKeystore("file:src/test/resources/crls/ca.p12");
 
       ConcurrentSigner csigner = securities.securityFactory()
-          .createSigner("PKCS12", conf, (X509Cert) null);
-      X509Cert caCert = csigner.x509Cert();
+          .createSigner("PKCS12", conf, (CertVariant) null);
+      X509Cert caCert = csigner.cert().x509Cert();
 
       Signer signer = csigner.borrowSigner();
       // no revoked certs

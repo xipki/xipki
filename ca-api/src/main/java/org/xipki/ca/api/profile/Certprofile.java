@@ -6,15 +6,18 @@ package org.xipki.ca.api.profile;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.CertificatePolicies;
 import org.xipki.asn1.x509.Extension;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
+import org.xipki.pkix.ca.BadCertTemplateException;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.ca.api.profile.ctrl.*;
-import org.xipki.codec.util.Args;
+import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.ca.X509PublicCaInfo;
 import org.xipki.util.conf.Validity;
 
 import java.time.Instant;
@@ -206,7 +209,7 @@ public abstract class Certprofile {
       List<Asn1Oid> extensionsToProcess,
       X500Name requestedSubject, X500Name grantedSubject,
       Map<Asn1Oid, Extension> requestedExtensions,
-      Instant notBefore, Instant notAfter, PublicCaInfo caInfo)
+      Instant notBefore, Instant notAfter, X509PublicCaInfo caInfo)
       throws CertprofileException, BadCertTemplateException;
 
   /**

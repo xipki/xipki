@@ -11,13 +11,13 @@ import org.xipki.asn1.x509.ExtendedKeyUsage;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.PolicyInformation;
 import org.xipki.asn1.x509.SubjectInfoAccessSyntax;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.profile.CertprofileException;
+import org.xipki.pkix.ca.BadCertTemplateException;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.ctrl.CertDomain;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.ctrl.ExtensionControl;
 import org.xipki.ca.api.profile.ctrl.GeneralNameTag;
@@ -237,7 +237,7 @@ public class CertprofileUtil {
       Asn1Oid[] requiredTypes = new Asn1Oid[] {
           AttributeOIDs.commonName, AttributeOIDs.organization, AttributeOIDs.country};
       for (Asn1Oid m : requiredTypes) {
-        if (!containsRdn(subject, AttributeOIDs.commonName)) {
+        if (!containsRdn(subject, m)) {
           throw new BadCertTemplateException("missing " + OIDs.getName(m) + " in subject");
         }
       }

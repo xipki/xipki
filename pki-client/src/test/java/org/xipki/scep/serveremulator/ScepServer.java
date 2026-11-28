@@ -5,13 +5,13 @@ package org.xipki.scep.serveremulator;
 
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.KeyUsage;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.util.KeyUtil;
-import org.xipki.scep.client.test.MyUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.scep.message.CaCaps;
+import org.xipki.pkix.util.KeyUtil;
+import org.xipki.scep.client.test.MyUtil;
 
 import java.math.BigInteger;
 import java.security.KeyPair;

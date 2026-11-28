@@ -6,14 +6,15 @@ package org.xipki.ca.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.mgmt.CaUris;
-import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.asn1.x509.*;
-import org.xipki.util.misc.NameId;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
+import org.xipki.pkix.ca.BadCertTemplateException;
+import org.xipki.pkix.ca.CaUris;
+import org.xipki.pkix.ca.CertDomain;
+import org.xipki.pkix.ca.CertLevel;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
 import org.xipki.ca.api.profile.Certprofile;
+import org.xipki.ca.api.profile.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ctrl.*;
@@ -21,18 +22,20 @@ import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Null;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Util;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.x509.id.KeyPurposeOIDs;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.ca.X509PublicCaInfo;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.NameId;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -157,7 +160,7 @@ public class IdentifiedCertprofile {
    */
   public ExtensionValues getExtensions(
       X500Name requestedSubject, X500Name grantedSubject, Extensions requestedExtensions,
-      SubjectPublicKeyInfo publicKeyInfo, PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
+      SubjectPublicKeyInfo publicKeyInfo, X509PublicCaInfo publicCaInfo, X509Cert crlSignerCert,
       Instant notBefore, Instant notAfter)
       throws CertprofileException, BadCertTemplateException {
     Args.notNull(publicKeyInfo, "publicKeyInfo");
@@ -176,12 +179,12 @@ public class IdentifiedCertprofile {
       for (Asn1Oid m : oids) {
         ExtensionControl control = controls.getControl(m);
         if (control == null) {
-          log.warn("ignore extension {}, it is defined in the profile", m.getId());
+          log.warn("ignore extension {}, it is not defined in the profile", m.getId());
         } else {
           if (control.isPermittedInRequest()) {
             requestedExtns.put(m, requestedExtensions.getExtension(m));
           } else {
-            log.warn("ignore extension {}, it is allowed in the request", m.getId());
+            log.warn("ignore extension {}, it is not allowed in the request", m.getId());
           }
         }
       }
@@ -296,7 +299,7 @@ public class IdentifiedCertprofile {
 
   private void addExtnAuthorityKeyIdentifier(
       ExtensionValues values, List<Asn1Oid> types, ExtensionsControl controls,
-      PublicCaInfo publicCaInfo) throws CertprofileException {
+      X509PublicCaInfo publicCaInfo) throws CertprofileException {
     byte[] ikiValue = publicCaInfo.subjectKeyIdentifier();
     if (ikiValue == null) {
       return;
@@ -314,7 +317,7 @@ public class IdentifiedCertprofile {
 
   private void addExtnIssuerAltName(
       ExtensionValues values, List<Asn1Oid> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
+      ExtensionsControl controls, X509PublicCaInfo publicCaInfo) throws CertprofileException {
     Asn1Oid extType = ExtensionOIDs.issuerAlternativeName;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -328,7 +331,7 @@ public class IdentifiedCertprofile {
 
   private void addExtnAuthorityInfoAccess(
       ExtensionValues values, List<Asn1Oid> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
+      ExtensionsControl controls, X509PublicCaInfo publicCaInfo) throws CertprofileException {
     Asn1Oid extType = ExtensionOIDs.authorityInfoAccess;
     ExtensionControl extControl = controls.getControl(extType);
     CaUris caUris = publicCaInfo.caUris();
@@ -360,7 +363,7 @@ public class IdentifiedCertprofile {
 
   private void addExtnCRLDistributionPoints(
       ExtensionValues values, List<Asn1Oid> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
+      ExtensionsControl controls, X509PublicCaInfo publicCaInfo) throws CertprofileException {
     // CRLDistributionPoints
     Asn1Oid extType = ExtensionOIDs.cRLDistributionPoints;
     ExtensionControl extControl = controls.getControl(extType);
@@ -383,7 +386,7 @@ public class IdentifiedCertprofile {
 
   private void addExtnFreshestCRL(
       ExtensionValues values, List<Asn1Oid> types,
-      ExtensionsControl controls, PublicCaInfo publicCaInfo) throws CertprofileException {
+      ExtensionsControl controls, X509PublicCaInfo publicCaInfo) throws CertprofileException {
     Asn1Oid extType = ExtensionOIDs.freshestCRL;
     ExtensionControl extControl = controls.getControl(extType);
     if (extControl == null) {
@@ -507,7 +510,7 @@ public class IdentifiedCertprofile {
     if (certDomain == CertDomain.CABForumBR) {
       if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
         if (!containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
-          throw new CertprofileException("CA profile does contain keyUsage cRLSign");
+          throw new CertprofileException("CA profile does not contain keyUsage cRLSign");
         }
       } else if (certLevel == CertLevel.EndEntity) {
         if (containsKeyusage(usageOccs, KeyUsage.cRLSign)) {

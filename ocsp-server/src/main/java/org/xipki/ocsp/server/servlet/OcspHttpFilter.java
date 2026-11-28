@@ -5,12 +5,12 @@ package org.xipki.ocsp.server.servlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.ocsp.server.OcspConf;
 import org.xipki.ocsp.server.OcspServer;
 import org.xipki.ocsp.server.ResponderAndPath;
 import org.xipki.pkix.Securities;
-import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;

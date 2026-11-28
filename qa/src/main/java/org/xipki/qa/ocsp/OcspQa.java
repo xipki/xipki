@@ -16,13 +16,13 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.CRLReason;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
-import org.xipki.codec.crypto.ContentVerifierFactory;
-import org.xipki.codec.util.TripleState;
 import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.crypto.ContentVerifierFactory;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.TripleState;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.codec.x509.id.OcspOIDs;
-import org.xipki.codec.util.Args;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
@@ -30,8 +30,9 @@ import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.X509IssuerHash;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509IssuerHash;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
@@ -458,7 +459,7 @@ public class OcspQa {
 
       byte[] hashValue = certHash.certificateHash();
       if (encodedCert != null) {
-        encodedCert = X509Util.toDerEncoded(encodedCert);
+        encodedCert = CertUtil.toRawEncoded(encodedCert);
 
         issue = new ValidationIssue("OCSP.RESPONSE." + index +
             ".CHASH.VALIDITY", "certhash validity");

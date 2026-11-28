@@ -12,14 +12,21 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>datasource</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
+    </dependency>
+    <dependency>
+      <!-- key generation in the certificate profile tests -->
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-be-jdk</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -32,4 +39,16 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- crypto-be-jdk: ML-DSA with context string, and the expanded ML-DSA / ML-KEM private keys
+               from the seed, use the internals of the JDK -->
+          <argLine>--add-exports java.base/sun.security.provider=ALL-UNNAMED --add-exports java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

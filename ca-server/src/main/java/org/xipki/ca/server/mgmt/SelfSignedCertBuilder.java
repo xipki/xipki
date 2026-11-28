@@ -7,28 +7,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
-import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
+import org.xipki.pkix.ca.BadCertTemplateException;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.profile.ExtensionValues;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.api.profile.ctrl.SubjectInfo;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.ca.X509PublicCaInfo;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
@@ -108,7 +108,7 @@ public class SelfSignedCertBuilder {
       }
 
       signer = securityFactory.createSigner(signerType,
-                new SignerConf(thisSignerConf), (X509Cert[]) null);
+                new SignerConf(thisSignerConf), (CertVariant[]) null);
     } catch (XiSecurityException | GenerationException ex) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE, ex);
     }
@@ -168,7 +168,7 @@ public class SelfSignedCertBuilder {
 
     try {
       byte[] ski = certprofile.getSubjectKeyIdentifier(publicKeyInfo);
-      PublicCaInfo publicCaInfo = new PublicCaInfo(grantedSubject,
+      X509PublicCaInfo publicCaInfo = new X509PublicCaInfo(grantedSubject,
           grantedSubject, serialNumber, null, ski, null, null);
 
       ExtensionValues extensionTuples = certprofile.getExtensions(

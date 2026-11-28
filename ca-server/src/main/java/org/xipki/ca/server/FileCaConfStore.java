@@ -5,12 +5,10 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaConf;
 import org.xipki.ca.api.mgmt.CaConfType;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
-import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
@@ -28,24 +26,28 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.ca.server.mgmt.CaProfileIdAliases;
 import org.xipki.ca.server.mgmt.SelfSignedCertBuilder;
 import org.xipki.codec.Base64;
-import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.ca.CaUris;
 import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.conf.FileOrBinary;
 import org.xipki.util.conf.FileOrValue;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.CompareUtil;
 import org.xipki.util.misc.DateUtil;
+import org.xipki.util.misc.NameId;
 
 import java.io.File;
 import java.io.IOException;
@@ -279,7 +281,7 @@ public class FileCaConfStore implements CaConfStore {
             if (binary == null) {
               conf = null;
             } else {
-              binary = X509Util.toDerEncoded(binary);
+              binary = CertUtil.toRawEncoded(binary);
               conf = Base64.encodeToString(binary);
             }
           } else {
@@ -534,9 +536,9 @@ public class FileCaConfStore implements CaConfStore {
         SignerConf signerConf = new SignerConf(signerConfs.get(0).conf());
 
         ConcurrentSigner signer = securityFactory.createSigner(
-            ci.base().signerType(), signerConf, (X509Cert) null);
+            ci.base().signerType(), signerConf, (CertVariant) null);
         try {
-          caCert = signer.x509Cert();
+          caCert = signer.cert().x509Cert();
         } finally {
           signer.close();
         }
@@ -545,15 +547,15 @@ public class FileCaConfStore implements CaConfStore {
       }
     }
 
-    caEntry.setCert(caCert);
+    caEntry.setCert(CertVariant.ofX509(caCert));
 
     // certchain
     if (CollectionUtil.isNotEmpty(ci.getCertchain())) {
-      List<X509Cert> certchain = new LinkedList<>();
+      List<CertVariant> certchain = new LinkedList<>();
       for (FileOrBinary cc : ci.getCertchain()) {
         byte[] bytes = getBinary(cc, baseDir);
         try {
-          certchain.add(X509Util.parseCert(bytes));
+          certchain.add(CertUtil.parseCert(bytes));
         } catch (CertificateException ex) {
           throw new InvalidConfException("invalid certchain for CA " + ident, ex);
         }

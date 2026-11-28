@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://www.w3.org/maven-v4_0_0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xipki.pki.shell</groupId>
@@ -17,23 +17,66 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>pkix</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>ca-mgmt-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>pki-client-shell</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <!-- CA system on in-memory H2 databases and the management servlet for the tests -->
+      <groupId>org.xipki.pki</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.pki</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-be-jdk</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- crypto-be-jdk: ML-DSA with context string, and the expanded ML-DSA / ML-KEM private keys
+               from the seed, use the internals of the JDK -->
+          <argLine>--add-exports java.base/sun.security.provider=ALL-UNNAMED --add-exports java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

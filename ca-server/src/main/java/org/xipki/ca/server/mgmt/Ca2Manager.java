@@ -10,9 +10,6 @@ import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Attribute;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.pkix.cert.KeyCertBytesPair;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CaStatus;
@@ -20,43 +17,49 @@ import org.xipki.ca.api.mgmt.CertListInfo;
 import org.xipki.ca.api.mgmt.CertListOrderBy;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.CtlogControl;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.mgmt.entry.BaseCaInfo;
-import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
+import org.xipki.ca.api.mgmt.entry.CaEntry.CaSignerConf;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
 import org.xipki.ca.sdk.CaAuditConstants;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
+import org.xipki.ca.server.Ca;
 import org.xipki.ca.server.CaConfStore;
 import org.xipki.ca.server.CaInfo;
 import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertStore;
 import org.xipki.ca.server.CertTemplateData;
 import org.xipki.ca.server.CtLogClient;
+import org.xipki.ca.server.CtLogPublicKeyFinder;
 import org.xipki.ca.server.IdentifiedCertprofile;
-import org.xipki.ca.server.Ca;
-import org.xipki.codec.exception.GenerationException;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.datasource.DataAccessException;
 import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.CsrVariant;
+import org.xipki.pkix.cert.KeyCertBytesPair;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.LogUtil;
 import org.xipki.util.audit.AuditEvent;
-import org.xipki.datasource.DataAccessException;
 import org.xipki.util.http.SslContextConf;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 
 import java.math.BigInteger;
 import java.time.Instant;
@@ -119,6 +122,14 @@ class Ca2Manager {
     CtlogControl ctlogControl = caEntry.ctlogControl();
     CtLogClient ctlogClient = null;
     if (ctlogControl != null && ctlogControl.isEnabled()) {
+      // the SCTs must be verifiable: the public keys of the CT logs are required
+      CtLogPublicKeyFinder finder = manager.ctLogPublicKeyFinder();
+      if (finder == null || !finder.hasPublicKeys()) {
+        LOG.error("CT log is enabled for CA {}, but no public keys of CT logs are configured "
+            + "(ctLog.keydir)", caName);
+        return false;
+      }
+
       String name = ctlogControl.sslContextName();
       SslContextConf ctxConf;
       if (name == null) {
@@ -284,10 +295,10 @@ class Ca2Manager {
 
         try {
           if (caEntry.cert() == null) {
-            if (signer.x509Cert() == null) {
+            if (signer.cert() == null) {
               throw new CaMgmtException("CA signer without certificate is not allowed");
             }
-            caEntry.setCert(signer.x509Cert());
+            caEntry.setCert(signer.cert());
           }
         } finally {
           signer.close();
@@ -299,7 +310,7 @@ class Ca2Manager {
     }
 
     manager.caConfStore.addCa(caEntry);
-    certstore.addCa(caEntry.ident(), caEntry.cert(), base.revocationInfo());
+    certstore.addCa(caEntry.ident(), caEntry.cert().x509Cert(), base.revocationInfo());
     createAndStartCA(name);
   } // method addCa
 
@@ -403,7 +414,6 @@ class Ca2Manager {
 
     LOG.info("removed CA '{}'", name);
     manager.caInfos.remove(name);
-    manager.idNameMap.removeCa(name);
     manager.idNameMap.removeCa(name);
     manager.caHasProfiles.remove(name);
     manager.caHasPublishers.remove(name);
@@ -518,7 +528,7 @@ class Ca2Manager {
 
     CaEntry entry = caEntry.copy();
     entry.setSignerConf(signerConf);
-    entry.setCert(caCert);
+    entry.setCert(CertVariant.ofX509(caCert));
     addCa(entry, certstore);
     return caCert;
   }
@@ -557,7 +567,7 @@ class Ca2Manager {
       throw new CaMgmtException(ex.getMessage());
     }
 
-    if (!manager.securityFactory().verifyPop(csr, null, null, null)) {
+    if (!manager.securityFactory().verifyPop(CsrVariant.ofX509(csr), null, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
@@ -590,14 +600,14 @@ class Ca2Manager {
         publicKeyInfo, notBefore, notAfter, extensions, profileName);
     certTemplateData.setForCrossCert(true);
 
-    CertificateInfo certInfo;
+    X509CertificateInfo certInfo;
     try {
       certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    return certInfo.cert().cert();
+    return certInfo.cert().x509Cert();
   }
 
   KeyCertBytesPair generateKeyCert(
@@ -615,7 +625,7 @@ class Ca2Manager {
     CertTemplateData certTemplateData = new CertTemplateData(
         x500Subject, null, notBefore, notAfter, null, profileName, BigInteger.ONE, true);
 
-    CertificateInfo certInfo;
+    X509CertificateInfo certInfo;
     try {
       certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
@@ -623,7 +633,7 @@ class Ca2Manager {
     }
 
     return new KeyCertBytesPair(certInfo.privateKey().getEncoded(),
-        certInfo.cert().cert().getEncoded());
+        certInfo.cert().getEncodedCert());
   }
 
   X509Cert generateCertificate(
@@ -643,7 +653,7 @@ class Ca2Manager {
       throw new CaMgmtException("invalid CSR request. ERROR: " + ex.getMessage(), ex);
     }
 
-    if (!manager.securityFactory().verifyPop(csr, null, null, null)) {
+    if (!manager.securityFactory().verifyPop(CsrVariant.ofX509(csr), null, null, null)) {
       throw new CaMgmtException("could not validate POP for the CSR");
     }
 
@@ -661,14 +671,14 @@ class Ca2Manager {
     CertTemplateData certTemplateData = new CertTemplateData(subject,
         publicKeyInfo, notBefore, notAfter, extensions, profileName);
 
-    CertificateInfo certInfo;
+    X509CertificateInfo certInfo;
     try {
       certInfo = ca.generateCert(manager.byCaRequestor, certTemplateData, null);
     } catch (OperationException ex) {
       throw new CaMgmtException(ex.getMessage(), ex);
     }
 
-    return certInfo.cert().cert();
+    return certInfo.cert().x509Cert();
   } // method generateCertificate
 
   void revokeCertificate(

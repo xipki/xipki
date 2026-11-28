@@ -3,17 +3,17 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.api.CertWithDbId;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.util.misc.NameId;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.codec.util.Args;
+import org.xipki.datasource.DataSourceMap;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
-import org.xipki.datasource.DataSourceMap;
+import org.xipki.util.misc.NameId;
 
 import java.io.Closeable;
 
@@ -41,7 +41,7 @@ public class IdentifiedCertPublisher implements Closeable {
     return certPublisher.caAdded(caCert);
   }
 
-  public boolean certificateAdded(CertificateInfo certInfo) {
+  public boolean certificateAdded(X509CertificateInfo certInfo) {
     return certPublisher.certificateAdded(certInfo);
   }
 

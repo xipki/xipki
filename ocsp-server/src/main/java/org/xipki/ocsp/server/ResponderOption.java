@@ -3,8 +3,8 @@
 
 package org.xipki.ocsp.server;
 
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.InvalidConfException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 
 import java.util.ArrayList;

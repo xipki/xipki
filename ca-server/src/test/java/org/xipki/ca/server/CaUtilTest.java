@@ -14,7 +14,7 @@ import org.xipki.asn1.x509.CRLDistributionPoints;
 import org.xipki.asn1.x509.DistributionPoint;
 import org.xipki.ca.api.mgmt.CaMgmtException;
 import org.xipki.ca.api.mgmt.PermissionConstants;
-import org.xipki.ca.api.profile.ctrl.CertLevel;
+import org.xipki.pkix.ca.CertLevel;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.Asn1Oid;

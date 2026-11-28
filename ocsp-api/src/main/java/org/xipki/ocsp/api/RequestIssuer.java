@@ -3,9 +3,9 @@
 
 package org.xipki.ocsp.api;
 
+import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.Hex;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.util.misc.CompareUtil;
 

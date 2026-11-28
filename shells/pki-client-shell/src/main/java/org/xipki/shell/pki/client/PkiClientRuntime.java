@@ -5,17 +5,17 @@ package org.xipki.shell.pki.client;
 
 import org.xipki.cmp.client.CmpClient;
 import org.xipki.cmp.client.internal.CmpClientImpl;
+import org.xipki.codec.util.IoUtil;
 import org.xipki.ocsp.client.HttpOcspRequestor;
-import org.xipki.scep.client.CaCertValidator;
-import org.xipki.scep.client.CaIdentifier;
-import org.xipki.scep.client.ScepClient;
 import org.xipki.pkix.Securities;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.util.X509Util;
+import org.xipki.scep.client.CaCertValidator;
+import org.xipki.scep.client.CaIdentifier;
+import org.xipki.scep.client.ScepClient;
 import org.xipki.shell.ShellUtil;
 import org.xipki.shell.security.SecurityRuntime;
 import org.xipki.util.http.DefaultCurl;
-import org.xipki.codec.util.IoUtil;
 
 import java.io.File;
 import java.io.IOException;

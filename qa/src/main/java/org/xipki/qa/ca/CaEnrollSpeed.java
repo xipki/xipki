@@ -7,12 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.sdk.EnrollCertsRequest;
 import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
+import org.xipki.ca.sdk.NameType;
 import org.xipki.ca.sdk.SdkClient;
 import org.xipki.ca.sdk.SdkClientConf;
-import org.xipki.ca.sdk.X500NameType;
 import org.xipki.codec.Hex;
-import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.speed.SpeedExecutor;
 import org.xipki.util.misc.RandomUtil;
 
 import java.math.BigInteger;
@@ -118,7 +118,7 @@ public class CaEnrollSpeed extends SpeedExecutor {
     for (int i = 0; i < num; i++) {
       long thisIndex = index.getAndIncrement();
       EnrollCertsRequest.Entry entry = new EnrollCertsRequest.Entry();
-      entry.setSubject(new X500NameType(speedEntry.getX500Name(thisIndex).getEncoded()));
+      entry.setSubject(new NameType(speedEntry.getX500Name(thisIndex).getEncoded()));
       if (!caGenKeyPair) {
         entry.setSubjectPublicKey(speedEntry.getSubjectPublicKeyInfo().getEncoded());
       }

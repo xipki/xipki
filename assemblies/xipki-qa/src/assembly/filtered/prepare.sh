@@ -200,6 +200,11 @@ mkdir -p "$script_dir"/xipki-dummy/tomcat/xipki/keycerts
 cp "$kc_dir"/dummy-server/* \
    "$script_dir"/xipki-dummy/tomcat/xipki/keycerts
 
+# public keys of the dummy CT logs: the CA verifies the SCTs (ctLog.keydir)
+mkdir -p "$script_dir"/xipki-ca/tomcat/xipki/ctlog
+cp "$script_dir"/xipki-qa-cli/xipki/ctlog/*.pem \
+   "$script_dir"/xipki-ca/tomcat/xipki/ctlog
+
 mkdir -p "$script_dir"/xipki-qa-cli/xipki/keycerts
 cp "$kc_dir"/ca-mgmt-client/* \
    "$kc_dir"/cmp-client/* \

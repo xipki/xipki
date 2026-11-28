@@ -3,14 +3,14 @@
 
 package org.xipki.shell.qa;
 
-import org.xipki.qa.ca.FillKeypool;
 import org.xipki.crypto.core.KeySpec;
+import org.xipki.datasource.DataSourceFactory;
+import org.xipki.qa.ca.FillKeypool;
 import org.xipki.shell.Completion;
 import org.xipki.shell.PicocliShell;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.SecurityCompleters;
 import org.xipki.shell.security.XiShellBaseCommand;
-import org.xipki.datasource.DataSourceFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

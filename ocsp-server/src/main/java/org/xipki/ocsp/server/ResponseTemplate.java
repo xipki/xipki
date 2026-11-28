@@ -5,12 +5,12 @@ package org.xipki.ocsp.server;
 
 import org.xipki.asn1.ocsp.CertHash;
 import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.crypto.core.HashAlgo;
 import org.xipki.ocsp.server.type.ASN1Type;
 import org.xipki.ocsp.server.type.ExtendedExtension;
 import org.xipki.ocsp.server.type.Extension;
 import org.xipki.ocsp.server.type.OID;
 import org.xipki.ocsp.server.type.WritableOnlyExtension;
-import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.CrlReason;
 
 import java.time.Instant;

@@ -3,9 +3,6 @@
 
 package org.xipki.ca.certprofile.test;
 
-import org.xipki.codec.asn1.Asn1Null;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.ca.api.profile.id.CertificatePolicyID;
 import org.xipki.ca.api.profile.id.ExtendedKeyUsageID;
 import org.xipki.ca.api.profile.id.ExtensionID;
@@ -13,11 +10,14 @@ import org.xipki.ca.certprofile.xijson.conf.ConstantExtnValue;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionType;
 import org.xipki.ca.certprofile.xijson.conf.ExtensionValueConf;
 import org.xipki.ca.certprofile.xijson.conf.GeneralSubtreeType;
+import org.xipki.codec.asn1.Asn1Null;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.util.TripleState;
+import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.TlsExtensionType;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.codec.util.TripleState;
 
 import java.util.ArrayList;
 import java.util.Arrays;

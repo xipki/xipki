@@ -5,14 +5,14 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertificateInfo;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
-import org.xipki.codec.util.speed.ProcessLog;
 import org.xipki.codec.util.Args;
+import org.xipki.codec.util.speed.ProcessLog;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,8 +132,7 @@ class CertRepublisher {
 
         SerialWithId sid = ((SerialWithIdQueueEntry) entry).serialWithId();
 
-        CertificateInfo certInfo;
-
+        X509CertificateInfo certInfo;
         try {
           certInfo = certstore.getCertForId(ca, caCert, sid.id(), caIdNameMap);
         } catch (OperationException ex) {

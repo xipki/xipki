@@ -10,45 +10,32 @@ import org.xipki.asn1.pkcs10.CertificationRequestInfo;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.Base64;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.ca.gateway.GatewayConf;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.codec.crypto.EmbedCertsMode;
-import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.ca.sdk.EnrollCertsRequest;
-import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
-import org.xipki.ca.sdk.ErrorEntry;
-import org.xipki.ca.sdk.OldCertInfo;
-import org.xipki.ca.sdk.RevokeCertsRequest;
-import org.xipki.ca.sdk.SdkClient;
-import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.ca.sdk.SingleCertSerialEntry;
-import org.xipki.ca.sdk.UnsuspendOrRemoveCertsRequest;
-import org.xipki.ca.sdk.X500NameType;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
+import org.xipki.ca.sdk.*;
+import org.xipki.codec.Base64;
 import org.xipki.codec.Hex;
+import org.xipki.codec.crypto.EmbedCertsMode;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.crypto.core.KemUtil;
+import org.xipki.crypto.core.SecretKeyWithAlias;
+import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.crypto.core.pem.PemObject;
 import org.xipki.crypto.core.pem.PemReader;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
-import org.xipki.crypto.core.KemUtil;
-import org.xipki.crypto.core.XiSecurityException;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.crypto.core.SecretKeyWithAlias;
-import org.xipki.ca.sdk.TlsHelper;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -620,7 +607,7 @@ public class RestResponder {
 
     // subject is null only for rekey: the CA re-uses the subject of the old certificate.
     if (subject != null) {
-      template.setSubject(new X500NameType(subject));
+      template.setSubject(new NameType(subject));
     }
     template.setNotBefore(notBefore);
     template.setNotAfter(notAfter);
@@ -670,7 +657,7 @@ public class RestResponder {
       template = new EnrollCertsRequest.Entry();
       template.setCertReqId(certIdEnc);
       template.setCertprofile(profileEnc);
-      template.setSubject(new X500NameType(subject));
+      template.setSubject(new NameType(subject));
       template.setNotBefore(notBefore);
       template.setNotAfter(notAfter);
 
@@ -818,7 +805,7 @@ public class RestResponder {
     EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(certId);
     template.setCertprofile(profile);
-    template.setSubject(new X500NameType(subject));
+    template.setSubject(new NameType(subject));
     template.setNotBefore(notBefore);
     template.setNotAfter(notAfter);
 

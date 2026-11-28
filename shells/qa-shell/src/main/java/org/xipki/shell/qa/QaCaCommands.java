@@ -6,13 +6,15 @@ package org.xipki.shell.qa;
 import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.asn1.pkcs10.CertificationRequestInfo;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.mgmt.CaManager;
 import org.xipki.ca.api.mgmt.CaProfileEntry;
 import org.xipki.ca.api.mgmt.CaStatus;
-import org.xipki.ca.api.mgmt.CaUris;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.Permissions;
+import org.xipki.ca.mgmt.shell.CaCompleters;
+import org.xipki.ca.mgmt.shell.CaMgmtRuntime;
+import org.xipki.pkix.ca.CaUris;
+import org.xipki.pkix.ca.ValidityMode;
 import org.xipki.ca.api.mgmt.entry.CaEntry;
 import org.xipki.ca.api.mgmt.entry.CaHasRequestorEntry;
 import org.xipki.ca.api.mgmt.entry.CertprofileEntry;
@@ -20,45 +22,36 @@ import org.xipki.ca.api.mgmt.entry.ChangeCaEntry;
 import org.xipki.ca.api.mgmt.entry.PublisherEntry;
 import org.xipki.ca.api.mgmt.entry.RequestorEntry;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
-import org.xipki.ca.api.profile.ctrl.ValidityMode;
 import org.xipki.ca.mgmt.client.CaMgmtClient;
 import org.xipki.codec.Base64;
 import org.xipki.codec.util.ConfPairs;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.KeySpec;
-import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.conf.Validity;
 import org.xipki.qa.ValidationIssue;
 import org.xipki.qa.ValidationResult;
-import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
 import org.xipki.qa.ca.CaEnrollBenchEntry;
+import org.xipki.qa.ca.CaEnrollBenchEntry.RandomDn;
 import org.xipki.qa.ca.CaEnrollBenchKeyEntry;
 import org.xipki.qa.ca.CaEnrollSpeed;
 import org.xipki.qa.ca.CaQaSystemManager;
 import org.xipki.qa.ca.CertprofileQa;
 import org.xipki.qa.ca.IssuerInfo;
 import org.xipki.shell.Completion;
-import org.xipki.shell.ca.mgmt.CaCompleters;
-import org.xipki.shell.ca.mgmt.CaMgmtRuntime;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.SecurityCompleters;
-import org.xipki.shell.xi.Completers;
 import org.xipki.shell.security.XiShellBaseCommand;
+import org.xipki.shell.xi.Completers;
+import org.xipki.util.conf.Validity;
+import org.xipki.util.misc.NameId;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import java.io.File;
 import java.rmi.UnexpectedException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The QA shell.
@@ -85,9 +78,11 @@ class QaCaCommands {
 
     @Override
     public void run() {
-      boolean initialized = qaManager().init();
-      println(initialized
-          ? "CA QA system initialized successfully" : "CA QA system initialization failed");
+      if (!qaManager().init()) {
+        println("CA QA system initialization failed");
+        throw new RuntimeException("CA QA system initialization failed");
+      }
+      println("CA QA system initialized successfully");
     }
   }
 
@@ -290,23 +285,28 @@ class QaCaCommands {
         CaEntry actual = Optional.ofNullable(client().getCa(name))
             .orElseThrow(() -> new RuntimeException("could not find CA '" + name + "'"));
 
-        if (expected.caUris() != null) {
-          assertObjEquals("CA URIs", expected.caUris(), actual.base().caUris());
-        }
+        // only the given URI lists are checked, null or empty for none
+        CaUris actualUris = actual.base().caUris();
+        assertUrisEquals("CA cert URIs", caCertUris,
+            actualUris == null ? null : actualUris.cacertUris());
+        assertUrisEquals("OCSP URIs", ocspUris,
+            actualUris == null ? null : actualUris.ocspUris());
+        assertUrisEquals("CRL URIs", crlUris,
+            actualUris == null ? null : actualUris.crlUris());
+        assertUrisEquals("delta CRL URIs", deltaCrlUris,
+            actualUris == null ? null : actualUris.deltaCrlUris());
         if (expected.encodedCert() != null
             && !certEquals(expected.encodedCert(), actual.cert().getEncoded())) {
           throw new RuntimeException("CA cert is not as expected");
         }
         if (expected.encodedCertchain() != null) {
           List<byte[]> expChain = expected.encodedCertchain();
-          List<X509Cert> actChain = actual.certchain();
+          List<CertVariant> actChain = actual.certchain();
           int expSize = expChain == null ? 0 : expChain.size();
           int actSize = actChain == null ? 0 : actChain.size();
           if (expSize != actSize) {
-            if (actChain != null && !actChain.isEmpty()) {
-              throw new RuntimeException("Length of CA certchain " + actSize
-                  + " is not as expected " + expSize);
-            }
+            throw new RuntimeException("Length of CA certchain " + actSize
+                + " is not as expected " + expSize);
           } else {
             for (int i = 0; i < expSize; i++) {
               if (!certEquals(expChain.get(i), actChain.get(i).getEncoded())) {
@@ -364,7 +364,7 @@ class QaCaCommands {
           assertObjEquals("validity mode", expected.validityMode(), actual.base().validityMode());
         }
 
-        println(" checked CA" + name);
+        println(" checked CA " + name);
       } catch (Exception ex) {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
             : new RuntimeException("could not check CA: " + ex.getMessage(), ex);
@@ -408,8 +408,6 @@ class QaCaCommands {
       if (permissions != null && !permissions.isEmpty()) {
         entry.setPermissions(permissions);
       }
-      entry.setCaUris(new CaUris(getUris(caCertUris), getUris(ocspUris),
-          getUris(crlUris), getUris(deltaCrlUris)));
       if (validityModeS != null) {
         entry.setValidityMode(ValidityMode.forName(validityModeS));
       }
@@ -578,7 +576,8 @@ class QaCaCommands {
               && "null".equalsIgnoreCase(effectiveProfiles.iterator().next())) {
             effectiveProfiles = Collections.emptySet();
           }
-          if (!new ArrayList<>(effectiveProfiles).equals(actual.profiles())) {
+          // the profiles are a set: the order does not matter
+          if (!lowerSet(effectiveProfiles).equals(lowerSet(actual.profiles()))) {
             throw new RuntimeException("profiles: is '" + actual.profiles()
                 + "', but expected '" + effectiveProfiles + "'");
           }
@@ -662,11 +661,12 @@ class QaCaCommands {
             .orElseThrow(() -> new RuntimeException(
                 "publisher named '" + name + "' is not configured"));
 
-        if (actual.type() != null) {
+        // only the given values are checked
+        if (type != null) {
           assertTypeEquals("type", type, actual.type());
         }
-        if (actual.conf() != null) {
-          assertEquals("signer conf", conf, actual.conf());
+        if (conf != null) {
+          assertEquals("conf", conf, actual.conf());
         }
         println(" checked publisher " + name);
       } catch (Exception ex) {
@@ -915,6 +915,28 @@ class QaCaCommands {
   private static void assertObjEquals(String label, Object expected, Object actual) {
     if (!Objects.equals(expected, actual)) {
       throw new RuntimeException(label + ": is '" + actual + "', but expected '" + expected + "'");
+    }
+  }
+
+  private static Set<String> lowerSet(Collection<String> texts) {
+    Set<String> ret = new HashSet<>();
+    if (texts != null) {
+      for (String text : texts) {
+        ret.add(text.toLowerCase(Locale.ROOT));
+      }
+    }
+    return ret;
+  }
+
+  /** Compares the given URIs (null: not checked, 'null': none) with the actual ones. */
+  private static void assertUrisEquals(String label, List<String> expected, List<String> actual) {
+    List<String> exp = getUris(expected);
+    if (exp == null) {
+      return;
+    }
+    List<String> act = actual == null ? Collections.emptyList() : actual;
+    if (!exp.equals(act)) {
+      throw new RuntimeException(label + ": is '" + act + "', but expected '" + exp + "'");
     }
   }
 

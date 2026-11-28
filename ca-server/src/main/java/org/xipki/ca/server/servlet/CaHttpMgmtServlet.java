@@ -19,11 +19,14 @@ import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
 import org.xipki.codec.util.Args;
-import org.xipki.pkix.cert.KeyCertBytesPair;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.cert.X509Crl;
-import org.xipki.pkix.util.X509Util;
 import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.cert.CertFormat;
+import org.xipki.pkix.cert.CertVariant;
+import org.xipki.pkix.cert.CrlVariant;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.NameVariant;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.X509Util;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -32,6 +35,7 @@ import org.xipki.util.http.XiHttpResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -75,7 +79,7 @@ class CaHttpMgmtServlet {
   private final String reverseProxyMode;
 
   public CaHttpMgmtServlet(CaManager caManager, String reverseProxyMode,
-                          Collection<X509Cert> mgmtCerts, boolean logReqResp) {
+                           Collection<X509Cert> mgmtCerts, boolean logReqResp) {
     this.caManager = Args.notNull(caManager, "caManager");
     this.reverseProxyMode = reverseProxyMode;
     this.mgmtCerts = new HashSet<>(Args.notEmpty(mgmtCerts, "mgmtCerts"));
@@ -206,7 +210,7 @@ class CaHttpMgmtServlet {
         }
         case generateCertificate: {
           MgmtRequest.GenerateCert req = MgmtRequest.GenerateCert.parse(nonNullReq(json));
-          X509Cert cert = caManager.generateCertificate(req.caName(),
+          CertVariant cert = caManager.generateCertificate(req.caName(),
               req.profileName(), req.encodedCsr(), req.notBefore(), req.notAfter());
           resp = toByteArray(cert);
           break;
@@ -215,7 +219,7 @@ class CaHttpMgmtServlet {
           MgmtRequest.GenerateCrossCertificate req =
               MgmtRequest.GenerateCrossCertificate.parse(nonNullReq(json));
 
-          X509Cert cert = caManager.generateCrossCertificate(req.caName(), req.profileName(),
+          CertVariant cert = caManager.generateCrossCertificate(req.caName(), req.profileName(),
               req.encodedCsr(), req.encodedTargetCert(), req.notBefore(), req.notAfter());
           resp = toByteArray(cert);
           break;
@@ -236,9 +240,8 @@ class CaHttpMgmtServlet {
         case generateRootCa: {
           MgmtRequest.GenerateRootCa req = MgmtRequest.GenerateRootCa.parse(nonNullReq(json));
 
-          X509Cert cert = caManager.generateRootCa(req.caEntry(),
-              req.profileName(), req.subject(),
-              req.serialNumber(), req.notBefore(), req.notAfter());
+          CertVariant cert = caManager.generateRootCa(req.caEntry(), req.profileName(),
+              req.subject(), req.serialNumber(), req.notBefore(), req.notAfter());
           resp = toByteArray(cert);
           break;
         }
@@ -254,13 +257,25 @@ class CaHttpMgmtServlet {
           resp = new MgmtResponse.GetCa(caEntry);
           break;
         }
+        case getCertFormat: {
+          String name = getNameFromRequest(nonNullReq(json));
+          CertFormat certFormat = Optional.ofNullable(caManager.getCertFormat(name))
+              .orElseThrow(() -> new CaMgmtException("Unknown CA " + name));
+          resp = new MgmtResponse.StringResponse(certFormat.name());
+          break;
+        }
         case getCaCerts: {
           String name = getNameFromRequest(nonNullReq(json));
-          List<X509Cert> caCerts = Optional.ofNullable(
+          List<CertVariant> caCerts = Optional.ofNullable(
               caManager.getCaCerts(name)).orElseThrow(
                   () -> new CaMgmtException("Unknown CA " + name));
-          resp = new MgmtResponse.StringResponse(
-              X509Util.encodePemCertificates(caCerts.toArray(new X509Cert[0])));
+          X509Cert[] x509CaCerts = new X509Cert[caCerts.size()];
+          int i = 0;
+          for (CertVariant m : caCerts) {
+            x509CaCerts[i++] = m.x509Cert();
+          }
+
+          resp = new MgmtResponse.StringResponse(X509Util.encodePemCertificates(x509CaCerts));
           break;
         }
         case getCaAliasNames: {
@@ -288,11 +303,12 @@ class CaHttpMgmtServlet {
             cert = caManager.getCert(req.caName(), req.serialNumber());
           } else {
             X500Name issuer = X500Name.fromEncoded(req.encodedIssuerDn());
-            cert = caManager.getCert(issuer, req.serialNumber());
+            cert = caManager.getCert(NameVariant.ofX509(issuer), req.serialNumber());
           }
 
           if (cert != null) {
-            resp = new MgmtResponse.GetCert(cert.cert().cert(), null, null);
+            resp = new MgmtResponse.GetCert(cert.cert().cert(), cert.revInfo(),
+                cert.certprofile());
           } else {
             resp = new MgmtResponse.GetCert(null, null, null);
           }
@@ -336,15 +352,15 @@ class CaHttpMgmtServlet {
         }
         case getCrl: {
           MgmtRequest.GetCrl req = MgmtRequest.GetCrl.parse(nonNullReq(json));
-          X509Crl crl = Optional.ofNullable(caManager.getCrl(req.caName(), req.crlNumber()))
+          CrlVariant crl = Optional.ofNullable(caManager.getCrl(req.caName(), req.crlNumber()))
               .orElseThrow(() -> new CaMgmtException("Found no CRL for CA " + req.caName() +
-                  " with CRL number 0x" + req.crlNumber().toString(16)));
+                  " with CRL number 0x" + Long.toString(req.crlNumber(), 16)));
           resp = toByteArray(action, crl);
           break;
         }
         case getCurrentCrl: {
           String caName = getNameFromRequest(nonNullReq(json));
-          X509Crl crl = Optional.ofNullable(caManager.getCurrentCrl(caName))
+          CrlVariant crl = Optional.ofNullable(caManager.getCurrentCrl(caName))
               .orElseThrow(() -> new CaMgmtException("No current CRL for CA " + caName));
           resp = toByteArray(action, crl);
           break;
@@ -418,9 +434,11 @@ class CaHttpMgmtServlet {
         }
         case listCertificates: {
           MgmtRequest.ListCertificates req = MgmtRequest.ListCertificates.parse(nonNullReq(json));
-          X500Name subjectPattern = X500Name.fromEncoded(req.encodedSubjectDnPattern());
+          byte[] encodedPattern = req.encodedSubjectDnPattern();
+          X500Name subjectPattern = (encodedPattern == null) ? null
+              : X500Name.fromEncoded(encodedPattern);
           List<CertListInfo> result = caManager.listCertificates(
-              req.caName(), subjectPattern, req.validFrom(),
+              req.caName(), NameVariant.ofX509(subjectPattern), req.validFrom(),
               req.validTo(), req.orderBy(), req.numEntries());
           resp = new MgmtResponse.ListCertificates(result);
           break;
@@ -583,13 +601,13 @@ class CaHttpMgmtServlet {
           .fillResponse(response);
     } catch (MyException ex) {
       Map<String, String> headers = Collections.singletonMap(
-          HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
+          HttpConstants.HEADER_XIPKI_ERROR, headerValue(ex.getMessage()));
 
       new HttpResponse(ex.status(), null, headers, null).fillResponse(response);
     } catch (CaMgmtException | CodecException ex) {
       LOG.error("CaMgmtException", ex);
       Map<String, String> headers = Collections.singletonMap(
-          HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
+          HttpConstants.HEADER_XIPKI_ERROR, headerValue(ex.getMessage()));
 
       new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, headers, null)
           .fillResponse(response);
@@ -613,7 +631,7 @@ class CaHttpMgmtServlet {
     return req;
   }
 
-  private static MgmtResponse.ByteArray toByteArray(X509Cert cert) {
+  private static MgmtResponse.ByteArray toByteArray(CertVariant cert) {
     if (cert == null) {
       return new MgmtResponse.ByteArray(null);
     }
@@ -622,7 +640,7 @@ class CaHttpMgmtServlet {
     return new MgmtResponse.ByteArray(encoded);
   } // method toByteArray
 
-  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, X509Crl crl) {
+  private static MgmtResponse.ByteArray toByteArray(MgmtAction action, CrlVariant crl) {
     if (crl == null) {
       return new MgmtResponse.ByteArray(null);
     }
@@ -636,5 +654,25 @@ class CaHttpMgmtServlet {
   private static String getNameFromRequest(JsonMap json) throws CodecException {
     return MgmtRequest.Name.parse(json).name();
   } // method getNameFromRequest
+
+
+  private static final int MAX_HEADER_VALUE_LEN = 1000;
+
+  /**
+   * The text as value of an HTTP header: control characters (e.g. the line breaks of database
+   * messages) are replaced by spaces, the length is limited.
+   */
+  static String headerValue(String text) {
+    if (text == null) {
+      return null;
+    }
+    int len = Math.min(text.length(), MAX_HEADER_VALUE_LEN);
+    StringBuilder sb = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char c = text.charAt(i);
+      sb.append((c < 0x20 || c == 0x7F) ? ' ' : c);
+    }
+    return sb.toString();
+  }
 
 }

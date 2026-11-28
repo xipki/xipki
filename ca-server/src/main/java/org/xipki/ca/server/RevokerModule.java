@@ -5,10 +5,10 @@ package org.xipki.ca.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertWithDbId;
 import org.xipki.ca.api.mgmt.CertWithRevocationInfo;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.RevokeSuspendedControl;
+import org.xipki.pkix.ca.CertWithDbId;
 import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.CertStore.SerialWithId;
@@ -16,12 +16,12 @@ import org.xipki.ca.server.mgmt.CaManagerImpl;
 import org.xipki.codec.util.Args;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
+import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.conf.Validity;
 import org.xipki.util.conf.Validity.Unit;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.misc.LogUtil;
-import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.misc.DateUtil;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.Closeable;
@@ -327,7 +327,7 @@ public class RevokerModule extends CaModule implements Closeable {
   private int revokeSuspendedCerts0() throws OperationException {
     if (!masterMode) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
-          "CA could not remove expired certificates in slave mode");
+          "CA could not revoke suspended certificates in slave mode");
     }
 
     final int numEntries = 100;

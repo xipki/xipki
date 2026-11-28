@@ -67,7 +67,7 @@ The binary `xipki-setup-<version>.tar.gz` can be obtained in one of the followin
       If the SNAPSHOT dependencies cannot be retrieved, build and install the
       corresponding repositories locally first, then rerun `./install.sh`:
       - [xipki/xicrypto](https://github.com/xipki/xicrypto) (groupId `org.xipki.crypto`)
-      - [xipki/xiutil](https://github.com/xipki/xiutil) (groupId `org.xipki.util`),
+      - [xipki/xipki-common](https://github.com/xipki/xipki-common) (groupId `org.xipki.common`),
         which depends on `xicrypto`, so build it after that.
 
       In each of these repositories:

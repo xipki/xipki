@@ -9,7 +9,6 @@ import org.xipki.codec.Base64;
 import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.api.CryptoApiFactory;
-import org.xipki.util.misc.LogUtil;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceWrapper;
@@ -18,6 +17,7 @@ import org.xipki.util.http.HttpStatusCode;
 import org.xipki.util.http.XiHttpFilter;
 import org.xipki.util.http.XiHttpRequest;
 import org.xipki.util.http.XiHttpResponse;
+import org.xipki.util.misc.LogUtil;
 
 import java.io.IOException;
 import java.security.MessageDigest;

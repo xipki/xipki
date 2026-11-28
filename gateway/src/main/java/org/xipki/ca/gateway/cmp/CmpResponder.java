@@ -19,33 +19,31 @@ import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.GeneralName;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
-import org.xipki.codec.asn1.Asn1GeneralizedTime;
-import org.xipki.codec.asn1.Asn1Integer;
-import org.xipki.codec.asn1.Asn1OctetString;
-import org.xipki.codec.asn1.Asn1Oid;
-import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
-import org.xipki.codec.x509.id.CmpOIDs;
-import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.ca.gateway.CaNameSigners;
 import org.xipki.ca.gateway.GatewayUtil;
 import org.xipki.ca.gateway.PopControl;
 import org.xipki.ca.sdk.*;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.Hex;
-import org.xipki.pkix.cmp.CertificateRequestMessage;
+import org.xipki.codec.asn1.Asn1GeneralizedTime;
+import org.xipki.codec.asn1.Asn1Integer;
+import org.xipki.codec.asn1.Asn1OctetString;
+import org.xipki.codec.asn1.Asn1Oid;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.InsufficientPermissionException;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
+import org.xipki.codec.x509.id.CmpOIDs;
+import org.xipki.codec.x509.id.ExtensionOIDs;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cmp.CertificateRequestMessage;
 import org.xipki.pkix.cmp.CmpUtf8Pairs;
 import org.xipki.pkix.cmp.CmpUtil;
-import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditStatus;
-import org.xipki.codec.exception.InsufficientPermissionException;
 import org.xipki.util.misc.DateUtil;
 import org.xipki.util.misc.LogUtil;
 
@@ -194,7 +192,7 @@ public class CmpResponder extends BaseCmpResponder {
 
         boolean reuseOldPublicKey = publicKey == null;
         oldCertInfo = new OldCertInfo(reuseOldPublicKey, new OldCertInfo.ByIssuerAndSerial(
-                new X500NameType(oldCertId.getIssuer().getDirectoryName()),
+                new NameType(oldCertId.getIssuer().getDirectoryName()),
                 oldCertId.serialNumber()));
       } // end if(reenroll)
 
@@ -242,7 +240,7 @@ public class CmpResponder extends BaseCmpResponder {
       }
 
       if (subject != null) {
-        template.setSubject(new X500NameType(subject));
+        template.setSubject(new NameType(subject));
       }
 
       if (oldCertInfo != null) {
@@ -555,7 +553,7 @@ public class CmpResponder extends BaseCmpResponder {
 
     SingleCertSerialEntry[] respEntries;
 
-    X500NameType issuerType = new X500NameType(issuer);
+    NameType issuerType = new NameType(issuer);
     if (revoke) {
       RevokeCertsRequest req = new RevokeCertsRequest(null, issuerType, aki,
           revokeEntries.toArray(new RevokeCertsRequest.Entry[0]));

@@ -4,6 +4,8 @@
 package org.xipki.ca.gateway;
 
 import org.slf4j.Logger;
+import org.xipki.acme.AcmeCsr;
+import org.xipki.acme.CsrVerifier;
 import org.xipki.asn1.cms.IssuerAndSerialNumber;
 import org.xipki.asn1.crmf.DhSigStatic;
 import org.xipki.asn1.pkcs10.CertificationRequest;
@@ -11,15 +13,17 @@ import org.xipki.ca.sdk.ErrorCode;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Sequence;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.id.XipkiOIDs;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.crypto.core.SecretKeyWithAlias;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CsrVariant;
+import org.xipki.pkix.cert.DHSigStaticKeyCertPair;
 import org.xipki.pkix.sign.KemHmacSignature;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
@@ -111,7 +115,7 @@ public class GatewayUtil {
       }
     }
 
-    return securityFactory.verifyPop(csr, popControl.popAlgoValidator(), kaKeyAndCert,
+    return securityFactory.verifyPop(CsrVariant.ofX509(csr), popControl.popAlgoValidator(), kaKeyAndCert,
         (kemMasterKey == null) ? null : kemMasterKey.secretKey());
   } // method verifyCsr
 
@@ -136,7 +140,7 @@ public class GatewayUtil {
 
   public static CertificationRequest parseCsrInRequest(byte[] csrBytes) throws OperationException {
     try {
-      return CertificationRequest.fromEncoded(X509Util.toDerEncoded(
+      return CertificationRequest.fromEncoded(CertUtil.toRawEncoded(
           Args.notNull(csrBytes, "csrBytes")));
     } catch (Exception ex) {
       throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
@@ -150,6 +154,26 @@ public class GatewayUtil {
     } catch (Exception ex) {
       throw new OperationException(ErrorCode.BAD_REQUEST, "invalid CSR: " + ex.getMessage());
     }
+  }
+
+  /**
+   * Returns the verifier of the proof of possession of the CSRs of the ACME gateway, as
+   * configured by the POP control.
+   *
+   * @param securityFactory the security factory.
+   * @param popControl the POP control.
+   * @return the verifier.
+   */
+  public static CsrVerifier csrVerifier(final SecurityFactory securityFactory,
+                                        final PopControl popControl) {
+    Args.notNull(securityFactory, "securityFactory");
+    Args.notNull(popControl, "popControl");
+    return new CsrVerifier() {
+      @Override
+      public boolean verify(AcmeCsr csr) throws Exception {
+        return verifyCsr(parseCsrInRequest(csr.encoded()), securityFactory, popControl);
+      }
+    };
   }
 
 }

@@ -3,12 +3,12 @@
 
 package org.xipki.ca.certprofile.xijson.conf;
 
+import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
 import org.xipki.ca.api.profile.id.ExtensionID;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
-import org.xipki.ca.api.profile.SubjectKeyIdentifierControl;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.TripleState;
 
 /**

@@ -20,44 +20,33 @@ import org.xipki.asn1.x509.Attribute;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
-import org.xipki.ca.sdk.ErrorCode;
-import org.xipki.ca.sdk.OperationException;
+import org.xipki.ca.gateway.GatewayConf;
+import org.xipki.ca.gateway.GatewayUtil;
+import org.xipki.ca.gateway.PopControl;
+import org.xipki.ca.sdk.*;
+import org.xipki.codec.Base64;
 import org.xipki.codec.asn1.Asn1Encoding;
 import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Set;
+import org.xipki.codec.crypto.EmbedCertsMode;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.id.AttributeOIDs;
 import org.xipki.codec.x509.id.CmsOIDs;
 import org.xipki.codec.x509.id.ExtensionOIDs;
-import org.xipki.ca.gateway.GatewayConf;
-import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.codec.crypto.EmbedCertsMode;
-import org.xipki.util.audit.HttpRespAuditException;
-import org.xipki.ca.gateway.PopControl;
-import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.ca.sdk.CertprofileInfoResponse;
-import org.xipki.ca.sdk.EnrollCertsRequest;
-import org.xipki.ca.sdk.EnrollOrPollCertsResponse;
-import org.xipki.ca.sdk.ErrorEntry;
-import org.xipki.ca.sdk.OldCertInfo;
-import org.xipki.ca.sdk.SdkClient;
-import org.xipki.ca.sdk.SdkErrorResponseException;
-import org.xipki.ca.sdk.X500NameType;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.Base64;
-import org.xipki.codec.exception.CodecException;
+import org.xipki.crypto.core.EcCurveEnum;
 import org.xipki.crypto.core.KeySpec;
 import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.auth.Requestor;
 import org.xipki.pkix.auth.RequestorAuthenticator;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.crypto.core.EcCurveEnum;
-import org.xipki.ca.sdk.TlsHelper;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.util.http.HttpRespContent;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -518,7 +507,7 @@ public class EstResponder {
     EnrollCertsRequest.Entry template = new EnrollCertsRequest.Entry();
     template.setCertReqId(reqId);
     template.setCertprofile(profile);
-    template.setSubject(new X500NameType(subject));
+    template.setSubject(new NameType(subject));
 
     event.addEventData(CaAuditConstants.NAME_certprofile, profile);
     event.addEventData(CaAuditConstants.NAME_req_subject,
@@ -656,7 +645,7 @@ public class EstResponder {
       }
     }
 
-    template.setSubject(new X500NameType(requestedSubject));
+    template.setSubject(new NameType(requestedSubject));
     event.addEventData(CaAuditConstants.NAME_req_subject,
         "\"" + X509Util.x500NameText(requestedSubject) + "\"");
 

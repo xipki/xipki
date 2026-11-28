@@ -12,19 +12,19 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>xi-shell</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>shell-base</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>security-shell</artifactId>
-      <version>${project.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

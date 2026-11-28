@@ -20,24 +20,23 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
+import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.exception.OperatorException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.x509.id.CmpOIDs;
 import org.xipki.codec.x509.id.XipkiOIDs;
-import org.xipki.crypto.core.KeyInfoUtil;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.api.ECPoint;
-import org.xipki.pkcs11.wrapper.Functions;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.Signer;
+import org.xipki.crypto.core.KeyInfoUtil;
 import org.xipki.crypto.core.WeierstraussCurveEnum;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkcs11.wrapper.Functions;
+import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.util.exception.NoIdleSignerException;
 import org.xipki.util.exception.PkixException;
 import org.xipki.util.misc.RandomUtil;
@@ -107,9 +106,9 @@ public class CmpUtil {
     if (signerName != null) {
       tmpSignerName = signerName;
     } else {
-      X500Name x500Name = Optional.ofNullable(signer.x509Cert()).orElseThrow(
+      X500Name x500Name = Optional.ofNullable(signer.cert()).orElseThrow(
           () -> new IllegalArgumentException("signer without certificate is not allowed"))
-          .subject();
+          .x509Cert().subject();
       tmpSignerName = GeneralName.ofDirectoryName(x500Name);
     }
 
@@ -117,7 +116,7 @@ public class CmpUtil {
         pkiMessage, tmpSignerName, null);
 
     if (addSignerCert) {
-      Certificate signerCert = signer.x509Cert().getCert();
+      Certificate signerCert = signer.cert().x509Cert().getCert();
       builder.addCMPCertificate(signerCert);
     }
 

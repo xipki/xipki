@@ -28,8 +28,8 @@ import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.util.http.Curl.CurlResult;
 import org.xipki.util.http.Curl;
+import org.xipki.util.http.Curl.CurlResult;
 import org.xipki.util.http.DefaultCurl;
 import org.xipki.util.http.SslContextConf;
 
@@ -142,9 +142,11 @@ public class CtLogClient {
       long timestamp = resp.timestamp();
       byte[] extensions = resp.extensions();
 
+      // an SCT that cannot be verified is not embedded
       PublicKey verifyKey = publicKeyFinder == null ? null : publicKeyFinder.getPublicKey(logId);
       if (verifyKey == null) {
-        LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "unknown CT log 0x" + hexLogId
+            + " (" + url + "): public key not in ctLog.keydir");
       } else {
         SignatureAndHashAlgorithm algorithm = ds.algorithm();
         String signAlgo = getSignatureAlgo(algorithm);

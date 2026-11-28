@@ -24,16 +24,20 @@ import org.xipki.cmp.client.Requestor;
 import org.xipki.cmp.client.RevokeCertRequest;
 import org.xipki.cmp.client.UnsuspendCertRequest;
 import org.xipki.codec.Hex;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.x509.PrivateKeyInfo;
 import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.codec.x509.id.CmpOIDs;
-import org.xipki.codec.util.IoUtil;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.crypto.core.HashAlgo;
 import org.xipki.crypto.core.SignAlgo;
 import org.xipki.crypto.core.SignAlgoMode;
+import org.xipki.pkix.cert.C509Crl;
+import org.xipki.pkix.cert.CertVariant;
 import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.CrlVariant;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.cmp.CertificateRequestMessage;
 import org.xipki.pkix.cmp.PkiStatusInfo;
 import org.xipki.pkix.pkcs12.Pkcs12KeyStore;
@@ -42,14 +46,14 @@ import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.sign.SignerConf;
 import org.xipki.pkix.util.KeyUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.password.Passwords;
 import org.xipki.shell.Completion;
 import org.xipki.shell.completer.FilePathCompleter;
 import org.xipki.shell.security.XiShellBaseCommand;
 import org.xipki.shell.xi.Completers;
 import org.xipki.util.http.ReqRespDebug;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
+import org.xipki.util.password.Passwords;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -111,7 +115,7 @@ public class CmpCommands {
         }
 
         ConcurrentSigner signer = PkiClientRuntime.getSecurities()
-            .securityFactory().createSigner("PKCS12", signerConf, (X509Cert) null);
+            .securityFactory().createSigner("PKCS12", signerConf, (CertVariant) null);
         return new Requestor.SignatureCmpRequestor(signer);
       } else {
         if (signerPasswordHint == null) {
@@ -219,7 +223,8 @@ public class CmpCommands {
         if (crl == null) {
           throw new IOException("received no CRL from server");
         }
-        saveVerbose("saved CRL to file", outFile, encodeCrl(crl.getEncoded(), outform));
+        saveVerbose("saved CRL to file", outFile,
+            encodeCrl(CrlVariant.ofX509(new X509Crl(crl)), outform));
       } catch (Exception ex) {
         throw new RuntimeException(ex.getMessage(), ex);
       }
@@ -481,7 +486,7 @@ public class CmpCommands {
       SignerConf signerConf = getPkcs11SignerConf(
           moduleName, Integer.parseInt(slotIndex), keyLabel, keyIdBytes, getSignAlgoMode());
       return PkiClientRuntime.getSecurities()
-          .securityFactory().createSigner("PKCS11", signerConf, (X509Cert[]) null);
+          .securityFactory().createSigner("PKCS11", signerConf, (CertVariant []) null);
     }
   }
 
@@ -508,7 +513,7 @@ public class CmpCommands {
         signerConf.setMode(mode);
       }
       return PkiClientRuntime.getSecurities()
-          .securityFactory().createSigner("PKCS12", signerConf, (X509Cert[]) null);
+          .securityFactory().createSigner("PKCS12", signerConf, (CertVariant []) null);
     }
   }
 
@@ -604,7 +609,7 @@ public class CmpCommands {
       SignerConf signerConf = getPkcs11SignerConf(
           moduleName, Integer.parseInt(slotIndex), keyLabel, keyIdBytes, getSignAlgoMode());
       return PkiClientRuntime.getSecurities()
-          .securityFactory().createSigner("PKCS11", signerConf, (X509Cert[]) null);
+          .securityFactory().createSigner("PKCS11", signerConf, (CertVariant []) null);
     }
   }
 
@@ -631,7 +636,7 @@ public class CmpCommands {
         signerConf.setMode(mode);
       }
       return PkiClientRuntime.getSecurities()
-          .securityFactory().createSigner("PKCS12", signerConf, (X509Cert[]) null);
+          .securityFactory().createSigner("PKCS12", signerConf, (CertVariant []) null);
     }
   }
 
@@ -766,9 +771,13 @@ public class CmpCommands {
     @Option(names = "--rsa-pss", description = "whether to use RSAPSS for POP")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(names = "--embeds-publickey",
-        description = "whether to embed the public key in the request")
-    private Boolean embedsPublicKey = Boolean.FALSE;
+    @Option(names = "--embeds-publickey", negatable = true, defaultValue = "true",
+        fallbackValue = "true",
+        description = "whether to embed the public key in the request, default true; with "
+            + "--no-embeds-publickey the CA certifies the public key of the old certificate")
+    private boolean embedsPublicKey = true;
+
+    private ConcurrentSigner signer;
 
     protected SignAlgoMode getSignAlgoMode() {
       return Boolean.TRUE.equals(rsaPss) ? SignAlgoMode.RSAPSS : null;
@@ -776,16 +785,23 @@ public class CmpCommands {
 
     protected abstract ConcurrentSigner getSigner() throws Exception;
 
+    /** The signer, created once per run (the keystore password is read once); reset in run(). */
+    private ConcurrentSigner signer() throws Exception {
+      if (signer == null) {
+        signer = getSigner();
+      }
+      return signer;
+    }
+
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return Boolean.TRUE.equals(embedsPublicKey)
-          ? getSigner().x509Cert().subjectPublicKeyInfo() : null;
+      return embedsPublicKey ? publicKeyOf(signer()) : null;
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
-      ConcurrentSigner signer = getSigner();
+      ConcurrentSigner signer = signer();
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
@@ -800,6 +816,7 @@ public class CmpCommands {
 
     @Override
     public void run() {
+      signer = null; // the shell reuses command objects
       try {
         EnrollCertResult result = enroll();
         EnrollCertResult.CertifiedKeyPairOrError certOrError = firstEnrollResult(result);
@@ -987,26 +1004,25 @@ public class CmpCommands {
 
     protected abstract ConcurrentSigner getSigner() throws Exception;
 
+    private ConcurrentSigner signer;
+
+    /** The signer, created once per run (the keystore password is read once); reset in run(). */
+    private ConcurrentSigner signer() throws Exception {
+      if (signer == null) {
+        signer = getSigner();
+      }
+      return signer;
+    }
+
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      ConcurrentSigner signer = getSigner();
-      X509Cert cert = signer.x509Cert();
-      if (cert != null) {
-        return cert.subjectPublicKeyInfo();
-      }
-
-      PublicKey publicKey = signer.publicKey();
-      if (publicKey != null) {
-        return SubjectPublicKeyInfo.fromPublicKey(publicKey);
-      }
-
-      throw new IOException("could not extract public key");
+      return publicKeyOf(signer());
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
-      ConcurrentSigner signer = getSigner();
+      ConcurrentSigner signer = signer();
       Signer signer0 = signer.borrowSigner();
       POPOSigningKey popSk;
       try {
@@ -1035,6 +1051,7 @@ public class CmpCommands {
 
     @Override
     public void run() {
+      signer = null; // the shell reuses command objects
       try {
         EnrollCertResult result = enroll();
         EnrollCertResult.CertifiedKeyPairOrError certOrError = firstEnrollResult(result);
@@ -1057,6 +1074,21 @@ public class CmpCommands {
     private List<String> ids;
     private List<BigInteger> serialNumbers;
     private List<String> sources;
+  }
+
+  /** The public key of the signer: of its certificate, or its public key (e.g. PKCS#11). */
+  static SubjectPublicKeyInfo publicKeyOf(ConcurrentSigner signer) throws Exception {
+    CertVariant cert = signer.cert();
+    if (cert != null && cert.hasX509()) {
+      return cert.x509Cert().subjectPublicKeyInfo();
+    }
+
+    PublicKey publicKey = signer.publicKey();
+    if (publicKey != null) {
+      return SubjectPublicKeyInfo.fromPublicKey(publicKey);
+    }
+
+    throw new IOException("could not extract public key");
   }
 
   static EnrollCertResult.CertifiedKeyPairOrError firstEnrollResult(EnrollCertResult result) {

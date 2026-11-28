@@ -21,14 +21,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.util</groupId>
+      <groupId>org.xipki.common</groupId>
       <artifactId>servlet-common</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xipki.crypto</groupId>
       <artifactId>xihsm</artifactId>
-      <version>${xiutil.version}</version>
+      <version>${xipki-common.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

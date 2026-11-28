@@ -7,17 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.asn1.cmp.PKIMessage;
 import org.xipki.ca.gateway.GatewayUtil;
-import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.ca.sdk.CaAuditConstants;
-import org.xipki.codec.util.Args;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.ca.sdk.TlsHelper;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.util.audit.AuditEvent;
 import org.xipki.util.audit.AuditLevel;
 import org.xipki.util.audit.AuditService;
 import org.xipki.util.audit.AuditStatus;
 import org.xipki.util.audit.Audits;
+import org.xipki.util.audit.HttpRespAuditException;
 import org.xipki.util.http.HttpConstants;
 import org.xipki.util.http.HttpResponse;
 import org.xipki.util.http.HttpStatusCode;
@@ -102,7 +102,8 @@ public class CmpHttpServlet {
       try {
         pkiReq = PKIMessage.fromEncoded(requestBytes);
       } catch (Exception ex) {
-        LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
+        // a client error: no error log entry
+        LogUtil.warn(LOG, ex, "could not parse the request (PKIMessage)");
         throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }

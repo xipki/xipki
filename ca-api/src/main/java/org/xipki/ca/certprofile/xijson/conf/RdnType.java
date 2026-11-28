@@ -9,10 +9,10 @@ import org.xipki.ca.api.profile.ctrl.StringType;
 import org.xipki.ca.api.profile.ctrl.SubjectDnSpec;
 import org.xipki.ca.api.profile.ctrl.TextValidator;
 import org.xipki.ca.api.profile.id.AttributeType;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonEncodable;
 import org.xipki.codec.json.JsonMap;
+import org.xipki.codec.util.Args;
 
 /**
  * Rdn Type definition.

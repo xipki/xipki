@@ -12,23 +12,23 @@ import org.xipki.asn1.pkcs10.CertificationRequest;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.CertificateList;
-import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.cmp.client.*;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.codec.json.JsonMap;
 import org.xipki.codec.json.JsonParser;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.crypto.core.SignAlgo;
-import org.xipki.pkix.cmp.PkiStatusInfo;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.x509.SubjectPublicKeyInfo;
 import org.xipki.crypto.core.KemEncapKey;
+import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.SecurityFactory;
 import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.util.X509Util;
+import org.xipki.pkix.cmp.PkiStatusInfo;
 import org.xipki.pkix.sign.AlgorithmValidator;
+import org.xipki.pkix.util.X509Util;
+import org.xipki.util.http.ReqRespDebug;
 import org.xipki.util.http.SslContextConf;
 import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.http.ReqRespDebug;
-import org.xipki.codec.util.IoUtil;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSocketFactory;
@@ -113,10 +113,14 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     CmpClientConf conf = parse(configFile);
-    SslContextConf sslCc = SslContextConf.ofSslConf(conf.ssl());
-
-    SSLSocketFactory sslSocketFactory = sslCc.getSslSocketFactory();
-    HostnameVerifier hostnameVerifier = sslCc.getHostnameVerifier();
+    // without ssl configuration: the defaults of the JDK
+    SSLSocketFactory sslSocketFactory = null;
+    HostnameVerifier hostnameVerifier = null;
+    if (conf.ssl() != null) {
+      SslContextConf sslCc = SslContextConf.ofSslConf(conf.ssl());
+      sslSocketFactory = sslCc.getSslSocketFactory();
+      hostnameVerifier = sslCc.getHostnameVerifier();
+    }
 
     // Responder configuration
     CmpClientConf.Responder responderConf = conf.responder();

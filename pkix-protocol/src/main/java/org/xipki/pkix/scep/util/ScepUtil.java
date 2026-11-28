@@ -9,13 +9,13 @@ import org.xipki.asn1.cms.SignedData;
 import org.xipki.asn1.x509.Certificate;
 import org.xipki.asn1.x509.CertificateList;
 import org.xipki.codec.asn1.AbstractAsn1Time;
-import org.xipki.codec.x509.AlgorithmIdentifier;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.x509.AlgorithmIdentifier;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cms.CmsSignedData;
 import org.xipki.pkix.cms.CmsSigner;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.SignatureContentVerifierFactory;
 import org.xipki.util.exception.PkixException;
 

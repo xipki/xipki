@@ -13,8 +13,8 @@ See also <https://github.com/xipki/xipki/releases>
 - The crypto modules moved to https://github.com/xipki/xicrypto and use the groupId `org.xipki.crypto`.
 - The ASN.1 structures are in the new module `asn1` (package `org.xipki.asn1`), built on the `crypto-codec` module of
   xicrypto instead of BouncyCastle. The PKIX API is in the module `pkix`. Both use the groupId `org.xipki.pki`.
-- The modules `org.xipki.pkix:pkix-util` and `util` moved to https://github.com/xipki/xiutil and use the groupId
-  `org.xipki.util`, as the modules `util` and `datasource`:
+- The modules `org.xipki.pkix:pkix-util` and `util` moved to https://github.com/xipki/xipki-common and use the groupId
+  `org.xipki.common`, as the modules `util` and `datasource`:
   - `org.xipki.pkix.util.password`, `.conf`, `.io` and `.misc` are renamed to `org.xipki.util.*`.
     Custom `PasswordCallback` and `PasswordResolver` classes, and class names in `password.cfg`,
     need the new package.
@@ -26,12 +26,12 @@ See also <https://github.com/xipki/xipki/releases>
     `org.xipki.ca.api`) moved to `org.xipki.util.conf`.
   - The modules `servlet-common`, `xi-shell` and `demo-shell` moved there too, with their packages
     unchanged.
+  - The module `security-shell` (package `org.xipki.shell.security`) moved there too
+    (`org.xipki.common:security-shell`).
   - `KeyCertBytesPair` and `CertPathValidationModel` moved from `org.xipki.pkix.cert` and `.verify` to
     `org.xipki.util.cert`, together with `EmbedCertsMode`, `PemEncoder` and `KeyInfoPair`.
   - `HttpRespAuditException` and `PasswordHash` moved from `org.xipki.ca.gateway` to
     `org.xipki.util.audit` and `org.xipki.util.password`.
-  - The new module `acme` holds the X.509-independent part of the ACME gateway (`org.xipki.acme`). A custom
-    `ContactVerifier` needs the new package.
   - The new module `pkix-util` holds the PKCS#11 modules, slots, keys and their configuration, moved from
     `org.xipki.pkix.pkcs11` to `org.xipki.util.pkcs11`. `P11Signer` and `P11SignerFactory` are now abstract there;
     `X509P11Signer` and `X509P11SignerFactory` in `org.xipki.pkix.pkcs11` implement them for X.509.
@@ -44,9 +44,30 @@ See also <https://github.com/xipki/xipki/releases>
   - The new module `dns` holds the DNS resolver and DNSSEC validator (`org.xipki.dns`).
   - `DatabaseMacAuditService` moved to `org.xipki.datasource`. The audit types `db-mac` and
     `database-mac` are unchanged, but need the module `datasource`.
-- The shell-base module moved to https://github.com/xipki/xiutil and use the groupId `org.xipki.util`. The
+- The shell-base module moved to https://github.com/xipki/xipki-common and use the groupId `org.xipki.common`. The
   package `org.xipki.shell` is unchanged.
 - The remaining modules use the groupId `org.xipki.pki` or `org.xipki.pki.*`
+- The CA management tools moved to https://github.com/xipki/xipki-common and use the groupId `org.xipki.common`:
+  - The modules `ca-sdk` (package `org.xipki.ca.sdk`) and `ca-mgmt` (the management client
+    `org.xipki.ca.mgmt.client` and the database tools `org.xipki.ca.mgmt.db`) moved with their packages
+    unchanged.
+  - The management API of `ca-api` (`CaManager`, `CaConf`, `MgmtRequest`, `MgmtResponse`, `Permissions`,
+    the entries) moved to the module `ca-mgmt-api`, with the package `org.xipki.ca.api.mgmt` unchanged.
+  - The module `ca-mgmt-shell` (package `org.xipki.ca.mgmt.shell`, formerly `org.xipki.shell.ca.mgmt`)
+    holds the CA management shell with the database commands (`export-*`, `import-*`, `diff-digest`,
+    `sql`). It replaces `shells/ca-mgmt-shell`.
+  - The new module `ca-mgmt-test` tests the management client, the CA management shell and the database
+    tools.
+- The ACME server of the gateway moved to the module `acme` of https://github.com/xipki/xipki-common (groupId
+  `org.xipki.common`):
+  - All classes are in the package `org.xipki.acme`: account, order, repository, nonces, messages, and
+    the protocol (`AcmeHttpServlet`, `AcmeResponder`, `CertEnroller`, `ChallengeValidator`, formerly in
+    `org.xipki.ca.gateway.acme`). A custom `ContactVerifier` needs the new package.
+  - `AcmeProtocolConf` remains in the gateway (`org.xipki.ca.gateway.acme`). `AcmeResponder` takes the
+    certificate format and a `CsrVerifier` (see `GatewayUtil.csrVerifier`) instead of the
+    `SecurityFactory` and the `PopControl`.
+  - The ACME database must have the certificate format X.509 (DBSCHEMA entry `CERTFORMAT` absent or
+    `X509`).
 - Protocol gateway
   - The gateway is deployed as `ROOT.war` (formerly `gw.war`) and serves the URLs
     `/acme/`, `/cmp/`, `/est/`, `/rest/` and `/scep/` directly; `/.well-known/est/` and `/.well-known/cmp/` are aliases of `/est/` and `/cmp/`.
@@ -109,6 +130,138 @@ See also <https://github.com/xipki/xipki/releases>
     status of the publication. Previously the revocation of a self-signed CA was audited as
     `FAILED` and logged the warning that the certificate does not exist, since the CA
     certificate is not in the table `CERT`.
+- CMP client: a configuration without `ssl` works (defaults of the JDK); previously the client
+  could not be initialized. `sendRequestorCert` defaults to `true` also when parsed, as the
+  field and the shipped configurations.
+- SCEP gateway: with one RA certificate for signature and encryption (no decryptor), GetCACert
+  returns the RA certificate once; previously twice, so that the XiPKI SCEP client could not
+  select it.
+- Keypool (`fill-keypool`): the private keys were also stored in clear text in the column
+  PUKDATA instead of the public keys, and the keypool generator could not use the keys.
+  **Keypools filled with an earlier version contain the clear private keys: empty and refill
+  them.** Also fixed a leaked database connection.
+- CA system status: with `noLock`, a failed start is reported as `ERROR` instead of
+  `LOCK_FAILED`.
+- CA SDK: a re-enrollment with a CSR did not check the old certificate: unknown, revoked
+  certificates and those of another issuer were renewed, and a requestor with only the
+  permission to re-enroll could get new certificates for any CSR. The CMP, EST and REST
+  gateways were not affected (no CSR for re-enrollment).
+- `SdkClient`: `enrollCert`, `reenrollCert` and the variants with key generated by the CA pass
+  on the error code and message of the CA instead of `SYSTEM_FAILURE`.
+- `diff-digest`: comparing a CA database with an OCSP database failed in both directions (hash
+  algorithm SHA1 instead of the `CERTHASH_ALGO` of the OCSP database, NullPointerException
+  with the OCSP database as reference, padded `HASH` values).
+- `diff-digest`: a difference of a certificate (revocation status, reason, time, hash) was not
+  reported; the comparison of the CA stopped with "not of the same serialNumber".
+- CA management: removing a CA with certificates or CRLs is rejected with a clear message
+  (deactivate the CA instead) instead of a database error. Error messages of the management
+  servlet are sent without line breaks (control characters replaced), at most 1000 characters.
+- OCSP: an HTTP GET request with an invalid percent escape is answered with 400 instead of 500
+  (and an error log entry with stack trace).
+- CA SDK interface: the client certificate is checked before the request is decoded and the CA
+  is looked up; an unauthenticated client gets 401 without information about the CAs.
+- ACME: the method check of the servlet is removed (it was ineffective); the responder checks the
+  method per command, HEAD for newNonce (RFC 8555 7.2) is kept.
+- CMP: a request that is not a PKIMessage is logged as warning instead of error.
+- CA management: every change of a CA, profile, requestor, signer, keypair generation or
+  publisher (`ca-up`, `profile-up`, ..., management client, REST) kept a connection of the CA
+  configuration database; when the pool was exhausted, all management operations failed after
+  a timeout until restart.
+- CA management shell
+  - `enroll-cert`: the keystore / key file is saved next to the certificate (`--out` without
+    its extension); previously the path was cut at its last dot (a dot in a directory name
+    gave a wrong file, `--out` without dot failed after the certificate was issued).
+  - `list-cert` (and the other date options): yyyyMMdd is accepted as documented.
+  - `ca-up --ocsp-uri null` (and the other URI options with `null`) removes the URIs; previously
+    they stayed unchanged. Via the management client / REST: the list `["null"]` removes them.
+  - `convert-profile` removed: it only copied the file since the support of v1 profiles was
+    removed.
+- PKI client shell
+  - `ocsp-status` prints `status=good` and `reason=<name>`; previously the debug text of the
+    status / reason.
+  - CMP enroll / update with PKCS#12 and the SCEP commands read the keystore once: without
+    `--password` the password is asked once (was twice).
+  - `cmp-update-p12` / `cmp-update-p11` certify the key of the keystore / token by default
+    (`--embeds-publickey` defaults to true); previously the CA certified the key of the old
+    certificate. `--no-embeds-publickey` keeps the old key. With PKCS#11 the option failed.
+- QA shell: `ca-check` checks only the given URI lists and fails for a different certificate
+  chain length; `publisher-check` checks only the given type / conf; `careq-check` compares the
+  profiles as a set; `init-caqa` fails (exit code 1) if the initialization fails.
+- Shells (xiutil): saving a file that exists fails if the question "replace?" is not answered
+  (e.g. end of the input in a script); previously the content was saved to `tmp-<random>` in
+  the current directory and the command reported success. A failed save no longer falls back to
+  `tmp-<random>` either.
+- HTTP client of the shells (`curl.json`, xiutil `DefaultCurl`): `hostConfs` is optional; an
+  invalid configuration is reported with the file name, and for every request: previously the
+  following requests were sent without the configured TLS settings. A TLS configuration of a
+  host that cannot be initialized (e.g. missing trust anchor file) is an error; previously it
+  was logged, and the requests to that host used the default TLS settings of the JDK.
+- Security shell
+  - The certificate format: the commands generating a certificate or CSR (`keypair-p12`, `csr-jce`,
+    `csr-p11`, `csr-p12`) generate X.509 certificates and PKCS#10 CSRs, with the new option `--c509`
+    C509 certificates and CSRs. The other commands detect the format of their input: `cert-info`,
+    `crl-info`, `validate-csr`, `import-cert` (C509 certificates only to PKCS#12), `export-cert-p12`,
+    `update-cert-p12`, `pkcs12`, `convert-keystore` (C509 certificates only to PKCS#12 and PEM) and
+    `export-keycert-pem` (also COSE_C509 files). `export-cert-p7m` and `export-keycert-est` remain X.509
+    only. `cert-info --cbor` is an alias of `--der`.
+  - `import-cert` into an existing keystore: a certificate whose common name equals that of an
+    existing entry (aliases are case-insensitive) replaced that entry; it is added with the
+    alias `<CN>-<n>`.
+  - `secretkey-p12 --password <password>` is accepted; previously the option took no value and
+    the command could only be used interactively.
+  - `cert-info --subject` / `--issuer` and `crl-info --issuer` print the DN (e.g.
+    `CN=a,O=b,C=DE`) instead of a multi-line debug text.
+  - Several lines from a redirected standard input (password parts with `-k`, the repeated
+    confirmations of `delete-key-p11`, `delete-objects-p11`, `delete-all-objects-p11`) are read
+    one after the other; previously only the first line was read (NullPointerException, or
+    nothing deleted).
+  - The CLIs read the password configuration `xipki/security/password.cfg` (master password of
+    `PBE:` passwords, `pbe-enc`, `pbe-dec`); previously it was ignored and the master password
+    was asked in a dialog. The unused `password` block is removed from `xipki/etc/security.json`.
+- OCSP store `ejbca-db`: a revoked CA whose revocation date is null in the CA data (`CAData`)
+  is revoked at the time the store reads it; previously a `<long>` of a following key (e.g. the
+  expiration time) was taken as revocation time.
+- Certificate Transparency: the embedded SCT list was wrapped twice in an OCTET STRING, so that
+  the SCTs of the certificates could not be read (RFC 6962 3.3). Certificates with SCTs issued
+  with an earlier 7.0.0 snapshot have an unreadable SCT extension.
+- Certificate Transparency: SCTs must be verifiable. An SCT of a CT log whose public key is not in
+  `ctLog.keydir` is rejected (before: embedded unverified with a warning), and a CA with CT
+  enabled does not start without public keys of CT logs. **Deployments using CT must put the
+  public keys of their CT logs into the directory `ctLog.keydir`.**
+- QA: the public keys of the dummy CT logs are copied to the CA (`prepare.sh`); the CT log URLs
+  of the `qa.d` CAs point to the dummy logs (`ctlogrsa`, `ctlogec`).
+- CA management
+  - `listCertificates` without subject pattern, and `getDbSchemas`, failed with HTTP 500.
+  - `getCert` returns the revocation information and the certificate profile; previously every
+    certificate looked unrevoked to the management client and the mgmt shell.
+  - A revoked CA can be read by the management client (`getCa`): the revocation information of
+    the CA was written as JSON object but parsed as text.
+  - `diff-digest-db` works on H2 and PostgreSQL: it ran SQL texts on a prepared statement.
+  - The database tools support the certificate formats X.509 and C509, given by the DBSCHEMA entry
+    `CERTFORMAT`: absent or `X509` for X.509, `C509` for C509; other values are rejected. The exports
+    record the format (`certFormat` in `ca-certstore.json` and `ocsp-certstore.json`, absent for X.509).
+    Export, import and `diff-digest` stop before anything is written if the formats of the databases
+    and export files differ.
+  - The database tools no longer support CA databases with a schema version below 7 (xipki before
+    6.0.0).
+  - A missing DBSCHEMA entry `X500NAME_MAXLEN` is 350 also in the OCSP publisher and the database
+    tools; previously the publisher was not loaded and export / import failed.
+  - The CA checks at startup that its CA configuration, CA and OCSP (publisher) databases have the
+    certificate format X.509 (`CERTFORMAT` absent or `X509`).
+- Certificate profiles
+  - A requested notBefore is used if it is not in the past (with `notBeforeTime` as offset, e.g.
+    `current`). Previously the current time was used.
+  - The order of `signatureAlgorithms` is kept: the CA signs with the first algorithm it
+    supports. Previously the order was lost.
+  - CA/B Forum (`certDomain` `CABForumBR`) CA certificates require organization and country in
+    the subject, as intended. Previously only the commonName was checked.
+  - An RDN with `toSAN` requires the extension SubjectAlternativeName (clear error message);
+    with SubjectAlternativeName but without `modes`, all modes are allowed. Previously both
+    cases failed with a NullPointerException.
+  - Own extensions in subclasses of `XijsonCertprofile`: the protected methods
+    `initExtraExtension` and `getExtraExtensions` are called for the extensions the xijson
+    profile cannot process. The QA profile `certprofile-extended.json` (extension `1.2.3.4.1`) needs
+    such a subclass; the test class `ExtendedCertprofile` is an example.
 - Dependencies
   - dnsjava: removed
   - bouncycastle (bcutil, bcpkix, bcprov): removed

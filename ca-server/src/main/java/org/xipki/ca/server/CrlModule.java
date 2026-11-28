@@ -13,28 +13,26 @@ import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.GeneralName;
 import org.xipki.asn1.x509.GeneralNames;
 import org.xipki.asn1.x509.IssuingDistributionPoint;
-import org.xipki.util.conf.HourMinute;
-import org.xipki.ca.api.mgmt.PublicCaInfo;
 import org.xipki.ca.api.mgmt.CrlControl;
 import org.xipki.ca.api.mgmt.RequestorInfo;
 import org.xipki.ca.api.mgmt.entry.SignerEntry;
 import org.xipki.ca.sdk.OperationException;
 import org.xipki.ca.server.mgmt.CaManagerImpl;
-import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.exception.GenerationException;
 import org.xipki.codec.util.Args;
+import org.xipki.pkix.ca.X509PublicCaInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.KeyUsage;
 import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cert.X509Crl;
 import org.xipki.pkix.sign.ConcurrentSigner;
-import org.xipki.pkix.sign.Signer;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.util.exception.NoIdleSignerException;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.misc.LogUtil;
 import org.xipki.util.audit.AuditEvent;
+import org.xipki.util.conf.HourMinute;
+import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
+import org.xipki.util.misc.LogUtil;
 import org.xipki.util.misc.RandomUtil;
 
 import java.io.Closeable;
@@ -210,7 +208,7 @@ public class CrlModule extends CaModule implements Closeable {
     if (caInfo.crlControl() != null) {
       X509Cert crlSignerCert;
       if (caInfo.crlSignerName() != null) {
-        crlSignerCert = getCrlSigner().certificate();
+        crlSignerCert = getCrlSigner().certificate().x509Cert();
       } else {
         // CA signs the CRL
         crlSignerCert = caCert;
@@ -432,10 +430,11 @@ public class CrlModule extends CaModule implements Closeable {
 
     try {
       SignerEntry crlSigner = getCrlSigner();
-      PublicCaInfo pci = caInfo.publicCaInfo();
+      X509PublicCaInfo pci = caInfo.publicCaInfo();
 
       boolean indirectCrl = (crlSigner != null);
-      X500Name crlIssuer = indirectCrl ? crlSigner.certificate().subject() : pci.subject();
+      X500Name crlIssuer = indirectCrl
+          ? crlSigner.certificate().x509Cert().subject() : pci.subject();
 
       CertificateList.V2CRLBuilder crlBuilder =
           new CertificateList.V2CRLBuilder(crlIssuer, thisUpdate);

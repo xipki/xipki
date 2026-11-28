@@ -8,23 +8,24 @@ import org.slf4j.LoggerFactory;
 import org.xipki.asn1.ocsp.CrlID;
 import org.xipki.asn1.x500.X500Name;
 import org.xipki.asn1.x509.TBSCertificate;
-import org.xipki.codec.util.StringUtil;
-import org.xipki.codec.util.Args;
 import org.xipki.codec.Base64;
 import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
+import org.xipki.codec.util.IoUtil;
+import org.xipki.codec.util.StringUtil;
+import org.xipki.crypto.core.HashAlgo;
+import org.xipki.datasource.DataAccessException;
+import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.datasource.SqlUtil;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCert;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCertsIterator;
-import org.xipki.crypto.core.HashAlgo;
 import org.xipki.pkix.cert.CertRevocationInfo;
 import org.xipki.pkix.cert.CrlReason;
 import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
-import org.xipki.datasource.DataAccessException;
-import org.xipki.datasource.DataSourceWrapper;
 import org.xipki.util.misc.DateUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.datasource.SqlUtil;
-import org.xipki.codec.util.IoUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -304,7 +305,7 @@ class ImportCrl {
 
       String cacertFp;
       try {
-        byte[] derCertBytes = X509Util.toDerEncoded(IoUtil.read(caCertFile));
+        byte[] derCertBytes = CertUtil.toRawEncoded(IoUtil.read(caCertFile));
         cacertFp = HashAlgo.SHA1.hexHash(derCertBytes);
       } catch (IOException ex) {
         LOG.error("error reading {}", caCertFile.getPath(), ex);

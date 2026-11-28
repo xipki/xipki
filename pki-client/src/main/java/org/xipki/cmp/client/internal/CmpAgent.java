@@ -21,6 +21,13 @@ import org.xipki.asn1.x509.CertificateList;
 import org.xipki.asn1.x509.Extension;
 import org.xipki.asn1.x509.Extensions;
 import org.xipki.asn1.x509.GeneralName;
+import org.xipki.cmp.client.CmpClientException;
+import org.xipki.cmp.client.EnrollCertRequest;
+import org.xipki.cmp.client.PkiErrorException;
+import org.xipki.cmp.client.Requestor;
+import org.xipki.cmp.client.RevokeCertRequest;
+import org.xipki.cmp.client.UnsuspendCertRequest;
+import org.xipki.codec.Hex;
 import org.xipki.codec.asn1.Asn1Encodable;
 import org.xipki.codec.asn1.Asn1GeneralizedTime;
 import org.xipki.codec.asn1.Asn1Integer;
@@ -29,8 +36,11 @@ import org.xipki.codec.asn1.Asn1Oid;
 import org.xipki.codec.asn1.Asn1Primitive;
 import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.asn1.Asn1Utf8String;
-import org.xipki.codec.x509.GCMParameters;
+import org.xipki.codec.crypto.ContentVerifierFactory;
+import org.xipki.codec.exception.CodecException;
+import org.xipki.codec.util.Args;
 import org.xipki.codec.x509.AlgorithmIdentifier;
+import org.xipki.codec.x509.GCMParameters;
 import org.xipki.codec.x509.PBES2Parameters;
 import org.xipki.codec.x509.PBKDF2Params;
 import org.xipki.codec.x509.PrivateKeyInfo;
@@ -40,21 +50,16 @@ import org.xipki.codec.x509.id.AlgorithmOIDs;
 import org.xipki.codec.x509.id.CmpOIDs;
 import org.xipki.codec.x509.id.NistOIDs;
 import org.xipki.codec.x509.id.XipkiOIDs;
-import org.xipki.cmp.client.CmpClientException;
-import org.xipki.cmp.client.EnrollCertRequest;
-import org.xipki.cmp.client.PkiErrorException;
-import org.xipki.cmp.client.Requestor;
-import org.xipki.cmp.client.RevokeCertRequest;
-import org.xipki.cmp.client.UnsuspendCertRequest;
-import org.xipki.codec.crypto.ContentVerifierFactory;
-import org.xipki.codec.util.Args;
-import org.xipki.codec.exception.CodecException;
-import org.xipki.codec.Hex;
 import org.xipki.crypto.api.CryptoApi;
 import org.xipki.crypto.api.CryptoApiFactory;
 import org.xipki.crypto.core.HashAlgo;
-import org.xipki.pkix.SecurityFactory;
+import org.xipki.crypto.core.KemEncapKey;
 import org.xipki.crypto.core.SignAlgo;
+import org.xipki.crypto.core.XiSecurityException;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertVariant;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.cmp.CmpUtf8Pairs;
 import org.xipki.pkix.cmp.CmpUtil;
 import org.xipki.pkix.cmp.ProtectedPkiMessage;
@@ -63,21 +68,17 @@ import org.xipki.pkix.cmp.ProtectionVerificationResult;
 import org.xipki.pkix.cmp.VerifiedPkiMessage;
 import org.xipki.pkix.cms.CmsEnvelopedData;
 import org.xipki.pkix.cms.CmsRecipient;
-import org.xipki.crypto.core.KemEncapKey;
-import org.xipki.crypto.core.XiSecurityException;
-import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.X509Cert;
 import org.xipki.pkix.sign.ConcurrentSigner;
 import org.xipki.pkix.util.X509Util;
 import org.xipki.util.exception.NoIdleSignerException;
 import org.xipki.util.exception.PkixException;
 import org.xipki.util.http.HttpRespContent;
+import org.xipki.util.http.ReqRespDebug;
+import org.xipki.util.http.ReqRespDebug.ReqRespPair;
 import org.xipki.util.http.XiHttpClient;
 import org.xipki.util.misc.CollectionUtil;
 import org.xipki.util.misc.DateUtil;
 import org.xipki.util.misc.LogUtil;
-import org.xipki.util.http.ReqRespDebug;
-import org.xipki.util.http.ReqRespDebug.ReqRespPair;
 import org.xipki.util.misc.RandomUtil;
 
 import javax.crypto.Cipher;
@@ -469,7 +470,8 @@ class CmpAgent {
       }
 
       X509Cert cert = sigResponder.getCert();
-      ContentVerifierFactory verifierFactory = securityFactory.getContentVerifierFactory(cert);
+      ContentVerifierFactory verifierFactory = securityFactory.getContentVerifierFactory(
+          CertVariant.ofX509(cert));
 
       if (verifierFactory == null) {
         LOG.warn("tid={}: not authorized responder '{}'", tid, header.getSender());
@@ -545,7 +547,11 @@ class CmpAgent {
     VerifiedPkiMessage response = signAndSend(caName, requestor, responder, request, debug);
     checkProtection(response);
     Asn1Primitive itvValue = parseGenRep(response.pkiMessage(), type);
-    return KemEncapKey.decode(((Asn1OctetString) itvValue).getOctets());
+    try {
+      return KemEncapKey.decode(((Asn1OctetString) itvValue).getOctets());
+    } catch (CodecException e) {
+      throw new CmpClientException("could not parse returned KEM encapsulated key", e);
+    }
   } // method downloadCrl
 
   RevokeCertResponse revokeCertificate(

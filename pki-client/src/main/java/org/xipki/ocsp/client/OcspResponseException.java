@@ -4,8 +4,8 @@
 package org.xipki.ocsp.client;
 
 import org.xipki.asn1.ocsp.OCSPResponseStatus;
-import org.xipki.codec.util.StringUtil;
 import org.xipki.codec.Hex;
+import org.xipki.codec.util.StringUtil;
 import org.xipki.util.exception.PkixException;
 
 /**

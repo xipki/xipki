@@ -3,9 +3,9 @@
 
 package org.xipki.ca.server;
 
-import org.xipki.ca.api.CertificateInfo;
 import org.xipki.codec.util.Args;
 import org.xipki.crypto.core.HashAlgo;
+import org.xipki.pkix.ca.X509CertificateInfo;
 import org.xipki.util.misc.CollectionUtil;
 
 import java.math.BigInteger;
@@ -31,15 +31,15 @@ class PendingCertificatePool {
 
     private final long waitForConfirmTill;
 
-    private final CertificateInfo certInfo;
+    private final X509CertificateInfo certInfo;
 
     private final byte[] certHash;
 
-    MyEntry(BigInteger certReqId, long waitForConfirmTill, CertificateInfo certInfo) {
+    MyEntry(BigInteger certReqId, long waitForConfirmTill, X509CertificateInfo certInfo) {
       this.certReqId = Args.notNull(certReqId, "certReqId");
       this.certInfo = Args.notNull(certInfo, "certInfo");
       this.waitForConfirmTill = waitForConfirmTill;
-      this.certHash = HashAlgo.SHA1.hash(certInfo.cert().cert().getEncoded());
+      this.certHash = HashAlgo.SHA1.hash(certInfo.cert().getEncodedCert());
     } // constructor
 
     @Override
@@ -67,7 +67,7 @@ class PendingCertificatePool {
   }
 
   void addCertificate(String transactionId, BigInteger certReqId,
-                      CertificateInfo certInfo, long waitForConfirmTill) {
+                      X509CertificateInfo certInfo, long waitForConfirmTill) {
     Args.notNull(transactionId, "transactionId");
     if (Args.notNull(certInfo, "certInfo").isAlreadyIssued()) {
       return;
@@ -81,7 +81,7 @@ class PendingCertificatePool {
     }
   } // method addCertificate
 
-  CertificateInfo removeCertificate(String transactionId, BigInteger certReqId, byte[] certHash) {
+  X509CertificateInfo removeCertificate(String transactionId, BigInteger certReqId, byte[] certHash) {
     Args.notBlank(transactionId, "transactionId");
     Args.notNull(certReqId, "certReqId");
     Args.notNull(certHash, "certHash");
@@ -115,7 +115,7 @@ class PendingCertificatePool {
     return (retEntry == null) ? null : retEntry.certInfo;
   } // method removeCertificate
 
-  Set<CertificateInfo> removeCertificates(String transactionId) {
+  Set<X509CertificateInfo> removeCertificates(String transactionId) {
     Args.notNull(transactionId, "transactionId");
 
     Set<PendingCertificatePool.MyEntry> entries;
@@ -127,14 +127,14 @@ class PendingCertificatePool {
       return null;
     }
 
-    Set<CertificateInfo> ret = new HashSet<>();
+    Set<X509CertificateInfo> ret = new HashSet<>();
     for (PendingCertificatePool.MyEntry myEntry :entries) {
       ret.add(myEntry.certInfo);
     }
     return ret;
   } // method removeCertificates
 
-  Set<CertificateInfo> removeConfirmTimeoutedCertificates() {
+  Set<X509CertificateInfo> removeConfirmTimeoutedCertificates() {
     synchronized (map) {
       if (CollectionUtil.isEmpty(map)) {
         return null;
@@ -142,7 +142,7 @@ class PendingCertificatePool {
 
       long now = Clock.systemUTC().millis();
 
-      Set<CertificateInfo> ret = new HashSet<>();
+      Set<X509CertificateInfo> ret = new HashSet<>();
 
       for (Iterator<Entry<String, Set<MyEntry>>> mapIt = map.entrySet().iterator();
           mapIt.hasNext();) {

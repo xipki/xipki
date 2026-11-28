@@ -11,6 +11,7 @@ import org.xipki.codec.asn1.Asn1Sequence;
 import org.xipki.codec.exception.CodecException;
 import org.xipki.ocsp.server.store.CrlStreamParser;
 import org.xipki.ocsp.server.store.CrlStreamParser.RevokedCertsIterator;
+import org.xipki.pkix.util.CertUtil;
 import org.xipki.pkix.util.X509Util;
 
 import java.io.File;
@@ -192,7 +193,7 @@ public class CrlStreamParserTest {
       throws IOException, CertificateEncodingException {
     try {
       return Certificate.fromEncoded(
-          X509Util.toDerEncoded(Files.readAllBytes(Paths.get(fileName))));
+          CertUtil.toRawEncoded(Files.readAllBytes(Paths.get(fileName))));
     } catch (CodecException ex) {
       throw new CertificateEncodingException("error decoding certificate: " + ex.getMessage());
     }

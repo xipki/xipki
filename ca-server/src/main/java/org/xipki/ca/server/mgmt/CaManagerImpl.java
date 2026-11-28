@@ -6,9 +6,6 @@ package org.xipki.ca.server.mgmt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.asn1.x500.X500Name;
-import org.xipki.pkix.cert.KeyCertBytesPair;
-import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
-import org.xipki.util.misc.NameId;
 import org.xipki.ca.api.kpgen.KeypairGenerator;
 import org.xipki.ca.api.kpgen.KeypairGeneratorFactory;
 import org.xipki.ca.api.mgmt.*;
@@ -24,8 +21,8 @@ import org.xipki.ca.api.profile.Certprofile;
 import org.xipki.ca.api.profile.ctrl.KeypairGenControl;
 import org.xipki.ca.sdk.CaIdentifierRequest;
 import org.xipki.ca.sdk.CertprofileInfoResponse;
+import org.xipki.ca.sdk.NameType;
 import org.xipki.ca.sdk.OperationException;
-import org.xipki.ca.sdk.X500NameType;
 import org.xipki.ca.server.*;
 import org.xipki.ca.server.db.DbCaConfStore;
 import org.xipki.ca.server.db.DbCertStore;
@@ -35,23 +32,30 @@ import org.xipki.codec.exception.InvalidConfException;
 import org.xipki.codec.util.Args;
 import org.xipki.codec.util.IoUtil;
 import org.xipki.codec.util.StringUtil;
-import org.xipki.pkix.SecurityFactory;
-import org.xipki.pkix.cert.CertRevocationInfo;
-import org.xipki.pkix.cert.CrlReason;
-import org.xipki.pkix.cert.X509Cert;
-import org.xipki.pkix.cert.X509Crl;
-import org.xipki.util.conf.FileOrValue;
-import org.xipki.util.misc.CollectionUtil;
-import org.xipki.util.misc.LogUtil;
-import org.xipki.util.audit.AuditLevel;
-import org.xipki.util.audit.AuditStatus;
-import org.xipki.util.audit.Audits;
-import org.xipki.util.audit.PciAuditEvent;
 import org.xipki.datasource.DataAccessException;
 import org.xipki.datasource.DataSourceConf;
 import org.xipki.datasource.DataSourceFactory;
 import org.xipki.datasource.DataSourceMap;
 import org.xipki.datasource.DataSourceWrapper;
+import org.xipki.pkix.SecurityFactory;
+import org.xipki.pkix.cert.CertFormat;
+import org.xipki.pkix.cert.CertRevocationInfo;
+import org.xipki.pkix.cert.CertVariant;
+import org.xipki.pkix.cert.CrlReason;
+import org.xipki.pkix.cert.CrlVariant;
+import org.xipki.pkix.cert.KeyCertBytesPair;
+import org.xipki.pkix.cert.NameVariant;
+import org.xipki.pkix.cert.X509Cert;
+import org.xipki.pkix.cert.X509Crl;
+import org.xipki.pkix.pkcs11.P11CryptServiceFactory;
+import org.xipki.util.audit.AuditLevel;
+import org.xipki.util.audit.AuditStatus;
+import org.xipki.util.audit.Audits;
+import org.xipki.util.audit.PciAuditEvent;
+import org.xipki.util.conf.FileOrValue;
+import org.xipki.util.misc.CollectionUtil;
+import org.xipki.util.misc.LogUtil;
+import org.xipki.util.misc.NameId;
 import org.xipki.util.misc.UniqueIdGenerator;
 
 import java.io.ByteArrayInputStream;
@@ -616,7 +620,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       return masterMode ? CaSystemStatus.STARTED_AS_MASTER : CaSystemStatus.STARTED_AS_SLAVE;
     } else if (initializing) {
       return CaSystemStatus.INITIALIZING;
-    } else if (!caLockedByMe) {
+    } else if (!noLock && !caLockedByMe) {
+      // with noLock the system does not hold the lock, a failure is not a lock failure
       return CaSystemStatus.LOCK_FAILED;
     } else {
       return CaSystemStatus.ERROR;
@@ -982,16 +987,23 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public List<X509Cert> getCaCerts(String name) {
+  public CertFormat getCertFormat(String caName) throws CaMgmtException {
+    return CertFormat.X509;
+  }
+
+  @Override
+  public List<CertVariant> getCaCerts(String name) {
     CaInfo caInfo = caInfos.get(Args.toNonBlankLower(name, "name"));
     if (caInfo == null) {
       return null;
     }
 
-    List<X509Cert> ret = new LinkedList<>();
-    ret.add(caInfo.cert());
+    List<CertVariant> ret = new LinkedList<>();
+    ret.add(CertVariant.ofX509(caInfo.cert()));
     if (caInfo.certchain() != null) {
-      ret.addAll(caInfo.certchain());
+      for (X509Cert m : caInfo.certchain()) {
+        ret.add(CertVariant.ofX509(m));
+      }
     }
     return ret;
   }
@@ -1228,6 +1240,24 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeCa(String name) throws CaMgmtException {
     assertMasterMode();
+    name = Args.toNonBlankLower(name, "name");
+    NameId ident = idNameMap.getCa(name);
+    if (ident != null) {
+      // the certificates and CRLs of a CA are kept, a CA with them cannot be removed
+      long numCerts;
+      long maxCrlNumber;
+      try {
+        numCerts = certstore.getCountOfCerts(ident, false);
+        maxCrlNumber = certstore.getMaxCrlNumber(ident);
+      } catch (OperationException ex) {
+        throw new CaMgmtException(ex);
+      }
+      if (numCerts > 0 || maxCrlNumber > 0) {
+        throw new CaMgmtException("CA " + name + " has " + numCerts + " certificate(s)"
+            + (maxCrlNumber > 0 ? " and CRLs" : "") + " and cannot be removed; "
+            + "deactivate it instead (status inactive)");
+      }
+    }
     certstore.removeCa(name);
     ca2Manager.removeCa(name);
   }
@@ -1300,18 +1330,21 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateCertificate(
+  public CertVariant generateCertificate(
       String caName, String profileName, byte[] encodedCsr, Instant notBefore, Instant notAfter)
       throws CaMgmtException {
-    return ca2Manager.generateCertificate(caName, profileName, encodedCsr, notBefore, notAfter);
+    X509Cert cert = ca2Manager.generateCertificate(
+        caName, profileName, encodedCsr, notBefore, notAfter);
+    return cert == null ? null : CertVariant.ofX509(cert);
   }
 
   @Override
-  public X509Cert generateCrossCertificate(
+  public CertVariant generateCrossCertificate(
       String caName, String profileName, byte[] encodedCsr,
       byte[] encodedTargetCert, Instant notBefore, Instant notAfter) throws CaMgmtException {
-    return ca2Manager.generateCrossCertificate(caName, profileName,
+    X509Cert cert = ca2Manager.generateCrossCertificate(caName, profileName,
         encodedCsr, encodedTargetCert, notBefore, notAfter);
+    return cert == null ? null : CertVariant.ofX509(cert);
   }
 
   @Override
@@ -1340,11 +1373,12 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Cert generateRootCa(
+  public CertVariant generateRootCa(
       CaEntry caEntry, String profileName, String subject,
       String serialNumber, Instant notBefore, Instant notAfter) throws CaMgmtException {
-    return ca2Manager.generateRootCa(caEntry, profileName, subject,
+    X509Cert cert = ca2Manager.generateRootCa(caEntry, profileName, subject,
         serialNumber, notBefore, notAfter, certstore);
+    return cert == null ? null : CertVariant.ofX509(cert);
   }
 
   void assertMasterMode() throws CaMgmtException {
@@ -1382,18 +1416,21 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public X509Crl generateCrlOnDemand(String caName) throws CaMgmtException {
-    return ca2Manager.generateCrlOnDemand(caName);
+  public CrlVariant generateCrlOnDemand(String caName) throws CaMgmtException {
+    X509Crl crl = ca2Manager.generateCrlOnDemand(caName);
+    return CrlVariant.ofX509(crl);
   }
 
   @Override
-  public X509Crl getCrl(String caName, long crlNumber) throws CaMgmtException {
-    return ca2Manager.getCrl(caName, crlNumber);
+  public CrlVariant getCrl(String caName, long crlNumber) throws CaMgmtException {
+    X509Crl crl = ca2Manager.getCrl(caName, crlNumber);
+    return CrlVariant.ofX509(crl);
   }
 
   @Override
-  public X509Crl getCurrentCrl(String caName) throws CaMgmtException {
-    return ca2Manager.getCurrentCrl(caName);
+  public CrlVariant getCurrentCrl(String caName) throws CaMgmtException {
+    X509Crl crl = ca2Manager.getCurrentCrl(caName);
+    return CrlVariant.ofX509(crl);
   }
 
   @Override
@@ -1403,16 +1440,18 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   @Override
-  public CertWithRevocationInfo getCert(X500Name issuer, BigInteger serialNumber)
+  public CertWithRevocationInfo getCert(NameVariant issuer, BigInteger serialNumber)
       throws CaMgmtException {
-    return ca2Manager.getCert(issuer, serialNumber);
+    return ca2Manager.getCert(issuer.x509Name(), serialNumber);
   }
 
   @Override
   public List<CertListInfo> listCertificates(
-      String caName, X500Name subjectPattern, Instant validFrom,
+      String caName, NameVariant subjectPattern, Instant validFrom,
       Instant validTo, CertListOrderBy orderBy, int numEntries) throws CaMgmtException {
-    return ca2Manager.listCertificates(caName, subjectPattern,
+    // subjectPattern is optional: null matches all subjects
+    return ca2Manager.listCertificates(caName,
+        subjectPattern == null ? null : subjectPattern.x509Name(),
         validFrom, validTo, orderBy, numEntries);
   }
 
@@ -1440,7 +1479,7 @@ public class CaManagerImpl implements CaManager, Closeable {
   }
 
   public Ca getCa(CaIdentifierRequest req) {
-    X500NameType issuer = req.issuer();
+    NameType issuer = req.issuer();
     X500Name x500Issuer = null;
     if (issuer != null) {
       try {
