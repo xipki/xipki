@@ -2,7 +2,6 @@
 // License Apache License 2.0
 package org.xipki.util.codec.json;
 
-import org.xipki.util.codec.Args;
 import org.xipki.util.codec.CodecException;
 
 import java.io.IOException;
@@ -30,7 +29,8 @@ public class JsonInputStream {
   private JsonInputStream(String bytes, boolean allowComments) {
     this.bytes = bytes;
     this.allowComments = allowComments && hasMultipleLines(bytes);
-    this.maxPosition = Args.positive(this.bytes.length(), "bytes.length") - 1;
+    // empty input: maxPosition is -1, and read() returns -1 (EOF) immediately.
+    this.maxPosition = this.bytes.length() - 1;
   }
 
   public static JsonInputStream newReader(byte[] bytes, boolean allowComments) {
@@ -101,6 +101,11 @@ public class JsonInputStream {
       return -1;
     }
 
+    if (allowComments && position == -1) {
+      // the beginning of the input is the beginning of the first line.
+      return readAtLineStart();
+    }
+
     char chr = bytes.charAt(++position);
 
     if (!allowComments) {
@@ -109,14 +114,18 @@ public class JsonInputStream {
       return chr;
     }
 
-    if (chr == '\r') {
-      if (position == maxPosition) {
-        return -1;
-      } else if (bytes.charAt(position + 1) == '\n') {
-        ++position;
-      }
+    if (chr == '\r' && position < maxPosition && bytes.charAt(position + 1) == '\n') {
+      ++position;
     }
 
+    return readAtLineStart();
+  }
+
+  /**
+   * Skips the leading whitespaces and the comment lines.
+   * @return the first character after them, or -1 if the end of input is reached.
+   */
+  private int readAtLineStart() {
     while (true) {
       // skip comment line
       // find first none space char
@@ -124,7 +133,8 @@ public class JsonInputStream {
       while (position < maxPosition) {
         char b = bytes.charAt(++position);
         if (!isWhiteSpace(b)) {
-          firstNonSpaceChar = 0xFF & b;
+          firstNonSpaceChar = b;
+
           break;
         }
       }

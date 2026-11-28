@@ -270,8 +270,16 @@ public class JsonTxtBuilder {
         case '\r':
           append(out, "\\r");
           break;
+        case '\t':
+          append(out, "\\t");
+          break;
         default:
-          append(out, ch);
+          if (ch < 0x20) {
+            // the other control characters must be escaped as well (RFC 8259, section 7)
+            append(out, String.format("\\u%04x", (int) ch));
+          } else {
+            append(out, ch);
+          }
       }
     }//for
   }
@@ -284,13 +292,13 @@ public class JsonTxtBuilder {
 
     if (value < 0) {
       append(out, '-');
-      value *= -1;
     }
 
+    // work on the (possibly negative) value directly: -Long.MIN_VALUE overflows.
     final int[] buf = this.buf;
     int index = 0;
-    while (value > 0) {
-      buf[index++] = '0' + (int) (value % 10);
+    while (value != 0) {
+      buf[index++] = '0' + (int) Math.abs(value % 10);
       value /= 10;
     }
 
@@ -300,10 +308,13 @@ public class JsonTxtBuilder {
   }
 
   private void write(double value, Appendable out) throws CodecException {
-    write((long) value, out);
+    // write the sign here: (long) value is 0 for values in (-1, 0).
     if (value < 0) {
+      append(out, '-');
       value *= -1;
     }
+    write((long) value, out);
+
 
     double decimal = value - (long) value;
     append(out, '.');

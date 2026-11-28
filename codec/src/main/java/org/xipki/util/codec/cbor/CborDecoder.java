@@ -28,6 +28,19 @@ import static org.xipki.util.codec.cbor.CborConstants.*;
  */
 public abstract class CborDecoder implements AutoCloseable {
 
+  /**
+   * The default maximal number of elements of an array, and of entries of a map: 1048576. It can
+   * be set by the system property {@code org.xipki.codec.cbor.maxElements}.
+   * <p>
+   * The decoders allocate memory for the declared number of elements. Without a limit, a few
+   * bytes declaring a huge array would exhaust the memory, in particular for a stream, whose
+   * remaining length is unknown.
+   */
+  public static final int DEFAULT_MAX_ELEMENTS =
+      Integer.getInteger("org.xipki.codec.cbor.maxElements", 1 << 20);
+
+  private int maxElements = DEFAULT_MAX_ELEMENTS;
+
   private static final BigInteger U = new BigInteger("10000000000000000", 16);
 
   private static void fail(String msg, Object... args) throws CodecException {
@@ -99,7 +112,34 @@ public abstract class CborDecoder implements AutoCloseable {
       // -1: break / infinite length
       throw new CodecException("array length not in range [0, " + Integer.MAX_VALUE + "]");
     }
+    checkMaxElements("array", len);
     return (int) len;
+  }
+
+  /**
+   * Returns the maximal number of elements of an array, and of entries of a map.
+   * @return the maximal number of elements.
+   */
+  public int maxElements() {
+    return maxElements;
+  }
+
+  /**
+   * Sets the maximal number of elements of an array, and of entries of a map.
+   * @param maxElements the maximal number of elements, see {@link #DEFAULT_MAX_ELEMENTS}.
+   */
+  public void setMaxElements(int maxElements) {
+    if (maxElements < 1) {
+      throw new IllegalArgumentException("maxElements must be positive: " + maxElements);
+    }
+    this.maxElements = maxElements;
+  }
+
+  private void checkMaxElements(String type, long len) throws CodecException {
+    if (len > maxElements) {
+      throw new CodecException(type + " length " + len
+          + " exceeds the maximal number of elements " + maxElements);
+    }
   }
 
   /**
@@ -379,6 +419,7 @@ public abstract class CborDecoder implements AutoCloseable {
       throw new CodecException("map length not in range [0, " +
           Integer.MAX_VALUE + "]");
     }
+    checkMaxElements("map", len);
     return (int) len;
 
   }
@@ -835,7 +876,7 @@ public abstract class CborDecoder implements AutoCloseable {
     byte[] bytes = readByteString();
     BigInteger value = new BigInteger(1, bytes);
     if (neg) {
-      value = value.negate().min(BigInteger.ONE);
+      value = value.negate().subtract(BigInteger.ONE);
     }
 
     return value;
@@ -881,7 +922,7 @@ public abstract class CborDecoder implements AutoCloseable {
       String timePart = timestamp.substring(0, signIndex);
       Instant time = Instant.parse(timePart + "Z");
       String offPart = timestamp.substring(signIndex + 1);
-      String[] offTokens = offPart.substring(1).split(":");
+      String[] offTokens = offPart.split(":");
       int offHour = Integer.parseInt(offTokens[0]);
       int offMin = 0;
       if (offTokens.length > 1) {
@@ -991,6 +1032,15 @@ public abstract class CborDecoder implements AutoCloseable {
   }
 
   public static Object readNext(CborDecoder decoder) throws CodecException {
+    return readNext(decoder, 0);
+  }
+
+  private static Object readNext(CborDecoder decoder, int depth) throws CodecException {
+    // the nested items are read recursively: limit the depth to avoid StackOverflowError.
+    if (depth > MAX_ENCODED_ITEM_DEPTH) {
+      fail("CBOR data nested too deeply (> %d)", MAX_ENCODED_ITEM_DEPTH);
+    }
+
     CborType type = decoder.peekType();
     if (type.isNullThenRead(decoder)) {
       return null;
@@ -1003,29 +1053,43 @@ public abstract class CborDecoder implements AutoCloseable {
     } else if (type.isByteString()) {
       return decoder.readByteString();
     } else if (type.isArray()) {
-      int arrayLen = decoder.readArrayLength();
-      List<Object> array = new ArrayList<>(arrayLen);
+      int arrayLen = assertDefiniteLength(decoder.readArrayLength());
+      // the nested arrays are read recursively: allocate on demand, not the declared length,
+      // otherwise a few bytes of nested array headers would allocate depth * maxElements.
+      List<Object> array = new ArrayList<>(Math.min(arrayLen, 1024));
       for (int i = 0; i< arrayLen; i++) {
-        array.add(readNext(decoder));
+        array.add(readNext(decoder, depth + 1));
       }
       return array;
     } else if (type.isMap()) {
-      int mapLen = decoder.readMapLength();
+      int mapLen = assertDefiniteLength(decoder.readMapLength());
       Map<Object, Object> map = new HashMap<>();
       for (int i = 0; i < mapLen; i++) {
-        Object key = readNext(decoder);
-        Object value = readNext(decoder);
+        Object key = readNext(decoder, depth + 1);
+        Object value = readNext(decoder, depth + 1);
         map.put(key, value);
       }
       return map;
     } else if (type.isTag()) {
       long tag = decoder.readTag();
-      Object value = readNext(decoder);
+      Object value = readNext(decoder, depth + 1);
       return new CborTaggedObject(tag, value);
     } else {
       throw new CodecException("unsupported object type " + type);
     }
   }
+
+  private static int assertDefiniteLength(int len) throws CodecException {
+    if (len < 0) {
+      throw new CodecException("indefinite length is not supported");
+    }
+    return len;
+  }
+
+  /**
+   * Maximal nesting depth of arrays, maps and tags accepted by {@link #readNext()}.
+   */
+  public static final int MAX_ENCODED_ITEM_DEPTH = 128;
 
   @Override
   public void close() {

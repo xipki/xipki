@@ -488,6 +488,11 @@ public class CborDiag {
             if (addInfo >= 0 && addInfo <= 23) {
               read1Byte();
               writeLine(level, readResetBuffer(), concat(prefix, "simple-uint(" + addInfo + ")"));
+            } else {
+              // 28 to 31 are reserved (RFC 8949, 3.1). The byte is not consumed: without the
+              // exception, an enclosing indefinite-length array would loop forever.
+              throw new CodecException("reserved additional information " + addInfo
+                  + " for unsigned integer at offset " + getOffset());
             }
           }
         }
@@ -708,7 +713,11 @@ public class CborDiag {
   }
 
   protected void printTextString(int level, String prefix) throws CodecException {
-    int len = (int) readTextStringLength();
+    long declaredLen = readTextStringLength();
+    if (declaredLen < 0 || declaredLen > Integer.MAX_VALUE) {
+      throw new CodecException("unsupported text string length " + declaredLen);
+    }
+    int len = (int) declaredLen;
     writeLine(level, readResetBuffer(), concat(prefix, "char[" + len + "]"));
     if (len == 0) {
       return;
@@ -758,18 +767,28 @@ public class CborDiag {
   }
 
   protected byte[] readExactBytes(int len) throws CodecException {
-    byte[] out = new byte[len];
-    int read;
+    if (len < 0) {
+      throw new CodecException("invalid length " + len);
+    }
 
+    // read in chunks: the memory grows with the bytes actually read, not with the declared
+    // length, which may be up to 2^31 - 1 for a few bytes of input.
+    ByteArrayOutputStream out = new ByteArrayOutputStream(Math.min(len, 8192));
+    byte[] chunk = new byte[Math.min(len, 8192)];
     int off = 0;
-    while (off < len && (read = is.read(out, off, len - off)) != -1) {
+    while (off < len) {
+      int read = is.read(chunk, 0, Math.min(chunk.length, len - off));
+      if (read == -1) {
+        break;
+      }
+      out.write(chunk, 0, read);
       off += read;
     }
 
     if (off < len) {
       throw new CodecException("in reaches end, but still expected " + (len - off) + " bytes");
     }
-    return out;
+    return out.toByteArray();
   }
 
   protected void writeBytesBlock(int level, byte[] data) throws CodecException {

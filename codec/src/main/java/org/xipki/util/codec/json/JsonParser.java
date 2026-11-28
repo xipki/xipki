@@ -233,6 +233,9 @@ public class JsonParser {
       }
 
       String key = parseString();
+      if (ret.getKeys().contains(key)) {
+        throw new CodecException("duplicated key '" + key + "'");
+      }
 
       currentChar = consumeWhitespace(this.recentChar);
       if (currentChar != ':') {
@@ -462,6 +465,12 @@ public class JsonParser {
         break;
       case 'r':
         append('\r');
+        break;
+      case 't':
+        append('\t');
+        break;
+      case '/':
+        append('/');
         break;
       case 'u':
         parseHexadecimalCharacter();

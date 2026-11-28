@@ -309,7 +309,8 @@ public abstract class CborEncoder {
     }
 
     write(0x3B);
-    byte[] bytes = value.toByteArray();
+    // CBOR encodes the negative integer v as -1 - v.
+    byte[] bytes = value.subtract(BigInteger.ONE).toByteArray();
     int len = bytes.length;
     if (len == 9) {
       write(bytes, 1, 8);
