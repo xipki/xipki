@@ -78,7 +78,8 @@ public class FileMacAuditService extends MacAuditService {
       writer.write(logLine);
       writer.write('\n');
     } catch (Exception ex) {
-      LogUtil.error(LOG, ex);
+      LogUtil.error(LOG, ex, "could not store the audit entry " + thisId);
+      throw new IllegalStateException("could not store the audit entry " + thisId, ex);
     }
   }
 

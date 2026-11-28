@@ -61,6 +61,19 @@ public class Audits {
   private Audits() {
   }
 
+  /**
+   * Replaces the line breaks CR and LF by the text \\r and \\n, so that a (user-controlled)
+   * value cannot start a new, forged audit entry.
+   * @param text the text, may be {@code null}.
+   * @return the text without line breaks.
+   */
+  public static String escapeLineBreaks(String text) {
+    if (text == null || (text.indexOf('\n') == -1 && text.indexOf('\r') == -1)) {
+      return text;
+    }
+    return text.replace("\r", "\\r").replace("\n", "\\n");
+  }
+
   public static AuditService getAuditService() {
     if (auditService != null) {
       return auditService;

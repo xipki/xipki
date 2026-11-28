@@ -11,6 +11,7 @@ import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.audit.AuditEvent;
 import org.xipki.util.extra.audit.AuditLevel;
 import org.xipki.util.extra.audit.AuditService;
+import org.xipki.util.extra.audit.Audits;
 import org.xipki.util.extra.audit.PciAuditEvent;
 import org.xipki.util.misc.StringUtil;
 
@@ -103,6 +104,10 @@ public abstract class MacAuditService implements AuditService {
         + (previousTag == null ? "" : previousTag) + DELIM + message;
   }
 
+  /**
+   * Stores the audit entry.
+   * @throws IllegalStateException if the entry could not be stored.
+   */
   protected abstract void storeLog(
       Instant date, long thisId, int eventType, String levelText,
       long previousId, String message, String thisTag);
@@ -151,7 +156,8 @@ public abstract class MacAuditService implements AuditService {
         char[] passwordChars = password.toCharArray();
         KeySpec spec = new PBEKeySpec(passwordChars, "ENC".getBytes(StandardCharsets.UTF_8),
                             10000, 256);
-        decryptionKey = factory.generateSecret(spec);
+        // as the current key: an AES key, not the PBKDF2 key
+        decryptionKey = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
       } catch (NoSuchAlgorithmException | InvalidKeySpecException ex) {
         throw new IllegalStateException("error deriving key", ex);
       }
@@ -262,10 +268,22 @@ public abstract class MacAuditService implements AuditService {
     log(AuditService.PCI_AUDIT_EVENT, event.level(), event.toTextMessage());
   }
 
+  /**
+   * Returns the message as it will be stored, e.g. shortened to the maximal length. The MAC
+   * covers this message, so the stored entries can be verified.
+   * @param message the message without line breaks.
+   * @return the message to be stored.
+   */
+  protected String prepareMessage(String message) {
+    return message;
+  }
+
   private synchronized void log(int eventType, AuditLevel level, String message) {
+    // one line per entry: also covered by the MAC
+    message = prepareMessage(Audits.escapeLineBreaks(message));
     Instant date = Instant.now();
     long previousId = id.get();
-    long thisId = id.incrementAndGet();
+    long thisId = previousId + 1;
     String levelText = level.text();
 
     String payload = buildMacPayload(date, thisId, eventType, levelText,
@@ -276,9 +294,13 @@ public abstract class MacAuditService implements AuditService {
     mac.update(payload.getBytes(StandardCharsets.UTF_8));
     byte[] tag = mac.doFinal();
     String tagWithMeta = tagPrefix + Base64.getEncoder().encodeToString(tag);
+
+    // throws an exception if the entry could not be stored: the chain is only continued
+    // with stored entries, otherwise the next start would detect a deleted entry.
+    storeLog(date, thisId, eventType, levelText, previousId, message, tagWithMeta);
+    id.set(thisId);
     this.previousTag = tagWithMeta;
 
-    storeLog(date, thisId, eventType, levelText, previousId, message, tagWithMeta);
     if (encInterval <= 1 || thisId % encInterval == 0) {
       String integrityText = buildIntegrityText();
       storeIntegrity(integrityText);
@@ -307,7 +329,7 @@ public abstract class MacAuditService implements AuditService {
 
   @Override
   public final void close() throws Exception {
-    if (!(encInterval <= 1 | id.get() % encInterval == 0)) {
+    if (!(encInterval <= 1 || id.get() % encInterval == 0)) {
       String integrityText = buildIntegrityText();
       storeIntegrity(integrityText);
     }

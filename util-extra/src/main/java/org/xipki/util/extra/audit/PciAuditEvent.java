@@ -208,7 +208,8 @@ public class PciAuditEvent {
 
   private static String replaceDelimiter(String fieldValue) {
     return (fieldValue == null || fieldValue.isEmpty()) ? fieldValue
-        : fieldValue.replace(DEFAULT_DELIMITER, DEFAULT_REPLACE_DELIMITER);
+        : Audits.escapeLineBreaks(
+            fieldValue.replace(DEFAULT_DELIMITER, DEFAULT_REPLACE_DELIMITER));
   } // method replaceDelimiter
 
   private static String getHostAddress() {

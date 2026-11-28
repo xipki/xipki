@@ -10,6 +10,7 @@ import org.xipki.util.conf.InvalidConfException;
 import org.xipki.util.extra.audit.AuditEvent;
 import org.xipki.util.extra.audit.AuditLevel;
 import org.xipki.util.extra.audit.AuditService;
+import org.xipki.util.extra.audit.Audits;
 import org.xipki.util.extra.audit.PciAuditEvent;
 import org.xipki.util.extra.misc.DateUtil;
 import org.xipki.util.extra.misc.LogUtil;
@@ -59,7 +60,7 @@ public class EmbedAuditService implements AuditService {
 
   private Instant lastMsOfToday;
 
-  private int maxFileSize;
+  private long maxFileSize;
 
   private OutputStreamWriter writer;
 
@@ -85,19 +86,23 @@ public class EmbedAuditService implements AuditService {
       this.maxFileSize = 10 * mb; // 10 MB
     } else {
       str = str.trim().toLowerCase(Locale.ROOT);
-      int value = Integer.parseInt(str.substring(0, str.length() - 2).trim());
+      long unit = 1;
       if (str.endsWith("gb")) {
-        this.maxFileSize = value * 1024 * mb;
+        unit = 1024L * mb;
       } else if (str.endsWith("mb")) {
-        this.maxFileSize = value * mb;
+        unit = mb;
       } else if (str.endsWith("kb")) {
-        this.maxFileSize = value * 1024;
-      } else {
-        this.maxFileSize = Integer.parseInt(str);
+        unit = 1024;
+      }
+      String number = (unit == 1) ? str : str.substring(0, str.length() - 2).trim();
+      try {
+        this.maxFileSize = Math.multiplyExact(Long.parseLong(number), unit);
+      } catch (NumberFormatException | ArithmeticException ex) {
+        throw new InvalidConfException("invalid size " + str);
       }
 
       if (this.maxFileSize < mb) {
-        throw new InvalidConfException("invalid size " + str);
+        throw new InvalidConfException("invalid size " + str + ", at least 1mb");
       }
     }
 
@@ -144,7 +149,8 @@ public class EmbedAuditService implements AuditService {
     Instant date = Instant.now();
 
     String payload = DTF.format(date.atZone(timeZone)) + DELIM
-                      + level.text() + DELIM + eventType + DELIM + message;
+                      + level.text() + DELIM + eventType + DELIM
+                      + Audits.escapeLineBreaks(message);
 
     try {
       long size = Files.size(writerPath);
@@ -157,7 +163,7 @@ public class EmbedAuditService implements AuditService {
         writer.flush();
         writer.close();
 
-        if (oldLastOfToday == lastMsOfToday) {
+        if (oldLastOfToday.equals(lastMsOfToday)) {
           for (int i = 1; ;i++) {
             File renameTo = new File(logDir, writerFileCoreName + "-" + i + logFileNameSuffix);
             if (!renameTo.exists()) {

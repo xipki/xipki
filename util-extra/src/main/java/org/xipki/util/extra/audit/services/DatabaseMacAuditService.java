@@ -39,7 +39,8 @@ public class DatabaseMacAuditService extends MacAuditService {
   private static final String SQL_ADD_AUDIT = SqlUtil.buildInsertSql("AUDIT",
           "SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG");
 
-  private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=1";
+  // one row per shard: ID = shard-id + 1, the shard 0 uses the row 1.
+  private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=?";
 
   private int maxMessageLength = 1000;
 
@@ -54,6 +55,7 @@ public class DatabaseMacAuditService extends MacAuditService {
     try {
       ps = datasource.prepareStatement(SQL_UPDATE_INTEGRITY);
       ps.setString(1, integrityText);
+      ps.setInt(2, integrityRowId());
       ps.executeUpdate();
     } catch (SQLException ex) {
       throw new IllegalStateException(datasource.translate(SQL_UPDATE_INTEGRITY, ex));
@@ -62,6 +64,17 @@ public class DatabaseMacAuditService extends MacAuditService {
     } finally {
       datasource.releaseResources(ps, null);
     }
+  }
+
+  private int integrityRowId() {
+    return shardId + 1;
+  }
+
+  @Override
+  protected String prepareMessage(String message) {
+    // shortened before the MAC is computed: the MAC covers the stored message
+    return message.length() <= maxMessageLength
+        ? message : message.substring(0, maxMessageLength - 4) + " ...";
   }
 
   @Override
@@ -75,20 +88,21 @@ public class DatabaseMacAuditService extends MacAuditService {
   @Override
   protected void storeLog(Instant date, long thisId, int eventType, String levelText,
                           long previousId, String message, String thisTag) {
-    String logMessage = message.length() <= maxMessageLength
-        ? message : message.substring(0, maxMessageLength - 4) + " ...";
-
+    // the message has been shortened in prepareMessage(), before the MAC is computed
     try {
       PreparedStatement ps = datasource.prepareStatement(SQL_ADD_AUDIT);
       try {
         int idx = 1;
         ps.setInt   (idx++, shardId);
         ps.setLong  (idx++, thisId);
-        ps.setString(idx++, formatDate(date));
+        // stored without the ending 'Z' to fit into the column TIME CHAR(23), it is always UTC.
+        // The MAC covers the time with 'Z', see formatDate().
+        String time = formatDate(date);
+        ps.setString(idx++, time.substring(0, time.length() - 1));
         ps.setString(idx++, levelText);
         ps.setInt   (idx++, eventType);
         ps.setLong  (idx++, previousId);
-        ps.setString(idx++, logMessage);
+        ps.setString(idx++, message);
         ps.setString(idx, thisTag);
         ps.executeUpdate();
       } catch (SQLException ex) {
@@ -97,7 +111,8 @@ public class DatabaseMacAuditService extends MacAuditService {
         datasource.releaseResources(ps, null);
       }
     } catch (Exception ex) {
-      LogUtil.error(LOG, ex);
+      LogUtil.error(LOG, ex, "could not store the audit entry " + thisId);
+      throw new IllegalStateException("could not store the audit entry " + thisId, ex);
     }
   }
 
@@ -143,9 +158,11 @@ public class DatabaseMacAuditService extends MacAuditService {
         }
       }
 
-      String integrityText = datasource.getFirstStringValue(conn, "INTEGRITY", "TEXT", "ID=1");
+      String integrityText = datasource.getFirstStringValue(conn, "INTEGRITY", "TEXT",
+          "ID=" + integrityRowId());
       if (integrityText == null) {
-        String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(1,'')";
+        String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(" + integrityRowId() + ",'')";
+
         try {
           datasource.createStatement(conn).executeUpdate(sql);
         } catch (SQLException ex) {

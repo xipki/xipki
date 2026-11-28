@@ -174,7 +174,7 @@ public class AuditEvent {
   public String toTextMessage() {
     StringBuilder sb = new StringBuilder(150);
 
-    sb.append(applicationName);
+    sb.append(Audits.escapeLineBreaks(applicationName));
 
     AuditStatus status = status();
     if (status == null) {
@@ -194,7 +194,8 @@ public class AuditEvent {
           continue;
         }
 
-        sb.append("\t").append(m.name()).append(": ").append(m.value());
+        sb.append("\t").append(Audits.escapeLineBreaks(m.name())).append(": ")
+            .append(Audits.escapeLineBreaks(String.valueOf(m.value())));
       }
     }
 
