@@ -33,10 +33,10 @@
     <!-- table AUDIT -->
     <createTable tableName="AUDIT">
       <column name="SHARD_ID" type="SMALLINT">
-        <constraints nullable="false"/>
+        <constraints primaryKey="true" primaryKeyName="PK_AUDIT" nullable="false"/>
       </column>
       <column name="ID" type="BIGINT">
-        <constraints nullable="false"/>
+        <constraints primaryKey="true" primaryKeyName="PK_AUDIT" nullable="false"/>
       </column>
       <column name="TIME" type="CHAR(23)"
           remarks="Logging time e.g. 2022.03.06-10:18:35.483">
@@ -65,16 +65,13 @@
     </createTable>
     <!-- table INTEGRITY -->
     <createTable tableName="INTEGRITY">
-      <column name="ID" type="SMALLINT">
-        <constraints nullable="false"/>
+      <!-- one row per shard, inserted by the audit service -->
+      <column name="SHARD_ID" type="SMALLINT">
+        <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="TEXT" type="VARCHAR(1000)">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <insert tableName="INTEGRITY">
-      <column name="ID" value="1"/>
-      <column name="TEXT" value=""/>
-    </insert>
   </changeSet>
 </databaseChangeLog>

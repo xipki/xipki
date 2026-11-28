@@ -39,8 +39,12 @@ public class DatabaseMacAuditService extends MacAuditService {
   private static final String SQL_ADD_AUDIT = SqlUtil.buildInsertSql("AUDIT",
           "SHARD_ID,ID,TIME,LEVEL,EVENT_TYPE,PREVIOUS_ID,MESSAGE,TAG");
 
-  // one row per shard: ID = shard-id + 1, the shard 0 uses the row 1.
-  private static final String SQL_UPDATE_INTEGRITY = "UPDATE INTEGRITY SET TEXT=? WHERE ID=?";
+  // one row per shard, inserted with the first integrity text of the shard.
+  private static final String SQL_UPDATE_INTEGRITY =
+      "UPDATE INTEGRITY SET TEXT=? WHERE SHARD_ID=?";
+
+  private static final String SQL_ADD_INTEGRITY =
+      SqlUtil.buildInsertSql("INTEGRITY", "SHARD_ID,TEXT");
 
   private int maxMessageLength = 1000;
 
@@ -51,23 +55,28 @@ public class DatabaseMacAuditService extends MacAuditService {
 
   @Override
   protected void storeIntegrity(String integrityText) {
+    int updated = executeIntegritySql(false, integrityText);
+    if (updated == 0) {
+      // first integrity text of this shard
+      executeIntegritySql(true, integrityText);
+    }
+  }
+
+  private int executeIntegritySql(boolean insert, String integrityText) {
+    String sql = insert ? SQL_ADD_INTEGRITY : SQL_UPDATE_INTEGRITY;
     PreparedStatement ps = null;
     try {
-      ps = datasource.prepareStatement(SQL_UPDATE_INTEGRITY);
-      ps.setString(1, integrityText);
-      ps.setInt(2, integrityRowId());
-      ps.executeUpdate();
+      ps = datasource.prepareStatement(sql);
+      ps.setString(insert ? 2 : 1, integrityText);
+      ps.setInt   (insert ? 1 : 2, shardId);
+      return ps.executeUpdate();
     } catch (SQLException ex) {
-      throw new IllegalStateException(datasource.translate(SQL_UPDATE_INTEGRITY, ex));
+      throw new IllegalStateException(datasource.translate(sql, ex));
     } catch (DataAccessException ex) {
       throw new IllegalStateException(ex);
     } finally {
       datasource.releaseResources(ps, null);
     }
-  }
-
-  private int integrityRowId() {
-    return shardId + 1;
   }
 
   @Override
@@ -158,17 +167,9 @@ public class DatabaseMacAuditService extends MacAuditService {
         }
       }
 
+      // null if the shard has no integrity text yet: then it must not have audit entries
       String integrityText = datasource.getFirstStringValue(conn, "INTEGRITY", "TEXT",
-          "ID=" + integrityRowId());
-      if (integrityText == null) {
-        String sql = "INSERT INTO INTEGRITY (ID,TEXT) VALUES(" + integrityRowId() + ",'')";
-
-        try {
-          datasource.createStatement(conn).executeUpdate(sql);
-        } catch (SQLException ex) {
-          throw datasource.translate(sql, ex);
-        }
-      }
+          "SHARD_ID=" + shardId);
 
       verify(id.get(), previousTag, integrityText, confPairs);
     } catch (IOException | DataAccessException ex) {
