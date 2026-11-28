@@ -58,6 +58,7 @@ import java.time.Instant;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 /**
@@ -329,8 +330,10 @@ class SecurityCommands {
           }
 
           Enumeration<String> strs = isPkcs12Ks ? pkcs12Ks.aliases() : ks.aliases();
+          // aliases in lower case: the keystores compare aliases case-insensitively and return
+          // them in lower case, an alias differing only in case would replace an entry
           while (strs.hasMoreElements()) {
-            aliases.add(strs.nextElement());
+            aliases.add(strs.nextElement().toLowerCase(Locale.ROOT));
           }
         } else {
           if (isPkcs12Ks) {
@@ -345,7 +348,7 @@ class SecurityCommands {
           String baseAlias = X509Util.getCommonName(cert.subject());
           String alias = baseAlias;
           int idx = 2;
-          while (aliases.contains(alias)) {
+          while (aliases.contains(alias.toLowerCase(Locale.ROOT))) {
             alias = baseAlias + "-" + (idx++);
           }
 
@@ -354,7 +357,7 @@ class SecurityCommands {
           } else {
             pkcs12Ks.setCertificateEntry(alias, cert.getCert());
           }
-          aliases.add(alias);
+          aliases.add(alias.toLowerCase(Locale.ROOT));
         }
 
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream(4096)) {

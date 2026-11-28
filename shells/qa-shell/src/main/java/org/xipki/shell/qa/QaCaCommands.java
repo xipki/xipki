@@ -58,7 +58,10 @@ import java.rmi.UnexpectedException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -90,9 +93,11 @@ class QaCaCommands {
 
     @Override
     public void run() {
-      boolean initialized = qaManager().init();
-      println(initialized
-          ? "CA QA system initialized successfully" : "CA QA system initialization failed");
+      if (!qaManager().init()) {
+        println("CA QA system initialization failed");
+        throw new RuntimeException("CA QA system initialization failed");
+      }
+      println("CA QA system initialized successfully");
     }
   }
 
@@ -306,9 +311,16 @@ class QaCaCommands {
         CaEntry actual = Optional.ofNullable(client().getCa(name))
             .orElseThrow(() -> new RuntimeException("could not find CA '" + name + "'"));
 
-        if (expected.caUris() != null) {
-          assertObjEquals("CA URIs", expected.caUris(), actual.base().caUris());
-        }
+        // only the given URI lists are checked, null or empty for none
+        CaUris actualUris = actual.base().caUris();
+        assertUrisEquals("CA cert URIs", caCertUris,
+            actualUris == null ? null : actualUris.cacertUris());
+        assertUrisEquals("OCSP URIs", ocspUris,
+            actualUris == null ? null : actualUris.ocspUris());
+        assertUrisEquals("CRL URIs", crlUris,
+            actualUris == null ? null : actualUris.crlUris());
+        assertUrisEquals("delta CRL URIs", deltaCrlUris,
+            actualUris == null ? null : actualUris.deltaCrlUris());
         if (expected.encodedCert() != null
             && !certEquals(expected.encodedCert(), actual.cert().getEncoded())) {
           throw new RuntimeException("CA cert is not as expected");
@@ -319,10 +331,8 @@ class QaCaCommands {
           int expSize = expChain == null ? 0 : expChain.size();
           int actSize = actChain == null ? 0 : actChain.size();
           if (expSize != actSize) {
-            if (actChain != null && !actChain.isEmpty()) {
-              throw new RuntimeException("Length of CA certchain " + actSize
-                  + " is not as expected " + expSize);
-            }
+            throw new RuntimeException("Length of CA certchain " + actSize
+                + " is not as expected " + expSize);
           } else {
             for (int i = 0; i < expSize; i++) {
               if (!certEquals(expChain.get(i), actChain.get(i).getEncoded())) {
@@ -380,7 +390,7 @@ class QaCaCommands {
           assertObjEquals("validity mode", expected.validityMode(), actual.base().validityMode());
         }
 
-        println(" checked CA" + name);
+        println(" checked CA " + name);
       } catch (Exception ex) {
         throw ex instanceof RuntimeException ? (RuntimeException) ex
             : new RuntimeException("could not check CA: " + ex.getMessage(), ex);
@@ -424,8 +434,6 @@ class QaCaCommands {
       if (permissions != null && !permissions.isEmpty()) {
         entry.setPermissions(permissions);
       }
-      entry.setCaUris(new CaUris(getUris(caCertUris), getUris(ocspUris),
-          getUris(crlUris), getUris(deltaCrlUris)));
       if (validityModeS != null) {
         entry.setValidityMode(ValidityMode.forName(validityModeS));
       }
@@ -594,7 +602,8 @@ class QaCaCommands {
               && "null".equalsIgnoreCase(effectiveProfiles.iterator().next())) {
             effectiveProfiles = Collections.emptySet();
           }
-          if (!new ArrayList<>(effectiveProfiles).equals(actual.profiles())) {
+          // the profiles are a set: the order does not matter
+          if (!lowerSet(effectiveProfiles).equals(lowerSet(actual.profiles()))) {
             throw new RuntimeException("profiles: is '" + actual.profiles()
                 + "', but expected '" + effectiveProfiles + "'");
           }
@@ -678,11 +687,12 @@ class QaCaCommands {
             .orElseThrow(() -> new RuntimeException(
                 "publisher named '" + name + "' is not configured"));
 
-        if (actual.type() != null) {
+        // only the given values are checked
+        if (type != null) {
           assertTypeEquals("type", type, actual.type());
         }
-        if (actual.conf() != null) {
-          assertEquals("signer conf", conf, actual.conf());
+        if (conf != null) {
+          assertEquals("conf", conf, actual.conf());
         }
         println(" checked publisher " + name);
       } catch (Exception ex) {
@@ -932,6 +942,28 @@ class QaCaCommands {
   private static void assertObjEquals(String label, Object expected, Object actual) {
     if (!Objects.equals(expected, actual)) {
       throw new RuntimeException(label + ": is '" + actual + "', but expected '" + expected + "'");
+    }
+  }
+
+  private static Set<String> lowerSet(Collection<String> texts) {
+    Set<String> ret = new HashSet<>();
+    if (texts != null) {
+      for (String text : texts) {
+        ret.add(text.toLowerCase(Locale.ROOT));
+      }
+    }
+    return ret;
+  }
+
+  /** Compares the given URIs (null: not checked, 'null': none) with the actual ones. */
+  private static void assertUrisEquals(String label, List<String> expected, List<String> actual) {
+    List<String> exp = getUris(expected);
+    if (exp == null) {
+      return;
+    }
+    List<String> act = actual == null ? Collections.emptyList() : actual;
+    if (!exp.equals(act)) {
+      throw new RuntimeException(label + ": is '" + act + "', but expected '" + exp + "'");
     }
   }
 

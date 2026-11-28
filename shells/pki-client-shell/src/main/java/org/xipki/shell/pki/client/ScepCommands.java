@@ -80,7 +80,17 @@ public class ScepCommands {
       return readIdentity().certificate;
     }
 
+    private Identity identity;
+
+    /** The identity, read once per command (the keystore password is read once). */
     private Identity readIdentity() throws Exception {
+      if (identity == null) {
+        identity = readIdentity0();
+      }
+      return identity;
+    }
+
+    private Identity readIdentity0() throws Exception {
       char[] pwd = passwordHint == null
           ? readPassword("Enter the keystore password")
           : Passwords.resolvePassword(passwordHint);

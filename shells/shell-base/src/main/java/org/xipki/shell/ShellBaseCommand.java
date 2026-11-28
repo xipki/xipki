@@ -8,10 +8,8 @@ import org.jline.reader.LineReader;
 import org.jline.reader.UserInterruptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.util.codec.Hex;
 import org.xipki.util.extra.misc.LogUtil;
 import org.xipki.util.extra.misc.PemEncoder;
-import org.xipki.util.extra.misc.RandomUtil;
 import org.xipki.util.io.IoUtil;
 import org.xipki.util.misc.StringUtil;
 import org.xipki.util.password.PasswordResolverException;
@@ -63,7 +61,7 @@ public abstract class ShellBaseCommand implements Runnable {
     } else {
       out().print(effectivePrompt + ": ");
       out().flush();
-      String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+      String line = readStdinLine();
       password = line == null ? null : line.toCharArray();
     }
 
@@ -108,7 +106,29 @@ public abstract class ShellBaseCommand implements Runnable {
 
     out().print(tmpPrompt);
     out().flush();
-    return new BufferedReader(new InputStreamReader(System.in)).readLine();
+    return readStdinLine();
+  }
+
+  /** The reader of {@link #stdinSource}, shared by all reads of the standard input. */
+  private static BufferedReader stdinReader;
+
+  private static InputStream stdinSource;
+
+  /**
+   * Reads a line from the standard input. One reader is shared by all reads: a reader per read
+   * would buffer the following lines of a piped input and lose them.
+   *
+   * @return the line, {@code null} at the end of the input.
+   * @throws IOException if reading fails.
+   */
+  protected static String readStdinLine() throws IOException {
+    synchronized (ShellBaseCommand.class) {
+      if (stdinReader == null || stdinSource != System.in) {
+        stdinSource = System.in;
+        stdinReader = new BufferedReader(new InputStreamReader(stdinSource));
+      }
+      return stdinReader.readLine();
+    }
   }
 
   protected void saveVerbose(String promptPrefix, String file, byte[] content)
@@ -116,61 +136,30 @@ public abstract class ShellBaseCommand implements Runnable {
     saveVerbose(promptPrefix, Paths.get(file), content);
   }
 
+  /**
+   * Saves the content to the file. If the file exists, the user is asked whether to replace it
+   * or to give another path; if saving fails, the user is asked for another path (twice).
+   *
+   * @throws IOException if the content could not be saved, also if a question could not be
+   *         answered (e.g. the end of the input in a script): nothing is saved then.
+   */
   protected void saveVerbose(String promptPrefix, Path file, byte[] content) throws IOException {
     File saveTo = new File(IoUtil.expandFilepath(file.toString()));
+    saveTo = confirmTarget(saveTo);
 
-    if (saveTo.exists()) {
-      try {
-        boolean bo = true;
-        while (saveTo.exists()) {
-          String answer;
-          if (bo) {
-            answer = readPrompt("A file named '" + saveTo.getPath()
-                + "' already exists. Do you want to replace it [Yes/No]? ");
-          } else {
-            answer = readPrompt("Please answer with Yer or No: ");
-          }
-
-          if (answer == null) {
-            throw new IOException("interrupted");
-          }
-
-          if (StringUtil.orEqualsIgnoreCase(answer, "yes", "y")) {
-            break;
-          } else if (StringUtil.orEqualsIgnoreCase(answer, "no", "n")) {
-            bo = true;
-            saveTo = promptSaveTarget();
-          } else {
-            bo = false;
-          }
-        }
-      } catch (IOException ex) {
-        LogUtil.error(LOG, ex, "could not save file");
-        saveTo = new File("tmp-" + randomHex(6));
-      }
-    }
-
-    int tries = 2;
+    int retries = 2;
     while (true) {
       try {
-        tries--;
         save(saveTo, content);
         break;
       } catch (IOException ex) {
-        println("ERROR: " + ex.getMessage());
-        if (tries > 0) {
-          try {
-            saveTo = promptSaveTarget();
-          } catch (IOException ex2) {
-            LogUtil.error(LOG, ex2, "could not save to file");
-            saveTo = new File("tmp-" + randomHex(6));
-          }
-        } else if (tries == 0) {
-          saveTo = new File("tmp-" + randomHex(6));
-        } else {
+        if (retries-- <= 0) {
           LogUtil.error(LOG, ex, "could not save to file");
-          throw new IOException("could not save to file", ex);
+          throw new IOException("could not save to file " + saveTo.getPath() + ": "
+              + ex.getMessage(), ex);
         }
+        println("ERROR: " + ex.getMessage());
+        saveTo = confirmTarget(promptSaveTarget());
       }
     }
 
@@ -178,9 +167,41 @@ public abstract class ShellBaseCommand implements Runnable {
     println(tmpPromptPrefix + " " + saveTo.getPath());
   }
 
+  /**
+   * Returns the file to save to: the given one if it does not exist or may be replaced,
+   * otherwise another one entered by the user.
+   */
+  private File confirmTarget(File file) throws IOException {
+    File saveTo = file;
+    boolean firstQuestion = true;
+    while (saveTo.exists()) {
+      String answer = readPrompt(firstQuestion
+          ? "A file named '" + saveTo.getPath() + "' already exists. Do you want to replace it "
+              + "[Yes/No]? "
+          : "Please answer with Yes or No: ");
+      if (answer == null) {
+        throw new IOException("file " + saveTo.getPath()
+            + " exists and was not replaced (no answer)");
+      }
+
+      if (StringUtil.orEqualsIgnoreCase(answer, "yes", "y")) {
+        break;
+      } else if (StringUtil.orEqualsIgnoreCase(answer, "no", "n")) {
+        firstQuestion = true;
+        saveTo = promptSaveTarget();
+      } else {
+        firstQuestion = false;
+      }
+    }
+    return saveTo;
+  }
+
   private File promptSaveTarget() throws IOException {
     while (true) {
       String newFn = readPrompt("Enter new path to save to ... ");
+      if (newFn == null) {
+        throw new IOException("no path to save to was entered (no answer)");
+      }
       if (StringUtil.isNotBlank(newFn)) {
         return new File(newFn);
       }
@@ -236,8 +257,5 @@ public abstract class ShellBaseCommand implements Runnable {
     return derPemEncode(encoded, outform, "output", pemLabel);
   }
 
-  private static String randomHex(int numOfBytes) {
-    return Hex.encode(RandomUtil.nextBytes(numOfBytes));
-  }
 
 }

@@ -17,7 +17,9 @@ import org.xipki.ocsp.client.RequestOptions;
 import org.xipki.security.HashAlgo;
 import org.xipki.security.OIDs;
 import org.xipki.security.SignAlgo;
+import org.xipki.security.pkix.CrlReason;
 import org.xipki.security.pkix.X509Cert;
+
 import org.xipki.security.util.X509Util;
 import org.xipki.shell.Completion;
 import org.xipki.shell.ShellBaseCommand;
@@ -230,7 +232,14 @@ public class OcspCommands {
             RevokedStatus revokedStatus = (RevokedStatus) status;
             statusText = "revoked";
             if (revokedStatus.hasRevocationReason()) {
-              statusText += " reason=" + revokedStatus.getRevocationReason();
+              int reasonCode = revokedStatus.getRevocationReason();
+              String reasonText;
+              try {
+                reasonText = CrlReason.forReasonCode(reasonCode).description();
+              } catch (IllegalArgumentException ex) {
+                reasonText = Integer.toString(reasonCode);
+              }
+              statusText += " reason=" + reasonText;
             }
             if (revokedStatus.getRevocationTime() != null) {
               statusText += " revocationTime=" + revokedStatus.getRevocationTime();

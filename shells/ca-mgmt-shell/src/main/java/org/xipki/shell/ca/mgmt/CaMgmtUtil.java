@@ -83,9 +83,15 @@ class CaMgmtUtil {
     }
   }
 
+  /**
+   * Parses a UTC time yyyyMMddHHmmss, or yyyyMMdd for the start of the day.
+   */
   static Instant parseDate(String dateStr) {
-    return StringUtil.isBlank(dateStr) ? null
-        : DateUtil.parseUtcTimeyyyyMMddhhmmss(dateStr);
+    if (StringUtil.isBlank(dateStr)) {
+      return null;
+    }
+    String text = dateStr.trim();
+    return DateUtil.parseUtcTimeyyyyMMddhhmmss(text.length() == 8 ? text + "000000" : text);
   }
 
   static String formatCertListLine(int index, CertListInfo info) {
@@ -294,7 +300,8 @@ class CaMgmtUtil {
 
     for (String uri : uris) {
       if (CaManager.NULL.equalsIgnoreCase(uri)) {
-        return Collections.emptyList();
+        // "remove the URIs": an empty list would be transported as null (unchanged)
+        return Collections.singletonList(CaManager.NULL);
       }
     }
     return new ArrayList<>(uris);

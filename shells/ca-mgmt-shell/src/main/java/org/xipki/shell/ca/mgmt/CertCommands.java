@@ -415,7 +415,16 @@ public class CertCommands {
     protected void saveGeneratedKey(
         String certOutFile, String keyOutform, char[] keyPwd, KeyCertBytesPair pair)
         throws Exception {
-      String ksFilePrefix = certOutFile.substring(0, certOutFile.lastIndexOf('.'));
+      // next to the certificate: the file name of the certificate without its extension
+      File certOut = new File(certOutFile);
+      String name = certOut.getName();
+      int idx = name.lastIndexOf('.');
+      if (idx > 0) {
+        name = name.substring(0, idx);
+      }
+      String ksFilePrefix = certOut.getParent() == null ? name
+          : new File(certOut.getParentFile(), name).getPath();
+
       PrivateKeyInfo privKeyInfo = PrivateKeyInfo.getInstance(pair.key());
       if (StringUtil.orEqualsIgnoreCase(keyOutform, "p12", "pkcs12")) {
         Certificate cert = Certificate.getInstance(pair.cert());

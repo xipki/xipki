@@ -59,7 +59,7 @@ public class P12Commands {
     @Completion(FilePathCompleter.class)
     private String keyOutFile;
 
-    @Option(names = "--password", interactive = true, description = "password of the keystore file")
+    @Option(names = "--password", description = "password of the keystore file")
     private String passwordHint;
 
     @Override

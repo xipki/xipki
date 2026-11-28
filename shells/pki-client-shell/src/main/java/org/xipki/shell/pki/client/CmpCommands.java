@@ -767,9 +767,13 @@ public class CmpCommands {
     @Option(names = "--rsa-pss", description = "whether to use RSAPSS for POP")
     private Boolean rsaPss = Boolean.FALSE;
 
-    @Option(names = "--embeds-publickey",
-        description = "whether to embed the public key in the request")
-    private Boolean embedsPublicKey = Boolean.FALSE;
+    @Option(names = "--embeds-publickey", negatable = true, defaultValue = "true",
+        fallbackValue = "true",
+        description = "whether to embed the public key in the request, default true; with "
+            + "--no-embeds-publickey the CA certifies the public key of the old certificate")
+    private boolean embedsPublicKey = true;
+
+    private ConcurrentSigner signer;
 
     protected SignAlgoMode getSignAlgoMode() {
       return Boolean.TRUE.equals(rsaPss) ? SignAlgoMode.RSAPSS : null;
@@ -777,16 +781,23 @@ public class CmpCommands {
 
     protected abstract ConcurrentSigner getSigner() throws Exception;
 
+    /** The signer, created once per command (the keystore password is read once). */
+    private ConcurrentSigner signer() throws Exception {
+      if (signer == null) {
+        signer = getSigner();
+      }
+      return signer;
+    }
+
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      return Boolean.TRUE.equals(embedsPublicKey)
-          ? getSigner().x509Cert().subjectPublicKeyInfo() : null;
+      return embedsPublicKey ? publicKeyOf(signer()) : null;
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
-      ConcurrentSigner signer = getSigner();
+      ConcurrentSigner signer = signer();
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
       Signer signer0 = signer.borrowSigner();
@@ -990,26 +1001,26 @@ public class CmpCommands {
 
     protected abstract ConcurrentSigner getSigner() throws Exception;
 
+    private ConcurrentSigner signer;
+
+    /** The signer, created once per command (the keystore password is read once). */
+    private ConcurrentSigner signer() throws Exception {
+      if (signer == null) {
+        signer = getSigner();
+      }
+      return signer;
+    }
+
     @Override
     protected SubjectPublicKeyInfo getPublicKey() throws Exception {
-      ConcurrentSigner signer = getSigner();
-      X509Cert cert = signer.x509Cert();
-      if (cert != null) {
-        return cert.subjectPublicKeyInfo();
-      }
-
-      PublicKey publicKey = signer.publicKey();
-      if (publicKey != null) {
-        return SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
-      }
-
-      throw new IOException("could not extract public key");
+      return publicKeyOf(signer());
     }
 
     @Override
     protected EnrollCertRequest.Entry buildEnrollCertRequestEntry(
         String id, String profile, CertRequest certRequest) throws Exception {
-      ConcurrentSigner signer = getSigner();
+      ConcurrentSigner signer = signer();
+
       ProofOfPossessionSigningKeyBuilder popBuilder =
           new ProofOfPossessionSigningKeyBuilder(certRequest);
       Signer signer0 = signer.borrowSigner();
@@ -1061,6 +1072,21 @@ public class CmpCommands {
     private List<String> ids;
     private List<BigInteger> serialNumbers;
     private List<String> sources;
+  }
+
+  /** The public key of the signer: of its certificate, or its public key (e.g. PKCS#11). */
+  static SubjectPublicKeyInfo publicKeyOf(ConcurrentSigner signer) throws Exception {
+    X509Cert cert = signer.x509Cert();
+    if (cert != null) {
+      return cert.subjectPublicKeyInfo();
+    }
+
+    PublicKey publicKey = signer.publicKey();
+    if (publicKey != null) {
+      return SubjectPublicKeyInfo.getInstance(publicKey.getEncoded());
+    }
+
+    throw new IOException("could not extract public key");
   }
 
   static EnrollCertResult.CertifiedKeyPairOrError firstEnrollResult(EnrollCertResult result) {

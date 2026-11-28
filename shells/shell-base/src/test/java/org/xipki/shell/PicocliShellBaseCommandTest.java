@@ -8,6 +8,7 @@ import org.junit.Test;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
@@ -55,16 +56,19 @@ public class PicocliShellBaseCommandTest {
   }
 
   @Test
-  public void testSaveVerboseCtrlCUsesTmpFile() throws Exception {
+  public void testSaveVerboseInterruptedSavesNothing() throws Exception {
     Path dir = Files.createTempDirectory("xipki-save-interrupt-");
     Path target = dir.resolve("a.txt");
     Files.write(target, "old".getBytes(StandardCharsets.UTF_8));
 
-    TestSaveCommand cmd = new TestSaveCommand("no");
+    // Ctrl-C at the question "replace?": nothing is saved, no tmp-* fallback file
+    TestSaveCommand cmd = new TestSaveCommand();
     cmd.failAfterPrompts();
-    cmd.saveVerbose("saved to file", target, "new".getBytes(StandardCharsets.UTF_8));
+    Assert.assertThrows(IOException.class, () -> cmd.saveVerbose("saved to file", target,
+        "new".getBytes(StandardCharsets.UTF_8)));
 
-    Assert.assertTrue(cmd.output().contains("saved to file tmp-"));
+    Assert.assertEquals("old", Files.readString(target));
+    Assert.assertFalse(cmd.output().contains("saved to file"));
   }
 
   @Test

@@ -29,10 +29,8 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 import javax.crypto.SecretKey;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.Key;
@@ -538,8 +536,10 @@ public class P11Commands {
 
     protected boolean confirm(String prompt, int count) throws IOException {
       for (int i = 0; i < count; i++) {
-        println(prompt + " [yes/no]");
-        String answer = new BufferedReader(new InputStreamReader(System.in)).readLine();
+        // the line reader of the interactive shell, or the shared reader of the standard input:
+        // the repeated confirmations are read from consecutive lines
+        String answer = readPrompt(prompt + " [yes/no]");
+
         if (!"yes".equalsIgnoreCase(answer)) {
           return false;
         }
