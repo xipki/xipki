@@ -112,10 +112,14 @@ public final class CmpClientImpl implements CmpClient {
     }
 
     CmpClientConf conf = parse(configFile);
-    SslContextConf sslCc = SslContextConf.ofSslConf(conf.ssl());
-
-    SSLSocketFactory sslSocketFactory = sslCc.getSslSocketFactory();
-    HostnameVerifier hostnameVerifier = sslCc.getHostnameVerifier();
+    // without ssl configuration: the defaults of the JDK
+    SSLSocketFactory sslSocketFactory = null;
+    HostnameVerifier hostnameVerifier = null;
+    if (conf.ssl() != null) {
+      SslContextConf sslCc = SslContextConf.ofSslConf(conf.ssl());
+      sslSocketFactory = sslCc.getSslSocketFactory();
+      hostnameVerifier = sslCc.getHostnameVerifier();
+    }
 
     // Responder configuration
     CmpClientConf.Responder responderConf = conf.responder();

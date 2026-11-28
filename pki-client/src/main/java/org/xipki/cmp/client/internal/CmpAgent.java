@@ -56,6 +56,7 @@ import org.xipki.security.sign.ConcurrentSigner;
 import org.xipki.security.util.KeyUtil;
 import org.xipki.security.util.X509Util;
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
 import org.xipki.util.codec.Hex;
 import org.xipki.util.extra.http.HttpRespContent;
 import org.xipki.util.extra.http.XiHttpClient;
@@ -517,7 +518,11 @@ class CmpAgent {
 
     GeneralPKIMessage response = send(caName, request, debug);
     ASN1Encodable itvValue = parseGenRep(response, type);
-    return KemEncapKey.decode(ASN1OctetString.getInstance(itvValue).getOctets());
+    try {
+      return KemEncapKey.decode(ASN1OctetString.getInstance(itvValue).getOctets());
+    } catch (CodecException e) {
+      throw new CmpClientException("could not parse returned KEM encapsulated key", e);
+    }
   } // method downloadCrl
 
   RevokeCertResponse revokeCertificate(

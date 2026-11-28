@@ -520,24 +520,37 @@ public class EjbcaCertStatusStore extends OcspStore {
     return certs;
   } // method parseCerts
 
+  /**
+   * Extracts the first value of the given type in the entry of the key in the CA data (a map
+   * encoded by {@code java.beans.XMLEncoder}). The value may be nested in the entry, e.g. the
+   * {@code <long>} of a {@code java.util.Date} or the {@code <string>} of a list. Returns
+   * {@code null} if the key is absent or its entry contains no such value (e.g. {@code <null/>}).
+   */
   private static String extractTextFromCaData(String caData, String key, String valueType) {
     String keyTag = "<string>" + key + "</string>";
     int index = caData.indexOf(keyTag);
     if (index == -1) {
       return null;
     }
+    index += keyTag.length();
+
+    // the entry of the key ends where the next entry of the map starts
+    int entryEnd = caData.indexOf("<void method=\"put\">", index);
+    if (entryEnd == -1) {
+      entryEnd = caData.length();
+    }
 
     String valueStartTag = "<" + valueType + ">";
     String valueEndTag = "</" + valueType + ">";
 
-    index = caData.indexOf(valueStartTag, index + keyTag.length());
-    if (index == -1) {
+    index = caData.indexOf(valueStartTag, index);
+    if (index == -1 || index >= entryEnd) {
       return null;
     }
     int startIndex = index + valueStartTag.length();
 
     index = caData.indexOf(valueEndTag, startIndex);
-    return (index == -1) ? null : caData.substring(startIndex, index);
+    return (index == -1 || index > entryEnd) ? null : caData.substring(startIndex, index);
   } // method extractTextFromCaData
 
   /**

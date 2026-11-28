@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.xipki.util.codec.Base64.decodeFast;
@@ -102,12 +103,11 @@ final class AcmeUtils {
         return false;
       }
 
-      ASN1ObjectIdentifier curveOid2;
-      try {
-        curveOid2 = ASN1ObjectIdentifier.getInstance(pkInfoAlgo.getParameters());
-      } catch (IllegalArgumentException ex) {
+      // only named curves: no, NULL or explicit parameters do not match
+      if (!(pkInfoAlgo.getParameters() instanceof ASN1ObjectIdentifier)) {
         return false;
       }
+      ASN1ObjectIdentifier curveOid2 = (ASN1ObjectIdentifier) pkInfoAlgo.getParameters();
 
       String curveName = jwk.get("crv");
       EcCurveEnum curve = EcCurveEnum.ofAlias(curveName);
@@ -119,7 +119,7 @@ final class AcmeUtils {
         decodeFast(jwk.get("x")), decodeFast(jwk.get("y")));
       return Arrays.equals(Asn1Util.getPublicKeyData(pkInfo), encodedPoint);
     } else {
-      throw new RuntimeException("unsupported kty " + kty);
+      throw new InvalidKeySpecException("unsupported kty " + kty);
     }
   }
 
@@ -201,7 +201,9 @@ final class AcmeUtils {
     String text = value.trim();
     boolean wildcard = text.startsWith("*.");
     String host = wildcard ? text.substring(2) : text;
-    host = host.toLowerCase();
+    // independent of the default locale, e.g. 'I' is lower-cased to the dotless 'ı' in Turkish
+    host = host.toLowerCase(Locale.ROOT);
+
 
     if (host.isEmpty()) {
       throw new AcmeProtocolException(HttpStatusCode.SC_BAD_REQUEST,

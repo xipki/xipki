@@ -44,10 +44,9 @@ public class AcmeHttpServlet {
   }
 
   public void service(XiHttpRequest req, XiHttpResponse resp) throws IOException {
+    // the responder checks the method per command: HEAD (newNonce, RFC 8555 7.2), GET, POST
     String method = req.getMethod();
-    if (!("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
-      resp.setStatus(HttpStatusCode.SC_METHOD_NOT_ALLOWED);
-    }
+
     service0(req, "POST".equalsIgnoreCase(method)).fillResponse(resp);
   }
 

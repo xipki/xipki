@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -45,11 +46,12 @@ public class AcmeRepo implements AcmeDataSource.IdChecker {
 
     @Override
     public T next() {
-      if (hasNext()) {
-        return list.get(index.getAndIncrement());
-      } else {
-        return null;
+      // claim the index atomically: hasNext() followed by getAndIncrement() is not atomic.
+      int i = index.getAndIncrement();
+      if (i >= list.size()) {
+        throw new NoSuchElementException();
       }
+      return list.get(i);
     }
   }
 

@@ -12,7 +12,6 @@ import org.xipki.ocsp.server.ResponderAndPath;
 import org.xipki.security.HashAlgo;
 import org.xipki.util.codec.Args;
 import org.xipki.util.codec.Base64;
-import org.xipki.util.codec.Hex;
 import org.xipki.util.extra.http.HttpConstants;
 import org.xipki.util.extra.http.HttpResponse;
 import org.xipki.util.extra.http.HttpStatusCode;
@@ -238,7 +237,17 @@ class HttpOcspServlet {
       byte[] realB64Bytes = new byte[len - cnt * 2];
       for (int i = 0, j = 0; j < realB64Bytes.length; i++, j++) {
         if (b64OcspReqBytes[i] == '%') {
-          realB64Bytes[j] = Hex.decodeSingle(b64OcspReqBytes, i + 1);
+          // an invalid or truncated escape is a bad request
+          if (i + 2 >= len) {
+            return null;
+          }
+          int hi = Character.digit(b64OcspReqBytes[i + 1], 16);
+          int lo = Character.digit(b64OcspReqBytes[i + 2], 16);
+          if (hi < 0 || lo < 0) {
+            return null;
+          }
+          realB64Bytes[j] = (byte) ((hi << 4) | lo);
+
           i += 2;
         } else {
           realB64Bytes[j] = b64OcspReqBytes[i];

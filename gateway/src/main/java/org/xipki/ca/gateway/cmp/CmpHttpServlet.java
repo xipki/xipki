@@ -102,7 +102,9 @@ public class CmpHttpServlet {
       try {
         pkiReq = PKIMessage.getInstance(requestBytes);
       } catch (Exception ex) {
-        LogUtil.error(LOG, ex, "could not parse the request (PKIMessage)");
+        // a client error: no error log entry
+        LogUtil.warn(LOG, ex, "could not parse the request (PKIMessage)");
+
         throw new HttpRespAuditException(HttpStatusCode.SC_BAD_REQUEST,
             "bad request", AuditLevel.INFO, AuditStatus.FAILED);
       }

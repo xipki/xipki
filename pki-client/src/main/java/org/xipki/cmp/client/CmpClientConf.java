@@ -161,7 +161,8 @@ public class CmpClientConf {
 
   public static CmpClientConf parse(JsonMap json) throws CodecException {
     CmpClientConf ret = new CmpClientConf();
-    ret.setSendRequestorCert(json.getBool("sendRequestorCert", false));
+    ret.setSendRequestorCert(json.getBool("sendRequestorCert", true));
+
     JsonMap map = json.getMap("responder");
     if (map != null) {
       ret.setResponder(Responder.parse(map));
