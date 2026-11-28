@@ -35,6 +35,7 @@ import org.xipki.ca.server.CaUtil;
 import org.xipki.ca.server.CertStore;
 import org.xipki.ca.server.CertTemplateData;
 import org.xipki.ca.server.CtLogClient;
+import org.xipki.ca.server.CtLogPublicKeyFinder;
 import org.xipki.ca.server.IdentifiedCertprofile;
 import org.xipki.ca.server.X509Ca;
 import org.xipki.security.OIDs;
@@ -121,6 +122,14 @@ class Ca2Manager {
     CtlogControl ctlogControl = caEntry.ctlogControl();
     CtLogClient ctlogClient = null;
     if (ctlogControl != null && ctlogControl.isEnabled()) {
+      // the SCTs must be verifiable: the public keys of the CT logs are required
+      CtLogPublicKeyFinder finder = manager.ctLogPublicKeyFinder();
+      if (finder == null || !finder.hasPublicKeys()) {
+        LOG.error("CT log is enabled for CA {}, but no public keys of CT logs are configured "
+            + "(ctLog.keydir)", caName);
+        return false;
+      }
+
       String name = ctlogControl.sslContextName();
       SslContextConf ctxConf;
       if (name == null) {
@@ -406,7 +415,7 @@ class Ca2Manager {
     LOG.info("removed CA '{}'", name);
     manager.caInfos.remove(name);
     manager.idNameMap.removeCa(name);
-    manager.idNameMap.removeCa(name);
+
     manager.caHasProfiles.remove(name);
     manager.caHasPublishers.remove(name);
     manager.caHasRequestors.remove(name);

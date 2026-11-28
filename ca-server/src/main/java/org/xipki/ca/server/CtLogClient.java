@@ -151,9 +151,11 @@ public class CtLogClient {
       long timestamp = resp.timestamp();
       byte[] extensions = resp.extensions();
 
+      // an SCT that cannot be verified is not embedded
       PublicKey verifyKey = publicKeyFinder == null ? null : publicKeyFinder.getPublicKey(logId);
       if (verifyKey == null) {
-        LOG.warn("could not find CtLog public key 0x{} to verify the SCT", hexLogId);
+        throw new OperationException(ErrorCode.SYSTEM_FAILURE, "unknown CT log 0x" + hexLogId
+            + " (" + url + "): public key not in ctLog.keydir");
       } else {
         SignatureAndHashAlgorithm algorithm = ds.algorithm();
         String signAlgo = getSignatureAlgo(algorithm);

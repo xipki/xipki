@@ -81,6 +81,11 @@ public class CtLogPublicKeyFinder {
     this.withPublicKeys = logIds.length > 0;
   }
 
+  /** Whether at least one public key of a CT log is configured. */
+  public boolean hasPublicKeys() {
+    return withPublicKeys;
+  }
+
   public PublicKey getPublicKey(byte[] logId) {
     if (withPublicKeys) {
       for (int i = 0; i < logIds.length; i++) {
