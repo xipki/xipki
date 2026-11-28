@@ -172,7 +172,8 @@ public class X509Util {
 
   public static X509Cert parseCert(byte[] bytes) throws CertificateEncodingException {
     byte[] certBytes = null;
-    if (CompareUtil.areEqual(notNull(bytes, "bytes"), 0, BEGIN_PEM, 0, BEGIN_PEM.length)) {
+    if (notNull(bytes, "bytes").length >= BEGIN_PEM.length
+        && CompareUtil.areEqual(bytes, 0, BEGIN_PEM, 0, BEGIN_PEM.length)) {
       try (PemReader r = new PemReader(new InputStreamReader(
           new ByteArrayInputStream(bytes), StandardCharsets.UTF_8))) {
         PemObject obj;
@@ -225,44 +226,72 @@ public class X509Util {
     if (len > 23) {
       // check if PEM encoded
       if (CompareUtil.areEqual(bytes, 0, BEGIN_PEM, 0, BEGIN_PEM.length)) {
-        int base64Start = -1;
-        int base64End = -1;
-
-        for (int i = BEGIN_PEM.length + 1; i < len; i++) {
-          if (CompareUtil.areEqual(bytes, i, PEM_SEP, 0, PEM_SEP.length)) {
-            base64Start = i + PEM_SEP.length;
-            break;
-          }
-        }
-
-        if (bytes[base64Start] == '\n') {
-          base64Start++;
-        }
-
-        for (int i = len - END_PEM.length - 6; i > 0; i--) {
-          if (CompareUtil.areEqual(bytes, i, END_PEM, 0, END_PEM.length)) {
-            base64End = i - 1;
-            break;
-          }
-        }
-
-        if (bytes[base64End - 1] == '\r') {
-          base64End--;
-        }
-
-        byte[] base64Bytes = new byte[base64End - base64Start + 1];
-        System.arraycopy(bytes, base64Start, base64Bytes, 0, base64Bytes.length);
-        return Base64.decode(base64Bytes);
+        byte[] derBytes = pemToDer(bytes);
+        // malformed PEM: returned as is, decoding it fails in the caller
+        return derBytes == null ? bytes : derBytes;
       }
     }
 
     // check whether base64 encoded
-    if (Base64.getEncoder().containsOnlyValidChars(bytes, 0, 10)) {
-      return Base64.decode(bytes);
+    if (len >= 10 && Base64.getEncoder().containsOnlyValidChars(bytes, 0, 10)) {
+      try {
+        return Base64.decode(bytes);
+      } catch (IllegalArgumentException ex) {
+        // not base64 encoded: returned as is, decoding it fails in the caller
+      }
     }
 
     return bytes;
   } // method toDerEncoded
+
+  /**
+   * Returns the decoded content of the PEM object, or {@code null} if the PEM structure is
+   * malformed.
+   */
+  private static byte[] pemToDer(byte[] bytes) {
+    final int len = bytes.length;
+
+    int base64Start = -1;
+    for (int i = BEGIN_PEM.length + 1; i <= len - PEM_SEP.length; i++) {
+      if (CompareUtil.areEqual(bytes, i, PEM_SEP, 0, PEM_SEP.length)) {
+        base64Start = i + PEM_SEP.length;
+        break;
+      }
+    }
+
+    if (base64Start == -1) {
+      return null;
+    }
+
+    if (base64Start < len && bytes[base64Start] == '\n') {
+      base64Start++;
+    }
+
+    int base64End = -1;
+    for (int i = len - END_PEM.length - 6; i > base64Start; i--) {
+      if (CompareUtil.areEqual(bytes, i, END_PEM, 0, END_PEM.length)) {
+        base64End = i - 1;
+        break;
+      }
+    }
+
+    if (base64End == -1) {
+      return null;
+    }
+
+    if (base64End > base64Start && bytes[base64End - 1] == '\r') {
+      base64End--;
+    }
+
+    byte[] base64Bytes = new byte[base64End - base64Start + 1];
+    System.arraycopy(bytes, base64Start, base64Bytes, 0, base64Bytes.length);
+    try {
+      return Base64.decode(base64Bytes);
+    } catch (IllegalArgumentException ex) {
+      return null;
+    }
+  } // method pemToDer
+
 
   public static String toPemCert(X509Cert cert) {
     return StringUtil.toUtf8String(PemEncoder.encode(

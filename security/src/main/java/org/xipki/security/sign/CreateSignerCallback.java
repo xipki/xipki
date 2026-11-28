@@ -46,8 +46,10 @@ public interface CreateSignerCallback {
         case RSA2048:
         case RSA3072:
         case RSA4096:
-          return (mode == SignAlgoMode.RSAPKCS1)
-              ? SignAlgo.RSA_SHA256 : SignAlgo.RSAPSS_SHA256;
+          // PKCS#1 v1.5 unless RSA-PSS is requested, as in SignAlgo.getInstance().
+          return (mode == SignAlgoMode.RSAPSS)
+              ? SignAlgo.RSAPSS_SHA256 : SignAlgo.RSA_SHA256;
+
         case P256:
         case BRAINPOOLP256R1:
         case FRP256V1:

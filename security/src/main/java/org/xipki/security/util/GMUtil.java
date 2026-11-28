@@ -111,8 +111,9 @@ public class GMUtil {
     BigInteger s;
 
     while (true) {
-      BigInteger k = new BigInteger(order.bitLength(), random);
-      k = k.mod(order);
+      // uniformly distributed in [1, order - 1]: a biased nonce may reveal the private key.
+      BigInteger k = SM2.randomScalar(random);
+
 
       // (x, y) = k * G
       ECPoint kG = SM2.multiplyBase(k);

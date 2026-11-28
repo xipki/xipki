@@ -4,6 +4,7 @@
 package org.xipki.security.encap;
 
 import org.xipki.util.codec.Args;
+import org.xipki.util.codec.CodecException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -13,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Kem Encap Key.
  * Encoding:
  *
- * alg:                  1 byte
  * len(id):              length of id in bytes, 2 bytes
  * id:                   len(id) bytes
+ * alg:                  1 byte
  * len(encapKey):        2 bytes
  * encapKey:             len(encapKey) bytes
  * len(encryptedSecret): 2 bytes
@@ -33,17 +34,34 @@ public class KemEncapKey {
   public KemEncapKey(String id, KemEncapsulation encapsulation) {
     this.id = Args.notNull(id, "id");
     Args.max(id.length(), "id.length", 0xFFFF);
+    // the id is encoded in US-ASCII: other characters would be replaced by '?'.
+    for (int i = 0; i < id.length(); i++) {
+      if (id.charAt(i) > 0x7F) {
+        throw new IllegalArgumentException("id contains non-ASCII character: " + id);
+      }
+    }
     this.encapulation = Args.notNull(encapsulation, "encapsulation");
   }
 
-  public static KemEncapKey decode(byte[] encoded) {
+  public static KemEncapKey decode(byte[] encoded) throws CodecException {
+    Args.notNull(encoded, "encoded");
     AtomicInteger off = new AtomicInteger(0);
     byte[] idBytes = readBytes(encoded, off);
     String id = new String(idBytes, StandardCharsets.US_ASCII);
+    checkRemaining(encoded, off, 1);
     byte alg = encoded[off.getAndIncrement()];
     byte[] encapKey = readBytes(encoded, off);
     byte[] encryptedSecret = readBytes(encoded, off);
-    return new KemEncapKey(id, new KemEncapsulation(alg, encapKey, encryptedSecret));
+    if (off.get() != encoded.length) {
+      throw new CodecException("encoded has " + (encoded.length - off.get())
+          + " trailing bytes");
+    }
+
+    try {
+      return new KemEncapKey(id, new KemEncapsulation(alg, encapKey, encryptedSecret));
+    } catch (IllegalArgumentException e) {
+      throw new CodecException(e.getMessage(), e);
+    }
   }
 
   public String id() {
@@ -76,9 +94,19 @@ public class KemEncapKey {
     off.addAndGet(len);
   }
 
-  private static byte[] readBytes(byte[] bytes, AtomicInteger off) {
+  private static byte[] readBytes(byte[] bytes, AtomicInteger off) throws CodecException {
+    checkRemaining(bytes, off, 2);
     int len = ((0xFF & bytes[off.getAndIncrement()]) << 8) + (0xFF & bytes[off.getAndIncrement()]);
+    // Arrays.copyOfRange() would pad a truncated value with zeros.
+    checkRemaining(bytes, off, len);
     return Arrays.copyOfRange(bytes, off.get(), off.addAndGet(len));
   }
 
+  private static void checkRemaining(byte[] bytes, AtomicInteger off, int len)
+      throws CodecException {
+    if (bytes.length - off.get() < len) {
+      throw new CodecException("encoded is truncated: expected " + len + " more bytes at offset "
+          + off.get() + ", but only " + (bytes.length - off.get()) + " remain");
+    }
+  }
 }

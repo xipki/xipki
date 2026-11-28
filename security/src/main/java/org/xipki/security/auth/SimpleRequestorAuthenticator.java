@@ -358,8 +358,10 @@ public class SimpleRequestorAuthenticator implements RequestorAuthenticator {
 
       this.passwordRequestors = passwordRequestors0;
       this.certRequestors = certRequestors0;
-    } catch (CodecException | PasswordResolverException | IOException | CertificateException e) {
-      throw new XiSecurityException(e.getMessage(), e);
+    } catch (CodecException | PasswordResolverException | IOException | CertificateException
+             | RuntimeException e) {
+      // RuntimeException: e.g. unknown protocol, empty permissions, or missing user
+      throw new XiSecurityException("invalid configuration: " + e.getMessage(), e);
     }
   }
 

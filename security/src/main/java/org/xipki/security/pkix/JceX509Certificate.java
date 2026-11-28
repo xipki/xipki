@@ -247,8 +247,15 @@ public class JceX509Certificate extends X509Certificate {
   @Override
   public void verify(PublicKey key, String sigProvider) throws CertificateException,
       NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException {
-    Provider provider = Security.getProvider(sigProvider);
-    verify(publicKey, provider);
+    Provider provider = null;
+    if (sigProvider != null) {
+      provider = Security.getProvider(sigProvider);
+      if (provider == null) {
+        throw new NoSuchProviderException("provider " + sigProvider + " not found");
+      }
+    }
+    // the given key, not the public key of this certificate
+    verify(key, provider);
   }
 
   @Override

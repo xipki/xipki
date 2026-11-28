@@ -200,8 +200,8 @@ public class KEMUtil {
       PrivateKeyInfo skInfo = PrivateKeyInfo.getInstance(privateKey.getEncoded());
       suite = CompositeKemSuite.getAlgoSuite(skInfo.getPrivateKeyAlgorithm());
       if (suite == null) {
-        throw new IllegalArgumentException("The given public key (spki) " +
-            "is not an MLKEM or composite MLKEM key.");
+        throw new IllegalArgumentException("The given private key " +
+            "is not a composite MLKEM key.");
       }
       sk = skInfo.getPrivateKey().getOctets();
     }

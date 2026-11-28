@@ -110,10 +110,8 @@ public class CompositeKemUtil {
             break;
         }
 
-        BigInteger order = curveEnum.order();
-        byte[] tmpSk = new byte[curveEnum.fieldByteSize()];
-        rnd.nextBytes(tmpSk);
-        BigInteger tmpSkBn = new BigInteger(1, tmpSk).mod(order);
+        // uniformly distributed in [1, order - 1]
+        BigInteger tmpSkBn = curveEnum.randomScalar(rnd);
 
         byte[] tmpPk = curveEnum.multiplyBase(tmpSkBn).normalize().getEncoded(false);
 
@@ -188,7 +186,7 @@ public class CompositeKemUtil {
           throw new XiSecurityException("invalid sk.length " + sk.length);
         }
         if (ct.length != size) {
-          throw new XiSecurityException("invalid ct.length " + sk.length);
+          throw new XiSecurityException("invalid ct.length " + ct.length);
         }
         byte[] r = new byte[size];
         if (isX448) {
@@ -271,6 +269,20 @@ public class CompositeKemUtil {
 
     public BigInteger order() {
       return curve.getOrder();
+    }
+
+    /**
+     * Returns a uniformly distributed random scalar in [1, order - 1], by rejection sampling.
+     */
+    public BigInteger randomScalar(SecureRandom random) {
+      BigInteger order = order();
+      int bitLength = order.bitLength();
+      while (true) {
+        BigInteger k = new BigInteger(bitLength, random);
+        if (k.signum() != 0 && k.compareTo(order) < 0) {
+          return k;
+        }
+      }
     }
 
     public int fieldByteSize() {

@@ -118,21 +118,28 @@ public enum WeierstraussCurveEnum {
     return r;
   }
 
-  public byte[][] generateKeyPair(SecureRandom random) {
+  /**
+   * Returns a uniformly distributed random scalar in [1, order - 1], by rejection sampling
+   * (FIPS 186-5, A.2.2). Reducing a random value of the field size modulo the order would be
+   * biased, e.g. for P-521 (528 random bits modulo a 521-bit order).
+   *
+   * @param random the source of randomness.
+   * @return the random scalar.
+   */
+  public BigInteger randomScalar(SecureRandom random) {
     BigInteger order = getOrder();
-    int fieldByteSize = (getFieldBitSize() + 7) / 8;
-
-    BigInteger sk;
+    int bitLength = order.bitLength();
     while (true) {
-      byte[] bytes = new byte[fieldByteSize];
-      random.nextBytes(bytes);
-
-      sk = new BigInteger(1, bytes).mod(order);
-      if (sk.signum() != 0) {
-        break;
+      BigInteger k = new BigInteger(bitLength, random);
+      if (k.signum() != 0 && k.compareTo(order) < 0) {
+        return k;
       }
     }
+  }
 
+  public byte[][] generateKeyPair(SecureRandom random) {
+    int fieldByteSize = (getFieldBitSize() + 7) / 8;
+    BigInteger sk = randomScalar(random);
     ECPoint pk = multiplyBase(sk);
     return new byte[][] {BigIntegers.asUnsignedByteArray(fieldByteSize, sk), encodePoint(pk)};
   }

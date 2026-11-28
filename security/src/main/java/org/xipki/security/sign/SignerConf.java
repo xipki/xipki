@@ -65,7 +65,9 @@ public class SignerConf {
   }
 
   public SignerConf copy() {
-    SignerConf copy = new SignerConf(confPairs);
+    // the copy is independent of this configuration
+    SignerConf copy = new SignerConf(confPairs.copy());
+
     copy.callback = callback;
     copy.peerCertificates = peerCertificates;
     return copy;
@@ -76,12 +78,14 @@ public class SignerConf {
   }
 
   public HashAlgo hash() throws NoSuchAlgorithmException {
-    String str = value(name_algo);
+    String str = value(name_hash);
+
     return str == null ? null : HashAlgo.getInstance(str);
   }
 
   public SignerConf setAlgo(SignAlgo signAlgo) {
-    return putPair(name_algo, signAlgo.jceName());
+    // the GMAC algorithms share the JCE name AES-GMAC: use the unique name
+    return putPair(name_algo, signAlgo.isGmac() ? signAlgo.name() : signAlgo.jceName());
   }
 
   public SignAlgo algo() throws InvalidConfException {

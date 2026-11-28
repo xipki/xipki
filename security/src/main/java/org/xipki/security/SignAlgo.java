@@ -139,9 +139,10 @@ public enum SignAlgo {
 
   // AES-GMAC
   // we ignore there the params of GMAC
-  GMAC_AES128("AES-GMAC", 0x61, OIDs.Algo.AES128_GMAC),
-  GMAC_AES192("AES-GMAC", 0x62, OIDs.Algo.AES192_GMAC),
-  GMAC_AES256("AES-GMAC", 0x63, OIDs.Algo.AES256_GMAC),
+  // codes 0x61 - 0x63 are used by ML-DSA
+  GMAC_AES128("AES-GMAC", 0x71, OIDs.Algo.AES128_GMAC),
+  GMAC_AES192("AES-GMAC", 0x72, OIDs.Algo.AES192_GMAC),
+  GMAC_AES256("AES-GMAC", 0x73, OIDs.Algo.AES256_GMAC),
 
   //DHPOP-MAC
   DHPOP_X25519("DHPOP-X25519", 0x5A,
@@ -242,6 +243,11 @@ public enum SignAlgo {
         mgf1HashToSigMap.put(type.hashAlgo, type);
       } else {
         map.put(type.oid.getId(), type);
+      }
+
+      if (type.isGmac()) {
+        // the GMAC algorithms share the JCE name AES-GMAC: it does not identify one of them.
+        continue;
       }
 
       String jceName = type.jceName().toUpperCase(Locale.ROOT);
@@ -468,7 +474,16 @@ public enum SignAlgo {
 
     SignAlgo rv = null;
     if (OIDs.Algo.id_RSASSA_PSS.equals(oid)) {
-      RSASSAPSSparams param = RSASSAPSSparams.getInstance(params);
+      if (params == null) {
+        throw new NoSuchAlgorithmException("RSASSA-PSS parameters are absent");
+      }
+
+      RSASSAPSSparams param;
+      try {
+        param = RSASSAPSSparams.getInstance(params);
+      } catch (IllegalArgumentException ex) {
+        throw new NoSuchAlgorithmException("invalid RSASSA-PSS parameters", ex);
+      }
       AlgorithmIdentifier digestAlgId = param.getHashAlgorithm();
 
       AlgorithmIdentifier mgf = param.getMaskGenAlgorithm();
@@ -477,20 +492,31 @@ public enum SignAlgo {
         throw new NoSuchAlgorithmException("mgf != MGF1");
       }
 
-      AlgorithmIdentifier mgfDigestAlgId = AlgorithmIdentifier.getInstance(mgf.getParameters());
+      if (mgf.getParameters() == null) {
+        throw new NoSuchAlgorithmException("MGF1 parameters are absent");
+      }
+
+      AlgorithmIdentifier mgfDigestAlgId;
+      try {
+        mgfDigestAlgId = AlgorithmIdentifier.getInstance(mgf.getParameters());
+      } catch (IllegalArgumentException ex) {
+        throw new NoSuchAlgorithmException("invalid MGF1 parameters", ex);
+      }
       if (!digestAlgId.equals(mgfDigestAlgId)) {
         throw new NoSuchAlgorithmException("digestAlg != MGF1.digestAlg");
       }
 
-      int trailerField = param.getTrailerField().intValueExact();
-      if (TRAILER_FIELD_BC != param.getTrailerField().intValueExact()) {
-        throw new NoSuchAlgorithmException("trailerField != 0xBC" + trailerField);
+      // compare as BigInteger: the values may exceed int, intValueExact() would throw
+      // ArithmeticException.
+      if (!BigInteger.valueOf(TRAILER_FIELD_BC).equals(param.getTrailerField())) {
+        throw new NoSuchAlgorithmException(
+            "trailerField != 1 (0xBC): " + param.getTrailerField());
       }
 
       HashAlgo hashAlgo = HashAlgo.getInstance(digestAlgId);
-      int saltLen = param.getSaltLength().intValueExact();
-      if (hashAlgo.length() != saltLen) {
-        throw new NoSuchAlgorithmException("saltLen != " + hashAlgo.length() + ": " + saltLen);
+      if (!BigInteger.valueOf(hashAlgo.length()).equals(param.getSaltLength())) {
+        throw new NoSuchAlgorithmException("saltLen != " + hashAlgo.length() + ": "
+            + param.getSaltLength());
       }
 
       return mgf1HashToSigMap.get(hashAlgo);
@@ -745,7 +771,8 @@ public enum SignAlgo {
 
   private static HashAlgo getDefaultHashAlgo(long keyType, int keySize) {
     if (keyType == PKCS11T.CKK_RSA) {
-      return keySize > 3084 ? SHA512 : keySize > 2048 ? SHA384 : SHA256;
+      // SHA-256 for all key sizes, as in getDefaultSignAlgo().
+      return SHA256;
     } else if (keyType == PKCS11T.CKK_VENDOR_SM2) {
       return SM3;
     } else if (keyType == PKCS11T.CKK_EC) {

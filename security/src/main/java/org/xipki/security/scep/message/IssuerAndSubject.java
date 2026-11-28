@@ -24,6 +24,9 @@ public class IssuerAndSubject extends ASN1Object {
 
   private IssuerAndSubject(ASN1Sequence seq) {
     Args.notNull(seq, "seq");
+    if (seq.size() != 2) {
+      throw new IllegalArgumentException("seq.size() is not 2: " + seq.size());
+    }
     this.issuer = X500Name.getInstance(seq.getObjectAt(0));
     this.subject = X500Name.getInstance(seq.getObjectAt(1));
   }
