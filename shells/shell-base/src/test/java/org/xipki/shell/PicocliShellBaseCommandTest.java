@@ -72,6 +72,44 @@ public class PicocliShellBaseCommandTest {
   }
 
   @Test
+  public void testSourcePrintsCommandsByDefault() throws Exception {
+    Path dir = Files.createTempDirectory("xipki-source-trace-default-");
+    Path script = dir.resolve("a.script");
+    Files.writeString(script, "echo one" + System.lineSeparator());
+
+    TestShell shell = TestShell.withDefaults();
+    Assert.assertEquals(0, shell.executeLine("source " + script));
+    // the printed command is styled with ANSI escape sequences
+    List<String> lines = shell.outputLines().stream()
+        .map(line -> line.replaceAll("\u001B\\[[0-9;]*m", "")).collect(Collectors.toList());
+    Assert.assertEquals(List.of("echo one", "one"), lines);
+  }
+
+  @Test
+  public void testSourceMasksPasswordsInPrintedCommands() throws Exception {
+    Path dir = Files.createTempDirectory("xipki-source-trace-mask-");
+    Path script = dir.resolve("a.script");
+    Files.writeString(script, "echo --password secret" + System.lineSeparator());
+
+    TestShell shell = TestShell.withDefaults();
+    Assert.assertEquals(0, shell.executeLine("source " + script));
+    String printedCommand = shell.outputLines().get(0).replaceAll("\u001B\\[[0-9;]*m", "");
+    Assert.assertEquals("echo --password ******", printedCommand);
+  }
+
+  @Test
+  public void testSourceTraceCanBeTurnedOff() throws Exception {
+    Path dir = Files.createTempDirectory("xipki-source-trace-off-");
+    Path script = dir.resolve("a.script");
+    Files.writeString(script, "echo one" + System.lineSeparator());
+
+    TestShell shell = TestShell.withDefaults();
+    Assert.assertEquals(0, shell.executeLine("set SCRIPT_TRACE false"));
+    Assert.assertEquals(0, shell.executeLine("source " + script));
+    Assert.assertEquals(List.of("one"), shell.outputLines());
+  }
+
+  @Test
   public void testSourceReturnResumesParentScript() throws Exception {
     Path dir = Files.createTempDirectory("xipki-source-return-parent-");
     Path child = dir.resolve("b.script");
@@ -301,8 +339,15 @@ public class PicocliShellBaseCommandTest {
 
     private final StringWriter error;
 
+    /** A shell that does not print the script commands, the output is that of the commands. */
     TestShell() {
       this(new StringWriter(), new StringWriter());
+      executeLine("set SCRIPT_TRACE false");
+    }
+
+    /** A shell with the default settings: the script commands are printed. */
+    static TestShell withDefaults() {
+      return new TestShell(new StringWriter(), new StringWriter());
     }
 
     private TestShell(StringWriter output, StringWriter error) {

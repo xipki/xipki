@@ -2,10 +2,10 @@
 
 `bin/xipki`
 
-Print each command in the script file (e.g. my.script) while it executes:
+Each command in a script file (e.g. my.script) is printed while it executes. To turn this off:
 
 ```text
-set SCRIPT_TRACE true
+set SCRIPT_TRACE false
 source my.script
 ```
 

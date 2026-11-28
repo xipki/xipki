@@ -131,11 +131,13 @@ class SourceCommand implements Callable<Integer> {
   }
 
   private void printScriptCommand(String command, ShellScriptContext context) {
-    if (!context.isTrue(SCRIPT_TRACE_VARIABLE)) {
+    // printed by default, suppressed by "set SCRIPT_TRACE false"
+    if (context.isFalse(SCRIPT_TRACE_VARIABLE)) {
       return;
     }
 
-    shell.out().println(formatDisplayedCommand(command));
+    // passwords are not printed in plain text
+    shell.out().println(formatDisplayedCommand(ShellHistorySupport.maskSensitiveValues(command)));
     shell.out().flush();
   }
 

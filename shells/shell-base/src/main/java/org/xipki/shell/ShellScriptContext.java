@@ -100,6 +100,14 @@ final class ShellScriptContext implements ShellVariableSupport.Resolver {
     return "true".equalsIgnoreCase(String.valueOf(value).trim());
   }
 
+  boolean isFalse(String name) {
+    Object value = variables.get(name);
+    if (value == null) {
+      return false;
+    }
+    return "false".equalsIgnoreCase(String.valueOf(value).trim());
+  }
+
   private static String stringValue(Object value) {
     if (value == null) {
       return "";

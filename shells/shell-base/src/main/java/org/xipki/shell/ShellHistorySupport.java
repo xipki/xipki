@@ -7,21 +7,31 @@ import org.jline.reader.impl.history.DefaultHistory;
 import org.xipki.util.misc.StringUtil;
 
 import java.time.Instant;
-import java.util.Set;
+import java.util.Locale;
 
 /**
- * History helpers for masking sensitive shell input before it is persisted.
+ * Helpers for masking sensitive values (passwords, PINs) in command lines, before they are
+ * persisted in the history or printed while a script is executed.
  *
  * @author Lijun Liao (xipki)
  */
 final class ShellHistorySupport {
 
-  private static final Set<String> MASKED_OPTIONS = Set.of("--password", "--pin");
+  /** Key of a password in a configuration string, e.g. "algo=...,password=changeit". */
+  private static final String CONF_PASSWORD_KEY = "password=";
 
   private ShellHistorySupport() {
   }
 
-  static String maskSensitiveHistoryValues(String line) {
+  /**
+   * Masks the sensitive values in the command line: the values of the options whose name ends
+   * with "password" or "pwd" and of --pin, and the values of "password=" in configuration
+   * strings. References to variables (starting with $) are not masked.
+   *
+   * @param line the command line.
+   * @return the command line with masked sensitive values.
+   */
+  static String maskSensitiveValues(String line) {
     if (StringUtil.isBlank(line)) {
       return line;
     }
@@ -38,15 +48,12 @@ final class ShellHistorySupport {
       String token = new String(chars, i, tokenEnd - i);
 
       int eqIndex = token.indexOf('=');
-      if (eqIndex > 0) {
-        String option = token.substring(0, eqIndex);
-        if (MASKED_OPTIONS.contains(option)) {
-          String valueToken = token.substring(eqIndex + 1);
-          if (!isVariableReference(valueToken)) {
-            maskRange(chars, i + eqIndex + 1, tokenEnd);
-          }
+      if (eqIndex > 0 && isMaskedOption(token.substring(0, eqIndex))) {
+        String valueToken = token.substring(eqIndex + 1);
+        if (!isVariableReference(valueToken)) {
+          maskRange(chars, i + eqIndex + 1, tokenEnd);
         }
-      } else if (MASKED_OPTIONS.contains(token)) {
+      } else if (isMaskedOption(token)) {
         int valueStart = skipWhitespace(chars, tokenEnd);
         if (valueStart < chars.length) {
           int valueEnd = findTokenEnd(chars, valueStart);
@@ -56,12 +63,56 @@ final class ShellHistorySupport {
           }
           tokenEnd = valueEnd;
         }
+      } else {
+        maskConfPasswords(chars, i, tokenEnd);
       }
 
       i = tokenEnd;
     }
 
     return new String(chars);
+  }
+
+  private static boolean isMaskedOption(String token) {
+    if (!token.startsWith("--")) {
+      return false;
+    }
+    String name = token.toLowerCase(Locale.ROOT);
+    // e.g. --password, --signer-password, --inpwd; but not --password-file
+    return name.equals("--pin") || name.endsWith("password") || name.endsWith("pwd");
+  }
+
+  /**
+   * Masks the values of "password=" in a configuration string within the token, e.g.
+   * "algo=ECDSA-SHA256,password=changeit,keystore=file:ca.p12".
+   */
+  private static void maskConfPasswords(char[] chars, int start, int end) {
+    String token = new String(chars, start, end - start).toLowerCase(Locale.ROOT);
+    int idx = 0;
+    while ((idx = token.indexOf(CONF_PASSWORD_KEY, idx)) != -1) {
+      // the key starts the token, a pair (after ',') or a quoted string
+      char prev = idx == 0 ? ',' : token.charAt(idx - 1);
+      idx += CONF_PASSWORD_KEY.length();
+      if (prev != ',' && prev != '"' && prev != '\'') {
+        continue;
+      }
+
+      int valueEnd = idx;
+      while (valueEnd < token.length()) {
+        char ch = token.charAt(valueEnd);
+        if (ch == ',' || ch == '"' || ch == '\'') {
+          break;
+        }
+        valueEnd++;
+      }
+
+      if (valueEnd > idx && token.charAt(idx) != '$') {
+        for (int k = idx; k < valueEnd; k++) {
+          chars[start + k] = '*';
+        }
+      }
+      idx = valueEnd;
+    }
   }
 
   private static int skipWhitespace(char[] chars, int start) {
@@ -123,7 +174,7 @@ final class ShellHistorySupport {
 
     @Override
     public void add(Instant time, String line) {
-      super.add(time, maskSensitiveHistoryValues(line));
+      super.add(time, maskSensitiveValues(line));
     }
   }
 
