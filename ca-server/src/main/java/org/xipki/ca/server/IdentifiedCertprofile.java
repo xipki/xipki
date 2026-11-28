@@ -234,7 +234,7 @@ public class IdentifiedCertprofile {
       if (value == null && extControl.isPermittedInRequest()) {
         Extension reqExt = requestedExtns.get(type);
         if (reqExt != null) {
-          value = new ExtensionValue(extControl.isCritical(), reqExt);
+          value = new ExtensionValue(extControl.isCritical(), reqExt.getParsedValue());
         }
       }
 
