@@ -82,6 +82,7 @@
 
     <module>ca-api</module>
     <module>ca-server</module>
+    <module>ca-mgmt-test</module>
     <module>shells</module>
     <module>qa</module>
     <module>servlets</module>

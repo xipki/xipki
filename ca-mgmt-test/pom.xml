@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xipki.pki</groupId>
+    <artifactId>xipki-parent</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>ca-mgmt-test</artifactId>
+  <name>XiPKI :: ${project.artifactId}</name>
+  <description>Tests of the CA management client, shell and database tools</description>
+  <properties>
+    <!-- only tests -->
+    <skipDeploy>true</skipDeploy>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>ca-mgmt</artifactId>
+      <version>${xipki-common.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>ca-mgmt-shell</artifactId>
+      <version>${xipki-common.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>security-shell</artifactId>
+      <version>${xipki-common.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.common</groupId>
+      <artifactId>datasource</artifactId>
+      <version>${xipki-common.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>crypto-be-jdk</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- the CA and the management servlet for the tests -->
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-server</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- in-memory PKCS#11 module (xihsm:mem) for the PKCS#11 tests -->
+      <groupId>org.xipki.crypto</groupId>
+      <artifactId>xihsm</artifactId>
+      <version>${xicrypto.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- crypto-be-jdk: ML-DSA with context string, and the expanded ML-DSA / ML-KEM private keys
+               from the seed, use the internals of the JDK -->
+          <argLine>--add-exports java.base/sun.security.provider=ALL-UNNAMED --add-exports java.base/com.sun.crypto.provider=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
