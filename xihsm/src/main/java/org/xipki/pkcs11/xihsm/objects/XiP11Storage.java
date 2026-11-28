@@ -200,17 +200,52 @@ public abstract class XiP11Storage extends XiP11Object {
 
   public final void updateAttributes(
       LoginState loginState, ObjectInitMethod initMethod, XiTemplate attrs) throws HsmException {
-    assertAttributesSettable(attrs);
+    // RESTORE loads the attributes stored by xihsm itself, which may include read-only
+    // attributes such as CKA_ALWAYS_SENSITIVE: only the attributes given by the caller are
+    // checked.
+    if (initMethod != ObjectInitMethod.RESTORE) {
+      assertAttributesSettable(attrs);
+    }
 
     if (modifiable != null && !modifiable) {
       throw new HsmException(CKR_ACTION_PROHIBITED, "The object is not modifiable");
     }
 
-    doSetAttributes(loginState, initMethod, attrs);
+    if (initMethod != ObjectInitMethod.UPDATE) {
+      doSetAttributes(loginState, initMethod, attrs);
 
-    if (attrs.getSize() > 0) {
+      if (attrs.getSize() > 0) {
+        throw new HsmException(CKR_ATTRIBUTE_TYPE_INVALID,
+            "Attribute of types are not allowed: " + Arrays.toString(attrs.getTextTypes()));
+      }
+      return;
+    }
+
+    // C_SetAttributeValue: doSetAttributes() assigns all attributes it handles, the absent ones
+    // as null. Set the current attributes overlaid by the given ones, so that the attributes
+    // which are not given (e.g. CKA_ID when only CKA_LABEL is changed) keep their values.
+    long[] givenTypes = attrs.getTypes();
+    XiTemplate merged = getAllAttributes();
+    merged.removeAttributes(givenTypes);
+    for (XiAttribute attr : attrs.getAttributes()) {
+      merged.add(attr);
+    }
+
+    doSetAttributes(loginState, initMethod, merged);
+
+    // the given attributes must have been consumed; the other remaining attributes, e.g.
+    // CKA_CLASS, are not settable and keep their values.
+    XiTemplate notSettable = new XiTemplate();
+    for (long type : givenTypes) {
+      XiAttribute attr = merged.getAttribute(type);
+      if (attr != null) {
+        notSettable.add(attr);
+      }
+    }
+
+    if (notSettable.getSize() > 0) {
       throw new HsmException(CKR_ATTRIBUTE_TYPE_INVALID,
-          "Attribute of types are not allowed: " + Arrays.toString(attrs.getTextTypes()));
+          "Attribute of types are not allowed: " + Arrays.toString(notSettable.getTextTypes()));
     }
   }
 

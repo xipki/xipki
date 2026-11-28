@@ -283,15 +283,19 @@ public class Session {
           throw new InvalidKeySpecException("privateKey and publicKey " +
               "do not have the same publicKey data");
         }
-      } else if (Asn1Const.id_rsaPublicKey.equals(oid)) {
-        rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.privateKey());
-        Asn1RSAPublicKey rsaPk = Asn1RSAPublicKey.getInstance(asn1Pk.publicKeyData());
-        if (!(Arrays.equals(rsaSk.modulus(), rsaPk.modulus())
-              && Arrays.equals(rsaSk.publicExponent(), rsaPk.publicExponent()))) {
-          throw new InvalidKeySpecException("RSA privateKey and publicKey " +
-              "do not have the same publicKey data");
+      } else {
+        if (Asn1Const.id_rsaPublicKey.equals(oid)) {
+          rsaSk = Asn1RSAPrivateKey.getInstance(asn1Sk.privateKey());
+          Asn1RSAPublicKey rsaPk = Asn1RSAPublicKey.getInstance(asn1Pk.publicKeyData());
+          if (!(Arrays.equals(rsaSk.modulus(), rsaPk.modulus())
+                && Arrays.equals(rsaSk.publicExponent(), rsaPk.publicExponent()))) {
+            throw new InvalidKeySpecException("RSA privateKey and publicKey " +
+                "do not have the same publicKey data");
+          }
         }
 
+        // the private key does not contain the public key (e.g. PKCS#8 v1 of the JDK):
+        // use the given public key, for all key types, not only RSA.
         publicKeyData = asn1Pk.publicKeyData();
       }
     }
@@ -1411,10 +1415,10 @@ public class Session {
         if (value != vendorValue) {
           ((LongAttribute) attr).setValue(vendorValue);
         }
-      } else if (type == CKA_EC_POINT) {
-        byte[] value = ((ByteArrayAttribute) attr).getValue();
-        ((ByteArrayAttribute) attr).setValue(Asn1Util.toOctetString(value));
       } else if (type == CKA_EC_PARAMS) {
+        // CKA_EC_POINT is not converted: Template.ecPoint(byte[]) already stores the
+        // DER-encoded OCTET STRING, as specified by PKCS#11.
+
         byte[] value = ((ByteArrayAttribute) attr).getValue();
         byte[] newPValue = null;
         if (module.hasSpecialBehaviour(SpecialBehaviour.EC_PARAMS_NAME_ONLY_EDWARDS)) {

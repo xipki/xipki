@@ -211,8 +211,18 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
     addAttr(res, types, CKA_SIGN,        sign);
     addAttr(res, types, CKA_UNWRAP,      unwrap);
     addAttr(res, types, CKA_WRAP_WITH_TRUSTED, wrapWithTrusted);
-    addAttr(res, types, CKA_ALWAYS_SENSITIVE,  alwaysSensitive);
-    addAttr(res, types, CKA_NEVER_EXTRACTABLE, neverExtractable);
+    // PKCS#11: for a key generated on the token, CKA_ALWAYS_SENSITIVE is its CKA_SENSITIVE and
+    // CKA_NEVER_EXTRACTABLE the negation of its CKA_EXTRACTABLE; for keys whose value was known
+    // outside the token (created, unwrapped), both are CK_FALSE. The attributes are always
+    // present. A stored value (e.g. set to CK_FALSE when CKA_SENSITIVE was changed) wins.
+    // The derived values are only returned to queries (types != null), not stored in the
+    // encoding of the object (types == null), where they would be read-only on restore.
+    boolean generated = newObjectMethod == Origin.GENERATE;
+    boolean derive = types != null;
+    addAttr(res, types, CKA_ALWAYS_SENSITIVE, (alwaysSensitive != null || !derive)
+        ? alwaysSensitive : Boolean.valueOf(generated && isSensitive()));
+    addAttr(res, types, CKA_NEVER_EXTRACTABLE, (neverExtractable != null || !derive)
+        ? neverExtractable : Boolean.valueOf(generated && !isExtractable()));
     addAttr(res, types, CKA_UNWRAP_TEMPLATE,   unwrapTemplate);
     addAttr(res, types, CKA_DERIVE_TEMPLATE,   deriveTemplate);
   }
@@ -225,16 +235,18 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
     decrypt = attrs.removeBool(CKA_DECRYPT);
 
     // CKA_EXTRACTABLE
+    // PKCS#11: CKA_EXTRACTABLE may be changed from TRUE to FALSE, but not back
     Boolean attrB = attrs.removeBool(CKA_EXTRACTABLE);
     if (attrB != null) {
-      assertNotFalseToTrue(initMethod, CKA_WRAP_WITH_TRUSTED, attrB, isWrapWithTrusted());
+      assertNotFalseToTrue(initMethod, CKA_EXTRACTABLE, attrB, isExtractable());
       this.extractable = attrB;
     }
 
     // CKA_SENSITIVE
+    // PKCS#11: CKA_SENSITIVE may be changed from FALSE to TRUE, but not back
     attrB = attrs.removeBool(CKA_SENSITIVE);
     if (attrB != null) {
-      assertNotTrueToFalse(initMethod, CKA_WRAP_WITH_TRUSTED, attrB, isWrapWithTrusted());
+      assertNotTrueToFalse(initMethod, CKA_SENSITIVE, attrB, isSensitive());
       this.sensitive = attrB;
     }
 
@@ -250,26 +262,20 @@ public abstract class XiPrivateOrSecretKey extends XiKey {
       this.wrapWithTrusted = attrB;
     }
 
+    // read-only for the caller (see assertAttributesSettable), set internally and on RESTORE
     attrB = attrs.removeBool(CKA_ALWAYS_SENSITIVE);
     if (attrB != null) {
-      if (initMethod != ObjectInitMethod.RESTORE) {
-        this.alwaysSensitive = attrB;
-      } else {
-        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY, "CKA_ALWAYS_SENSITIVE is read-only");
-      }
+      this.alwaysSensitive = attrB;
     } else {
       if (!boolValue(sensitive, true)) {
         alwaysSensitive = false;
       }
     }
 
+    // read-only for the caller (see assertAttributesSettable), set internally and on RESTORE
     attrB = attrs.removeBool(CKA_NEVER_EXTRACTABLE);
     if (attrB != null) {
-      if (initMethod != ObjectInitMethod.RESTORE) {
-        this.neverExtractable = attrB;
-      } else {
-        throw new HsmException(CKR_ATTRIBUTE_READ_ONLY, "CKA_NEVER_EXTRACTABLE is read-only");
-      }
+      this.neverExtractable = attrB;
     } else {
       if (boolValue(extractable, false)) {
         neverExtractable = false;

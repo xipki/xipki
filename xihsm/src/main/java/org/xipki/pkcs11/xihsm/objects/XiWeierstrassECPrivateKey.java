@@ -87,7 +87,10 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
     BigInteger s;
 
     while (true) {
-      BigInteger k = new BigInteger(order.bitLength(), random).mod(order);
+      // uniformly distributed in [1, order - 1]: random bits reduced modulo the order would be
+      // biased, and a biased nonce may reveal the private key.
+      BigInteger k = curve.randomScalar(random);
+
 
       // (x,y) = k*G
       ECPoint xy = curve.multiplyBase(k);
@@ -256,6 +259,9 @@ public class XiWeierstrassECPrivateKey extends XiECPrivateKey {
       ret = new XiSm2ECPrivateKey(vendor, cku, newObjectMethod,
           handle, inToken, keyType, keyGenMechanism, ecParams, value, ecPoint);
     } else {
+      // vendors with EC_PRIVATEKEY_ECPOINT require CKA_EC_POINT for the EC private key (see
+      // XiPKCS11Module): consume it, the public point is derived from the private value.
+      attrs.removeByteArray(PKCS11T.CKA_EC_POINT);
       ret = new XiWeierstrassECPrivateKey(vendor, cku, newObjectMethod,
           handle, inToken, keyType, keyGenMechanism, ecParams, value);
     }

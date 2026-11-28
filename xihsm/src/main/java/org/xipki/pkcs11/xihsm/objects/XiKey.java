@@ -168,7 +168,13 @@ public abstract class XiKey extends XiP11Storage {
     addAttr(res, types, CKA_START_DATE, startDate);
     addAttr(res, types, CKA_END_DATE,   endDate);
     addAttr(res, types, CKA_DERIVE,     derive);
-    addAttr(res, types, CKA_LOCAL,      local);
+    // PKCS#11: CK_TRUE only if the key was generated on the token (C_GenerateKey or
+    // C_GenerateKeyPair); the attribute is always present. The derived value is only returned
+    // to queries (types != null), not stored in the encoding of the object (types == null),
+    // where CKA_LOCAL would be read-only on restore.
+    Boolean localValue = (local != null || types == null) ? local
+        : Boolean.valueOf(newObjectMethod == Origin.GENERATE);
+    addAttr(res, types, CKA_LOCAL, localValue);
     addAttr(res, types, CKA_KEY_GEN_MECHANISM,  keyGenMechanism);
     addAttr(res, types, CKA_ALLOWED_MECHANISMS, allowedMechanisms);
   }
