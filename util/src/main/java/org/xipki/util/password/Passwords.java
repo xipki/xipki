@@ -199,7 +199,8 @@ public class Passwords {
   }
 
   private static String solveVariables(String line, int offset, Properties properties) {
-    if (offset + 4 >= line.length()) {
+    // the shortest variable "${x}" has 4 characters
+    if (offset + 4 > line.length()) {
       return line;
     }
 
@@ -227,7 +228,8 @@ public class Passwords {
     int newOffset;
     if (value != null) {
       line = line.substring(0, startIndex) + value + line.substring(endIndex + 1);
-      newOffset = startIndex + value.length() + 1;
+      // the next variable may follow the value directly
+      newOffset = startIndex + value.length();
     } else {
       newOffset = endIndex + 1;
     }

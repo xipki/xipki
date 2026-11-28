@@ -93,8 +93,16 @@ public class FileOrValue implements JsonEncodable {
   }
 
   public static FileOrValue parse(JsonMap json) throws CodecException {
-    return json == null ? null
-        : new FileOrValue(json.getString("file"), json.getString("value"));
+    if (json == null) {
+      return null;
+    }
+
+    try {
+      return new FileOrValue(json.getString("file"), json.getString("value"));
+    } catch (IllegalArgumentException ex) {
+      // not exactly one of file and value
+      throw new CodecException("invalid FileOrValue: " + ex.getMessage(), ex);
+    }
   }
 
   public JsonMap toCodec() {

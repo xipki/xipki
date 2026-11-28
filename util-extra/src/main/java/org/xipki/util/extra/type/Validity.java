@@ -112,13 +112,20 @@ public class Validity implements Comparable<Validity> {
       }
       return ZonedDateTime.of(year + validity, month, day, utcDate.getHour(),
           utcDate.getMinute(), utcDate.getSecond(), 0, TIMEZONE_UTC).toInstant();
+    } else if (unit == Unit.WEEK) {
+      // Instant does not support ChronoUnit.WEEKS
+      return referenceDate.plus(7L * validity, ChronoUnit.DAYS);
     } else {
       return referenceDate.plus(validity, unit.unit());
     }
   } // method add
 
+  /**
+   * Returns the approximate duration in minutes, a year with 365.2425 days.
+   * @return the approximate duration in minutes.
+   */
   public long approxMinutes() {
-    return unit.unit().getDuration().getSeconds() / 60;
+    return validity * unit.unit().getDuration().getSeconds() / 60;
   }
 
   @Override

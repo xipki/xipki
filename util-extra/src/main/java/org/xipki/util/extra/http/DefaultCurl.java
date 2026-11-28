@@ -26,8 +26,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,13 +55,11 @@ public class DefaultCurl implements Curl {
     private final List<HostConf> hostConfs;
 
     public CurlConf(List<HostConf> hostConfs) {
-      this.hostConfs = hostConfs;
-      if (hostConfs == null) {
-        return;
-      }
+      // without hostConfs: no host-specific TLS configuration
+      this.hostConfs = hostConfs == null ? Collections.emptyList() : hostConfs;
 
       Set<String> urlPatterns = new HashSet<>();
-      for (HostConf m : hostConfs) {
+      for (HostConf m : this.hostConfs) {
         for (String p : m.urlPattern) {
           if (urlPatterns.contains(p)) {
             throw new IllegalArgumentException("duplicated urlPattern " + p);
@@ -93,7 +92,7 @@ public class DefaultCurl implements Curl {
 
         return new CurlConf(hosts);
       } catch (RuntimeException e) {
-        throw new CodecException(e);
+        throw new CodecException("invalid curl configuration " + file + ": " + e.getMessage(), e);
       }
     }
 
@@ -143,7 +142,8 @@ public class DefaultCurl implements Curl {
 
     public boolean match(URL url) {
       if (!"*".equals(host)) {
-        if (!url.getHost().contains(host)) {
+        // exact match: the TLS configuration of a host must not be used for other hosts
+        if (!url.getHost().equalsIgnoreCase(host)) {
           return false;
         }
       }
@@ -193,11 +193,15 @@ public class DefaultCurl implements Curl {
 
   private SslContextConf sslContextConf;
 
-  private final Map<UrlPattern, SslContextConf> sslContextConfs = new HashMap<>();
+  // in the order of the configuration: the first matching pattern applies
+  private final Map<UrlPattern, SslContextConf> sslContextConfs = new LinkedHashMap<>();
 
   private UrlPattern[] urlPatterns;
 
   private boolean initialized;
+
+  /** The error of the initialization, thrown again by every request. */
+  private ObjectCreationException initException;
 
   public DefaultCurl() {
   }
@@ -215,6 +219,10 @@ public class DefaultCurl implements Curl {
   }
 
   private synchronized void initIfNotDone() throws ObjectCreationException {
+    if (initException != null) {
+      throw initException;
+    }
+
     if (initialized) {
       return;
     }
@@ -225,11 +233,13 @@ public class DefaultCurl implements Curl {
           UrlPattern urlPattern = new UrlPattern("*:*/*");
           try {
             sslContextConf.init();
-            sslContextConfs.put(urlPattern, sslContextConf);
-            LOG.info("initialized SslContextConf for UrlPattern {}", urlPattern);
           } catch (ObjectCreationException ex) {
-            LogUtil.error(LOG, ex, "error initializing sslContextConf");
+            // no requests with the default TLS settings instead of the configured ones
+            throw new ObjectCreationException("could not initialize the TLS configuration: "
+                + ex.getMessage(), ex);
           }
+          sslContextConfs.put(urlPattern, sslContextConf);
+          LOG.info("initialized SslContextConf for UrlPattern {}", urlPattern);
         } else if (confFile != null) {
           CurlConf conf = CurlConf.parse(new File(confFile));
 
@@ -238,14 +248,16 @@ public class DefaultCurl implements Curl {
 
             try {
               sslContextConf.init();
-              for (String p : m.urlPattern) {
-                sslContextConfs.put(new UrlPattern(p), sslContextConf);
-              }
-              LOG.info("initialized SslContextConf for UrlPattern {}", m.urlPattern);
             } catch (ObjectCreationException ex) {
-              LogUtil.error(LOG, ex, "error initializing " +
-                  "SslContextConf for URL pattern " + m.urlPattern);
+              // no requests to these hosts with the default TLS settings instead of the
+              // configured ones
+              throw new ObjectCreationException("could not initialize the TLS configuration for "
+                  + "URL pattern " + m.urlPattern + ": " + ex.getMessage(), ex);
             }
+            for (String p : m.urlPattern) {
+              sslContextConfs.put(new UrlPattern(p), sslContextConf);
+            }
+            LOG.info("initialized SslContextConf for UrlPattern {}", m.urlPattern);
           }
         } else {
           LOG.info("neither confFile nor sslContextConf is configured, skipping.");
@@ -254,9 +266,12 @@ public class DefaultCurl implements Curl {
         List<UrlPattern> patterns = new ArrayList<>(sslContextConfs.keySet());
         this.urlPatterns = patterns.toArray(new UrlPattern[0]);
       }
-    } catch (CodecException | RuntimeException ex) {
+    } catch (CodecException | ObjectCreationException | RuntimeException ex) {
       LogUtil.error(LOG, ex, "error initializing DefaultCurl");
-      throw new ObjectCreationException("error initializing DefaultCurl: " + ex.getMessage());
+      // remembered: the requests must not be sent without the configured TLS settings
+      initException = new ObjectCreationException(
+          "error initializing DefaultCurl: " + ex.getMessage(), ex);
+      throw initException;
     } finally {
       initialized = true;
     }

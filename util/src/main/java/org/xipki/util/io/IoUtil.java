@@ -370,7 +370,8 @@ public class IoUtil {
     StringBuilder builder = new StringBuilder();
     try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
       long fileLength = file.length() - 1;
-      if (fileLength < 1) {
+      // a file with one character has fileLength 0
+      if (fileLength < 0) {
         return "";
       }
 
