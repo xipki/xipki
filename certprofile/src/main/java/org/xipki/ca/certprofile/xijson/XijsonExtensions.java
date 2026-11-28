@@ -132,8 +132,8 @@ public class XijsonExtensions {
 
   private ExtensionValue mrtdDocumentTypes;
 
-  XijsonExtensions(XijsonCertprofileType conf, SubjectControl subjectControl)
-      throws CertprofileException {
+  XijsonExtensions(XijsonCertprofile certprofile, XijsonCertprofileType conf,
+                   SubjectControl subjectControl) throws CertprofileException {
     Args.notNull(subjectControl, "subjectControl");
 
     List<ExtensionType> extensionsConf = conf.extensions();
@@ -298,10 +298,18 @@ public class XijsonExtensions {
       }
     }
 
+    // extensions processed by a subclass of XijsonCertprofile
+    for (ASN1ObjectIdentifier extnId : new ArrayList<>(extnIds)) {
+      if (certprofile.initExtraExtension(extensions.get(extnId.getId()))) {
+        extnIds.remove(extnId);
+      }
+    }
+
     if (!extnIds.isEmpty()) {
       throw new CertprofileException("Cannot process the extensions: " + extnIds);
     }
-  } // method initialize0
+  } // constructor
+
 
   private void initAuthorityInfoAccess(Set<ASN1ObjectIdentifier> extnIds,
                                       Map<String, ExtensionType> extensions) {
@@ -711,7 +719,13 @@ public class XijsonExtensions {
         continue;
       }
 
-      if (!subjectAltNameModes.contains(targetTag)) {
+      if (!extensionsControl.containsID(OIDs.Extn.subjectAlternativeName)) {
+        throw new CertprofileException("toSAN " + targetTag
+            + " cannot be configured if extension subjectAltName is not permitted");
+      }
+
+      // no configured modes: all modes are allowed
+      if (subjectAltNameModes != null && !subjectAltNameModes.contains(targetTag)) {
         throw new CertprofileException("target tag " + targetTag + " not allowed in SAN");
       }
 

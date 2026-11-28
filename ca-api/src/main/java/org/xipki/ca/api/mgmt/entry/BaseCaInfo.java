@@ -366,9 +366,12 @@ public class BaseCaInfo {
       ret.setNumCrls(i);
     }
 
-    String str = json.getString("revocationInfo");
-    if (str != null) {
-      ret.setRevocationInfo(CertRevocationInfo.fromEncoded(str));
+    // written as JSON map by toCodec; the encoded text form is accepted as well
+    Object revInfo = json.getObject("revocationInfo");
+    if (revInfo instanceof JsonMap) {
+      ret.setRevocationInfo(CertRevocationInfo.parse((JsonMap) revInfo));
+    } else if (revInfo instanceof String) {
+      ret.setRevocationInfo(CertRevocationInfo.fromEncoded((String) revInfo));
     }
 
     Boolean b = json.getBool("saveCert");
@@ -386,7 +389,8 @@ public class BaseCaInfo {
       ret.setSnSize(i);
     }
 
-    str = json.getString("status");
+    String str = json.getString("status");
+
     if (str != null) {
       ret.setStatus(CaStatus.valueOf(str));
     }

@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -202,7 +204,8 @@ public class XijsonCertprofileType implements JsonEncodable {
   public void setSignatureAlgorithms(List<SignAlgo> signatureAlgorithms) {
     // remove duplicated algorithms
     this.signatureAlgorithms = (signatureAlgorithms == null) ? null
-        : new ArrayList<>(new HashSet<>(signatureAlgorithms));
+        // keep the order: the first algorithm supported by the CA is used
+        : new ArrayList<>(new LinkedHashSet<>(signatureAlgorithms));
   }
 
   public List<KeySpec> keyAlgorithms() {

@@ -236,7 +236,7 @@ public class CertprofileUtil {
       ASN1ObjectIdentifier[] requiredTypes = new ASN1ObjectIdentifier[] {
           OIDs.DN.commonName, OIDs.DN.organization, OIDs.DN.country};
       for (ASN1ObjectIdentifier m : requiredTypes) {
-        if (!containsRdn(subject, OIDs.DN.commonName)) {
+        if (!containsRdn(subject, m)) {
           throw new BadCertTemplateException("missing " + OIDs.getName(m) + " in subject");
         }
       }

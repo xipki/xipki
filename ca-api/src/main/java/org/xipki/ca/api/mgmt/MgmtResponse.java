@@ -56,7 +56,7 @@ public abstract class MgmtResponse extends MgmtMessage {
     public JsonMap toCodec() {
       JsonMap ret = new JsonMap();
       ret.putStringMap("result", result);
-      return null;
+      return ret;
     }
 
     public static GetDbSchemas parse(JsonMap json) throws CodecException {
@@ -339,7 +339,7 @@ public abstract class MgmtResponse extends MgmtMessage {
       JsonMap map = json.getMap("revInfo");
       CertRevocationInfo revInfo = null;
       if (map != null) {
-        revInfo = CertRevocationInfo.parse(json);
+        revInfo = CertRevocationInfo.parse(map);
       }
       return new GetCert(cert, revInfo, json.getString("certprofile"));
     }

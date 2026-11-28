@@ -260,26 +260,31 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
     return unrevokedCert;
   } // doUnrevokeCertificate
 
+  /**
+   * Revokes the CA. The revocation of the CA is saved in the table CA (not CERT, which does not
+   * contain the CA certificate) by the caller, and published here.
+   */
   public void revokeCa(RequestorInfo requestor, CertRevocationInfo revocationInfo)
       throws OperationException {
-    caInfo.setRevocationInfo(Args.notNull(revocationInfo, "revocationInfo"));
-
-    if (caInfo.isSelfSigned()) {
-      AuditEvent event = newAuditEvent(
-          revocationInfo.reason() == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_ca :TYPE_revoke_ca,
-          requestor);
-      boolean successful = true;
-      try {
-        CertWithRevocationInfo ret = revokeCertificate0(
-            caInfo.serialNumber(), revocationInfo.reason(),
-            revocationInfo.invalidityTime(), true, event);
-        successful = (ret != null);
-      } finally {
-        finish(event, successful);
-      }
+    Args.notNull(revocationInfo, "revocationInfo");
+    AuditEvent event = newAuditEvent(
+        revocationInfo.reason() == CrlReason.CERTIFICATE_HOLD ? TYPE_suspend_ca : TYPE_revoke_ca,
+        requestor);
+    event.addEventData(NAME_serial, LogUtil.formatCsn(caInfo.serialNumber()));
+    event.addEventData(NAME_reason, revocationInfo.reason().description());
+    if (revocationInfo.invalidityTime() != null) {
+      event.addEventData(NAME_invalidity_time,
+          DateUtil.toUtcTimeyyyyMMddhhmmss(revocationInfo.invalidityTime()));
     }
 
-    boolean succ = publisherModule.publishCaRevoked(revocationInfo);
+    caInfo.setRevocationInfo(revocationInfo);
+    boolean succ = false;
+    try {
+      succ = publisherModule.publishCaRevoked(revocationInfo);
+    } finally {
+      finish(event, succ);
+    }
+
     if (!succ) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
           "could not publish event caRevoked of CA " + caIdent + " to at least one publisher");
@@ -287,24 +292,21 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   } // method revokeCa
 
   public void unrevokeCa(RequestorInfo requestor) throws OperationException {
+    AuditEvent event = newAuditEvent(TYPE_unsuspend_ca, requestor);
+    event.addEventData(NAME_serial, LogUtil.formatCsn(caInfo.serialNumber()));
+
     caInfo.setRevocationInfo(null);
-    if (caInfo.isSelfSigned()) {
-      AuditEvent event = newAuditEvent(TYPE_unsuspend_ca, requestor);
-      boolean successful = false;
-      try {
-        unsuspendCert0(caInfo.serialNumber(), true, event);
-        successful = true;
-      } finally {
-        finish(event, successful);
-      }
+    boolean succ = false;
+    try {
+      succ = publisherModule.publishCaUnrevoked();
+    } finally {
+      finish(event, succ);
     }
 
-    boolean succ = publisherModule.publishCaUnrevoked();
     if (!succ) {
       throw new OperationException(ErrorCode.SYSTEM_FAILURE,
-          "could not event caUnrevoked of CA " + caIdent + " to at least one publisher");
+          "could not publish event caUnrevoked of CA " + caIdent + " to at least one publisher");
     }
-
   } // method unrevokeCa
 
   private int revokeSuspendedCerts() throws OperationException {
@@ -324,7 +326,7 @@ public class X509RevokerModule extends X509CaModule implements Closeable {
   private int revokeSuspendedCerts0() throws OperationException {
     if (!masterMode) {
       throw new OperationException(ErrorCode.NOT_PERMITTED,
-          "CA could not remove expired certificates in slave mode");
+          "CA could not revoke suspended certificates in slave mode");
     }
 
     final int numEntries = 100;

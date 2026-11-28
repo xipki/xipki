@@ -97,7 +97,8 @@ class DigestDiffReporter implements Closeable {
   }
 
   public void addDiff(DigestEntry refCert, DigestEntry targetCert) throws IOException {
-    if (Args.notNull(refCert, "refCert").serialNumber().equals(
+    if (!Args.notNull(refCert, "refCert").serialNumber().equals(
+
         Args.notNull(targetCert, "targetCert").serialNumber())) {
       throw new IllegalArgumentException("refCert and targetCert are not of the same serialNumber");
     }

@@ -292,7 +292,8 @@ class CaHttpMgmtServlet {
           }
 
           if (cert != null) {
-            resp = new MgmtResponse.GetCert(cert.cert().cert(), null, null);
+            resp = new MgmtResponse.GetCert(cert.cert().cert(), cert.revInfo(),
+                cert.certprofile());
           } else {
             resp = new MgmtResponse.GetCert(null, null, null);
           }
@@ -583,13 +584,13 @@ class CaHttpMgmtServlet {
           .fillResponse(response);
     } catch (MyException ex) {
       Map<String, String> headers = Collections.singletonMap(
-          HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
+          HttpConstants.HEADER_XIPKI_ERROR, headerValue(ex.getMessage()));
 
       new HttpResponse(ex.status(), null, headers, null).fillResponse(response);
     } catch (CaMgmtException | CodecException ex) {
       LOG.error("CaMgmtException", ex);
       Map<String, String> headers = Collections.singletonMap(
-          HttpConstants.HEADER_XIPKI_ERROR, ex.getMessage());
+          HttpConstants.HEADER_XIPKI_ERROR, headerValue(ex.getMessage()));
 
       new HttpResponse(HttpStatusCode.SC_INTERNAL_SERVER_ERROR, null, headers, null)
           .fillResponse(response);
@@ -637,4 +638,22 @@ class CaHttpMgmtServlet {
     return MgmtRequest.Name.parse(json).name();
   } // method getNameFromRequest
 
+  private static final int MAX_HEADER_VALUE_LEN = 1000;
+
+  /**
+   * The text as value of an HTTP header: control characters (e.g. the line breaks of database
+   * messages) are replaced by spaces, the length is limited.
+   */
+  static String headerValue(String text) {
+    if (text == null) {
+      return null;
+    }
+    int len = Math.min(text.length(), MAX_HEADER_VALUE_LEN);
+    StringBuilder sb = new StringBuilder(len);
+    for (int i = 0; i < len; i++) {
+      char c = text.charAt(i);
+      sb.append((c < 0x20 || c == 0x7F) ? ' ' : c);
+    }
+    return sb.toString();
+  }
 }

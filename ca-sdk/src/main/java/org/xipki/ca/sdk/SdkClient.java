@@ -251,6 +251,7 @@ public class SdkClient {
     }
 
     EnrollOrPollCertsResponse.Entry rEntry = resp.entries()[0];
+    assertNoError(rEntry);
     return Optional.ofNullable(rEntry.cert()).orElseThrow(() ->
         new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func));
   }
@@ -271,10 +272,26 @@ public class SdkClient {
     }
 
     EnrollOrPollCertsResponse.Entry rEntry = resp.entries()[0];
+    assertNoError(rEntry);
     if (rEntry.cert() == null || rEntry.privateKey() == null) {
       throw new SdkErrorResponseException(ErrorCode.SYSTEM_FAILURE, "error " + func);
     }
     return new KeyCertBytesPair(rEntry.privateKey(), rEntry.cert());
+  }
+
+  /** Throws the error of the CA for this entry, with its code and message. */
+  private static void assertNoError(EnrollOrPollCertsResponse.Entry entry)
+      throws SdkErrorResponseException {
+    ErrorEntry error = entry.error();
+    if (error != null) {
+      ErrorCode code;
+      try {
+        code = ErrorCode.ofCode(error.code());
+      } catch (IllegalArgumentException ex) {
+        code = ErrorCode.SYSTEM_FAILURE;
+      }
+      throw new SdkErrorResponseException(code, error.message());
+    }
   }
 
   public byte[] enrollCert(String ca, String certprofile, byte[] p10Req)

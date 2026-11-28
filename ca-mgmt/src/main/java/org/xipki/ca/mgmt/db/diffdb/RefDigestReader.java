@@ -116,7 +116,9 @@ class RefDigestReader implements Closeable {
           }
 
           String hash =
-              (dbType == DbType.XIPKI_OCSP_v4)  ? rs.getString("HASH")
+              // HASH is CHAR(86): padded with spaces
+              (dbType == DbType.XIPKI_OCSP_v4)  ? rs.getString("HASH").trim()
+
               : (certhashAlgo == HashAlgo.SHA1) ? rs.getString("SHA1")
               : certhashAlgo.base64Hash(Base64.decodeFast(rs.getString("CERT")));
 
@@ -239,15 +241,10 @@ class RefDigestReader implements Closeable {
       caCert = X509Util.parseCert(StringUtil.toUtf8Bytes(rs.getString("CERT")));
       rs.close();
 
-      sql = "SELECT COUNT(*) FROM CERT WHERE " + colCaId + "=" + caId;
-      rs = stmt.executeQuery(sql);
-
-      totalAccount = rs.next() ? rs.getInt(1) : 0;
-      rs.close();
-
-      sql = "SELECT MIN(ID) FROM CERT WHERE " + colCaId + "=" + caId;
-      rs = stmt.executeQuery(sql);
-      minId = rs.next() ? rs.getLong(1) : 1;
+      // own statements: a PreparedStatement may not execute another SQL text
+      String criteria = colCaId + "=" + caId;
+      totalAccount = datasource.getCount(null, "CERT", criteria);
+      minId = datasource.getMin(null, "CERT", "ID", criteria);
 
       RefDigestReader reader = new RefDigestReader(datasource, caCert,
           totalAccount, minId, numBlocksToRead, stopMe);

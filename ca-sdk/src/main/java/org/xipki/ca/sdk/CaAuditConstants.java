@@ -74,9 +74,10 @@ public class CaAuditConstants {
 
   public static final String TYPE_revoke_ca = "revoke_ca";
 
-  public static final String TYPE_suspend_ca = "revoke_ca";
+  public static final String TYPE_suspend_ca = "suspend_ca";
 
-  public static final String TYPE_unsuspend_ca = "unrevoke_ca";
+  public static final String TYPE_unsuspend_ca = "unsuspend_ca";
+
 
   public static final String TYPE_revoke_suspendedCert = "revoke_suspended_cert";
 

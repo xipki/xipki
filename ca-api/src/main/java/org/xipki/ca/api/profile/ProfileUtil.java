@@ -337,7 +337,7 @@ public class ProfileUtil {
       if (maxLen != null && len > maxLen) {
         throw new BadCertTemplateException(String.format(
             "subject %s '%s' is too long (length (%d) > maxLen (%d))",
-            tmpText, tmpText, len, maxLen));
+            typeDesc, tmpText, len, maxLen));
       }
     }
 

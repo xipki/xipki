@@ -42,7 +42,8 @@ public class NotBeforeOption {
       long notOlderThan = (offsetSeconds != null && offsetSeconds < 0)
           ? nowSecond + offsetSeconds : nowSecond;
       long notBefore = Math.max(requestedNotBefore.getEpochSecond(), notOlderThan);
-      return (midNightTimeZone != null) ? setToMidnight(notBefore) : now;
+      return (midNightTimeZone != null) ? setToMidnight(notBefore)
+          : Instant.ofEpochSecond(notBefore);
     } else {
       return (midNightTimeZone != null) ? setToMidnight(nowSecond) : now.plusSeconds(offsetSeconds);
     }

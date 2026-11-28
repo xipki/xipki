@@ -352,7 +352,8 @@ class TargetDigestReader implements Closeable {
 
   private String getBase64HashValue(ResultSet rs) throws SQLException {
     if (dbType == DbType.XIPKI_OCSP_v4) {
-      return rs.getString("HASH");
+      // HASH is CHAR(86): padded with spaces
+      return rs.getString("HASH").trim();
     }
     if (certhashAlgo == HashAlgo.SHA1) {
       return rs.getString("SHA1");

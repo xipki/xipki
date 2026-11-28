@@ -174,12 +174,12 @@ public class IdentifiedCertprofile {
       for (ASN1ObjectIdentifier m : oids) {
         ExtensionControl control = controls.getControl(m);
         if (control == null) {
-          log.warn("ignore extension {}, it is defined in the profile", m.getId());
+          log.warn("ignore extension {}, it is not defined in the profile", m.getId());
         } else {
           if (control.isPermittedInRequest()) {
             requestedExtns.put(m, requestedExtensions.getExtension(m));
           } else {
-            log.warn("ignore extension {}, it is allowed in the request", m.getId());
+            log.warn("ignore extension {}, it is not allowed in the request", m.getId());
           }
         }
       }
@@ -492,7 +492,7 @@ public class IdentifiedCertprofile {
     if (certDomain == CertDomain.CABForumBR) {
       if (certLevel == CertLevel.RootCA || certLevel == CertLevel.SubCA) {
         if (!containsKeyusage(usageOccs, KeyUsage.cRLSign)) {
-          throw new CertprofileException("CA profile does contain keyUsage cRLSign");
+          throw new CertprofileException("CA profile does not contain keyUsage cRLSign");
         }
       } else if (certLevel == CertLevel.EndEntity) {
         if (containsKeyusage(usageOccs, KeyUsage.cRLSign)) {

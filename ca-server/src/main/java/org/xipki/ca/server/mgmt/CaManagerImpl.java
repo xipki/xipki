@@ -597,7 +597,8 @@ public class CaManagerImpl implements CaManager, Closeable {
       return masterMode ? CaSystemStatus.STARTED_AS_MASTER : CaSystemStatus.STARTED_AS_SLAVE;
     } else if (initializing) {
       return CaSystemStatus.INITIALIZING;
-    } else if (!caLockedByMe) {
+    } else if (!noLock && !caLockedByMe) {
+      // with noLock the system does not hold the lock, a failure is not a lock failure
       return CaSystemStatus.LOCK_FAILED;
     } else {
       return CaSystemStatus.ERROR;
@@ -1209,7 +1210,26 @@ public class CaManagerImpl implements CaManager, Closeable {
   @Override
   public void removeCa(String name) throws CaMgmtException {
     assertMasterMode();
+    name = Args.toNonBlankLower(name, "name");
+    NameId ident = idNameMap.getCa(name);
+    if (ident != null) {
+      // the certificates and CRLs of a CA are kept, a CA with them cannot be removed
+      long numCerts;
+      long maxCrlNumber;
+      try {
+        numCerts = certstore.getCountOfCerts(ident, false);
+        maxCrlNumber = certstore.getMaxCrlNumber(ident);
+      } catch (OperationException ex) {
+        throw new CaMgmtException(ex);
+      }
+      if (numCerts > 0 || maxCrlNumber > 0) {
+        throw new CaMgmtException("CA " + name + " has " + numCerts + " certificate(s)"
+            + (maxCrlNumber > 0 ? " and CRLs" : "") + " and cannot be removed; "
+            + "deactivate it instead (status inactive)");
+      }
+    }
     certstore.removeCa(name);
+
     ca2Manager.removeCa(name);
   }
 

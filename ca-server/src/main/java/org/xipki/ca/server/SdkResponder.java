@@ -191,6 +191,20 @@ public class SdkResponder {
         return new ErrorResponse(null, PATH_NOT_FOUND, "command is not specified");
       }
 
+      // the client is authenticated before the request is decoded and the CA is looked up:
+      // an unauthenticated client learns nothing about the CAs
+      X509Cert clientCert;
+      try {
+        clientCert = TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
+      } catch (IOException ex) {
+        LogUtil.error(LOG, ex, "error getTlsClientCert");
+        return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
+      }
+
+      if (clientCert == null) {
+        return new ErrorResponse(null, UNAUTHORIZED, "no client certificate");
+      }
+
       CaIdentifierRequest req = null;
       switch (command) {
         case CMD_poll_cert:
@@ -248,18 +262,6 @@ public class SdkResponder {
       if (ca.caInfo().status() != CaStatus.active) {
         return new ErrorResponse(null, PATH_NOT_FOUND,
             "CA '" + ca.caIdent().name() + "' is out of service");
-      }
-
-      X509Cert clientCert;
-      try {
-        clientCert = TlsHelper.getTlsClientCert(httpRequest, reverseProxyMode);
-      } catch (IOException ex) {
-        LogUtil.error(LOG, ex, "error getTlsClientCert");
-        return new ErrorResponse(null, UNAUTHORIZED, "error retrieving client certificate");
-      }
-
-      if (clientCert == null) {
-        return new ErrorResponse(null, UNAUTHORIZED, "no client certificate");
       }
 
       RequestorInfo requestor = ca.getRequestor(clientCert);
@@ -408,99 +410,100 @@ public class SdkResponder {
         if (entry.subjectPublicKey() != null) {
           publicKeyInfo = SubjectPublicKeyInfo.getInstance(entry.subjectPublicKey());
         }
+      }
 
-        if (reenroll) {
-          OldCertInfo oldCertInfo = entry.oldCertInfo();
+      // the old certificate is checked with and without CSR
+      if (reenroll) {
+        OldCertInfo oldCertInfo = entry.oldCertInfo();
 
-          if (oldCertInfo == null) {
-            throw new OperationException(BAD_CERT_TEMPLATE,
-                "Neither oldCertIsn nor oldCertSubject is specified in " +
-                "reenroll_cert command, but exactly one of them is permitted");
-          }
-
-          boolean reusePublicKey = oldCertInfo.isReusePublicKey();
-          String text;
-          CertWithRevocationInfo oldCert;
-
-          if (oldCertInfo.isn() != null) {
-            OldCertInfo.ByIssuerAndSerial ocIsn = oldCertInfo.isn();
-            String issuer;
-            try {
-              issuer = X509Util.x500NameText(ocIsn.issuer().toX500Name());
-            } catch (IOException ex) {
-              throw new OperationException(BAD_CERT_TEMPLATE,
-                  "Invalid oldIsn.issuer: " + ex.getMessage());
-            }
-            if (!issuer.equals(ca.caCert().subjectText())) {
-              throw new OperationException(UNKNOWN_CERT, "unknown issuer " + issuer);
-            }
-
-            BigInteger serialNumber = ocIsn.serialNumber();
-            text = "certificate with the issuer '" + issuer +
-                    "' and serial number " + serialNumber;
-            oldCert = ca.getCertWithRevocationInfo(serialNumber);
-          } else if (oldCertInfo.fsn() != null) {
-            OldCertInfo.BySha1FpAndSerial ocFsn = oldCertInfo.fsn();
-            String sha1Fp = Hex.encode(ocFsn.caCertSha1());
-            if (!sha1Fp.equalsIgnoreCase(ca.hexSha1OfCert())) {
-              throw new OperationException(UNKNOWN_CERT, "unknown issuer sha1fp" + sha1Fp);
-            }
-
-            BigInteger serialNumber = ocFsn.serialNumber();
-            text = "certificate with the issuer (sha1fp) '" + sha1Fp +
-                    "' and serial number " + serialNumber;
-            oldCert = ca.getCertWithRevocationInfo(serialNumber);
-          } else {
-            OldCertInfo.BySubject ocSubject = oldCertInfo.subject();
-            X500Name oldSubject = X500Name.getInstance(ocSubject.subject());
-            String subjectText = X509Util.x500NameText(oldSubject);
-            text = "certificate with subject '" + subjectText + "'";
-            oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.san());
-          }
-
-          if (oldCert == null) {
-            throw new OperationException(UNKNOWN_CERT, "found no " + text);
-          }
-
-          if (oldCert.isRevoked()) {
-            throw new OperationException(CERT_REVOKED, "could not update a revoked " + text);
-          }
-
-          if (profile == null) {
-            profile = oldCert.certprofile();
-            profiles.add(profile);
-          }
-
-          if (subject == null) {
-            subject = oldCert.cert().cert().subject();
-          }
-
-          if (publicKeyInfo == null && reusePublicKey) {
-            publicKeyInfo = oldCert.cert().cert().subjectPublicKeyInfo();
-          }
-
-          // extensions
-          Map<String, Extension> extns = new HashMap<>();
-          if (extensions != null) {
-            // add all requested extensions
-            ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
-            for (ASN1ObjectIdentifier oid : oids) {
-              extns.put(oid.getId(), extensions.getExtension(oid));
-            }
-          }
-
-          // extract extensions from the certificate
-          Extensions oldExtensions = oldCert.cert().cert().getCertHolder().getExtensions();
-          ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
-          for (ASN1ObjectIdentifier oid : oldOids) {
-            String id = oid.getId();
-            if (!(extns.containsKey(id) || reenrollCertExtnIds.contains(id))) {
-              extns.put(id, oldExtensions.getExtension(oid));
-            }
-          }
-
-          extensions = new Extensions(extns.values().toArray(new Extension[0]));
+        if (oldCertInfo == null) {
+          throw new OperationException(BAD_CERT_TEMPLATE,
+              "Neither oldCertIsn nor oldCertSubject is specified in " +
+              "reenroll_cert command, but exactly one of them is permitted");
         }
+
+        boolean reusePublicKey = oldCertInfo.isReusePublicKey();
+        String text;
+        CertWithRevocationInfo oldCert;
+
+        if (oldCertInfo.isn() != null) {
+          OldCertInfo.ByIssuerAndSerial ocIsn = oldCertInfo.isn();
+          String issuer;
+          try {
+            issuer = X509Util.x500NameText(ocIsn.issuer().toX500Name());
+          } catch (IOException ex) {
+            throw new OperationException(BAD_CERT_TEMPLATE,
+                "Invalid oldIsn.issuer: " + ex.getMessage());
+          }
+          if (!issuer.equals(ca.caCert().subjectText())) {
+            throw new OperationException(UNKNOWN_CERT, "unknown issuer " + issuer);
+          }
+
+          BigInteger serialNumber = ocIsn.serialNumber();
+          text = "certificate with the issuer '" + issuer +
+                  "' and serial number " + serialNumber;
+          oldCert = ca.getCertWithRevocationInfo(serialNumber);
+        } else if (oldCertInfo.fsn() != null) {
+          OldCertInfo.BySha1FpAndSerial ocFsn = oldCertInfo.fsn();
+          String sha1Fp = Hex.encode(ocFsn.caCertSha1());
+          if (!sha1Fp.equalsIgnoreCase(ca.hexSha1OfCert())) {
+            throw new OperationException(UNKNOWN_CERT, "unknown issuer sha1fp" + sha1Fp);
+          }
+
+          BigInteger serialNumber = ocFsn.serialNumber();
+          text = "certificate with the issuer (sha1fp) '" + sha1Fp +
+                  "' and serial number " + serialNumber;
+          oldCert = ca.getCertWithRevocationInfo(serialNumber);
+        } else {
+          OldCertInfo.BySubject ocSubject = oldCertInfo.subject();
+          X500Name oldSubject = X500Name.getInstance(ocSubject.subject());
+          String subjectText = X509Util.x500NameText(oldSubject);
+          text = "certificate with subject '" + subjectText + "'";
+          oldCert = ca.getCertWithRevocationInfoBySubject(oldSubject, ocSubject.san());
+        }
+
+        if (oldCert == null) {
+          throw new OperationException(UNKNOWN_CERT, "found no " + text);
+        }
+
+        if (oldCert.isRevoked()) {
+          throw new OperationException(CERT_REVOKED, "could not update a revoked " + text);
+        }
+
+        if (profile == null) {
+          profile = oldCert.certprofile();
+          profiles.add(profile);
+        }
+
+        if (subject == null) {
+          subject = oldCert.cert().cert().subject();
+        }
+
+        if (publicKeyInfo == null && reusePublicKey) {
+          publicKeyInfo = oldCert.cert().cert().subjectPublicKeyInfo();
+        }
+
+        // extensions
+        Map<String, Extension> extns = new HashMap<>();
+        if (extensions != null) {
+          // add all requested extensions
+          ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
+          for (ASN1ObjectIdentifier oid : oids) {
+            extns.put(oid.getId(), extensions.getExtension(oid));
+          }
+        }
+
+        // extract extensions from the certificate
+        Extensions oldExtensions = oldCert.cert().cert().getCertHolder().getExtensions();
+        ASN1ObjectIdentifier[] oldOids = oldExtensions.getExtensionOIDs();
+        for (ASN1ObjectIdentifier oid : oldOids) {
+          String id = oid.getId();
+          if (!(extns.containsKey(id) || reenrollCertExtnIds.contains(id))) {
+            extns.put(id, oldExtensions.getExtension(oid));
+          }
+        }
+
+        extensions = new Extensions(extns.values().toArray(new Extension[0]));
       }
 
       if (profile == null) {

@@ -75,7 +75,11 @@ class DigestDiff {
     this.refDbType = detectDbType(refDatasource);
     this.targetDbType = detectDbType(targetDatasource);
 
-    if (refDbType == DbType.XIPKI_OCSP_v4) {
+    // An OCSP database contains only the hash of the certificates (CERTHASH_ALGO), a CA
+    // database contains the certificates, from which any hash can be computed.
+    boolean refIsOcsp = refDbType == DbType.XIPKI_OCSP_v4;
+    boolean targetIsOcsp = targetDbType == DbType.XIPKI_OCSP_v4;
+    if (refIsOcsp && targetIsOcsp) {
       HashAlgo refAlgo = detectOcspDbCerthashAlgo(refDatasource);
       HashAlgo targetAlgo = detectOcspDbCerthashAlgo(targetDatasource);
       if (refAlgo != targetAlgo) {
@@ -84,6 +88,10 @@ class DigestDiff {
             "refDataSource (",refAlgo, ") and targetDataSource (", targetAlgo, ")"));
       }
       this.certhashAlgo = refAlgo;
+    } else if (refIsOcsp) {
+      this.certhashAlgo = detectOcspDbCerthashAlgo(refDatasource);
+    } else if (targetIsOcsp) {
+      this.certhashAlgo = detectOcspDbCerthashAlgo(targetDatasource);
     } else {
       this.certhashAlgo = HashAlgo.SHA1;
     }

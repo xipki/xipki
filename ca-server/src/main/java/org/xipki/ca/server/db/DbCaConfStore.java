@@ -723,25 +723,25 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
       // CAcert URIs
       List<String> uris = changeUris.cacertUris();
       if (uris != null) {
-        newCC.setCacertUris(uris.isEmpty() ? null : uris);
+        newCC.setCacertUris(isRemoveUris(uris) ? null : uris);
       }
 
       // CRL URIs
       uris = changeUris.crlUris();
       if (uris != null) {
-        newCC.setCrlUris(uris.isEmpty() ? null : uris);
+        newCC.setCrlUris(isRemoveUris(uris) ? null : uris);
       }
 
       // DeltaCRL URIs
       uris = changeUris.deltaCrlUris();
       if (uris != null) {
-        newCC.setDeltaCrlUris(uris.isEmpty() ? null : uris);
+        newCC.setDeltaCrlUris(isRemoveUris(uris) ? null : uris);
       }
 
       // OCSP URIs
       uris = changeUris.ocspUris();
       if (uris != null) {
-        newCC.setOcspUris(uris.isEmpty() ? null : uris);
+        newCC.setOcspUris(isRemoveUris(uris) ? null : uris);
       }
     }
 
@@ -1153,6 +1153,15 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
     return maxX500nameLen;
   }
 
+  /**
+   * Whether the URIs of a CA change mean "remove": empty, or only {@link CaManager#NULL} (an
+   * empty list cannot be transported, {@code CaUris} turns it into null = unchanged).
+   */
+  private static boolean isRemoveUris(List<String> uris) {
+    return uris.isEmpty()
+        || (uris.size() == 1 && CaManager.NULL.equalsIgnoreCase(uris.get(0)));
+  }
+
   private PreparedStatement prepareStatement(String sql) throws CaMgmtException {
     try {
       return datasource.prepareStatement(sql);
@@ -1246,7 +1255,8 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
 
     final String sql = buf.toString();
 
-    try (PreparedStatement ps = prepareStatement(sql)){
+    PreparedStatement ps = prepareStatement(sql);
+    try {
       Map<String, String> changedColumns = new HashMap<>();
 
       int index = 1;
@@ -1266,6 +1276,9 @@ public class DbCaConfStore extends QueryExecutor implements CaConfStore {
           tableName, whereColumn.name(), whereColumn.value(), changedColumns);
     } catch (SQLException ex) {
       throw new CaMgmtException(datasource.translate(sql, ex));
+    } finally {
+      // closes the statement and returns the connection to the pool
+      datasource.releaseResources(ps, null);
     }
   } // method changeIfNotNull
 
